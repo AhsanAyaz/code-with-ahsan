@@ -111,4 +111,5 @@ module.exports = {
       },
     },
   ],
+  pathPrefix: "/community-portfolio",
 }

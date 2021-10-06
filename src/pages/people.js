@@ -9,8 +9,8 @@ export default ({ data }) => {
   const people = data.allPeopleJson.edges || []
   return (
     <PageLayout>
-      <SEO title="People" />
-      <PageTitle title="People" />
+      <SEO title="Community" />
+      <PageTitle title="Community" />
       <Container className="text-left">
         <section>
           {people.map(({ node }) => (

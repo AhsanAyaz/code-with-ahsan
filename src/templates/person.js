@@ -14,9 +14,9 @@ export default data => {
         <Container className="text-justify">
           <div>Github Username: {githubUsername}</div>
           <h2>Projects</h2>
-          {projects.map(project => (
-            <div>
-              <a href={project.url} target="_blank" rel="noopener noreferer">
+          {projects.map((project, index) => (
+            <div key={index}>
+              <a href={project.url} target="_blank" rel="noopener noreferrer">
                 {project.name}
               </a>
             </div>
