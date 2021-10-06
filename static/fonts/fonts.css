@@ -1,0 +1,7 @@
+@font-face {
+  font-family: "Aurebesh";
+  font-weight: 400;
+  font-style: normal;
+  src: url("./Aurebesh/Aurebesh.woff") format("woff");
+  font-display: swap;
+}

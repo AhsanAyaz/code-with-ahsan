@@ -1,0 +1,203 @@
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";
+@import "colors";
+
+/*
+ * Theme definitions
+ */
+
+$themes: (
+  light: (
+    backgroundColor: white,
+    footerBackground: white,
+    navBackground: $gray-100,
+    secondary: $gray-900,
+    textColor: $black,
+    firstName: orange,
+    lastName: $black,
+    linkHover: $gray-800,
+    themeColor: $dark-blue,
+    heartColor: pink,
+    titleColor: $dark-blue,
+    hrefColor: $dark-blue,
+    github: $black,
+    linkedin: $linkedin-blue,
+    fcc: $fcc-green,
+    hr: $hr-green,
+    mail: $yellow,
+    file: $dark-blue,
+    iconBackground: $white,
+    cardBackground: $white,
+  ),
+  dark: (
+    backgroundColor: #222,
+    footerBackground: #222,
+    secondary: $gray-100,
+    navBackground: $dark-gray,
+    linkHover: $gray-200,
+    textColor: $gray-300,
+    firstName: $gray-100,
+    lastName: $empire-red,
+    titleColor: $white,
+    hrefColor: $faded-red,
+    themeColor: $dark-red,
+    heartColor: red,
+    github: $empire-red,
+    linkedin: $empire-red,
+    fcc: $empire-red,
+    hr: $empire-red,
+    mail: $empire-red,
+    file: $empire-red,
+    iconBackground: $black,
+    cardBackground: $dark-gray,
+  ),
+);
+
+/*
+ * Implementation of themes
+ */
+@mixin themify($themes) {
+  @each $theme, $map in $themes {
+    .theme-#{$theme} & {
+      $theme-map: () !global;
+      @each $key, $submap in $map {
+        $value: map-get(map-get($themes, $theme), "#{$key}");
+        $theme-map: map-merge(
+          $theme-map,
+          (
+            $key: $value,
+          )
+        ) !global;
+      }
+      @content;
+      $theme-map: null !global;
+    }
+  }
+}
+
+@function themed($key) {
+  @return map-get($theme-map, $key);
+}
+
+/** CUSTOM THEMING BEGIN */
+
+.first-name {
+  @include themify($themes) {
+    color: themed("firstName");
+  }
+}
+
+.last-name {
+  @include themify($themes) {
+    color: themed("lastName");
+  }
+}
+
+// header
+.navbar,
+.navbar div {
+  @include themify($themes) {
+    background: themed("navBackground");
+  }
+}
+
+.nav-links a {
+  @include themify($themes) {
+    color: themed("linkHover") !important;
+    &:hover {
+      text-decoration: underline themed("hrefColor") solid;
+    }
+  }
+}
+
+.footer {
+  @include themify($themes) {
+    background: themed("backgroundColor");
+  }
+}
+
+.heart {
+  @include themify($themes) {
+    color: themed("heartColor");
+  }
+}
+
+.watch-list-title {
+  @include themify($themes) {
+    color: themed("secondary");
+  }
+}
+
+.card-container {
+  @include themify($themes) {
+    width: 25rem;
+    height: 23rem;
+    text-decoration-color: themed("hrefColor");
+    & * {
+      background: themed("cardBackground");
+    }
+  }
+}
+
+.blog-filter {
+  @include themify($themes) {
+    & input {
+      color: themed("titleColor");
+      &:focus {
+        box-shadow: 0 0 0 1px rgba(themed("hrefColor"), 0.5);
+        border-color: rgba(themed("hrefColor"), 0.5);
+      }
+    }
+  }
+}
+
+.resume-tags {
+  @include themify($themes) {
+    background: themed("navBackground");
+  }
+}
+
+.icons:hover {
+  @include themify($themes) {
+    background: themed("iconBackground");
+    &.github {
+      color: themed("github");
+    }
+    &.linkedin {
+      color: themed("linkedin");
+    }
+    &.fcc {
+      color: themed("fcc");
+    }
+    &.hr {
+      color: themed("hr");
+    }
+    &.mail {
+      color: themed("mail");
+    }
+    &.file {
+      color: themed("file");
+    }
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  @include themify($themes) {
+    color: themed("titleColor");
+  }
+}
+
+div {
+  @include themify($themes) {
+    background: themed("backgroundColor");
+  }
+}
+
+p {
+  @include themify($themes) {
+    color: themed("textColor");
+  }
+}

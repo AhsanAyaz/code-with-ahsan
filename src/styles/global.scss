@@ -1,0 +1,107 @@
+@import "../../static/fonts/fonts.css";
+
+@import "themes";
+
+html,
+body {
+  margin: 0;
+  font-family: "Raleway", sans-serif;
+  font-display: swap;
+  height: 100%;
+  width: 100%;
+  // font-size: calc(16px * ((80vw - 700px) / (1600 - 400)));
+  // line-height: calc(1.3em + (1.5 - 1.2) * ((100vw - 300px) / (1600 - 300)));
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app-container * {
+  transition: color 0.45s ease-in-out;
+  transition: background 0.45s ease-in-out;
+}
+
+.bg-none {
+  background: rgba(0, 0, 0, 0) !important;
+}
+
+.aurebesh:hover {
+  font-family: "Aurebesh", sans-serif;
+  font-display: swap;
+}
+
+.i-5 {
+  text-indent: 5vmin;
+}
+
+/** Toggle Switch Styling START */
+.custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
+  border: none;
+  box-shadow: none;
+}
+
+.custom-control-input:focus ~ .custom-control-label::before {
+  box-shadow: none;
+}
+
+.custom-control-input ~ .custom-control-label {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+// light mode
+.custom-control-input ~ .custom-control-label::before {
+  border-color: $yellow;
+  background-color: $yellow;
+}
+
+.custom-switch .custom-control-input ~ .custom-control-label::after {
+  background-color: $white;
+}
+
+// dark mode
+.custom-control-input:checked ~ .custom-control-label::before {
+  border-color: $black;
+  background-color: $black;
+}
+
+.custom-switch .custom-control-input:checked ~ .custom-control-label::after {
+  background-color: $red;
+}
+/** Toggle Switch Styling END */
+
+/** Home Page Icon Styling START */
+.icons-container a {
+  margin: 0 1rem;
+}
+
+.icons {
+  font-size: 3.75rem;
+  margin: 0.1rem;
+  color: $gray-600;
+}
+
+.brand-icon {
+  font-size: 2.75rem;
+  color: $gray-700;
+  &:hover {
+    color: $faded-red;
+  }
+  &.empire {
+    border-radius: 50%;
+    color: $white;
+    background: $black;
+    &:hover {
+      color: $black;
+      background: $white;
+    }
+  }
+}
+/** Home Page Icon Styling END */
+
+.unemployed {
+  font-size: 1.35rem;
+}
