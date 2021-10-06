@@ -7,10 +7,10 @@
 module.exports = {
   /* Your site config here */
   siteMetadata: {
-    title: `John Doe`,
-    author: `John Doe`,
-    firstName: `John`,
-    lastName: `Doe`,
+    title: `Code with Ahsan`,
+    author: `Code with Ahsan`,
+    firstName: `Code with`,
+    lastName: `Ahsan`,
     description: `John Doe's personal site`,
     occupation: `Software Engineer`,
     keywords: [`John`, `Doe`, `Personal`, `Blog`, `Resume`, `Projects`, `Work`],
@@ -59,6 +59,7 @@ module.exports = {
     ],
   },
   plugins: [
+    `gatsby-transformer-json`,
     `gatsby-plugin-preload-link-crossorigin`,
     `gatsby-plugin-catch-links`,
     {
@@ -66,6 +67,14 @@ module.exports = {
       options: {
         name: "src",
         path: `${__dirname}/src/`,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `data`,
+        path: `${__dirname}/src/data/`,
+        ignore: [`**/\.*`], // ignore f
       },
     },
     `gatsby-plugin-sass`,

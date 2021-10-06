@@ -17,12 +17,15 @@ export default ({ data }) => {
           width="150"
           height="150"
           fluid
-          src={dark ? `../../icons/darth-vader.png` : `../../icons/r2-d2.png`}
+          src={dark ? `../../images/cwa.png` : `../../images/cwa.png`}
           alt={dark ? "Darth Vader" : "R2-D2"}
         />
         {unemployed && (
           <p className="mt-2">
-            <b> Hey! I am looking for new opportunities :)</b>
+            <b>
+              {" "}
+              Learning amazing things, meeting amazing people, everyday! :)
+            </b>
           </p>
         )}
         <Container className="py-0 my-0">
@@ -37,8 +40,8 @@ export default ({ data }) => {
           </h1>
           <p>
             <i>
-              {occupation} by day,&nbsp;
-              {dark ? `Imperial enforcer by night` : `Rebel scum by night`}
+              The one stop shop to have fun with amazing people, and to code of
+              course.
             </i>
           </p>
         </Container>

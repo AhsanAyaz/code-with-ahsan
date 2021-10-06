@@ -38,8 +38,41 @@ exports.createPages = async ({ graphql, actions }) => {
           }
         }
       }
+      allPeopleJson {
+        edges {
+          node {
+            id
+            projects {
+              name
+              url
+            }
+            name
+            githubUsername
+          }
+        }
+      }
     }
   `)
+
+  result.data.allPeopleJson.edges.forEach(({ node }) => {
+    const { githubUsername, name, projects } = node
+    createPage({
+      path: `people/${githubUsername}`,
+      component: path.resolve(
+        path.join(__dirname, "./src/templates/person.js")
+      ),
+      context: {
+        //   Data passed to context is available in page queries as graphql variables
+        slug: `people/${githubUsername}`,
+        templatePath: path.resolve(
+          path.join(__dirname, "./src/templates/person.js")
+        ),
+        name,
+        githubUsername,
+        projects,
+      },
+    })
+  })
 
   result.data.allMarkdownRemark.edges.forEach(({ node }) => {
     const contentType = node.fields.slug.split(`/`)[1]
