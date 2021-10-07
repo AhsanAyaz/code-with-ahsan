@@ -36,6 +36,8 @@ export const query = graphql`
           projects {
             name
             url
+            description
+            imageUrl
           }
           name
           githubUsername

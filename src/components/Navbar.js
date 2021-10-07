@@ -4,6 +4,7 @@ import { Navbar, Nav, Form } from "react-bootstrap"
 import { Link } from "gatsby"
 import "./Fontawesome.js"
 import { Image } from "react-bootstrap"
+import logo from "../../static/images/cwa.png"
 export default () => {
   const { dark, toggleDark, toString } = useContext(ThemeContext)
   return (
@@ -14,8 +15,8 @@ export default () => {
           width="20"
           height="20"
           fluid
-          src={dark ? `images/cwa.png` : `images/cwa.png`}
-          alt={dark ? "Darth Vader" : "R2-D2"}
+          src={logo}
+          alt={"CWA Logo"}
         />
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />

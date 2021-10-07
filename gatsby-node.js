@@ -45,6 +45,8 @@ exports.createPages = async ({ graphql, actions }) => {
             projects {
               name
               url
+              description
+              imageUrl
             }
             name
             githubUsername
