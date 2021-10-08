@@ -12,7 +12,7 @@ export default ({ data }) => {
   return (
     <PageLayout>
       <SEO title="Home" />
-      <Container className="text-center pt-5 mt-5" fluid>
+      <Container className="text-center mt-5" fluid>
         <Image
           width="150"
           height="150"
@@ -48,7 +48,7 @@ export default ({ data }) => {
         <hr className="my-3 w-25" />
         <div className="d-md-inline-flex icons-container">
           <a
-            href="https://www.github.com"
+            href="https://www.github.com/ahsanayaz"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -59,7 +59,7 @@ export default ({ data }) => {
             />
           </a>
           <a
-            href="https://linkedin.com"
+            href="https://linkedin.com/in/ahsanayaz"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -92,7 +92,7 @@ export default ({ data }) => {
             />
           </a>
           <a
-            href="mailto:johndoe@gmail.com"
+            href="mailto:ahsan.ubitian@gmail.com"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -100,13 +100,6 @@ export default ({ data }) => {
               icon={["fas", "envelope"]}
               className="icons mail"
               title="e-mail"
-            />
-          </a>
-          <a href="../../resume.pdf" target="_blank" download>
-            <FontAwesomeIcon
-              icon={["fas", "file-alt"]}
-              className="icons file"
-              title="Resume"
             />
           </a>
         </div>
