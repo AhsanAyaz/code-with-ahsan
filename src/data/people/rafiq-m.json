@@ -1,0 +1,18 @@
+{
+    "githubUsername": "rafiq-m",
+    "name": "Muhammad Rafiq",
+    "projects": [
+      {
+        "url": "https://github.com/rafiq-m/CS-CPP-Compiler",
+        "name": "CS-CPP COMPILER",
+        "description": "This project was created as a part of course project, Compiler which is a combination of C# and C++ language, I did Lexical, syntax and semantic Analysis in this project",
+        "imageUrl": ""
+      },
+      {
+        "url": "https://github.com/rafiq-m/General-Ecommerce-Website",
+        "name": "ECOMMERCE WESBITE – LAPTOP SELL/PURCHASE",
+        "description": "This website is made using React as a frontend library, and .NET Core on the backend, Also I integrated stripe payment API, SQLite database is used to store all the orders and its details, It can be used for the purchase and selling of different types of laptops",
+        "imageUrl": ""
+      }
+    ]
+  }
