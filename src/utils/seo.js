@@ -7,9 +7,10 @@ import { useStaticQuery, graphql } from "gatsby"
 
 const SEO = ({ description, lang, meta, image: img, title, pathname }) => {
   const { site } = useStaticQuery(query)
-
+  const defaultImage = `${site.siteMetadata.siteUrl}/images/cwa-banner.jpeg`
   const metaDescription = description || site.siteMetadata.description
-  const image = img && img.src ? `${site.siteMetadata.siteUrl}${img.src}` : null
+  const image =
+    img && img.src ? `${site.siteMetadata.siteUrl}${img.src}` : defaultImage
 
   const canonical = pathname ? `${site.siteMetadata.siteUrl}${pathname}` : null
 

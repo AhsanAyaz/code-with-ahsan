@@ -2,7 +2,7 @@ See me [live!](https://codewithahsan.org)
 
 ## codewithahsan.org
 
-<img src="./assets/cwa-banner.jpeg" alt="Code With Ahsan Banner" width="700">
+<img src="./static/images/cwa-banner.jpeg" alt="Code With Ahsan Banner" width="700">
 
 ## 📋 Starter README
 
