@@ -11,9 +11,16 @@ module.exports = {
     author: `Code with Ahsan`,
     firstName: `Code with`,
     lastName: `Ahsan`,
-    description: `John Doe's personal site`,
+    description: `The most welcoming, interactive, and amazing developers community that helps you grow`,
     occupation: `Software Engineer`,
-    keywords: [`John`, `Doe`, `Personal`, `Blog`, `Resume`, `Projects`, `Work`],
+    keywords: [
+      `CodeWithAhsan`,
+      `Ahsan Ayaz`,
+      `Community`,
+      `Blog`,
+      `Contribution`,
+      `Software Development`,
+    ],
     siteUrl:
       process.env.URL || process.env.DEPLOY_URL || `http://localhost:8000`,
     unemployed: true,
@@ -84,12 +91,12 @@ module.exports = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `John Doe's Personal Site`,
-        short_name: `J.Doe`,
-        description: `This is my personal site.`,
+        name: `Code with Ahsan`,
+        short_name: `CWA`,
+        description: `The most welcoming, interactive, and amazing developers community that helps you grow`,
         start_url: `/`,
         background_color: `#fff`,
-        theme_color: `#fff`,
+        theme_color: `#6f42c1`,
         display: `standalone`,
         icon: `${__dirname}/static/images/cwa.png`, // This path is relative to the root of the site.
       },
