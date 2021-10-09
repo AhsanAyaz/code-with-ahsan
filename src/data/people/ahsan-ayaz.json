@@ -1,12 +1,11 @@
-[
-  {
+{
     "githubUsername": "ahsanayaz",
     "name": "Muhammad Ahsan Ayaz",
     "projects": [
       {
         "url": "https://github.com/KoderLabs/ngx-device-detector",
         "name": "Ngx Device Detector",
-        "description": "",
+        "description": "An Angular 6+ powered AOT compatible device detector that helps to identify browser, os and other useful information regarding the device using the app. The processing is based on user-agent.",
         "imageUrl": "https://repository-images.githubusercontent.com/73164717/a62c4100-f4ca-11e9-9425-7f132463cd5e"
       },
       {
@@ -32,31 +31,6 @@
         "name": "Ngx Device Detector",
         "description": "",
         "imageUrl": "https://repository-images.githubusercontent.com/73164717/a62c4100-f4ca-11e9-9425-7f132463cd5e"
-      },
-      {
-        "url": "https://github.com/KoderLabs/ngx-device-detector",
-        "name": "Ngx Device Detector",
-        "description": "",
-        "imageUrl": "https://repository-images.githubusercontent.com/73164717/a62c4100-f4ca-11e9-9425-7f132463cd5e"
-      }
-    ]
-  },
-  {
-    "githubUsername": "arsalan98m",
-    "name": "Muhammad Arsalan Manzoor",
-    "projects": [
-      {
-        "url": "https://tesla-clone-331cd.web.app/",
-        "name": "Tesla HomePage Clone",
-        "description": "React, React Reveal, Material UI",
-        "imageUrl": "https://tesla-cdn.thron.com/delivery/public/image/tesla/32e5e0f3-5c04-42ef-8f8f-c6b1c26f8a9e/bvlatuR/std/2880x1800/ms-main-hero-desktop"
-      },
-      {
-        "url": "https://whatsapp-clone-49ffa.web.app/",
-        "name": "WhatsApp Clone",
-        "description": "React, Redux, Material UI, Firebase",
-        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeTehMHMn3p6FqNFrVMw7cB7S9An_2Q0LgXg&usqp=CAU"
       }
     ]
   }
-]
