@@ -111,5 +111,5 @@ module.exports = {
       },
     },
   ],
-  pathPrefix: "/community-portfolio",
+  pathPrefix: "/cwa-web",
 }
