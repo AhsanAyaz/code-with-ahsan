@@ -29,7 +29,7 @@ export default ({ data }) => {
 
 export const query = graphql`
   query {
-    allPeopleJson {
+    allPeopleJson(filter : { show : { ne: false } }) {
       edges {
         node {
           id
