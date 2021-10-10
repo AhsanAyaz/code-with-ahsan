@@ -186,7 +186,7 @@ div {
   }
 }
 
-p {
+p, .cardTitle {
   @include themify($themes) {
     color: themed("textColor");
   }
