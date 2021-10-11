@@ -20,10 +20,8 @@ $themes: (
     titleColor: $purple,
     hrefColor: $purple,
     github: $black,
-    linkedin: $linkedin-blue,
-    fcc: $fcc-green,
-    hr: $hr-green,
-    mail: $yellow,
+    facebook: $facebook-blue,
+    twitch: $twitch,
     file: $purple,
     iconBackground: $white,
     cardBackground: $white,
@@ -42,10 +40,8 @@ $themes: (
     themeColor: $dark-red,
     heartColor: red,
     github: $empire-red,
-    linkedin: $empire-red,
-    fcc: $empire-red,
-    hr: $empire-red,
-    mail: $empire-red,
+    facebook: $facebook-blue,
+    twitch: $twitch,
     file: $empire-red,
     iconBackground: $black,
     cardBackground: $dark-gray,
@@ -162,17 +158,11 @@ $themes: (
     &.github {
       color: themed("github");
     }
-    &.linkedin {
-      color: themed("linkedin");
+    &.facebook {
+      color: themed("facebook");
     }
-    &.fcc {
-      color: themed("fcc");
-    }
-    &.hr {
-      color: themed("hr");
-    }
-    &.mail {
-      color: themed("mail");
+    &.twitch {
+      color: themed("twitch");
     }
     &.file {
       color: themed("file");
@@ -196,7 +186,7 @@ div {
   }
 }
 
-p {
+p, .cardTitle {
   @include themify($themes) {
     color: themed("textColor");
   }

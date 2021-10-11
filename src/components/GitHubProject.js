@@ -9,7 +9,7 @@ const GitHubProject = ({ project }) => {
     <Card>
       {project.imageUrl && <Card.Img variant="top" src={project.imageUrl} />}
       <Card.Body>
-        <Card.Title>{project.name}</Card.Title>
+        <Card.Title className='cardTitle'>{project.name}</Card.Title>
         {project.description && <Card.Text>{project.description}</Card.Text>}
         <Button variant="primary" onClick={openProject}>
           Open Project

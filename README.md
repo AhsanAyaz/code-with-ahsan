@@ -1,10 +1,8 @@
-See me [live!](https://gatsby-starter-portfolio.herokuapp.com/)
+See me [live!](https://codewithahsan.org)
 
-## Usage
+## codewithahsan.org
 
-`npm i -g gatsby-cli`\
-`gatsby new your-site-name https://github.com/surudhb/gatsby-personal-site-template.git`\
-`cd your-site-name && gatsby develop`
+<img src="./static/images/cwa-banner.jpeg" alt="Code With Ahsan Banner" width="700">
 
 ## 📋 Starter README
 

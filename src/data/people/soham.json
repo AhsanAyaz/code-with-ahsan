@@ -1,0 +1,13 @@
+{
+    "githubUsername": "sohamdata",
+    "name": "Soham Datta",
+    "projects": [
+        {
+            "url": "https://github.com/sohamdata/website",
+            "name": "My website",
+            "description": "Just for fun",
+            "imageUrl": "https://sohamdatta.tk/"
+        }
+    ],
+    "show": false
+}

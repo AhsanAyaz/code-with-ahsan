@@ -48,7 +48,29 @@ export default ({ data }) => {
         <hr className="my-3 w-25" />
         <div className="d-md-inline-flex icons-container">
           <a
-            href="https://www.github.com/ahsanayaz"
+            href="https://twitch.tv/CodeWithAhsan"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FontAwesomeIcon
+              icon={["fab", "twitch"]}
+              className="icons twitch"
+              title="Twitch"
+            />
+          </a>
+          <a
+            href="https://facebook.com/codewithahsan"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FontAwesomeIcon
+              icon={["fab", "facebook"]}
+              className="icons facebook"
+              title="Facebook"
+            />
+          </a>
+          <a
+            href="https://github.com/code-with-ahsan"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -56,50 +78,6 @@ export default ({ data }) => {
               icon={["fab", "github"]}
               className="icons github"
               title="Github"
-            />
-          </a>
-          <a
-            href="https://linkedin.com/in/ahsanayaz"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FontAwesomeIcon
-              icon={["fab", "linkedin"]}
-              className="icons linkedin"
-              title="LinkedIn"
-            />
-          </a>
-          <a
-            href="https://www.freecodecamp.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FontAwesomeIcon
-              icon={["fab", "free-code-camp"]}
-              className="icons fcc"
-              title="FreeCodeCamp"
-            />
-          </a>
-          <a
-            href="https://www.hackerrank.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FontAwesomeIcon
-              icon={["fab", "hackerrank"]}
-              className="icons hr"
-              title="Hackerrank"
-            />
-          </a>
-          <a
-            href="mailto:ahsan.ubitian@gmail.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FontAwesomeIcon
-              icon={["fas", "envelope"]}
-              className="icons mail"
-              title="e-mail"
             />
           </a>
         </div>
