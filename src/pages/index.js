@@ -31,7 +31,7 @@ export default ({ data }) => {
         <Container className="py-0 my-0">
           <h1
             style={{
-              fontSize: "5rem",
+              fontSize: "4rem",
               color: "black",
             }}
           >
