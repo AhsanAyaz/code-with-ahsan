@@ -11,8 +11,9 @@ export default ({ data }) => {
   const { dark } = useContext(ThemeContext)
   return (
     <PageLayout>
-      <SEO title="Home" />
-      <Container className="text-center mt-5" fluid>
+      <SEO title="Home"/>
+      
+      <Container className="text-center mt-5 parent-container" fluid>
         <Image
           width="150"
           height="150"
@@ -28,7 +29,7 @@ export default ({ data }) => {
             </b>
           </p>
         )}
-        <Container className="py-0 my-0">
+        <Container className="py-0 my-0 name-container">
           <h1
             style={{
               fontSize: "5rem",

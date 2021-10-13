@@ -9,7 +9,7 @@ export default () => {
   const { dark, toggleDark, toString } = useContext(ThemeContext)
   return (
     <Navbar variant={toString()} fixed="top" collapseOnSelect expand="md">
-      <Navbar.Brand className="pl-5 ml-5" as={Link} to="/">
+      <Navbar.Brand className="pl-5 ml-5 navbar-link" as={Link} to="/">
         <Image
           id="appLogo"
           width="20"
