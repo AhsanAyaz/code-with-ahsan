@@ -1,27 +1,26 @@
 {
-    "githubUsername": "Darainn",
-    "name": "Syed Darain",
-    "projects": [
-      {
-        "url": "https://github.com/Darainn/_Readosphere",
-        "name": "Readosphere",
-        "description": "The website showing various collection of books and information about their authors."
-      },
-      {
-        "url": "https://github.com/Darainn/Visual-Programming-Project",
-        "name": "Driver Drowsiness",
-        "description": "A driver drowsiness application using python libraries (Streamlit , OPENCV , keras)."
-      },
-      {
-        "url": "https://github.com/Darainn/ReactJS-Project",
-        "name": "React Website",
-        "description": "A simple project on REACTJS using React Hooks , Routing , Components , Props etc."
-      },
-      {
-        "url": "https://github.com/Darainn/ngrx-app",
-        "name": "Angular Ngrx - Todo",
-        "description": "A simple todo app using ngrx-angular"
-      }
-    ]
-  }
-  
+  "githubUsername": "Darainn",
+  "name": "Syed Darain",
+  "projects": [
+    {
+      "url": "https://github.com/Darainn/_Readosphere",
+      "name": "Readosphere",
+      "description": "The website showing various collection of books and information about their authors."
+    },
+    {
+      "url": "https://github.com/Darainn/Visual-Programming-Project",
+      "name": "Driver Drowsiness",
+      "description": "A driver drowsiness application using python libraries (Streamlit , OPENCV , keras)."
+    },
+    {
+      "url": "https://github.com/Darainn/ReactJS-Project",
+      "name": "React Website",
+      "description": "A simple project on REACTJS using React Hooks , Routing , Components , Props etc."
+    },
+    {
+      "url": "https://github.com/Darainn/ngrx-app",
+      "name": "Angular Ngrx - Todo",
+      "description": "A simple todo app using ngrx-angular"
+    }
+  ]
+}
