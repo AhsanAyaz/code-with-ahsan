@@ -7,7 +7,7 @@ const GitHubProject = ({ project }) => {
   }
   return (
     <Card>
-      {project.imageUrl && <Card.Img variant="top" src={project.imageUrl} />}
+      {project.imageUrl && <Card.Img variant="top" src={project.imageUrl} onClick={openProject} style={{cursor: "pointer"}}/>}
       <Card.Body>
         <Card.Title className='cardTitle'>{project.name}</Card.Title>
         {project.description && <Card.Text>{project.description}</Card.Text>}
