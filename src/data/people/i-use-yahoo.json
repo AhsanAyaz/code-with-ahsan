@@ -1,0 +1,12 @@
+{
+    "githubUsername": "iUseYahoo",
+    "name": "iUseYahoo",
+    "projects": [
+        {
+            "url": "https://yahoos-dumb-counter.netlify.app/",
+            "name": "The Dumb Counter",
+            "description": "Number Counter via clicking.",
+            "imageUrl": ""
+        }
+    ]
+}
