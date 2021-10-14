@@ -107,6 +107,13 @@ body {
   font-size: 1.35rem;
 }
 
+@media screen and (max-width: 770px){
+  .footer-div{
+    margin-top: 20px !important;
+
+  }
+}
+
 
 
 @media screen and (max-width: 600px){
@@ -123,6 +130,7 @@ body {
     padding: 0px !important;
     margin-left: 20px !important;
   }
+
 }
 
 @media screen and (max-width: 400px){
@@ -140,6 +148,10 @@ body {
 
   .name-container > h1{
     line-height: 0.875em;
+  }
+
+  .twitch, .github, .facebook{
+    font-size: 2.5rem;
   }
 
 }
