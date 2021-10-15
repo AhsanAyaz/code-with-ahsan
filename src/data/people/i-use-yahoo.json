@@ -6,7 +6,11 @@
             "url": "https://yahoos-dumb-counter.netlify.app/",
             "name": "The Dumb Counter",
             "description": "Number Counter via clicking.",
-            "imageUrl": ""
+        },
+        {
+          "url": "https://github.com/iUseYahoo/GeForce-GPU-Checker",
+          "name": "GeForceG GPU Checker",
+          "description": "GeForce GPU Card 3090 and 3080 Checker"
         }
     ]
 }
