@@ -1,0 +1,15 @@
+.peoplecontainer {
+  padding: 2rem 0;
+  @media (min-width: 720px) {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+    place-items: center;
+    gap: 3rem;
+  }
+
+  @media (min-width: 1170px) {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

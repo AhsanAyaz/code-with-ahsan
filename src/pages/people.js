@@ -12,7 +12,7 @@ export default ({ data }) => {
       <SEO title="Community" />
       <PageTitle title="Community" />
       <Container className="text-left">
-        <section>
+        <section className="peoplecontainer">
           {people.map(({ node }) => (
             <Person
               key={node.id}
@@ -29,7 +29,7 @@ export default ({ data }) => {
 
 export const query = graphql`
   query {
-    allPeopleJson(filter : { show : { ne: false } }) {
+    allPeopleJson(filter: { show: { ne: false } }) {
       edges {
         node {
           id

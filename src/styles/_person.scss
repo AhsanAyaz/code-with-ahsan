@@ -1,0 +1,30 @@
+.person {
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  margin-bottom: 2rem;
+  border-radius: 6px;
+  transition: all ease-in-out 0.5s !important;
+  min-height: 300px;
+  padding: 2rem;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    transform: scale(1.05);
+  }
+
+  img {
+    width: 50%;
+    border-radius: 50%;
+    border: 2px solid #6f42c1;
+  }
+
+  h2 {
+    color: #6f42c1;
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+
+  @media (min-width: 720px) {
+    margin: 0;
+  }
+}
