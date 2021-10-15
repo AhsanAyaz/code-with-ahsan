@@ -106,3 +106,62 @@ body {
 .unemployed {
   font-size: 1.35rem;
 }
+
+@media screen and (max-width: 770px){
+  .footer-div{
+    margin-top: 20px !important;
+
+  }
+}
+
+
+
+@media screen and (max-width: 600px){
+  .first-name, .last-name{
+    font-size: 4rem;
+  }
+
+  .parent-container{
+    padding: 1em;
+    margin: 0px !important;
+  }
+
+  .navbar-link{
+    padding: 0px !important;
+    margin-left: 20px !important;
+  }
+
+}
+
+@media screen and (max-width: 400px){
+  .first-name, .last-name{
+    font-size: 3.2rem;
+  }
+
+  .parent-container{
+    padding: 0em;
+  }
+
+  .footer-div{
+    padding: 1em 1em;
+  }
+
+  .name-container > h1{
+    line-height: 0.875em;
+  }
+
+  .twitch, .github, .facebook{
+    font-size: 2.5rem;
+  }
+
+}
+
+@media screen  and (max-width: 300px){
+  .first-name, .last-name{
+    font-size: 2.8rem;
+  }
+
+  .name-container{
+    padding: 0px !important;
+  }
+}
