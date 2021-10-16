@@ -45,6 +45,7 @@ $themes: (
     file: $empire-red,
     iconBackground: $black,
     cardBackground: $dark-gray,
+    cardBackgroundColor: $devil-gray,
   ),
 );
 
@@ -189,5 +190,11 @@ div {
 p, .cardTitle {
   @include themify($themes) {
     color: themed("textColor");
+  }
+}
+
+.card {
+  @include themify($themes) {
+    background-color: themed("cardBackgroundColor");
   }
 }
