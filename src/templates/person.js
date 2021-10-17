@@ -1,6 +1,7 @@
 import React from "react"
 import { Col, Row } from "react-bootstrap"
 import Container from "react-bootstrap/Container"
+import { Image } from "react-bootstrap"
 import { PageLayout, PageTitle } from "../components"
 import GitHubProject from "../components/GitHubProject"
 
@@ -11,7 +12,8 @@ export default data => {
   return (
     <PageLayout>
       <SEO title={name} description={`${name}'s Portfolio`} />
-      <Container className="text-center pt-5 mt-5" fluid>
+      <Container className="text-center pt-5" fluid>
+        <Image src={`https://github.com/${githubUsername}.png`} width="200" style={{borderRadius: "50%"}}/>
         <a
           href={`https://github.com/${githubUsername}`}
           target="_blank"
