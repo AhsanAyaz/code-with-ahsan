@@ -4,6 +4,7 @@ import Container from "react-bootstrap/Container"
 import { Image } from "react-bootstrap"
 import { PageLayout, PageTitle } from "../components"
 import GitHubProject from "../components/GitHubProject"
+import githublogo from "../../static/images/github-logo.png"
 
 import SEO from "../utils/seo"
 
@@ -13,13 +14,26 @@ export default data => {
     <PageLayout>
       <SEO title={name} description={`${name}'s Portfolio`} />
       <Container className="text-center pt-5" fluid>
-        <Image src={`https://github.com/${githubUsername}.png`} width="200" style={{borderRadius: "50%"}}/>
+        <Image
+          src={`https://github.com/${githubUsername}.png`}
+          width="200"
+          style={{ borderRadius: "50%" }}
+        />
+
+        <PageTitle title={name} />
         <a
           href={`https://github.com/${githubUsername}`}
           target="_blank"
           rel="noreferrer noopener"
         >
-          <PageTitle title={name} />
+          <Image
+            id="GithubLogo"
+            width="50"
+            height="50"
+            fluid
+            src={githublogo}
+            alt={"Github Logo"}
+          />
         </a>
         <Container className="text-center mt-5" fluid>
           <h3 className="mb-4">Projects</h3>
