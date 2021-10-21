@@ -8,7 +8,7 @@ export default ({ name, githubUsername }) => {
       <Link to={`/people/${githubUsername}`} style={{ textDecoration: "none" }}>
         <img
           src="https://www.pngarts.com/files/3/Boy-Avatar-PNG-Transparent-Image.png"
-          alt=""
+          alt={name}
         />
         <h2 className="mt-5">{name}</h2>
       </Link>

@@ -7,12 +7,13 @@ import Person from "../components/Person"
 
 export default ({ data }) => {
   const people = data.allPeopleJson.edges || []
+
   return (
     <PageLayout>
       <SEO title="Community" />
       <PageTitle title="Community" />
       <Container className="text-left">
-        <section className="peoplecontainer">
+        <section className="people-container">
           {people.map(({ node }) => (
             <Person
               key={node.id}
