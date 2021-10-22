@@ -5,7 +5,7 @@ import { SEO, Utils } from "../utils"
 import Container from "react-bootstrap/Container"
 
 export default ({ data }) => {
-  const allProjects = data.allMarkdownRemark.edges || []
+  const allProjects = data.allMdx.edges || []
   const allFeaturedImages = data.allFile.edges || []
   const regex = /\/[projects].*\/|$/
   const featuredImageMap = Utils.getImageMap(allFeaturedImages, regex, true, 3)
@@ -36,7 +36,7 @@ export default ({ data }) => {
 
 export const query = graphql`
   query {
-    allMarkdownRemark(
+    allMdx(
       filter: { fileAbsolutePath: { regex: "/projects/" } }
       sort: { fields: [frontmatter___date], order: DESC }
     ) {
