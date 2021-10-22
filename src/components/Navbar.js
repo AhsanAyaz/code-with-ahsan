@@ -42,10 +42,7 @@ export default () => {
           </Nav.Link>
           {/* <Nav.Link className="ms-2" as={Link} to="/projects" title="Projects">
             Projects
-          </Nav.Link>
-          <Nav.Link className="ms-2" as={Link} to="/resume" title="Resume">
-            Resume
-          </Nav.Link> */}
+          </Nav.Link>*/}
           <Form className="my-auto">
             <Form.Check
               type="switch"
