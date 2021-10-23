@@ -11,8 +11,20 @@ export default ({ data }) => {
     <PageLayout>
       <SEO title="Community" />
       <PageTitle title="Community" />
-      <Container className="text-left">
-        <section>
+      <Container
+        className="text-left"
+        style={{
+          padding: "1rem 0"
+        }}
+      >
+        <section 
+        style={{
+          display: "grid",
+          placeItems: "center",
+          gridTemplateColumns: "repeat(auto-fill, minmax(16rem, 1fr))",
+          gridTemplateRows: "20rem",
+          gap: "1.5rem"
+        }}> 
           {people.map(({ node }) => (
             <Person
               key={node.id}
@@ -29,7 +41,7 @@ export default ({ data }) => {
 
 export const query = graphql`
   query {
-    allPeopleJson(filter : { show : { ne: false } }) {
+    allPeopleJson(filter: { show: { ne: false } }) {
       edges {
         node {
           id
