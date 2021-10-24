@@ -1,0 +1,22 @@
+{
+  "githubUsername": "taimooralqureshi",
+  "name": "Taimoor Qureshi",
+  "projects": [
+    {
+      "url": "https://github.com/taimooralqureshi/Internet-Service-Provider-app",
+      "name": "Internet Service Provider App",
+      "description": "ISP CRM and Accounting app developed using MERN(Mysql + ExpressJS + ReactJS + NodeJS) stack"
+    },
+    {
+      "url": "https://github.com/taimooralqureshi/scrapify",
+      "name": "Scrapify",
+      "description": "its a scraping lib internal parser engine. tried to implement the under the hood HTML parser of beautiful soup lib."
+    },
+    {
+      "url": "https://github.com/taimooralqureshi/NewtonRaphsonSolver",
+      "name": "Newton Raphson Solver",
+      "description": "A GUI base desktop Application develop on Python Tkinter framework. A Numerical Computing application to solve numerical expression of any type."
+    }
+  ],
+  "show": true
+}
