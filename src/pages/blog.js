@@ -11,7 +11,7 @@ export default ({ data }) => {
   })
 
   const allFeaturedImages = data.allFile.edges || []
-  const allPosts = data.allMarkdownRemark.edges || []
+  const allPosts = data.allMdx.edges || []
   const regex = /\/[blog].*\/|$/
   const featuredImageMap = Utils.getImageMap(allFeaturedImages, regex)
 
@@ -77,7 +77,7 @@ export default ({ data }) => {
 
 export const query = graphql`
   query {
-    allMarkdownRemark(
+    allMdx(
       filter: { fileAbsolutePath: { regex: "/blog/" } }
       sort: { fields: [frontmatter___date], order: DESC }
     ) {

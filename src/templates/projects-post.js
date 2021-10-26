@@ -14,7 +14,7 @@ const SubTitle = ({ tags }) => (
 )
 
 export default ({ data }) => {
-  const post = data.markdownRemark
+  const post = data.mdx
   return (
     <PostTemplate
       title={post.frontmatter.title}
@@ -27,7 +27,7 @@ export default ({ data }) => {
 
 export const query = graphql`
   query($slug: String!) {
-    markdownRemark(fields: { slug: { eq: $slug } }) {
+    mdx(fields: { slug: { eq: $slug } }) {
       html
       frontmatter {
         title

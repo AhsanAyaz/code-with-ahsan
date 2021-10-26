@@ -76,43 +76,6 @@ export default ({ data }) => {
             what's recently caught my eye!
           </p>
         </article>
-        <article className="w-75 m-auto">
-          {unemployed && (
-            <>
-              <hr />
-              <p className="unemployed">
-                <small>
-                  I am <b>currently looking for new opportunities</b>! If you
-                  like what you <Link to="/resume">see</Link>, let's get
-                  in&nbsp;
-                  <a
-                    href="mailto:red.five@rebellion.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    touch
-                  </a>
-                  !
-                </small>
-              </p>
-            </>
-          )}
-          <hr />
-          <h5 className="watch-list-title pt-4">
-            Here are a couple of books from my reading list:
-          </h5>
-          <ul style={{ fontSize: "0.9rem", listStyle: "none" }}>{bookLinks}</ul>
-          <h5 className="watch-list-title pt-4">
-            Here are a couple of shows from my watch list:
-          </h5>
-          <ul style={{ fontSize: "0.9rem", listStyle: "none" }}>{showLinks}</ul>
-          <h5 className="watch-list-title pt-4">
-            Here are a couple of movies from my watch list:
-          </h5>
-          <p>
-            <i>...waaaay too many to list.</i>
-          </p>
-        </article>
       </Container>
     </PageLayout>
   )

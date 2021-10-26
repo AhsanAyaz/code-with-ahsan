@@ -8,8 +8,14 @@ import logo from "../../static/images/cwa.png"
 export default () => {
   const { dark, toggleDark, toString } = useContext(ThemeContext)
   return (
-    <Navbar variant={toString()} fixed="top" collapseOnSelect expand="md">
-      <Navbar.Brand className="pl-5 ml-5 navbar-link" as={Link} to="/">
+    <Navbar
+      className="ps-3 pe-3 pe-sm-5 ps-sm-5"
+      variant={toString()}
+      fixed="top"
+      collapseOnSelect
+      expand="md"
+    >
+      <Navbar.Brand as={Link} to="/">
         <Image
           id="appLogo"
           width="20"
@@ -25,22 +31,19 @@ export default () => {
         className="justify-content-end"
       >
         <Nav className="nav-links">
-          {/* <Nav.Link className="ml-2" as={Link} to="/blog" title="Blog">
+          {/* <Nav.Link className="ms-2" as={Link} to="/blog" title="Blog">
             Blog
           </Nav.Link>
-          <Nav.Link className="ml-2" as={Link} to="/about" title="About">
+          <Nav.Link className="ms-2" as={Link} to="/about" title="About">
             About
           </Nav.Link> */}
-          <Nav.Link className="ml-2" as={Link} to="/people" title="Community">
+          <Nav.Link className="ms-2" as={Link} to="/people" title="Community">
             Community
           </Nav.Link>
-          {/* <Nav.Link className="ml-2" as={Link} to="/projects" title="Projects">
+          {/* <Nav.Link className="ms-2" as={Link} to="/projects" title="Projects">
             Projects
-          </Nav.Link>
-          <Nav.Link className="ml-2" as={Link} to="/resume" title="Resume">
-            Resume
-          </Nav.Link> */}
-          <Form className="ml-3 my-auto">
+          </Nav.Link>*/}
+          <Form className="my-auto">
             <Form.Check
               type="switch"
               id="custom-switch"

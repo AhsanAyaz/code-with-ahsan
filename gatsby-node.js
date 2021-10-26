@@ -7,7 +7,7 @@ const getContentType = node =>
   node.fileAbsolutePath.match(/content(.*)/)[0].split(`/`)[1]
 
 exports.onCreateNode = ({ node, getNode, actions }) => {
-  if (node.internal.type === "MarkdownRemark") {
+  if (node.internal.type === "Mdx") {
     const contentType = getContentType(node)
     const path = `content/${contentType}/`
     const { createNodeField } = actions
@@ -28,7 +28,7 @@ exports.createPages = async ({ graphql, actions }) => {
   const { createPage } = actions
   const result = await graphql(`
     query {
-      allMarkdownRemark {
+      allMdx {
         edges {
           node {
             fields {
@@ -76,7 +76,7 @@ exports.createPages = async ({ graphql, actions }) => {
     })
   })
 
-  result.data.allMarkdownRemark.edges.forEach(({ node }) => {
+  result.data.allMdx.edges.forEach(({ node }) => {
     const contentType = node.fields.slug.split(`/`)[1]
     if (requiresTemplate.includes(contentType)) {
       createPage({
