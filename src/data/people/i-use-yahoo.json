@@ -11,6 +11,11 @@
         "url": "https://github.com/iUseYahoo/GeForce-GPU-Checker",
         "name": "GeForce GPU Checker",
         "description": "GeForce GPU Card 3090 and 3080 Checker."
+      },
+      {
+        "url": "https://github.com/iUseYahoo/GoogleForm-Spammer",
+        "name": "Google Forms Spammer",
+        "description": "Spams google forms with POST requests."
       }
     ]
   }
