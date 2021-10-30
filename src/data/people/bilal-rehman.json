@@ -5,12 +5,14 @@
      {
         "url":"https://github.com/BilalRehman08/Nodejs-Mongoose-with-Axios",
         "name":"Social App",
-        "description":"Social App with Nodejs and Mongodb"
+        "description":"Social App with Nodejs and Mongodb",
+        "imageUrl":""
      },
      {
         "url":"https://github.com/BilalRehman08/Getx-Todo.git",
         "name":"Getx App",
-        "description":"Getx App with Firebase Authentication and CRUD functionality"
+        "description":"Getx App with Firebase Authentication and CRUD functionality",
+        "imageUrl":""
      }
   ]
 }
