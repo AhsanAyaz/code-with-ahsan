@@ -1,0 +1,13 @@
+{
+    "githubUsername": "YOUR_GITHUB_USERNAME",
+    "name": "YOUR_NAME",
+    "projects": [
+      {
+        "url": "YOUR_PROJECT_URL",
+        "name": "YOUR_PROJECT_NAME",
+        "description": "YOUR_PROJECT_DESCRIPTION",
+        "imageUrl": "YOUR_PROJECT_IMAGE_URL"
+      }
+    ],
+    "show": false
+  }

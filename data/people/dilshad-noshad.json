@@ -1,0 +1,18 @@
+{
+    "githubUsername": "DilshadNoshad",
+    "name": "Muhammad Dilshad Noshad",
+    "projects": [
+      {
+        "url": "https://github.com/DilshadNoshad/new-version_CMS",
+        "name": "New Version-Blogging CMS",
+        "description": "PHP, Boostrap, Blogging CMS",
+        "imageUrl": "https://i.ibb.co/h1YhQG3/site-logo-D.png"
+      },
+      {
+        "url": "https://dilshadnoshad.github.io/Login_page_version-1/",
+        "name": "Admin Login page V1",
+        "description": "Javascript, HTML, CSS, Responsive, Modern Design",
+        "imageUrl": "https://i.ibb.co/rQfKrDF/admin-login-img.png"
+      }
+    ]
+  }
