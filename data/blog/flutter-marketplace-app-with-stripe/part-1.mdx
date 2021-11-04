@@ -1,0 +1,581 @@
+---
+title: Flutter Marketplace app with Stripe Connect - Part 1
+date: 2021-05-04 00:00:00
+author: Muhammad Ahsan Ayaz
+images: ['/static/images/flutter-marketplace-app-with-stripe-connect-part-1/thumbnail.png']
+description: In this series of blog posts, you'll learn how to configure Payments using
+  Stripe Connect for a marketplace app built with Flutter. Specifically in Part
+  1, we're going to cover Stripe configuration and Seller Registration
+tags:
+  - flutter
+  - stripe
+  - payments
+  - dart
+  - mobile development
+---
+
+<header>
+  In this series of blog posts, you'll learn how to configure Payments using Stripe Connect for a
+  marketplace app built with Flutter. I'll also be working on a video tutorial series as well. Which
+  will be more detailed and hands-on. This article series is for those of you who love reading and
+  following articles instead. Find the links below for the code repositories:
+  <ul className="mt-20">
+    <li>
+      <a href="https://github.com/AhsanAyaz/flutter_stripe_connect">Flutter Stripe Connect App</a>
+    </li>
+    <li>
+      <a href="https://github.com/AhsanAyaz/stripe-connect-backend">Stripe Connect Backend</a>
+    </li>
+  </ul>
+</header>
+<PromotionBanner title="Would rather see a video tutorial? I got you covered 👌<br/>Watch it below 👇"></PromotionBanner>
+<EmbeddedYouTubeVideo src="https://www.youtube.com/embed/R2Okg53lUv8" />
+<hr />
+
+## Stripe account & marketplace configuration
+
+First of all, log into your Stripe account. Once logged in, go to the
+[Stripe Dashboard](https://dashboard.stripe.com/dashboard). From the left nav
+items, click **View test data** to make sure we're viewing the Dashboard in
+**Test Mode** as shown in [Figure 1.1](#figure-1.1). This is important so we can
+build the app in Test Mode, and make some test transactions without having to
+actually pay anything.
+
+<ImageWithBg
+  title="View test data in stripe dashboard"
+  alt="View test data in stripe dashboard"
+  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/view-test-data.png"
+  caption="Figure 1.1"
+  backgroundColor="transparent"
+/>
+
+Once done, go to the
+[Developers > API Keys](https://dashboard.stripe.com/test/apikeys) page to get
+your **Publishable key** and your **Secret Key** as shown in
+[Figure 1.2](#figure-1.2). You'll need these later in the tutorial.
+
+<ImageWithBg
+  title="Get stripe keys"
+  alt="Get stripe keys image"
+  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/get-stripe-keys.png"
+  caption="Figure 1.2"
+  backgroundColor="transparent"
+/>
+
+Now, go to the
+[Stripe Connect Settings](https://dashboard.stripe.com/test/settings/applications)
+page and fill the **Branding** information according to your business details.
+It's great that Stripe provides this configuration so when the user/seller signs
+up, the onboarding flow feels natural and consistent with our business's
+branding and colors. [Figure 1.3](#figure-1.3) shows how I have configured it
+for my test application named **"Panda Gums"**. Make sure to click the **Save
+branding changes** button once you're done.
+
+<ImageWithBg
+  title="Set branding info"
+  alt="Set branding info image"
+  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/set-branding-info.png"
+  caption="Figure 1.3"
+  backgroundColor="transparent"
+/>
+
+Now that we have set up the branding information, we need to enable **Express
+Checkout** for our country so we can work with test seller accounts created in
+our country. In order to do so, scroll above to the **Availability** section on
+the same Settings page and click the **Manage** link as shown in
+[Figure 1.4](#figure-1.4).
+
+<ImageWithBg
+  title="Manage express accounts availability"
+  alt="Manage express accounts availability image"
+  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/manage-availibility.png"
+  caption="Figure 1.4"
+  backgroundColor="transparent"
+/>
+
+Now that you are on the
+[Express Accounts Settings Page](https://dashboard.stripe.com/test/settings/applications/express),
+check your desired country for which you'll create the seller accounts. Make
+sure to enable **Transfers**, **Payments**, and **Cards** capabilities for the
+same country as shown in [Figure 1.5](#figure-1.5) and
+[Figure 1.6](#figure-1.6). Once done, scroll to the bottom of the page and click
+the **Save** button.
+
+<ImageWithBg
+  title="Enable your country in Stripe"
+  alt="Enable your country in Stripe image"
+  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/enable-your-country.png"
+  caption="Figure 1.5"
+  backgroundColor="transparent"
+/>
+<ImageWithBg
+  title="Enable card payments for country"
+  alt="Enable card payments for country image"
+  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/enable-card-payments.png"
+  caption="Figure 1.6"
+  backgroundColor="transparent"
+/>
+
+## Running the Stripe Backend server locally
+
+Make sure you have [NodeJS](https://nodejs.org/en/) and
+[Git](https://git-scm.com/downloads) installed in your system. Then clone the
+backend code from the
+[repository](https://github.com/AhsanAyaz/stripe-connect-backend) by running the
+following command in your terminal:
+
+```bash
+git clone https://github.com/AhsanAyaz/stripe-connect-backend.git
+```
+
+Once cloned, navigate to the project folder and install the dependencies by
+running the command:
+
+```bash
+yarn
+## OR
+npm install
+```
+
+Then follow the instructions in the backend project's
+[Readme](https://github.com/AhsanAyaz/stripe-connect-backend#readme) file to set
+up the Environment variables. Essentially, you need to create the `.env.local`
+file in project root and set the following variables:
+
+```
+// .env.local
+STRIPE_API_SECRET=YOUR_STRIPE_SECRET_KEY
+NEXT_PUBLIC_STRIPE_API_PUBLIC=YOUR_STRIPE_PUBLIC_KEY
+NEXT_PUBLIC_APP_SCHEME=pandagums
+NEXT_PUBLIC_HOST=http://localhost:3000
+STRIPE_APP_FEE=1.23
+```
+
+Once done, run the backend server by running the following command:
+
+```bash
+yarn dev
+## OR
+npm run dev
+```
+
+This should start the backend server at
+[http://localhost:3000](http://localhost:3000). The API routes in the backend
+project are avaible at **http://localhost:3000/api/\***. We don't essentially
+need to code anything for the backend in this tutorial. Everything is already
+set up. The specific API endpoint we're going to use in this article is
+`GET http://localhost:3000/api/stripe/account`. And the code for this API
+resides
+[here in the stripe-connect-backend project](https://github.com/AhsanAyaz/stripe-connect-backend/blob/main/pages/api/stripe/account/index.js).
+Let's have a look at it.
+
+```javascript {2,3,8-24}
+// pages/api/stripe/account/index.js
+const stripe = require("stripe")(process.env.STRIPE_API_SECRET)
+const host = process.env.NEXT_PUBLIC_HOST
+
+const stripeAccount = async (req, res) => {
+  const { method } = req
+  if (method === "GET") {
+    // CREATE CONNECTED ACCOUNT
+    const { mobile } = req.query
+    const account = await stripe.accounts.create({
+      type: "express",
+    })
+    const accountLinks = await stripe.accountLinks.create({
+      account: account.id,
+      refresh_url: `${host}/api/stripe/account/reauth?account_id=${account.id}`,
+      return_url: `${host}/register${mobile ? "-mobile" : ""}?account_id=${
+        account.id
+      }&result=success`,
+      type: "account_onboarding",
+    })
+    if (mobile) {
+      // In case of request generated from the flutter app, return a json response
+      res.status(200).json({ success: true, url: accountLinks.url })
+    }
+    else {
+      // In case of request generated from the web app, redirect
+      res.redirect(accountLinks.url)
+    }
+  }
+  else if (method === "DELETE") {...} else if (method === "POST") {...}
+}
+
+export default stripeAccount
+```
+
+Note that we use the [Stripe NodeJS](https://github.com/stripe/stripe-node)
+package/sdk to connect with stripe using the `STRIPE_API_SECRET`.
+
+We first create the
+[Account object](https://stripe.com/docs/api/accounts/object) using the
+`stripe.accounts.create()` method. Then we create the
+[Account Link](https://stripe.com/docs/api/account_links) object using the
+`stripe.accountLinks.create()` method. Note that we provide the `account_id`
+from Account Object, the `refresh_url`, the `type` set to
+`'account_onboarding'`, and the `return_url` to this method. And we then return
+the `url` received with the Account Link object back to the Flutter app. More on
+this in a
+[later section](#understanding-seller-registration-via-stripe-connect-onboarding).
+
+## Getting started with the Flutter marketplace app
+
+Run the following commands to clone the project from the
+[repository](https://github.com/AhsanAyaz/flutter-stripe-connect) and to
+checkout the `start-here` branch:
+
+```bash
+git clone https://github.com/AhsanAyaz/flutter-stripe-connect
+
+git checkout start-here
+```
+
+Assuming you already have set up Flutter in your machine, open the project in
+Android Studio or your favorite editor. Install the dependencies of the Flutter
+project by running the following command in your project:
+
+```bash
+flutter pub get
+```
+
+Now run the project your Android Emulator or AVD. Once done successfully, you
+should be able to see the app running as shown in [Figure 1.7](#figure-1.7).
+
+<ImageWithBg
+  title="App start state"
+  alt="App start state image"
+  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/app-start-state.png"
+  caption="Figure 1.7"
+  imageHeight="500"
+  backgroundColor="transparent"
+/>
+
+As you can see in [Figure 1.7](#figure-1.7), we have a marketplace app named
+**Panda Gums**. There will be Merchants/Sellers registered within this
+marketplace. And there will be Customers paying for products from these sellers.
+In this part, we'll only focus on registering Sellers/Merchants in the app.
+
+<div id="understanding-seller-registration-via-stripe-connect-onboarding" />
+
+## Understanding Seller Registration via Stripe Connect Onboarding
+
+The Seller registration flow includes a couple of things as shown in
+[Figure 1.8](#figure-1.8).
+
+<ImageWithBg
+  title="Sellers onboarding flow"
+  alt="Sellers onboarding flow image"
+  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/stripe-connect-onboarding-flow.jpg"
+  caption="Figure 1.8"
+  backgroundColor="transparent"
+/>
+
+Essentially, the steps are as follows:
+
+1. Our Flutter app sends a request to our NodeJS Backend API
+2. The NodeJS backend receives the request and uses the
+   [Stripe NodeJS SDK](https://github.com/stripe/stripe-node) to create a Stripe
+   Account for the Seller. In return, the backend receives the
+   [Account object](https://stripe.com/docs/api/accounts/object).
+3. The backend then uses the ID from the Seller's Account object to create an
+   [Account Link](https://stripe.com/docs/api/account_links) using the Stripe
+   SDK. This Account Link grants the Seller's account to access the
+   Stripe-hosted Connect Onboarding later. In response of the Account Link
+   creation, we receive the
+   [Account Link object](https://stripe.com/docs/api/account_links/object) from
+   Stripe.
+4. We use the `url` property from the
+   [Account Link object](https://stripe.com/docs/api/account_links/object)
+   received, and send it back to the Flutter app.
+5. The Flutter app opens the
+   [Account Link URL](https://stripe.com/docs/api/account_links/object#account_link_object-url)
+   into the mobile's browser using the
+   [url_launcher](https://pub.dev/packages/url_launcher) flutter package.
+6. In the Browser, we go through the entire Stripe Connect Onboarding flow. And
+   Stripe provides a great way of using Test Data when we're working in the Test
+   mode.
+7. Finally, when the seller has entered all the required information and has
+   completed the onboarding flow, we land on the
+   [return_url](https://stripe.com/docs/api/account_links/create#create_account_link-return_url).
+   Which is configured in our
+   [NodeJS Backend](https://github.com/AhsanAyaz/stripe-connect-backend/blob/main/pages/api/stripe/account/index.js#L14)
+   for when we create the Account Link. And that's basically a web page served
+   by our backend itself.
+8. The web page we land on in Step 7 contains a button that says **Continue in
+   App**. We click it and that deep links into our Flutter app to open a new app
+   page containing the success message.
+
+## Let's write some Code, Yeah?
+
+### Seller registration flow
+
+Now that we understand how the Seller's Registration flow works, let's jump into
+the code. We'll begin with creating a Service in our Flutter application to
+communicate with the NodeJS backend.
+
+In the Flutter app project, create a new folder inside the `lib` folder named
+`services`. If you're using Android Studio, you can right click on the `lib`
+folder, hover on the option `New`, and click on `Package` to create the folder.
+Inside the folder, create a file named `stripe-backend-service.dart` and add the
+following code:
+
+```dart
+// lib/services/stripe-backend-service.dart
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+import '../constants.dart';
+
+class CreateAccountResponse {
+  late String url;
+  late bool success;
+
+  CreateAccountResponse(String url, bool success) {
+    this.url = url;
+    this.success = success;
+  }
+}
+
+class CheckoutSessionResponse {
+  late Map<String, dynamic> session;
+
+  CheckoutSessionResponse(Map<String, dynamic> session) {
+    this.session = session;
+  }
+}
+
+class StripeBackendService {
+  static String apiBase = '$BACKEND_HOST/api/stripe';
+  static String createAccountUrl =
+      '${StripeBackendService.apiBase}/account?mobile=true';
+  static Map<String, String> headers = {'Content-Type': 'application/json'};
+
+  static Future<CreateAccountResponse> createSellerAccount() async {
+    var url = Uri.parse(StripeBackendService.createAccountUrl);
+    var response = await http.get(url, headers: StripeBackendService.headers);
+    Map<String, dynamic> body = jsonDecode(response.body);
+    return new CreateAccountResponse(body['url'], true);
+  }
+}
+```
+
+#### Installing and configuring url_launcher
+
+Install the [url_launcher](https://pub.dev/packages/url_launcher) package in the
+flutter app project by running the following command in the project root:
+
+```bash
+flutter pub add url_launcher
+## Based on your editor, you might also want to run `flutter pub get`
+```
+
+Now open the file `android/app/src/main/AndroidManifest.xml` and update to add
+the `<queries>` object as follows:
+
+```xml {4-17}
+// android/app/src/main/AndroidManifest.xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.flutter_stripe_connect">
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="pandagums" />
+        </intent>
+    </queries>
+   <application
+        android:label="flutter_stripe_connect"
+        android:icon="@mipmap/ic_launcher">
+        ...
+    </application>
+</manifest>
+```
+
+This makes sure that our Flutter app can open `http://`, `https://` and
+`pandagums://` links in the browser using the
+[url_launcher](https://pub.dev/packages/url_launcher) package. The
+[Account Link object](https://stripe.com/docs/api/account_links/object) that we
+receive from Stripe has the `https://` scheme. Therefore, this step is
+important.
+
+> Note: After the above change, the app needs a full restart. Restart the app
+> before proceeding with further steps.
+
+#### Using the url_launcher package to open Account Link URL
+
+Open the file `lib/pages/register.dart` and modify it as follows:
+
+```dart {5,6,30-33}
+// lib/pages/register.dart
+import 'dart:developer';
+import 'package:flutter/material.dart';
+import 'package:sn_progress_dialog/progress_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_stripe_connect/services/stripe-backend-service.dart';
+
+class RegisterSeller extends StatefulWidget {
+  @override
+  _RegisterSellerState createState() => _RegisterSellerState();
+}
+
+class _RegisterSellerState extends State<RegisterSeller> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Register as Seller"),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () async {
+            ProgressDialog pd = ProgressDialog(context: context);
+            pd.show(
+              max: 100,
+              msg: 'Please wait...',
+              progressBgColor: Colors.transparent,
+            );
+            try {
+              CreateAccountResponse response = await StripeBackendService.createSellerAccount();
+              pd.close();
+              await canLaunch(response.url) ? await launch(response.url) : throw 'Could not launch URL';
+            } catch (e) {
+              log(e.toString());
+              pd.close();
+            }
+          },
+          child: Text('Register with Stripe'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+The preceding change ultimately results in calling our Backend API and recieving
+the Account Link URL. Notice that we call the methods `canLaunch()` and
+`launch()` from the `url_launcher` package. And we provide `response.url` to
+these methods to identify if our app can open the link in the browser .
+
+If you go to the
+[Connected Accounts page](https://dashboard.stripe.com/test/connect/accounts/overview)
+in the Stripe dashboard, you'll see that there are currently no connected
+accounts as shown in [Figure 1.9](#figure-1.9).
+
+<ImageWithBg
+  title="No Connected Accounts"
+  alt="No Connected Accounts image"
+  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/no-connected-accounts.png"
+  caption="Figure 1.9"
+  backgroundColor="transparent"
+/>
+
+Now open the Flutter app and go to the Registration page by tapping the
+**Register as Seller** card from the home page. Then tap the **Register with
+Stripe** button. Ideally, it should open the Stripe Connect Onboarding flow in
+the mobile's browser as shown in [Figure 1.10](#figure-1.10).
+
+<ImageWithBg
+  title="Sellers onboarding flow"
+  alt="Sellers onboarding flow image"
+  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/use-test-phone.png"
+  caption="Figure 1.10"
+  imageHeight="500"
+  backgroundColor="transparent"
+/>
+
+> Note: You might encounter the following `SocketException` error when working
+> with Android:
+>
+> ```
+> SocketException: OS Error: Connection refused, errno = 111, address = localhost, port = 43248
+> ```
+>
+> What you need to do is expose the port `3000` to the Android emulator by using
+> the following command:
+>
+> ```bash
+> adb reverse tcp:3000 tcp:3000
+> ```
+
+Once you have the Onboarding flow opened in the Browser, tap the **the test
+phone number** link there to use the Stripe-provided test phone number. Then
+enter your Stripe email (the real one) for the Stripe account you're using right
+now.
+
+> Note: We need the **real email** for this step as Stripe will ask you to log
+> into your account for this step.
+
+Once you've successfully logged in, Stripe will redirect you back to the
+Onboarding flow. Use the Test code and test data provided by Stripe in all the
+following steps. Make sure the **Country** you select is the one we enabled
+Payments for in the initial Stripe configuration step.
+
+Fill all the values (dummy values) i.e. the name, birth date, address in the
+form as shown in [Figure 1.11](#figure-1.11). Also, select the **Industry** and
+write a dummy **Business Website** when prompted.
+
+<ImageWithBg
+  title="Dummy values in onboarding"
+  alt="Dummy values in onboarding image"
+  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/dummy-form-values.png"
+  imageHeight="500"
+  caption="Figure 1.11"
+  backgroundColor="transparent"
+/>
+
+Use the **test account** when asked for Bank Details. And finally, review the
+information and hit the **Submit** button. You should be redirected to a
+[web page](http://localhost:3000/register-mobile?result=success) served by our
+backend as shown in [Figure 1.12](#figure-1.12). Notice that we have a button
+with text **Continue in App**. Ideally, pressing this button should open up the
+app and show us a new page with success message. However, that's not the case
+since we haven't implemented
+[Deep linking](https://flutter.dev/docs/development/ui/navigation/deep-linking)
+yet.
+
+<ImageWithBg
+  title="Onboarding result redirect"
+  alt="Onboarding result redirect image"
+  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/registration-redirect.png"
+  imageHeight="500"
+  caption="Figure 1.12"
+  backgroundColor="transparent"
+/>
+
+Even though we're not finished yet with the tutorial, we have made some great
+progress. If you go to the
+[Connected Accounts](https://dashboard.stripe.com/test/connect/accounts/overview)
+page now, you should be able to see the newly registered connected account.
+Click on it and you should see the account details as shown in
+[Figure 1.13](#figure-1.13)
+
+<ImageWithBg
+  title="Seller account created"
+  alt="Seller account created image"
+  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/seller-account-created.png"
+  caption="Figure 1.13"
+  backgroundColor="transparent"
+/>
+
+And that is it for this article. See the next section to summarize what we've
+learnt today.
+
+## Conclusion
+
+In this article, you learnt how to configure Stripe Connect in the Stripe
+Dashboard. And you learnt how to use http calls in our Flutter App, via our
+backend to create Connected Accounts for Sellers in Stripe. Ultimately, we are
+able to create Connected Accounts. And they can receive payments. However, in
+terms of user-experience for the Seller registration, our tutorial isn't
+finished yet. And we'll continue with it in the next part. Stay tuned, and as
+always, Happy Coding 🙌🏼!
+
+Akso, make sure to share this article on your social media to help others 😎.

@@ -1,0 +1,167 @@
+---
+title: Angular Unit Tests with Jest - This constructor is not compatible with Angular Dependency Injection
+date: 2021-03-07 15:00:00
+author: Muhammad Ahsan Ayaz
+description: In this article, you'll fix the error "This constructor is not compatible with Angular Dependency Injection" when working with Jest for unit tests.
+tags:
+  - angular
+  - testing
+  - jest
+---
+
+<IonicCourse />
+<header>
+  In this short article, you'll learn how to fix this annyoing issue in Angular when you're starting
+  to implement component unit tests with Jest that have dependencies. Or you might be just migrating
+  away from Jasmine and Karma.
+</header>
+
+## What the error?
+
+If you have an Angular component that depends on a service, and you've just migrated to Jest from Jasmine and Karma,
+you might see something as follows if you've missed one critical step:
+
+```bash
+This constructor is not compatible with Angular Dependency Injection because its dependency at index 0 of the parameter list is invalid.
+    This can happen if the dependency type is a primitive like a string or if an ancestor of this class is missing an Angular decorator.
+
+    Please check that 1) the type for the parameter at index 0 is correct and 2) the correct Angular decorators are defined for this class and its ancestors.
+
+      at ɵɵinvalidFactoryDep (../packages/core/src/di/injector_compatibility.ts:112:9)
+```
+
+## Example:
+
+Let's suppose we have a component named `WatchComponent` as follows:
+
+```typescript
+import { Component, OnInit } from '@angular/core'
+import { WatchService } from 'src/app/services/watch.service'
+
+@Component({
+  selector: 'app-watch',
+  templateUrl: './watch.component.html',
+  styleUrls: ['./watch.component.scss'],
+})
+export class WatchComponent implements OnInit {
+  time: string
+
+  constructor(private watchService: WatchService) {}
+
+  ngOnInit(): void {
+    this.time = this.watchService.getTime()
+  }
+
+  startTimer() {
+    this.watchService.startTimer()
+  }
+
+  stopTimer() {
+    this.watchService.stopTimer()
+  }
+
+  resetTimer() {
+    this.watchService.resetTimer()
+  }
+}
+```
+
+And we have the `WatchService` as follows:
+
+```typescript
+import { Injectable } from '@angular/core'
+
+@Injectable({
+  providedIn: 'root',
+})
+export class WatchService {
+  constructor() {}
+
+  getTime() {
+    return new Date()
+  }
+
+  startTimer() {
+    //some code
+  }
+
+  stopTimer() {
+    //some code
+  }
+
+  resetTimer() {
+    //some code
+  }
+}
+```
+
+If you write the tests as follows, you'll still see the error we've mentioned above:
+
+```typescript {2,9,10,13-17,20,28,33}
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { WatchService } from 'src/app/services/watch.service'
+
+import { WatchComponent } from './watch.component'
+
+describe('WatchComponent', () => {
+  let component: WatchComponent
+  let fixture: ComponentFixture<WatchComponent>
+  let watchServiceStub: Partial<WatchService>
+  let watchService
+
+  beforeEach(async () => {
+    watchServiceStub = {
+      startTimer: () => {},
+      stopTimer: () => {},
+      resetTimer: () => {},
+    }
+    await TestBed.configureTestingModule({
+      declarations: [WatchComponent],
+      providers: [{ provide: WatchService, useValue: watchServiceStub }],
+    }).compileComponents()
+  })
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(CounterComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+    watchService = TestBed.inject(WatchService)
+  })
+
+  it('should get the inital value of time from the service on component init', () => {
+    component.ngOnInit()
+    expect(watchService.getTime).toBeCalled()
+  })
+})
+```
+
+## Solution?
+
+The reason why the tests work with Karma and Jasmine, and not with Jests is just one tiny
+thing missing from one of the tsconfig files that some of the articles online have missed. For example, while working on the #ngBook I'm writing as of today, I followed [this article](https://ordina-jworks.github.io/testing/2018/08/03/testing-angular-with-jest.html) and ended up
+with the mentioned issue.
+
+If you've faced the same, just make sure that you have set both the `esModuleInterop` and `emitDecoratorMetadata` properties to `true` inside your `tsconfig.spec.json` file.
+It should ideally look something as follows:
+
+```typescript{5-7}
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec",
+    "types": ["jest", "node"],
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true
+  },
+  "files": ["src/polyfills.ts"],
+  "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
+}
+
+```
+
+The `esModuleInterop` property makes sure you don't get any weird warnings from Jest while running the tests. And the `emitDecoratorMetadata` makes sure that the decorator metadata information is compatible and available beween Angular's Dependency Injection and Jest.
+
+## Conclusion
+
+Go through different articles/sources while implementing a solution 😄. <br/> If you liked the article, considering subscribing to the newsletter for more. And share this article on your social links with 🖤.
+And as always, Happy Coding! 🙌🏼

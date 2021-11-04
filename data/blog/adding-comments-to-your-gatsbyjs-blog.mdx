@@ -1,0 +1,292 @@
+---
+title: How to Add Comments To Your GatsbyJS Blog In Less Than 10 Minutes
+date: 2021-06-28 00:00:00
+author: Muhammad Ahsan Ayaz
+description: Learn how to add comments to your GatsbyJS Blog in less than 10 minutes using
+  utterances. We'll create a new gatsbyjs blog and will add the capability to
+  add comments to it.
+
+tags:
+  - github
+  - gatsbyjs
+  - web development
+---
+
+<header>
+  In this quick article, you'll kearn how to add comments to your GatsbyJS Blog in less than 10
+  minutes using <a href="https://utteranc.es/">Utterances</a>. Which is a free 🚀, no-ads 🚫, and
+  open-sourced 🙌 solution for implementing comments using the{' '}
+  <a href="https://developer.github.com/v3/search/#search-issues">GitHub Issues Search API</a>.
+  We'll create a new gatsbyjs blog and will add the capability to add comments to it. Fun Fact:
+  Scroll to the bottom of this post. And you'll find the same implementation for the comments that
+  I'm teaching you in this article
+</header>
+<ImageWithBg
+  title="Add comments"
+  alt="Cat typing fast gif"
+  src="https://media.giphy.com/media/lJNoBCvQYp7nq/giphy.gif"
+  backgroundColor="transparent"
+/>
+
+<div className="mt-30">
+  <PromotionBanner title="Would rather see a video tutorial? I got you covered 👌<br/>Watch it below 👇"></PromotionBanner>
+  <EmbeddedYouTubeVideo src="https://www.youtube.com/embed/YK0vZb9vupk" />
+</div>
+
+## Why
+
+If you've a blog or website where you share your thoughts, tutorials, or
+articles etc, it is most likely that your intent is to share knowledge or your
+thoughts with an audience and you'd want to get their feedback on what you
+share. For that, implementing comments on your posts is a really good idea to
+gather feedback. Now, there are many ways to do that. But if you're a developer,
+or your audience is mainly folks who might have an account on GitHub, this
+article is for you.
+
+<ImageWithBg
+  title="It's all for you"
+  alt="For you gif"
+  src="https://media.giphy.com/media/Xav6Pp0ex5SLu/giphy.gif"
+  backgroundColor="transparent"
+/>
+
+## Let's do it!
+
+### Creating the GatsbyJS Blog project
+
+We'll begin with creating a new project in our local machine. I'm supposing that
+you being a developer already has NodeJS installed in your machine. We'll start
+with creating a gatsbyjs project using the blog starter.
+
+Choose a folder in your machine where you'd want to create this project, then
+run the following command in your command prompt/terminal after navigating to
+the folder:
+
+```bash
+npx gatsby new blog-with-comments https://github.com/gatsbyjs/gatsby-starter-blog
+```
+
+Now navigate to the folder and start the development server by using the
+following commands:
+
+```bash
+cd blog-with-comments
+
+npm run develop
+```
+
+Navigate to [http://localhost:8000](http://localhost:8000) and you should now
+see the app working as follows:
+
+<ImageWithBg
+  title="Gatsby Starter Blog"
+  alt="Gatsby Starter Blog image"
+  src="/static/images/adding-comments-to-your-gatsbyjs-blog/gatsby-starter-blog.png"
+/>
+
+### Creating the GitHub repository for the project
+
+Go to your GitHub account and create a new repository as follows:
+
+<ImageWithBg
+  title="Gatsby Starter Blog"
+  alt="Gatsby Starter Blog image"
+  src="/static/images/adding-comments-to-your-gatsbyjs-blog/new-repository.png"
+/>
+
+No need to create any Readme or license file when you create this repository.
+Once done, go back to your project and add the new repository's origin to your
+git remote as follows:
+
+```bash
+git remote add origin <YOUR_REPOSITORY_URL>
+```
+
+Then push your code to your repository as follows:
+
+```bash
+git branch -M main
+git remote add origin <YOUR_REPOSITORY_URL>
+git push -u origin main
+```
+
+### Installing the Utterances app for the GitHub repository
+
+Now install the [Utterances app](https://github.com/apps/utterances) into your
+newly created repository. I'd suggest using the "Only select repositories"
+option and specifically selecting your target repository within your GitHub
+space.
+
+### Implementing the _Comments_ component to use the Utterances app
+
+Once done, open the GatsbyJs project in your favorite editor. I personally use
+[VSCode](https://code.visualstudio.com/) these days. Create a new file under the
+`src/components` folder named `Comments.js` and add the following code to it:
+
+```javascript
+import React, { useEffect } from 'react'
+const Comments = ({ issueTerm }) => {
+  const commentsUUID = `comments_${issueTerm}`
+  useEffect(() => {
+    let anchor
+    const theme = 'github-light' // you could choose other themes too
+    const script = document.createElement('script')
+    anchor = document.getElementById(commentsUUID)
+    script.setAttribute('src', 'https://utteranc.es/client.js')
+    script.setAttribute('crossorigin', 'anonymous')
+    script.setAttribute('async', true)
+    script.setAttribute('repo', 'YOUR_GITHUB_USERNAME/YOUR_REPOSITORY_NAME')
+    script.setAttribute('issue-term', issueTerm)
+    script.setAttribute('theme', theme)
+    anchor.appendChild(script)
+    return () => {
+      anchor.innerHTML = ''
+    }
+  })
+  return (
+    <>
+      <div id={commentsUUID} className="post-comments" className="relative">
+        <div className="utterances-frame"></div>
+      </div>
+    </>
+  )
+}
+
+export default Comments
+```
+
+Make sure to put the correct github username and the github repository as
+specified in the code above. Once done, add the `Comments` component in the
+`src/templates/blog-post.js` file as follows:
+
+```js {7,33,86-88}
+import * as React from 'react'
+import { Link, graphql } from 'gatsby'
+
+import Bio from '../components/bio'
+import Layout from '../components/layout'
+import Seo from '../components/seo'
+import Comments from '../components/Comments'
+
+const BlogPostTemplate = ({ data, location }) => {
+  const post = data.markdownRemark
+  const siteTitle = data.site.siteMetadata?.title || `Title`
+  const { previous, next } = data
+
+  return (
+    <Layout location={location} title={siteTitle}>
+      <Seo
+        title={post.frontmatter.title}
+        description={post.frontmatter.description || post.excerpt}
+      />
+      <article className="blog-post" itemScope itemType="http://schema.org/Article">
+        <header>
+          <h1 itemProp="headline">{post.frontmatter.title}</h1>
+          <p>{post.frontmatter.date}</p>
+        </header>
+        <section dangerouslySetInnerHTML={{ __html: post.html }} itemProp="articleBody" />
+        <Comments issueTerm={post.fields.slug} />
+        <hr />
+        <footer>
+          <Bio />
+        </footer>
+      </article>
+      <nav className="blog-post-nav">
+        <ul className="flex flex-wrape space-between p-0">
+          <li>
+            {previous && (
+              <Link to={previous.fields.slug} rel="prev">
+                ← {previous.frontmatter.title}
+              </Link>
+            )}
+          </li>
+          <li>
+            {next && (
+              <Link to={next.fields.slug} rel="next">
+                {next.frontmatter.title} →
+              </Link>
+            )}
+          </li>
+        </ul>
+      </nav>
+    </Layout>
+  )
+}
+
+export default BlogPostTemplate
+
+export const pageQuery = graphql`
+  query BlogPostBySlug(
+    $id: String!
+    $previousPostId: String
+    $nextPostId: String
+  ) {
+    site {
+      siteMetadata {
+        title
+      }
+    }
+    markdownRemark(id: { eq: $id }) {
+      id
+      excerpt(pruneLength: 160)
+      html
+      fields {
+        slug
+      }
+      frontmatter {
+        title
+        date(formatString: "MMMM DD, YYYY")
+        description
+      }
+    }
+    previous: markdownRemark(id: { eq: $previousPostId }) {...}
+    next: markdownRemark(id: { eq: $nextPostId }) {...}
+  }
+`
+```
+
+Now navigate to [http://localhost:8000](http://localhost:8000) and click on any
+blog post. Scroll down and at the bottom, you should be able to see the comments
+widget as follows:
+
+<ImageWithBg
+  title="Comments widget"
+  alt="Comments widget image"
+  src="/static/images/adding-comments-to-your-gatsbyjs-blog/comments-added.png"
+/>
+
+And boom! 😄 You now have the capability to add comments to all your blog posts.
+Click the "Sign in with GitHub" button and try adding a comment. What's great is
+that the comment box supports markdown. Which means people can also add code
+snippets to their comments using the syntax highlighting etc.
+
+<ImageWithBg
+  title="Sample comment"
+  alt="CSample comment image"
+  src="/static/images/adding-comments-to-your-gatsbyjs-blog/sample-comment.png"
+/>
+
+What's amazing is that the Utterances app will automatically generate a new
+GitHub issue for each post someone comments on.
+
+<ImageWithBg
+  title="GitHib Issue created for comments"
+  alt="GitHib Issue created for comments image"
+  src="/static/images/adding-comments-to-your-gatsbyjs-blog/issue-created-for-comments.png"
+/>
+
+And if you wanted to moderate the comments, you can simply go to the GitHub
+issue and do that.
+
+## Conclusion
+
+I found the [Utterances app](https://utteranc.es/) quite handy as I've been
+thinking about the easiest way to add comments to my blog for the developer
+community. I could go with creating my own comments and likes system using
+something like Firebase. But that's just too much work and I'd rather spend my
+time creating more content for you folks than re-inventing the wheel when there
+are already amazing and open-source solutions available like this.
+
+Let me know in the comments if you found this article useful. Also, find my
+socials below to connect with me. Don't forget to share this article with your
+friends and as always, Happy coding!🎉

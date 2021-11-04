@@ -21,6 +21,7 @@ const getAllFilesRecursively = (folder) =>
   pipe(fs.readdirSync, map(pipe(pathJoinPrefix(folder), walkDir)), flattenArray)(folder)
 
 async function generateThumbnailFromFrontMatter(post) {
+  console.log(post)
   const { images, title, slug } = post
   if (!slug || (images && images.length)) {
     return Promise.resolve()
