@@ -2,11 +2,10 @@ const siteMetadata = {
   title: 'CodeWithAhsan',
   author: 'Muhammad Ahsan Ayaz',
   headerTitle: 'CodeWithAhsan',
-  description:
-    'The one stop shop to have fun with amazing people, and to code of course.',
+  description: 'The one stop shop to have fun with amazing people, and to code of course.',
   language: 'en-us',
   siteUrl: 'https://codewithahsan.org',
-  siteRepo: 'https://github.com/code-with-ahsan/cwa-web',
+  siteRepo: 'https://github.com/code-with-ahsan/code-with-ahsan',
   siteLogo: '/static/images/logo.png',
   image: '/static/images/avatar.jpeg',
   socialBanner: '/static/images/twitter-card.png',
