@@ -9,12 +9,7 @@ module.exports = withBundleAnalyzer({
     dirs: ['pages', 'components', 'lib', 'layouts', 'scripts'],
   },
   images: {
-    domains: [
-      'media.giphy.com',
-      'github.com',
-      'img.buymeacoffee.com',
-      'media1.tenor.com',
-    ],
+    domains: ['media.giphy.com', 'github.com', 'img.buymeacoffee.com', 'media1.tenor.com'],
   },
   webpack: (config, { dev, isServer }) => {
     config.module.rules.push({

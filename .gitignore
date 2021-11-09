@@ -8,6 +8,8 @@
 # testing
 /coverage
 
+.env
+
 # next.js
 /.next/
 /out/
@@ -18,7 +20,7 @@ public/sitemap.xml
 /build
 *.xml
 # rss feed
-/public/feed.xml 
+/public/feed.xml
 
 # misc
 .DS_Store
