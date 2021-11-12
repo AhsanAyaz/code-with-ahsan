@@ -2,7 +2,6 @@
 title: Flutter Stripe Tutorial with the new/official package - Part 1
 date: 2021-11-05 00:00:00
 author: Muhammad Ahsan Ayaz
-draft: true
 images: ['/static/images/flutter-marketplace-app-with-stripe-connect-part-1/thumbnail.png']
 description: In this series of blog posts, you'll learn how to configure Payments using
   Stripe Connect for a marketplace app built with Flutter. Specifically in Part
@@ -17,9 +16,8 @@ tags:
 
 <header>
   In this series of blog posts, you'll learn how to use Stripe with Flutter in a really simple, yet
-  interesting mobile app built with Flutter. I'll also be working on a video tutorial series as
-  well. Which will be more detailed and hands-on. This article series is for those of you who love
-  reading and following articles instead. Find the link below for the code repository:
+  interesting mobile app built with Flutter. This is sort of a rendition of my old [Flutter Stripe
+  Tutorial](). The package I used in that one although is deprecated now. Sad lyf!
   <ul className="mt-20">
     <li>
       <a href="https://github.com/AhsanAyaz/flutter_stripe_tto">Code Repo</a>
@@ -114,13 +112,13 @@ the **Save** button.
   backgroundColor="transparent"
 />
 
-## Running the Stripe Backend server locally
+## Creating the backend for the stripe integration
 
-Make sure you have [NodeJS](https://nodejs.org/en/) and
-[Git](https://git-scm.com/downloads) installed in your system. Then clone the
-backend code from the
-[repository](https://github.com/AhsanAyaz/stripe-connect-backend) by running the
-following command in your terminal:
+We're going to use [Firebase Functions](https://firebase.google.com/docs/functions) (or "Cloud functions for Firebase" as they call it now) as the backend for our stripe integration.
+You can however a simple NodeJS/ExpressJS app to do the same.
+
+First, make sure you have [NodeJS](https://nodejs.org/en/) and
+[Git](https://git-scm.com/downloads) installed in your system. Then follow the [Firebase Functions getting started](https://firebase.google.com/docs/functions/get-started) to create a project.
 
 ```bash
 git clone https://github.com/AhsanAyaz/stripe-connect-backend.git
