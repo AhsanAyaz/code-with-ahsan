@@ -7,7 +7,7 @@ import Head from 'next/head'
 import Analytics from '@/components/analytics'
 import LayoutWrapper from '@/components/LayoutWrapper'
 import { ClientReload } from '@/components/ClientReload'
-
+import dynamic from 'next/dynamic'
 const isDevelopment = process.env.NODE_ENV === 'development'
 
 export default function App({ Component, pageProps }) {
