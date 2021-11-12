@@ -1,4 +1,5 @@
 import mailchimp from '@mailchimp/mailchimp_marketing'
+const md5 = require('md5')
 
 mailchimp.setConfig({
   apiKey: process.env.MAILCHIMP_API_KEY,
@@ -14,12 +15,22 @@ export default async (req, res) => {
   }
 
   try {
-    const test = await mailchimp.lists.addListMember(process.env.MAILCHIMP_AUDIENCE_ID, {
+    const listId = process.env.MAILCHIMP_AUDIENCE_ID
+    await mailchimp.lists.addListMember(listId, {
       email_address: email,
       status: 'subscribed',
     })
+    const subscriberHash = md5(email.toLowerCase())
+    await mailchimp.lists.updateListMemberTags(listId, subscriberHash, {
+      tags: [
+        {
+          name: 'codewithahsan.org',
+          status: 'active',
+        },
+      ],
+    })
     return res.status(201).json({ error: '' })
   } catch (error) {
-    return res.status(500).json({ error: error.message || error.toString() })
+    return res.status(error.status).json({ error: error })
   }
 }

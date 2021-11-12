@@ -10,7 +10,11 @@ const NewsletterForm = ({ title = 'Subscribe to the newsletter' }) => {
 
   const subscribe = async (e) => {
     e.preventDefault()
-
+    if (subscribed) {
+      inputEl.current.value = ''
+      setSubscribed(false)
+      return
+    }
     const res = await fetch(`/api/${siteMetadata.newsletter.provider}`, {
       body: JSON.stringify({
         email: inputEl.current.value,
@@ -60,7 +64,6 @@ const NewsletterForm = ({ title = 'Subscribe to the newsletter' }) => {
               subscribed ? 'cursor-default' : 'hover:bg-primary-700 dark:hover:bg-primary-400'
             } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 dark:ring-offset-black`}
             type="submit"
-            disabled={subscribed}
           >
             {subscribed ? 'Thank you!' : 'Sign up'}
           </button>
