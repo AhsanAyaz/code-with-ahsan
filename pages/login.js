@@ -1,6 +1,6 @@
 import siteMetadata from '@/data/siteMetadata'
 import { PageSEO } from '@/components/SEO'
-import { LoginPage } from 'your-courses-library-react'
+// import { LoginPage } from 'your-courses-library-react'
 export default function Login() {
   const loginSubmit = ({ detail }) => {
     const { email, password } = detail
@@ -10,7 +10,7 @@ export default function Login() {
   return (
     <>
       <PageSEO title={`Login - ${siteMetadata.author}`} description={siteMetadata.description} />
-      <LoginPage onFormSubmitted={loginSubmit} />
+      {/* <LoginPage onFormSubmitted={loginSubmit} /> */}
     </>
   )
 }
