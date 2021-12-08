@@ -11,6 +11,11 @@
         "url": "https://github.com/iUseYahoo/GeForce-GPU-Checker",
         "name": "GeForce GPU Checker",
         "description": "GeForce GPU Card 3090 and 3080 Checker."
+      },
+      {
+        "url": "https://github.com/iUseYahoo/Discord-Self-Bot-V2",
+        "name": "Discord Self Bot V2",
+        "description": "The newer version of my Discord Self Bot v1. Including a Database."
       }
     ]
   }
