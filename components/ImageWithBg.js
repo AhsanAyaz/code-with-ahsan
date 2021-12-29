@@ -22,13 +22,7 @@ const ImageWithBg = ({
     linkId = caption.toLowerCase().replace(/ +/g, '-')
   }
   return (
-    <div
-      className="image-with-bg relative flex flex-col items-center"
-      style={{
-        height: imageHeight || 500,
-        margin: '0 auto',
-      }}
-    >
+    <div className="image-with-bg relative flex flex-col items-center m-auto">
       {noLink === false && linkId !== null ? <div id={linkId} /> : null}
       <div
         className="wrapper relative"

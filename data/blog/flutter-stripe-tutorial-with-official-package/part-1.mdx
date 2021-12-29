@@ -118,7 +118,256 @@ We're going to use [Firebase Functions](https://firebase.google.com/docs/functio
 You can however a simple NodeJS/ExpressJS app to do the same.
 
 First, make sure you have [NodeJS](https://nodejs.org/en/) and
-[Git](https://git-scm.com/downloads) installed in your system. Then follow the [Firebase Functions getting started](https://firebase.google.com/docs/functions/get-started) to create a project.
+[Git](https://git-scm.com/downloads) installed in your system.
+Essentially you need to create a Firebase Project first in the [Firebase Console](https://console.firebase.google.com).
+Then you need to create firebase functions inside this repository by following the [Firebase Functions getting started guide](https://firebase.google.com/docs/functions/get-started).
+Essentially, you need to run the following commands in the terminal, making sure you're in the project directory:
+
+```bash
+# installing firebase tools globally
+npm install -g firebase-tools
+
+# logging into firebase
+firebase login
+
+# creating a firebase functions folder
+firebase init functions
+```
+
+You should see the following prompt. Choose 'Use an existing project', and then select the project that you created on the [Firebase Console](https://console.firebase.google.com).
+
+<ImageWithBg
+  title="Create firebase functions"
+  alt="Create firebase functions image"
+  src="/static/images/flutter-stripe-tutorial-with-official-package/firebase-functions-init.png"
+  caption="Figure 1.7"
+  backgroundColor="transparent"
+/>
+
+Make sure to select **Typescript** as the language for your functions and enabling **ESLint**. Then, proceed forward with the installation.
+
+<ImageWithBg
+  title="Firebase functions setup"
+  alt="Firebase functions setup image"
+  src="/static/images/flutter-stripe-tutorial-with-official-package/ff-setup.png"
+  caption="Figure 1.8"
+  backgroundColor="transparent"
+/>
+
+Now, create a new file inside the `functions` folder called `.env.local`. And add the following lines:
+
+```bash
+# Stripe API keys - see https://stripe.com/docs/development/quickstart#api-keys
+STRIPE_PUBLISHABLE_KEY=pk_test_xxxx # Replace with your publishable key
+STRIPE_SECRET_KEY=sk_test_xxx # Replace with your secret key
+```
+
+Now, we're going to set up the server itself. To do that, navigate to the `functions` folder using your terminal and add the following npm packages by running the command:
+
+```bash
+# navigate to the functions folder
+cd functions
+
+# install the packages
+npm install --save body-parser express dotenv stripe
+```
+
+Once the dependencies are installed, open the `functions/src/index.ts` file and update it with the following lines of code:
+
+```typescript
+import * as functions from 'firebase-functions'
+
+import * as env from 'dotenv'
+// Replace if using a different env file or config.
+env.config({ path: './.env' })
+
+import * as bodyParser from 'body-parser'
+import * as express from 'express'
+
+import Stripe from 'stripe'
+import { generateResponse } from './utils'
+
+const stripePublishableKey = process.env.STRIPE_PUBLISHABLE_KEY || ''
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || ''
+
+const app = express()
+
+app.use((req: express.Request, res: express.Response, next: express.NextFunction): void => {
+  if (req.originalUrl === '/webhook') {
+    next()
+  } else {
+    bodyParser.json()(req, res, next)
+  }
+})
+
+// tslint:disable-next-line: interface-name
+interface Order {
+  items: object[]
+}
+
+const calculateOrderAmount = (_order?: Order): number => {
+  // Replace this constant with a calculation of the order's amount.
+  // Calculate the order total on the server to prevent
+  // people from directly manipulating the amount on the client.
+  return 2500
+}
+
+function getKeys() {
+  let secret_key: string | undefined = stripeSecretKey
+  let publishable_key: string | undefined = stripePublishableKey
+
+  publishable_key = process.env.STRIPE_PUBLISHABLE_KEY
+  secret_key = process.env.STRIPE_SECRET_KEY
+
+  return { secret_key, publishable_key }
+}
+
+app.post(
+  '/pay-without-webhooks',
+  async (req: express.Request, res: express.Response): Promise<void> => {
+    const {
+      paymentMethodId,
+      paymentIntentId,
+      items,
+      currency,
+      useStripeSdk,
+      cvcToken,
+      email,
+    }: {
+      paymentMethodId?: string
+      paymentIntentId?: string
+      cvcToken?: string
+      items: Order
+      currency: string
+      useStripeSdk: boolean
+      email?: string
+    } = req.body
+
+    const orderAmount: number = calculateOrderAmount(items)
+    const { secret_key } = getKeys()
+
+    const stripe = new Stripe(secret_key as string, {
+      apiVersion: '2020-08-27',
+      typescript: true,
+    })
+
+    try {
+      if (cvcToken && email) {
+        const customers = await stripe.customers.list({
+          email,
+        })
+
+        // The list all Customers endpoint can return multiple customers that share the same email address.
+        // For this example we're taking the first returned customer but in a production integration
+        // you should make sure that you have the right Customer.
+        if (!customers.data[0]) {
+          res.send({
+            error: 'There is no associated customer object to the provided e-mail',
+          })
+        }
+
+        const paymentMethods = await stripe.paymentMethods.list({
+          customer: customers.data[0].id,
+          type: 'card',
+        })
+
+        if (!paymentMethods.data[0]) {
+          res.send({
+            error: `There is no associated payment method to the provided customer's e-mail`,
+          })
+        }
+
+        const params: Stripe.PaymentIntentCreateParams = {
+          amount: orderAmount,
+          confirm: true,
+          confirmation_method: 'manual',
+          currency,
+          payment_method: paymentMethods.data[0].id,
+          payment_method_options: {
+            card: {
+              cvc_token: cvcToken,
+            },
+          },
+          use_stripe_sdk: useStripeSdk,
+          customer: customers.data[0].id,
+        }
+        const intent = await stripe.paymentIntents.create(params)
+        res.send(generateResponse(intent))
+      } else if (paymentMethodId) {
+        // Create new PaymentIntent with a PaymentMethod ID from the client.
+        const params: Stripe.PaymentIntentCreateParams = {
+          amount: orderAmount,
+          confirm: true,
+          confirmation_method: 'manual',
+          currency,
+          payment_method: paymentMethodId,
+          // If a mobile client passes `useStripeSdk`, set `use_stripe_sdk=true`
+          // to take advantage of new authentication features in mobile SDKs.
+          use_stripe_sdk: useStripeSdk,
+        }
+        const intent = await stripe.paymentIntents.create(params)
+        // After create, if the PaymentIntent's status is succeeded, fulfill the order.
+        res.send(generateResponse(intent))
+      } else if (paymentIntentId) {
+        // Confirm the PaymentIntent to finalize payment after handling a required action
+        // on the client.
+        const intent = await stripe.paymentIntents.confirm(paymentIntentId)
+        // After confirm, if the PaymentIntent's status is succeeded, fulfill the order.
+        res.send(generateResponse(intent))
+      }
+    } catch (e) {
+      // Handle "hard declines" e.g. insufficient funds, expired card, etc
+      // See https://stripe.com/docs/declines/codes for more.
+      res.send({ error: e.message })
+    }
+  }
+)
+
+export const webApi = functions.https.onRequest(app)
+```
+
+Notice that the above snippet makes use of the `utils` file. That doesn't exist so far. Let's create a new file named `utils.ts` inside the `functions/src` folder.
+Add the following lines of code in the file:
+
+```typescript
+import type Stripe from 'stripe'
+
+export const generateResponse = (
+  intent: Stripe.PaymentIntent
+):
+  | {
+      clientSecret: string | null
+      requiresAction: boolean
+      status: string
+    }
+  | { clientSecret: string | null; status: string }
+  | { error: string } => {
+  // Generate a response based on the intent's status
+  switch (intent.status) {
+    case 'requires_action':
+      // Card requires authentication
+      return {
+        clientSecret: intent.client_secret,
+        requiresAction: true,
+        status: intent.status,
+      }
+    case 'requires_payment_method':
+      // Card was not properly authenticated, suggest a new payment method
+      return {
+        error: 'Your card was denied, please provide a new payment method',
+      }
+    case 'succeeded':
+      // Payment is complete, authentication not required
+      // To cancel the payment after capture you will need to issue a Refund (https://stripe.com/docs/api/refunds).
+      console.log('💰 Payment received!')
+      return { clientSecret: intent.client_secret, status: intent.status }
+  }
+
+  return {
+    error: 'Failed',
+  }
+}
+```
 
 ```bash
 git clone https://github.com/AhsanAyaz/stripe-connect-backend.git
