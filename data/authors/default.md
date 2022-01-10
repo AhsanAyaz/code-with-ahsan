@@ -4,7 +4,7 @@ avatar: /static/images/avatar.jpeg
 occupation: Software Architect | GDE in Angular | Author | Streamer
 company: Syncron AB
 email: muhd.ahsanayaz@gmail.com
-twitter: https://twitter.com/muhd_ahsanayaz
+twitter: https://twitter.com/codewith_ahsan
 linkedin: https://www.linkedin.com/in/ahsanayaz
 github: https://github.com/ahsanayaz
 ---

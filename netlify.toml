@@ -47,7 +47,7 @@
   force = true
 [[redirects]]
   from = "https://ahsanayaz.com/twitter"
-  to = "https://twitter.com/muhd_ahsanayaz"
+  to = "https://twitter.com/codewith_ahsan"
   status = 301
   force = true
 

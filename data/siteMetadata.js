@@ -11,7 +11,7 @@ const siteMetadata = {
   socialBanner: '/static/images/twitter-card.png',
   email: 'muhd.ahsanayaz@gmail.com',
   github: 'https://github.com/code-with-ahsan',
-  twitter: 'https://twitter.com/muhd_ahsanayaz',
+  twitter: 'https://twitter.com/codewith_ahsan',
   twitch: 'https://twitch.tv/codewithahsan',
   facebook: 'https://facebook.com/CodeWithAhsan',
   youtube: 'https://youtube.com/c/CodeWithAhsan',
