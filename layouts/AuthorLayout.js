@@ -1,6 +1,7 @@
 import SocialIcon from '@/components/social-icons'
 import Image from '@/components/Image'
 import { PageSEO } from '@/components/SEO'
+import { youtube } from '../data/siteMetadata'
 
 export default function AuthorLayout({ children, frontMatter }) {
   const { name, avatar, occupation, company, email, twitter, linkedin, github } = frontMatter
@@ -29,6 +30,7 @@ export default function AuthorLayout({ children, frontMatter }) {
             <div className="flex pt-6 space-x-3">
               <SocialIcon kind="mail" href={`mailto:${email}`} />
               <SocialIcon kind="github" href={github} />
+              <SocialIcon color="text-red-600" kind="youtube" href={youtube} />
               <SocialIcon kind="linkedin" href={linkedin} />
               <SocialIcon kind="twitter" href={twitter} />
             </div>

@@ -18,7 +18,7 @@ const components = {
   twitch: Twitch,
 }
 
-const SocialIcon = ({ kind, href, size = 24 }) => {
+const SocialIcon = ({ kind, href, size = 24, color = 'text-gray-700' }) => {
   if (!href || (kind === 'mail' && !/^mailto:\w+([.-]?\w+)@\w+([.-]?\w+)(.\w{2,3})+$/.test(href)))
     return null
 
@@ -31,10 +31,10 @@ const SocialIcon = ({ kind, href, size = 24 }) => {
       rel="noopener noreferrer"
       href={href}
     >
-      {/* <span className="sr-only">{kind}</span> */}
+      <span className="sr-only">{kind}</span>
       <SocialSvg
         style={{ width: size, height: size }}
-        className={`fill-current text-gray-700 dark:text-gray-200 hover:text-primary-500 dark:hover:text-primary-400 `}
+        className={`fill-current ${color} dark:text-gray-200 hover:text-primary-500 dark:hover:text-primary-400 `}
       />
     </a>
   )

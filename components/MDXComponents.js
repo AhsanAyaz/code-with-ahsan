@@ -9,6 +9,7 @@ import BuyMeACoffee from './BuyMeACoffee'
 import IonicCourse from './IonicCourse'
 import CustomLink from './Link'
 import TOCInline from './TOCInline'
+import AboutContent from './AboutContent'
 import Pre from './Pre'
 import { BlogNewsletterForm } from './NewsletterForm'
 
@@ -16,6 +17,7 @@ export const MDXComponents = {
   Image,
   ImageWithBg,
   IonicCourse,
+  AboutContent,
   PromotionBanner,
   EmbeddedYouTubeVideo,
   BuyMeACoffee,
