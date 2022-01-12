@@ -17,6 +17,7 @@ const siteMetadata = {
   youtube: 'https://youtube.com/c/CodeWithAhsan',
   linkedin: 'https://www.linkedin.com/in/ahsanayaz',
   gde: 'https://codewithahsan.dev/gde',
+  ngBook: 'https://ahsanayaz.com/ng-book',
   socials: 'https://bio.link/muhd_ahsanayaz',
   locale: 'en-US',
   analytics: {
