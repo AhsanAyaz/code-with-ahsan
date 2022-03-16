@@ -17,18 +17,25 @@ tags:
 <header>
   In this series of blog posts, you'll learn how to use Stripe with Flutter in a really simple, yet
   interesting mobile app built with Flutter. This is sort of a rendition of my old [Flutter Stripe
-  Tutorial](). The package I used in that one although is deprecated now. Sad lyf!
-  <ul className="mt-20">
-    <li>
-      <a href="https://github.com/AhsanAyaz/flutter_stripe_tto">Code Repo</a>
-    </li>
-  </ul>
+  Tutorial
+  Series](https://www.youtube.com/watch?v=VOtmM9i25R4&list=PL2sQdFoGnLIgvo5DviCeCPZnfeVbCrRsV). The
+  package I used in that one although is deprecated now. Sad lyf!
 </header>
 {/* <PromotionBanner title="Would rather see a video tutorial? I got you covered 👌<br/>Watch it below 👇"></PromotionBanner>
 <EmbeddedYouTubeVideo src="https://www.youtube.com/embed/R2Okg53lUv8" /> */}
 <hr />
 
-## Stripe account & marketplace configuration
+## Clone the repository
+
+We have a repository already set up. In order to follow this tutorial, you need to clone the repository and then checkout the `start_here` branch.
+
+<ul className="mt-20">
+  <li>
+    <a href="https://github.com/AhsanAyaz/flutter_stripe_tto">Code Repo</a>
+  </li>
+</ul>
+
+## Get your Stripe API Keys
 
 First of all, log into your Stripe account. Once logged in, go to the
 [Stripe Dashboard](https://dashboard.stripe.com/dashboard). From the left nav
@@ -53,64 +60,36 @@ your **Publishable key** and your **Secret Key** as shown in
 <ImageWithBg
   title="Get stripe keys"
   alt="Get stripe keys image"
-  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/get-stripe-keys.png"
+  src="/static/images/flutter-stripe-tutorial/copy-api-keys.png"
   caption="Figure 1.2"
   backgroundColor="transparent"
 />
 
-Now, go to the
-[Stripe Connect Settings](https://dashboard.stripe.com/test/settings/applications)
-page and fill the **Branding** information according to your business details.
-It's great that Stripe provides this configuration so when the user/seller signs
-up, the onboarding flow feels natural and consistent with our business's
-branding and colors. [Figure 1.3](#figure-1.3) shows how I have configured it
-for my test application named **"Panda Gums"**. Make sure to click the **Save
-branding changes** button once you're done.
+## Install the flutter_stripe package
 
-<ImageWithBg
-  title="Set branding info"
-  alt="Set branding info image"
-  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/set-branding-info.png"
-  caption="Figure 1.3"
-  backgroundColor="transparent"
-/>
+Open the cloned repository in android studio, and add the the latest version of the `flutter_stripe` package inside the `pubspec.yaml` in the `dependencies`. It should look something as follows:
 
-Now that we have set up the branding information, we need to enable **Express
-Checkout** for our country so we can work with test seller accounts created in
-our country. In order to do so, scroll above to the **Availability** section on
-the same Settings page and click the **Manage** link as shown in
-[Figure 1.4](#figure-1.4).
+```yaml {15}
+version: 1.0.0+1
 
-<ImageWithBg
-  title="Manage express accounts availability"
-  alt="Manage express accounts availability image"
-  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/manage-availibility.png"
-  caption="Figure 1.4"
-  backgroundColor="transparent"
-/>
+environment:
+  sdk: '>=2.12.0 <3.0.0'
 
-Now that you are on the
-[Express Accounts Settings Page](https://dashboard.stripe.com/test/settings/applications/express),
-check your desired country for which you'll create the seller accounts. Make
-sure to enable **Transfers**, **Payments**, and **Cards** capabilities for the
-same country as shown in [Figure 1.5](#figure-1.5) and
-[Figure 1.6](#figure-1.6). Once done, scroll to the bottom of the page and click
-the **Save** button.
+dependencies:
+  flutter:
+    sdk: flutter
 
-<ImageWithBg
-  title="Enable your country in Stripe"
-  alt="Enable your country in Stripe image"
-  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/enable-your-country.png"
-  caption="Figure 1.5"
-  backgroundColor="transparent"
-/>
-<ImageWithBg
-  title="Enable card payments for country"
-  alt="Enable card payments for country image"
-  src="/static/images/flutter-marketplace-app-with-stripe-connect-part-1/enable-card-payments.png"
-  caption="Figure 1.6"
-  backgroundColor="transparent"
-/>
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.2
+  flutter_credit_card: ^3.0.1
+  http: 0.13.3
+  flutter_stripe: ^1.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+```
 
 ## Creating the backend for the stripe integration
 
