@@ -8,6 +8,7 @@ import ThemeSwitch from './ThemeSwitch'
 import Image from './Image'
 
 const LayoutWrapper = ({ children }) => {
+  const highlightContext = `relative w-full sm:w-auto block text-sm font-semibold outline-primary-600 ring-2 rounded-lg text-primary py-4 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 hover:bg-primary-600 hover:text-white hover:outline-none hover:ring-0`
   return (
     <SectionContainer>
       <div className="flex flex-col justify-between h-screen">
@@ -26,12 +27,16 @@ const LayoutWrapper = ({ children }) => {
             </Link>
           </div>
           <div className="flex items-center text-base leading-5">
-            <div className="hidden sm:block">
+            <div className="hidden sm:flex">
               {headerNavLinks.map((link) => (
                 <Link
                   key={link.title}
                   href={link.href}
-                  className="p-1 font-medium text-gray-900 sm:p-4 dark:text-gray-100"
+                  className={`${
+                    link.href.includes('ng-book')
+                      ? highlightContext
+                      : 'p-1 font-medium text-gray-900 sm:p-4 dark:text-gray-100'
+                  }`}
                 >
                   {link.title}
                 </Link>
@@ -41,7 +46,7 @@ const LayoutWrapper = ({ children }) => {
             <MobileNav />
           </div>
         </header>
-        <main className="mb-auto">{children}</main>
+        <main>{children}</main>
         <Footer />
       </div>
     </SectionContainer>
