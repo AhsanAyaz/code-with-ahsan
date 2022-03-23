@@ -1,9 +1,9 @@
 import siteMetadata from '@/data/siteMetadata'
 import { PageSEO } from '@/components/SEO'
 import axios from 'axios'
-import CourseCard from '../components/courses/CourseCard'
+import CourseCard from '../../components/courses/CourseCard'
 import qs from 'qs'
-import Course from '../classes/Course.class'
+import Course from '../../classes/Course.class'
 
 export async function getStaticProps() {
   const strapiUrl = process.env.STRAPI_URL
@@ -30,14 +30,12 @@ export async function getStaticProps() {
 
 export default function Courses({ coursesStr }) {
   const courses = JSON.parse(coursesStr)
-  console.log('🚀 ~ file: courses.js ~ line 30 ~ courses.map ~ course', courses)
   return (
     <>
       <PageSEO title={`Courses - ${siteMetadata.author}`} description={siteMetadata.description} />
-      <div className="flex flex-wrap gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {courses &&
           courses.map((course) => {
-            console.log('🚀 ~ file: courses.js ~ line 30 ~ courses.map ~ course', course)
             return <CourseCard course={course} key={course.id} />
           })}
       </div>

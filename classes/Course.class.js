@@ -1,4 +1,5 @@
-const strapiUrl = process.env.STRAPI_URL
+import Post from './Post.class'
+
 class Course {
   constructor(course) {
     this.id = course.id
@@ -6,9 +7,29 @@ class Course {
     this.name = courseAttributes.name
     this.description = courseAttributes.description
     this.outline = courseAttributes.outline
-    this.videoUrls = courseAttributes.videoUrls.urls
+    this.videoUrls = courseAttributes.videoUrls
     this.publishedAt = courseAttributes.publishedAt
     this.duration = courseAttributes.duration
+    this.slug = courseAttributes.slug
+    if (courseAttributes.chapters) {
+      this.chapters = courseAttributes.chapters.data.map((chapter) => {
+        const { attributes } = chapter
+        const { title, description, posts } = attributes
+        let mappedPosts = posts.data.map((post) => new Post(post))
+        if (mappedPosts.length > 0 && mappedPosts[0].order) {
+          // sort by order
+          mappedPosts.sort((a, b) => +a.order - +b.order)
+        }
+        return {
+          title,
+          description,
+          posts: mappedPosts,
+        }
+      })
+    } else {
+      this.chapters = []
+    }
+
     this.authors = courseAttributes.authors.data.map((author) => {
       const { attributes } = author
       const { bio, name, socials, avatar } = attributes
@@ -16,40 +37,10 @@ class Course {
         bio,
         name,
         socials,
-        avatar: `${strapiUrl}${avatar.data.attributes.url}`,
+        avatar: avatar?.data?.attributes?.url,
       }
     })
   }
 }
 
 export default Course
-
-/*
-(course) => {
-    return {
-      attributes: {
-        ...course.attributes,
-        authors: {
-          data: course.attributes.authors.data.map((author) => {
-            return {
-              ...author,
-              attributes: {
-                ...author.attributes,
-                avatar: {
-                  data: {
-                    ...author.attributes.avatar.data,
-                    attributes: {
-                      ...author.attributes.avatar.data.attributes,
-                      url: `${strapiUrl}${author.attributes.avatar.data.attributes.url}`,
-                    },
-                  },
-                },
-              },
-            }
-          }),
-        },
-      },
-    }
-  }
-
-*/

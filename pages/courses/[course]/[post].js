@@ -2,8 +2,9 @@ import siteMetadata from '@/data/siteMetadata'
 import { PageSEO } from '@/components/SEO'
 import axios from 'axios'
 import qs from 'qs'
-import Course from '../../classes/Course.class'
+import Course from '../../../classes/Course.class'
 import Link from 'next/link'
+import Post from '../../../classes/Post.class'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -11,7 +12,7 @@ const strapiAPIKey = process.env.STRAPI_API_KEY
 export async function getStaticPaths() {
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar'],
+      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts'],
       _sort: 'chapters.posts:ASC',
     },
     {
@@ -27,19 +28,28 @@ export async function getStaticPaths() {
     },
   })
   const courses = coursesResp.data.data.map((course) => new Course(course))
+  const paths = []
+  courses.map((course) => {
+    course.chapters.map((chapter) => {
+      chapter.posts.map((post) => {
+        paths.push({
+          params: {
+            course: course.slug,
+            post: post.id.toString(),
+          },
+        })
+      })
+    })
+  })
   const config = {
-    paths: courses.map((course) => ({
-      params: {
-        course: course.slug,
-      },
-    })),
+    paths,
     fallback: false,
   }
   return config
 }
 
 export async function getStaticProps({ params }) {
-  const courseId = params.course
+  const { course: courseId, post: postId } = params
 
   const query = qs.stringify(
     {
@@ -57,17 +67,26 @@ export async function getStaticProps({ params }) {
       Authorization: `Bearer ${strapiAPIKey}`,
     },
   })
+  const postResp = await axios.get(`${strapiUrl}/api/posts/${postId}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      Authorization: `Bearer ${strapiAPIKey}`,
+    },
+  })
   const course = new Course(coursesResp.data.data)
-  return { props: { courseStr: JSON.stringify(course) } }
+  const post = new Post(postResp.data.data)
+  return { props: { courseStr: JSON.stringify(course), postStr: JSON.stringify(post) } }
 }
 
-export default function CoursePage({ courseStr }) {
+export default function PostPage({ courseStr, postStr }) {
   const course = JSON.parse(courseStr)
+  const post = JSON.parse(postStr)
   return (
     <>
       <PageSEO title={`Courses - ${course.name}`} description={siteMetadata.description} />
-      <div className="">
-        <article className="chapters text-center">
+      <div className="grid grid-cols-3 gap-4">
+        <article className="chapters col-span-1">
           {course &&
             course.chapters.map((chapter, index) => {
               return (
@@ -88,6 +107,11 @@ export default function CoursePage({ courseStr }) {
               )
             })}
         </article>
+        <main className="flex-1 min-h-[300px] col-span-2">
+          <div className="embed-container mb-4">
+            <iframe src={post.embedUrl} title={post.title} frameBorder="0" allowFullScreen></iframe>
+          </div>
+        </main>
       </div>
     </>
   )

@@ -7,7 +7,7 @@ const CourseCard = ({ course }) => {
     return authors
   }, [course])
   return (
-    <Link passHref href={`/courses/${course.id}`}>
+    <Link passHref href={`/courses/${course.slug}`}>
       <div className="relative block p-8 overflow-hidden border border-gray-100 rounded-lg hover:shadow-md hover:cursor-pointer">
         <span className="absolute inset-x-0 bottom-0 h-2  bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
 
