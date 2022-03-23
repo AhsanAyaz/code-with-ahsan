@@ -85,7 +85,7 @@ export default function PostPage({ courseStr, postStr }) {
   return (
     <>
       <PageSEO title={`Courses - ${course.name}`} description={siteMetadata.description} />
-      <div className="grid grid-cols-3 gap-4">
+      <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-4">
         <article className="chapters col-span-1">
           {course &&
             course.chapters.map((chapter, index) => {
@@ -96,7 +96,7 @@ export default function PostPage({ courseStr, postStr }) {
                     {chapter.posts.map((post, index) => {
                       return (
                         <Link passHref key={index} href={`/courses/${course.slug}/${post.id}`}>
-                          <li className="px-4 py-2 cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white ">
+                          <li className="px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-[#6366f1] cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white ">
                             <a className="break-words">{post.title}</a>
                           </li>
                         </Link>
@@ -107,7 +107,7 @@ export default function PostPage({ courseStr, postStr }) {
               )
             })}
         </article>
-        <main className="flex-1 min-h-[300px] col-span-2">
+        <main className="flex-1 md:min-h-[300px] col-span-2">
           <div className="embed-container mb-4">
             <iframe src={post.embedUrl} title={post.title} frameBorder="0" allowFullScreen></iframe>
           </div>

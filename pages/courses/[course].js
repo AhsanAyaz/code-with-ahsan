@@ -77,7 +77,7 @@ export default function CoursePage({ courseStr }) {
                     {chapter.posts.map((post, index) => {
                       return (
                         <Link passHref key={index} href={`/courses/${course.slug}/${post.id}`}>
-                          <li className="px-4 py-2 cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white ">
+                          <li className="px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-[#6366f1] cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white ">
                             <a className="break-words">{post.title}</a>
                           </li>
                         </Link>
