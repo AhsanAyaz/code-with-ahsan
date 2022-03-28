@@ -1,6 +1,5 @@
 import { PageSEO } from '@/components/SEO'
 import siteMetadata from '@/data/siteMetadata'
-import Image from 'next/image'
 import SocialIcon from '@/components/social-icons'
 
 import NewsletterForm from '@/components/NewsletterForm'
@@ -12,15 +11,15 @@ export default function Home() {
       <PageSEO title={siteMetadata.title} description={siteMetadata.description} />
 
       <div className="flex flex-col justify-center h-full">
-        <figure className="md:flex bg-gray-100 rounded-xl p-8 md:p-0 dark:bg-gray-800">
+        <figure className="md:flex w-96 md:w-full mx-auto md:mx-0 bg-gray-100 rounded-xl md:p-0 dark:bg-gray-800">
           <img
-            className="w-24 h-24 md:w-48 md:h-auto md:rounded-none md:rounded-l-xl object-cover rounded-full mx-auto"
+            className="w-96 rounded-t-lg md:w-48 h-auto md:rounded-none md:rounded-l-xl object-cover mx-auto md:mx-0"
             src={siteMetadata.image}
             alt=""
             width="384"
             height="512"
           />
-          <div className="pt-6 md:p-8 text-center md:text-left space-y-4">
+          <div className="p-8 text-left leading-relaxed space-y-4">
             <blockquote>
               <AboutContent />
             </blockquote>
