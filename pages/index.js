@@ -13,12 +13,12 @@ export default function Home() {
       <PageSEO title={siteMetadata.title} description={siteMetadata.description} />
 
       <div className="flex flex-col justify-center h-full">
-        <div className="flex items-center mt-8 mb-20">
-          <div className="flex flex-col mr-4">
-            <div className="text-4xl flex-1 mb-16">
+        <div className="flex flex-col-reverse lg:flex-row items-start mt-8 mb-20">
+          <div className="flex flex-col mr-4 mt-14 lg:mt-0">
+            <div className="text-3xl text-center sm:text-left sm:text-4xl flex-1 mb-16">
               On a mission to make learning Software Development fun and easy for you!
             </div>
-            <div className="flex flex-col gap-4">
+            <div className="flex items-center lg:items-start flex-col gap-4">
               <Link href={'/courses'} passHref>
                 <button className="py-2 w-40 ring-1 dark:text-black dark:ring-gray-300  dark:bg-white dark:hover:bg-white dark:ring-offset-black dark:hover:ring-offset-2 ring-primary-500 bg-primary-700 text-white px-4 rounded-md font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 hover:bg-primary-700 hover:text-white ">
                   Take a Course
