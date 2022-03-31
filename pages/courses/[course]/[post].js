@@ -3,9 +3,10 @@ import { PageSEO } from '@/components/SEO'
 import axios from 'axios'
 import qs from 'qs'
 import Course from '../../../classes/Course.class'
-import Link from 'next/link'
 import Post from '../../../classes/Post.class'
 import PostsList from '../../../components/courses/PostsList'
+import { useReducer, useEffect } from 'react'
+import { postsReducer } from '../../../services/PostService'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -82,7 +83,30 @@ export async function getStaticProps({ params }) {
 
 export default function PostPage({ courseStr, postStr }) {
   const course = JSON.parse(courseStr)
+  const [state, dispatch] = useReducer(postsReducer, { completedPosts: {} })
   const post = JSON.parse(postStr)
+  const markAsComplete = () => {
+    dispatch({
+      type: 'MARK_AS_COMPLETE',
+      payload: {
+        slug: post.slug,
+      },
+    })
+  }
+  const markAsIncomplete = () => {
+    dispatch({
+      type: 'MARK_AS_INCOMPLETE',
+      payload: {
+        slug: post.slug,
+      },
+    })
+  }
+
+  useEffect(() => {
+    dispatch({
+      type: 'RETRIEVE_COMPLETED_POSTS',
+    })
+  }, [post.slug])
   return (
     <>
       <PageSEO title={`Courses - ${course.name}`} description={siteMetadata.description} />
@@ -93,7 +117,12 @@ export default function PostPage({ courseStr, postStr }) {
               return (
                 <section key={index} className="mb-2">
                   <h3>{chapter.name}</h3>
-                  <PostsList chapter={chapter} courseSlug={course.slug} post={post} />
+                  <PostsList
+                    chapter={chapter}
+                    courseSlug={course.slug}
+                    post={post}
+                    completedPosts={state.completedPosts}
+                  />
                 </section>
               )
             })}
@@ -101,6 +130,23 @@ export default function PostPage({ courseStr, postStr }) {
         <main className="flex-1 md:min-h-[300px] col-span-2">
           <div className="embed-container mb-4">
             <iframe src={post.embedUrl} title={post.title} frameBorder="0" allowFullScreen></iframe>
+          </div>
+          <div className="mb-4 flex justify-end">
+            {state.completedPosts[post.slug] ? (
+              <button
+                onClick={markAsIncomplete}
+                className="py-2 w-40 ring-1 dark:text-black dark:ring-offset-black dark:hover:ring-offset-2 ring-green-600 bg-green-500 text-white px-4 rounded-md font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-green-500 hover:text-white "
+              >
+                Completed
+              </button>
+            ) : (
+              <button
+                onClick={markAsComplete}
+                className="py-2 w-40 ring-1 dark:text-black dark:ring-gray-300  dark:bg-white dark:hover:bg-white dark:ring-offset-black dark:hover:ring-offset-2 ring-black bg-white px-4 rounded-md font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-primary-700 hover:text-white "
+              >
+                Complete
+              </button>
+            )}
           </div>
         </main>
       </div>
