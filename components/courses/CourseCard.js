@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 import format from 'date-fns/format'
 import Link from 'next/link'
+import LegitMarkdown from '../LegitMarkdown'
 const CourseCard = ({ course }) => {
   const getAuthorName = useCallback(() => {
     const authors = course.authors.map((author) => author.name).join(', ')
@@ -30,7 +31,7 @@ const CourseCard = ({ course }) => {
         </div>
 
         <div className="mt-4 sm:pr-8">
-          <p className="text-sm text-gray-500 dark:text-gray-300">{course.description}</p>
+          <LegitMarkdown>{course.description}</LegitMarkdown>
         </div>
 
         <dl className="flex mt-6">

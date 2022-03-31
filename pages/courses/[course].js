@@ -6,6 +6,7 @@ import Course from '../../classes/Course.class'
 import PostsList from '../../components/courses/PostsList'
 import { useReducer, useEffect } from 'react'
 import { postsReducer } from '../../services/PostService'
+import LegitMarkdown from '../../components/LegitMarkdown'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -74,23 +75,30 @@ export default function CoursePage({ courseStr }) {
   return (
     <>
       <PageSEO title={`Courses - ${course.name}`} description={siteMetadata.description} />
-      <div className="">
-        <article className="chapters text-center">
-          {course &&
-            course.chapters.map((chapter, index) => {
-              return (
-                <section key={index} className="mb-2">
-                  <h3>{chapter.name}</h3>
-                  <PostsList
-                    chapter={chapter}
-                    courseSlug={course.slug}
-                    completedPosts={state.completedPosts}
-                  />
-                </section>
-              )
-            })}
-        </article>
+      <header className="text-5xl text-center mb-6 font-bold">
+        <h1>{course.name}</h1>
+      </header>
+      <div className="mb-6">
+        <LegitMarkdown>{course.description}</LegitMarkdown>
       </div>
+      <div className="mb-6">
+        <LegitMarkdown>{course.outline}</LegitMarkdown>
+      </div>
+      <article className="chapters text-center">
+        {course &&
+          course.chapters.map((chapter, index) => {
+            return (
+              <section key={index} className="mb-2">
+                <h3>{chapter.name}</h3>
+                <PostsList
+                  chapter={chapter}
+                  courseSlug={course.slug}
+                  completedPosts={state.completedPosts}
+                />
+              </section>
+            )
+          })}
+      </article>
     </>
   )
 }

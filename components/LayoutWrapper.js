@@ -11,7 +11,7 @@ const LayoutWrapper = ({ children }) => {
   const highlightContext = `relative w-full sm:w-auto block text-sm font-semibold outline-primary-600 ring-2 rounded-lg text-primary py-4 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 hover:bg-primary-600 hover:text-white hover:outline-none hover:ring-0`
   return (
     <SectionContainer>
-      <div className="flex flex-col justify-between h-screen">
+      <div className="flex flex-col h-screen">
         <header className="flex items-center justify-between py-0 sm:py-4">
           <div>
             <Link href="/" aria-label="Tailwind CSS Blog">
@@ -46,7 +46,7 @@ const LayoutWrapper = ({ children }) => {
             <MobileNav />
           </div>
         </header>
-        <main>{children}</main>
+        <main className="flex-1">{children}</main>
         <Footer />
       </div>
     </SectionContainer>
