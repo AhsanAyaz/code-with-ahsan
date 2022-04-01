@@ -1,4 +1,5 @@
-import Post from './Post.class'
+import Author from './Author.class'
+import Chapter from './Chapter.class'
 
 class Course {
   constructor(course) {
@@ -12,34 +13,12 @@ class Course {
     this.duration = courseAttributes.duration
     this.slug = courseAttributes.slug
     if (courseAttributes.chapters) {
-      this.chapters = courseAttributes.chapters.data.map((chapter) => {
-        const { attributes } = chapter
-        const { title, description, posts } = attributes
-        let mappedPosts = posts.data.map((post) => new Post(post))
-        if (mappedPosts.length > 0 && mappedPosts[0].order) {
-          // sort by order
-          mappedPosts.sort((a, b) => +a.order - +b.order)
-        }
-        return {
-          title,
-          description,
-          posts: mappedPosts,
-        }
-      })
+      this.chapters = courseAttributes.chapters.data.map((chapter) => new Chapter(chapter))
     } else {
       this.chapters = []
     }
 
-    this.authors = courseAttributes.authors.data.map((author) => {
-      const { attributes } = author
-      const { bio, name, socials, avatar } = attributes
-      return {
-        bio,
-        name,
-        socials,
-        avatar: avatar?.data?.attributes?.url,
-      }
-    })
+    this.authors = courseAttributes.authors.data.map((author) => new Author(author))
   }
 }
 

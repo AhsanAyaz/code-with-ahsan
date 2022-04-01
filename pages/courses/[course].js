@@ -84,21 +84,26 @@ export default function CoursePage({ courseStr }) {
       <div className="mb-6">
         <LegitMarkdown>{course.outline}</LegitMarkdown>
       </div>
-      <article className="chapters text-center">
-        {course &&
-          course.chapters.map((chapter, index) => {
-            return (
-              <section key={index} className="mb-2">
-                <h3>{chapter.name}</h3>
-                <PostsList
-                  chapter={chapter}
-                  courseSlug={course.slug}
-                  completedPosts={state.completedPosts}
-                />
-              </section>
-            )
-          })}
-      </article>
+      <div className="chapters">
+        <h4 className="text-center mb-6 font-bold">Chapters</h4>
+        <article>
+          {course &&
+            course.chapters.map((chapter, index) => {
+              return (
+                <section key={index} className="mb-2">
+                  {chapter.showName && (
+                    <div className="mb-4 text-base font-bold">{chapter.name}</div>
+                  )}
+                  <PostsList
+                    chapter={chapter}
+                    courseSlug={course.slug}
+                    completedPosts={state.completedPosts}
+                  />
+                </section>
+              )
+            })}
+        </article>
+      </div>
     </>
   )
 }

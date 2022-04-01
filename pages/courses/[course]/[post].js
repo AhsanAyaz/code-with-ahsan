@@ -116,7 +116,9 @@ export default function PostPage({ courseStr, postStr }) {
             course.chapters.map((chapter, index) => {
               return (
                 <section key={index} className="mb-2">
-                  <h3>{chapter.name}</h3>
+                  {chapter.showName && (
+                    <div className="mb-4 text-base font-bold">{chapter.name}</div>
+                  )}
                   <PostsList
                     chapter={chapter}
                     courseSlug={course.slug}

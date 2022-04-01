@@ -10,6 +10,8 @@ const LegitMarkdown = ({ children }) => {
             {props.children}
           </a>
         ),
+        ul: (props) => <ul className="list-disc pl-6 my-6">{props.children}</ul>,
+        li: (props) => <li className="py-2 text-lg">{props.children}</li>,
       }}
     >
       {children}
