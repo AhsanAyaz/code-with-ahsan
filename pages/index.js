@@ -6,8 +6,30 @@ import SocialIcon from '@/components/social-icons'
 import NewsletterForm from '@/components/NewsletterForm'
 import AboutContent from '../components/AboutContent'
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 export default function Home() {
+  useEffect(() => {
+    var chatbox = document.getElementById('fb-customer-chat')
+    chatbox.setAttribute('page_id', '114435320270263')
+    chatbox.setAttribute('attribution', 'biz_inbox')
+    window.fbAsyncInit = function () {
+      // eslint-disable-next-line no-undef
+      FB.init({
+        xfbml: true,
+        version: 'v13.0',
+      })
+    }
+    ;(function (d, s, id) {
+      let js,
+        fjs = d.getElementsByTagName(s)[0]
+      if (d.getElementById(id)) return
+      js = d.createElement(s)
+      js.id = id
+      js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js'
+      fjs.parentNode.insertBefore(js, fjs)
+    })(document, 'script', 'facebook-jssdk')
+  }, [])
   return (
     <>
       <PageSEO title={siteMetadata.title} description={siteMetadata.description} />
@@ -80,6 +102,9 @@ export default function Home() {
           <a href="https://www.vecteezy.com/free-vector/human">Human Vectors by Vecteezy</a>
         </div>
       </div>
+      <div id="fb-root"></div>
+
+      <div id="fb-customer-chat" className="fb-customerchat"></div>
     </>
   )
 }
