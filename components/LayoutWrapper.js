@@ -13,8 +13,8 @@ const LayoutWrapper = ({ children }) => {
     <SectionContainer>
       <div className="flex flex-col h-screen">
         <header className="flex items-center justify-between py-0 sm:py-4">
-          <div>
-            <Link href="/" aria-label="Tailwind CSS Blog">
+          <nav>
+            <Link href="/" aria-label="Code with Ahsan">
               <div className="flex items-center justify-between">
                 <Image
                   src={siteMetadata.siteLogo}
@@ -25,9 +25,9 @@ const LayoutWrapper = ({ children }) => {
                 />
               </div>
             </Link>
-          </div>
+          </nav>
           <div className="flex items-center text-base leading-5">
-            <div className="hidden sm:flex items-center">
+            <nav className="hidden sm:flex items-center">
               {headerNavLinks.map((link) => (
                 <Link
                   key={link.title}
@@ -41,7 +41,7 @@ const LayoutWrapper = ({ children }) => {
                   {link.title}
                 </Link>
               ))}
-            </div>
+            </nav>
             <ThemeSwitch />
             <MobileNav />
           </div>

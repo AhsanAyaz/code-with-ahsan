@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import ReactMarkdown from 'react-markdown'
-const LegitMarkdown = ({ children }) => {
+const LegitMarkdown = ({ children, components = {} }) => {
   return (
     <ReactMarkdown
       components={{
@@ -12,6 +12,7 @@ const LegitMarkdown = ({ children }) => {
         ),
         ul: (props) => <ul className="list-disc pl-6 my-6">{props.children}</ul>,
         li: (props) => <li className="py-2 text-lg">{props.children}</li>,
+        ...components,
       }}
     >
       {children}

@@ -6,10 +6,21 @@ import SocialIcon from '@/components/social-icons'
 import NewsletterForm from '@/components/NewsletterForm'
 import AboutContent from '../components/AboutContent'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import LegitMarkdown from 'components/LegitMarkdown'
 
 export default function Home() {
+  const [banners, setBanners] = useState([])
+
+  const getBanners = async () => {
+    const response = await fetch(`/api/banners`)
+    const { banners } = await response.json()
+    console.log({ banners })
+    setBanners(banners)
+  }
+
   useEffect(() => {
+    getBanners()
     var chatbox = document.getElementById('fb-customer-chat')
     chatbox.setAttribute('page_id', '114435320270263')
     chatbox.setAttribute('attribution', 'biz_inbox')
@@ -33,33 +44,46 @@ export default function Home() {
   return (
     <>
       <PageSEO title={siteMetadata.title} description={siteMetadata.description} />
-
-      <div className="flex flex-col justify-center h-full">
-        <div className="flex flex-col-reverse lg:flex-row items-start mt-8 mb-20">
-          <div className="flex flex-col mr-4 mt-14 lg:mt-0">
-            <div className="text-3xl text-center sm:text-left sm:text-4xl flex-1 mb-16">
-              On a mission to make learning Software Development fun and easy for you!
-            </div>
-            <div className="flex items-center lg:items-start flex-col gap-4">
-              <Link href={'/courses'} passHref>
-                <button className="py-2 w-40 ring-1 dark:text-black dark:ring-gray-300  dark:bg-white dark:hover:bg-white dark:ring-offset-black dark:hover:ring-offset-2 ring-primary-500 bg-primary-700 text-white px-4 rounded-md font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 hover:bg-primary-700 hover:text-white ">
-                  Take a Course
-                </button>
-              </Link>
-              <Link href={'/blog'} passHref>
-                <button className="py-2 w-40 ring-1 dark:text-white dark:ring-gray-300 dark:hover:ring-offset-2 dark:hover:bg-transparent text-primary-500 ring-primary-500 px-4 rounded-md font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 hover:text-white dark:ring-offset-black">
-                  Read the Blog
-                </button>
-              </Link>
-            </div>
-          </div>
+      {banners.map((banner, index) => (
+        <div
+          className="top-banner mb-4 relative bg-indigo-700 text-white px-6 py-3 rounded-lg"
+          key={index}
+        >
+          <span className="animate-ping absolute -right-1 -top-1 inline-flex h-4 w-4 rounded-full bg-yellow-700 dark:bg-yellow-300 z-10 opacity-75"></span>
+          <LegitMarkdown
+            components={{
+              a: (props) => (
+                <a className="text-yellow-300" target={'_blank'} {...props}>
+                  {props.children}
+                </a>
+              ),
+            }}
+          >
+            {banner.attributes.content}
+          </LegitMarkdown>
+        </div>
+      ))}
+      <div className="flex flex-col justify-center">
+        <div className="flex flex-col items-start mb-6 relative">
           <Image
-            src="/static/images/home/landing-vector.svg"
+            src="/static/images/banner.png"
             alt="boy working"
             width={1600}
-            height={1200}
+            height={1000}
             objectFit="contain"
           />
+          <div className="flex flex-col pr-6 absolute bottom-0 top-0 items-end justify-center h-full w-full gap-4">
+            <Link href={'/courses'} passHref>
+              <button className="py-1 px-2 lg:py-2 lg:px-4 w-32 lg:w-40 ring-1 dark:text-black dark:ring-gray-300  dark:bg-white dark:hover:bg-white dark:ring-offset-black dark:hover:ring-offset-2 ring-primary-500 bg-primary-700 text-white rounded-md font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 hover:bg-primary-700 hover:text-white sm:text-sm md:text-base">
+                Take a Course
+              </button>
+            </Link>
+            <Link href={'/blog'} passHref>
+              <button className="py-1 px-2 lg:py-2 lg:px-4 w-32 lg:w-40 ring-1 bg-black text-white ring-gray-300 hover:ring-offset-2 hover:bg-transparent rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2  hover:text-white ring-offset-black">
+                Read the Blog
+              </button>
+            </Link>
+          </div>
         </div>
         <figure className="md:flex bg-gray-100 rounded-xl p-8 md:p-0 dark:bg-gray-800">
           <img
@@ -77,20 +101,10 @@ export default function Home() {
         </figure>
         <div className="text-center mt-5 parent-container">
           <div className="inline-flex gap-10 icons-container my-8">
-            <a href="https://twitch.tv/CodeWithAhsan" target="_blank" rel="noopener noreferrer">
-              <SocialIcon kind="twitch" href={siteMetadata.twitch} size="42" />
-            </a>
-            <a href="https://youtube.com/codewithahsan" target="_blank" rel="noopener noreferrer">
-              <SocialIcon
-                color="text-red-700"
-                kind="youtube"
-                href={siteMetadata.youtube}
-                size="42"
-              />
-            </a>
-            <a href="https://github.com/code-with-ahsan" target="_blank" rel="noopener noreferrer">
-              <SocialIcon kind="github" href={siteMetadata.github} size="42" />
-            </a>
+            <SocialIcon kind="twitch" href={siteMetadata.twitch} size="42" />
+
+            <SocialIcon color="text-red-700" kind="youtube" href={siteMetadata.youtube} size="42" />
+            <SocialIcon kind="github" href={siteMetadata.github} size="42" />
           </div>
         </div>
         {siteMetadata.newsletter.provider !== '' && (

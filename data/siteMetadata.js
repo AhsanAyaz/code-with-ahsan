@@ -8,7 +8,7 @@ const siteMetadata = {
   siteRepo: 'https://github.com/code-with-ahsan/code-with-ahsan',
   siteLogo: '/static/images/logo.png',
   image: '/static/images/avatar.jpeg',
-  socialBanner: '/static/images/meta.png',
+  socialBanner: '/static/images/banner.png',
   email: 'muhd.ahsanayaz@gmail.com',
   github: 'https://github.com/code-with-ahsan',
   twitter: 'https://twitter.com/codewith_ahsan',

@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/AhsanAyaz/ahsanayaz/master/public/static/images/meta.png"/>
+<img src="https://raw.githubusercontent.com/AhsanAyaz/ahsanayaz/master/public/static/images/banner.png"/>
  <hr></hr>
 <div style="text-align: center">
   <div>
