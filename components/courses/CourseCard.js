@@ -30,7 +30,7 @@ const CourseCard = ({ course }) => {
           </div>
         </div>
 
-        <div className="mt-4 sm:pr-8">
+        <div className="mt-4 sm:pr-8 max-h-32 line-clamp-3">
           <LegitMarkdown>{course.description}</LegitMarkdown>
         </div>
 

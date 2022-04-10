@@ -7,6 +7,7 @@ import Post from '../../../classes/Post.class'
 import PostsList from '../../../components/courses/PostsList'
 import { useReducer, useEffect } from 'react'
 import { postsReducer } from '../../../services/PostService'
+import STRAPI_CONFIG from '../../../lib/strapiConfig'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -15,7 +16,7 @@ export async function getStaticPaths() {
   const query = qs.stringify(
     {
       populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts'],
-      _sort: 'chapters.posts:ASC',
+      publicationState: STRAPI_CONFIG.publicationState,
     },
     {
       encodeValuesOnly: true,

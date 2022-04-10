@@ -11,6 +11,7 @@ class Course {
     this.videoUrls = courseAttributes.videoUrls
     this.publishedAt = courseAttributes.publishedAt
     this.duration = courseAttributes.duration
+    this.banner = courseAttributes.banner?.data?.attributes?.url
     this.slug = courseAttributes.slug
     if (courseAttributes.chapters) {
       this.chapters = courseAttributes.chapters.data.map((chapter) => new Chapter(chapter))
@@ -19,6 +20,7 @@ class Course {
     }
 
     this.authors = courseAttributes.authors.data.map((author) => new Author(author))
+    console.log(this)
   }
 }
 

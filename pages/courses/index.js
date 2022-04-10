@@ -4,6 +4,7 @@ import axios from 'axios'
 import CourseCard from '../../components/courses/CourseCard'
 import qs from 'qs'
 import Course from '../../classes/Course.class'
+import STRAPI_CONFIG from '../../lib/strapiConfig'
 
 export async function getStaticProps() {
   const strapiUrl = process.env.STRAPI_URL
@@ -11,6 +12,8 @@ export async function getStaticProps() {
   const query = qs.stringify(
     {
       populate: ['authors', 'authors.avatar'],
+      sort: ['publishedAt:desc'],
+      publicationState: STRAPI_CONFIG.publicationState,
     },
     {
       encodeValuesOnly: true,

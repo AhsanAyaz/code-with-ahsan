@@ -7,6 +7,8 @@ import PostsList from '../../components/courses/PostsList'
 import { useReducer, useEffect } from 'react'
 import { postsReducer } from '../../services/PostService'
 import LegitMarkdown from '../../components/LegitMarkdown'
+import Image from 'next/image'
+import STRAPI_CONFIG from '../../lib/strapiConfig'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -15,7 +17,7 @@ export async function getStaticPaths() {
   const query = qs.stringify(
     {
       populate: ['authors', 'authors.avatar'],
-      _sort: 'chapters.posts:ASC',
+      publicationState: STRAPI_CONFIG.publicationState,
     },
     {
       encodeValuesOnly: true,
@@ -46,7 +48,8 @@ export async function getStaticProps({ params }) {
 
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts'],
+      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts', 'banner'],
+      publicationState: STRAPI_CONFIG.publicationState,
     },
     {
       encodeValuesOnly: true,
@@ -77,6 +80,17 @@ export default function CoursePage({ courseStr }) {
       <PageSEO title={`Courses - ${course.name}`} description={siteMetadata.description} />
       <header className="text-5xl text-center mb-6 font-bold">
         <h1>{course.name}</h1>
+        <div className="my-4">
+          {course.banner && (
+            <Image
+              width={900}
+              height={400}
+              objectFit={'contain'}
+              alt={`${course.name} banner`}
+              src={course.banner}
+            />
+          )}
+        </div>
       </header>
       <div className="mb-6">
         <LegitMarkdown>{course.description}</LegitMarkdown>
@@ -84,11 +98,11 @@ export default function CoursePage({ courseStr }) {
       <div className="mb-6">
         <LegitMarkdown>{course.outline}</LegitMarkdown>
       </div>
-      <div className="chapters">
-        <h4 className="text-center mb-6 font-bold">Chapters</h4>
-        <article>
-          {course &&
-            course.chapters.map((chapter, index) => {
+      {course?.chapters?.length ? (
+        <div className="chapters">
+          <h4 className="text-center mb-6 font-bold">Chapters</h4>
+          <article>
+            {course.chapters.map((chapter, index) => {
               return (
                 <section key={index} className="mb-2">
                   {chapter.showName && (
@@ -102,8 +116,9 @@ export default function CoursePage({ courseStr }) {
                 </section>
               )
             })}
-        </article>
-      </div>
+          </article>
+        </div>
+      ) : null}
     </>
   )
 }
