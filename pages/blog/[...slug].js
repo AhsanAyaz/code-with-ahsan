@@ -76,3 +76,5 @@ export default function Blog({ post, authorDetails, prev, next }) {
     </>
   )
 }
+
+Blog.showAds = true

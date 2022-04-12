@@ -126,3 +126,5 @@ export default function CoursePage({ courseStr }) {
     </>
   )
 }
+
+CoursePage.showAds = true

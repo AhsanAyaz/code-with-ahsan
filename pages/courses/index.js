@@ -45,3 +45,5 @@ export default function Courses({ coursesStr }) {
     </>
   )
 }
+
+Courses.showAds = true

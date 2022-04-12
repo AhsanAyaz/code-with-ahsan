@@ -157,3 +157,5 @@ export default function PostPage({ courseStr, postStr }) {
     </>
   )
 }
+
+PostPage.showAds = true
