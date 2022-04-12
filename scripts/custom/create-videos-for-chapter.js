@@ -4,13 +4,20 @@ const puppeteer = require('puppeteer')
 // Headers config
 axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.STRAPI_API_ADMIN_KEY}`
 
+const toKebabCase = (str) =>
+  str &&
+  str
+    .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
+    .map((x) => x.toLowerCase())
+    .join('-')
+
 // Constants
 const PLAYLIST_URL =
-  'https://www.youtube.com/watch?v=e8CKjkwpadA&list=PL2sQdFoGnLIjERHiLVzcheUODYLPMiUx3'
-const CHAPTER_ID = '1'
+  'https://www.youtube.com/watch?v=5VUIEryDwI0&list=PL2sQdFoGnLIhobWtEEvClQ5-peYO-RSZj'
+const CHAPTER_ID = '3'
 
 const createPosts = (videos, chapterId) => {
-  videos.reduce((acc, video, index) => {
+  videos.reduce((acc, video) => {
     const { url, title } = video
     return acc.then(() => {
       return axios
@@ -21,6 +28,7 @@ const createPosts = (videos, chapterId) => {
             videoUrl: url,
             video: null,
             resources: [],
+            slug: toKebabCase(title),
             chapter: chapterId,
           },
         })

@@ -77,7 +77,11 @@ export default function CoursePage({ courseStr }) {
   }, [course.slug])
   return (
     <>
-      <PageSEO title={`Courses - ${course.name}`} description={siteMetadata.description} />
+      <PageSEO
+        title={course.name}
+        imageUrl={course.banner}
+        description={course.description || siteMetadata.description}
+      />
       <header className="text-5xl text-center mb-6 font-bold">
         <h1>{course.name}</h1>
         <div className="my-4">

@@ -57,6 +57,7 @@ export async function getStaticProps({ params }) {
   const query = qs.stringify(
     {
       populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts'],
+      publicationState: STRAPI_CONFIG.publicationState,
     },
     {
       encodeValuesOnly: true,
@@ -110,7 +111,7 @@ export default function PostPage({ courseStr, postStr }) {
   }, [post.slug])
   return (
     <>
-      <PageSEO title={`Courses - ${course.name}`} description={siteMetadata.description} />
+      <PageSEO title={post.title} description={post.description || siteMetadata.description} />
       <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-4">
         <article className="chapters col-span-1">
           {course &&

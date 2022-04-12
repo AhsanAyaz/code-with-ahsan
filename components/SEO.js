@@ -28,9 +28,9 @@ const CommonSEO = ({ title, description, ogType, ogImage, twImage }) => {
   )
 }
 
-export const PageSEO = ({ title, description }) => {
-  const ogImageUrl = siteMetadata.siteUrl + siteMetadata.socialBanner
-  const twImageUrl = siteMetadata.siteUrl + siteMetadata.socialBanner
+export const PageSEO = ({ title, description, imageUrl }) => {
+  const ogImageUrl = imageUrl || siteMetadata.siteUrl + siteMetadata.socialBanner
+  const twImageUrl = imageUrl || siteMetadata.siteUrl + siteMetadata.socialBanner
   return (
     <CommonSEO
       title={title}
