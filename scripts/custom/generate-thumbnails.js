@@ -76,10 +76,6 @@ async function getAllFilesFrontMatter(folder) {
         date: frontmatter.date ? new Date(frontmatter.date).toISOString() : null,
       }
       allFrontMatter.push(frontMatterData)
-      // if (folder === 'blog' && process.env.NODE_ENV === 'production') {
-      //   console.log('test', folder)
-      //   generateThumbnailFromFrontMatter(frontMatterData)
-      // }
     }
   })
 

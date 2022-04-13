@@ -20,7 +20,6 @@ class Course {
     }
 
     this.authors = courseAttributes.authors.data.map((author) => new Author(author))
-    console.log(this)
   }
 }
 

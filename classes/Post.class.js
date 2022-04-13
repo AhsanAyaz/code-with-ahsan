@@ -16,11 +16,17 @@ class Post {
     try {
       if (this.videoUrl.includes('youtube')) {
         vidUrl = this.videoUrl.split('watch?v=')[1]
+        if (vidUrl.includes('&')) {
+          vidUrl = vidUrl.split('&')[0]
+        }
         return `https://www.youtube.com/embed/${vidUrl}`
       } else if (this.videoUrl.includes('vimeo')) {
         vidUrl = this.videoUrl.split('vimeo.com/')[1]
       } else if (this.videoUrl.includes('youtu.be')) {
         vidUrl = this.videoUrl.split('youtu.be/')[1]
+        if (vidUrl.includes('&')) {
+          vidUrl = vidUrl.split('&')[0]
+        }
         return `https://www.youtube.com/embed/${vidUrl}`
       } else if (this.videoUrl.includes('dailymotion')) {
         vidUrl = this.videoUrl.split('video/')[1]
