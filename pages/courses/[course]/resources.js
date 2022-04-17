@@ -2,22 +2,19 @@ import siteMetadata from '@/data/siteMetadata'
 import { PageSEO } from '@/components/SEO'
 import axios from 'axios'
 import qs from 'qs'
-import Course from '../../classes/Course.class'
-import PostsList from '../../components/courses/PostsList'
+import Course from '../../../classes/Course.class'
+import PostsList from '../../../components/courses/PostsList'
+import STRAPI_CONFIG from '../../../lib/strapiConfig'
 import { useReducer, useEffect } from 'react'
-import { postsReducer } from '../../services/PostService'
-import LegitMarkdown from '../../components/LegitMarkdown'
-import Image from 'next/image'
-import STRAPI_CONFIG from '../../lib/strapiConfig'
-import ResourcesLinks from '../../components/ResourcesLinks'
-
+import { postsReducer } from '../../../services/PostService'
+import ResourcesLinks from '../../../components/ResourcesLinks'
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
 
 export async function getStaticPaths() {
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar'],
+      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts'],
       publicationState: STRAPI_CONFIG.publicationState,
     },
     {
@@ -33,23 +30,27 @@ export async function getStaticPaths() {
     },
   })
   const courses = coursesResp.data.data.map((course) => new Course(course))
-  const config = {
-    paths: courses.map((course) => ({
+  const paths = []
+  courses.map((course) => {
+    paths.push({
       params: {
         course: course.slug,
       },
-    })),
+    })
+  })
+  const config = {
+    paths,
     fallback: false,
   }
   return config
 }
 
 export async function getStaticProps({ params }) {
-  const courseId = params.course
+  const { course: courseId } = params
 
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts', 'banner', 'resources'],
+      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts', 'resources'],
       publicationState: STRAPI_CONFIG.publicationState,
     },
     {
@@ -68,9 +69,11 @@ export async function getStaticProps({ params }) {
   return { props: { courseStr: JSON.stringify(course) } }
 }
 
-export default function CoursePage({ courseStr }) {
+export default function CourseResourcesPage({ courseStr }) {
   const course = JSON.parse(courseStr)
   const [state, dispatch] = useReducer(postsReducer, { completedPosts: {} })
+  console.log({ course })
+  const { resources } = course
   useEffect(() => {
     dispatch({
       type: 'RETRIEVE_COMPLETED_POSTS',
@@ -79,39 +82,19 @@ export default function CoursePage({ courseStr }) {
   return (
     <>
       <PageSEO
-        title={course.name}
-        imageUrl={course.banner}
+        title={`${course.name} - Resources`}
         description={course.description || siteMetadata.description}
       />
-      <header className="text-5xl text-center mb-6 font-bold">
-        <h1>{course.name}</h1>
-        <div className="my-4">
-          {course.banner && (
-            <Image
-              width={900}
-              height={400}
-              objectFit={'contain'}
-              alt={`${course.name} banner`}
-              src={course.banner}
-            />
-          )}
-        </div>
-      </header>
-      <div className="mb-6">
-        <LegitMarkdown>{course.description}</LegitMarkdown>
-      </div>
-      <div className="mb-6">
-        <LegitMarkdown>{course.outline}</LegitMarkdown>
-      </div>
-      {course?.chapters?.length ? (
-        <div className="chapters">
-          <h4 className="text-center mb-6 font-bold">Chapters</h4>
-          <article>
-            {course.chapters.map((chapter, index) => {
+      <div className="flex gap-12 flex-col-reverse md:grid md:grid-cols-3 md:gap-4">
+        <article className="chapters col-span-1">
+          {course &&
+            course.chapters.map((chapter, index) => {
               return (
                 <section key={index} className="mb-2">
                   {chapter.showName && (
-                    <div className="mb-4 text-base font-bold">{chapter.name}</div>
+                    <div className="mb-4 text-left md:text-center text-base font-bold">
+                      {chapter.name}
+                    </div>
                   )}
                   <PostsList
                     chapter={chapter}
@@ -121,19 +104,13 @@ export default function CoursePage({ courseStr }) {
                 </section>
               )
             })}
-          </article>
-        </div>
-      ) : null}
-      {course.resources?.length ? (
-        <div className="resources mt-6">
-          <ResourcesLinks
-            headingClasses="text-center mb-6 font-bold"
-            resources={course.resources}
-          />
-        </div>
-      ) : null}
+        </article>
+        <main className="flex-1 md:min-h-[300px] col-span-2">
+          <ResourcesLinks resources={resources} />
+        </main>
+      </div>
     </>
   )
 }
 
-CoursePage.showAds = true
+CourseResourcesPage.showAds = true

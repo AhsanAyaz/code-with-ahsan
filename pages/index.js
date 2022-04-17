@@ -15,7 +15,6 @@ export default function Home() {
   const getBanners = async () => {
     const response = await fetch(`/api/banners`)
     const { banners } = await response.json()
-    console.log({ banners })
     setBanners(banners)
   }
 

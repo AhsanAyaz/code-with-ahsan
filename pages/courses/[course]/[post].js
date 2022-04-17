@@ -8,6 +8,7 @@ import PostsList from '../../../components/courses/PostsList'
 import { useReducer, useEffect } from 'react'
 import { postsReducer } from '../../../services/PostService'
 import STRAPI_CONFIG from '../../../lib/strapiConfig'
+import Link from 'next/link'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -56,7 +57,7 @@ export async function getStaticProps({ params }) {
 
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts'],
+      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts', 'resources'],
       publicationState: STRAPI_CONFIG.publicationState,
     },
     {
@@ -113,7 +114,7 @@ export default function PostPage({ courseStr, postStr }) {
     <>
       <PageSEO title={post.title} description={post.description || siteMetadata.description} />
       <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-4">
-        <article className="chapters col-span-1">
+        <aside className="chapters col-span-1">
           {course &&
             course.chapters.map((chapter, index) => {
               return (
@@ -130,7 +131,21 @@ export default function PostPage({ courseStr, postStr }) {
                 </section>
               )
             })}
-        </article>
+          {course.resources?.length && (
+            <>
+              <div className="my-6">
+                <h5 className="text-center md:text-left mb-4">Resources</h5>
+                <Link passHref href={`/courses/${course.slug}/resources`}>
+                  <li
+                    className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-[#6366f1] cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white`}
+                  >
+                    <a className="break-words">View Resources</a>
+                  </li>
+                </Link>
+              </div>
+            </>
+          )}
+        </aside>
         <main className="flex-1 md:min-h-[300px] col-span-2">
           <div className="embed-container mb-4">
             <iframe src={post.embedUrl} title={post.title} frameBorder="0" allowFullScreen></iframe>

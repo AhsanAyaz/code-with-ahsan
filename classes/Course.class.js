@@ -11,6 +11,7 @@ class Course {
     this.videoUrls = courseAttributes.videoUrls
     this.publishedAt = courseAttributes.publishedAt
     this.duration = courseAttributes.duration
+    this.resources = courseAttributes.resources
     this.banner = courseAttributes.banner?.data?.attributes?.url
     this.slug = courseAttributes.slug
     if (courseAttributes.chapters) {
