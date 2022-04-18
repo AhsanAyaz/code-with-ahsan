@@ -18,8 +18,7 @@ export default function Home() {
     setBanners(banners)
   }
 
-  useEffect(() => {
-    getBanners()
+  const initFBMessenger = () => {
     var chatbox = document.getElementById('fb-customer-chat')
     chatbox.setAttribute('page_id', '114435320270263')
     chatbox.setAttribute('attribution', 'biz_inbox')
@@ -39,13 +38,20 @@ export default function Home() {
       js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js'
       fjs.parentNode.insertBefore(js, fjs)
     })(document, 'script', 'facebook-jssdk')
+  }
+
+  useEffect(() => {
+    getBanners()
+    if (!location.href.includes('localhost')) {
+      initFBMessenger()
+    }
   }, [])
   return (
     <>
       <PageSEO title={siteMetadata.title} description={siteMetadata.description} />
       {banners.map((banner, index) => (
         <div
-          className="top-banner mb-4 relative bg-indigo-700 text-white px-6 py-3 rounded-lg"
+          className="top-banner mb-4 relative bg-indigo-700 text-white px-6 py-3 rounded-md"
           key={index}
         >
           <span className="animate-ping absolute -right-1 -top-1 inline-flex h-4 w-4 rounded-full bg-yellow-700 dark:bg-yellow-300 z-10 opacity-75"></span>

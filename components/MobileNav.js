@@ -16,7 +16,7 @@ const MobileNav = () => {
       return !status
     })
   }
-  const highlightContext = `relative w-full sm:w-auto block text-sm font-semibold bg-primary-600 rounded-lg text-white py-3 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 hover:bg-primary-500`
+  const highlightContext = `relative w-full sm:w-auto block text-sm font-semibold bg-primary-600 rounded-md text-white py-3 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 hover:bg-primary-500`
   return (
     <div className="sm:hidden">
       <button

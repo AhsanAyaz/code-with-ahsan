@@ -11,7 +11,7 @@ export async function getStaticProps() {
   const strapiAPIKey = process.env.STRAPI_API_KEY
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar'],
+      populate: ['authors', 'authors.avatar', 'banner', 'banner.image'],
       sort: ['publishedAt:desc'],
       publicationState: STRAPI_CONFIG.publicationState,
     },
@@ -36,7 +36,7 @@ export default function Courses({ coursesStr }) {
   return (
     <>
       <PageSEO title={`Courses - ${siteMetadata.author}`} description={siteMetadata.description} />
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="max-w-lg mx-auto grid grid-cols-1 gap-8">
         {courses &&
           courses.map((course) => {
             return <CourseCard course={course} key={course.id} />
