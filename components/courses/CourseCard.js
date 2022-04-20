@@ -31,7 +31,7 @@ const CourseCard = ({ course }) => {
           <LegitMarkdown>{course.description}</LegitMarkdown>
         </div>
 
-        <button className="px-4 mb-6 hover:bg-green-500 hover:shadow-md py-3 w-full bg-green-400">
+        <button className="px-4 text-white uppercase mb-6 hover:bg-green-500 hover:shadow-md py-3 w-full bg-green-400">
           Start
         </button>
 
