@@ -2,12 +2,14 @@ class Post {
   constructor(post) {
     this.id = post.id
     const attributes = post.attributes
-    const { title, description, videoUrl, order, slug } = attributes
+    const { title, description, videoUrl, order, slug, chapter } = attributes
+    const chapterId = chapter?.data?.id
     this.title = title
     this.description = description
     this.videoUrl = videoUrl
     this.order = order
     this.slug = slug
+    this.chapterId = chapterId
     this.embedUrl = this.getEmbedUrl()
   }
 

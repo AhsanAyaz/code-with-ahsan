@@ -6,9 +6,11 @@ import Course from '../../../classes/Course.class'
 import Post from '../../../classes/Post.class'
 import PostsList from '../../../components/courses/PostsList'
 import { useReducer, useEffect } from 'react'
-import { postsReducer } from '../../../services/PostService'
+import { getNextAndPreviousPosts, postsReducer } from '../../../services/PostService'
 import STRAPI_CONFIG from '../../../lib/strapiConfig'
 import Link from 'next/link'
+import Button from '../../../components/Button'
+import { useRouter } from 'next/router'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -72,7 +74,16 @@ export async function getStaticProps({ params }) {
       Authorization: `Bearer ${strapiAPIKey}`,
     },
   })
-  const postResp = await axios.get(`${strapiUrl}/api/posts/${postId}`, {
+  const postQuery = qs.stringify(
+    {
+      populate: ['chapter'],
+      publicationState: STRAPI_CONFIG.publicationState,
+    },
+    {
+      encodeValuesOnly: true,
+    }
+  )
+  const postResp = await axios.get(`${strapiUrl}/api/posts/${postId}?${postQuery}`, {
     headers: {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
@@ -80,14 +91,29 @@ export async function getStaticProps({ params }) {
     },
   })
   const course = new Course(coursesResp.data.data)
+  console.log(postResp.data.data)
   const post = new Post(postResp.data.data)
-  return { props: { courseStr: JSON.stringify(course), postStr: JSON.stringify(post) } }
+  const { nextPost, previousPost } = getNextAndPreviousPosts(course, post)
+  return {
+    props: {
+      courseStr: JSON.stringify(course),
+      postStr: JSON.stringify({
+        ...post,
+        nextPost,
+        previousPost,
+      }),
+    },
+  }
 }
 
 export default function PostPage({ courseStr, postStr }) {
   const course = JSON.parse(courseStr)
   const [state, dispatch] = useReducer(postsReducer, { completedPosts: {} })
   const post = JSON.parse(postStr)
+  const router = useRouter()
+  const goToPost = (slug) => {
+    router.push(`/courses/${course.slug}/${slug}`)
+  }
   const markAsComplete = () => {
     dispatch({
       type: 'MARK_AS_COMPLETE',
@@ -132,18 +158,16 @@ export default function PostPage({ courseStr, postStr }) {
               )
             })}
           {course.resources?.length && (
-            <>
-              <div className="my-6">
-                <h5 className="text-center md:text-left mb-4">Resources</h5>
-                <Link passHref href={`/courses/${course.slug}/resources`}>
-                  <li
-                    className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-[#6366f1] cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white`}
-                  >
-                    <a className="break-words">View Resources</a>
-                  </li>
-                </Link>
-              </div>
-            </>
+            <div className="my-6">
+              <h5 className="text-center md:text-left mb-4">Resources</h5>
+              <Link passHref href={`/courses/${course.slug}/resources`}>
+                <li
+                  className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-[#6366f1] cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white`}
+                >
+                  <a className="break-words">View Resources</a>
+                </li>
+              </Link>
+            </div>
           )}
         </aside>
         <main className="flex-1 md:min-h-[300px] col-span-2">
@@ -151,21 +175,40 @@ export default function PostPage({ courseStr, postStr }) {
             <iframe src={post.embedUrl} title={post.title} frameBorder="0" allowFullScreen></iframe>
           </div>
           <div className="mb-4 flex justify-end">
-            {state.completedPosts[post.slug] ? (
-              <button
-                onClick={markAsIncomplete}
-                className="py-2 w-40 ring-1 dark:text-black dark:ring-offset-black dark:hover:ring-offset-2 ring-green-600 bg-green-500 text-white px-4 rounded-md font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-green-500 hover:text-white "
-              >
-                Completed
-              </button>
-            ) : (
-              <button
-                onClick={markAsComplete}
-                className="py-2 w-40 ring-1 dark:text-black dark:ring-gray-300  dark:bg-white dark:hover:bg-white dark:ring-offset-black dark:hover:ring-offset-2 ring-black bg-white px-4 rounded-md font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-primary-700 hover:text-white "
-              >
-                Complete
-              </button>
-            )}
+            <div className="flex-1">
+              {post.previousPost && (
+                <Button
+                  onClick={() => {
+                    goToPost(post.previousPost)
+                  }}
+                >
+                  Previous
+                </Button>
+              )}
+            </div>
+            <div className="flex gap-4">
+              {state.completedPosts[post.slug] ? (
+                <Button color="green" onClick={markAsIncomplete}>
+                  Completed
+                </Button>
+              ) : (
+                <button
+                  onClick={markAsComplete}
+                  className="py-2 dark:text-white px-4 rounded-md font-bold"
+                >
+                  Mark as Complete
+                </button>
+              )}
+              {post.nextPost && (
+                <Button
+                  onClick={() => {
+                    goToPost(post.nextPost)
+                  }}
+                >
+                  Next
+                </Button>
+              )}
+            </div>
           </div>
         </main>
       </div>
