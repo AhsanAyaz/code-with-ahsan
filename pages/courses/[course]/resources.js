@@ -8,6 +8,7 @@ import STRAPI_CONFIG from '../../../lib/strapiConfig'
 import { useReducer, useEffect } from 'react'
 import { postsReducer } from '../../../services/PostService'
 import ResourcesLinks from '../../../components/ResourcesLinks'
+import logAnalyticsEvent from '../../../lib/utils/logAnalyticsEvent'
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
 
@@ -77,6 +78,9 @@ export default function CourseResourcesPage({ courseStr }) {
   useEffect(() => {
     dispatch({
       type: 'RETRIEVE_COMPLETED_POSTS',
+    })
+    logAnalyticsEvent('course_resources_viewed', {
+      courseSlug: course.slug,
     })
   }, [course.slug])
   return (

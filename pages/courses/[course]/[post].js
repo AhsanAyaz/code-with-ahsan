@@ -11,6 +11,7 @@ import STRAPI_CONFIG from '../../../lib/strapiConfig'
 import Link from 'next/link'
 import Button from '../../../components/Button'
 import { useRouter } from 'next/router'
+import logAnalyticsEvent from '../../../lib/utils/logAnalyticsEvent'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -121,6 +122,10 @@ export default function PostPage({ courseStr, postStr }) {
         slug: post.slug,
       },
     })
+    logAnalyticsEvent('post_marked_complete', {
+      courseSlug: course.slug,
+      postSlug: post.slug,
+    })
   }
   const markAsIncomplete = () => {
     dispatch({
@@ -129,6 +134,10 @@ export default function PostPage({ courseStr, postStr }) {
         slug: post.slug,
       },
     })
+    logAnalyticsEvent('post_marked_incomplete', {
+      courseSlug: course.slug,
+      postSlug: post.slug,
+    })
   }
 
   useEffect(() => {
@@ -136,6 +145,12 @@ export default function PostPage({ courseStr, postStr }) {
       type: 'RETRIEVE_COMPLETED_POSTS',
     })
   }, [post.slug])
+  useEffect(() => {
+    logAnalyticsEvent('course_post_viewed', {
+      courseSlug: course.slug,
+      postSlug: post.slug,
+    })
+  }, [post.slug, course.slug])
   return (
     <>
       <PageSEO title={post.title} description={post.description || siteMetadata.description} />
