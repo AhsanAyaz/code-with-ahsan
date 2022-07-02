@@ -19,6 +19,7 @@ export default function AngularCookbook() {
     <>
       <PageSEO
         title={`Angular Cookbook - ${siteMetadata.author}`}
+        imageUrl={'https://m.media-amazon.com/images/P/B08VTWYJ7H.01._SCLZZZZZZZ_SX500_.jpg'}
         description={siteMetadata.description}
       />
     </>
