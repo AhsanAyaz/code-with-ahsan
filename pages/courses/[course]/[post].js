@@ -172,7 +172,7 @@ export default function PostPage({ courseStr, postStr }) {
                 </section>
               )
             })}
-          {course.resources?.length && (
+          {course.resources?.length ? (
             <div className="my-6">
               <h5 className="text-center md:text-left mb-4">Resources</h5>
               <Link passHref href={`/courses/${course.slug}/resources`}>
@@ -183,7 +183,7 @@ export default function PostPage({ courseStr, postStr }) {
                 </li>
               </Link>
             </div>
-          )}
+          ) : null}
         </aside>
         <main className="flex-1 md:min-h-[300px] col-span-2">
           <div className="embed-container mb-4">
