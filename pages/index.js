@@ -77,14 +77,15 @@ export default function Home() {
             height={1000}
             objectFit="contain"
           />
+          <div className="overlay opacity-40 bg-black absolute w-full h-full"></div>
           <div className="flex flex-col pr-6 absolute bottom-0 top-0 items-end justify-center h-full w-full gap-4">
             <Link href={'/courses'} passHref>
-              <button className="py-1 px-2 lg:py-2 lg:px-4 w-32 lg:w-40 ring-1 dark:text-black dark:ring-gray-300  dark:bg-white dark:hover:bg-white dark:ring-offset-black dark:hover:ring-offset-2 ring-primary-500 bg-primary-700 text-white rounded-md font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 hover:bg-primary-700 hover:text-white sm:text-sm md:text-base">
+              <button className="p-4 lg:p-6 lg:w-72 w-52 text-xl lg:text-2xl ring-1 dark:text-black dark:ring-gray-300  dark:bg-white dark:hover:bg-white dark:ring-offset-black dark:hover:ring-offset-2 ring-primary-500 bg-primary-700 text-white rounded-md font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 hover:bg-primary-700 hover:text-white">
                 Take a Course
               </button>
             </Link>
             <Link href={'/blog'} passHref>
-              <button className="py-1 px-2 lg:py-2 lg:px-4 w-32 lg:w-40 ring-1 bg-black text-white ring-gray-300 hover:ring-offset-2 hover:bg-transparent rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2  hover:text-white ring-offset-black">
+              <button className="p-4 lg:p-6 lg:w-72 w-52 text-xl lg:text-2xl ring-1 bg-gray-800 text-white ring-gray-300 hover:ring-offset-2 hover:bg-white rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2  hover:text-black ring-offset-black">
                 Read the Blog
               </button>
             </Link>

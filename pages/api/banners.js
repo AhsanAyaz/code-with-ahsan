@@ -16,10 +16,10 @@ export default async function handler(req, res) {
             Authorization: `Bearer ${strapiAPIKey}`,
           },
         })
-        const banners = bannersResp.data.data
-        res.status(200).json({ success: true, banners })
+        const banners = bannersResp?.data?.data || []
+        res.status(200).json({ success: !!banners.length, banners })
       } catch (error) {
-        res.status(400).json({ success: false })
+        res.status(400).json({ success: false, banners: [] })
       }
       break
     default:
