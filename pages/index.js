@@ -41,7 +41,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    getBanners()
+    // getBanners()
     if (!location.href.includes('localhost')) {
       initFBMessenger()
     }
