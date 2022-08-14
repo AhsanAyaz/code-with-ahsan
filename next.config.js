@@ -17,6 +17,58 @@ module.exports = withBundleAnalyzer({
       'media1.tenor.com',
     ],
   },
+  redirects: async () => {
+    return [
+      {
+        source: '/youtube',
+        destination: 'https://youtube.com/codewithahsan',
+        permanent: true,
+      },
+      {
+        source: '/gde',
+        destination:
+          'https://developers.google.com/community/experts/directory/profile/profile-muhammad-ahsan-ayaz',
+        permanent: true,
+      },
+      {
+        source: '/instagram',
+        destination: 'https://instagram.com/codewithahsan',
+        permanent: true,
+      },
+      {
+        source: '/facebook',
+        destination: 'https://facebook.com/codewithahsan',
+        permanent: true,
+      },
+      {
+        source: '/tiktok',
+        destination: 'https://tiktok.com/@codewithahsan',
+        permanent: true,
+      },
+      {
+        source: '/linkedin',
+        destination: 'https://linked.com/in/ahsanayaz',
+        permanent: true,
+      },
+      {
+        source: '/web-dev-bootcamp',
+        destination: '/courses/web-dev-bootcamp',
+        permanent: true,
+      },
+      {
+        source: '/rapidapi',
+        destination:
+          'https://rapidapi.com/hub?utm_source=AHSAN-AYAZ&utm_medium=DevRel&utm_campaign=DevRel',
+        permanent: true,
+      },
+      {
+        source: '/rapidapi-extension',
+        destination:
+          'https://marketplace.visualstudio.com/items?itemName=RapidAPI.vscode-rapidapi-client',
+        permanent: true,
+      },
+    ]
+  },
   webpack: (config, { dev, isServer }) => {
     config.module.rules.push({
       test: /\.(png|jpe?g|gif|mp4)$/i,
