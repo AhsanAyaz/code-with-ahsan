@@ -67,6 +67,11 @@ module.exports = withBundleAnalyzer({
           'https://marketplace.visualstudio.com/items?itemName=RapidAPI.vscode-rapidapi-client',
         permanent: true,
       },
+      {
+        source: '/discord',
+        destination: 'https://discord.gg/KSPpuxD8SG',
+        permanent: true,
+      },
     ]
   },
   webpack: (config, { dev, isServer }) => {
