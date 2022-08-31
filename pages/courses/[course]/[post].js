@@ -184,6 +184,16 @@ export default function PostPage({ courseStr, postStr }) {
               </Link>
             </div>
           ) : null}
+          <div className="my-6">
+            <h5 className="text-center md:text-left mb-4">Project Submissions</h5>
+            <Link passHref href={`/courses/${course.slug}/submissions`}>
+              <li
+                className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-[#6366f1] cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white`}
+              >
+                <a className="break-words">View Submissions</a>
+              </li>
+            </Link>
+          </div>
         </aside>
         <main className="flex-1 md:min-h-[300px] col-span-2">
           <div className="embed-container mb-4">

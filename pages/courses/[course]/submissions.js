@@ -7,11 +7,16 @@ import PostsList from '../../../components/courses/PostsList'
 import STRAPI_CONFIG from '../../../lib/strapiConfig'
 import { useReducer, useEffect } from 'react'
 import { postsReducer } from '../../../services/PostService'
-import ResourcesLinks from '../../../components/ResourcesLinks'
 import logAnalyticsEvent from '../../../lib/utils/logAnalyticsEvent'
 import getCoursesForStaticPaths from '../../../services/CourseService'
+import Button from '../../../components/Button'
+import { getApp } from 'firebase/app'
+import { getAuth, GithubAuthProvider, signInWithPopup } from 'firebase/auth'
+
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
+const auth = getAuth(getApp())
+const provider = new GithubAuthProvider()
 
 export async function getStaticPaths() {
   return getCoursesForStaticPaths()
@@ -41,23 +46,48 @@ export async function getStaticProps({ params }) {
   return { props: { courseStr: JSON.stringify(course) } }
 }
 
-export default function CourseResourcesPage({ courseStr }) {
+export default function CourseSubmissionsPage({ courseStr }) {
   const course = JSON.parse(courseStr)
   const [state, dispatch] = useReducer(postsReducer, { completedPosts: {} })
-  console.log({ course })
-  const { resources } = course
   useEffect(() => {
     dispatch({
       type: 'RETRIEVE_COMPLETED_POSTS',
     })
-    logAnalyticsEvent('course_resources_viewed', {
+    logAnalyticsEvent('course_submissions_viewed', {
       courseSlug: course.slug,
     })
   }, [course.slug])
+
+  const newSubmission = () => {
+    console.log('TBD')
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        // This gives you a GitHub Access Token. You can use it to access the GitHub API.
+        const credential = GithubAuthProvider.credentialFromResult(result)
+        const token = credential.accessToken
+
+        // The signed-in user info.
+        const user = result.user
+        console.log({ credential, token, user })
+        // ...
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code
+        const errorMessage = error.message
+        // The email of the user's account used.
+        const email = error.customData.email
+        // The AuthCredential type that was used.
+        const credential = GithubAuthProvider.credentialFromError(error)
+        console.log({ error })
+        // ...
+      })
+  }
+
   return (
     <>
       <PageSEO
-        title={`${course.name} - Resources`}
+        title={`${course.name} - Project Submissions`}
         description={course.description || siteMetadata.description}
       />
       <div className="flex gap-12 flex-col-reverse md:grid md:grid-cols-3 md:gap-4">
@@ -81,11 +111,14 @@ export default function CourseResourcesPage({ courseStr }) {
             })}
         </article>
         <main className="flex-1 md:min-h-[300px] col-span-2">
-          <ResourcesLinks resources={resources} />
+          <header className="flex items-center justify-end">
+            <Button onClick={newSubmission}>Submit</Button>
+          </header>
+          <div>Submissions will be here</div>
         </main>
       </div>
     </>
   )
 }
 
-CourseResourcesPage.showAds = true
+CourseSubmissionsPage.showAds = true
