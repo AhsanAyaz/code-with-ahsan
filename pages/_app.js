@@ -1,5 +1,6 @@
 import '@/css/tailwind.css'
 import '@/css/prism.css'
+import '@/css/layout.css'
 
 import { ThemeProvider } from 'next-themes'
 import Head from 'next/head'

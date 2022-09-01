@@ -1,0 +1,12 @@
+.profile-dd--hidden .profile-dd__inner__menu {
+  display: none;
+}
+
+.profile-dd--shown .profile-dd__inner {
+  @apply border-indigo-700;
+  @apply bg-gray-800;
+}
+
+.profile-dd--shown .profile-dd__inner__menu {
+  display: block;
+}
