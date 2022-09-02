@@ -64,7 +64,7 @@ module.exports = withBundleAnalyzer({
       {
         source: '/rapidapi-extension',
         destination:
-          'https://marketplace.visualstudio.com/items?itemName=RapidAPI.vscode-rapidapi-client',
+          'https://marketplace.visualstudio.com/items?itemName=RapidAPI.vscode-rapidapi-client&utm_source=AHSAN-AYAZ&utm_medium=DevRel&utm_campaign=DevRel',
         permanent: true,
       },
       {
