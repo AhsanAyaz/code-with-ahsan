@@ -12,6 +12,8 @@ import getCoursesForStaticPaths from '../../../services/CourseService'
 import Button from '../../../components/Button'
 import { getApp } from 'firebase/app'
 import { getAuth, GithubAuthProvider, signInWithPopup } from 'firebase/auth'
+import Dialog from '../../../components/Dialog'
+import { logIn } from '../../../services/AuthService'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -58,30 +60,13 @@ export default function CourseSubmissionsPage({ courseStr }) {
     })
   }, [course.slug])
 
-  const newSubmission = () => {
+  const newSubmission = async () => {
     console.log('TBD')
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        // This gives you a GitHub Access Token. You can use it to access the GitHub API.
-        const credential = GithubAuthProvider.credentialFromResult(result)
-        const token = credential.accessToken
-
-        // The signed-in user info.
-        const user = result.user
-        console.log({ credential, token, user })
-        // ...
-      })
-      .catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code
-        const errorMessage = error.message
-        // The email of the user's account used.
-        const email = error.customData.email
-        // The AuthCredential type that was used.
-        const credential = GithubAuthProvider.credentialFromError(error)
-        console.log({ error })
-        // ...
-      })
+    if (!auth.currentUser) {
+      const user = await logIn()
+      console.log({ user })
+    }
+    console.log('Submission form')
   }
 
   return (
@@ -116,6 +101,7 @@ export default function CourseSubmissionsPage({ courseStr }) {
           </header>
           <div>Submissions will be here</div>
         </main>
+        {/* <Dialog></Dialog> */}
       </div>
     </>
   )

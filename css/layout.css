@@ -1,12 +1,30 @@
+.modal {
+  transition: opacity 0.25s ease;
+}
+
+body.modal-active {
+  overflow-x: hidden;
+  overflow-y: visible !important;
+}
+
 .profile-dd--hidden .profile-dd__inner__menu {
   display: none;
 }
 
 .profile-dd--shown .profile-dd__inner {
   @apply border-indigo-700;
-  @apply bg-gray-800;
 }
 
 .profile-dd--shown .profile-dd__inner__menu {
   display: block;
+}
+
+.profile-dd--shown .bi-chevron-down {
+  transform: rotate(180deg);
+}
+
+@media (prefers-color-scheme: dark) {
+  .profile-dd--shown .profile-dd__inner {
+    @apply bg-gray-800;
+  }
 }
