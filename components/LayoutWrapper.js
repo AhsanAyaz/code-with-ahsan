@@ -6,9 +6,11 @@ import Footer from './Footer'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
 import Image from './Image'
+import ProfileMenu from './ProfileMenu'
 
 const LayoutWrapper = ({ children }) => {
   const highlightContext = `relative w-full sm:w-auto block text-sm font-bold outline-primary-600 ring-2 rounded-md text-primary py-4 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 hover:bg-primary-600 hover:text-white hover:outline-none hover:ring-0`
+
   return (
     <SectionContainer>
       <div className="flex flex-col h-screen">
@@ -45,6 +47,7 @@ const LayoutWrapper = ({ children }) => {
             <ThemeSwitch />
             <MobileNav />
           </div>
+          <ProfileMenu />
         </header>
         <main className="flex-1">{children}</main>
         <Footer />

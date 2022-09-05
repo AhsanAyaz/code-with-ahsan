@@ -12,7 +12,7 @@ const CourseCard = ({ course }) => {
   return (
     <Link passHref href={`/courses/${course.slug}`}>
       <div className="block p-4 overflow-hidden border transition ease-in-out duration-150 border-gray-100 rounded-md shadow-md relative hover:-translate-y-1 hover:shadow-lg hover:cursor-pointer">
-        <span className="absolute inset-x-0 bottom-0 h-2  bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
+        <span className="absolute inset-x-0 bottom-0 h-2  bg-gradient-to-r from-emerald-300 via-blue-500 to-purple-600"></span>
         {banner && (
           <div className="mb-4">
             <Image
@@ -31,7 +31,7 @@ const CourseCard = ({ course }) => {
           <LegitMarkdown>{course.description}</LegitMarkdown>
         </div>
 
-        <button className="px-4 text-white uppercase mb-6 hover:bg-green-500 hover:shadow-md py-3 w-full bg-green-400">
+        <button className="px-4 text-white uppercase mb-6 hover:bg-emerald-500 hover:shadow-md py-3 w-full bg-emerald-400">
           Start
         </button>
 

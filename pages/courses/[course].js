@@ -11,6 +11,7 @@ import Image from 'next/image'
 import STRAPI_CONFIG from '../../lib/strapiConfig'
 import ResourcesLinks from '../../components/ResourcesLinks'
 import logAnalyticsEvent from '../../lib/utils/logAnalyticsEvent'
+import Link from 'next/link'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -136,6 +137,16 @@ export default function CoursePage({ courseStr }) {
           />
         </div>
       ) : null}
+      <div>
+        <h4 className="my-6 text-center font-bold">Project Submissions</h4>
+        <Link passHref href={`/courses/${course.slug}/submissions`}>
+          <li
+            className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-[#6366f1] cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white`}
+          >
+            <a className="break-words">View Submissions</a>
+          </li>
+        </Link>
+      </div>
     </>
   )
 }
