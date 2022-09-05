@@ -271,7 +271,7 @@ export default function CourseSubmissionsPage({ courseStr }) {
                   key={sub.id}
                   className="max-w-xs transition ease-in-out duration-150 rounded-md shadow-md relative hover:-translate-y-1 hover:shadow-lg hover:cursor-pointer"
                 >
-                  {sub.by.uid === auth.currentUser.uid && (
+                  {sub.by.uid === auth.currentUser?.uid && (
                     <button
                       onClick={deleteSubmission}
                       className="hover:opacity-50 cursor-pointer absolute top-3 right-3"
