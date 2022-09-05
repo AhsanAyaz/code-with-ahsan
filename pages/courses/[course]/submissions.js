@@ -2,6 +2,7 @@ import siteMetadata from '@/data/siteMetadata'
 import { PageSEO } from '@/components/SEO'
 import axios from 'axios'
 import qs from 'qs'
+import Link from 'next/link'
 import Course from '../../../classes/Course.class'
 import PostsList from '../../../components/courses/PostsList'
 import STRAPI_CONFIG from '../../../lib/strapiConfig'
@@ -14,9 +15,20 @@ import { getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import Dialog from '../../../components/Dialog'
 import { logIn } from '../../../services/AuthService'
-import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
-import { getFirestore, getDocs, collection, setDoc, doc } from 'firebase/firestore'
+import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
+import {
+  getFirestore,
+  getDocs,
+  collection,
+  setDoc,
+  doc,
+  getDoc,
+  deleteDoc,
+} from 'firebase/firestore'
 import { URL_REGEX } from '../../../lib/regexes'
+import { getFireStorageFileName } from '../../../lib/utils/queryParams'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -137,6 +149,25 @@ export default function CourseSubmissionsPage({ courseStr }) {
     }
   }
 
+  const deleteProjectFileIfExists = async (docRef) => {
+    const existingDoc = await getDoc(docRef)
+    if (existingDoc.exists()) {
+      const existingFileUrl = existingDoc.data().screenshotUrl
+      const filePath = getFireStorageFileName(existingFileUrl)
+      await deleteObject(ref(storage, filePath))
+    }
+  }
+
+  const deleteSubmission = async () => {
+    const docRef = doc(
+      firestore,
+      `cwa-web/project-submissions/${course.slug}/${auth.currentUser.uid}`
+    )
+    await deleteProjectFileIfExists(docRef)
+    await deleteDoc(docRef)
+    getSubmissions()
+  }
+
   const saveSubmission = async (file, user, link) => {
     if (!file || !user || !link) {
       return
@@ -145,19 +176,21 @@ export default function CourseSubmissionsPage({ courseStr }) {
       return alert('Invalid URL')
     }
     try {
+      const docRef = doc(firestore, `cwa-web/project-submissions/${course.slug}/${user.uid}`)
       setIsSubmittingProject(true)
+      deleteProjectFileIfExists(docRef)
       const url = await uploadFile(file)
       const params = {
         courseId: course.slug,
         by: {
           name: user.displayName,
           photoURL: user.photoURL,
+          uid: user.uid,
         },
         screenshotUrl: url,
         demoLink: link,
         createdAt: Date.now(),
       }
-      const docRef = doc(firestore, `cwa-web/project-submissions/${course.slug}/${user.uid}`)
       await setDoc(docRef, params)
       setIsSubmittingProject(false)
       onSubModalClose()
@@ -186,7 +219,7 @@ export default function CourseSubmissionsPage({ courseStr }) {
         description={course.description || siteMetadata.description}
       />
       <div className="flex gap-12 flex-col-reverse md:grid md:grid-cols-3 md:gap-4">
-        <article className="chapters col-span-1">
+        <aside className="chapters col-span-1">
           {course &&
             course.chapters.map((chapter, index) => {
               return (
@@ -204,27 +237,57 @@ export default function CourseSubmissionsPage({ courseStr }) {
                 </section>
               )
             })}
-        </article>
+          {course.resources?.length ? (
+            <div className="my-6">
+              <h5 className="text-center md:text-left mb-4">Resources</h5>
+              <Link passHref href={`/courses/${course.slug}/resources`}>
+                <li
+                  className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-[#6366f1] cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white`}
+                >
+                  <a className="break-words">View Resources</a>
+                </li>
+              </Link>
+            </div>
+          ) : null}
+          <div className="my-6">
+            <h5 className="text-center md:text-left mb-4">Project Submissions</h5>
+            <Link passHref href={`/courses/${course.slug}/submissions`}>
+              <li
+                className={`flex items-center gap-4 justify-between px-4 py-2 dark:hover:bg-[#6366f1] cursor-pointer bg-[#6366f1] text-white rounded-md hover:bg-[#6366f1] hover:text-white`}
+              >
+                <a className="break-words">View Submissions</a>
+              </li>
+            </Link>
+          </div>
+        </aside>
         <main className="flex-1 md:min-h-[300px] col-span-2">
           <header className="flex items-center justify-end">
-            <Button onClick={newSubmission}>Submit</Button>
+            <Button onClick={newSubmission}>Submit your project</Button>
           </header>
           <div className="submissions mt-8 flex flex-wrap gap-5">
             {submissions &&
               submissions.map((sub) => (
                 <div
                   key={sub.id}
-                  className="max-w-xs bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700"
+                  className="max-w-xs transition ease-in-out duration-150 rounded-md shadow-md relative hover:-translate-y-1 hover:shadow-lg hover:cursor-pointer"
                 >
+                  {sub.by.uid === auth.currentUser.uid && (
+                    <button
+                      onClick={deleteSubmission}
+                      className="hover:opacity-50 cursor-pointer absolute top-3 right-3"
+                    >
+                      <FontAwesomeIcon icon={faTrash} color={'red'} />
+                    </button>
+                  )}
                   <a
                     href={sub.demoLink}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="overflow-hidden rounded-t-lg flex items-center justify-center aspect-square bg-black/80"
+                    className="overflow-hidden rounded-t-md flex items-center justify-center aspect-square bg-black/80"
                   >
                     <img src={sub.screenshotUrl} alt="" />
                   </a>
-                  <div className="p-5">
+                  <div className="p-5 border border-t-0 rounded-b-md border-gray-100">
                     <div className="flex items-center gap-4">
                       <img src={sub.by.photoURL} className="rounded-full w-12 h-12" />
                       <a href={sub.demoLink} target="_blank" rel="noreferrer noopener">

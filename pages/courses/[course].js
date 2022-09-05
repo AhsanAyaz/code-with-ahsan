@@ -137,7 +137,6 @@ export default function CoursePage({ courseStr }) {
           />
         </div>
       ) : null}
-
       <div>
         <h4 className="my-6 text-center font-bold">Project Submissions</h4>
         <Link passHref href={`/courses/${course.slug}/submissions`}>

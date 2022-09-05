@@ -5,7 +5,7 @@ const Button = ({ onClick, children, color = 'primary' }) => {
       colorClass = `hover:bg-primary-700 dark:hover:bg-primary-400 ring-primary-500 bg-primary-500 text-white hover:text-white`
       break
     case 'green':
-      colorClass = `hover:bg-green-700 dark:hover:bg-green-400 ring-green-500 bg-green-500 text-white hover:text-white`
+      colorClass = `hover:bg-emerald-700 dark:hover:bg-emerald-400 ring-emerald-500 bg-emerald-500 text-white hover:text-white`
       break
   }
   return (
