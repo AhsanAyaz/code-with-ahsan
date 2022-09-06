@@ -29,6 +29,7 @@ import { URL_REGEX } from '../../../lib/regexes'
 import { getFireStorageFileName } from '../../../lib/utils/queryParams'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import Spinner from '../../../components/Spinner'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -70,7 +71,9 @@ export default function CourseSubmissionsPage({ courseStr }) {
   const [state, dispatch] = useReducer(postsReducer, { completedPosts: {} })
   const [showSubDialog, setShowSubDialog] = useState(false)
   const [isSubmittingProject, setIsSubmittingProject] = useState(false)
+  const [isDeletingSubmission, setIsDeletingSubmission] = useState(false)
   const [submissionFile, setSubmissionFile] = useState(null)
+  const [user, setUser] = useState(auth.currentUser)
   const [submissions, setSubmissions] = useState([])
   const [submissionDemoLink, setSubmissionDemoLink] = useState('')
   const supportedFileTypes = ['image/png', 'image/jpeg']
@@ -93,13 +96,20 @@ export default function CourseSubmissionsPage({ courseStr }) {
     logAnalyticsEvent('course_submissions_viewed', {
       courseSlug: course.slug,
     })
+    const sub = auth.onAuthStateChanged((user) => {
+      setUser(user)
+    })
     getSubmissions()
+
+    return () => {
+      sub()
+    }
   }, [course.slug, getSubmissions])
 
   const newSubmission = async () => {
-    if (!auth.currentUser) {
-      const user = await logIn()
-      if (!user) {
+    if (!user) {
+      const loggedInUser = await logIn()
+      if (!loggedInUser) {
         return
       }
     }
@@ -159,13 +169,17 @@ export default function CourseSubmissionsPage({ courseStr }) {
   }
 
   const deleteSubmission = async () => {
-    const docRef = doc(
-      firestore,
-      `cwa-web/project-submissions/${course.slug}/${auth.currentUser.uid}`
-    )
-    await deleteProjectFileIfExists(docRef)
-    await deleteDoc(docRef)
-    getSubmissions()
+    setIsDeletingSubmission(true)
+    try {
+      const docRef = doc(firestore, `cwa-web/project-submissions/${course.slug}/${user.uid}`)
+      await deleteProjectFileIfExists(docRef)
+      await deleteDoc(docRef)
+      getSubmissions()
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setIsDeletingSubmission(false)
+    }
   }
 
   const saveSubmission = async (file, user, link) => {
@@ -271,7 +285,7 @@ export default function CourseSubmissionsPage({ courseStr }) {
                   key={sub.id}
                   className="max-w-xs transition ease-in-out duration-150 rounded-md shadow-md relative hover:-translate-y-1 hover:shadow-lg hover:cursor-pointer"
                 >
-                  {sub.by.uid === auth.currentUser?.uid && (
+                  {sub.by.uid === user?.uid && !isDeletingSubmission && (
                     <button
                       onClick={deleteSubmission}
                       className="hover:opacity-50 cursor-pointer absolute top-3 right-3"
@@ -279,14 +293,21 @@ export default function CourseSubmissionsPage({ courseStr }) {
                       <FontAwesomeIcon icon={faTrash} color={'red'} />
                     </button>
                   )}
-                  <a
-                    href={sub.demoLink}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="overflow-hidden rounded-t-md flex items-center justify-center aspect-square bg-black/80"
-                  >
-                    <img src={sub.screenshotUrl} alt="" />
-                  </a>
+                  {isDeletingSubmission ? (
+                    <div className="flex items-center justify-center">
+                      <Spinner></Spinner>
+                    </div>
+                  ) : (
+                    <a
+                      href={sub.demoLink}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="overflow-hidden rounded-t-md flex items-center justify-center aspect-square bg-black/80"
+                    >
+                      <img src={sub.screenshotUrl} alt="" />
+                    </a>
+                  )}
+
                   <div className="p-5 border border-t-0 rounded-b-md border-gray-100">
                     <div className="flex items-center gap-4">
                       <img src={sub.by.photoURL} className="rounded-full w-12 h-12" />
@@ -320,7 +341,7 @@ export default function CourseSubmissionsPage({ courseStr }) {
               label: 'Save',
               disabled: !(submissionFile && submissionDemoLink),
               onClick: () => {
-                saveSubmission(submissionFile, auth.currentUser, submissionDemoLink)
+                saveSubmission(submissionFile, user, submissionDemoLink)
               },
               type: 'primary',
             },
@@ -367,7 +388,7 @@ export default function CourseSubmissionsPage({ courseStr }) {
               />
             </label>
             <input
-              className="focus:ring-2 text-black focus:ring-blue-500 focus:outline-none appearance-none w-full text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md my-4 py-2 px-4 ring-1 ring-slate-200 shadow-sm"
+              className="focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none w-full text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md my-4 py-2 px-4 ring-1 ring-slate-200 shadow-sm"
               type="url"
               onChange={(ev) => {
                 setSubmissionDemoLink(ev.target.value)
