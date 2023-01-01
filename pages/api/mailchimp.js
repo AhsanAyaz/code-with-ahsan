@@ -29,7 +29,7 @@ export default async (req, res) => {
         },
       ],
     })
-    return res.status(201).json({ error: '' })
+    return res.status(201).json({ success: true })
   } catch (error) {
     return res.status(error.status).json({ error: error })
   }

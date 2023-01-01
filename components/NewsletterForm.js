@@ -65,7 +65,7 @@ const NewsletterForm = ({ title = 'Subscribe to the newsletter' }) => {
             } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 dark:ring-offset-black`}
             type="submit"
           >
-            {subscribed ? 'Thank you!' : 'Sign up'}
+            {subscribed ? 'OK!' : 'Sign up'}
           </button>
         </div>
       </form>
