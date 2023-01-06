@@ -25,6 +25,11 @@ module.exports = withBundleAnalyzer({
         permanent: true,
       },
       {
+        source: '/slides',
+        destination: 'https://ahsanayaz.github.io/slides',
+        permanent: true,
+      },
+      {
         source: '/gde',
         destination:
           'https://developers.google.com/community/experts/directory/profile/profile-muhammad-ahsan-ayaz',
