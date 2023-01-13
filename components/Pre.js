@@ -28,7 +28,7 @@ const Pre = (props) => {
           type="button"
           className={`absolute right-2 top-2 w-8 h-8 p-1 rounded border-2 bg-gray-700 dark:bg-gray-800 ${
             copied
-              ? 'focus:outline-none focus:border-emerald-400 border-emerald-400'
+              ? 'focus:outline-none focus:border-yellow-400 border-yellow-400'
               : 'border-gray-300'
           }`}
           onClick={onCopy}
@@ -38,7 +38,7 @@ const Pre = (props) => {
             viewBox="0 0 24 24"
             stroke="currentColor"
             fill="none"
-            className={copied ? 'text-emerald-400' : 'text-gray-300'}
+            className={copied ? 'text-yellow-400' : 'text-gray-300'}
           >
             {copied ? (
               <>

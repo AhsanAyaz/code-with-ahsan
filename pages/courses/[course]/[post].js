@@ -92,7 +92,6 @@ export async function getStaticProps({ params }) {
     },
   })
   const course = new Course(coursesResp.data.data)
-  console.log(postResp.data.data)
   const post = new Post(postResp.data.data)
   const { nextPost, previousPost } = getNextAndPreviousPosts(course, post)
   return {

@@ -9,6 +9,7 @@ class Chapter {
       // sort by order
       mappedPosts.sort((a, b) => +a.order - +b.order)
     }
+    this.id = chapter.id
     this.name = name
     this.description = description
     this.posts = mappedPosts

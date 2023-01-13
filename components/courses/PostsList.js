@@ -4,8 +4,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons'
 
 const PostsList = ({ chapter, courseSlug, post, completedPosts = {} }) => {
+  if (!chapter.posts.length) {
+    return (
+      <ul className="flex flex-col gap-2">
+        <li
+          className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white bg-gray-100 rounded-md `}
+        >
+          -
+        </li>
+      </ul>
+    )
+  }
   return (
-    <ul className="flex flex-col gap-2">
+    <ul className="flex flex-col gap-2 mb-4">
       {chapter.posts.map((chapterPost, index) => {
         return (
           <Link passHref key={index} href={`/courses/${courseSlug}/${chapterPost.slug}`}>
@@ -16,7 +27,10 @@ const PostsList = ({ chapter, courseSlug, post, completedPosts = {} }) => {
             >
               <a className="break-words">{chapterPost.title}</a>
               {completedPosts[chapterPost.slug] && (
-                <FontAwesomeIcon icon={faCircleCheck} color={'rgb(52, 211, 153)'} />
+                <FontAwesomeIcon
+                  icon={faCircleCheck}
+                  className={'dark:text-yellow-300 text-yellow-400'}
+                />
               )}
             </li>
           </Link>

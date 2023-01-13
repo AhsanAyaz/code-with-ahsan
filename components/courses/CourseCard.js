@@ -11,7 +11,7 @@ const CourseCard = ({ course }) => {
   }, [course])
   return (
     <Link passHref href={`/courses/${course.slug}`}>
-      <div className="block p-4 overflow-hidden border transition ease-in-out duration-150 border-gray-100 rounded-md shadow-md relative hover:-translate-y-1 hover:shadow-lg hover:cursor-pointer">
+      <div className="block p-4 overflow-hidden border transition ease-in-out duration-150 border-gray-600 rounded-md shadow-md relative hover:-translate-y-1 hover:shadow-lg hover:cursor-pointer">
         <span className="absolute inset-x-0 bottom-0 h-2  bg-gradient-to-r from-emerald-300 via-blue-500 to-purple-600"></span>
         {banner && (
           <div className="mb-4">
@@ -31,11 +31,11 @@ const CourseCard = ({ course }) => {
           <LegitMarkdown>{course.description}</LegitMarkdown>
         </div>
 
-        <button className="px-4 text-white uppercase mb-6 hover:bg-emerald-500 hover:shadow-md py-3 w-full bg-emerald-400">
+        <button className="px-4 text-white uppercase mb-6 hover:bg-yellow-500 hover:shadow-md py-3 w-full bg-yellow-400 dark:bg-yellow-500 dark:hover:bg-yellow-600">
           Start
         </button>
 
-        {/* <dl className="flex mt-6">
+        <dl className="flex mt-6">
           <div className="flex flex-col-reverse">
             <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">Published</dt>
             <dd className="text-xs text-gray-500 dark:text-gray-300">
@@ -51,7 +51,7 @@ const CourseCard = ({ course }) => {
               <dd className="text-xs text-gray-500 dark:text-gray-300">{course.duration}</dd>
             </div>
           )}
-        </dl> */}
+        </dl>
       </div>
     </Link>
   )

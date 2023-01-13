@@ -55,32 +55,19 @@ export const postsReducer = (state, action) => {
 }
 
 export const getNextAndPreviousPosts = (course, post) => {
-  let postIndex = null
-  let chapterPosts = null
-  course.chapters.reduce((acc, chapter) => {
-    chapterPosts = chapter.posts
-    const foundPost = chapter.posts.find((p, index) => {
-      if (p.slug === post.slug) {
-        postIndex = index
-        return true
-      }
-      return false
-    })
-    if (foundPost) {
-      return foundPost.slug
-    }
-    return acc
-  }, null)
-  if (postIndex === null) {
+  const chapter = course.chapters.find((chapter) => {
+    return chapter.id === post.chapterId
+  })
+  const postIndex = chapter.posts.findIndex((p, index) => p.slug === post.slug)
+  if (postIndex < 0) {
     return {
       nextPost: null,
       previousPost: null,
     }
   }
-  const postsLength = chapterPosts.length
-
+  const postsLength = chapter.posts.length
   return {
-    nextPost: postIndex === postsLength - 1 ? null : chapterPosts[postIndex + 1].slug,
-    previousPost: postIndex === 0 ? null : chapterPosts[postIndex - 1].slug,
+    nextPost: postIndex === postsLength - 1 ? null : chapter.posts[postIndex + 1].slug,
+    previousPost: postIndex === 0 ? null : chapter.posts[postIndex - 1].slug,
   }
 }
