@@ -131,8 +131,6 @@ export default function CourseSubmissionsPage({ courseStr }) {
         return alert('Please only select one file')
       } else {
         const file = items[0].getAsFile()
-        console.log(`${file.name}`)
-        console.log(file)
         setSubmissionFile(file)
       }
     } else {

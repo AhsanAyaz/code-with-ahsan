@@ -1,8 +1,9 @@
 class Post {
   constructor(post) {
     this.id = post.id
+    console.log({ post })
     const attributes = post.attributes
-    const { title, description, videoUrl, order, slug, chapter } = attributes
+    const { title, description, videoUrl, order, slug, chapter, videoEmbedded } = attributes
     const chapterId = chapter?.data?.id
     this.title = title
     this.description = description
@@ -10,18 +11,20 @@ class Post {
     this.order = order
     this.slug = slug
     this.chapterId = chapterId
+    this.videoEmbedded = videoEmbedded ? JSON.parse(videoEmbedded) : null
     this.embedUrl = this.getEmbedUrl()
   }
 
   getEmbedUrl() {
-    let vidUrl = this.videoUrl
+    const originalUrl = this.videoUrl || this.videoEmbedded.url
+    let vidUrl = ''
     let videoParams = ''
     try {
-      if (this.videoUrl.includes('youtube') || this.videoUrl.includes('youtu.be')) {
+      if (originalUrl.includes('youtube') || originalUrl.includes('youtu.be')) {
         vidUrl = `https://www.youtube.com/embed/`
-        videoParams = this.videoUrl.includes('youtube')
-          ? this.videoUrl.split('watch?v=')[1]
-          : this.videoUrl.split('youtu.be/')[1]
+        videoParams = originalUrl.includes('youtube')
+          ? originalUrl.split('watch?v=')[1]
+          : originalUrl.split('youtu.be/')[1]
         if (videoParams.includes('&')) {
           const [videoId, ...segments] = videoParams.split('&')
           videoParams = videoId

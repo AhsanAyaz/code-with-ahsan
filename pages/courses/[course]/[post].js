@@ -60,7 +60,7 @@ export async function getStaticProps({ params }) {
 
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts', 'resources'],
+      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts', 'resources', 'banner'],
       publicationState: STRAPI_CONFIG.publicationState,
     },
     {
@@ -152,7 +152,11 @@ export default function PostPage({ courseStr, postStr }) {
   }, [post.slug, course.slug])
   return (
     <>
-      <PageSEO title={post.title} description={post.description || siteMetadata.description} />
+      <PageSEO
+        title={post.title}
+        description={post.description || siteMetadata.description}
+        imageUrl={post.videoEmbedded?.thumbnail || course.banner}
+      />
       <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-4">
         <aside className="chapters col-span-1">
           {course &&
@@ -196,7 +200,12 @@ export default function PostPage({ courseStr, postStr }) {
         </aside>
         <main className="flex-1 md:min-h-[300px] col-span-2">
           <div className="embed-container mb-4">
-            <iframe src={post.embedUrl} title={post.title} frameBorder="0" allowFullScreen></iframe>
+            <iframe
+              src={post.embedUrl}
+              title={post.title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            ></iframe>
           </div>
           <div className="mb-4 flex justify-end">
             <div className="flex-1">

@@ -45,7 +45,6 @@ export async function getStaticProps({ params }) {
 export default function CourseResourcesPage({ courseStr }) {
   const course = JSON.parse(courseStr)
   const [state, dispatch] = useReducer(postsReducer, { completedPosts: {} })
-  console.log({ course })
   const { resources } = course
   useEffect(() => {
     dispatch({
