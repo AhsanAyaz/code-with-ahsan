@@ -1,22 +1,34 @@
 class Post {
   constructor(post) {
     this.id = post.id
-    console.log({ post })
     const attributes = post.attributes
-    const { title, description, videoUrl, order, slug, chapter, videoEmbedded } = attributes
+    const {
+      title,
+      resources,
+      description,
+      videoUrl,
+      order,
+      slug,
+      chapter,
+      videoEmbedded,
+    } = attributes
     const chapterId = chapter?.data?.id
     this.title = title
     this.description = description
     this.videoUrl = videoUrl
     this.order = order
     this.slug = slug
+    this.resources = resources
     this.chapterId = chapterId
     this.videoEmbedded = videoEmbedded ? JSON.parse(videoEmbedded) : null
     this.embedUrl = this.getEmbedUrl()
   }
 
   getEmbedUrl() {
-    const originalUrl = this.videoUrl || this.videoEmbedded.url
+    const originalUrl = this.videoUrl || this.videoEmbedded?.url
+    if (!originalUrl) {
+      return
+    }
     let vidUrl = ''
     let videoParams = ''
     try {
@@ -25,6 +37,7 @@ class Post {
         videoParams = originalUrl.includes('youtube')
           ? originalUrl.split('watch?v=')[1]
           : originalUrl.split('youtu.be/')[1]
+
         if (videoParams.includes('&')) {
           const [videoId, ...segments] = videoParams.split('&')
           videoParams = videoId
@@ -40,7 +53,7 @@ class Post {
       }
       return vidUrl
     } catch (e) {
-      console.log(e)
+      console.log(e, this)
     }
   }
 }

@@ -3,7 +3,7 @@ const qs = require('qs')
 const axios = require('axios')
 
 // Headers config
-axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.STRAPI_API_ADMIN_KEY}`
+axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.STRAPI_API_KEY}`
 
 const CHAPTER_ID = 5
 

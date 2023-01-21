@@ -12,6 +12,7 @@ import Link from 'next/link'
 import Button from '../../../components/Button'
 import { useRouter } from 'next/router'
 import logAnalyticsEvent from '../../../lib/utils/logAnalyticsEvent'
+import ResourcesLinks from '../../../components/ResourcesLinks'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -77,7 +78,7 @@ export async function getStaticProps({ params }) {
   })
   const postQuery = qs.stringify(
     {
-      populate: ['chapter'],
+      populate: ['chapter', 'resources'],
       publicationState: STRAPI_CONFIG.publicationState,
     },
     {
@@ -199,15 +200,15 @@ export default function PostPage({ courseStr, postStr }) {
           </div>
         </aside>
         <main className="flex-1 md:min-h-[300px] col-span-2">
-          <div className="embed-container mb-4">
+          <section className="embed-container mb-4">
             <iframe
               src={post.embedUrl}
               title={post.title}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
             ></iframe>
-          </div>
-          <div className="mb-4 flex justify-end">
+          </section>
+          <section className="mb-4 flex justify-end">
             <div className="flex-1">
               {post.previousPost && (
                 <Button
@@ -242,7 +243,17 @@ export default function PostPage({ courseStr, postStr }) {
                 </Button>
               )}
             </div>
-          </div>
+          </section>
+          {post.description && (
+            <section className="mt-8 mb-4">
+              <p>{post.description}</p>
+            </section>
+          )}
+          {post.resources?.length > 0 && (
+            <section className="mt-4">
+              <ResourcesLinks resources={post.resources} />
+            </section>
+          )}
         </main>
       </div>
     </>
