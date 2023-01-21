@@ -103,7 +103,10 @@ export default function CourseResourcesPage({ courseStr }) {
           </div>
         </aside>
         <main className="flex-1 md:min-h-[300px] col-span-2">
-          <ResourcesLinks resources={resources} />
+          <header className="mb-6">
+            <h1 className="text-4xl text-center">Resources</h1>
+          </header>
+          <ResourcesLinks noHeading={true} resources={resources} />
         </main>
       </div>
     </>

@@ -1,7 +1,7 @@
-const ResourcesLinks = ({ heading, resources, headingClasses = 'mb-4 text-center' }) => {
+const ResourcesLinks = ({ noHeading, heading, resources, headingClasses = 'mb-4 text-center' }) => {
   return (
     <>
-      <h4 className={headingClasses}>{heading || 'Resources'}</h4>
+      {!noHeading && <h4 className={headingClasses}>{heading || 'Resources'}</h4>}
       <div className="flex flex-col gap-2">
         {resources.map((resource, index) => {
           return (

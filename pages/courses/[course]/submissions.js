@@ -273,12 +273,18 @@ export default function CourseSubmissionsPage({ courseStr }) {
           </div>
         </aside>
         <main className="flex-1 md:min-h-[300px] col-span-2">
-          <header className="flex items-center justify-end">
-            <Button onClick={newSubmission}>Submit your project</Button>
+          <header className="mb-6">
+            <h1 className="text-4xl text-center">Submissions</h1>
           </header>
-          <div className="submissions mt-8 flex flex-wrap gap-5">
-            {submissions &&
-              submissions.map((sub) => (
+          <div className="flex items-center justify-end">
+            <Button title="Submit your project" onClick={newSubmission}>
+              +
+            </Button>
+          </div>
+
+          {submissions?.length > 0 ? (
+            <div className="submissions mt-8 flex flex-wrap gap-5">
+              {submissions.map((sub) => (
                 <div
                   key={sub.id}
                   className="max-w-xs transition ease-in-out duration-150 rounded-md shadow-md relative hover:-translate-y-1 hover:shadow-lg hover:cursor-pointer"
@@ -315,15 +321,13 @@ export default function CourseSubmissionsPage({ courseStr }) {
                         </h5>
                       </a>
                     </div>
-
-                    {/* <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-                    Here are the biggest enterprise technology acquisitions of 2021 so far, in
-                    reverse chronological order.
-                  </p> */}
                   </div>
                 </div>
               ))}
-          </div>
+            </div>
+          ) : (
+            <h2 className="text-2xl text-center my-8">No submissions yet</h2>
+          )}
         </main>
         <Dialog
           title={'Submit project'}

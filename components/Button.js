@@ -1,4 +1,4 @@
-const Button = ({ onClick, children, color = 'primary' }) => {
+const Button = ({ onClick, children, color = 'primary', title }) => {
   let colorClass = ''
   switch (color) {
     case 'primary':
@@ -11,6 +11,7 @@ const Button = ({ onClick, children, color = 'primary' }) => {
   return (
     <button
       onClick={onClick}
+      title={title || ''}
       className={`px-4 py-2 ring-1 dark:ring-offset-black dark:hover:ring-offset-2 ${colorClass} rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2`}
     >
       {children}

@@ -200,6 +200,9 @@ export default function PostPage({ courseStr, postStr }) {
           </div>
         </aside>
         <main className="flex-1 md:min-h-[300px] col-span-2">
+          <header className="mb-6">
+            <h1 className="text-4xl text-center">{post.title}</h1>
+          </header>
           <section className="embed-container mb-4">
             <iframe
               src={post.embedUrl}
