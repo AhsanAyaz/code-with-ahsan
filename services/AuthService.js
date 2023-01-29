@@ -17,3 +17,12 @@ export async function logIn() {
     return null
   }
 }
+
+export const checkUserAndLogin = async () => {
+  const auth = getAuth(getApp())
+  let attendee = auth.currentUser
+  if (!attendee) {
+    attendee = await logIn()
+  }
+  return attendee
+}

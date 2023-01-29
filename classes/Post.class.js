@@ -11,6 +11,7 @@ class Post {
       slug,
       chapter,
       videoEmbedded,
+      assignment,
     } = attributes
     const chapterId = chapter?.data?.id
     this.title = title
@@ -22,6 +23,7 @@ class Post {
     this.chapterId = chapterId
     this.videoEmbedded = videoEmbedded ? JSON.parse(videoEmbedded) : null
     this.embedUrl = this.getEmbedUrl()
+    this.assignment = assignment
   }
 
   getEmbedUrl() {

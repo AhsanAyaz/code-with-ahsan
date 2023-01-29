@@ -1,14 +1,30 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import format from 'date-fns/format'
 import Link from 'next/link'
 import LegitMarkdown from '../LegitMarkdown'
 import Image from 'next/image'
-const CourseCard = ({ course }) => {
+
+import { getFirestore, doc, getDoc } from 'firebase/firestore'
+import { getApp } from 'firebase/app'
+
+const firestore = getFirestore(getApp())
+
+const CourseCard = ({ course, enrollHandler, user }) => {
   const { banner } = course
-  const getAuthorName = useCallback(() => {
-    const authors = course.authors.map((author) => author.name).join(', ')
-    return authors
-  }, [course])
+  const [enrolled, setEnrolled] = useState(false)
+
+  const getEnrollment = useCallback(async () => {
+    const enrollmentRef = doc(firestore, `enrollment/${course.slug}_${user.uid}`)
+    const existingCourse = await getDoc(enrollmentRef)
+    setEnrolled(existingCourse.exists())
+  }, [user, course.slug])
+
+  useEffect(() => {
+    if (user) {
+      getEnrollment()
+    }
+  }, [user, getEnrollment])
+
   return (
     <Link passHref href={`/courses/${course.slug}`}>
       <div className="block p-4 overflow-hidden border transition ease-in-out duration-150 border-gray-600 rounded-md shadow-md relative hover:-translate-y-1 hover:shadow-lg hover:cursor-pointer">
@@ -31,8 +47,17 @@ const CourseCard = ({ course }) => {
           <LegitMarkdown>{course.description}</LegitMarkdown>
         </div>
 
-        <button className="px-4 text-white uppercase mb-6 hover:bg-yellow-500 hover:shadow-md py-3 w-full bg-yellow-400 dark:bg-yellow-500 dark:hover:bg-yellow-600">
-          Start
+        <button
+          onClick={(event) => {
+            if (enrolled) {
+              return
+            }
+            event.stopPropagation()
+            enrollHandler(course)
+          }}
+          className="px-4 text-white uppercase mb-6 hover:bg-yellow-500 hover:shadow-md py-3 w-full bg-yellow-400 dark:bg-yellow-500 dark:hover:bg-yellow-600"
+        >
+          {enrolled ? 'Continue' : 'Enroll'}
         </button>
 
         <dl className="flex mt-6">
