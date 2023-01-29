@@ -5,17 +5,24 @@ import qs from 'qs'
 import Course from '../../../classes/Course.class'
 import Post from '../../../classes/Post.class'
 import PostsList from '../../../components/courses/PostsList'
-import { useReducer, useEffect } from 'react'
-import { getNextAndPreviousPosts, postsReducer } from '../../../services/PostService'
+import { useEffect, useState, useCallback } from 'react'
+import { getNextAndPreviousPosts } from '../../../services/PostService'
 import STRAPI_CONFIG from '../../../lib/strapiConfig'
 import Link from 'next/link'
 import Button from '../../../components/Button'
 import { useRouter } from 'next/router'
 import logAnalyticsEvent from '../../../lib/utils/logAnalyticsEvent'
 import ResourcesLinks from '../../../components/ResourcesLinks'
+import LegitMarkdown from '../../../components/LegitMarkdown'
+import { getFirestore, getDoc, updateDoc } from 'firebase/firestore'
+import { getAuth } from 'firebase/auth'
+import { getApp } from 'firebase/app'
+import { checkUserAndLogin, logIn } from '../../../services/AuthService'
+import { getEnrollmentRef } from '../../../services/EnrollmentService'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
+const auth = getAuth(getApp())
 
 export async function getStaticPaths() {
   const query = qs.stringify(
@@ -78,7 +85,7 @@ export async function getStaticProps({ params }) {
   })
   const postQuery = qs.stringify(
     {
-      populate: ['chapter', 'resources'],
+      populate: ['chapter', 'resources', 'assignment'],
       publicationState: STRAPI_CONFIG.publicationState,
     },
     {
@@ -109,30 +116,63 @@ export async function getStaticProps({ params }) {
 
 export default function PostPage({ courseStr, postStr }) {
   const course = JSON.parse(courseStr)
-  const [state, dispatch] = useReducer(postsReducer, { completedPosts: {} })
+  const [marked, setMarked] = useState({})
   const post = JSON.parse(postStr)
   const router = useRouter()
   const goToPost = (slug) => {
     router.push(`/courses/${course.slug}/${slug}`)
   }
-  const markAsComplete = () => {
-    dispatch({
-      type: 'MARK_AS_COMPLETE',
-      payload: {
-        slug: post.slug,
+
+  useEffect(() => {
+    const sub = auth.onAuthStateChanged((user) => {
+      if (user) {
+        getMarked(user)
+      } else {
+        setMarked({})
+      }
+    })
+
+    return () => {
+      sub()
+    }
+  }, [])
+
+  const markAsComplete = async () => {
+    const attendee = await checkUserAndLogin()
+    if (!attendee) {
+      return
+    }
+    const enrollmentRef = await getEnrollmentRef({ course, attendee })
+    await updateDoc(enrollmentRef, {
+      marked: {
+        ...marked,
+        [post.slug]: true,
       },
+    })
+    setMarked({
+      ...marked,
+      [post.slug]: true,
     })
     logAnalyticsEvent('post_marked_complete', {
       courseSlug: course.slug,
       postSlug: post.slug,
     })
   }
-  const markAsIncomplete = () => {
-    dispatch({
-      type: 'MARK_AS_INCOMPLETE',
-      payload: {
-        slug: post.slug,
+  const markAsIncomplete = async () => {
+    const attendee = await checkUserAndLogin()
+    if (!attendee) {
+      return
+    }
+    const enrollmentRef = await getEnrollmentRef({ course, attendee })
+    await updateDoc(enrollmentRef, {
+      marked: {
+        ...marked,
+        [post.slug]: false,
       },
+    })
+    setMarked({
+      ...marked,
+      [post.slug]: false,
     })
     logAnalyticsEvent('post_marked_incomplete', {
       courseSlug: course.slug,
@@ -140,17 +180,25 @@ export default function PostPage({ courseStr, postStr }) {
     })
   }
 
-  useEffect(() => {
-    dispatch({
-      type: 'RETRIEVE_COMPLETED_POSTS',
-    })
-  }, [post.slug])
+  const getMarked = useCallback(
+    async (user) => {
+      if (!user) {
+        return
+      }
+      const enrollmentRef = await getEnrollmentRef({ course, attendee: user })
+      const enrollment = await getDoc(enrollmentRef)
+      setMarked(enrollment.data().marked)
+    },
+    [course]
+  )
+
   useEffect(() => {
     logAnalyticsEvent('course_post_viewed', {
       courseSlug: course.slug,
       postSlug: post.slug,
     })
   }, [post.slug, course.slug])
+
   return (
     <>
       <PageSEO
@@ -171,7 +219,7 @@ export default function PostPage({ courseStr, postStr }) {
                     chapter={chapter}
                     courseSlug={course.slug}
                     post={post}
-                    completedPosts={state.completedPosts}
+                    completedPosts={marked}
                   />
                 </section>
               )
@@ -224,7 +272,7 @@ export default function PostPage({ courseStr, postStr }) {
               )}
             </div>
             <div className="flex gap-4">
-              {state.completedPosts[post.slug] ? (
+              {marked[post.slug] ? (
                 <Button color="green" onClick={markAsIncomplete}>
                   Completed
                 </Button>
@@ -256,6 +304,19 @@ export default function PostPage({ courseStr, postStr }) {
             <section className="mt-4">
               <ResourcesLinks resources={post.resources} />
             </section>
+          )}
+          {post.assignment && (
+            <LegitMarkdown
+              components={{
+                a: (props) => (
+                  <a className="text-yellow-300" target={'_blank'} {...props}>
+                    {props.children}
+                  </a>
+                ),
+              }}
+            >
+              {post.assignment}
+            </LegitMarkdown>
           )}
         </main>
       </div>

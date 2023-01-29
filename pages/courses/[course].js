@@ -4,17 +4,22 @@ import axios from 'axios'
 import qs from 'qs'
 import Course from '../../classes/Course.class'
 import PostsList from '../../components/courses/PostsList'
-import { useReducer, useEffect } from 'react'
-import { postsReducer } from '../../services/PostService'
+import { useEffect, useCallback, useState } from 'react'
 import LegitMarkdown from '../../components/LegitMarkdown'
 import Image from 'next/image'
 import STRAPI_CONFIG from '../../lib/strapiConfig'
 import ResourcesLinks from '../../components/ResourcesLinks'
 import logAnalyticsEvent from '../../lib/utils/logAnalyticsEvent'
 import Link from 'next/link'
+import { getEnrollmentRef } from '../../services/EnrollmentService'
+import { getAuth } from 'firebase/auth'
+import { getApp } from 'firebase/app'
+import { getDoc } from 'firebase/firestore'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
+
+const auth = getAuth(getApp())
 
 export async function getStaticPaths() {
   const query = qs.stringify(
@@ -72,11 +77,35 @@ export async function getStaticProps({ params }) {
 
 export default function CoursePage({ courseStr }) {
   const course = JSON.parse(courseStr)
-  const [state, dispatch] = useReducer(postsReducer, { completedPosts: {} })
+  const [marked, setMarked] = useState({})
+
+  const getMarked = useCallback(
+    async (user) => {
+      if (!user) {
+        return
+      }
+      const enrollmentRef = await getEnrollmentRef({ course, attendee: user })
+      const enrollment = await getDoc(enrollmentRef)
+      setMarked(enrollment.data().marked)
+    },
+    [course]
+  )
+
   useEffect(() => {
-    dispatch({
-      type: 'RETRIEVE_COMPLETED_POSTS',
+    const sub = auth.onAuthStateChanged((user) => {
+      if (user) {
+        getMarked(user)
+      } else {
+        setMarked({})
+      }
     })
+
+    return () => {
+      sub()
+    }
+  }, [])
+
+  useEffect(() => {
     logAnalyticsEvent('course_viewed', {
       courseSlug: course.slug,
     })
@@ -118,11 +147,7 @@ export default function CoursePage({ courseStr }) {
                   {chapter.showName && (
                     <div className="mb-4 text-base font-bold">{chapter.name}</div>
                   )}
-                  <PostsList
-                    chapter={chapter}
-                    courseSlug={course.slug}
-                    completedPosts={state.completedPosts}
-                  />
+                  <PostsList chapter={chapter} courseSlug={course.slug} completedPosts={marked} />
                 </section>
               )
             })}
