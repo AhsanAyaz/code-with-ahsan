@@ -14,7 +14,7 @@ import { useRouter } from 'next/router'
 import logAnalyticsEvent from '../../../lib/utils/logAnalyticsEvent'
 import ResourcesLinks from '../../../components/ResourcesLinks'
 import LegitMarkdown from '../../../components/LegitMarkdown'
-import { getFirestore, getDoc, updateDoc } from 'firebase/firestore'
+import { getDoc, updateDoc } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 import { getApp } from 'firebase/app'
 import { checkUserAndLogin, logIn } from '../../../services/AuthService'
@@ -123,19 +123,17 @@ export default function PostPage({ courseStr, postStr }) {
     router.push(`/courses/${course.slug}/${slug}`)
   }
 
-  useEffect(() => {
-    const sub = auth.onAuthStateChanged((user) => {
-      if (user) {
-        getMarked(user)
-      } else {
-        setMarked({})
+  const getMarked = useCallback(
+    async (user) => {
+      if (!user) {
+        return
       }
-    })
-
-    return () => {
-      sub()
-    }
-  }, [])
+      const enrollmentRef = await getEnrollmentRef({ course, attendee: user })
+      const enrollment = await getDoc(enrollmentRef)
+      setMarked(enrollment.data().marked)
+    },
+    [course]
+  )
 
   const markAsComplete = async () => {
     const attendee = await checkUserAndLogin()
@@ -180,17 +178,20 @@ export default function PostPage({ courseStr, postStr }) {
     })
   }
 
-  const getMarked = useCallback(
-    async (user) => {
-      if (!user) {
-        return
+  useEffect(() => {
+    const sub = auth.onAuthStateChanged((user) => {
+      if (user) {
+        getMarked(user)
+      } else {
+        setMarked({})
       }
-      const enrollmentRef = await getEnrollmentRef({ course, attendee: user })
-      const enrollment = await getDoc(enrollmentRef)
-      setMarked(enrollment.data().marked)
-    },
-    [course]
-  )
+    })
+
+    return () => {
+      sub()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [post.slug])
 
   useEffect(() => {
     logAnalyticsEvent('course_post_viewed', {
