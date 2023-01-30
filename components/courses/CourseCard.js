@@ -22,6 +22,8 @@ const CourseCard = ({ course, enrollHandler, user }) => {
   useEffect(() => {
     if (user) {
       getEnrollment()
+    } else {
+      setEnrolled(false)
     }
   }, [user, getEnrollment])
 

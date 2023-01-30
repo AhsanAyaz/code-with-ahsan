@@ -9,7 +9,6 @@ import { getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { useEffect, useState } from 'react'
 import { checkUserAndLogin } from '../../services/AuthService'
-import { getFirestore } from 'firebase/firestore'
 import { getEnrollmentRef } from '../../services/EnrollmentService'
 
 export async function getStaticProps() {
