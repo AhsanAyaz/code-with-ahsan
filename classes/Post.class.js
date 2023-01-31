@@ -11,19 +11,23 @@ class Post {
       slug,
       chapter,
       videoEmbedded,
-      assignment,
+      hasAssignment,
+      type,
+      article,
     } = attributes
     const chapterId = chapter?.data?.id
     this.title = title
+    this.type = type
     this.description = description
     this.videoUrl = videoUrl
     this.order = order
     this.slug = slug
+    this.article = article
     this.resources = resources
     this.chapterId = chapterId
     this.videoEmbedded = videoEmbedded ? JSON.parse(videoEmbedded) : null
     this.embedUrl = this.getEmbedUrl()
-    this.assignment = assignment
+    this.hasAssignment = hasAssignment
   }
 
   getEmbedUrl() {

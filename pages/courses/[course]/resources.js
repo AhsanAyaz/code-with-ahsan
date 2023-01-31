@@ -57,7 +57,7 @@ export default function PostPageWithLayout({ courseStr }) {
       ChildComponent={CourseResourcesPage}
       courseStr={courseStr}
       seo={{
-        title: `${course.title} - Resources`,
+        title: `${course.name} - Resources`,
         description: `Resources for ${course.title}`,
       }}
     ></CoursePostLayout>

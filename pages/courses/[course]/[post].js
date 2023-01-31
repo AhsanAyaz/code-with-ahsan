@@ -10,9 +10,14 @@ import logAnalyticsEvent from '../../../lib/utils/logAnalyticsEvent'
 import ResourcesLinks from '../../../components/ResourcesLinks'
 import LegitMarkdown from '../../../components/LegitMarkdown'
 import CoursePostLayout from '../../../layouts/CoursePostLayout'
+import SubmissionWrapper from '../../../components/SubmissionWrapper'
+import { getAuth } from 'firebase/auth'
+import { getApp } from 'firebase/app'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
+
+const auth = getAuth(getApp())
 
 export async function getStaticPaths() {
   const query = qs.stringify(
@@ -75,7 +80,7 @@ export async function getStaticProps({ params }) {
   })
   const postQuery = qs.stringify(
     {
-      populate: ['chapter', 'resources', 'assignment'],
+      populate: ['chapter', 'resources', 'article'],
       publicationState: STRAPI_CONFIG.publicationState,
     },
     {
@@ -104,27 +109,61 @@ export async function getStaticProps({ params }) {
   }
 }
 
-function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomplete }) {
+function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomplete, user }) {
   useEffect(() => {
     logAnalyticsEvent('course_post_viewed', {
       courseSlug: course.slug,
       postSlug: post.slug,
     })
+    console.log(post)
   }, [post.slug, course.slug])
   return (
     <>
       <header className="mb-6">
         <h1 className="text-4xl text-center">{post.title}</h1>
       </header>
-      <section className="embed-container mb-4">
-        <iframe
-          src={post.embedUrl}
-          title={post.title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        ></iframe>
-      </section>
-      <section className="mb-4 flex justify-end">
+      {post.hasAssignment && (
+        <SubmissionWrapper
+          user={auth.currentUser}
+          submissionParams={{
+            courseId: course.slug,
+            postId: post.slug,
+          }}
+          submitButtonText={'Submit Assignment'}
+          submissionDone={() => {
+            console.log('submitted')
+          }}
+          submissionUrl={`assignments/${course.slug}_${auth.currentUser?.uid}`}
+        ></SubmissionWrapper>
+      )}
+      {post.type === 'video' && (
+        <section className="embed-container mb-4">
+          <iframe
+            src={post.embedUrl}
+            title={post.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          ></iframe>
+        </section>
+      )}
+      {post.article && (
+        <section>
+          {post.article && (
+            <LegitMarkdown
+              components={{
+                a: (props) => (
+                  <a className="text-yellow-300" target={'_blank'} {...props}>
+                    {props.children}
+                  </a>
+                ),
+              }}
+            >
+              {post.article}
+            </LegitMarkdown>
+          )}
+        </section>
+      )}
+      <section className="my-4 flex justify-end">
         <div className="flex-1">
           {post.previousPost && (
             <Button
@@ -172,21 +211,6 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
           <section className="mt-4">
             <ResourcesLinks resources={post.resources} />
           </section>
-        )}
-      </section>
-      <section>
-        {post.assignment && (
-          <LegitMarkdown
-            components={{
-              a: (props) => (
-                <a className="text-yellow-300" target={'_blank'} {...props}>
-                  {props.children}
-                </a>
-              ),
-            }}
-          >
-            {post.assignment}
-          </LegitMarkdown>
         )}
       </section>
     </>
