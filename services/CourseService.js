@@ -6,7 +6,7 @@ import STRAPI_CONFIG from '../lib/strapiConfig'
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
 
-const getCoursesForStaticPaths = async () => {
+export const getCoursesForStaticPaths = async () => {
   const query = qs.stringify(
     {
       populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts'],
@@ -39,5 +39,3 @@ const getCoursesForStaticPaths = async () => {
   }
   return config
 }
-
-export default getCoursesForStaticPaths

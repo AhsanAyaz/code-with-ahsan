@@ -1,15 +1,10 @@
-import siteMetadata from '@/data/siteMetadata'
-import { PageSEO } from '@/components/SEO'
 import axios from 'axios'
 import qs from 'qs'
-import Link from 'next/link'
 import Course from '../../../classes/Course.class'
-import PostsList from '../../../components/courses/PostsList'
 import STRAPI_CONFIG from '../../../lib/strapiConfig'
-import { useReducer, useEffect, useState, useRef, useCallback } from 'react'
-import { postsReducer } from '../../../services/PostService'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import logAnalyticsEvent from '../../../lib/utils/logAnalyticsEvent'
-import getCoursesForStaticPaths from '../../../services/CourseService'
+import { getCoursesForStaticPaths } from '../../../services/CourseService'
 import Button from '../../../components/Button'
 import { getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
@@ -30,6 +25,7 @@ import { getFireStorageFileName } from '../../../lib/utils/queryParams'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import Spinner from '../../../components/Spinner'
+import CoursePostLayout from '../../../layouts/CoursePostLayout'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -65,10 +61,8 @@ export async function getStaticProps({ params }) {
   return { props: { courseStr: JSON.stringify(course) } }
 }
 
-export default function CourseSubmissionsPage({ courseStr }) {
-  const course = JSON.parse(courseStr)
+function CourseSubmissionsPage({ course }) {
   const submissionFileElRef = useRef(null)
-  const [state, dispatch] = useReducer(postsReducer, { completedPosts: {} })
   const [showSubDialog, setShowSubDialog] = useState(false)
   const [isSubmittingProject, setIsSubmittingProject] = useState(false)
   const [isDeletingSubmission, setIsDeletingSubmission] = useState(false)
@@ -90,9 +84,6 @@ export default function CourseSubmissionsPage({ courseStr }) {
   }, [course.slug])
 
   useEffect(() => {
-    dispatch({
-      type: 'RETRIEVE_COMPLETED_POSTS',
-    })
     logAnalyticsEvent('course_submissions_viewed', {
       courseSlug: course.slug,
     })
@@ -226,183 +217,148 @@ export default function CourseSubmissionsPage({ courseStr }) {
 
   return (
     <>
-      <PageSEO
-        title={`${course.name} - Project Submissions`}
-        description={course.description || siteMetadata.description}
-      />
-      <div className="flex gap-12 flex-col-reverse md:grid md:grid-cols-3 md:gap-4">
-        <aside className="chapters col-span-1">
-          {course &&
-            course.chapters.map((chapter, index) => {
-              return (
-                <section key={index} className="mb-2">
-                  {chapter.showName && (
-                    <div className="mb-4 text-left md:text-center text-base font-bold">
-                      {chapter.name}
-                    </div>
-                  )}
-                  <PostsList
-                    chapter={chapter}
-                    courseSlug={course.slug}
-                    completedPosts={state.completedPosts}
-                  />
-                </section>
-              )
-            })}
-          {course.resources?.length ? (
-            <div className="my-6">
-              <h5 className="text-center md:text-left mb-4">Resources</h5>
-              <Link passHref href={`/courses/${course.slug}/resources`}>
-                <li
-                  className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-[#6366f1] cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white`}
-                >
-                  <a className="break-words">View Resources</a>
-                </li>
-              </Link>
-            </div>
-          ) : null}
-          <div className="my-6">
-            <h5 className="text-center md:text-left mb-4">Project Submissions</h5>
-            <Link passHref href={`/courses/${course.slug}/submissions`}>
-              <li
-                className={`flex items-center gap-4 justify-between px-4 py-2 dark:hover:bg-[#6366f1] cursor-pointer bg-[#6366f1] text-white rounded-md hover:bg-[#6366f1] hover:text-white`}
-              >
-                <a className="break-words">View Submissions</a>
-              </li>
-            </Link>
-          </div>
-        </aside>
-        <main className="flex-1 md:min-h-[300px] col-span-2">
-          <header className="mb-6">
-            <h1 className="text-4xl text-center">Submissions</h1>
-          </header>
-          <div className="flex items-center justify-end">
-            <Button title="Submit your project" onClick={newSubmission}>
-              +
-            </Button>
-          </div>
-
-          {submissions?.length > 0 ? (
-            <div className="submissions mt-8 flex flex-wrap gap-5">
-              {submissions.map((sub) => (
-                <div
-                  key={sub.id}
-                  className="max-w-xs transition ease-in-out duration-150 rounded-md shadow-md relative hover:-translate-y-1 hover:shadow-lg hover:cursor-pointer"
-                >
-                  {sub.by.uid === user?.uid && !isDeletingSubmission && (
-                    <button
-                      onClick={deleteSubmission}
-                      className="hover:opacity-50 cursor-pointer absolute top-3 right-3"
-                    >
-                      <FontAwesomeIcon icon={faTrash} color={'red'} />
-                    </button>
-                  )}
-                  {isDeletingSubmission ? (
-                    <div className="flex items-center justify-center">
-                      <Spinner></Spinner>
-                    </div>
-                  ) : (
-                    <a
-                      href={sub.demoLink}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="overflow-hidden rounded-t-md flex items-center justify-center aspect-square bg-black/80"
-                    >
-                      <img src={sub.screenshotUrl} alt="" />
-                    </a>
-                  )}
-
-                  <div className="p-5 border border-t-0 rounded-b-md border-gray-100">
-                    <div className="flex items-center gap-4">
-                      <img src={sub.by.photoURL} className="rounded-full w-12 h-12" />
-                      <a href={sub.demoLink} target="_blank" rel="noreferrer noopener">
-                        <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-                          {sub.by.name}
-                        </h5>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <h2 className="text-2xl text-center my-8">No submissions yet</h2>
-          )}
-        </main>
-        <Dialog
-          title={'Submit project'}
-          show={showSubDialog}
-          onClose={onSubModalClose}
-          isLoading={isSubmittingProject}
-          actions={[
-            {
-              label: 'Cancel',
-              onClick: onSubModalClose,
-            },
-            {
-              label: 'Save',
-              disabled: !(submissionFile && submissionDemoLink),
-              onClick: () => {
-                saveSubmission(submissionFile, user, submissionDemoLink)
-              },
-              type: 'primary',
-            },
-          ]}
-        >
-          <div className="max-w-xl">
-            <label
-              onDrop={dropHandler}
-              onDragOver={dragOverHandler}
-              className="flex justify-center w-full h-32 px-4 transition bg-white border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none"
-            >
-              <span className="flex items-center space-x-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-6 h-6 text-gray-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  />
-                </svg>
-                {submissionFile ? (
-                  <span className="font-medium text-gray-600 break-all">{submissionFile.name}</span>
-                ) : (
-                  <span className="font-medium text-gray-600">
-                    Drop files to Attach, or &nbsp;
-                    <span className="text-blue-600 underline">browse</span>
-                  </span>
-                )}
-              </span>
-              <input
-                ref={submissionFileElRef}
-                type="file"
-                accept={supportedFileTypes.join(', ')}
-                onChange={handleFileSelect}
-                name="file_upload"
-                className="hidden"
-                multiple={false}
-              />
-            </label>
-            <input
-              className="focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none w-full text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md my-4 py-2 px-4 ring-1 ring-slate-200 shadow-sm"
-              type="url"
-              onChange={(ev) => {
-                setSubmissionDemoLink(ev.target.value)
-              }}
-              aria-label="Demo link"
-              placeholder="Demo link"
-            ></input>
-          </div>
-        </Dialog>
+      <header className="mb-6">
+        <h1 className="text-4xl text-center">Submissions</h1>
+      </header>
+      <div className="flex items-center justify-end">
+        <Button title="Submit your project" onClick={newSubmission}>
+          +
+        </Button>
       </div>
+
+      {submissions?.length > 0 ? (
+        <ul className="submissions mt-8 flex flex-wrap gap-5">
+          {submissions.map((sub) => (
+            <li
+              key={sub.screenshotUrl}
+              className="max-w-xs transition ease-in-out duration-150 rounded-md shadow-md relative hover:-translate-y-1 hover:shadow-lg hover:cursor-pointer"
+            >
+              {sub.by.uid === user?.uid && !isDeletingSubmission && (
+                <button
+                  onClick={deleteSubmission}
+                  className="hover:opacity-50 cursor-pointer absolute top-3 right-3"
+                >
+                  <FontAwesomeIcon icon={faTrash} color={'red'} />
+                </button>
+              )}
+              {isDeletingSubmission ? (
+                <div className="flex items-center justify-center">
+                  <Spinner></Spinner>
+                </div>
+              ) : (
+                <a
+                  href={sub.demoLink}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="overflow-hidden rounded-t-md flex items-center justify-center aspect-square bg-black/80"
+                >
+                  <img src={sub.screenshotUrl} alt="" />
+                </a>
+              )}
+
+              <div className="p-5 border border-t-0 rounded-b-md border-gray-100">
+                <div className="flex items-center gap-4">
+                  <img src={sub.by.photoURL} className="rounded-full w-12 h-12" />
+                  <a href={sub.demoLink} target="_blank" rel="noreferrer noopener">
+                    <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+                      {sub.by.name}
+                    </h5>
+                  </a>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <h2 className="text-2xl text-center my-8">No submissions yet</h2>
+      )}
+      <Dialog
+        title={'Submit project'}
+        show={showSubDialog}
+        onClose={onSubModalClose}
+        isLoading={isSubmittingProject}
+        actions={[
+          {
+            label: 'Cancel',
+            onClick: onSubModalClose,
+          },
+          {
+            label: 'Save',
+            disabled: !(submissionFile && submissionDemoLink),
+            onClick: () => {
+              saveSubmission(submissionFile, user, submissionDemoLink)
+            },
+            type: 'primary',
+          },
+        ]}
+      >
+        <div className="max-w-xl">
+          <label
+            onDrop={dropHandler}
+            onDragOver={dragOverHandler}
+            className="flex justify-center w-full h-32 px-4 transition bg-white border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none"
+          >
+            <span className="flex items-center space-x-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6 text-gray-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
+              </svg>
+              {submissionFile ? (
+                <span className="font-medium text-gray-600 break-all">{submissionFile.name}</span>
+              ) : (
+                <span className="font-medium text-gray-600">
+                  Drop files to Attach, or &nbsp;
+                  <span className="text-blue-600 underline">browse</span>
+                </span>
+              )}
+            </span>
+            <input
+              ref={submissionFileElRef}
+              type="file"
+              accept={supportedFileTypes.join(', ')}
+              onChange={handleFileSelect}
+              name="file_upload"
+              className="hidden"
+              multiple={false}
+            />
+          </label>
+          <input
+            className="focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none w-full text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md my-4 py-2 px-4 ring-1 ring-slate-200 shadow-sm"
+            type="url"
+            onChange={(ev) => {
+              setSubmissionDemoLink(ev.target.value)
+            }}
+            aria-label="Demo link"
+            placeholder="Demo link"
+          ></input>
+        </div>
+      </Dialog>
     </>
   )
 }
 
 CourseSubmissionsPage.showAds = true
+
+export default function PostPageWithLayout({ courseStr }) {
+  const course = JSON.parse(courseStr)
+  return (
+    <CoursePostLayout
+      ChildComponent={CourseSubmissionsPage}
+      courseStr={courseStr}
+      seo={{
+        title: `${course.title} - Submissions`,
+        description: `Project Submissions for ${course.title}`,
+      }}
+    ></CoursePostLayout>
+  )
+}

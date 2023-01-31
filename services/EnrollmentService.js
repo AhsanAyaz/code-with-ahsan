@@ -1,5 +1,4 @@
 import { getFirestore, setDoc, doc, getDoc } from 'firebase/firestore'
-
 import { getApp } from 'firebase/app'
 
 export const getEnrollmentRef = async ({ course, attendee }, create = true) => {
@@ -9,6 +8,8 @@ export const getEnrollmentRef = async ({ course, attendee }, create = true) => {
   if (!enrollment.exists() && create) {
     await setDoc(enrollmentRef, {
       userId: attendee.uid,
+      userEmail: attendee.email,
+      userName: attendee.displayName,
       courseId: course.slug,
       marked: {},
     })
