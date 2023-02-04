@@ -129,6 +129,7 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
             courseId: course.slug,
             postId: post.slug,
           }}
+          submitModalTitle={'Submit Assignment'}
           submitButtonText={'Submit Assignment'}
           submissionDone={() => {
             console.log('submitted')

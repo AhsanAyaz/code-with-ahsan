@@ -18,6 +18,7 @@ export default function SubmissionWrapper({
   submissionParams,
   children,
   submitButtonText,
+  submitModalTitle = 'Submit',
 }) {
   const submissionFileElRef = useRef(null)
   const [showSubDialog, setShowSubDialog] = useState(false)
@@ -139,7 +140,7 @@ export default function SubmissionWrapper({
 
       {children}
       <Dialog
-        title={'Submit project'}
+        title={submitModalTitle}
         show={showSubDialog}
         onClose={onSubModalClose}
         isLoading={isSubmittingProject}
@@ -183,7 +184,7 @@ export default function SubmissionWrapper({
                 <span className="font-medium text-gray-600 break-all">{submissionFile.name}</span>
               ) : (
                 <span className="font-medium text-gray-600">
-                  Drop files to Attach, or &nbsp;
+                  Drop screenshot file to attach, or &nbsp;
                   <span className="text-blue-600 underline">browse</span>
                 </span>
               )}
