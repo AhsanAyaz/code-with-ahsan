@@ -120,7 +120,17 @@ export default function CoursePage({ courseStr }) {
       <header className="text-5xl text-center mb-6 font-bold">
         <h1>{course.name}</h1>
         <div className="my-4">
-          {course.banner && (
+          {course.introEmbeddedUrl && (
+            <section className="embed-container mb-4">
+              <iframe
+                src={course.introEmbeddedUrl}
+                title={course.name}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              ></iframe>
+            </section>
+          )}
+          {!course.introEmbeddedUrl && course.banner && (
             <Image
               width={900}
               height={400}

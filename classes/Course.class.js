@@ -1,3 +1,4 @@
+import { getEmbedUrl } from '../services/YouTubeService'
 import Author from './Author.class'
 import Chapter from './Chapter.class'
 
@@ -13,6 +14,7 @@ class Course {
     this.duration = courseAttributes.duration
     this.resources = courseAttributes.resources
     this.banner = courseAttributes.banner?.data?.attributes?.url
+    this.introVideoUrl = courseAttributes.introVideoUrl
     this.slug = courseAttributes.slug
     if (courseAttributes.chapters) {
       this.chapters = courseAttributes.chapters.data.map((chapter) => new Chapter(chapter))
@@ -21,6 +23,7 @@ class Course {
     }
 
     this.authors = courseAttributes.authors.data.map((author) => new Author(author))
+    this.introEmbeddedUrl = getEmbedUrl(this.introVideoUrl)
   }
 }
 
