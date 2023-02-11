@@ -4,28 +4,48 @@ import Link from 'next/link'
 import LegitMarkdown from '../LegitMarkdown'
 import Image from 'next/image'
 
-import { getFirestore, doc, getDoc } from 'firebase/firestore'
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  query,
+  collection,
+  where,
+  getCountFromServer,
+} from 'firebase/firestore'
 import { getApp } from 'firebase/app'
 
-const firestore = getFirestore(getApp())
+const db = getFirestore(getApp())
 
 const CourseCard = ({ course, enrollHandler, user }) => {
   const { banner } = course
-  const [enrolled, setEnrolled] = useState(false)
+  const [enrolled, setEnrolled] = useState(null)
+  const [enrollmentCount, setEnrollmentCount] = useState(null)
 
   const getEnrollment = useCallback(async () => {
-    const enrollmentRef = doc(firestore, `enrollment/${course.slug}_${user.uid}`)
+    const enrollmentRef = doc(db, `enrollment/${course.slug}_${user.uid}`)
     const existingCourse = await getDoc(enrollmentRef)
     setEnrolled(existingCourse.exists())
   }, [user, course.slug])
 
+  const getGetEnrollmentCount = useCallback(async () => {
+    const q = query(collection(db, 'enrollment'), where('courseId', '==', course.slug))
+    const snapshot = await getCountFromServer(q)
+    setEnrollmentCount(snapshot.data().count)
+  }, [course.slug])
+
   useEffect(() => {
     if (user) {
       getEnrollment()
-    } else {
+    } else if (enrolled) {
       setEnrolled(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, getEnrollment])
+
+  useEffect(() => {
+    getGetEnrollmentCount()
+  }, [getGetEnrollmentCount])
 
   return (
     <Link passHref href={`/courses/${course.slug}`}>
@@ -45,10 +65,12 @@ const CourseCard = ({ course, enrollHandler, user }) => {
         <h5 className="text-base lg:text-2xl mb-4 text-center font-bold text-gray-900 dark:text-gray-200">
           {course.name}
         </h5>
-        <div className="mb-8 text-sm lg:text-base text-center sm:pr-8">
+        <div className="text-sm text-center lg:text-base">
           <LegitMarkdown>{course.description}</LegitMarkdown>
         </div>
-
+        <p className="text-center mt-4 mb-8">
+          {enrollmentCount !== null ? `${enrollmentCount} students enrolled` : '...'}
+        </p>
         <button
           onClick={(event) => {
             if (enrolled) {
@@ -59,7 +81,7 @@ const CourseCard = ({ course, enrollHandler, user }) => {
           }}
           className="px-4 text-white uppercase mb-6 hover:bg-yellow-500 hover:shadow-md py-3 w-full bg-yellow-400 dark:bg-yellow-500 dark:hover:bg-yellow-600"
         >
-          {enrolled ? 'Continue' : 'Enroll'}
+          {enrolled === null ? '...' : enrolled ? 'Continue' : 'Enroll'}
         </button>
 
         <dl className="flex mt-6">

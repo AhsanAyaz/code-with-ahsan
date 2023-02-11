@@ -14,12 +14,14 @@ import Link from 'next/link'
 import { getEnrollmentRef } from '../../services/EnrollmentService'
 import { getAuth } from 'firebase/auth'
 import { getApp } from 'firebase/app'
-import { getDoc } from 'firebase/firestore'
+import { getFirestore } from 'firebase/firestore'
+import { getDoc, query, collection, getCountFromServer, where } from 'firebase/firestore'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
 
 const auth = getAuth(getApp())
+const db = getFirestore(getApp())
 
 export async function getStaticPaths() {
   const query = qs.stringify(
@@ -78,6 +80,7 @@ export async function getStaticProps({ params }) {
 export default function CoursePage({ courseStr }) {
   const course = JSON.parse(courseStr)
   const [marked, setMarked] = useState({})
+  const [enrollmentCount, setEnrollmentCount] = useState(null)
 
   const getMarked = useCallback(
     async (user) => {
@@ -91,6 +94,12 @@ export default function CoursePage({ courseStr }) {
     [course]
   )
 
+  const getGetEnrollmentCount = useCallback(async () => {
+    const q = query(collection(db, 'enrollment'), where('courseId', '==', course.slug))
+    const snapshot = await getCountFromServer(q)
+    setEnrollmentCount(snapshot.data().count)
+  }, [course.slug])
+
   useEffect(() => {
     const sub = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -99,7 +108,6 @@ export default function CoursePage({ courseStr }) {
         setMarked({})
       }
     })
-
     return () => {
       sub()
     }
@@ -109,7 +117,8 @@ export default function CoursePage({ courseStr }) {
     logAnalyticsEvent('course_viewed', {
       courseSlug: course.slug,
     })
-  }, [course.slug])
+    getGetEnrollmentCount()
+  }, [course.slug, getGetEnrollmentCount])
   return (
     <>
       <PageSEO
@@ -119,6 +128,7 @@ export default function CoursePage({ courseStr }) {
       />
       <header className="text-5xl text-center mb-6 font-bold">
         <h1>{course.name}</h1>
+        <p className="text-center text-xl">{enrollmentCount} students enrolled</p>
         <div className="my-4">
           {course.introEmbeddedUrl && (
             <section className="embed-container mb-4">

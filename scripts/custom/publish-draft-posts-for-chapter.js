@@ -5,7 +5,7 @@ const axios = require('axios')
 // Headers config
 axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.STRAPI_API_KEY}`
 
-const CHAPTER_ID = 5
+const CHAPTER_ID = 6
 
 const publishPosts = async (chapterId) => {
   const postQuery = qs.stringify(
