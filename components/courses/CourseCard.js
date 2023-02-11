@@ -81,7 +81,7 @@ const CourseCard = ({ course, enrollHandler, user }) => {
           }}
           className="px-4 text-white uppercase mb-6 hover:bg-yellow-500 hover:shadow-md py-3 w-full bg-yellow-400 dark:bg-yellow-500 dark:hover:bg-yellow-600"
         >
-          {enrolled === null ? '...' : enrolled ? 'Continue' : 'Enroll'}
+          {enrolled ? 'Continue' : 'Enroll'}
         </button>
 
         <dl className="flex mt-6">
