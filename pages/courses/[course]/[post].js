@@ -222,13 +222,14 @@ PostPage.showAds = true
 
 export default function PostPageWithLayout({ courseStr, postStr }) {
   const post = JSON.parse(postStr)
+  const course = JSON.parse(courseStr)
   return (
     <CoursePostLayout
       ChildComponent={PostPage}
       postStr={postStr}
       courseStr={courseStr}
       seo={{
-        title: post.title,
+        title: `${post.title} - ${course.name}`,
         description: post.description,
       }}
     ></CoursePostLayout>

@@ -16,6 +16,7 @@ import { getAuth } from 'firebase/auth'
 import { getApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 import { getDoc, query, collection, getCountFromServer, where } from 'firebase/firestore'
+import { format } from 'date-fns'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -129,6 +130,23 @@ export default function CoursePage({ courseStr }) {
       <header className="text-5xl text-center mb-6 font-bold">
         <h1>{course.name}</h1>
         <p className="text-center text-xl">{enrollmentCount} students enrolled</p>
+        <dl className="flex flex-col my-4 gap-4 items-center">
+          <div className="flex items-center gap-4">
+            <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">Published</dt>
+            <dd className="text-xs text-gray-500 dark:text-gray-300">
+              {format(new Date(course.publishedAt), 'MM/dd/yyyy')}
+            </dd>
+          </div>
+
+          {course.duration && (
+            <div className="flex items-center gap-4">
+              <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Course Duration
+              </dt>
+              <dd className="text-xs text-gray-500 dark:text-gray-300">{course.duration}</dd>
+            </div>
+          )}
+        </dl>
         <div className="my-4">
           {course.introEmbeddedUrl && (
             <section className="embed-container mb-4">

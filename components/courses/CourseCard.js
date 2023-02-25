@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import format from 'date-fns/format'
 import Link from 'next/link'
 import LegitMarkdown from '../LegitMarkdown'
 import Image from 'next/image'
@@ -62,10 +61,10 @@ const CourseCard = ({ course, enrollHandler, user }) => {
             />
           </div>
         )}
-        <h5 className="text-base lg:text-2xl mb-4 text-center font-bold text-gray-900 dark:text-gray-200">
+        <h5 className="text-base lg:text-2xl mb-4 line-clamp-1 text-center font-bold text-gray-900 dark:text-gray-200">
           {course.name}
         </h5>
-        <div className="text-sm text-center lg:text-base">
+        <div className="text-sm text-center lg:text-base line-clamp-3 text-ellipsis">
           <LegitMarkdown>{course.description}</LegitMarkdown>
         </div>
         <p className="text-center mt-4 mb-8">
@@ -83,24 +82,6 @@ const CourseCard = ({ course, enrollHandler, user }) => {
         >
           {enrolled ? 'Continue' : 'Enroll'}
         </button>
-
-        <dl className="flex mt-6">
-          <div className="flex flex-col-reverse">
-            <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">Published</dt>
-            <dd className="text-xs text-gray-500 dark:text-gray-300">
-              {format(new Date(course.publishedAt), 'MM/dd/yyyy')}
-            </dd>
-          </div>
-
-          {course.duration && (
-            <div className="flex flex-col-reverse ml-3 sm:ml-6">
-              <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Course Duration
-              </dt>
-              <dd className="text-xs text-gray-500 dark:text-gray-300">{course.duration}</dd>
-            </div>
-          )}
-        </dl>
       </div>
     </Link>
   )

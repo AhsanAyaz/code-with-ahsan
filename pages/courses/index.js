@@ -62,7 +62,10 @@ export default function Courses({ coursesStr }) {
   return (
     <>
       <PageSEO title={`Courses - ${siteMetadata.author}`} description={siteMetadata.description} />
-      <div className="max-w-lg mx-auto grid grid-cols-1 gap-8">
+      <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14 text-center mt-4 mb-4 md:mb-8">
+        Courses
+      </h1>
+      <div className="max-w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         {courses &&
           courses.map((course) => {
             return <CourseCard course={course} user={user} enrollHandler={enroll} key={course.id} />

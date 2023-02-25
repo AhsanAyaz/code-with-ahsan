@@ -18,34 +18,34 @@ export default function Home() {
     setBanners(banners)
   }
 
-  const initFBMessenger = () => {
-    var chatbox = document.getElementById('fb-customer-chat')
-    chatbox.setAttribute('page_id', '114435320270263')
-    chatbox.setAttribute('attribution', 'biz_inbox')
-    window.fbAsyncInit = function () {
-      // eslint-disable-next-line no-undef
-      FB.init({
-        xfbml: true,
-        version: 'v13.0',
-      })
-    }
-    ;(function (d, s, id) {
-      let js,
-        fjs = d.getElementsByTagName(s)[0]
-      if (d.getElementById(id)) return
-      js = d.createElement(s)
-      js.id = id
-      js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js'
-      fjs.parentNode.insertBefore(js, fjs)
-    })(document, 'script', 'facebook-jssdk')
-  }
+  // const initFBMessenger = () => {
+  //   var chatbox = document.getElementById('fb-customer-chat')
+  //   chatbox.setAttribute('page_id', '114435320270263')
+  //   chatbox.setAttribute('attribution', 'biz_inbox')
+  //   window.fbAsyncInit = function () {
+  //     // eslint-disable-next-line no-undef
+  //     FB.init({
+  //       xfbml: true,
+  //       version: 'v13.0',
+  //     })
+  //   }
+  //   ;(function (d, s, id) {
+  //     let js,
+  //       fjs = d.getElementsByTagName(s)[0]
+  //     if (d.getElementById(id)) return
+  //     js = d.createElement(s)
+  //     js.id = id
+  //     js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js'
+  //     fjs.parentNode.insertBefore(js, fjs)
+  //   })(document, 'script', 'facebook-jssdk')
+  // }
 
-  useEffect(() => {
-    // getBanners()
-    if (!location.href.includes('localhost')) {
-      initFBMessenger()
-    }
-  }, [])
+  // useEffect(() => {
+  //   // getBanners()
+  //   if (!location.href.includes('localhost')) {
+  //     initFBMessenger()
+  //   }
+  // }, [])
   return (
     <>
       <PageSEO title={siteMetadata.title} description={siteMetadata.description} />
@@ -69,16 +69,17 @@ export default function Home() {
         </div>
       ))}
       <div className="flex flex-col justify-center">
-        <div className="flex flex-col items-start mb-6 relative">
+        <div className="flex flex-col md:flex-row items-center mb-16 px-24 md:px-0 relative">
           <Image
-            src="/static/images/banner.png"
-            alt="boy working"
-            width={1600}
-            height={1000}
+            src="/static/images/banner-dev.svg"
+            alt="banner dev"
+            width={800}
+            height={800}
+            className="w-84 md:w-auto md:flex-1"
             objectFit="contain"
           />
-          <div className="overlay opacity-40 bg-black absolute w-full h-full"></div>
-          <div className="flex flex-col pr-6 absolute bottom-0 top-0 items-end justify-center h-full w-full gap-4">
+          {/* <div className="overlay opacity-40 bg-black absolute w-full h-full"></div> */}
+          <div className="flex flex-col pr-6 py-10 bottom-0 top-0 items-center md:items-end justify-center h-full w-full gap-4">
             <Link href={'/courses'} passHref>
               <button className="p-4 lg:p-6 lg:w-72 w-52 text-xl lg:text-2xl ring-1 dark:text-black dark:ring-gray-300  dark:bg-white dark:hover:bg-white dark:ring-offset-black dark:hover:ring-offset-2 ring-primary-500 bg-primary-700 text-white rounded-md font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 hover:bg-primary-700 hover:text-white">
                 Take a Course
@@ -124,7 +125,7 @@ export default function Home() {
       </div>
       <div id="fb-root"></div>
 
-      <div id="fb-customer-chat" className="fb-customerchat"></div>
+      {/* <div id="fb-customer-chat" className="fb-customerchat"></div> */}
     </>
   )
 }
