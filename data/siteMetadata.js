@@ -4,7 +4,7 @@ const siteMetadata = {
   headerTitle: 'CodeWithAhsan',
   description: 'The one stop shop to have fun with amazing people, and to code of course.',
   language: 'en-us',
-  siteUrl: 'https://codewithahsan.org',
+  siteUrl: 'https://codewithahsan.dev',
   siteRepo: 'https://github.com/code-with-ahsan/code-with-ahsan',
   siteLogo: '/static/images/logo.png',
   image: '/static/images/avatar.jpeg',

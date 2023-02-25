@@ -24,7 +24,7 @@ export default async (req, res) => {
     await mailchimp.lists.updateListMemberTags(listId, subscriberHash, {
       tags: [
         {
-          name: 'codewithahsan.org',
+          name: 'codewithahsan.dev',
           status: 'active',
         },
       ],
