@@ -1,6 +1,6 @@
-Sitemap: [sitemap.xml]
+sitemap: https://codewithahsan.dev/sitemap.xml
 
-User-agent: *
-Allow: /*
+user-agent: *
+allow: /*
 
-Disallow: /api/*
+disallow: /api/*
