@@ -131,12 +131,12 @@ export default function CoursePage({ courseStr }) {
         <h1>{course.name}</h1>
         <p className="text-center text-xl">{enrollmentCount} students enrolled</p>
         <dl className="flex flex-col my-4 gap-4 items-center">
-          <div className="flex items-center gap-4">
+          {/* <div className="flex items-center gap-4">
             <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">Published</dt>
             <dd className="text-xs text-gray-500 dark:text-gray-300">
-              {format(new Date(course.publishedAt), 'MM/dd/yyyy')}
+              {format(new Date(course.publishedAt), 'dd/MM/yyyy')}
             </dd>
-          </div>
+          </div> */}
 
           {course.duration && (
             <div className="flex items-center gap-4">
