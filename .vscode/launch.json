@@ -9,6 +9,13 @@
       "type": "node"
     },
     {
+      "name": "Generate Sitemap",
+      "program": "${workspaceFolder}/scripts/generate-sitemap.js",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    },
+    {
       "name": "Next.js: debug server-side",
       "type": "node-terminal",
       "request": "launch",

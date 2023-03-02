@@ -3,6 +3,38 @@ const globby = require('globby')
 const prettier = require('prettier')
 const siteMetadata = require('../data/siteMetadata')
 
+require('dotenv').config()
+const qs = require('qs')
+const axios = require('axios')
+
+// Headers config
+axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.STRAPI_API_KEY}`
+
+const getCourses = async () => {
+  const strapiUrl = process.env.STRAPI_URL
+  const strapiAPIKey = process.env.STRAPI_API_KEY
+  const query = qs.stringify(
+    {
+      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts'],
+      sort: ['publishedAt:desc'],
+      publicationState: 'live',
+    },
+    {
+      encodeValuesOnly: true,
+    }
+  )
+  const url = `${strapiUrl}/api/courses?${query}`
+  const coursesResp = await axios.get(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      Authorization: `Bearer ${strapiAPIKey}`,
+    },
+  })
+  const courses = coursesResp.data.data
+  return courses
+}
+
 ;(async () => {
   const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
   const pages = await globby([
@@ -13,11 +45,26 @@ const siteMetadata = require('../data/siteMetadata')
     '!pages/_*.js',
     '!pages/api',
   ])
+  const paths = ['/courses']
+  const courses = await getCourses()
+  courses.map((course) => {
+    const { slug: courseSlug, chapters } = course.attributes
+    paths.push(`/courses/${courseSlug}`)
+    chapters.data.map((chapter) => {
+      const { posts } = chapter.attributes
+      posts.data.map((post) => {
+        const { slug: postSlug } = post.attributes
+        paths.push(`/courses/${courseSlug}/${postSlug}`)
+      })
+      paths.push(`/courses/${courseSlug}/resources`)
+      paths.push(`/courses/${courseSlug}/submissions`)
+    })
+  })
 
   const sitemap = `
         <?xml version="1.0" encoding="UTF-8"?>
         <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-            ${pages
+            ${[...pages, ...paths]
               .map((page) => {
                 const path = page
                   .replace('pages/', '/')
