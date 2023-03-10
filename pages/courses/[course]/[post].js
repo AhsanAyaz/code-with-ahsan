@@ -147,6 +147,13 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
           ></iframe>
         </section>
       )}
+      <section>
+        {post.description && (
+          <section className="mt-8 mb-4">
+            <p>{post.description}</p>
+          </section>
+        )}
+      </section>
       {post.article && (
         <section>
           {post.article && (
@@ -199,13 +206,6 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
             </Button>
           )}
         </div>
-      </section>
-      <section>
-        {post.description && (
-          <section className="mt-8 mb-4">
-            <p>{post.description}</p>
-          </section>
-        )}
       </section>
       <section>
         {post.resources?.length > 0 && (
