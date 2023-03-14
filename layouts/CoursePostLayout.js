@@ -222,7 +222,7 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
                 onClick={async () => {
                   const attendee = await checkUserAndLogin()
                   const sure = confirm(
-                    'Are you sure you want to leave the course? We hate to see you go :('
+                    `Are you sure you want to leave the course? This will delete all your progress in the course including any submitted assignments. Also, we hate to see you go :(`
                   )
                   if (sure) {
                     await unEnroll({ course, attendee })
