@@ -3,7 +3,6 @@ import { PageSEO } from '@/components/SEO'
 import axios from 'axios'
 import qs from 'qs'
 import Course from '../../classes/Course.class'
-import PostsList from '../../components/courses/PostsList'
 import { useEffect, useCallback, useState } from 'react'
 import LegitMarkdown from '../../components/LegitMarkdown'
 import Image from 'next/image'
@@ -16,6 +15,7 @@ import { getAuth } from 'firebase/auth'
 import { getApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 import { query, collection, getCountFromServer, where } from 'firebase/firestore'
+import { CoursesList } from '../../components/courses/CoursesList'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -173,23 +173,7 @@ export default function CoursePage({ courseStr }) {
       <div className="mb-6">
         <LegitMarkdown>{course.outline}</LegitMarkdown>
       </div>
-      {course?.chapters?.length ? (
-        <div className="chapters">
-          <h4 className="text-center mb-6 font-bold">Chapters</h4>
-          <article>
-            {course.chapters.map((chapter, index) => {
-              return (
-                <section key={index} className="mb-2">
-                  {chapter.showName && (
-                    <div className="mb-4 text-base font-bold">{chapter.name}</div>
-                  )}
-                  <PostsList chapter={chapter} courseSlug={course.slug} completedPosts={marked} />
-                </section>
-              )
-            })}
-          </article>
-        </div>
-      ) : null}
+      {course?.chapters && <CoursesList course={course} markedPosts={marked} />}
       {course.resources?.length ? (
         <div className="resources mt-6">
           <ResourcesLinks

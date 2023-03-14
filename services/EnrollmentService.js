@@ -77,7 +77,6 @@ export const unEnroll = async ({ course, attendee }) => {
   } catch (e) {
     console.log('error deleting enrollment firestore object', e)
   }
-  window.location.reload()
 }
 
 const deleteSreenshotForDoc = async (doc) => {

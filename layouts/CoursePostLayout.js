@@ -9,16 +9,13 @@ import { getApp } from 'firebase/app'
 import logAnalyticsEvent from '../lib/utils/logAnalyticsEvent'
 import { getEnrollmentDoc, unEnroll } from '../services/EnrollmentService'
 import { checkUserAndLogin } from '../services/AuthService'
-import PostsList from '../components/courses/PostsList'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
+import { CoursesList } from '../components/courses/CoursesList'
 
 const auth = getAuth(getApp())
 
 export default function CoursePostLayout({ courseStr, postStr, seo, ChildComponent }) {
   const course = JSON.parse(courseStr)
   const [marked, setMarked] = useState({})
-  const [chaptersExpansion, setChaptersExpansion] = useState({})
   const [user, setUser] = useState(null)
   const [enrolled, setEnrolled] = useState(false)
   const post = JSON.parse(postStr || '{}')
@@ -101,20 +98,6 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
       setUser(user)
     })
 
-    const chaptersExp = course.chapters.reduce((acc, chapter) => {
-      const params = {
-        ...acc,
-        [chapter.id]: false,
-      }
-      const hasActivePost = chapter.posts.find((chapterPost) => {
-        return chapterPost.id === post.id
-      })
-      if (hasActivePost) {
-        params[chapter.id] = true
-      }
-      return params
-    }, {})
-    setChaptersExpansion(chaptersExp)
     return () => {
       sub()
     }
@@ -148,44 +131,7 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
       />
       <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-4">
         <aside className="chapters col-span-1">
-          {course &&
-            course.chapters.map((chapter, index) => {
-              const expanded = chaptersExpansion[chapter.id]
-              return (
-                <section
-                  key={index}
-                  className="mb-2 border-b border-b-gray-200 dark:border-b-gray-700"
-                >
-                  {chapter.showName && (
-                    <button
-                      onClick={() => {
-                        setChaptersExpansion({
-                          ...chaptersExpansion,
-                          [chapter.id]: !chaptersExpansion[chapter.id],
-                        })
-                      }}
-                      className="pb-4 w-full text-base font-bold flex items-center justify-between"
-                    >
-                      <span>
-                        Chapter {index + 1} : {chapter.name}
-                      </span>
-                      <FontAwesomeIcon
-                        icon={faChevronDown}
-                        className={`${expanded ? 'rotate-180' : ''} duration-200`}
-                      />
-                    </button>
-                  )}
-                  {expanded ? (
-                    <PostsList
-                      chapter={chapter}
-                      courseSlug={course.slug}
-                      post={post}
-                      completedPosts={marked}
-                    />
-                  ) : null}
-                </section>
-              )
-            })}
+          {course && <CoursesList course={course} activePost={post} markedPosts={marked} />}
           {course.resources?.length ? (
             <div className="my-6">
               <h5 className="text-center md:text-left mb-4">Resources</h5>

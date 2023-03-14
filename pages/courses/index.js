@@ -10,6 +10,7 @@ import { getAuth } from 'firebase/auth'
 import { useEffect, useState } from 'react'
 import { checkUserAndLogin } from '../../services/AuthService'
 import { getEnrollmentDoc } from '../../services/EnrollmentService'
+import { useRouter } from 'next/router'
 
 export async function getStaticProps() {
   const strapiUrl = process.env.STRAPI_URL
@@ -40,6 +41,7 @@ const auth = getAuth(getApp())
 
 export default function Courses({ coursesStr }) {
   const courses = JSON.parse(coursesStr)
+  const router = useRouter()
   const [user, setUser] = useState(auth.currentUser)
   useEffect(() => {
     const sub = auth.onAuthStateChanged((user) => {
@@ -57,7 +59,7 @@ export default function Courses({ coursesStr }) {
       return
     }
     getEnrollmentDoc({ course, attendee }, true)
-    window.location.href = `/courses/${course.slug}`
+    router.push(`/courses/${course.slug}`)
   }
   return (
     <>
