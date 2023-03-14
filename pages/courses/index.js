@@ -9,7 +9,7 @@ import { getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { useEffect, useState } from 'react'
 import { checkUserAndLogin } from '../../services/AuthService'
-import { getEnrollmentRef } from '../../services/EnrollmentService'
+import { getEnrollmentDoc } from '../../services/EnrollmentService'
 
 export async function getStaticProps() {
   const strapiUrl = process.env.STRAPI_URL
@@ -56,7 +56,7 @@ export default function Courses({ coursesStr }) {
     if (!attendee) {
       return
     }
-    getEnrollmentRef({ course, attendee })
+    getEnrollmentDoc({ course, attendee }, true)
     window.location.href = `/courses/${course.slug}`
   }
   return (

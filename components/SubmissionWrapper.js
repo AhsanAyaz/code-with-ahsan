@@ -7,6 +7,7 @@ import { getFireStorageFileName } from '../lib/utils/queryParams'
 import { URL_REGEX } from '../lib/regexes'
 import Button from './Button'
 import Dialog from './Dialog'
+import { getEnrollmentDoc } from '../services/EnrollmentService'
 
 const storage = getStorage(getApp())
 const firestore = getFirestore(getApp())
@@ -19,6 +20,7 @@ export default function SubmissionWrapper({
   children,
   submitButtonText,
   submitModalTitle = 'Submit',
+  enrollmentChanged,
 }) {
   const submissionFileElRef = useRef(null)
   const [showSubDialog, setShowSubDialog] = useState(false)
@@ -34,6 +36,8 @@ export default function SubmissionWrapper({
         return
       }
     }
+    await getEnrollmentDoc({ course: { slug: submissionParams.courseId }, attendee: user }, true)
+    enrollmentChanged?.({ enrolled: true })
     setShowSubDialog(true)
   }
 

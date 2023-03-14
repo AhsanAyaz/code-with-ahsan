@@ -134,7 +134,7 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
           submissionDone={() => {
             console.log('submitted')
           }}
-          submissionUrl={`assignments/${course.slug}_${auth.currentUser?.uid}`}
+          submissionUrl={`assignments/${course.slug}/${auth.currentUser?.uid}/${post.slug}`}
         ></SubmissionWrapper>
       )}
       {post.type === 'video' && (

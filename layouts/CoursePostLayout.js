@@ -3,19 +3,24 @@ import { PageSEO } from '@/components/SEO'
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { getDoc, updateDoc } from 'firebase/firestore'
+import { onSnapshot, updateDoc } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 import { getApp } from 'firebase/app'
 import logAnalyticsEvent from '../lib/utils/logAnalyticsEvent'
-import { getEnrollmentRef } from '../services/EnrollmentService'
+import { getEnrollmentDoc, unEnroll } from '../services/EnrollmentService'
 import { checkUserAndLogin } from '../services/AuthService'
 import PostsList from '../components/courses/PostsList'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
 
 const auth = getAuth(getApp())
 
 export default function CoursePostLayout({ courseStr, postStr, seo, ChildComponent }) {
   const course = JSON.parse(courseStr)
   const [marked, setMarked] = useState({})
+  const [chaptersExpansion, setChaptersExpansion] = useState({})
+  const [user, setUser] = useState(null)
+  const [enrolled, setEnrolled] = useState(false)
   const post = JSON.parse(postStr || '{}')
   const router = useRouter()
   const currentRoute = router.pathname
@@ -29,9 +34,12 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
       if (!user) {
         return
       }
-      const enrollmentRef = await getEnrollmentRef({ course, attendee: user })
-      const enrollment = await getDoc(enrollmentRef)
-      setMarked(enrollment.data().marked)
+      const enrollment = await getEnrollmentDoc({ course, attendee: user })
+      const isEnrolled = enrollment.exists()
+      setEnrolled(isEnrolled)
+      if (isEnrolled) {
+        setMarked(enrollment.data().marked)
+      }
     },
     [course]
   )
@@ -41,8 +49,8 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
     if (!attendee) {
       return
     }
-    const enrollmentRef = await getEnrollmentRef({ course, attendee })
-    await updateDoc(enrollmentRef, {
+    const enrollmentDoc = await getEnrollmentDoc({ course, attendee }, true)
+    await updateDoc(enrollmentDoc.ref, {
       marked: {
         ...marked,
         [post.slug]: true,
@@ -52,6 +60,9 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
       ...marked,
       [post.slug]: true,
     })
+    if (!enrolled) {
+      setEnrolled(true)
+    }
     logAnalyticsEvent('post_marked_complete', {
       courseSlug: course.slug,
       postSlug: post.slug,
@@ -62,8 +73,8 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
     if (!attendee) {
       return
     }
-    const enrollmentRef = await getEnrollmentRef({ course, attendee })
-    await updateDoc(enrollmentRef, {
+    const enrollmentDoc = await getEnrollmentDoc({ course, attendee })
+    await updateDoc(enrollmentDoc.ref, {
       marked: {
         ...marked,
         [post.slug]: false,
@@ -85,14 +96,48 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
         getMarked(user)
       } else {
         setMarked({})
+        setEnrolled(false)
       }
+      setUser(user)
     })
 
+    const chaptersExp = course.chapters.reduce((acc, chapter) => {
+      const params = {
+        ...acc,
+        [chapter.id]: false,
+      }
+      const hasActivePost = chapter.posts.find((chapterPost) => {
+        return chapterPost.id === post.id
+      })
+      if (hasActivePost) {
+        params[chapter.id] = true
+      }
+      return params
+    }, {})
+    setChaptersExpansion(chaptersExp)
     return () => {
       sub()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post?.slug])
+
+  useEffect(() => {
+    if (!user) {
+      return
+    }
+
+    let enrollmentSub
+    getEnrollmentDoc({ course: course, attendee: user }).then((doc) => {
+      enrollmentSub = onSnapshot(doc.ref, (snapshot) => {
+        const exists = snapshot.exists()
+        setEnrolled(exists)
+      })
+    })
+
+    return () => {
+      enrollmentSub()
+    }
+  }, [user, course.slug])
 
   return (
     <>
@@ -105,17 +150,39 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
         <aside className="chapters col-span-1">
           {course &&
             course.chapters.map((chapter, index) => {
+              const expanded = chaptersExpansion[chapter.id]
               return (
-                <section key={index} className="mb-2">
+                <section
+                  key={index}
+                  className="mb-2 border-b border-b-gray-200 dark:border-b-gray-700"
+                >
                   {chapter.showName && (
-                    <div className="mb-4 text-base font-bold">{chapter.name}</div>
+                    <button
+                      onClick={() => {
+                        setChaptersExpansion({
+                          ...chaptersExpansion,
+                          [chapter.id]: !chaptersExpansion[chapter.id],
+                        })
+                      }}
+                      className="pb-4 w-full text-base font-bold flex items-center justify-between"
+                    >
+                      <span>
+                        Chapter {index + 1} : {chapter.name}
+                      </span>
+                      <FontAwesomeIcon
+                        icon={faChevronDown}
+                        className={`${expanded ? 'rotate-180' : ''} duration-200`}
+                      />
+                    </button>
                   )}
-                  <PostsList
-                    chapter={chapter}
-                    courseSlug={course.slug}
-                    post={post}
-                    completedPosts={marked}
-                  />
+                  {expanded ? (
+                    <PostsList
+                      chapter={chapter}
+                      courseSlug={course.slug}
+                      post={post}
+                      completedPosts={marked}
+                    />
+                  ) : null}
                 </section>
               )
             })}
@@ -148,6 +215,40 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
                 <a className="break-words">View Submissions</a>
               </li>
             </Link>
+          </div>
+          <div className="my-6">
+            {enrolled ? (
+              <button
+                onClick={async () => {
+                  const attendee = await checkUserAndLogin()
+                  const sure = confirm(
+                    'Are you sure you want to leave the course? We hate to see you go :('
+                  )
+                  if (sure) {
+                    await unEnroll({ course, attendee })
+                    setEnrolled(false)
+                    setMarked({})
+                  }
+                }}
+                className="px-4 text-white uppercase mb-6 hover:bg-red-500 hover:shadow-md rounded-md py-2 w-full bg-red-400 dark:bg-red-500 dark:hover:bg-red-600"
+              >
+                Leave Course
+              </button>
+            ) : (
+              <button
+                onClick={async () => {
+                  const attendee = await checkUserAndLogin()
+                  if (!attendee) {
+                    return
+                  }
+                  await getEnrollmentDoc({ course, attendee }, true)
+                  setEnrolled(true)
+                }}
+                className="px-4 text-white uppercase mb-6 hover:bg-yellow-500 hover:shadow-md rounded-md py-2 w-full bg-yellow-400 dark:bg-yellow-500 dark:hover:bg-yellow-600"
+              >
+                Enroll
+              </button>
+            )}
           </div>
         </aside>
         <main className="flex-1 md:min-h-[300px] col-span-2">

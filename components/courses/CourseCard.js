@@ -13,6 +13,7 @@ import {
   getCountFromServer,
 } from 'firebase/firestore'
 import { getApp } from 'firebase/app'
+import { getIsEnrolled } from '../../services/EnrollmentService'
 
 const db = getFirestore(getApp())
 
@@ -22,9 +23,8 @@ const CourseCard = ({ course, enrollHandler, user }) => {
   const [enrollmentCount, setEnrollmentCount] = useState(null)
 
   const getEnrollment = useCallback(async () => {
-    const enrollmentRef = doc(db, `enrollment/${course.slug}_${user.uid}`)
-    const existingCourse = await getDoc(enrollmentRef)
-    setEnrolled(existingCourse.exists())
+    const enrolled = await getIsEnrolled(course.slug, user.uid)
+    setEnrolled(enrolled)
   }, [user, course.slug])
 
   const getGetEnrollmentCount = useCallback(async () => {

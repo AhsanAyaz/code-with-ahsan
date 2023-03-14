@@ -11,12 +11,11 @@ import STRAPI_CONFIG from '../../lib/strapiConfig'
 import ResourcesLinks from '../../components/ResourcesLinks'
 import logAnalyticsEvent from '../../lib/utils/logAnalyticsEvent'
 import Link from 'next/link'
-import { getEnrollmentRef } from '../../services/EnrollmentService'
+import { getEnrollmentDoc } from '../../services/EnrollmentService'
 import { getAuth } from 'firebase/auth'
 import { getApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
-import { getDoc, query, collection, getCountFromServer, where } from 'firebase/firestore'
-import { format } from 'date-fns'
+import { query, collection, getCountFromServer, where } from 'firebase/firestore'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -88,8 +87,7 @@ export default function CoursePage({ courseStr }) {
       if (!user) {
         return
       }
-      const enrollmentRef = await getEnrollmentRef({ course, attendee: user })
-      const enrollment = await getDoc(enrollmentRef)
+      const enrollment = await getEnrollmentDoc({ course, attendee: user })
       setMarked(enrollment.data().marked)
     },
     [course]
