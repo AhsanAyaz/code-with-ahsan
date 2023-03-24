@@ -38,7 +38,7 @@ export const CoursesList = ({ course, activePost, markedPosts = {} }) => {
       {course.chapters.map((chapter, index) => {
         const expanded = chaptersExpansion[chapter.id]
         return (
-          <section key={index} className="mb-2 border-b border-b-gray-200 dark:border-b-gray-700">
+          <section key={index} className={`mb-2 border-b border-b-gray-200 dark:border-b-gray-700`}>
             {chapter.showName && (
               <button
                 onClick={() => {
