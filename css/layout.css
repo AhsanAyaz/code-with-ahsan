@@ -37,6 +37,10 @@ body.modal-active {
   overflow-y: visible !important;
 }
 
+.post-cover-image img {
+  object-fit: cover;
+}
+
 /* Spinner css */
 
 .lds-ring {

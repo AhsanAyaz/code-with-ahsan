@@ -15,8 +15,6 @@ In this blog post, we will dive into the fundamentals of the CSS Box Model, incl
 
 ## The Components of the CSS Box Model
 
-![Box Model Cover](/static/images/css-box-model/cover.png)
-
 The CSS Box Model is made up of four components:
 
 - Content: This is the actual content of the element, such as text, images, or videos.

@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import siteMetadata from '@/data/siteMetadata'
+import { getFeaturedImages } from '../lib/utils/frontMatterUtils'
 
 const CommonSEO = ({ title, description, ogType, ogImage, twImage }) => {
   const router = useRouter()
@@ -71,19 +72,7 @@ export const BlogSEO = ({ authorDetails, title, summary, date, lastmod, url, ima
   const router = useRouter()
   const publishedAt = new Date(date).toISOString()
   const modifiedAt = new Date(lastmod || date).toISOString()
-  let imagesArr =
-    images.length === 0
-      ? [siteMetadata.socialBanner]
-      : typeof images === 'string'
-      ? [images]
-      : images
-
-  const featuredImages = imagesArr.map((img) => {
-    return {
-      '@type': 'ImageObject',
-      url: `${siteMetadata.siteUrl}${img}`,
-    }
-  })
+  const featuredImages = getFeaturedImages(images, siteMetadata)
 
   let authorList
   if (authorDetails) {

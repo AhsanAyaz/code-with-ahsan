@@ -62,7 +62,7 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
                     </dd>
                   </dl>
                   <div className="space-y-3 xl:col-span-3">
-                    <Link className="space-y-6" href={`/blog/${slug}`}>
+                    <Link className="space-y-6 aspect-video" href={`/blog/${slug}`}>
                       <img alt={slug} src={image} />
                     </Link>
                     <div>

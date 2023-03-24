@@ -9,7 +9,7 @@ const EmbeddedYouTubeVideo = ({
   allowfullscreen = true,
 }) => {
   return (
-    <div className="embedded-yt-video mb-1.5">
+    <div className="embedded-yt-video mb-1.5 flex items-center justify-center">
       <iframe
         id={id || src}
         width={width}
