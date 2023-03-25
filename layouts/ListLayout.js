@@ -4,6 +4,7 @@ import siteMetadata from '@/data/siteMetadata'
 import { useState } from 'react'
 import Pagination from '@/components/Pagination'
 import formatDate from '@/lib/utils/formatDate'
+import Image from 'next/image'
 
 export default function ListLayout({ posts, title, initialDisplayPosts = [], pagination }) {
   const [searchValue, setSearchValue] = useState('')
@@ -62,8 +63,11 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
                     </dd>
                   </dl>
                   <div className="space-y-3 xl:col-span-3">
-                    <Link className="space-y-6 aspect-video" href={`/blog/${slug}`}>
-                      <img alt={slug} src={image} />
+                    <Link
+                      className="post-cover-image space-y-6 aspect-video h-54 block relative"
+                      href={`/blog/${slug}`}
+                    >
+                      <Image layout="fill" alt={slug} src={image} />
                     </Link>
                     <div>
                       <h3 className="text-2xl font-bold leading-8 tracking-tight">

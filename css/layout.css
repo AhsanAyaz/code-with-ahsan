@@ -38,7 +38,11 @@ body.modal-active {
 }
 
 .post-cover-image img {
-  object-fit: cover;
+  object-fit: contain;
+}
+
+.dark .prose :where(pre):not(:where([class~='not-prose'] *)) {
+  background-color: #262626 !important;
 }
 
 /* Spinner css */
