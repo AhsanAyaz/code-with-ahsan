@@ -31,6 +31,7 @@ const ProfileMenu = () => {
   if (!currentUser) {
     return (
       <button
+        aria-label="Login Button"
         onClick={() => logIn()}
         className="overflow-hidden mx-4 relative w-10 h-10 bg-gray-100 border border-gray-500 dark:border-transparent rounded-full dark:bg-gray-600"
       >

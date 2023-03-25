@@ -70,11 +70,11 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
                       <Image layout="fill" alt={slug} src={image} />
                     </Link>
                     <div>
-                      <h3 className="text-2xl font-bold leading-8 tracking-tight">
+                      <h2 className="text-2xl font-bold leading-8 tracking-tight">
                         <Link href={`/blog/${slug}`} className="text-gray-900 dark:text-gray-100">
                           {title}
                         </Link>
-                      </h3>
+                      </h2>
                       <div className="text-gray-500 my-4 max-w-none dark:text-gray-400">
                         {summary}
                       </div>

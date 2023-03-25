@@ -21,6 +21,10 @@
   h6 {
     @apply text-lg;
   }
+
+  .dark .dark\:prose-dark :where(a):not(:where([class~='not-prose'] *)) {
+    @apply text-primary-300 hover:text-primary-400 !important;
+  }
 }
 
 .task-list-item:before {
