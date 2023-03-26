@@ -10,6 +10,7 @@ import logAnalyticsEvent from '../lib/utils/logAnalyticsEvent'
 import { getEnrollmentDoc, unEnroll } from '../services/EnrollmentService'
 import { checkUserAndLogin } from '../services/AuthService'
 import { CoursesList } from '../components/courses/CoursesList'
+import Button from '../components/Button'
 
 const auth = getAuth(getApp())
 
@@ -137,9 +138,9 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
               <h5 className="text-center md:text-left mb-4">Resources</h5>
               <Link passHref href={`/courses/${course.slug}/resources`}>
                 <li
-                  className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-[#6366f1] cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white ${
+                  className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-primary-800 cursor-pointer bg-gray-100 rounded-md hover:bg-primary-500 hover:text-white ${
                     currentRoute === `/courses/[course]/resources`
-                      ? 'bg-[#6366f1] dark:bg-[#6366f1] text-white'
+                      ? 'bg-primary-500 dark:bg-primary-800 text-white'
                       : ''
                   } `}
                 >
@@ -152,9 +153,9 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
             <h5 className="text-center md:text-left mb-4">Project Submissions</h5>
             <Link passHref href={`/courses/${course.slug}/submissions`}>
               <li
-                className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-[#6366f1] cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white ${
+                className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-primary-800 cursor-pointer bg-gray-100 rounded-md hover:bg-primary-500 hover:text-white ${
                   currentRoute === `/courses/[course]/submissions`
-                    ? 'bg-[#6366f1] dark:bg-[#6366f1] text-white'
+                    ? 'bg-primary-500 dark:bg-primary-800 text-white'
                     : ''
                 } `}
               >
@@ -181,7 +182,7 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
                 Leave Course
               </button>
             ) : (
-              <button
+              <Button
                 onClick={async () => {
                   const attendee = await checkUserAndLogin()
                   if (!attendee) {
@@ -190,10 +191,11 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
                   await getEnrollmentDoc({ course, attendee }, true)
                   setEnrolled(true)
                 }}
-                className="px-4 text-white uppercase mb-6 hover:bg-yellow-500 hover:shadow-md rounded-md py-2 w-full bg-yellow-400 dark:bg-yellow-500 dark:hover:bg-yellow-600"
+                color="accent"
+                className="px-4 uppercase mb-6 py-3 w-full border-none rounded-none"
               >
                 Enroll
-              </button>
+              </Button>
             )}
           </div>
         </aside>

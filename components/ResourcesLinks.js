@@ -7,7 +7,7 @@ const ResourcesLinks = ({ noHeading, heading, resources, headingClasses = 'mb-4 
           return (
             <a
               key={index}
-              className={`flex break-words items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-[#6366f1] cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white`}
+              className={`flex break-words items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-primary-800 cursor-pointer bg-gray-100 rounded-md hover:bg-primary-500 hover:text-white`}
               href={resource.url}
               target={'_blank'}
               rel="noreferrer"

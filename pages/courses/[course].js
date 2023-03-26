@@ -186,7 +186,7 @@ export default function CoursePage({ courseStr }) {
         <h4 className="my-6 text-center font-bold">Project Submissions</h4>
         <Link passHref href={`/courses/${course.slug}/submissions`}>
           <li
-            className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-[#6366f1] cursor-pointer bg-gray-100 rounded-md hover:bg-[#6366f1] hover:text-white`}
+            className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-primary-800 cursor-pointer bg-gray-100 rounded-md hover:bg-primary-500 hover:text-white`}
           >
             <a className="break-words">View Submissions</a>
           </li>

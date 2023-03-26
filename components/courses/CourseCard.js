@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore'
 import { getApp } from 'firebase/app'
 import { getIsEnrolled } from '../../services/EnrollmentService'
+import Button from '../Button'
 
 const db = getFirestore(getApp())
 
@@ -70,7 +71,7 @@ const CourseCard = ({ course, enrollHandler, user }) => {
         <p className="text-center mt-4 mb-8">
           {enrollmentCount !== null ? `${enrollmentCount} students enrolled` : '...'}
         </p>
-        <button
+        <Button
           onClick={(event) => {
             if (enrolled) {
               return
@@ -78,10 +79,11 @@ const CourseCard = ({ course, enrollHandler, user }) => {
             event.stopPropagation()
             enrollHandler(course)
           }}
-          className="px-4 text-white uppercase mb-6 hover:bg-yellow-500 hover:shadow-md py-3 w-full bg-yellow-400 dark:bg-yellow-500 dark:hover:bg-yellow-600"
+          color="accent"
+          className="px-4 uppercase mb-6 py-3 w-full border-none rounded-none"
         >
           {enrolled ? 'Continue' : 'Enroll'}
-        </button>
+        </Button>
       </div>
     </Link>
   )
