@@ -33,7 +33,7 @@ export default function PostLayout({ frontMatter, authorDetails, next, prev, chi
       />
       <ScrollTopAndComment />
       {postImage && (
-        <section className="post-cover-image w-full mb-4 aspect-video relative">
+        <section className="banner-img post-cover-image w-full mb-4 aspect-video relative">
           <Image alt="" layout="fill" src={postImage} />
         </section>
       )}

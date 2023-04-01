@@ -5,6 +5,7 @@ import { useState } from 'react'
 import Pagination from '@/components/Pagination'
 import formatDate from '@/lib/utils/formatDate'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 
 export default function ListLayout({ posts, title, initialDisplayPosts = [], pagination }) {
   const [searchValue, setSearchValue] = useState('')
@@ -12,6 +13,43 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
     const searchContent = frontMatter.title + frontMatter.summary + frontMatter.tags.join(' ')
     return searchContent.toLowerCase().includes(searchValue.toLowerCase())
   })
+
+  const router = useRouter()
+
+  async function spaNavigate(link, e) {
+    if (!document.startViewTransition) {
+      router.push(link)
+      return
+    }
+
+    const x = e?.clientX ?? innerWidth / 2
+    const y = e?.clientY ?? innerHeight / 2
+    const endRadius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
+
+    const coverImage = e.currentTarget.closest('article').querySelector('.post-cover-image')
+    coverImage.style.viewTransitionName = 'banner-img'
+
+    const transition = document.startViewTransition(async () => {
+      await router.push(link)
+      coverImage.style.viewTransitionName = ''
+    })
+
+    await transition.ready
+
+    // Circle clip out animation
+    // Animate the root's new view
+    // document.documentElement.animate(
+    //   {
+    //     clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`],
+    //   },
+    //   {
+    //     duration: 500,
+    //     easing: 'ease-in',
+    //     // Specify which pseudo-element to animate
+    //     pseudoElement: '::view-transition-new(root)',
+    //   }
+    // )
+  }
 
   // If initialDisplayPosts exist, display it if no searchValue is specified
   const displayPosts =
@@ -50,7 +88,7 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
         </div>
         <ul>
           {!filteredBlogPosts.length && 'No posts found.'}
-          {displayPosts.map((frontMatter) => {
+          {displayPosts.map((frontMatter, i) => {
             const { slug, date, title, summary, images, tags } = frontMatter
             const image = images && images[0] ? images[0] : `/static/images/${slug}/seo.jpg`
             return (
@@ -63,18 +101,23 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
                     </dd>
                   </dl>
                   <div className="space-y-3 xl:col-span-3">
-                    <Link
+                    <div
+                      role={'button'}
+                      aria-hidden={true}
+                      onClick={(e) => spaNavigate(`/blog/${slug}`, e)}
                       className="post-cover-image space-y-6 aspect-video h-54 block relative"
-                      href={`/blog/${slug}`}
                     >
                       <Image layout="fill" alt={slug} src={image} />
-                    </Link>
+                    </div>
                     <div>
-                      <h2 className="text-2xl font-bold leading-8 tracking-tight">
-                        <Link href={`/blog/${slug}`} className="text-gray-900 dark:text-gray-100">
-                          {title}
-                        </Link>
-                      </h2>
+                      <div
+                        tabIndex={i}
+                        role={'button'}
+                        onClick={(e) => spaNavigate(`/blog/${slug}`, e)}
+                        aria-hidden="true"
+                      >
+                        <h2 className="text-2xl font-bold leading-8 tracking-tight">{title}</h2>
+                      </div>
                       <div className="text-gray-500 my-4 max-w-none dark:text-gray-400">
                         {summary}
                       </div>

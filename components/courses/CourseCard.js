@@ -3,18 +3,11 @@ import Link from 'next/link'
 import LegitMarkdown from '../LegitMarkdown'
 import Image from 'next/image'
 
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  query,
-  collection,
-  where,
-  getCountFromServer,
-} from 'firebase/firestore'
+import { getFirestore, query, collection, where, getCountFromServer } from 'firebase/firestore'
 import { getApp } from 'firebase/app'
 import { getIsEnrolled } from '../../services/EnrollmentService'
 import Button from '../Button'
+import { useRouter } from 'next/router'
 
 const db = getFirestore(getApp())
 
@@ -22,7 +15,7 @@ const CourseCard = ({ course, enrollHandler, user }) => {
   const { banner } = course
   const [enrolled, setEnrolled] = useState(null)
   const [enrollmentCount, setEnrollmentCount] = useState(null)
-
+  const router = useRouter()
   const getEnrollment = useCallback(async () => {
     const enrolled = await getIsEnrolled(course.slug, user.uid)
     setEnrolled(enrolled)
@@ -47,8 +40,48 @@ const CourseCard = ({ course, enrollHandler, user }) => {
     getGetEnrollmentCount()
   }, [getGetEnrollmentCount])
 
+  async function spaNavigate(link, e) {
+    const coverImage = e.currentTarget.querySelector('img')
+    if (!document.startViewTransition || !coverImage) {
+      router.push(link)
+      return
+    }
+    coverImage.style.viewTransitionName = 'banner-img'
+
+    const x = e?.clientX ?? innerWidth / 2
+    const y = e?.clientY ?? innerHeight / 2
+    const endRadius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
+
+    const transition = document.startViewTransition(async () => {
+      await router.push(link)
+      coverImage.style.viewTransitionName = ''
+    })
+
+    await transition.ready
+
+    // Circle clip out animation
+    // Animate the root's new view
+    // document.documentElement.animate(
+    //   {
+    //     clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`],
+    //   },
+    //   {
+    //     duration: 500,
+    //     easing: 'ease-in',
+    //     // Specify which pseudo-element to animate
+    //     pseudoElement: '::view-transition-new(root)',
+    //   }
+    // )
+  }
+
   return (
-    <Link passHref href={`/courses/${course.slug}`}>
+    <div
+      role={'button'}
+      aria-hidden={true}
+      onClick={(e) => {
+        spaNavigate(`/courses/${course.slug}`, e)
+      }}
+    >
       <div className="block p-4 overflow-hidden border transition ease-in-out duration-150 border-gray-600 rounded-md shadow-md relative hover:-translate-y-1 hover:shadow-lg hover:cursor-pointer">
         <span className="absolute inset-x-0 bottom-0 h-2  bg-gradient-to-r from-emerald-300 via-blue-500 to-purple-600"></span>
         {banner && (
@@ -85,7 +118,7 @@ const CourseCard = ({ course, enrollHandler, user }) => {
           {enrolled ? 'Continue' : 'Enroll'}
         </Button>
       </div>
-    </Link>
+    </div>
   )
 }
 

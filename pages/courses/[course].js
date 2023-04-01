@@ -145,7 +145,7 @@ export default function CoursePage({ courseStr }) {
             </div>
           )}
         </dl>
-        <div className="my-4">
+        <div className="my-4 post-cover-image banner-img">
           {course.introEmbeddedUrl && (
             <section className="embed-container mb-4">
               <iframe
