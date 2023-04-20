@@ -146,3 +146,18 @@ body.modal-active {
 .back-transition::view-transition-new(root) {
   animation-name: fade-in, slide-from-left;
 }
+
+.slide-in-left {
+  animation: 0.3s ease-in 2s slide-in-left both;
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

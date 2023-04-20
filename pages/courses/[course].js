@@ -10,12 +10,17 @@ import STRAPI_CONFIG from '../../lib/strapiConfig'
 import ResourcesLinks from '../../components/ResourcesLinks'
 import logAnalyticsEvent from '../../lib/utils/logAnalyticsEvent'
 import Link from 'next/link'
-import { getEnrollmentDoc } from '../../services/EnrollmentService'
+import { getEnrollmentDoc, unEnroll } from '../../services/EnrollmentService'
 import { getAuth } from 'firebase/auth'
 import { getApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 import { query, collection, getCountFromServer, where } from 'firebase/firestore'
 import { CoursesList } from '../../components/courses/CoursesList'
+import Button from '@/components/Button'
+import { checkUserAndLogin } from 'services/AuthService'
+import { useRouter } from 'next/router'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPersonCirclePlus } from '@fortawesome/free-solid-svg-icons'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -81,13 +86,18 @@ export default function CoursePage({ courseStr }) {
   const course = JSON.parse(courseStr)
   const [marked, setMarked] = useState({})
   const [enrollmentCount, setEnrollmentCount] = useState(null)
-
+  const [enrolled, setEnrolled] = useState(null)
+  const router = useRouter()
   const getMarked = useCallback(
     async (user) => {
       if (!user) {
         return
       }
       const enrollment = await getEnrollmentDoc({ course, attendee: user })
+      setEnrolled(!!enrollment)
+      if (!enrollment?.data()) {
+        return
+      }
       setMarked(enrollment.data().marked)
     },
     [course]
@@ -112,12 +122,22 @@ export default function CoursePage({ courseStr }) {
     }
   }, [])
 
+  const enroll = async (course) => {
+    const attendee = await checkUserAndLogin()
+    if (!attendee) {
+      return
+    }
+    await getEnrollmentDoc({ course, attendee }, true)
+    router.push(`/courses/${course.slug}`)
+  }
+
   useEffect(() => {
     logAnalyticsEvent('course_viewed', {
       courseSlug: course.slug,
     })
     getGetEnrollmentCount()
   }, [course.slug, getGetEnrollmentCount])
+
   return (
     <>
       <PageSEO
@@ -125,9 +145,9 @@ export default function CoursePage({ courseStr }) {
         imageUrl={course.banner}
         description={course.description || siteMetadata.description}
       />
-      <header className="text-5xl text-center mb-6 font-bold">
-        <h1>{course.name}</h1>
-        <p className="text-center text-xl">{enrollmentCount} students enrolled</p>
+      <header className="text-center mb-6 font-bold">
+        <h1 className="text-5xl">{course.name}</h1>
+        <p className="text-center text-xl mb-4">{enrollmentCount} students enrolled</p>
         <dl className="flex flex-col my-4 gap-4 items-center">
           {/* <div className="flex items-center gap-4">
             <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">Published</dt>
@@ -192,6 +212,55 @@ export default function CoursePage({ courseStr }) {
           </li>
         </Link>
       </div>
+      <section className="enrollment my-4" id="enrollmentManagement">
+        <h4 className="my-6 text-center font-bold">Manage enrollment</h4>
+        {enrolled ? (
+          <button
+            onClick={async () => {
+              const attendee = await checkUserAndLogin()
+              const sure = confirm(
+                `Are you sure you want to leave the course? This will delete all your progress in the course including any submitted assignments. Also, we hate to see you go :(`
+              )
+              if (sure) {
+                await unEnroll({ course, attendee })
+                setEnrolled(false)
+                setMarked({})
+              }
+            }}
+            className="px-4 text-white uppercase hover:bg-red-500 hover:shadow-md rounded-md py-2 w-full bg-red-400 dark:bg-red-500 dark:hover:bg-red-600"
+          >
+            Leave Course
+          </button>
+        ) : (
+          <Button
+            onClick={async (event) => {
+              if (enrolled) {
+                return
+              }
+              event.stopPropagation()
+              await enroll(course)
+              setEnrolled(true)
+            }}
+            color="accent"
+            className="px-4 uppercase mb-0 py-3 w-full border-none rounded-none"
+          >
+            {enrolled ? 'Leave' : 'Enroll'}
+          </Button>
+        )}
+      </section>
+      {!enrolled ? (
+        <Button
+          onClick={() => {
+            const el = document.querySelector('#enrollmentManagement')
+            el.scrollIntoView(true)
+          }}
+          color="accent"
+          className="slide-in-left fixed bottom-20 right-4 shadow-lg text-center uppercase mb-0 py-1   border-none rounded-md"
+        >
+          <span className="mr-2">Enroll</span>{' '}
+          <FontAwesomeIcon className="animate-bounce" icon={faPersonCirclePlus} />
+        </Button>
+      ) : null}
     </>
   )
 }
