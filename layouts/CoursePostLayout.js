@@ -128,7 +128,7 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
       <PageSEO
         title={title}
         description={description || siteMetadata.description}
-        imageUrl={post?.videoEmbedded?.thumbnail || course.banner}
+        imageUrl={post?.videoEmbedded?.thumbnail || post?.thumbnail || course.banner}
       />
       <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-4">
         <aside className="chapters col-span-1">
