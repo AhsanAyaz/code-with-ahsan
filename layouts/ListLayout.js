@@ -1,6 +1,4 @@
-import Link from '@/components/Link'
 import Tag from '@/components/Tag'
-import siteMetadata from '@/data/siteMetadata'
 import { useState } from 'react'
 import Pagination from '@/components/Pagination'
 import formatDate from '@/lib/utils/formatDate'
@@ -35,20 +33,6 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
     })
 
     await transition.ready
-
-    // Circle clip out animation
-    // Animate the root's new view
-    // document.documentElement.animate(
-    //   {
-    //     clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`],
-    //   },
-    //   {
-    //     duration: 500,
-    //     easing: 'ease-in',
-    //     // Specify which pseudo-element to animate
-    //     pseudoElement: '::view-transition-new(root)',
-    //   }
-    // )
   }
 
   // If initialDisplayPosts exist, display it if no searchValue is specified
@@ -92,7 +76,7 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
             const { slug, date, title, summary, images, tags } = frontMatter
             const image = images && images[0] ? images[0] : `/static/images/${slug}/seo.jpg`
             return (
-              <li key={slug} className="py-4">
+              <li key={slug} className="py-4 blog-post-item mb-12">
                 <article className="space-y-2 xl:grid xl:grid-cols-4 xl:space-y-0 xl:items-baseline">
                   <dl>
                     <dt className="sr-only">Published on</dt>

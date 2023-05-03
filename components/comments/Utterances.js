@@ -13,7 +13,7 @@ const Utterances = ({ issueTerm }) => {
 
   const COMMENTS_ID = 'comments-container'
 
-  const LoadComments = useCallback(() => {
+  const loadComments = useCallback(() => {
     setEnabledLoadComments(false)
     const script = document.createElement('script')
     script.src = 'https://utteranc.es/client.js'
@@ -37,13 +37,17 @@ const Utterances = ({ issueTerm }) => {
   useEffect(() => {
     const iframe = document.querySelector('iframe.utterances-frame')
     if (!iframe) return
-    LoadComments()
-  }, [LoadComments])
+    loadComments()
+  }, [loadComments])
+
+  useEffect(() => {
+    loadComments()
+  }, [])
 
   // Added `relative` to fix a weird bug with `utterances-frame` position
   return (
     <div className="pt-6 pb-6 text-center text-gray-700 dark:text-gray-300">
-      {enableLoadComments && <button onClick={LoadComments}>Load Comments</button>}
+      {enableLoadComments && <button onClick={loadComments}>Load Comments</button>}
       <div className="relative utterances-frame" id={COMMENTS_ID} />
     </div>
   )

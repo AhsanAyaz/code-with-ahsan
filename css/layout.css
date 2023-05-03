@@ -41,6 +41,10 @@ body.modal-active {
   object-fit: contain;
 }
 
+.blog-post-item:hover h2 {
+  @apply text-primary-500;
+}
+
 .post-cover-image.banner-img {
   view-transition-name: banner-img;
 }
