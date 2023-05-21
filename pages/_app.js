@@ -11,6 +11,8 @@ import LayoutWrapper from '@/components/LayoutWrapper'
 import { ClientReload } from '@/components/ClientReload'
 const isDevelopment = process.env.NODE_ENV === 'development'
 import { initializeApp, getApps } from 'firebase/app'
+import CookieConsent from 'react-cookie-consent'
+
 config.autoAddCss = false
 
 const firebaseConfig = {
@@ -45,6 +47,11 @@ export default function App({ Component, pageProps }) {
       <Analytics />
       <LayoutWrapper>
         <Component {...pageProps} />
+        <CookieConsent
+          buttonStyle={{ backgroundColor: 'rgb(99 102 241)', color: 'white', borderRadius: '4px' }}
+        >
+          This website uses cookies to enhance the user experience.
+        </CookieConsent>
       </LayoutWrapper>
     </ThemeProvider>
   )
