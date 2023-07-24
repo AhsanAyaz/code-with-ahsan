@@ -1,0 +1,7 @@
+.eventsPage {
+  font-family: Roboto !important;
+}
+
+.section {
+  @apply border border-slate-300 px-6 py-8 rounded-3xl flex gap-8;
+}

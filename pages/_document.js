@@ -29,6 +29,10 @@ class MyDocument extends Document {
             rel="stylesheet"
           />
           <link
+            href="https://fonts.googleapis.com/css2?family=DM+Sans&family=Roboto&display=swap"
+            rel="stylesheet"
+          ></link>
+          <link
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css"
             integrity="sha384-Um5gpz1odJg5Z4HAmzPtgZKdTBHZdw8S29IecapCSB31ligYPhHQZMIlWLYQGVoc"
