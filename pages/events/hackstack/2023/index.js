@@ -3,15 +3,17 @@ import styles from '../../hackstack/hackstack.module.css'
 import { PageSEO } from '../../../../components/SEO'
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
-const HackStack2023 = () => {
-  const { theme, setTheme, resolvedTheme } = useTheme()
+
+export const HackStack2023Base = () => {
+  const { theme } = useTheme()
+
   return (
     <>
       <PageSEO
         title={'HackStack Pakistan 2023'}
         description={`HackStack 2023 - Pakistan's Premier Full Stack Hackathon. Get ready to ignite
-        your ideas and create the future. Join us for an exhilarating journey of innovation,
-        learning, and camaraderie`}
+  your ideas and create the future. Join us for an exhilarating journey of innovation,
+  learning, and camaraderie`}
         imageUrl={`/static/images/hackstack/cover.svg`}
       />
       <div className={`flex flex-col gap-8 mt-8 ${theme === 'dark' ? styles.dark : styles.light}`}>
@@ -153,6 +155,10 @@ const HackStack2023 = () => {
       </div>
     </>
   )
+}
+
+const HackStack2023 = () => {
+  return <HackStack2023Base />
 }
 
 export default HackStack2023

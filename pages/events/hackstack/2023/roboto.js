@@ -1,9 +1,13 @@
 import React from 'react'
 import styles from '../../hackstack/hackstack.module.css'
 import LayoutWrapper from '../../../../components/LayoutWrapper'
-import EventPage from './index'
+import { HackStack2023Base } from './index'
 
-EventPage.getLayout = ({ children }) => {
+const HackStacKWithRoboto = () => {
+  return <HackStack2023Base />
+}
+
+HackStacKWithRoboto.getLayout = ({ children }) => {
   return (
     <main className={styles.eventsPage}>
       <LayoutWrapper>{children}</LayoutWrapper>
@@ -11,4 +15,4 @@ EventPage.getLayout = ({ children }) => {
   )
 }
 
-export default EventPage
+export default HackStacKWithRoboto
