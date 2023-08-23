@@ -1,0 +1,162 @@
+---
+title: Boosting Angular App Performance with Performance Budgets
+date: 2023-08-23 00:00:00
+author: Muhammad Ahsan Ayaz
+summary: In this article, we'll dive into the world of performance budgets, exploring their benefits, implementation, and why they're crucial for your Angular projects. 🚀
+images: ['/static/images/angular-perf-budgets/cover.png']
+tags:
+  - javascript
+  - web development
+  - angular
+---
+
+# 🚀 Boosting Angular App Performance with Performance Budgets 📊
+
+## Introduction
+
+👋 In the fast-paced world of web development, user expectations for snappy and seamless experiences are at an all-time high. As developers, we're tasked with not only creating feature-rich Angular applications but also ensuring that they perform like a well-oiled machine. This is where Angular performance budgets come into play. In this article, we'll dive into the world of performance budgets, exploring their benefits, implementation, and why they're crucial for your Angular projects. 🚀
+
+## The Power of Performance Budgets 💪
+
+🎯 Performance budgets serve as guardrails, guiding your Angular application to stay within acceptable performance limits. These limits are defined by various metrics such as page load time, time to interactive, and network requests. But why are these budgets so important?
+
+### 1. Enhancing User Experience 🌟
+
+Imagine clicking on a website and waiting impatiently as it takes ages to load. Frustrating, right? Performance budgets ensure that your app loads quickly, reacts swiftly to user interactions, and navigates seamlessly. This translates to happier users who stick around longer.
+
+<ImageWithBg
+  title="Loading meme"
+  alt="Loading meme"
+  imageHeight={300}
+  src="https://media.giphy.com/media/l3nWhI38IWDofyDrW/giphy.gif"
+  backgroundColor="transparent"
+/>
+
+### 2. SEO Benefits 🌐
+
+Search engines adore speedy websites, often ranking them higher in search results. By adhering to performance budgets, you can boost your app's visibility and ranking in search engines.
+
+<ImageWithBg
+  title="SEO ranking"
+  alt="SEO ranking"
+  imageHeight={300}
+  src="https://media.giphy.com/media/rM0wxzvwsv5g4/giphy.gif"
+  backgroundColor="transparent"
+/>
+
+### 3. Turbocharged Conversion Rates 💰
+
+Sluggish sites tend to have higher bounce rates and lower conversion rates. By adhering to performance budgets, you can keep users engaged, leading to increased conversions and potentially more revenue.
+
+<ImageWithBg
+  title="Conversion rates"
+  alt="Conversion rates"
+  imageHeight={300}
+  src="https://media.giphy.com/media/tnmbBC0ZVfnmCNZuYt/giphy.gif"
+  backgroundColor="transparent"
+/>
+
+### 4. Efficient Resource Management 📦
+
+Performance budgets encourage efficient resource utilization. This not only saves hosting costs but also ensures that your app runs smoothly without hogging users' devices.
+
+<ImageWithBg
+  title="Save money and resouces"
+  alt="Save money and resouces"
+  imageHeight={300}
+  src="https://media.giphy.com/media/67ThRZlYBvibtdF9JH/giphy.gif"
+  backgroundColor="transparent"
+/>
+
+### 5. Streamlined Maintainability 🛠️
+
+As Angular apps grow, maintaining performance becomes challenging. Performance budgets act as your early warning system, helping you identify and address performance bottlenecks in the development phase, leading to easier maintenance down the road.
+
+<ImageWithBg
+  title="Streamlined maintainability"
+  alt="Streamlined maintainability"
+  imageHeight={300}
+  src="https://media.giphy.com/media/l4KhQo2MESJkc6QbS/giphy.gif"
+  backgroundColor="transparent"
+/>
+
+## Implementing Performance Budgets 📋
+
+Implementing performance budgets involves a strategic approach to ensure that your Angular app stays within defined limits. Let's explore how to set up and enforce these budgets effectively using real-world examples and useful tools.
+
+#### 1. **Project Kick-off 🚀**
+
+At the onset of your project, establish clear performance budgets aligned with your app's objectives and user expectations. These budgets should include key metrics such as:
+
+- **[Page Load Time](https://web.dev/fast/):** Define the maximum time your app should take to load initially.
+- **[Time to Interactive](https://web.dev/tti/):** Set a threshold for when your app should become interactive and responsive.
+- **Network Requests:** Limit the number of requests your app makes to external resources.
+
+For instance, you might set a page load time budget of 3 seconds and a maximum of 10 network requests.
+
+#### 2. **Continuous Integration 🔄**
+
+Integrate performance testing into your development workflow to catch regressions early. Leverage tools like:
+
+- **[Lighthouse](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk?hl=sv):** An open-source tool by Google that audits web performance and provides actionable suggestions.
+- **[WebPageTest](https://www.webpagetest.org/):** A website performance testing tool that simulates real user scenarios.
+- **[Google's PageSpeed Insights](https://pagespeed.web.dev/):** Analyzes your site's performance, offering insights for improvements.
+
+During development, automate these tools to regularly evaluate your app against established performance budgets. If a regression is detected, your team will be immediately alerted, allowing for quick corrective action.
+
+#### 3. **Code Reviews 👁️‍🗨️**
+
+Incorporate performance budgets as part of your code review process. Collaborate with your team to ensure that new code changes don't compromise your app's performance. If a pull request increases resource sizes beyond the set limits, it's a signal to revisit the implementation for optimization.
+
+#### 4. **Ongoing Optimization 🔄**
+
+As your Angular app evolves, revisit your performance budgets regularly. Consider how new features or changes might impact these budgets. For example, adding a feature that introduces heavy animations could potentially increase load times. Adjust your budgets accordingly to accommodate these changes while maintaining optimal performance.
+
+#### 5. **Production Monitoring 📊**
+
+Even after deployment, continue monitoring your app's performance in real-world scenarios. Use tools like [Google Analytics](https://analytics.google.com) or [New Relic](https://www.google.com/aclk?sa=l&ai=DChcSEwjExYC31PKAAxUsQkECHXkLBp4YABAAGgJ3cw&gclid=Cj0KCQjw3JanBhCPARIsAJpXTx6xW76mPk9797hoCBThuXty7kR0sKTweppW55Oc6lNBQ41OMMlcUAsaAu8WEALw_wcB&sig=AOD64_2wZ6_X9QJC2oGjsNnJEv_rKkNT-g&q&adurl&ved=2ahUKEwjGuva21PKAAxUqQPEDHZB_AwoQ0Qx6BAgBEAE) to track user interactions and performance metrics. Set up alerts to notify your team if performance metrics exceed your established budgets. This proactive approach helps identify issues before they become critical.
+
+#### 6. **Optimization Tools and Techniques 🛠️**
+
+Utilize optimization techniques to help meet performance budgets:
+
+- **Minification:** Remove whitespace and unnecessary characters from your code and assets to reduce file sizes.
+- **Compression:** Use Gzip or Brotli compression to further reduce the size of assets before they are sent to the user's browser.
+- **Lazy Loading:** Load only the resources required for the current view, delaying the loading of non-essential resources until they are needed.
+
+For example, you can minify your CSS and JavaScript files using tools the built-in tools in modern frameworks using Webpack/Rollup etc. Or use something like UglifyJS and CSSNano. Compressing assets can be done using server-side configurations or build tools.
+
+By diligently implementing and monitoring performance budgets, you'll ensure that your Angular app maintains optimal performance, providing users with a seamless and satisfying experience while also adhering to your defined metrics.
+
+Incorporating these tools and strategies into your development process empowers you to create Angular applications that not only look and function brilliantly but also perform exceptionally well, enhancing user satisfaction and engagement.
+
+## Angular and Performance Budgets 🛠️
+
+Angular provides a powerful way to manage performance budgets through the `angular.json` configuration file. In this file, you can define budgets for various aspects of your app's build sizes, including JavaScript, CSS, and more. These budgets can be set using size thresholds, ensuring that your app's bundles stay within defined limits.
+
+Here's an example of how you can set performance budgets for your Angular app:
+
+```json
+"architect": {
+  "build": {
+    "configurations": {
+      "production": {
+        "budgets": [{
+          "type": "initial",
+          "maximumWarning": "500kb",
+          "maximumError": "1mb"
+        }, {
+          "type": "anyComponentStyle",
+          "maximumWarning": "2kb",
+          "maximumError": "4kb"
+        }]
+      }
+    }
+  }
+}
+```
+
+## Conclusion
+
+💪🏽 Angular performance budgets are your secret weapon for creating lightning-fast, responsive, and user-friendly applications. By setting and adhering to these budgets, you're not only enhancing the user experience but also driving SEO, improving accessibility, and boosting conversion rates. So, the next time you embark on an Angular project, remember to keep an eye on those performance budgets; your users will thank you! 👏👏👏
+Btw, if you enjoyed this article. Do share it or tweet [@codewith_ahsan](https://twitter.com/codewith_ahsan)

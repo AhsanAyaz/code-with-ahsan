@@ -1,7 +1,5 @@
 import React from 'react'
 import Image from 'next/image'
-// import "./ImageWithBg.css"
-// import { rhythm } from "../../utils/typography"
 
 const ImageWithBg = ({
   src,
