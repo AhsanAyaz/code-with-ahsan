@@ -3,7 +3,7 @@ title: CSS Box Model - Understanding the Fundamentals
 date: 2023-02-18 00:00:00
 author: Muhammad Ahsan Ayaz
 summary: This article discusses the CSS Box Model, a fundamental concept in web development that determines the layout of web pages. It explains the four components of the Box Model and how they affect the dimensions of elements on a web page. By understanding this concept, web developers can create effective and aesthetically pleasing designs.
-images: ['/static/images/css-box-model/cover.png']
+images: ['/static/images/css-box-model/cover.jpg']
 tags:
   - css
   - web development

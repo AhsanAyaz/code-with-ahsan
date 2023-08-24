@@ -71,7 +71,7 @@ export default function Home() {
       <div className="flex flex-col justify-center">
         <div className="flex flex-col md:flex-row items-center mb-16 px-24 md:px-0 relative">
           <Image
-            src="/static/images/banner-dev.svg"
+            src="/static/images/banner-dev.webp"
             alt="banner dev"
             width={800}
             height={800}

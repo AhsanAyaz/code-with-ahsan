@@ -2,7 +2,7 @@
 title: Make passive income by building and selling APIs
 date: 2023-08-14 00:00:00
 author: Muhammad Ahsan Ayaz
-images: ['/static/images/make-passive-income-by-selling-apis/cover.png']
+images: ['/static/images/make-passive-income-by-selling-apis/cover.jpg']
 summary:
 tags:
   - javascript
