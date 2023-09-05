@@ -14,7 +14,6 @@ const Button = ({ onClick, children, color = '', title, className }) => {
       colorClass = `dark:hover:bg-slate-800 ring-slate-500 bg-slate-100 text-slate-900 hover:bg-slate-700 dark:bg-slate-700 dark:text-white hover:text-white`
       break
   }
-  console.log({ colorClass, color })
 
   return (
     <button

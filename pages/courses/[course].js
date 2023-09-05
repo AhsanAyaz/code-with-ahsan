@@ -225,6 +225,9 @@ export default function CoursePage({ courseStr }) {
                 await unEnroll({ course, attendee })
                 setEnrolled(false)
                 setMarked({})
+                logAnalyticsEvent('course_left', {
+                  courseSlug: course.slug,
+                })
               }
             }}
             className="px-4 text-white uppercase hover:bg-red-500 hover:shadow-md rounded-md py-2 w-full bg-red-400 dark:bg-red-500 dark:hover:bg-red-600"
@@ -240,6 +243,9 @@ export default function CoursePage({ courseStr }) {
               event.stopPropagation()
               await enroll(course)
               setEnrolled(true)
+              logAnalyticsEvent('course_joined', {
+                courseSlug: course.slug,
+              })
             }}
             color="accent"
             className="px-4 uppercase mb-0 py-3 w-full border-none rounded-none"
