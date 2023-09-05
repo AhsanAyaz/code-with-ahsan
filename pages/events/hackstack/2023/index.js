@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useTheme } from 'next-themes'
 import siteMetadata from '@/data/siteMetadata'
 import Button from '../../../../components/Button'
+import NoSSRWrapper from '../../../../components/NoSSRWrapper'
 
 export const HackStack2023Base = () => {
   const { resolvedTheme: theme } = useTheme()
@@ -26,8 +27,10 @@ export const HackStack2023Base = () => {
       />
       <div className={`flex flex-col gap-8 mt-8 ${theme !== 'light' ? styles.dark : styles.light}`}>
         <section className={`${styles.section} relative flex-col !p-0 overflow-hidden`}>
-          <span className="w-[150px] h-[150px] -top-4 sm:w-[300px] sm:h-[300px] sm:-top-8 md:w-[400px] md:h-[400px] absolute right-0 md:-top-10 z-0">
+          <span className="block w-[150px] h-[150px] -top-4 sm:w-[300px] sm:h-[300px] sm:-top-8 md:w-[400px] md:h-[400px] absolute right-0 md:-top-10 z-0">
+            Theme is {theme}
             <Image
+              priority={true}
               src={
                 theme === 'dark'
                   ? '/static/images/hackstack/shield-red.svg'
@@ -36,6 +39,7 @@ export const HackStack2023Base = () => {
               objectFit="contain"
               alt="Shield gray"
               layout="fill"
+              className="z-20"
             />
           </span>
           <div className="flex gap-4 px-6 pt-12 relative top-10 sm:top-24">
@@ -70,6 +74,7 @@ export const HackStack2023Base = () => {
               layout="fill"
               alt="pakistan-places logo"
               className="h-32 w-full"
+              priority={true}
             />
           </div>
         </section>
@@ -156,82 +161,80 @@ export const HackStack2023Base = () => {
         </section>
         <section id="rules" className={`${styles.section} flex-col`}>
           <h2 className="text-4xl">Rules and Guidelines</h2>
-          <p>
-            <ul className="list-disc px-4">
-              <li>
-                Teams can consist of a minimum of 2 members and a maximum of 4 members. Participants
-                must register as teams rather than individuals. Teams are required to be formed
-                prior to the event.
-              </li>
-              <li>
-                As part of the registration process, each team must submit a concise proposal for
-                their hackathon project. The proposal should encompass the following details:
-                <ul className="list-disc pl-8">
-                  <li>
-                    Project Idea: A description of the problem the team will address, and their
-                    proposed solution.
-                  </li>
-                  <li>
-                    Tech Stack: A list of the programming languages, frameworks, and tools the team
-                    plans to use.
-                  </li>
-                  <li>
-                    Roles of Team Members: An outline of each team member's role in the project,
-                    including their areas of expertise and primary responsibilities.
-                  </li>
-                  <li>
-                    Timeline: A rough timeline showing how the team plans to break down their
-                    project into manageable tasks, and how they plan to allocate their time over the
-                    course of the hackathon.
-                  </li>
-                </ul>
-              </li>
-              <li>
-                All projects must be developed as Full Stack Web Applications. Projects can be
-                mobile-first web apps, progressive web apps, or regular web applications. But they
-                must include both a frontend, some database, and a backend server.
-              </li>
-              <li>
-                The Hackathon will happen in three rounds:
-                <ul className="list-disc pl-8">
-                  <li>
-                    Preliminary Round: This functions as the screening round. Your proposals will be
-                    evaluated by the organizers based on several factors. If your team is selected,
-                    you will progress to the Online Hackathon stage, which spans two weeks.
-                  </li>
-                  <li>
-                    Online Hackathon During this two-week-long phase, teams will develop their
-                    proposed ideas. Mentors will provide valuable feedback to refine these ideas.
-                    Teams will also need to join the Discord server and provide updates regarding
-                    the development progress of their projects throughout the hackathon.
-                  </li>
-                  <li>
-                    On-Site Event Following the Online Hackathon, projects will be evaluated. The
-                    top 10 teams will be invited to an on-site event to present and pitch their
-                    projects. Prizes will be awarded to the top 3 teams.
-                  </li>
-                </ul>
-              </li>
-              <li>
-                All work on the project should be done during the hackathon. Pre-existing projects
-                or code written before the hackathon cannot be submitted.
-              </li>
-              <li>
-                Teams must submit their final projects via GitHub. They will be provided GitHub
-                repositories where they will submit their code. Finally, they will be filling out a
-                submission form including a link to their demo site, along with a short demo video.
-              </li>
-              <li>
-                While the primary focus is on full-stack development, there are no specific
-                restrictions on the languages, libraries, or frameworks that can be used. However,
-                for the frontend, teams must use Angular (Google's Framework for Web Development).
-              </li>
-              <li>
-                Projects will be evaluated based on criteria such as creativity, technical
-                complexity, design, and functionality. The decisions made by the judges are final.
-              </li>
-            </ul>{' '}
-          </p>
+          <ul className="list-disc px-4">
+            <li>
+              Teams can consist of a minimum of 2 members and a maximum of 4 members. Participants
+              must register as teams rather than individuals. Teams are required to be formed prior
+              to the event.
+            </li>
+            <li>
+              As part of the registration process, each team must submit a concise proposal for
+              their hackathon project. The proposal should encompass the following details:
+              <ul className="list-disc pl-8">
+                <li>
+                  Project Idea: A description of the problem the team will address, and their
+                  proposed solution.
+                </li>
+                <li>
+                  Tech Stack: A list of the programming languages, frameworks, and tools the team
+                  plans to use.
+                </li>
+                <li>
+                  Roles of Team Members: An outline of each team member's role in the project,
+                  including their areas of expertise and primary responsibilities.
+                </li>
+                <li>
+                  Timeline: A rough timeline showing how the team plans to break down their project
+                  into manageable tasks, and how they plan to allocate their time over the course of
+                  the hackathon.
+                </li>
+              </ul>
+            </li>
+            <li>
+              All projects must be developed as Full Stack Web Applications. Projects can be
+              mobile-first web apps, progressive web apps, or regular web applications. But they
+              must include both a frontend, some database, and a backend server.
+            </li>
+            <li>
+              The Hackathon will happen in three rounds:
+              <ul className="list-disc pl-8">
+                <li>
+                  Preliminary Round: This functions as the screening round. Your proposals will be
+                  evaluated by the organizers based on several factors. If your team is selected,
+                  you will progress to the Online Hackathon stage, which spans two weeks.
+                </li>
+                <li>
+                  Online Hackathon During this two-week-long phase, teams will develop their
+                  proposed ideas. Mentors will provide valuable feedback to refine these ideas.
+                  Teams will also need to join the Discord server and provide updates regarding the
+                  development progress of their projects throughout the hackathon.
+                </li>
+                <li>
+                  On-Site Event Following the Online Hackathon, projects will be evaluated. The top
+                  10 teams will be invited to an on-site event to present and pitch their projects.
+                  Prizes will be awarded to the top 3 teams.
+                </li>
+              </ul>
+            </li>
+            <li>
+              All work on the project should be done during the hackathon. Pre-existing projects or
+              code written before the hackathon cannot be submitted.
+            </li>
+            <li>
+              Teams must submit their final projects via GitHub. They will be provided GitHub
+              repositories where they will submit their code. Finally, they will be filling out a
+              submission form including a link to their demo site, along with a short demo video.
+            </li>
+            <li>
+              While the primary focus is on full-stack development, there are no specific
+              restrictions on the languages, libraries, or frameworks that can be used. However, for
+              the frontend, teams must use Angular (Google's Framework for Web Development).
+            </li>
+            <li>
+              Projects will be evaluated based on criteria such as creativity, technical complexity,
+              design, and functionality. The decisions made by the judges are final.
+            </li>
+          </ul>{' '}
         </section>
         <section id="mentors" className={`${styles.section} flex-col`}>
           <h2 className="text-4xl">Mentors</h2>
@@ -386,7 +389,11 @@ export const HackStack2023Base = () => {
 }
 
 const HackStack2023 = () => {
-  return <HackStack2023Base />
+  return (
+    <NoSSRWrapper>
+      <HackStack2023Base />
+    </NoSSRWrapper>
+  )
 }
 
 export default HackStack2023

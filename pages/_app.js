@@ -33,7 +33,7 @@ export default function App({ Component, pageProps }) {
   const { showAds } = Component
   const Wrapper = Component.getLayout || LayoutWrapper
   return (
-    <ThemeProvider attribute="class">
+    <ThemeProvider attribute="class" defaultTheme="system">
       <Head>
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         {showAds && (
