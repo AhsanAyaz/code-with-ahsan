@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Link from './Link'
 import headerNavLinks from '@/data/headerNavLinks'
 
-const MobileNav = () => {
+const MobileNav = ({ linkClassOverrides }) => {
   const [navShow, setNavShow] = useState(false)
 
   const onToggleNav = () => {
@@ -18,7 +18,7 @@ const MobileNav = () => {
   }
   const highlightContext = `relative w-full sm:w-auto block text-sm font-semibold bg-primary-600 rounded-md text-white py-3 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 hover:bg-primary-500`
   return (
-    <div className="sm:hidden">
+    <div className="sm:hidden z-50">
       <button
         type="button"
         className="w-8 h-8 ml-1 mr-1 rounded"
@@ -62,9 +62,9 @@ const MobileNav = () => {
             <div key={link.title} className="px-12 py-4">
               <Link
                 href={link.href}
-                className={`text-2xl font-bold tracking-widest text-gray-900 dark:text-gray-100 ${
-                  link.href.includes('ng-book') ? highlightContext : ''
-                }`}
+                className={`text-2xl font-bold tracking-widest text-gray-900 dark:text-gray-100${linkClassOverrides(
+                  link
+                )} ${link.href.includes('ng-book') ? highlightContext : ''}`}
                 onClick={onToggleNav}
               >
                 {link.title}
