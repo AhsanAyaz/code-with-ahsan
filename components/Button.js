@@ -1,4 +1,4 @@
-const Button = ({ onClick, children, color = 'primary', title, className }) => {
+const Button = ({ onClick, children, color = '', title, className }) => {
   let colorClass = ''
   switch (color) {
     case 'primary':
@@ -7,7 +7,15 @@ const Button = ({ onClick, children, color = 'primary', title, className }) => {
     case 'accent':
       colorClass = `hover:bg-yellow-600 dark:hover:bg-yellow-800 ring-yellow-500 bg-yellow-500 dark:bg-yellow-700 text-white hover:text-white`
       break
+    case 'hackstack':
+      colorClass = `hover:bg-red-600 dark:hover:bg-red-900 ring-red-500 bg-red-500 dark:bg-red-800 text-white hover:text-white`
+      break
+    default:
+      colorClass = `dark:hover:bg-slate-800 ring-slate-500 bg-slate-100 text-slate-900 hover:bg-slate-700 dark:bg-slate-700 dark:text-white hover:text-white`
+      break
   }
+  console.log({ colorClass, color })
+
   return (
     <button
       onClick={onClick}

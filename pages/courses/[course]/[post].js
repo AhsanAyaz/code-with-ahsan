@@ -175,6 +175,7 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
         <div className="flex-1">
           {post.previousPost && (
             <Button
+              color="primary"
               onClick={() => {
                 goToPost(post.previousPost)
               }}
@@ -198,6 +199,7 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
           )}
           {post.nextPost && (
             <Button
+              color="primary"
               onClick={() => {
                 goToPost(post.nextPost)
               }}

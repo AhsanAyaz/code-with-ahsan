@@ -1,5 +1,6 @@
 .eventsPage {
   font-family: Roboto !important;
+  font-size: 44px;
 }
 
 .section {
@@ -8,4 +9,11 @@
 
 .dark .section {
   @apply border-red-700;
+}
+
+.link {
+  @apply text-red-700 hover:text-red-600;
+}
+
+.shake:hover {
 }
