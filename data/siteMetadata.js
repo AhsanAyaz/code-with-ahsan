@@ -16,8 +16,8 @@ const siteMetadata = {
   facebook: 'https://facebook.com/CodeWithAhsan',
   youtube: 'https://youtube.com/c/CodeWithAhsan',
   linkedin: 'https://www.linkedin.com/in/ahsanayaz',
-  gde: 'https://ahsanayaz.com/gde',
-  ngBook: 'https://ahsanayaz.com/ng-book',
+  gde: 'https://codewithahsan.dev/gde',
+  ngBook: 'https://codewithahsan.dev/ng-book',
   socials: 'https://bio.link/muhd_ahsanayaz',
   locale: 'en-US',
   analytics: {

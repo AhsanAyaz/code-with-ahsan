@@ -1,5 +1,5 @@
 export const LINKS = {
-  ANGULAR_COOKBOOK: 'https://ahsanayaz.com/ng-book',
+  ANGULAR_COOKBOOK: 'https://codewithahsan.dev/ng-book',
 }
 const headerNavLinks = [
   { href: '/blog', title: 'Blog' },

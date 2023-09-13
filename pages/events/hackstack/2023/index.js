@@ -6,6 +6,9 @@ import { useTheme } from 'next-themes'
 import siteMetadata from '@/data/siteMetadata'
 import Button from '../../../../components/Button'
 import NoSSRWrapper from '../../../../components/NoSSRWrapper'
+import MentorCard from '../../../../components/MentorCard'
+import { HACKSTACK_2023_MENTORS } from './mentors'
+import { HACKSTACK_2023_SPONSORS } from './sponsors'
 
 export const HackStack2023Base = () => {
   const { resolvedTheme: theme } = useTheme()
@@ -238,24 +241,40 @@ export const HackStack2023Base = () => {
         </section>
         <section id="mentors" className={`${styles.section} flex-col`}>
           <h2 className="text-4xl">Mentors</h2>
-          <p>To be announced</p>
-          {/* <p>
+          <p>
             Meet our group of esteemed mentors who will be guiding teams throughout the event. They
             are industry experts, seasoned developers, and tech innovators ready to share their
             knowledge and expertise.
             <br />
-            (mentor cards below)
-          </p> */}
+          </p>
+          <div className="flex flex-wrap w-full justify-center gap-8">
+            {HACKSTACK_2023_MENTORS.map((mentor, i) => {
+              return <MentorCard mentor={mentor} key={i} />
+            })}
+          </div>
         </section>
         <section id="sponsors" className={`${styles.section} flex-col`}>
           <h2 className="text-4xl">Sponsors</h2>
-          <p>To be announced</p>
-          {/* <p>
+          <p>
             We are proud to be supported by our generous sponsors who believe in the power of
             innovation and learning.
             <br />
             (sponsor cards below)
-          </p> */}
+          </p>
+          <div className="flex flex-col md:flex-row gap-16 items-center justify-center relative">
+            {HACKSTACK_2023_SPONSORS.map((sponsor) => {
+              return (
+                <div key={sponsor.dark} className="w-60 h-40 relative">
+                  <Image
+                    objectFit={'contain'}
+                    src={theme === 'dark' ? sponsor.dark : sponsor.light}
+                    alt={''}
+                    layout={'fill'}
+                  />
+                </div>
+              )
+            })}
+          </div>
         </section>
         <section id="faq" className={`${styles.section} flex-col`}>
           <h2 className="text-4xl">FAQ</h2>

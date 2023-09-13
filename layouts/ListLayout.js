@@ -74,7 +74,10 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
           {!filteredBlogPosts.length && 'No posts found.'}
           {displayPosts.map((frontMatter, i) => {
             const { slug, date, title, summary, images, tags } = frontMatter
-            const image = images && images[0] ? images[0] : `/static/images/${slug}/seo.jpg`
+            let image = images && images[0] ? images[0] : `/static/images/${slug}/seo.jpg`
+            if (image.endsWith('seo.jpg')) {
+              image = ''
+            }
             return (
               <li key={slug} className="py-4 blog-post-item mb-12">
                 <article className="space-y-2 xl:grid xl:grid-cols-4 xl:space-y-0 xl:items-baseline">
@@ -85,14 +88,17 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
                     </dd>
                   </dl>
                   <div className="space-y-3 xl:col-span-3">
-                    <div
-                      role={'button'}
-                      aria-hidden={true}
-                      onClick={(e) => spaNavigate(`/blog/${slug}`, e)}
-                      className="post-cover-image space-y-6 aspect-video h-54 block relative"
-                    >
-                      <Image layout="fill" alt={slug} src={image} />
-                    </div>
+                    {image && (
+                      <div
+                        role={'button'}
+                        aria-hidden={true}
+                        onClick={(e) => spaNavigate(`/blog/${slug}`, e)}
+                        className="post-cover-image space-y-6 aspect-video h-54 block relative"
+                      >
+                        <Image layout="fill" alt={slug} src={image} />
+                      </div>
+                    )}
+
                     <div>
                       <div
                         tabIndex={i}

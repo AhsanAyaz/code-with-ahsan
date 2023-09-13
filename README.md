@@ -2,7 +2,7 @@
  <hr></hr>
 <div style="text-align: center">
   <div>
-    I'm a Software Architect working at <a href="https://www.syncron.com/">Syncron</a> and a <a href="https://ahsanayaz.com/gde">Google Developers Expert in Angular</a>. I create video tutorials on <a href="https://ahsanayaz.com/youtube">YouTube</a> and write articles at my blog <a href="https://ahsanayaz.com">https://ahsanayaz.com</a>. 
+    I'm a Software Architect working at <a href="https://www.syncron.com/">Syncron</a> and a <a href="https://codewithahsan.dev/gde">Google Developers Expert in Angular</a>. I create video tutorials on <a href="https://codewithahsan.dev/youtube">YouTube</a> and write articles at my blog <a href="https://codewithahsan.dev">https://codewithahsan.dev</a>. 
   </div>
 </div>
 
