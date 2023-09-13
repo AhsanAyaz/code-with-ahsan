@@ -7,8 +7,8 @@ import siteMetadata from '@/data/siteMetadata'
 import Button from '../../../../components/Button'
 import NoSSRWrapper from '../../../../components/NoSSRWrapper'
 import MentorCard from '../../../../components/MentorCard'
-import { HACKSTACK_2023_MENTORS } from './mentors'
-import { HACKSTACK_2023_SPONSORS } from './sponsors'
+import { HACKSTACK_2023_MENTORS } from '../../../../data/events/hackstack/2023/mentors'
+import { HACKSTACK_2023_SPONSORS } from '../../../../data/events/hackstack/2023/sponsors'
 
 export const HackStack2023Base = () => {
   const { resolvedTheme: theme } = useTheme()
