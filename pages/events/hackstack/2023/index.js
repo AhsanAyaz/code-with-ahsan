@@ -259,7 +259,6 @@ export const HackStack2023Base = () => {
             We are proud to be supported by our generous sponsors who believe in the power of
             innovation and learning.
             <br />
-            (sponsor cards below)
           </p>
           <div className="flex flex-col md:flex-row gap-16 items-center justify-center relative">
             {HACKSTACK_2023_SPONSORS.map((sponsor) => {
