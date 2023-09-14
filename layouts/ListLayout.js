@@ -15,7 +15,8 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
   const router = useRouter()
 
   async function spaNavigate(link, e) {
-    if (!document.startViewTransition) {
+    const coverImage = e.currentTarget.closest('article').querySelector('.post-cover-image')
+    if (!document.startViewTransition || !coverImage) {
       router.push(link)
       return
     }
@@ -24,7 +25,6 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
     const y = e?.clientY ?? innerHeight / 2
     const endRadius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
 
-    const coverImage = e.currentTarget.closest('article').querySelector('.post-cover-image')
     coverImage.style.viewTransitionName = 'banner-img'
 
     const transition = document.startViewTransition(async () => {

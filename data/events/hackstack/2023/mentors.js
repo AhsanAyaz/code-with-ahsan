@@ -1,7 +1,7 @@
 const baseUrl = '/static/images/hackstack/2023/mentors'
 export const HACKSTACK_2023_MENTORS = [
   {
-    name: 'Muhammad Taha',
+    name: 'Mohammad Taha',
     imageUrl: `${baseUrl}/mtaha.jpeg`,
     company: 'IOMechs',
     designation: 'Software Engineer',
@@ -35,5 +35,11 @@ export const HACKSTACK_2023_MENTORS = [
     imageUrl: `${baseUrl}/zohaib.jpg`,
     company: 'Rholab',
     designation: 'Team Lead',
+  },
+  {
+    name: 'Muhammad Awais',
+    imageUrl: `${baseUrl}/mawais.jpeg`,
+    company: 'Thrashtech',
+    designation: 'Principal Software Engineer ',
   },
 ]
