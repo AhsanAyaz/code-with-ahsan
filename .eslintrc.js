@@ -32,5 +32,7 @@ module.exports = {
     'react/prop-types': 0,
     'no-unused-vars': 0,
     'react/no-unescaped-entities': 0,
+    'jsx-a11y/no-noninteractive-element-interactions': 0,
+    'jsx-a11y/click-events-have-key-events': 0,
   },
 }

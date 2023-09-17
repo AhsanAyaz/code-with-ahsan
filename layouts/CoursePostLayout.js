@@ -132,7 +132,14 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
       />
       <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-4">
         <aside className="chapters col-span-1">
-          {course && <CoursesList course={course} activePost={post} markedPosts={marked} />}
+          {course && (
+            <CoursesList
+              enrolled={enrolled}
+              course={course}
+              activePost={post}
+              markedPosts={marked}
+            />
+          )}
           {course.resources?.length ? (
             <div className="my-6">
               <h5 className="text-center md:text-left mb-4">Resources</h5>

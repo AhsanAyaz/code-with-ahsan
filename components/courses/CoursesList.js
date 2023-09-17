@@ -1,9 +1,9 @@
-import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
+import { faChevronDown, faLock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect, useState } from 'react'
 import PostsList from './PostsList'
 
-export const CoursesList = ({ course, activePost, markedPosts = {} }) => {
+export const CoursesList = ({ course, activePost, markedPosts = {}, enrolled }) => {
   const [chaptersExpansion, setChaptersExpansion] = useState({})
 
   useEffect(() => {
@@ -49,9 +49,14 @@ export const CoursesList = ({ course, activePost, markedPosts = {} }) => {
                 }}
                 className="pb-4 w-full text-base font-bold flex items-center justify-between"
               >
-                <span>
-                  Chapter {index + 1} : {chapter.name}
-                </span>
+                <h2 className="text-base flex gap-4 items-center">
+                  <span>
+                    Chapter {index + 1} : {chapter.name}
+                  </span>
+                  {!enrolled && (
+                    <FontAwesomeIcon icon={faLock} className={'dark:text-gray-300 text-gray-400'} />
+                  )}
+                </h2>
                 <FontAwesomeIcon
                   icon={faChevronDown}
                   className={`${expanded ? 'rotate-180' : ''} duration-200`}
@@ -61,8 +66,9 @@ export const CoursesList = ({ course, activePost, markedPosts = {} }) => {
             {expanded ? (
               <PostsList
                 chapter={chapter}
-                courseSlug={course.slug}
+                course={course}
                 post={activePost}
+                enrolled={enrolled}
                 completedPosts={markedPosts}
               />
             ) : null}

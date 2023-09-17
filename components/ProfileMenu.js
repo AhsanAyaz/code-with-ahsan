@@ -67,7 +67,7 @@ const ProfileMenu = () => {
       <div className="flex justify-center items-center">
         <div className="relative profile-dd__inner border-b-4 border-transparent py-0.5 transform transition duration-300">
           <div className="flex px-4 justify-center items-center space-x-2 cursor-pointer">
-            <div className="w-12 h-12 rounded-full overflow-hidden">
+            <div className="w-12 h-12 block rounded-full overflow-hidden">
               <img
                 src={currentUser?.photoURL}
                 alt={currentUser?.displayName}

@@ -109,6 +109,20 @@ export default function CoursePage({ courseStr }) {
     setEnrollmentCount(snapshot.data().count)
   }, [course.slug])
 
+  const scrollToEnroll = () => {
+    const el = document.querySelector('#enrollmentManagement')
+    el.scrollIntoView(true)
+  }
+
+  const enrollUser = async (event) => {
+    event.stopPropagation()
+    await enroll(course)
+    setEnrolled(true)
+    logAnalyticsEvent('course_joined', {
+      courseSlug: course.slug,
+    })
+  }
+
   useEffect(() => {
     const sub = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -169,7 +183,7 @@ export default function CoursePage({ courseStr }) {
           {course.introEmbeddedUrl && (
             <section className="embed-container mb-4">
               <iframe
-                src={course.introEmbeddedUrl}
+                src={`${course.introEmbeddedUrl}&controls=${enroll ? 1 : 0}`}
                 title={course.name}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
@@ -193,7 +207,7 @@ export default function CoursePage({ courseStr }) {
       <div className="mb-6">
         <LegitMarkdown>{course.outline}</LegitMarkdown>
       </div>
-      {course?.chapters && <CoursesList course={course} markedPosts={marked} />}
+      {course?.chapters && <CoursesList enrolled={enrolled} course={course} markedPosts={marked} />}
       {course.resources?.length ? (
         <div className="resources mt-6">
           <ResourcesLinks
@@ -202,18 +216,19 @@ export default function CoursePage({ courseStr }) {
           />
         </div>
       ) : null}
-      <div>
-        <h4 className="my-6 text-center font-bold">Project Submissions</h4>
-        <Link passHref href={`/courses/${course.slug}/submissions`}>
-          <li
-            className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-primary-800 cursor-pointer bg-gray-100 rounded-md hover:bg-primary-500 hover:text-white`}
-          >
-            <a className="break-words">View Submissions</a>
-          </li>
-        </Link>
-      </div>
+      {enrolled && (
+        <section>
+          <h4 className="my-6 text-center font-bold">Project Submissions</h4>
+          <Link passHref href={`/courses/${course.slug}/submissions`}>
+            <li
+              className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-primary-800 cursor-pointer bg-gray-100 rounded-md hover:bg-primary-500 hover:text-white`}
+            >
+              <a className="break-words">View Submissions</a>
+            </li>
+          </Link>
+        </section>
+      )}
       <section className="enrollment my-4" id="enrollmentManagement">
-        <h4 className="my-6 text-center font-bold">Manage enrollment</h4>
         {enrolled ? (
           <button
             onClick={async () => {
@@ -236,30 +251,17 @@ export default function CoursePage({ courseStr }) {
           </button>
         ) : (
           <Button
-            onClick={async (event) => {
-              if (enrolled) {
-                return
-              }
-              event.stopPropagation()
-              await enroll(course)
-              setEnrolled(true)
-              logAnalyticsEvent('course_joined', {
-                courseSlug: course.slug,
-              })
-            }}
+            onClick={enrollUser}
             color="accent"
             className="px-4 uppercase mb-0 py-3 w-full border-none rounded-none"
           >
-            {enrolled ? 'Leave' : 'Enroll'}
+            Enroll
           </Button>
         )}
       </section>
       {!enrolled ? (
         <Button
-          onClick={() => {
-            const el = document.querySelector('#enrollmentManagement')
-            el.scrollIntoView(true)
-          }}
+          onClick={enrollUser}
           color="accent"
           className="slide-in-left fixed bottom-20 right-4 shadow-lg text-center uppercase mb-0 py-1   border-none rounded-md"
         >

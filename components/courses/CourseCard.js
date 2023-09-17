@@ -75,13 +75,7 @@ const CourseCard = ({ course, enrollHandler, user }) => {
   }
 
   return (
-    <div
-      role={'button'}
-      aria-hidden={true}
-      onClick={(e) => {
-        spaNavigate(`/courses/${course.slug}`, e)
-      }}
-    >
+    <article>
       <div className="block p-4 overflow-hidden border transition ease-in-out duration-150 border-gray-600 rounded-md shadow-md relative hover:-translate-y-1 hover:shadow-lg hover:cursor-pointer">
         <span className="absolute inset-x-0 bottom-0 h-2  bg-gradient-to-r from-emerald-300 via-blue-500 to-purple-600"></span>
         {banner && (
@@ -118,7 +112,7 @@ const CourseCard = ({ course, enrollHandler, user }) => {
           {enrolled ? 'Continue' : 'Enroll'}
         </Button>
       </div>
-    </div>
+    </article>
   )
 }
 

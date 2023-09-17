@@ -1,9 +1,10 @@
-import React, { useReducer } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCircleCheck } from '@fortawesome/free-solid-svg-icons'
+import { faCircleCheck, faLock } from '@fortawesome/free-solid-svg-icons'
 
-const PostsList = ({ chapter, courseSlug, post, completedPosts = {} }) => {
+const PostsList = ({ chapter, course, post, completedPosts = {}, enrolled }) => {
+  const courseSlug = course.slug
   if (!chapter.posts.length) {
     return (
       <ul className="flex flex-col gap-2">
@@ -18,7 +19,7 @@ const PostsList = ({ chapter, courseSlug, post, completedPosts = {} }) => {
   return (
     <ul className="flex flex-col gap-2 mb-4">
       {chapter.posts.map((chapterPost, index) => {
-        return (
+        return enrolled ? (
           <Link passHref key={index} href={`/courses/${courseSlug}/${chapterPost.slug}`}>
             <li
               className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-primary-800 cursor-pointer bg-gray-100 rounded-md hover:bg-primary-500 hover:text-white ${
@@ -34,6 +35,16 @@ const PostsList = ({ chapter, courseSlug, post, completedPosts = {} }) => {
               )}
             </li>
           </Link>
+        ) : (
+          <button
+            onClick={() => {
+              alert('Please enroll to access the video')
+            }}
+            className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-primary-800  bg-gray-200 rounded-md `}
+          >
+            <span className="break-words">{chapterPost.title}</span>
+            <FontAwesomeIcon icon={faLock} className={'dark:text-gray-300 text-gray-400'} />
+          </button>
         )
       })}
     </ul>
