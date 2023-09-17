@@ -94,8 +94,9 @@ export default function CoursePage({ courseStr }) {
         return
       }
       const enrollment = await getEnrollmentDoc({ course, attendee: user })
-      setEnrolled(!!enrollment)
-      if (!enrollment?.data()) {
+      const isEnrolled = enrollment.exists()
+      setEnrolled(!!isEnrolled)
+      if (!isEnrolled) {
         return
       }
       setMarked(enrollment.data().marked)
@@ -238,11 +239,11 @@ export default function CoursePage({ courseStr }) {
               )
               if (sure) {
                 await unEnroll({ course, attendee })
-                setEnrolled(false)
                 setMarked({})
                 logAnalyticsEvent('course_left', {
                   courseSlug: course.slug,
                 })
+                setEnrolled(false)
               }
             }}
             className="px-4 text-white uppercase hover:bg-red-500 hover:shadow-md rounded-md py-2 w-full bg-red-400 dark:bg-red-500 dark:hover:bg-red-600"
