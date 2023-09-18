@@ -69,6 +69,13 @@ const sendQuestionOfTheDay = async () => {
 
 export default async function handler(req, res) {
   const { method } = req
+  if (req.query.key !== 'sharedKey') {
+    res.status(404).end()
+    return
+  }
+  console.log(req.origin)
+
+  res.status(200).json({ success: true })
   switch (method) {
     case 'GET':
       try {
