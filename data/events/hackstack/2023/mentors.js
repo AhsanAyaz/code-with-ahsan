@@ -42,4 +42,10 @@ export const HACKSTACK_2023_MENTORS = [
     company: 'Thrashtech',
     designation: 'Principal Software Engineer ',
   },
+  {
+    name: 'Syed Yawar Abbas',
+    imageUrl: `${baseUrl}/yawar-abbas.jpeg`,
+    company: 'IOMechs',
+    designation: 'Co-Founder & Director',
+  },
 ]

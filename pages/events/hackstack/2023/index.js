@@ -9,6 +9,8 @@ import NoSSRWrapper from '../../../../components/NoSSRWrapper'
 import MentorCard from '../../../../components/MentorCard'
 import { HACKSTACK_2023_MENTORS } from '../../../../data/events/hackstack/2023/mentors'
 import { HACKSTACK_2023_SPONSORS } from '../../../../data/events/hackstack/2023/sponsors'
+import { HACKSTACK_2023_TEAMS } from '../../../../data/events/hackstack/2023/teams'
+import TeamCard from '../../../../components/hackstack/TeamCard'
 
 export const HackStack2023Base = () => {
   const { resolvedTheme: theme } = useTheme()
@@ -363,7 +365,15 @@ export const HackStack2023Base = () => {
           </ul>
         </section>
         <section id="team" className={`${styles.section} flex-col`}>
-          <h2>Team</h2>
+          <h2>Participating Teams</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4">
+            {HACKSTACK_2023_TEAMS.map((team) => {
+              return <TeamCard team={team} key={team.name} />
+            })}
+          </div>
+        </section>
+        <section id="team" className={`${styles.section} flex-col`}>
+          <h2>Organizing Team</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <article>
               <h4>Organizers</h4>
