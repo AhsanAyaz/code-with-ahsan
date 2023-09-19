@@ -3,7 +3,7 @@ const {
   OPEN_AI_SECRET,
   FB_PAGE_ACCESS_TOKEN,
   CODE_WITH_AHSAN_PAGE_ID,
-  HTTPSMS_API_KEY,
+  QOD_EP_API_KEY,
 } = process.env
 const openai = new OpenAI({
   apiKey: OPEN_AI_SECRET,
@@ -69,7 +69,7 @@ const sendQuestionOfTheDay = async () => {
 
 export default async function handler(req, res) {
   const { method } = req
-  if (req.query.key !== 'sharedKey') {
+  if (req.query.key !== QOD_EP_API_KEY) {
     res.status(404).end()
     return
   }
