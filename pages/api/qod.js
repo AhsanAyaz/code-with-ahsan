@@ -1,4 +1,5 @@
-const OpenAI = require('openai').default
+import OpenAI from 'openai'
+
 const {
   OPEN_AI_SECRET,
   FB_PAGE_ACCESS_TOKEN,
