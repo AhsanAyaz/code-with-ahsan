@@ -57,10 +57,9 @@ const getContentFromChatGPT = async () => {
   const messages = [
     {
       role: 'user',
-      content: `As a tech-content creator, and a software architect and fullstack developer,
-        write a short facebook post that the followers can engage with. Ask a question or something that everyone can respond to.
-        Keep it short. 350 characters max. Keep it sober and not too overwhelming with emojis. Start with "Hey everyone 👋🏽, it's time for the question of the day 🚀...\n" Use good hashtags for SEO.
-        Do not mention what you built or didn't. Just ask about the audience's activity, likings, things they find difficult etc. You can ask them to show off their projects. Make sure to ask a new question every day. Make it engaging.
+      content: `I want you to act like a full-stack software architect and tech content creator.
+        Write a short facebook post that the followers can engage with. Ask a question or something that everyone can respond to.
+        350 characters max. Ask about the audience's activities, projects, challenges etc. Make it engaging.
         Include the following hashtags at the end (you can add your own too). #codewithahsan #community #questionOfTheDay.
         `,
     },
