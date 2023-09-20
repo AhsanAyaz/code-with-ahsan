@@ -4,25 +4,24 @@ const {
   OPEN_AI_SECRET,
   CODE_WITH_AHSAN_PAGE_ID,
   QOD_EP_API_KEY,
-  FB_USER_ACCESS_TOKEN,
-  FB_USER_ID,
+  FB_PAGE_ACCESS_TOKEN,
 } = process.env
 const openai = new OpenAI({
   apiKey: OPEN_AI_SECRET,
 })
 import axios from 'axios'
 
-const getFBAccessToken = async () => {
-  const resp = await axios.get(
-    `https://graph.facebook.com/${FB_USER_ID}/accounts?access_token=${FB_USER_ACCESS_TOKEN}`
-  )
-  const { data } = resp.data
-  const { access_token } = data[0]
-  console.log({
-    resp: access_token,
-  })
-  return access_token
-}
+// const getFBAccessToken = async () => {
+//   const resp = await axios.get(
+//     `https://graph.facebook.com/${FB_USER_ID}/accounts?access_token=${FB_USER_ACCESS_TOKEN}`
+//   )
+//   const { data } = resp.data
+//   const { access_token } = data[0]
+//   console.log({
+//     resp: access_token,
+//   })
+//   return access_token
+// }
 
 const sendMessageToDiscord = async (content) => {
   const webhookURL = process.env.DISCORD_WEBHOOK
@@ -76,12 +75,11 @@ const getContentFromChatGPT = async () => {
 }
 
 const sendQuestionOfTheDay = async () => {
-  const fbPageAccessToken = await getFBAccessToken()
   const content = await getContentFromChatGPT()
-  if (fbPageAccessToken === null) {
+  if (!FB_PAGE_ACCESS_TOKEN) {
     return
   }
-  const resFacebook = await createPostForFacebook(content, fbPageAccessToken)
+  const resFacebook = await createPostForFacebook(content, FB_PAGE_ACCESS_TOKEN)
   if (resFacebook === null) {
     return
   }
