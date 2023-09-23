@@ -43,7 +43,7 @@ export const HACKSTACK_2023_TEAMS = [
   {
     name: 'Cloud7',
     description: "Floating high on the tech clouds, we're excited to see where Cloud7 takes us.",
-    members: ['M. Talib Farooq', 'Talha Faisal', 'Mahad'],
+    members: ['M. Talib Farooq', 'Talha Faisal', 'Mahad Ahmed', 'Kamran Ansari'],
   },
   {
     name: 'E-Health',
