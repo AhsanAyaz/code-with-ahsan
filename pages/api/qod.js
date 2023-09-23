@@ -30,7 +30,6 @@ const sendMessageToDiscord = async (content) => {
       content: `@everyone ${content}`,
       username: 'CodeWithAhsan',
     })
-    console.log('posted to discord successfully')
     return res
   } catch (e) {
     console.error('error posting message to discord: ', e)
@@ -39,7 +38,6 @@ const sendMessageToDiscord = async (content) => {
 }
 
 const createPostForFacebook = async (content, accessToken) => {
-  console.log({ content })
   try {
     const resp = await axios.post(
       `https://graph.facebook.com/${CODE_WITH_AHSAN_PAGE_ID}/feed?message=${encodeURIComponent(
@@ -82,7 +80,9 @@ const sendQuestionOfTheDay = async () => {
   if (resFacebook === null) {
     return
   }
+  console.log('Posted to facebook successfully')
   const resDiscord = await sendMessageToDiscord(content)
+  console.log('Posted to discord successfully')
 
   const responses = {
     resFacebook,
@@ -95,10 +95,10 @@ const sendQuestionOfTheDay = async () => {
 export default async function handler(req, res) {
   const { method } = req
   if (req.query.key !== QOD_EP_API_KEY) {
+    console.log('invalid api key', req.query.key)
     res.status(404).end()
     return
   }
-  console.log(req)
 
   switch (method) {
     case 'GET':
@@ -106,6 +106,9 @@ export default async function handler(req, res) {
         const resp = await sendQuestionOfTheDay()
         res.status(200).json({ resp })
       } catch (error) {
+        console.log({
+          errorSendingQod: error,
+        })
         res.status(400).json({ success: false, error })
       }
       break
