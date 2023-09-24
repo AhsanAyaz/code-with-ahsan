@@ -15,7 +15,7 @@ export const HACKSTACK_2023_TEAMS = [
     name: 'Binary Bots',
     description:
       'In the world of 1s and 0s, these bots are sure to have some binary magic up their sleeves.',
-    members: ['Naji Ahmed', 'Fatima Irshad', 'Usman Rajpoot'],
+    members: ['Naji Ahmed', 'Fatima Irshad', 'Rajput Usman'],
   },
   {
     name: 'Uran',
