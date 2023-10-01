@@ -55,11 +55,14 @@ const getContentFromChatGPT = async () => {
   const messages = [
     {
       role: 'user',
-      content: `I want you to act like a full-stack software architect and tech content creator.
-        Write a short facebook post that the followers can engage with. Ask a question or something that everyone can respond to.
-        350 characters max. Ask about the audience's activities, projects, challenges etc. Make it engaging.
-        Include the following hashtags at the end (you can add your own too). #codewithahsan #community #questionOfTheDay.
-        `,
+      content: `Generate a daily tech engagement question for a Facebook audience, similar in style to:
+
+      'Hey everyone, happy [day]. What has been your biggest challenge since yesterday?'
+      'Hey everyone. Do you have an opensource project you've been working on? Share the link in the comments.'
+      'Hey everyone. What is the programming language/tool you're focusing on these days?'
+      'Hey everyone. Do you prefer X frontend framework over Y? And what's the reason?'
+      'Hey everyone. How do you keep yourself productive throughout the day as a software engineer?'
+      Make sure the question is open-ended, relevant to tech enthusiasts, and encourages interaction.`,
     },
   ]
   const chatCompletion = await openai.chat.completions.create({
@@ -81,15 +84,8 @@ const sendQuestionOfTheDay = async () => {
     return
   }
   console.log('Posted to facebook successfully')
-  const resDiscord = await sendMessageToDiscord(content)
+  await sendMessageToDiscord(content)
   console.log('Posted to discord successfully')
-
-  const responses = {
-    resFacebook,
-    resDiscord,
-  }
-  console.log({ responses })
-  return responses
 }
 
 export default async function handler(req, res) {
@@ -103,8 +99,8 @@ export default async function handler(req, res) {
   switch (method) {
     case 'GET':
       try {
-        const resp = await sendQuestionOfTheDay()
-        res.status(200).json({ resp })
+        await sendQuestionOfTheDay()
+        res.status(200).json({ success: true })
       } catch (error) {
         console.log({
           errorSendingQod: error,
