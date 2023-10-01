@@ -48,4 +48,10 @@ export const HACKSTACK_2023_MENTORS = [
     company: 'IOMechs',
     designation: 'Co-Founder & Director',
   },
+  {
+    name: 'Sadaf Saeed',
+    imageUrl: `${baseUrl}/sadaf.jpg`,
+    company: '10Pearls',
+    designation: 'Principal Software Engineer',
+  },
 ]

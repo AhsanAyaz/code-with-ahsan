@@ -60,4 +60,10 @@ export const HACKSTACK_2023_TEAMS = [
     description: 'Representing UBIT with fervor, this team is one to watch!',
     members: ['Sooraj Kumar', 'Asadullah', 'M. Ali zehri'],
   },
+  {
+    name: 'Budget Buddy',
+    description:
+      "In an era where every penny counts, Budget Buddy promises to guide users towards smarter financial decisions. We're all eyes to see how they bring budgeting and tech together in harmony.",
+    members: ['Fahad Zardari', 'Arayan Memon'],
+  },
 ]
