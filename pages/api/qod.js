@@ -11,17 +11,7 @@ const openai = new OpenAI({
 })
 import axios from 'axios'
 
-// const getFBAccessToken = async () => {
-//   const resp = await axios.get(
-//     `https://graph.facebook.com/${FB_USER_ID}/accounts?access_token=${FB_USER_ACCESS_TOKEN}`
-//   )
-//   const { data } = resp.data
-//   const { access_token } = data[0]
-//   console.log({
-//     resp: access_token,
-//   })
-//   return access_token
-// }
+const IS_QOD_ENABLED = process.env.IS_QOD_ENABLED
 
 const sendMessageToDiscord = async (content) => {
   const webhookURL = process.env.DISCORD_WEBHOOK
@@ -75,6 +65,9 @@ const getContentFromChatGPT = async () => {
 }
 
 const sendQuestionOfTheDay = async () => {
+  if (!IS_QOD_ENABLED) {
+    return
+  }
   const content = await getContentFromChatGPT()
   if (!FB_PAGE_ACCESS_TOKEN) {
     return

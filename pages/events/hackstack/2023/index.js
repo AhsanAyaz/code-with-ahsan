@@ -88,8 +88,8 @@ export const HackStack2023Base = () => {
             <Image
               src={
                 theme === 'dark'
-                  ? '/static/images/hackstack/gdg-kolachi-dark.svg'
-                  : '/static/images/hackstack/gdg-kolachi.svg'
+                  ? '/static/images/hackstack/gdg-kolachi-dark.png'
+                  : '/static/images/hackstack/gdg-kolachi.png'
               }
               layout="fill"
               alt="gdg-kolachi logo"
