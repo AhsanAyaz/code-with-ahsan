@@ -32,7 +32,7 @@ module.exports = withBundleAnalyzer({
       {
         source: '/gde',
         destination:
-          'https://developers.google.com/community/experts/directory/profile/profile-muhammad-ahsan-ayaz',
+          'https://developers.google.com/profile/u/ahsanayaz',
         permanent: true,
       },
       {
