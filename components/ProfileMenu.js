@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { getAuth } from 'firebase/auth'
 import { getApp } from 'firebase/app'
 import { useEffect, useState } from 'react'
-import { logIn } from '../services/AuthService'
+import { AuthContext } from 'contexts/AuthContext'
 
 const ProfileMenu = () => {
+  const { setShowLoginPopup } = useContext(AuthContext)
   const auth = getAuth(getApp())
   const [currentUser, setCurrentUser] = useState(null)
   useEffect(() => {
@@ -32,7 +33,9 @@ const ProfileMenu = () => {
     return (
       <button
         aria-label="Login Button"
-        onClick={() => logIn()}
+        onClick={() => {
+          setShowLoginPopup(true)
+        }}
         className="overflow-hidden mx-4 relative w-10 h-10 bg-gray-100 border border-gray-500 dark:border-transparent rounded-full dark:bg-gray-600"
       >
         <svg
