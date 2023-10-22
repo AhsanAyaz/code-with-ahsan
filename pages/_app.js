@@ -12,6 +12,9 @@ import { ClientReload } from '@/components/ClientReload'
 const isDevelopment = process.env.NODE_ENV === 'development'
 import { initializeApp, getApps } from 'firebase/app'
 import CookieConsent from 'react-cookie-consent'
+import { AuthContext } from 'contexts/AuthContext'
+import { useContext, useState } from 'react'
+import LoginModal from '@/components/LoginModal'
 
 config.autoAddCss = false
 
@@ -31,29 +34,43 @@ if (getApps().length === 0) {
 
 export default function App({ Component, pageProps }) {
   const { showAds } = Component
+  const { showLoginPopup } = useContext(AuthContext)
+  const [showAuthLoginPopup, setShowLoginPopup] = useState(showLoginPopup)
   const Wrapper = Component.getLayout || LayoutWrapper
   return (
     <ThemeProvider attribute="class" defaultTheme="system">
-      <Head>
-        <meta content="width=device-width, initial-scale=1" name="viewport" />
-        {showAds && (
-          <script
-            async
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9844853681537365"
-            crossOrigin="anonymous"
-          ></script>
-        )}
-      </Head>
-      {isDevelopment && <ClientReload />}
-      <Analytics />
-      <Wrapper>
-        <Component {...pageProps} />
-        <CookieConsent
-          buttonStyle={{ backgroundColor: 'rgb(99 102 241)', color: 'white', borderRadius: '4px' }}
-        >
-          This website uses cookies to enhance the user experience.
-        </CookieConsent>
-      </Wrapper>
+      <AuthContext.Provider
+        value={{
+          showLoginPopup: showAuthLoginPopup,
+          setShowLoginPopup,
+        }}
+      >
+        <Head>
+          <meta content="width=device-width, initial-scale=1" name="viewport" />
+          {showAds && (
+            <script
+              async
+              src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9844853681537365"
+              crossOrigin="anonymous"
+            ></script>
+          )}
+        </Head>
+        {isDevelopment && <ClientReload />}
+        <Analytics />
+        <Wrapper>
+          <LoginModal show={showAuthLoginPopup} />
+          <Component {...pageProps} />
+          <CookieConsent
+            buttonStyle={{
+              backgroundColor: 'rgb(99 102 241)',
+              color: 'white',
+              borderRadius: '4px',
+            }}
+          >
+            This website uses cookies to enhance the user experience.
+          </CookieConsent>
+        </Wrapper>
+      </AuthContext.Provider>
     </ThemeProvider>
   )
 }

@@ -1,9 +1,23 @@
 import { getApp } from 'firebase/app'
-import { getAuth, GithubAuthProvider, signInWithRedirect } from 'firebase/auth'
+import {
+  getAuth,
+  GithubAuthProvider,
+  signInWithRedirect,
+  ProviderId,
+  GoogleAuthProvider,
+} from 'firebase/auth'
 
-export async function logIn() {
+export async function logIn(providerId) {
+  if (!providerId) {
+    throw new Error('ProviderId needed')
+  }
   const auth = getAuth(getApp())
-  const provider = new GithubAuthProvider()
+  let provider
+  if (providerId === ProviderId.GITHUB) {
+    provider = new GithubAuthProvider()
+  } else {
+    provider = new GoogleAuthProvider()
+  }
   try {
     const result = await signInWithRedirect(auth, provider)
     // This gives you a GitHub Access Token. You can use it to access the GitHub API.
@@ -18,11 +32,7 @@ export async function logIn() {
   }
 }
 
-export const checkUserAndLogin = async () => {
+export const getCurrentUser = async () => {
   const auth = getAuth(getApp())
-  let attendee = auth.currentUser
-  if (!attendee) {
-    attendee = await logIn()
-  }
-  return attendee
+  return auth.currentUser
 }

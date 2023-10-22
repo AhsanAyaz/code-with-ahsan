@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 import { getApp } from 'firebase/app'
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
 import { getFirestore, setDoc, doc, getDoc } from 'firebase/firestore'
@@ -8,6 +8,7 @@ import { URL_REGEX } from '../lib/regexes'
 import Button from './Button'
 import Dialog from './Dialog'
 import { getEnrollmentDoc } from '../services/EnrollmentService'
+import { AuthContext } from 'contexts/AuthContext'
 
 const storage = getStorage(getApp())
 const firestore = getFirestore(getApp())
@@ -28,13 +29,12 @@ export default function SubmissionWrapper({
   const [submissionFile, setSubmissionFile] = useState(null)
   const [submissionDemoLink, setSubmissionDemoLink] = useState('')
   const supportedFileTypes = ['image/png', 'image/jpeg']
+  const { showLoginPopup } = useContext(AuthContext)
 
   const newSubmission = async () => {
     if (!user) {
-      const loggedInUser = await logIn()
-      if (!loggedInUser) {
-        return
-      }
+      showLoginPopup(true)
+      return
     }
     await getEnrollmentDoc({ course: { slug: submissionParams.courseId }, attendee: user }, true)
     enrollmentChanged?.({ enrolled: true })
