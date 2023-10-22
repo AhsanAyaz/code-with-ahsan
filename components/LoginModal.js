@@ -20,8 +20,20 @@ export default function LoginModal({ show }) {
   }
 
   return (
-    <div className="fixed top-0 bottom-0 left-0 right-0 mx-auto sm:px-6 lg:px-8 w-full bg-slate-900 bg-opacity-50 z-10">
-      <div className="mx-auto max-w-lg bg-white px-4 py-16 my-24 shadow-lg rounded-lg relative">
+    <div
+      className="fixed top-0 bottom-0 left-0 right-0 mx-auto sm:px-6 lg:px-8 w-full bg-slate-900 bg-opacity-50 z-10"
+      role="article"
+      onClick={() => {
+        setShowLoginPopup(false)
+      }}
+    >
+      <div
+        role="article"
+        onClick={(ev) => {
+          ev.stopPropagation()
+        }}
+        className="mx-auto max-w-lg bg-white px-4 py-16 my-24 shadow-lg rounded-lg relative"
+      >
         <button
           onClick={() => {
             setShowLoginPopup(false)

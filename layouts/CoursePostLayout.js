@@ -1,6 +1,6 @@
 import siteMetadata from '@/data/siteMetadata'
 import { PageSEO } from '@/components/SEO'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useContext } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { onSnapshot, updateDoc } from 'firebase/firestore'
@@ -8,14 +8,16 @@ import { getAuth } from 'firebase/auth'
 import { getApp } from 'firebase/app'
 import logAnalyticsEvent from '../lib/utils/logAnalyticsEvent'
 import { getEnrollmentDoc, unEnroll } from '../services/EnrollmentService'
-import { checkUserAndLogin } from '../services/AuthService'
+import { getCurrentUser } from '../services/AuthService'
 import { CoursesList } from '../components/courses/CoursesList'
 import Button from '../components/Button'
+import { AuthContext } from '../contexts/AuthContext'
 
 const auth = getAuth(getApp())
 
 export default function CoursePostLayout({ courseStr, postStr, seo, ChildComponent }) {
   const course = JSON.parse(courseStr)
+  const { setShowLoginPopup } = useContext(AuthContext)
   const [marked, setMarked] = useState({})
   const [user, setUser] = useState(null)
   const [enrolled, setEnrolled] = useState(false)
@@ -43,8 +45,9 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
   )
 
   const markAsComplete = async () => {
-    const attendee = await checkUserAndLogin()
+    const attendee = await getCurrentUser()
     if (!attendee) {
+      setShowLoginPopup(true)
       return
     }
     const enrollmentDoc = await getEnrollmentDoc({ course, attendee }, true)
@@ -67,8 +70,9 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
     })
   }
   const markAsIncomplete = async () => {
-    const attendee = await checkUserAndLogin()
+    const attendee = await getCurrentUser()
     if (!attendee) {
+      setShowLoginPopup(true)
       return
     }
     const enrollmentDoc = await getEnrollmentDoc({ course, attendee })
@@ -174,7 +178,7 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
             {enrolled ? (
               <button
                 onClick={async () => {
-                  const attendee = await checkUserAndLogin()
+                  const attendee = await getCurrentUser()
                   const sure = confirm(
                     `Are you sure you want to leave the course? This will delete all your progress in the course including any submitted assignments. Also, we hate to see you go :(`
                   )
@@ -191,8 +195,9 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
             ) : (
               <Button
                 onClick={async () => {
-                  const attendee = await checkUserAndLogin()
+                  const attendee = await getCurrentUser()
                   if (!attendee) {
+                    setShowLoginPopup(true)
                     return
                   }
                   await getEnrollmentDoc({ course, attendee }, true)

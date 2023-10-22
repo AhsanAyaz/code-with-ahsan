@@ -8,7 +8,7 @@ import STRAPI_CONFIG from '../../lib/strapiConfig'
 import { getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { useEffect, useState } from 'react'
-import { checkUserAndLogin } from '../../services/AuthService'
+import { getCurrentUser } from '../../services/AuthService'
 import { getEnrollmentDoc } from '../../services/EnrollmentService'
 import { useRouter } from 'next/router'
 
@@ -54,7 +54,7 @@ export default function Courses({ coursesStr }) {
   }, [])
 
   const enroll = async (course) => {
-    const attendee = await checkUserAndLogin()
+    const attendee = await getCurrentUser()
     if (!attendee) {
       return
     }

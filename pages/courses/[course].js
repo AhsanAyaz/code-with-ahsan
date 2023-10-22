@@ -3,7 +3,7 @@ import { PageSEO } from '@/components/SEO'
 import axios from 'axios'
 import qs from 'qs'
 import Course from '../../classes/Course.class'
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useState, useContext } from 'react'
 import LegitMarkdown from '../../components/LegitMarkdown'
 import Image from 'next/image'
 import STRAPI_CONFIG from '../../lib/strapiConfig'
@@ -17,10 +17,11 @@ import { getFirestore } from 'firebase/firestore'
 import { query, collection, getCountFromServer, where } from 'firebase/firestore'
 import { CoursesList } from '../../components/courses/CoursesList'
 import Button from '@/components/Button'
-import { checkUserAndLogin } from 'services/AuthService'
+import { getCurrentUser } from 'services/AuthService'
 import { useRouter } from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPersonCirclePlus } from '@fortawesome/free-solid-svg-icons'
+import { AuthContext } from '../../contexts/AuthContext'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -88,6 +89,7 @@ export default function CoursePage({ courseStr }) {
   const [enrollmentCount, setEnrollmentCount] = useState(null)
   const [enrolled, setEnrolled] = useState(null)
   const router = useRouter()
+  const { setShowLoginPopup } = useContext(AuthContext)
   const getMarked = useCallback(
     async (user) => {
       if (!user) {
@@ -118,10 +120,6 @@ export default function CoursePage({ courseStr }) {
   const enrollUser = async (event) => {
     event.stopPropagation()
     await enroll(course)
-    setEnrolled(true)
-    logAnalyticsEvent('course_joined', {
-      courseSlug: course.slug,
-    })
   }
 
   useEffect(() => {
@@ -130,6 +128,7 @@ export default function CoursePage({ courseStr }) {
         getMarked(user)
       } else {
         setMarked({})
+        setEnrolled(false)
       }
     })
     return () => {
@@ -138,12 +137,17 @@ export default function CoursePage({ courseStr }) {
   }, [])
 
   const enroll = async (course) => {
-    const attendee = await checkUserAndLogin()
+    const attendee = await getCurrentUser()
     if (!attendee) {
+      setShowLoginPopup(true)
       return
     }
     await getEnrollmentDoc({ course, attendee }, true)
     router.push(`/courses/${course.slug}`)
+    setEnrolled(true)
+    logAnalyticsEvent('course_joined', {
+      courseSlug: course.slug,
+    })
   }
 
   useEffect(() => {
@@ -233,7 +237,7 @@ export default function CoursePage({ courseStr }) {
         {enrolled ? (
           <button
             onClick={async () => {
-              const attendee = await checkUserAndLogin()
+              const attendee = await getCurrentUser()
               const sure = confirm(
                 `Are you sure you want to leave the course? This will delete all your progress in the course including any submitted assignments. Also, we hate to see you go :(`
               )
@@ -264,7 +268,7 @@ export default function CoursePage({ courseStr }) {
         <Button
           onClick={enrollUser}
           color="accent"
-          className="slide-in-left fixed bottom-20 right-4 shadow-lg text-center uppercase mb-0 py-1   border-none rounded-md"
+          className="slide-in-left fixed bottom-20 right-4 shadow-lg text-center uppercase mb-52 py-1   border-none rounded-md"
         >
           <span className="mr-2">Enroll</span>{' '}
           <FontAwesomeIcon className="animate-bounce" icon={faPersonCirclePlus} />

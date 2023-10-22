@@ -32,11 +32,7 @@ export async function logIn(providerId) {
   }
 }
 
-export const checkUserAndLogin = async () => {
+export const getCurrentUser = async () => {
   const auth = getAuth(getApp())
-  let attendee = auth.currentUser
-  if (!attendee) {
-    attendee = await logIn()
-  }
-  return attendee
+  return auth.currentUser
 }
