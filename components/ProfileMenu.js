@@ -31,7 +31,7 @@ const ProfileMenu = () => {
   }
   if (currentUser === 'loading') {
     return (
-      <div className="overflow-hidden mx-4 relative flex items-center justify-center animate-spin w-10 h-10 bg-gray-100 border border-gray-500 dark:border-transparent rounded-full dark:bg-gray-600">
+      <div className="z-50 overflow-hidden mx-4 relative flex items-center justify-center animate-spin w-10 h-10 bg-gray-100 border border-gray-500 dark:border-transparent rounded-full dark:bg-gray-600">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -85,7 +85,7 @@ const ProfileMenu = () => {
         }
         toggleDropDown()
       }}
-      className="profile-dd profile-dd--hidden flex justify-center items-center select-none"
+      className="profile-dd z-50 profile-dd--hidden flex justify-center items-center select-none"
     >
       <div className="flex justify-center items-center">
         <div className="relative profile-dd__inner border-b-4 border-transparent py-0.5 transform transition duration-300">

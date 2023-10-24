@@ -58,20 +58,6 @@ const CourseCard = ({ course, enrollHandler, user }) => {
     })
 
     await transition.ready
-
-    // Circle clip out animation
-    // Animate the root's new view
-    // document.documentElement.animate(
-    //   {
-    //     clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`],
-    //   },
-    //   {
-    //     duration: 500,
-    //     easing: 'ease-in',
-    //     // Specify which pseudo-element to animate
-    //     pseudoElement: '::view-transition-new(root)',
-    //   }
-    // )
   }
 
   return (
