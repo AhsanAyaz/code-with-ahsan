@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 temp
+code-with-ahsan-service-account.json
 
 # testing
 /coverage

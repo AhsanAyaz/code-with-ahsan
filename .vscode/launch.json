@@ -9,6 +9,13 @@
       "type": "node"
     },
     {
+      "name": "Add Students to MailChimp",
+      "program": "${workspaceFolder}/scripts/custom/add-students-to-mailchimp.js",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    },
+    {
       "name": "Generate Sitemap",
       "program": "${workspaceFolder}/scripts/generate-sitemap.js",
       "request": "launch",
