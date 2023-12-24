@@ -7,10 +7,11 @@ import Course from '../../classes/Course.class'
 import STRAPI_CONFIG from '../../lib/strapiConfig'
 import { getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { getCurrentUser } from '../../services/AuthService'
 import { getEnrollmentDoc } from '../../services/EnrollmentService'
 import { useRouter } from 'next/router'
+import { AuthContext } from 'contexts/AuthContext'
 
 export async function getStaticProps() {
   const strapiUrl = process.env.STRAPI_URL
@@ -43,6 +44,7 @@ export default function Courses({ coursesStr }) {
   const courses = JSON.parse(coursesStr)
   const router = useRouter()
   const [user, setUser] = useState(auth.currentUser)
+  const { setShowLoginPopup } = useContext(AuthContext)
   useEffect(() => {
     const sub = auth.onAuthStateChanged((user) => {
       setUser(user)
@@ -56,6 +58,7 @@ export default function Courses({ coursesStr }) {
   const enroll = async (course) => {
     const attendee = await getCurrentUser()
     if (!attendee) {
+      setShowLoginPopup(true)
       return
     }
     getEnrollmentDoc({ course, attendee }, true)
