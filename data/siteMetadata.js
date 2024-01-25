@@ -10,7 +10,7 @@ const siteMetadata = {
   image: '/static/images/avatar.jpeg',
   socialBanner: '/static/images/banner.png',
   email: 'muhd.ahsanayaz@gmail.com',
-  github: 'https://github.com/code-with-ahsan',
+  github: 'https://github.com/ahsanayaz',
   twitter: 'https://twitter.com/codewith_ahsan',
   twitch: 'https://twitch.tv/codewithahsan',
   facebook: 'https://facebook.com/CodeWithAhsan',

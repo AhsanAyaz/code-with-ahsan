@@ -1,6 +1,6 @@
 [[redirects]]
   from = "https://codewithahsan.dev/ng-book"
-  to = "https://www.amazon.com/Angular-Cookbook-recipes-enterprise-scale-development-dp-1838989439/dp/1838989439/"
+  to = "https://ng-cookbook.com"
   status = 301
   force = true
 
