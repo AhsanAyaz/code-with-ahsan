@@ -9,7 +9,6 @@ const headerNavLinks = [
   { href: '/ng-book?source=nav', title: 'Angular Cookbook' },
   { href: '/gear', title: 'Gear' },
   { href: '/community', title: 'Community' },
-  { href: '/events/hackstack/2023', title: 'HackStack' },
   { href: '/about', title: 'About' },
 ]
 
