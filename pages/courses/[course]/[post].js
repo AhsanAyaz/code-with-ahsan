@@ -13,6 +13,7 @@ import CoursePostLayout from '../../../layouts/CoursePostLayout'
 import SubmissionWrapper from '../../../components/SubmissionWrapper'
 import { getAuth } from 'firebase/auth'
 import { getApp } from 'firebase/app'
+import NewsletterForm from '../../../components/NewsletterForm'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -226,14 +227,19 @@ export default function PostPageWithLayout({ courseStr, postStr }) {
   const post = JSON.parse(postStr)
   const course = JSON.parse(courseStr)
   return (
-    <CoursePostLayout
-      ChildComponent={PostPage}
-      postStr={postStr}
-      courseStr={courseStr}
-      seo={{
-        title: `${post.title} - ${course.name}`,
-        description: post.description,
-      }}
-    ></CoursePostLayout>
+    <>
+      <CoursePostLayout
+        ChildComponent={PostPage}
+        postStr={postStr}
+        courseStr={courseStr}
+        seo={{
+          title: `${post.title} - ${course.name}`,
+          description: post.description,
+        }}
+      ></CoursePostLayout>
+      <div className="flex items-center justify-center pt-4">
+        <NewsletterForm />
+      </div>
+    </>
   )
 }

@@ -22,6 +22,7 @@ import { useRouter } from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPersonCirclePlus } from '@fortawesome/free-solid-svg-icons'
 import { AuthContext } from '../../contexts/AuthContext'
+import NewsletterForm from '../../components/NewsletterForm'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -274,6 +275,9 @@ export default function CoursePage({ courseStr }) {
           <FontAwesomeIcon className="animate-bounce" icon={faPersonCirclePlus} />
         </Button>
       ) : null}
+      <div className="flex items-center justify-center pt-4">
+        <NewsletterForm />
+      </div>
     </>
   )
 }

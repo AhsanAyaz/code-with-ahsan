@@ -3,6 +3,7 @@ import siteMetadata from '@/data/siteMetadata'
 import { getAllFilesFrontMatter } from '@/lib/mdx'
 import ListLayout from '@/layouts/ListLayout'
 import { POSTS_PER_PAGE } from '../../blog'
+import NewsletterForm from '../../../components/NewsletterForm'
 
 export async function getStaticPaths() {
   let totalPosts = []
@@ -61,6 +62,9 @@ export default function PostPage({ posts, initialDisplayPosts, pagination }) {
         pagination={pagination}
         title="All Posts"
       />
+      <div className="flex items-center justify-center pt-4">
+        <NewsletterForm />
+      </div>
     </>
   )
 }

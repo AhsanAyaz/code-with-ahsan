@@ -3,6 +3,7 @@ import PageTitle from '@/components/PageTitle'
 import generateRss from '@/lib/generate-rss'
 import { MDXLayoutRenderer } from '@/components/MDXComponents'
 import { formatSlug, getAllFilesFrontMatter, getFileBySlug, getFiles } from '@/lib/mdx'
+import NewsletterForm from '../../components/NewsletterForm'
 
 const DEFAULT_LAYOUT = 'PostLayout'
 
@@ -54,15 +55,20 @@ export default function Blog({ post, authorDetails, prev, next }) {
   return (
     <>
       {frontMatter.draft !== true ? (
-        <MDXLayoutRenderer
-          layout={frontMatter.layout || DEFAULT_LAYOUT}
-          toc={toc}
-          mdxSource={mdxSource}
-          frontMatter={frontMatter}
-          authorDetails={authorDetails}
-          prev={prev}
-          next={next}
-        />
+        <>
+          <MDXLayoutRenderer
+            layout={frontMatter.layout || DEFAULT_LAYOUT}
+            toc={toc}
+            mdxSource={mdxSource}
+            frontMatter={frontMatter}
+            authorDetails={authorDetails}
+            prev={prev}
+            next={next}
+          />
+          <div className="flex items-center justify-center pt-4">
+            <NewsletterForm />
+          </div>
+        </>
       ) : (
         <div className="mt-24 text-center">
           <PageTitle>
