@@ -23,7 +23,7 @@ class Course {
     }
 
     this.authors = courseAttributes.authors.data.map((author) => new Author(author))
-    this.introEmbeddedUrl = getEmbedUrl(this.introVideoUrl)
+    this.introEmbeddedUrl = getEmbedUrl(this.introVideoUrl)?.url || ''
   }
 }
 

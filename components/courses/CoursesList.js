@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect, useState } from 'react'
 import PostsList from './PostsList'
 
-export const CoursesList = ({ course, activePost, markedPosts = {}, enrolled }) => {
+export const CoursesList = ({ course, activePost, markedPosts = {}, enrolled, enrollUser }) => {
   const [chaptersExpansion, setChaptersExpansion] = useState({})
 
   useEffect(() => {
@@ -70,6 +70,7 @@ export const CoursesList = ({ course, activePost, markedPosts = {}, enrolled }) 
                 post={activePost}
                 enrolled={enrolled}
                 completedPosts={markedPosts}
+                enrollUser={enrollUser}
               />
             ) : null}
           </section>

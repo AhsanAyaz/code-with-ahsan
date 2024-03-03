@@ -113,13 +113,8 @@ export default function CoursePage({ courseStr }) {
     setEnrollmentCount(snapshot.data().count)
   }, [course.slug])
 
-  const scrollToEnroll = () => {
-    const el = document.querySelector('#enrollmentManagement')
-    el.scrollIntoView(true)
-  }
-
   const enrollUser = async (event) => {
-    event.stopPropagation()
+    event?.stopPropagation()
     await enroll(course)
   }
 
@@ -167,7 +162,9 @@ export default function CoursePage({ courseStr }) {
       />
       <header className="text-center mb-6 font-bold">
         <h1 className="text-5xl">{course.name}</h1>
-        <p className="text-center text-xl mb-4">{enrollmentCount} students enrolled</p>
+        <p className="text-center text-xl mb-4">
+          {enrollmentCount} student{enrollmentCount > 1 ? 's' : ''} enrolled
+        </p>
         <dl className="flex flex-col my-4 gap-4 items-center">
           {/* <div className="flex items-center gap-4">
             <dt className="text-sm font-medium text-gray-600 dark:text-gray-400">Published</dt>
@@ -213,7 +210,14 @@ export default function CoursePage({ courseStr }) {
       <div className="mb-6">
         <LegitMarkdown>{course.outline}</LegitMarkdown>
       </div>
-      {course?.chapters && <CoursesList enrolled={enrolled} course={course} markedPosts={marked} />}
+      {course?.chapters && (
+        <CoursesList
+          enrolled={enrolled}
+          course={course}
+          markedPosts={marked}
+          enrollUser={enrollUser}
+        />
+      )}
       {course.resources?.length ? (
         <div className="resources mt-6">
           <ResourcesLinks

@@ -14,6 +14,7 @@ import SubmissionWrapper from '../../../components/SubmissionWrapper'
 import { getAuth } from 'firebase/auth'
 import { getApp } from 'firebase/app'
 import NewsletterForm from '../../../components/NewsletterForm'
+import YoutubePlayer from '../../../components/YouTubePlayer'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -140,12 +141,16 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
       )}
       {post.type === 'video' && (
         <section className="embed-container mb-4">
-          <iframe
-            src={post.embedUrl}
-            title={post.title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          ></iframe>
+          {post.embed?.isYouTube ? (
+            <YoutubePlayer videoId={post.embed.id} title={post.title} timestamp={post.embed.ts} />
+          ) : (
+            <iframe
+              src={post.embedUrl}
+              title={post.title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            ></iframe>
+          )}
         </section>
       )}
       <section>

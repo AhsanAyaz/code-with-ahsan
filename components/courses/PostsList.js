@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleCheck, faLock } from '@fortawesome/free-solid-svg-icons'
 
-const PostsList = ({ chapter, course, post, completedPosts = {}, enrolled }) => {
+const PostsList = ({ chapter, course, post, completedPosts = {}, enrolled, enrollUser }) => {
   const courseSlug = course.slug
   if (!chapter.posts.length) {
     return (
@@ -39,6 +39,7 @@ const PostsList = ({ chapter, course, post, completedPosts = {}, enrolled }) => 
           <button
             onClick={() => {
               alert('Please enroll to access the video')
+              enrollUser()
             }}
             className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-primary-800  bg-gray-200 rounded-md `}
           >

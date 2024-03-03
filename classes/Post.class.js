@@ -30,7 +30,7 @@ class Post {
     this.thumbnail = thumbnail
     this.chapterId = chapterId
     this.videoEmbedded = videoEmbedded ? JSON.parse(videoEmbedded) : null
-    this.embedUrl = getEmbedUrl(this.videoUrl || this.videoEmbedded?.url)
+    this.embed = getEmbedUrl(this.videoUrl || this.videoEmbedded?.url)
     this.hasAssignment = hasAssignment
   }
 }
