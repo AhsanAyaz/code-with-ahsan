@@ -8,7 +8,7 @@ const YouTubeComment = ({ comment }) => {
   } = comment.topLevelComment.snippet
 
   return (
-    <div className="flex space-x-4 p-4 items-start">
+    <div className="flex space-x-4 p-4 items-start dark:text-white">
       <img src={authorProfileImageUrl} alt={authorDisplayName} className="w-10 h-10 rounded-full" />
       <div className="flex-1">
         <a
@@ -27,7 +27,7 @@ const YouTubeComment = ({ comment }) => {
         </a>
         <div
           dangerouslySetInnerHTML={{ __html: textDisplay }}
-          className="mt-2 text-sm text-gray-700"
+          className="mt-2 text-sm text-gray-700 dark:text-white"
         ></div>
         <div className="flex items-center mt-2">
           <svg

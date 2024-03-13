@@ -168,6 +168,44 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
           </section>
         </>
       )}
+      <section className="my-4 flex justify-end">
+        <div className="flex-1">
+          {post.previousPost && (
+            <Button
+              color="primary"
+              onClick={() => {
+                goToPost(post.previousPost)
+              }}
+            >
+              Previous
+            </Button>
+          )}
+        </div>
+        <div className="flex gap-4">
+          {marked[post.slug] ? (
+            <Button color="green" onClick={markAsIncomplete}>
+              Completed
+            </Button>
+          ) : (
+            <button
+              onClick={markAsComplete}
+              className="py-2 dark:text-white px-4 rounded-md font-bold"
+            >
+              Mark as Complete
+            </button>
+          )}
+          {post.nextPost && (
+            <Button
+              color="primary"
+              onClick={() => {
+                goToPost(post.nextPost)
+              }}
+            >
+              Next
+            </Button>
+          )}
+        </div>
+      </section>
       <section>
         {post.description && (
           <section className="mt-8 mb-4">
@@ -221,44 +259,7 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
           )}
         </section>
       )}
-      <section className="my-4 flex justify-end">
-        <div className="flex-1">
-          {post.previousPost && (
-            <Button
-              color="primary"
-              onClick={() => {
-                goToPost(post.previousPost)
-              }}
-            >
-              Previous
-            </Button>
-          )}
-        </div>
-        <div className="flex gap-4">
-          {marked[post.slug] ? (
-            <Button color="green" onClick={markAsIncomplete}>
-              Completed
-            </Button>
-          ) : (
-            <button
-              onClick={markAsComplete}
-              className="py-2 dark:text-white px-4 rounded-md font-bold"
-            >
-              Mark as Complete
-            </button>
-          )}
-          {post.nextPost && (
-            <Button
-              color="primary"
-              onClick={() => {
-                goToPost(post.nextPost)
-              }}
-            >
-              Next
-            </Button>
-          )}
-        </div>
-      </section>
+
       <section>
         {post.resources?.length > 0 && (
           <section className="mt-4">
