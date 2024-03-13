@@ -166,34 +166,6 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
               ></iframe>
             )}
           </section>
-          {post.embed.isYouTube ? (
-            <>
-              <div className="flex gap-4 items-center justify-end">
-                <a
-                  href={`https://youtu.be/${post.embed.id}`}
-                  target="_blank"
-                  className="flex items-center bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded cursor-pointer"
-                  rel="noreferrer"
-                >
-                  Like
-                </a>
-                <a
-                  href={`https://youtu.be/${post.embed.id}`}
-                  target="_blank"
-                  type="submit"
-                  className=" bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded"
-                  rel="noreferrer"
-                >
-                  Post Comment
-                </a>
-              </div>
-              <ul className="comments-container">
-                {comments.map((comment) => {
-                  return <YouTubeComment key={comment.topLevelComment.id} comment={comment} />
-                })}
-              </ul>
-            </>
-          ) : null}
         </>
       )}
       <section>
@@ -203,6 +175,35 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
           </section>
         )}
       </section>
+      {post.type === 'video' && post.embed.isYouTube ? (
+        <>
+          <div className="flex gap-4 items-center justify-end">
+            <a
+              href={`https://youtu.be/${post.embed.id}`}
+              target="_blank"
+              className="flex items-center bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded cursor-pointer"
+              rel="noreferrer"
+            >
+              Like
+            </a>
+            <a
+              href={`https://youtu.be/${post.embed.id}`}
+              target="_blank"
+              type="submit"
+              className=" bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded"
+              rel="noreferrer"
+            >
+              Post Comment
+            </a>
+          </div>
+          <ul className="comments-container">
+            {comments.map((comment) => {
+              return <YouTubeComment key={comment.topLevelComment.id} comment={comment} />
+            })}
+          </ul>
+        </>
+      ) : null}
+
       {post.article && (
         <section>
           {post.article && (
