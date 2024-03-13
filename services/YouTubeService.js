@@ -67,6 +67,9 @@ export const getYouTubeComments = async (videoId) => {
       return item.snippet
     })
     .filter((comment) => {
-      return !comment.topLevelComment.snippet.textDisplay.includes('00:00')
+      const exclusions = ['0:0', 'timeline']
+      return !exclusions.some((excl) =>
+        comment.topLevelComment.snippet.textDisplay.toLowerCase().includes(excl)
+      )
     })
 }
