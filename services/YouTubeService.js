@@ -59,6 +59,8 @@ export const getYouTubeComments = async (videoId) => {
   const commentsProm = await youtube.commentThreads.list({
     videoId,
     part: 'snippet',
+    maxResults: 100,
+    order: 'time',
   })
   return commentsProm.data.items
     .map((item) => {
