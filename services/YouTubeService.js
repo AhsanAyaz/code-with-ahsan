@@ -29,8 +29,10 @@ export const getEmbedUrl = (originalUrl) => {
         })
       }
       vidUrl += `${videoParams}${videoParams.includes('?') ? `&` : '?'}autoplay=1`
+      vidUrl = addYouTubeExtraParams(vidUrl)
+    } else {
+      vidUrl = originalUrl
     }
-    vidUrl = addYouTubeExtraParams(vidUrl)
     return {
       url: vidUrl,
       isYouTube,

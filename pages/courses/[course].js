@@ -186,7 +186,7 @@ export default function CoursePage({ courseStr }) {
           {course.introEmbeddedUrl && (
             <section className="embed-container mb-4">
               <iframe
-                src={`${course.introEmbeddedUrl}&controls=${enroll ? 1 : 0}`}
+                src={`${course.introEmbeddedUrl}`}
                 title={course.name}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen

@@ -22,6 +22,7 @@ const YoutubePlayer = ({ videoId, title, thumbnail, timestamp }) => {
     if (videoRef?.current) {
       loadYtIframeAPI.then((YT) => {
         player = new YT.Player(videoRef.current, {
+          playerVars: { autoplay: 1, controls: 0 },
           events: {
             onReady: onPlayerReady,
             onStateChange: onPlayerStateChange,
@@ -32,9 +33,10 @@ const YoutubePlayer = ({ videoId, title, thumbnail, timestamp }) => {
   }
 
   const onPlayerReady = () => {
+    const time = player.getCurrentTime()
     setTimeout(() => {
-      player.seekTo(timestamp, true)
-    }, 500)
+      player.seekTo(time, true)
+    }, 100)
   }
 
   const onPlayerStateChange = (newState) => {
