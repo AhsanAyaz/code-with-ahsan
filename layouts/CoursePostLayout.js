@@ -15,7 +15,7 @@ import { AuthContext } from '../contexts/AuthContext'
 
 const auth = getAuth(getApp())
 
-export default function CoursePostLayout({ courseStr, postStr, seo, ChildComponent }) {
+export default function CoursePostLayout({ courseStr, postStr, seo, ChildComponent, comments }) {
   const course = JSON.parse(courseStr)
   const { setShowLoginPopup } = useContext(AuthContext)
   const [marked, setMarked] = useState({})
@@ -215,6 +215,7 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
           <ChildComponent
             post={post}
             course={course}
+            comments={comments}
             goToPost={goToPost}
             marked={marked}
             markAsComplete={markAsComplete}

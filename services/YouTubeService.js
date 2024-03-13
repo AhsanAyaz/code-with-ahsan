@@ -27,6 +27,8 @@ export const getEmbedUrl = (originalUrl) => {
             videoParams += `?start=${ts}`
           }
         })
+      } else {
+        vidId = videoParams
       }
       vidUrl += `${videoParams}${videoParams.includes('?') ? `&` : '?'}autoplay=1`
       vidUrl = addYouTubeExtraParams(vidUrl)
@@ -46,4 +48,23 @@ export const getEmbedUrl = (originalUrl) => {
 
 const addYouTubeExtraParams = (videoUrl) => {
   return videoUrl + `${!videoUrl.includes('?') ? '?' : '&'}&enablejsapi=1&rel=0`
+}
+
+export const getYouTubeComments = async (videoId) => {
+  const { google } = await import('googleapis')
+  const youtube = google.youtube({
+    version: 'v3',
+    auth: process.env['YT_API_KEY'],
+  })
+  const commentsProm = await youtube.commentThreads.list({
+    videoId,
+    part: 'snippet',
+  })
+  return commentsProm.data.items
+    .map((item) => {
+      return item.snippet
+    })
+    .filter((comment) => {
+      return !comment.topLevelComment.snippet.textDisplay.includes('00:00')
+    })
 }

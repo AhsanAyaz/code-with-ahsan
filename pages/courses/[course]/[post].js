@@ -2,7 +2,7 @@ import axios from 'axios'
 import qs from 'qs'
 import Course from '../../../classes/Course.class'
 import Post from '../../../classes/Post.class'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { getNextAndPreviousPosts } from '../../../services/PostService'
 import STRAPI_CONFIG from '../../../lib/strapiConfig'
 import Button from '../../../components/Button'
@@ -15,6 +15,7 @@ import { getAuth } from 'firebase/auth'
 import { getApp } from 'firebase/app'
 import NewsletterForm from '../../../components/NewsletterForm'
 import YoutubePlayer from '../../../components/YouTubePlayer'
+import YouTubeComment from '../../../components/YouTubeComment'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -111,14 +112,21 @@ export async function getStaticProps({ params }) {
   }
 }
 
-function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomplete, user }) {
+function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomplete }) {
+  const [comments, setComments] = useState([])
   useEffect(() => {
     logAnalyticsEvent('course_post_viewed', {
       courseSlug: course.slug,
       postSlug: post.slug,
     })
-    console.log(post)
+    getComments()
   }, [post.slug, course.slug])
+
+  const getComments = async () => {
+    const resp = await axios.get(`/api/youtube/comments?videoId=${post.embed.id}`)
+    const comments = resp.data.comments
+    setComments(comments)
+  }
   return (
     <>
       <header className="mb-6">
@@ -140,18 +148,53 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
         ></SubmissionWrapper>
       )}
       {post.type === 'video' && (
-        <section className="embed-container mb-4">
-          {post.embed?.isYouTube ? (
-            <YoutubePlayer videoId={post.embed.id} title={post.title} timestamp={post.embed.ts} />
-          ) : (
-            <iframe
-              src={post.embedUrl}
-              title={post.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            ></iframe>
-          )}
-        </section>
+        <>
+          <section className="embed-container mb-4">
+            {post.embed?.isYouTube ? (
+              <YoutubePlayer
+                videoId={post.embed.id}
+                title={post.title}
+                timestamp={post.embed.ts}
+                comments={comments}
+              />
+            ) : (
+              <iframe
+                src={post.embedUrl}
+                title={post.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              ></iframe>
+            )}
+          </section>
+          {post.embed.isYouTube ? (
+            <>
+              <div className="flex gap-4 items-center justify-end">
+                <a
+                  href={`https://youtu.be/${post.embed.id}`}
+                  target="_blank"
+                  className="flex items-center bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded cursor-pointer"
+                  rel="noreferrer"
+                >
+                  Like
+                </a>
+                <a
+                  href={`https://youtu.be/${post.embed.id}`}
+                  target="_blank"
+                  type="submit"
+                  className=" bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded"
+                  rel="noreferrer"
+                >
+                  Post Comment
+                </a>
+              </div>
+              <ul className="comments-container">
+                {comments.map((comment) => {
+                  return <YouTubeComment key={comment.topLevelComment.id} comment={comment} />
+                })}
+              </ul>
+            </>
+          ) : null}
+        </>
       )}
       <section>
         {post.description && (
@@ -228,7 +271,7 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
 
 PostPage.showAds = true
 
-export default function PostPageWithLayout({ courseStr, postStr }) {
+export default function PostPageWithLayout({ courseStr, postStr, comments }) {
   const post = JSON.parse(postStr)
   const course = JSON.parse(courseStr)
   return (
@@ -237,6 +280,7 @@ export default function PostPageWithLayout({ courseStr, postStr }) {
         ChildComponent={PostPage}
         postStr={postStr}
         courseStr={courseStr}
+        comments={comments}
         seo={{
           title: `${post.title} - ${course.name}`,
           description: post.description,

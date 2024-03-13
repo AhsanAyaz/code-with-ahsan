@@ -51,17 +51,19 @@ const YoutubePlayer = ({ videoId, title, thumbnail, timestamp }) => {
 
   if (videoId) {
     return (
-      <div className="aspect-video">
-        <LiteYouTubeEmbed
-          ref={videoRef}
-          wrapperClass="yt-lite rounded-md"
-          id={videoId}
-          title={title}
-          thumbnail={thumbnail}
-          params={`enablejsapi=1&autoplay=1&rel=0&start=${timestamp}`}
-          onIframeAdded={loadYtPlayer}
-        />
-      </div>
+      <>
+        <div className="aspect-video">
+          <LiteYouTubeEmbed
+            ref={videoRef}
+            wrapperClass="yt-lite rounded-md"
+            id={videoId}
+            title={title}
+            thumbnail={thumbnail}
+            params={`enablejsapi=1&autoplay=1&rel=0&start=${timestamp}`}
+            onIframeAdded={loadYtPlayer}
+          />
+        </div>
+      </>
     )
   } else {
     return null

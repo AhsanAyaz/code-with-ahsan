@@ -9,6 +9,7 @@ const PostsList = ({ chapter, course, post, completedPosts = {}, enrolled, enrol
     return (
       <ul className="flex flex-col gap-2">
         <li
+          key={1}
           className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white bg-gray-100 rounded-md `}
         >
           -
@@ -37,6 +38,7 @@ const PostsList = ({ chapter, course, post, completedPosts = {}, enrolled, enrol
           </Link>
         ) : (
           <button
+            key={`${index}_button`}
             onClick={() => {
               alert('Please enroll to access the video')
               enrollUser()
