@@ -44,6 +44,21 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
     [course]
   )
 
+  const enrollUser = async (event) => {
+    event?.stopPropagation()
+    const attendee = await getCurrentUser()
+    if (!attendee) {
+      setShowLoginPopup(true)
+      return
+    }
+    await getEnrollmentDoc({ course, attendee }, true)
+    router.push(`/courses/${course.slug}`)
+    setEnrolled(true)
+    logAnalyticsEvent('course_joined', {
+      courseSlug: course.slug,
+    })
+  }
+
   const markAsComplete = async () => {
     const attendee = await getCurrentUser()
     if (!attendee) {
@@ -142,6 +157,7 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
               course={course}
               activePost={post}
               markedPosts={marked}
+              enrollUser={enrollUser}
             />
           )}
           {course.resources?.length ? (
