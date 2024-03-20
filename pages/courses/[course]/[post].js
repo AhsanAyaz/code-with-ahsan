@@ -16,6 +16,7 @@ import { getApp } from 'firebase/app'
 import NewsletterForm from '../../../components/NewsletterForm'
 import YoutubePlayer from '../../../components/YouTubePlayer'
 import YouTubeComment from '../../../components/YouTubeComment'
+import Spinner from '../../../components/Spinner'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -114,6 +115,7 @@ export async function getStaticProps({ params }) {
 
 function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomplete }) {
   const [comments, setComments] = useState([])
+  const [loadingComments, setLoadingComments] = useState(false)
   useEffect(() => {
     logAnalyticsEvent('course_post_viewed', {
       courseSlug: course.slug,
@@ -123,9 +125,18 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
   }, [post.slug, course.slug])
 
   const getComments = async () => {
-    const resp = await axios.get(`/api/youtube/comments?videoId=${post.embed.id}`)
-    const comments = resp.data.comments
-    setComments(comments)
+    setLoadingComments(true)
+    try {
+      const resp = await axios.get(`/api/youtube/comments?videoId=${post.embed.id}`)
+      const comments = resp.data.comments
+      setComments(comments)
+    } catch (err) {
+      console.log({
+        err,
+      })
+    } finally {
+      setLoadingComments(false)
+    }
   }
   return (
     <>
@@ -235,9 +246,15 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
             </a>
           </div>
           <ul className="comments-container">
-            {comments.map((comment) => {
-              return <YouTubeComment key={comment.topLevelComment.id} comment={comment} />
-            })}
+            {loadingComments ? (
+              <div className="flex w-full justify-center items-center">
+                <Spinner />
+              </div>
+            ) : (
+              comments.map((comment) => {
+                return <YouTubeComment key={comment.topLevelComment.id} comment={comment} />
+              })
+            )}
           </ul>
         </>
       ) : null}

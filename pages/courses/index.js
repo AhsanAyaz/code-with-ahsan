@@ -27,14 +27,21 @@ export async function getStaticProps() {
     }
   )
   const url = `${strapiUrl}/api/courses?${query}`
-  const coursesResp = await axios.get(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
-      Authorization: `Bearer ${strapiAPIKey}`,
-    },
-  })
-  const courses = coursesResp.data.data.map((course) => new Course(course))
+  let courses = []
+  try {
+    const coursesResp = await axios.get(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        Authorization: `Bearer ${strapiAPIKey}`,
+      },
+    })
+    courses = coursesResp.data.data.map((course) => new Course(course))
+  } catch (err) {
+    console.log({
+      err,
+    })
+  }
   return { props: { coursesStr: JSON.stringify(courses) } }
 }
 
