@@ -31,8 +31,7 @@ module.exports = withBundleAnalyzer({
       },
       {
         source: '/gde',
-        destination:
-          'https://developers.google.com/profile/u/ahsanayaz',
+        destination: 'https://developers.google.com/profile/u/ahsanayaz',
         permanent: true,
       },
       {
@@ -97,15 +96,6 @@ module.exports = withBundleAnalyzer({
       test: /\.svg$/,
       use: ['@svgr/webpack'],
     })
-
-    if (!dev && !isServer) {
-      // Replace React with Preact only in client production build
-      Object.assign(config.resolve.alias, {
-        react: 'preact/compat',
-        'react-dom/test-utils': 'preact/test-utils',
-        'react-dom': 'preact/compat',
-      })
-    }
 
     return config
   },
