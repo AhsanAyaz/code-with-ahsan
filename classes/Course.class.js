@@ -16,6 +16,8 @@ class Course {
     this.banner = courseAttributes.banner?.data?.attributes?.url
     this.introVideoUrl = courseAttributes.introVideoUrl
     this.slug = courseAttributes.slug
+    this.isExternal = courseAttributes.isExternal
+    this.externalCourseUrl = courseAttributes.externalCourseUrl
     if (courseAttributes.chapters) {
       this.chapters = courseAttributes.chapters.data.map((chapter) => new Chapter(chapter))
     } else {

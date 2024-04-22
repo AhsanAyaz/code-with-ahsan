@@ -64,6 +64,11 @@ const CourseCard = ({ course, enrollHandler, user }) => {
     <article
       aria-hidden={true}
       onClick={(e) => {
+        if (course.isExternal) {
+          e.stopPropagation()
+          window.open(course.externalCourseUrl, '_blank')
+          return
+        }
         spaNavigate(`/courses/${course.slug}`, e)
       }}
     >
@@ -87,10 +92,19 @@ const CourseCard = ({ course, enrollHandler, user }) => {
           <LegitMarkdown>{course.description}</LegitMarkdown>
         </div>
         <p className="text-center mt-4 mb-8">
-          {enrollmentCount !== null ? `${enrollmentCount} students enrolled` : '...'}
+          {!course.isExternal ? (
+            <span>{enrollmentCount !== null ? `${enrollmentCount} students enrolled` : '...'}</span>
+          ) : (
+            <span>&nbsp;</span>
+          )}
         </p>
         <Button
           onClick={(event) => {
+            if (course.isExternal) {
+              event.stopPropagation()
+              window.open(course.externalCourseUrl, '_blank')
+              return
+            }
             if (enrolled) {
               return
             }
