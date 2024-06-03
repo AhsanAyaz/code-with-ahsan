@@ -18,6 +18,7 @@ class Course {
     this.slug = courseAttributes.slug
     this.isExternal = courseAttributes.isExternal
     this.externalCourseUrl = courseAttributes.externalCourseUrl
+    this.externalStudentsCount = courseAttributes.externalStudentsCount
     if (courseAttributes.chapters) {
       this.chapters = courseAttributes.chapters.data.map((chapter) => new Chapter(chapter))
     } else {

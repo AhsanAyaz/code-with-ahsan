@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import Link from 'next/link'
 import LegitMarkdown from '../LegitMarkdown'
 import Image from 'next/image'
 
@@ -95,7 +94,7 @@ const CourseCard = ({ course, enrollHandler, user }) => {
           {!course.isExternal ? (
             <span>{enrollmentCount !== null ? `${enrollmentCount} students enrolled` : '...'}</span>
           ) : (
-            <span>&nbsp;</span>
+            <span>{course.externalStudentsCount} students enrolled</span>
           )}
         </p>
         <Button

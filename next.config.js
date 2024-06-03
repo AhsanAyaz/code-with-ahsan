@@ -30,12 +30,6 @@ module.exports = withBundleAnalyzer({
         permanent: true,
       },
       {
-        source: '/pre',
-        destination:
-          'https://codewithahsan.teachable.com/courses/practical-react-essentials/lectures/53228310',
-        permanent: true,
-      },
-      {
         source: '/gde',
         destination: 'https://developers.google.com/profile/u/ahsanayaz',
         permanent: true,

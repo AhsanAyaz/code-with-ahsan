@@ -5,12 +5,6 @@
   force = true
 
 [[redirects]]
-  from = "https://codewithahsan.dev/pre"
-  to = "https://codewithahsan.teachable.com/courses/practical-react-essentials/lectures/53228310"
-  status = 301
-  force = true
-
-[[redirects]]
   from = "https://codewithahsan.dev/youtube"
   to = "https://youtube.com/c/CodewithAhsan"
   status = 301
