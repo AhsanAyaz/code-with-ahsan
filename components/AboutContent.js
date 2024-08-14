@@ -4,14 +4,12 @@ import PrimaryLink from './PrimaryLink'
 
 const AboutContent = () => (
   <p className="text-lg font-medium">
-    Muhammad Ahsan Ayaz is a Software Architect, Author of the{' '}
-    <PrimaryLink href={siteMetadata.ngBook}>Angular Cookbook</PrimaryLink>, and a{' '}
+    Muhammad Ahsan Ayaz is a Software Architect, an author of 2 world-wide published books (the{' '}
+    <PrimaryLink href={siteMetadata.ngBook}>Angular Cookbook</PrimaryLink>), and a{' '}
     <PrimaryLink href={siteMetadata.gde}>Google Developers Expert in Angular</PrimaryLink>. He loves
-    helping the startup ecosystem and product owners bring their ideas to life. And he loves to
-    teach programming using JavaScript, Angular and Web Technologies on{' '}
-    <PrimaryLink href={siteMetadata.twitch}>Twitch</PrimaryLink> and{' '}
-    <PrimaryLink href={siteMetadata.youtube}>YouTube</PrimaryLink> via Live Streams, video
-    tutorials, and <PrimaryLink href="https://codewithahsan.dev/blog">articles</PrimaryLink>.
+    helping the startup ecosystem and product owners bring their ideas to life. And to help make the{' '}
+    {''}
+    world a better place using technology.
     <br />
     Socials: <PrimaryLink href={siteMetadata.socials}>{siteMetadata.socials}</PrimaryLink>
   </p>
