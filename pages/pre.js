@@ -72,7 +72,7 @@ export default function AngularCookbookReader() {
               )
             }}
           >
-            Apply for a FREE slot (7 remaining)
+            Apply for a FREE slot (5 remaining)
           </Button>
         </div>
       </section>
