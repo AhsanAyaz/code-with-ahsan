@@ -4,6 +4,7 @@ import generateRss from '@/lib/generate-rss'
 import { MDXLayoutRenderer } from '@/components/MDXComponents'
 import { formatSlug, getAllFilesFrontMatter, getFileBySlug, getFiles } from '@/lib/mdx'
 import NewsletterForm from '../../components/NewsletterForm'
+import Comments from '../../components/comments'
 
 const DEFAULT_LAYOUT = 'PostLayout'
 
@@ -65,6 +66,7 @@ export default function Blog({ post, authorDetails, prev, next }) {
             prev={prev}
             next={next}
           />
+          <Comments frontMatter={frontMatter} />
           <div className="flex items-center justify-center pt-4">
             <NewsletterForm />
           </div>

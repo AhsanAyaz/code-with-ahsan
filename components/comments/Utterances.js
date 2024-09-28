@@ -4,12 +4,13 @@ import { useTheme } from 'next-themes'
 import siteMetadata from '@/data/siteMetadata'
 
 const Utterances = ({ issueTerm }) => {
-  const [enableLoadComments, setEnabledLoadComments] = useState(true)
+  const metaData = siteMetadata.default || siteMetadata
+  const [enableLoadComments, setEnabledLoadComments] = useState(false)
   const { theme, resolvedTheme } = useTheme()
   const commentsTheme =
     theme === 'dark' || resolvedTheme === 'dark'
-      ? siteMetadata.comment.utterancesConfig.darkTheme
-      : siteMetadata.comment.utterancesConfig.theme
+      ? metaData.comment.utterancesConfig.darkTheme
+      : metaData.comment.utterancesConfig.theme
 
   const COMMENTS_ID = 'comments-container'
 
@@ -17,9 +18,9 @@ const Utterances = ({ issueTerm }) => {
     setEnabledLoadComments(false)
     const script = document.createElement('script')
     script.src = 'https://utteranc.es/client.js'
-    script.setAttribute('repo', siteMetadata.comment.utterancesConfig.repo)
+    script.setAttribute('repo', metaData.comment.utterancesConfig.repo)
     script.setAttribute('issue-term', issueTerm)
-    script.setAttribute('label', siteMetadata.comment.utterancesConfig.label)
+    script.setAttribute('label', metaData.comment.utterancesConfig.label)
     script.setAttribute('theme', commentsTheme)
     script.setAttribute('crossorigin', 'anonymous')
     script.async = true
@@ -35,8 +36,12 @@ const Utterances = ({ issueTerm }) => {
 
   // Reload on theme change
   useEffect(() => {
-    const iframe = document.querySelector('iframe.utterances-frame')
-    if (!iframe) return
+    const iframe = document.querySelector(`.utterances`)
+    if (!iframe) {
+      return
+    }
+    const iframes = document.querySelectorAll('.utterances')
+    iframes.forEach((iframe) => iframe.remove())
     loadComments()
   }, [loadComments])
 
