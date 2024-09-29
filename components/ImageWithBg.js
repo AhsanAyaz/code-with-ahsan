@@ -37,13 +37,12 @@ const ImageWithBg = ({
           alt={alt}
           title={title}
           layout="fill"
-          objectFit="contain"
+          objectFit={objectFit}
           className="my-1 px-2 relative overflow-hidden xl:my-1 xl:px-2 xl:w-1/2"
           style={{
             marginBottom: 0,
             marginLeft: 'auto',
             marginRight: 'auto',
-            objectFit,
           }}
         />
       </div>
