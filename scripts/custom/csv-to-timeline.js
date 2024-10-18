@@ -16,11 +16,14 @@ csv
   .pipe(
     csv.transform((record) => {
       let recordInTime = record['Record In']
+      if (record['Notes'].includes('Marker')) {
+        return []
+      }
       recordInTime = recordInTime
         .split(':')
         .map((val, i, arr) => {
           if (i === 0) {
-            return (Number(val) - 1).toString().padStart(2)
+            return (Number(val) - 1).toString().padStart(2, 0)
           } else if (i === arr.length - 1) {
             return ''
           }
