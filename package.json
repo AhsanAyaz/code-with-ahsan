@@ -6,6 +6,7 @@
     "start": "cross-env NODE_ENV=development && node ./scripts/next-remote-watch.js ./data",
     "dev": "cross-env NODE_ENV=development && next dev",
     "build": "cross-env NODE_ENV=production && next build && node ./scripts/generate-sitemap",
+    "build:dev": "cross-env NODE_ENV=development next build",
     "serve": "cross-env NODE_ENV=development && next start",
     "analyze": "cross-env ANALYZE=true next build",
     "lint": "next lint --fix --dir pages --dir components --dir lib --dir layouts --dir scripts",

@@ -1,25 +1,40 @@
 require('dotenv').config()
 const axios = require('axios')
 const puppeteer = require('puppeteer')
+const crypto = require('crypto')
+
 // Headers config
 axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.STRAPI_API_KEY}`
-
-const toKebabCase = (str) =>
-  str &&
-  str
-    .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
-    .map((x) => x.toLowerCase())
-    .join('-')
 
 // Constants
 const PLAYLIST_URL =
   'https://www.youtube.com/watch?v=5VUIEryDwI0&list=PL2sQdFoGnLIhobWtEEvClQ5-peYO-RSZj'
 const CHAPTER_ID = '3'
 
+const generateUniqueSlug = async () => {
+  const maxAttempts = 10 // Adjust as needed
+  for (let i = 0; i < maxAttempts; i++) {
+    const slug = crypto.randomBytes(3).toString('hex')
+    try {
+      const response = await axios.get(
+        `${process.env.STRAPI_URL}/api/posts?filters[slug][$eq]=${slug}`
+      )
+      if (response.data.data.length === 0) {
+        return slug
+      }
+    } catch (error) {
+      console.error('Error checking slug uniqueness:', error)
+      return slug
+    }
+  }
+  throw new Error('Failed to generate a unique slug after multiple attempts')
+}
+
 const createPosts = (videos, chapterId) => {
-  videos.reduce((acc, video) => {
+  return videos.reduce((acc, video) => {
     const { url, title } = video
-    return acc.then(() => {
+    return acc.then(async () => {
+      const uniqueSlug = await generateUniqueSlug()
       return axios
         .post(`${process.env.STRAPI_URL}/api/posts`, {
           data: {
@@ -28,7 +43,7 @@ const createPosts = (videos, chapterId) => {
             videoUrl: url,
             video: null,
             resources: [],
-            slug: toKebabCase(title),
+            slug: uniqueSlug,
             chapter: chapterId,
           },
         })

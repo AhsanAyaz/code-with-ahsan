@@ -2,6 +2,10 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
 
+if (process.env.NODE_ENV === 'development') {
+  require('source-map-support').install()
+}
+
 module.exports = withBundleAnalyzer({
   reactStrictMode: true,
   pageExtensions: ['js', 'jsx', 'md', 'mdx'],
@@ -97,6 +101,13 @@ module.exports = withBundleAnalyzer({
       use: ['@svgr/webpack'],
     })
 
+    if (!dev && !isServer) {
+      config.devtool = 'source-map'
+    }
+
     return config
   },
+
+  // Add this line to enable source maps in production
+  productionBrowserSourceMaps: true,
 })
