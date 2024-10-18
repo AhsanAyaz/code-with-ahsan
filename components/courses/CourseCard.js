@@ -88,7 +88,7 @@ const CourseCard = ({ course, enrollHandler, user }) => {
           {course.name}
         </h5>
         <div className="text-sm text-center lg:text-base line-clamp-3 text-ellipsis">
-          <LegitMarkdown>{course.description}</LegitMarkdown>
+          <LegitMarkdown>{course.outline || course.description}</LegitMarkdown>
         </div>
         <p className="text-center mt-4 mb-8">
           {!course.isExternal ? (
