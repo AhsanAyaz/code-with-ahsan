@@ -34,7 +34,7 @@ This constructor is not compatible with Angular Dependency Injection because its
 
 Let's suppose we have a component named `WatchComponent` as follows:
 
-```typescript
+```ts
 import { Component, OnInit } from '@angular/core'
 import { WatchService } from 'src/app/services/watch.service'
 
@@ -68,7 +68,7 @@ export class WatchComponent implements OnInit {
 
 And we have the `WatchService` as follows:
 
-```typescript
+```ts
 import { Injectable } from '@angular/core'
 
 @Injectable({
@@ -97,7 +97,7 @@ export class WatchService {
 
 If you write the tests as follows, you'll still see the error we've mentioned above:
 
-```typescript {2,9,10,13-17,20,28,33}
+```ts
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { WatchService } from 'src/app/services/watch.service'
 
@@ -144,7 +144,7 @@ with the mentioned issue.
 If you've faced the same, just make sure that you have set both the `esModuleInterop` and `emitDecoratorMetadata` properties to `true` inside your `tsconfig.spec.json` file.
 It should ideally look something as follows:
 
-```typescript{5-7}
+```ts
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
