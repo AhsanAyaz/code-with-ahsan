@@ -64,7 +64,7 @@ export default function AngularCookbookReader() {
             Pay with Bank Transfer (PKR)
           </Button>
 
-          <Button
+          {/* <Button
             onClick={() => {
               window.open(
                 'https://button-crustacean-a78.notion.site/33-participants-can-get-the-Practical-React-Essentials-in-Urdu-Hindi-Course-for-FREE-9cbe31a19a9b474783e3860523c56315',
@@ -73,7 +73,7 @@ export default function AngularCookbookReader() {
             }}
           >
             Apply for a FREE slot (2 remaining)
-          </Button>
+          </Button> */}
         </div>
       </section>
     </SimpleLayout>
