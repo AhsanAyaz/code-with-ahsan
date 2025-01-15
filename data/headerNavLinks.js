@@ -2,7 +2,7 @@ export const LINKS = {
   ANGULAR_COOKBOOK: 'https://ng-cookbook.com',
 }
 const headerNavLinks = [
-  { href: 'https://codewithahsan.beehiiv.com/', title: 'Newsletter' },
+  { href: 'https://newsletter.codewithahsan.dev/', title: 'Newsletter' },
   { href: '/blog', title: 'Blog' },
   { href: '/courses', title: 'Courses' },
   { href: 'https://discord.gg/KSPpuxD8SG', title: 'Discord' },
