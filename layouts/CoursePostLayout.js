@@ -219,7 +219,7 @@ export default function CoursePostLayout({ courseStr, postStr, seo, ChildCompone
                   await getEnrollmentDoc({ course, attendee }, true)
                   setEnrolled(true)
                 }}
-                color="accent"
+                color="primary"
                 className="px-4 uppercase mb-6 py-3 w-full border-none rounded-none"
               >
                 Enroll

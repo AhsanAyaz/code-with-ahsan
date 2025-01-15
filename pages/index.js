@@ -51,7 +51,7 @@ export default function Home() {
       <PageSEO title={siteMetadata.title} description={siteMetadata.description} />
       {banners.map((banner, index) => (
         <div
-          className="top-banner mb-4 relative bg-indigo-700 text-white px-6 py-3 rounded-md"
+          className="top-banner mb-4 relative bg-primary-700 text-white px-6 py-3 rounded-md"
           key={index}
         >
           <span className="animate-ping absolute -right-1 -top-1 inline-flex h-4 w-4 rounded-full bg-yellow-700 dark:bg-yellow-300 z-10 opacity-75"></span>

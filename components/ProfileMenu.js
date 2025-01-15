@@ -118,9 +118,9 @@ const ProfileMenu = () => {
                   onClick={() => {
                     auth.signOut()
                   }}
-                  className="w-full flex items-center text-sm transform transition-colors duration-200 border-r-4 border-transparent hover:border-indigo-600"
+                  className="w-full flex items-center text-sm transform transition-colors duration-200 border-r-4 border-transparent hover:border-primary-600"
                 >
-                  <div className=" text-indigo-600">
+                  <div className=" text-primary-600">
                     <svg
                       className="w-6 h-6"
                       fill="none"

@@ -67,8 +67,8 @@ const Dialog = ({ show, onClose, actions, children, isLoading, title }) => {
               {actions.map((action) => {
                 const styles =
                   action.type !== 'primary'
-                    ? 'disabled:bg-gray-300 disabled:cursor-not-allowed px-4 bg-transparent p-3 rounded-lg text-indigo-500 hover:bg-gray-100 hover:text-indigo-400'
-                    : 'disabled:bg-gray-300 disabled:cursor-not-allowed modal-close px-4 bg-indigo-500 p-3 rounded-lg text-white hover:bg-indigo-400'
+                    ? 'disabled:bg-gray-300 disabled:cursor-not-allowed px-4 bg-transparent p-3 rounded-lg text-primary-500 hover:bg-gray-100 hover:text-primary-400'
+                    : 'disabled:bg-gray-300 disabled:cursor-not-allowed modal-close px-4 bg-primary-500 p-3 rounded-lg text-white hover:bg-primary-400'
 
                 return (
                   <button

@@ -231,9 +231,15 @@ export default function CoursePage({ courseStr }) {
           <h4 className="my-6 text-center font-bold">Project Submissions</h4>
           <Link passHref href={`/courses/${course.slug}/submissions`}>
             <li
-              className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-white dark:hover:bg-primary-800 cursor-pointer bg-gray-100 rounded-md hover:bg-primary-500 hover:text-white`}
+              className={`flex items-center gap-4 justify-between px-4 py-2 backdrop-blur border border-primary-500/20 dark:border-primary-500/30 hover:border-primary-500/40 dark:hover:border-primary-500/50 transition-colors rounded-lg shadow-lg cursor-pointer ${
+                course.active
+                  ? 'bg-primary-500 dark:bg-primary-800 text-white'
+                  : 'bg-gray-200 dark:bg-gray-800/50'
+              }`}
             >
-              <a className="break-words">View Submissions</a>
+              <a className="break-words text-gray-800 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-300">
+                View Submissions
+              </a>
             </li>
           </Link>
         </section>
@@ -262,7 +268,7 @@ export default function CoursePage({ courseStr }) {
         ) : (
           <Button
             onClick={enrollUser}
-            color="accent"
+            color="primary"
             className="px-4 uppercase mb-0 py-3 w-full border-none rounded-none"
           >
             Enroll
@@ -272,7 +278,7 @@ export default function CoursePage({ courseStr }) {
       {!enrolled ? (
         <Button
           onClick={enrollUser}
-          color="accent"
+          color="primary"
           className="slide-in-left fixed bottom-20 right-4 shadow-lg text-center uppercase mb-52 py-1   border-none rounded-md"
         >
           <span className="mr-2">Enroll</span>{' '}

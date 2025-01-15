@@ -1,4 +1,4 @@
-const YouTubeComment = ({ comment }) => {
+const YouTubeComment = ({ comment, videoLink }) => {
   const {
     authorDisplayName,
     authorProfileImageUrl,
@@ -8,13 +8,19 @@ const YouTubeComment = ({ comment }) => {
   } = comment.topLevelComment.snippet
 
   return (
-    <div className="flex space-x-4 p-4 items-start dark:text-white">
+    <a
+      href={videoLink}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="flex space-x-2 p-4 items-start dark:text-white break-words gap-4 justify-between px-4 py-2 backdrop-blur border border-primary-500/20 dark:border-primary-500/30 hover:border-primary-500/40 dark:hover:border-primary-500/50 transition-colors rounded-lg shadow-lg cursor-pointer"
+    >
       <img src={authorProfileImageUrl} alt={authorDisplayName} className="w-10 h-10 rounded-full" />
       <div className="flex-1">
         <a
           href={`https://youtube.com/${authorDisplayName}`}
           target="_blank"
           rel="noopener noreferrer"
+          className="hover:text-primary-500 max-w-fit block"
         >
           <h3 className="text-sm font-semibold">{authorDisplayName}</h3>
         </a>
@@ -47,7 +53,7 @@ const YouTubeComment = ({ comment }) => {
           <span className="text-xs text-gray-500">{likeCount} likes</span>
         </div>
       </div>
-    </div>
+    </a>
   )
 }
 

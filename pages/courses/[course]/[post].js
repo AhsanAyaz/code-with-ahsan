@@ -226,33 +226,29 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
       </section>
       {post.type === 'video' && post.embed.isYouTube ? (
         <>
-          <div className="flex gap-4 items-center justify-end">
-            <a
-              href={`https://youtu.be/${post.embed.id}`}
-              target="_blank"
-              className="flex items-center bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded cursor-pointer"
-              rel="noreferrer"
-            >
+          <div className="flex gap-4 items-center justify-end mb-8">
+            <Button color="primary" href={`https://youtu.be/${post.embed.id}`}>
               Like
-            </a>
-            <a
-              href={`https://youtu.be/${post.embed.id}`}
-              target="_blank"
-              type="submit"
-              className=" bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded"
-              rel="noreferrer"
-            >
+            </Button>
+
+            <Button color="primary" href={`https://youtu.be/${post.embed.id}`}>
               Post Comment
-            </a>
+            </Button>
           </div>
-          <ul className="comments-container">
+          <ul className="comments-container space-y-6">
             {loadingComments ? (
               <div className="flex w-full justify-center items-center">
                 <Spinner />
               </div>
             ) : (
               comments.map((comment) => {
-                return <YouTubeComment key={comment.topLevelComment.id} comment={comment} />
+                return (
+                  <YouTubeComment
+                    key={comment.topLevelComment.id}
+                    comment={comment}
+                    videoLink={`https://youtu.be/${post.embed.id}`}
+                  />
+                )
               })
             )}
           </ul>

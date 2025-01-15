@@ -12,7 +12,7 @@ body.modal-active {
 }
 
 .profile-dd--shown .profile-dd__inner {
-  @apply border-indigo-700;
+  @apply border-primary-700;
 }
 
 .profile-dd--shown .profile-dd__inner__menu {

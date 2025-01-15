@@ -42,7 +42,7 @@ export default function LoginModal({ show }) {
         >
           x
         </button>
-        <h1 className="text-center text-2xl font-bold text-indigo-600 sm:text-3xl">
+        <h1 className="text-center text-2xl font-bold text-primary-600 sm:text-3xl">
           Get started today
         </h1>
 

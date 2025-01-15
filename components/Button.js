@@ -1,4 +1,4 @@
-const Button = ({ onClick, children, color = '', title, className }) => {
+const Button = ({ onClick, children, color = '', title, className, href }) => {
   let colorClass = ''
   switch (color) {
     case 'primary':
@@ -15,7 +15,18 @@ const Button = ({ onClick, children, color = '', title, className }) => {
       break
   }
 
-  return (
+  return href ? (
+    <a
+      href={href}
+      title={title || ''}
+      target="_blank"
+      rel="noopener noreferrer"
+      role="button"
+      className={`px-4 py-2 ring-1 dark:ring-offset-black dark:hover:ring-offset-2 ${colorClass} rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${className}`}
+    >
+      {children}
+    </a>
+  ) : (
     <button
       onClick={onClick}
       title={title || ''}
