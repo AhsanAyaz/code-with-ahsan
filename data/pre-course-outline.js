@@ -6,16 +6,19 @@ export const PRE_COURSE_OUTLINE = [
         link:
           'https://codewithahsan.teachable.com/courses/practical-react-essentials/lectures/53228310',
         text: 'Course Overview (3:19)',
+        previewAvailable: true,
       },
       {
         link:
           'https://codewithahsan.teachable.com/courses/practical-react-essentials/lectures/53228311',
         text: 'Why Learn React (1:55)',
+        previewAvailable: true,
       },
       {
         link:
           'https://codewithahsan.teachable.com/courses/practical-react-essentials/lectures/53269512',
         text: 'Using the resources in this course (1:28)',
+        previewAvailable: true,
       },
     ],
   },
@@ -26,21 +29,25 @@ export const PRE_COURSE_OUTLINE = [
         link:
           'https://codewithahsan.teachable.com/courses/practical-react-essentials/lectures/53259898',
         text: 'Setup React with Vite (6:41)',
+        previewAvailable: true,
       },
       {
         link:
           'https://codewithahsan.teachable.com/courses/practical-react-essentials/lectures/53259934',
         text: 'Tailwind CSS Setup (8:31)',
+        previewAvailable: true,
       },
       {
         link:
           'https://codewithahsan.teachable.com/courses/practical-react-essentials/lectures/53259945',
         text: 'Git, React, and pushing code to GitHub (10:50)',
+        previewAvailable: true,
       },
       {
         link:
           'https://codewithahsan.teachable.com/courses/practical-react-essentials/lectures/53260140',
         text: 'Deploying to GitHub pages with GitHub Actions (12:52)',
+        previewAvailable: true,
       },
     ],
   },
@@ -116,6 +123,7 @@ export const PRE_COURSE_OUTLINE = [
         link:
           'https://codewithahsan.teachable.com/courses/practical-react-essentials/lectures/53611149',
         text: 'Introduction to Redux (13:29)',
+        previewAvailable: true,
       },
       {
         link:
@@ -161,6 +169,7 @@ export const PRE_COURSE_OUTLINE = [
         link:
           'https://codewithahsan.teachable.com/courses/practical-react-essentials/lectures/54015543',
         text: 'Assignment: Adding features to Contacts App using React Router (6:16)',
+        previewAvailable: true,
       },
       {
         link:
@@ -221,6 +230,7 @@ export const PRE_COURSE_OUTLINE = [
         link:
           'https://codewithahsan.teachable.com/courses/practical-react-essentials/lectures/53260150',
         text: 'Project Introduction (5:36)',
+        previewAvailable: true,
       },
       {
         link:
@@ -281,6 +291,7 @@ export const PRE_COURSE_OUTLINE = [
         link:
           'https://codewithahsan.teachable.com/courses/practical-react-essentials/lectures/53228334',
         text: 'Recap and Next Steps (6:53)',
+        previewAvailable: true,
       },
     ],
   },

@@ -1,3 +1,5 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faLock } from '@fortawesome/free-solid-svg-icons'
 export default function AngularCookbookReader() {
   return <MainPage />
 }
@@ -168,7 +170,16 @@ function MainPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       key={lessonIndex}
-                      className="bg-gray-800/50 backdrop-blur border border-primary-500/20 hover:border-primary-500/40 transition-colors rounded-lg shadow-lg"
+                      onClick={(ev) => {
+                        if (!lesson.previewAvailable) {
+                          ev.preventDefault()
+                        }
+                      }}
+                      className={`${
+                        !lesson.previewAvailable
+                          ? 'opacity-60 cursor-not-allowed'
+                          : 'bg-gray-800/50 hover:border-primary-500/40 cursor-pointer'
+                      } backdrop-blur border border-primary-500/20  transition-colors rounded-lg shadow-lg`}
                     >
                       <div className="p-4 flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -181,20 +192,27 @@ function MainPage() {
                           {duration && (
                             <span className="text-gray-400">{'(' + duration.replace('', '')}</span>
                           )}
-                          <svg
-                            className="w-5 h-5 text-primary-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
+                          {lesson.previewAvailable ? (
+                            <svg
+                              className="w-5 h-5 text-primary-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          ) : (
+                            <FontAwesomeIcon
+                              icon={faLock}
+                              className={'dark:text-gray-300 text-gray-400'}
                             />
-                          </svg>
+                          )}
                         </div>
                       </div>
                     </a>
