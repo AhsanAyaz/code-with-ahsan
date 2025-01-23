@@ -4,7 +4,6 @@ import axios from 'axios'
 import CourseCard from '../../components/courses/CourseCard'
 import qs from 'qs'
 import Course from '../../classes/Course.class'
-import STRAPI_CONFIG from '../../lib/strapiConfig'
 import { getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { useContext, useEffect, useState } from 'react'
@@ -16,33 +15,50 @@ import { AuthContext } from 'contexts/AuthContext'
 export async function getStaticProps() {
   const strapiUrl = process.env.STRAPI_URL
   const strapiAPIKey = process.env.STRAPI_API_KEY
+
+  // Updated query structure for Strapi v5
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar', 'banner', 'banner.image'],
-      sort: ['publishedAt:desc'],
-      publicationState: STRAPI_CONFIG.publicationState,
+      populate: ['banner', 'authors', 'chapters'],
+      sort: ['visibilityOrder:desc'],
+      // publicationState is now handled differently in v5
+      filters: {
+        publishedAt: {
+          $notNull: true,
+        },
+      },
     },
     {
       encodeValuesOnly: true,
     }
   )
+
   const url = `${strapiUrl}/api/courses?${query}`
   let courses = []
+
   try {
+    // Updated headers for Strapi v5
     const coursesResp = await axios.get(url, {
       headers: {
         'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
         Authorization: `Bearer ${strapiAPIKey}`,
       },
     })
-    courses = coursesResp.data.data.map((course) => new Course(course))
+
+    // Strapi v5 response structure might be slightly different
+    const respData = coursesResp.data
+    courses = respData.data.map((course) => new Course(course))
   } catch (err) {
-    console.log({
-      err,
-    })
+    console.error('Error fetching courses:', err)
   }
-  return { props: { coursesStr: JSON.stringify(courses) } }
+
+  return {
+    props: {
+      coursesStr: JSON.stringify(courses),
+    },
+    // Add revalidate for ISR (Optional)
+    // revalidate: 60, // Revalidate every 60 seconds
+  }
 }
 
 const auth = getAuth(getApp())
@@ -52,14 +68,12 @@ export default function Courses({ coursesStr }) {
   const router = useRouter()
   const [user, setUser] = useState(auth.currentUser)
   const { setShowLoginPopup } = useContext(AuthContext)
+
   useEffect(() => {
     const sub = auth.onAuthStateChanged((user) => {
       setUser(user)
     })
-
-    return () => {
-      sub()
-    }
+    return () => sub()
   }, [])
 
   const enroll = async (course) => {
@@ -68,9 +82,10 @@ export default function Courses({ coursesStr }) {
       setShowLoginPopup(true)
       return
     }
-    getEnrollmentDoc({ course, attendee }, true)
+    await getEnrollmentDoc({ course, attendee }, true)
     router.push(`/courses/${course.slug}`)
   }
+
   return (
     <>
       <PageSEO title={`Courses - ${siteMetadata.author}`} description={siteMetadata.description} />
@@ -78,10 +93,9 @@ export default function Courses({ coursesStr }) {
         Courses
       </h1>
       <div className="max-w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-        {courses &&
-          courses.map((course) => {
-            return <CourseCard course={course} user={user} enrollHandler={enroll} key={course.id} />
-          })}
+        {courses?.map((course) => (
+          <CourseCard course={course} user={user} enrollHandler={enroll} key={course.id} />
+        ))}
       </div>
     </>
   )

@@ -26,26 +26,42 @@ const auth = getAuth(getApp())
 export async function getStaticPaths() {
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts'],
-      publicationState: STRAPI_CONFIG.publicationState,
+      fields: ['slug'],
+      populate: {
+        authors: {
+          fields: ['name'],
+          populate: {
+            avatar: true,
+          },
+        },
+        chapters: {
+          fields: ['name'],
+          populate: {
+            posts: {
+              fields: ['slug'],
+            },
+          },
+        },
+      },
     },
     {
       encodeValuesOnly: true,
     }
   )
+
   const url = `${strapiUrl}/api/courses?${query}`
   const coursesResp = await axios.get(url, {
     headers: {
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
       Authorization: `Bearer ${strapiAPIKey}`,
     },
   })
+
   const courses = coursesResp.data.data.map((course) => new Course(course))
   const paths = []
-  courses.map((course) => {
-    course.chapters.map((chapter) => {
-      chapter.posts.map((post) => {
+
+  courses.forEach((course) => {
+    course.chapters?.forEach((chapter) => {
+      chapter.posts?.forEach((post) => {
         paths.push({
           params: {
             course: course.slug,
@@ -55,52 +71,97 @@ export async function getStaticPaths() {
       })
     })
   })
-  const config = {
+
+  return {
     paths,
     fallback: false,
   }
-  return config
 }
 
 export async function getStaticProps({ params }) {
   const { course: courseId, post: postId } = params
 
-  const query = qs.stringify(
+  // Course query
+  const courseQuery = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts', 'resources', 'banner'],
-      publicationState: STRAPI_CONFIG.publicationState,
+      fields: ['name', 'slug', 'description'],
+      populate: {
+        authors: {
+          fields: ['name', 'bio'],
+          populate: {
+            avatar: true,
+          },
+        },
+        chapters: {
+          fields: ['name', 'description'],
+          populate: {
+            posts: {
+              fields: ['title', 'slug', 'description', 'type', 'videoUrl'],
+            },
+          },
+        },
+        resources: {
+          fields: ['*'],
+        },
+        banner: true,
+      },
+      filters: {
+        slug: {
+          $eq: courseId,
+        },
+      },
     },
     {
       encodeValuesOnly: true,
     }
   )
-  const url = `${strapiUrl}/api/courses/${courseId}?${query}`
-  const coursesResp = await axios.get(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
-      Authorization: `Bearer ${strapiAPIKey}`,
-    },
-  })
+
+  // Post query
   const postQuery = qs.stringify(
     {
-      populate: ['chapter', 'resources', 'article'],
-      publicationState: STRAPI_CONFIG.publicationState,
+      fields: ['title', 'slug', 'description', 'type', 'videoUrl', 'article', 'hasAssignment'],
+      populate: {
+        chapter: {
+          fields: ['name'],
+        },
+        resources: {
+          fields: ['*'],
+        },
+      },
+      filters: {
+        slug: {
+          $eq: postId,
+        },
+      },
     },
     {
       encodeValuesOnly: true,
     }
   )
-  const postResp = await axios.get(`${strapiUrl}/api/posts/${postId}?${postQuery}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
-      Authorization: `Bearer ${strapiAPIKey}`,
-    },
-  })
-  const course = new Course(coursesResp.data.data)
-  const post = new Post(postResp.data.data)
+
+  const [courseResp, postResp] = await Promise.all([
+    axios.get(`${strapiUrl}/api/courses?${courseQuery}`, {
+      headers: {
+        Authorization: `Bearer ${strapiAPIKey}`,
+      },
+    }),
+    axios.get(`${strapiUrl}/api/posts?${postQuery}`, {
+      headers: {
+        Authorization: `Bearer ${strapiAPIKey}`,
+      },
+    }),
+  ])
+
+  if (!courseResp.data.data.length || !postResp.data.data.length) {
+    return {
+      notFound: true,
+    }
+  }
+
+  const course = new Course(courseResp.data.data[0])
+  const post = new Post(postResp.data.data[0])
   const { nextPost, previousPost } = getNextAndPreviousPosts(course, post)
+
   return {
     props: {
       courseStr: JSON.stringify(course),
@@ -110,6 +171,7 @@ export async function getStaticProps({ params }) {
         previousPost,
       }),
     },
+    // revalidate: 60, // Optional: Enable ISR
   }
 }
 
@@ -224,7 +286,7 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
           </section>
         )}
       </section>
-      {post.type === 'video' && post.embed.isYouTube ? (
+      {post.type === 'video' && post.embed?.isYouTube ? (
         <>
           <div className="flex gap-4 items-center justify-end mb-8">
             <Button color="primary" href={`https://youtu.be/${post.embed.id}`}>

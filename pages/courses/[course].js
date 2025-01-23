@@ -6,7 +6,6 @@ import Course from '../../classes/Course.class'
 import { useEffect, useCallback, useState, useContext } from 'react'
 import LegitMarkdown from '../../components/LegitMarkdown'
 import Image from 'next/image'
-import STRAPI_CONFIG from '../../lib/strapiConfig'
 import ResourcesLinks from '../../components/ResourcesLinks'
 import logAnalyticsEvent from '../../lib/utils/logAnalyticsEvent'
 import Link from 'next/link'
@@ -33,23 +32,30 @@ const db = getFirestore(getApp())
 export async function getStaticPaths() {
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar'],
-      publicationState: STRAPI_CONFIG.publicationState,
+      fields: ['slug'],
+      populate: {
+        authors: {
+          fields: ['name'],
+          populate: {
+            avatar: true,
+          },
+        },
+      },
     },
     {
       encodeValuesOnly: true,
     }
   )
+
   const url = `${strapiUrl}/api/courses?${query}`
   const coursesResp = await axios.get(url, {
     headers: {
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
       Authorization: `Bearer ${strapiAPIKey}`,
     },
   })
+
   const courses = coursesResp.data.data.map((course) => new Course(course))
-  const config = {
+  return {
     paths: courses.map((course) => ({
       params: {
         course: course.slug,
@@ -57,31 +63,64 @@ export async function getStaticPaths() {
     })),
     fallback: false,
   }
-  return config
 }
 
 export async function getStaticProps({ params }) {
   const courseId = params.course
-
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts', 'banner', 'resources'],
-      publicationState: STRAPI_CONFIG.publicationState,
+      populate: {
+        authors: {
+          fields: ['name', 'bio'],
+          populate: {
+            avatar: true,
+          },
+        },
+        chapters: {
+          fields: ['name', 'description', 'showName'],
+          populate: {
+            posts: {
+              fields: ['title', 'slug', 'description', 'type', 'videoUrl', 'order'],
+            },
+          },
+        },
+        banner: true, // or whatever your image field is named
+        resources: {
+          fields: ['*'], // Adjust based on your resources structure
+        },
+      },
+      filters: {
+        slug: {
+          $eq: courseId,
+        },
+      },
     },
     {
       encodeValuesOnly: true,
     }
   )
-  const url = `${strapiUrl}/api/courses/${courseId}?${query}`
+
+  const url = `${strapiUrl}/api/courses?${query}`
   const coursesResp = await axios.get(url, {
     headers: {
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
       Authorization: `Bearer ${strapiAPIKey}`,
     },
   })
-  const course = new Course(coursesResp.data.data)
-  return { props: { courseStr: JSON.stringify(course) } }
+
+  // Make sure to handle the case when no course is found
+  if (!coursesResp.data.data.length) {
+    return {
+      notFound: true, // This will show 404 page
+    }
+  }
+
+  const course = new Course(coursesResp.data.data[0])
+  return {
+    props: {
+      courseStr: JSON.stringify(course),
+    },
+    // revalidate: 60, // Optional: Enable ISR
+  }
 }
 
 export default function CoursePage({ courseStr }) {

@@ -5,27 +5,26 @@ import Chapter from './Chapter.class'
 class Course {
   constructor(course) {
     this.id = course.id
-    const courseAttributes = course.attributes
-    this.name = courseAttributes.name
-    this.description = courseAttributes.description
-    this.outline = courseAttributes.outline
-    this.videoUrls = courseAttributes.videoUrls
-    this.publishedAt = courseAttributes.publishedAt
-    this.duration = courseAttributes.duration
-    this.resources = courseAttributes.resources
-    this.banner = courseAttributes.banner?.data?.attributes?.url
-    this.introVideoUrl = courseAttributes.introVideoUrl
-    this.slug = courseAttributes.slug
-    this.isExternal = courseAttributes.isExternal
-    this.externalCourseUrl = courseAttributes.externalCourseUrl
-    this.externalStudentsCount = courseAttributes.externalStudentsCount
-    if (courseAttributes.chapters) {
-      this.chapters = courseAttributes.chapters.data.map((chapter) => new Chapter(chapter))
+    this.name = course.name
+    this.description = course.description
+    this.outline = course.outline
+    this.videoUrls = course.videoUrls
+    this.publishedAt = course.publishedAt
+    this.duration = course.duration
+    this.resources = course.resources
+    this.banner = course.banner?.url
+    this.introVideoUrl = course.introVideoUrl
+    this.slug = course.slug
+    this.isExternal = course.isExternal
+    this.externalCourseUrl = course.externalCourseUrl
+    this.externalStudentsCount = course.externalStudentsCount
+    if (course.chapters) {
+      this.chapters = course.chapters.map((chapter) => new Chapter(chapter))
     } else {
       this.chapters = []
     }
 
-    this.authors = courseAttributes.authors.data.map((author) => new Author(author))
+    this.authors = course.authors.map((author) => new Author(author))
     this.introEmbeddedUrl = getEmbedUrl(this.introVideoUrl)?.url || ''
   }
 }

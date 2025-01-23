@@ -23,7 +23,7 @@ export const CoursesList = ({ course, activePost, markedPosts = {}, enrolled, en
       }
       return params
     }, {})
-    if (!activePost) {
+    if (!activePost && course.chapters.at(0)?.id) {
       chaptersExp[course.chapters.at(0).id] = true
     }
     setChaptersExpansion(chaptersExp)

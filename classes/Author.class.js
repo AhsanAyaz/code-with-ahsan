@@ -1,10 +1,9 @@
 class Author {
   constructor(author) {
-    const { attributes } = author
-    const { bio, name, socials, avatar } = attributes
+    const { bio, name, meta, avatar } = author
     this.bio = bio
-    this.avatar = avatar?.data?.attributes?.url
-    this.socials = socials
+    this.avatar = avatar?.url
+    this.socials = meta?.socials
     this.name = name
   }
 }

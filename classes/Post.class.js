@@ -3,7 +3,6 @@ import { getEmbedUrl } from '../services/YouTubeService'
 class Post {
   constructor(post) {
     this.id = post.id
-    const attributes = post.attributes
     const {
       title,
       resources,
@@ -17,8 +16,9 @@ class Post {
       type,
       article,
       thumbnail,
-    } = attributes
-    const chapterId = chapter?.data?.id
+      publishedAt,
+    } = post
+    const chapterId = chapter?.id
     this.title = title
     this.type = type
     this.description = description
@@ -32,6 +32,7 @@ class Post {
     this.videoEmbedded = videoEmbedded ? JSON.parse(videoEmbedded) : null
     this.embed = getEmbedUrl(this.videoUrl || this.videoEmbedded?.url)
     this.hasAssignment = hasAssignment
+    this.publishedAt = publishedAt
   }
 }
 
