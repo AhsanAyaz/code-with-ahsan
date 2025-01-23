@@ -4,7 +4,10 @@ import Course from '../../../classes/Course.class'
 import Post from '../../../classes/Post.class'
 import { useEffect, useState } from 'react'
 import { getNextAndPreviousPosts } from '../../../services/PostService'
-import STRAPI_CONFIG from '../../../lib/strapiConfig'
+import STRAPI_CONFIG, {
+  STRAPI_COURSE_POPULATE_OBJ,
+  STRAPI_POST_QUERY_OBJ,
+} from '../../../lib/strapiQueryHelpers'
 import Button from '../../../components/Button'
 import logAnalyticsEvent from '../../../lib/utils/logAnalyticsEvent'
 import ResourcesLinks from '../../../components/ResourcesLinks'
@@ -85,26 +88,7 @@ export async function getStaticProps({ params }) {
   const courseQuery = qs.stringify(
     {
       fields: ['name', 'slug', 'description'],
-      populate: {
-        authors: {
-          fields: ['name', 'bio'],
-          populate: {
-            avatar: true,
-          },
-        },
-        chapters: {
-          fields: ['name', 'description'],
-          populate: {
-            posts: {
-              fields: ['title', 'slug', 'description', 'type', 'videoUrl'],
-            },
-          },
-        },
-        resources: {
-          fields: ['*'],
-        },
-        banner: true,
-      },
+      populate: STRAPI_COURSE_POPULATE_OBJ,
       filters: {
         slug: {
           $eq: courseId,
@@ -119,15 +103,7 @@ export async function getStaticProps({ params }) {
   // Post query
   const postQuery = qs.stringify(
     {
-      fields: ['title', 'slug', 'description', 'type', 'videoUrl', 'article', 'hasAssignment'],
-      populate: {
-        chapter: {
-          fields: ['name'],
-        },
-        resources: {
-          fields: ['*'],
-        },
-      },
+      ...STRAPI_POST_QUERY_OBJ,
       filters: {
         slug: {
           $eq: postId,

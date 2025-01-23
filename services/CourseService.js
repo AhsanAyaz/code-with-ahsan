@@ -1,7 +1,7 @@
 import axios from 'axios'
 import qs from 'qs'
 import Course from '../classes/Course.class'
-import STRAPI_CONFIG from '../lib/strapiConfig'
+import { STRAPI_COURSE_POPULATE_OBJ } from '../lib/strapiQueryHelpers'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -9,8 +9,7 @@ const strapiAPIKey = process.env.STRAPI_API_KEY
 export const getCoursesForStaticPaths = async () => {
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts'],
-      publicationState: STRAPI_CONFIG.publicationState,
+      populate: STRAPI_COURSE_POPULATE_OBJ,
     },
     {
       encodeValuesOnly: true,

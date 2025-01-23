@@ -27,7 +27,7 @@ const publishPosts = async (chapterId) => {
     .map((value) => {
       return {
         id: value.id,
-        ...value.attributes,
+        ...value,
       }
     })
     .filter((post) => post.publishedAt === null)

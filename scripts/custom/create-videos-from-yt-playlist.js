@@ -48,7 +48,7 @@ const createPosts = (videos, chapterId) => {
           },
         })
         .then((resp) => {
-          console.log('post created, ', resp.data.data.attributes)
+          console.log('post created, ', resp.data.data)
         })
         .catch((err) => {
           console.log(JSON.stringify(err))

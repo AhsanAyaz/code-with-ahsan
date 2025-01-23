@@ -64,7 +64,7 @@ export default function Home() {
               ),
             }}
           >
-            {banner.attributes.content}
+            {banner.content}
           </LegitMarkdown>
         </div>
       ))}

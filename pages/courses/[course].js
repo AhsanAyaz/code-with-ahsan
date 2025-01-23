@@ -22,6 +22,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPersonCirclePlus } from '@fortawesome/free-solid-svg-icons'
 import { AuthContext } from '../../contexts/AuthContext'
 import NewsletterForm from '../../components/NewsletterForm'
+import { STRAPI_COURSE_POPULATE_OBJ } from '../../lib/strapiQueryHelpers'
 
 const strapiUrl = process.env.STRAPI_URL
 const strapiAPIKey = process.env.STRAPI_API_KEY
@@ -69,26 +70,7 @@ export async function getStaticProps({ params }) {
   const courseId = params.course
   const query = qs.stringify(
     {
-      populate: {
-        authors: {
-          fields: ['name', 'bio'],
-          populate: {
-            avatar: true,
-          },
-        },
-        chapters: {
-          fields: ['name', 'description', 'showName'],
-          populate: {
-            posts: {
-              fields: ['title', 'slug', 'description', 'type', 'videoUrl', 'order'],
-            },
-          },
-        },
-        banner: true, // or whatever your image field is named
-        resources: {
-          fields: ['*'], // Adjust based on your resources structure
-        },
-      },
+      populate: STRAPI_COURSE_POPULATE_OBJ,
       filters: {
         slug: {
           $eq: courseId,

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import qs from 'qs'
 import Course from '../../../classes/Course.class'
-import STRAPI_CONFIG from '../../../lib/strapiConfig'
+import { STRAPI_COURSE_POPULATE_OBJ } from '../../../lib/strapiQueryHelpers'
 import ResourcesLinks from '../../../components/ResourcesLinks'
 import { getCoursesForStaticPaths } from '../../../services/CourseService'
 import CoursePostLayout from '../../../layouts/CoursePostLayout'
@@ -17,8 +17,7 @@ export async function getStaticProps({ params }) {
 
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts', 'resources'],
-      publicationState: STRAPI_CONFIG.publicationState,
+      populate: STRAPI_COURSE_POPULATE_OBJ,
     },
     {
       encodeValuesOnly: true,

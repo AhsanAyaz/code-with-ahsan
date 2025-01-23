@@ -6,6 +6,7 @@ const siteMetadata = require('../data/siteMetadata')
 require('dotenv').config()
 const qs = require('qs')
 const axios = require('axios')
+const { STRAPI_COURSE_POPULATE_OBJ } = require('../lib/strapiQueryHelpers')
 
 // Headers config
 axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.STRAPI_API_KEY}`
@@ -15,9 +16,8 @@ const getCourses = async () => {
   const strapiAPIKey = process.env.STRAPI_API_KEY
   const query = qs.stringify(
     {
-      populate: ['authors', 'authors.avatar', 'chapters', 'chapters.posts'],
+      populate: STRAPI_COURSE_POPULATE_OBJ,
       sort: ['publishedAt:desc'],
-      publicationState: 'live',
     },
     {
       encodeValuesOnly: true,
@@ -48,12 +48,12 @@ const getCourses = async () => {
   const paths = ['/courses']
   const courses = await getCourses()
   courses.map((course) => {
-    const { slug: courseSlug, chapters } = course.attributes
+    const { slug: courseSlug, chapters } = course
     paths.push(`/courses/${courseSlug}`)
-    chapters.data.map((chapter) => {
-      const { posts } = chapter.attributes
-      posts.data.map((post) => {
-        const { slug: postSlug } = post.attributes
+    chapters.map((chapter) => {
+      const { posts } = chapter
+      posts.map((post) => {
+        const { slug: postSlug } = post
         paths.push(`/courses/${courseSlug}/${postSlug}`)
       })
       paths.push(`/courses/${courseSlug}/resources`)
