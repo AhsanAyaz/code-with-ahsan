@@ -13,7 +13,8 @@ _An informative article to help non-Muslims understand what to expect during the
 
 ---
 
-Ramadan is a special month in the Islamic calendar during which Muslims worldwide observe fasting, prayer, and spiritual reflection. As our workplace includes colleagues who observe Ramadan, this guide aims to provide clarity on their practices and offer understanding and respect during this time.
+Ramadan is a special month in the Islamic calendar during which Muslims worldwide observe fasting, prayer, and spiritual reflection.
+As our workplaces include colleagues who may not know what to expect from Muslims in Ramadan, this guide aims to provide clarity on their practices and offer understanding and respect during this time.
 
 ---
 
