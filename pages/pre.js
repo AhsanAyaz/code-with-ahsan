@@ -236,3 +236,118 @@ function MainPage() {
     </div>
   )
 }
+
+const CourseEmbed = () => {
+  const handleTeachableBuyButtonClick = (event) => {
+    event.preventDefault()
+    const radio = document.querySelector('.teachable-pricing-plan-course-2506574:checked')
+    if (radio) {
+      const isNotFree = radio.getAttribute('data-plan-type')?.toLowerCase() !== 'free'
+      if (isNotFree) {
+        window.location.href = radio.value
+      }
+    }
+  }
+
+  return (
+    <div
+      className="teachable-embed-course-2506574"
+      style={{
+        color: 'rgb(43, 54, 54)',
+        width: '488px',
+        borderRadius: '8px',
+        border: '1px solid rgb(228, 228, 228)',
+        backgroundColor: 'rgb(255, 255, 255)',
+        paddingBottom: '16px',
+        wordBreak: 'break-word',
+      }}
+    >
+      <img
+        src="https://process.fs.teachablecdn.com/ADNupMnWyR7kCWRvm76Laz/resize=width:705/https://cdn.filestackcontent.com/bB8TxOp5T66QbDrqE8Ii"
+        alt="Practical React Essentials in Urdu/Hindi"
+        style={{
+          objectFit: 'cover',
+          width: '100%',
+          height: '274.5px',
+          borderRadius: '8px 8px 0 0',
+        }}
+      />
+      <h1
+        style={{
+          fontWeight: 400,
+          fontSize: '32px',
+          fontStyle: 'normal',
+          fontFamily: 'Metropolis',
+          padding: '16px 16px 0',
+        }}
+      >
+        Practical React Essentials in Urdu/Hindi
+      </h1>
+      <form>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            padding: '16px',
+            borderRadius: '0',
+            margin: '16px',
+            border: '1px solid rgb(167, 167, 167)',
+          }}
+        >
+          <label
+            htmlFor="pricing-plan-5463466"
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              fontFamily: 'sans-serif',
+              fontWeight: 400,
+              fontSize: '16px',
+              fontStyle: 'normal',
+              color: 'rgb(43, 54, 54)',
+              maxWidth: 'calc(80%)',
+            }}
+          >
+            <input
+              className="teachable-pricing-plan-course-2506574"
+              id="pricing-plan-5463466"
+              name="pricing-plan"
+              type="radio"
+              data-plan-type="One-Time Purchase"
+              value="https://codewithahsan.teachable.com/purchase?product_id=5463466&user_src=embed_buy_button&embed=true"
+              defaultChecked
+              style={{ display: 'none' }}
+            />
+            <span style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', paddingRight: '8px' }}>
+              One-Time Purchase
+            </span>
+          </label>
+          <span style={{ fontFamily: 'Metropolis', textAlign: 'end' }}>$5</span>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column-reverse', margin: '16px' }}>
+          <button
+            className="teachable-buy-button-course-2506574"
+            type="button"
+            onClick={handleTeachableBuyButtonClick}
+            style={{
+              border: '1px solid rgb(9, 165, 154)',
+              borderRadius: '0',
+              backgroundColor: 'rgb(9, 165, 154)',
+              padding: '16px',
+              fontFamily: 'sans-serif',
+              fontWeight: 600,
+              fontSize: '16px',
+              fontStyle: 'normal',
+              color: 'rgb(43, 54, 54)',
+              cursor: 'pointer',
+            }}
+          >
+            Buy now
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
