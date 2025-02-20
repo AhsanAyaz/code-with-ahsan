@@ -7,7 +7,7 @@ const headerNavLinks = [
   { href: '/courses', title: 'Courses' },
   { href: 'https://discord.gg/KSPpuxD8SG', title: 'Discord' },
   // { href: '/tags', title: 'Tags' },
-  { href: '/ng-book?source=nav', title: 'Angular Cookbook' },
+  { href: '/books', title: 'Books' },
   // { href: '/gear', title: 'Gear' },
   // { href: '/community', title: 'Community' },
   { href: '/about', title: 'About' },
