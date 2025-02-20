@@ -16,6 +16,13 @@
   status = 301
   force = true
 
+
+[[redirects]]
+  from = "https://codewithahsan.dev/pre"
+  to = "https://www.udemy.com/course/practical-reactjs-essentials-in-hindi-urdu/learn/lecture/48243993?couponCode=ST16MT28125BROW&referralCode=528F755E7CDEDF73E959#overview"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "https://codewithahsan.dev/instagram"
   to = "https://instagram.com/muhd.ahsanayaz"
