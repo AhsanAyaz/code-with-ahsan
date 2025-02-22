@@ -46,7 +46,7 @@ module.exports = withBundleAnalyzer({
       {
         source: '/pre',
         destination:
-          'https://www.udemy.com/course/practical-reactjs-essentials-in-hindi-urdu/learn/lecture/48243993?couponCode=ST16MT28125BROW&referralCode=528F755E7CDEDF73E959#overview',
+          'https://www.udemy.com/course/practical-reactjs-essentials-in-hindi-urdu/?couponCode=35F94B376C0B8FE3AD38',
         permanent: true,
       },
       {
