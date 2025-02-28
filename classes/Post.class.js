@@ -33,6 +33,9 @@ class Post {
     this.embed = getEmbedUrl(this.videoUrl || this.videoEmbedded?.url)
     this.hasAssignment = hasAssignment
     this.publishedAt = publishedAt
+    if (!this.embed) {
+      console.log('no embed', this)
+    }
   }
 }
 

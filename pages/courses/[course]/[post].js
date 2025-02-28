@@ -165,7 +165,9 @@ function PostPage({ course, post, goToPost, marked, markAsComplete, markAsIncomp
   const getComments = async () => {
     setLoadingComments(true)
     try {
+      console.log('in frontend', { post })
       const resp = await axios.get(`/api/youtube/comments?videoId=${post.embed.id}`)
+      console.log({ resp })
       const comments = resp.data.comments
       setComments(comments)
     } catch (err) {
