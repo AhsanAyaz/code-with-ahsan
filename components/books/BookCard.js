@@ -25,11 +25,11 @@ const BookCard = ({ book }) => {
           {book.description}
         </div>
         <Button
-          onClick={() => window.open(book.amazonLink, '_blank')}
+          onClick={() => window.open(book.link || book.amazonLink, '_blank')}
           color="primary"
           className="px-4 uppercase py-2 sm:py-3 w-full rounded-md hover:opacity-90"
         >
-          Buy on Amazon
+          {book.btnText || 'Buy'}
         </Button>
       </div>
     </article>
