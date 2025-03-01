@@ -93,8 +93,10 @@ const CourseCard = ({ course, enrollHandler, user }) => {
         <p className="text-center mt-4 mb-8">
           {!course.isExternal ? (
             <span>{enrollmentCount !== null ? `${enrollmentCount} students enrolled` : '...'}</span>
-          ) : (
+          ) : course.externalStudentsCount !== null ? (
             <span>{course.externalStudentsCount} students enrolled</span>
+          ) : (
+            <span>&nbsp;</span>
           )}
         </p>
         <Button
