@@ -85,7 +85,7 @@ export default function Home() {
                 Take a Course
               </button>
             </Link>
-            <Link href={'/blog'} passHref>
+            <Link href={'https://blog.codewithahsan.dev/'} passHref>
               <button className="p-4 lg:p-6 lg:w-72 w-52 text-xl lg:text-2xl ring-1 bg-gray-800 text-white ring-gray-300 hover:ring-offset-2 hover:bg-white rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2  hover:text-black ring-offset-black">
                 Read the Blog
               </button>

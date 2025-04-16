@@ -24,6 +24,7 @@ module.exports = withBundleAnalyzer({
   },
   redirects: async () => {
     return [
+      // Original redirects
       {
         source: '/youtube',
         destination: 'https://youtube.com/codewithahsan',
@@ -85,6 +86,146 @@ module.exports = withBundleAnalyzer({
       {
         source: '/discord',
         destination: 'https://discord.gg/KSPpuxD8SG',
+        permanent: true,
+      },
+
+      // Blog post redirects - mapping from original paths to Ghost paths
+      {
+        source: '/blog/8-techniques-to-write-cleaner-javscript-code',
+        destination: 'https://blog.codewithahsan.dev/8-techniques-to-write-cleaner-javscript-code',
+        permanent: true,
+      },
+      {
+        source: '/blog/10-critical-mistakes-every-software-engineer-should-avoid',
+        destination:
+          'https://blog.codewithahsan.dev/10-critical-mistakes-every-software-engineer-should-avoid',
+        permanent: true,
+      },
+      {
+        source: '/blog/adding-comments-to-your-gatsbyjs-blog',
+        destination: 'https://blog.codewithahsan.dev/adding-comments-to-your-gatsbyjs-blog',
+        permanent: true,
+      },
+      {
+        source: '/blog/angular-performance-budgets',
+        destination: 'https://blog.codewithahsan.dev/angular-performance-budgets',
+        permanent: true,
+      },
+      {
+        source: '/blog/angular-signals-taking-reactivity-to-new-heights',
+        destination:
+          'https://blog.codewithahsan.dev/angular-signals-taking-reactivity-to-new-heights',
+        permanent: true,
+      },
+      {
+        source:
+          '/blog/angular-unit-tests-constructor-not-compatible-with-angular-dependency-injection',
+        destination:
+          'https://blog.codewithahsan.dev/angular-unit-tests-constructor-not-compatible-with-angular-dependency-injection',
+        permanent: true,
+      },
+      {
+        source: '/blog/angular19-resource-api',
+        destination: 'https://blog.codewithahsan.dev/angular19-resource-api',
+        permanent: true,
+      },
+      {
+        source: '/blog/css-box-model',
+        destination: 'https://blog.codewithahsan.dev/css-box-model',
+        permanent: true,
+      },
+      {
+        source: '/blog/extend-angular-built-in-pipes',
+        destination: 'https://blog.codewithahsan.dev/extend-angular-built-in-pipes',
+        permanent: true,
+      },
+      {
+        source: '/blog/github-batch-pr-reviewer-chrome-extension',
+        destination: 'https://blog.codewithahsan.dev/github-batch-pr-reviewer-chrome-extension',
+        permanent: true,
+      },
+      {
+        source: '/blog/hackstack-2023-starts',
+        destination: 'https://blog.codewithahsan.dev/hackstack-2023-starts',
+        permanent: true,
+      },
+      {
+        source: '/blog/how-i-won-the-keychron-k2-at-whatthestack-conference',
+        destination:
+          'https://blog.codewithahsan.dev/how-i-won-the-keychron-k2-at-whatthestack-conference',
+        permanent: true,
+      },
+      {
+        source: '/blog/how-to-build-programming-logic',
+        destination: 'https://blog.codewithahsan.dev/how-to-build-programming-logic',
+        permanent: true,
+      },
+      {
+        source: '/blog/i-failed-a-lot',
+        destination: 'https://blog.codewithahsan.dev/i-failed-a-lot',
+        permanent: true,
+      },
+      {
+        source: '/blog/make-passive-income-by-selling-apis',
+        destination: 'https://blog.codewithahsan.dev/make-passive-income-by-selling-apis',
+        permanent: true,
+      },
+      {
+        source: '/blog/mastering-consistency-web-development-learning',
+        destination:
+          'https://blog.codewithahsan.dev/mastering-consistency-web-development-learning',
+        permanent: true,
+      },
+      {
+        source: '/blog/tech-karo-first-meetup-2021',
+        destination: 'https://blog.codewithahsan.dev/tech-karo-first-meetup-2021',
+        permanent: true,
+      },
+      {
+        source: '/blog/the-complete-typescript-setup-from-zero-to-hero',
+        destination:
+          'https://blog.codewithahsan.dev/the-complete-typescript-setup-from-zero-to-hero',
+        permanent: true,
+      },
+      {
+        source: '/blog/the-most-easy-way-to-add-update-and-delete-contacts-in-flutter',
+        destination:
+          'https://blog.codewithahsan.dev/the-most-easy-way-to-add-update-and-delete-contacts-in-flutter',
+        permanent: true,
+      },
+      {
+        source: '/blog/understanding-discriminated-unions-in-typescript',
+        destination:
+          'https://blog.codewithahsan.dev/understanding-discriminated-unions-in-typescript',
+        permanent: true,
+      },
+      {
+        source: '/blog/understanding-ramadan-for-non-muslim-workspace-colleagues',
+        destination:
+          'https://blog.codewithahsan.dev/understanding-ramadan-for-non-muslim-workspace-colleagues',
+        permanent: true,
+      },
+      {
+        source: '/blog/web-dev-roadmap-2024',
+        destination: 'https://blog.codewithahsan.dev/web-dev-roadmap-2024',
+        permanent: true,
+      },
+
+      // Nested blog post redirects
+      {
+        source: '/blog/flutter-marketplace-app-with-stripe/part-1',
+        destination: 'https://blog.codewithahsan.dev/flutter-marketplace-app-with-stripe-part-1',
+        permanent: true,
+      },
+      {
+        source: '/blog/flutter-marketplace-app-with-stripe/part-2',
+        destination: 'https://blog.codewithahsan.dev/flutter-marketplace-app-with-stripe-part-2',
+        permanent: true,
+      },
+      {
+        source: '/blog/flutter-stripe-tutorial-with-official-package/part-1',
+        destination:
+          'https://blog.codewithahsan.dev/flutter-stripe-tutorial-with-official-package-part-1',
         permanent: true,
       },
     ]
