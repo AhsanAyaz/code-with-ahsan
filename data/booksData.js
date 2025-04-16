@@ -29,7 +29,7 @@ const booksData = [
     amazonLink: null,
     imageUrl: '/static/images/book-placeholder.png',
     author: 'Ahsan Ayaz',
-    link: 'https://newsletter.codewithahsan.dev',
+    link: 'https://blog.codewithahsan.dev',
     btnText: 'Subscribe to newsletter',
   },
 ]

@@ -116,7 +116,7 @@ export default function Home() {
         </div>
         {siteMetadata.newsletter.provider !== '' && (
           <div className="flex items-center justify-center pt-4">
-            <NewsletterForm />
+            <NewsletterForm suppressHydrationWarning={true} />
           </div>
         )}
         <div className="text-sm text-center mt-10">

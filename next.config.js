@@ -19,6 +19,7 @@ module.exports = withBundleAnalyzer({
       'res.cloudinary.com',
       'img.buymeacoffee.com',
       'media1.tenor.com',
+      'cdn.jsdelivr.net',
     ],
   },
   redirects: async () => {
