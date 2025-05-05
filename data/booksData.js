@@ -27,9 +27,9 @@ const booksData = [
     edition: 'Coming Soon',
     description: 'Coming soon. Subscribe to the newsletter to be notified!',
     amazonLink: null,
-    imageUrl: '/static/images/book-placeholder.png',
+    imageUrl: '/static/images/books/mastering-angular-signals-3d.png',
     author: 'Ahsan Ayaz',
-    link: 'https://blog.codewithahsan.dev',
+    link: 'https://blog.codewithahsan.dev/#/portal/signup',
     btnText: 'Subscribe to newsletter',
   },
 ]
