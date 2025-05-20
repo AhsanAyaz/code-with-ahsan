@@ -23,14 +23,14 @@ const booksData = [
   },
   {
     id: 3,
-    title: 'Modern Angular - Mastering Angular Signals',
+    title: 'Mastering Angular Signals',
     edition: 'Coming Soon',
-    description: 'Coming soon. Subscribe to the newsletter to be notified!',
+    description: 'A Practical Guide to Modern Reactivity, Performance, and Migration.',
     amazonLink: null,
     imageUrl: '/static/images/books/mastering-angular-signals-3d.png',
     author: 'Ahsan Ayaz',
-    link: 'https://blog.codewithahsan.dev/#/portal/signup',
-    btnText: 'Subscribe to newsletter',
+    link: '/books/mastering-angular-signals',
+    btnText: 'Get your copy',
   },
 ]
 
