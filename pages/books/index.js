@@ -18,7 +18,7 @@ export default function Books() {
       </div>
 
       <section className="text-center mt-16">
-        <h2 className="text-2xl">
+        <h2 className="text-2xl pb-4">
           Want to get notified when new books come out? 🔔
           <br />
           Subscribe to the newsletter 👇🏽

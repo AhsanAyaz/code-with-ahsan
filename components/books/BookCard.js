@@ -29,7 +29,7 @@ const BookCard = ({ book }) => {
           color="primary"
           className="px-4 uppercase py-2 sm:py-3 w-full rounded-md hover:opacity-90"
         >
-          {book.btnText || 'Buy'}
+          {book.btnText || 'Get your copy'}
         </Button>
       </div>
     </article>

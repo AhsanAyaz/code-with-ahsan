@@ -1,5 +1,15 @@
 const booksData = [
   {
+    id: 3,
+    title: 'Mastering Angular Signals',
+    description: 'A Practical Guide to Modern Reactivity, Performance, and Migration.',
+    amazonLink: null,
+    imageUrl: '/static/images/books/mastering-angular-signals-3d.png',
+    author: 'Ahsan Ayaz',
+    link: 'https://www.amazon.com/dp/B0FF9LSHJN/',
+    btnText: 'Get your copy',
+  },
+  {
     id: 1,
     title: 'Angular Cookbook',
     edition: '1st Edition',
@@ -20,17 +30,6 @@ const booksData = [
       'https://www.amazon.com/Angular-Cookbook-actionable-recipes-developers-ebook/dp/B0C3MG5X99',
     imageUrl: '/static/images/ng-cookbook-black.jpg',
     author: 'Ahsan Ayaz',
-  },
-  {
-    id: 3,
-    title: 'Mastering Angular Signals',
-    edition: 'Coming Soon',
-    description: 'A Practical Guide to Modern Reactivity, Performance, and Migration.',
-    amazonLink: null,
-    imageUrl: '/static/images/books/mastering-angular-signals-3d.png',
-    author: 'Ahsan Ayaz',
-    link: '/books/mastering-angular-signals',
-    btnText: 'Get your copy',
   },
 ]
 

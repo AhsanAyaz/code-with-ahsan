@@ -13,8 +13,8 @@ export default function ModernAngularSignalsBookPage() {
   const authorCreds = 'GDE in Angular, Speaker, Software Architect, Author of Angular Cookbook'
   const githubRepo = 'https://github.com/AhsanAyaz/modern-angular-signals-book'
   // Temporary CTA Link - remember to update this later!
-  const ctaLink = 'https://blog.codewithahsan.dev/#/portal/signup'
-  const ctaText = 'Get notified when published!' // Or 'Learn More & Buy'
+  const ctaLink = 'https://www.amazon.com/dp/B0FF9LSHJN/'
+  const ctaText = 'Get your copy' // Or 'Learn More & Buy'
 
   // You can also add a description or any other relevant information herec
   const ctaButton = () => (
@@ -42,10 +42,10 @@ export default function ModernAngularSignalsBookPage() {
             {bookTitle}
           </h1>
           <p className="text-center text-lg leading-7 text-gray-500 dark:text-gray-400">
-            A Comprehensive Guide by {authorName}
+            A Practical Guide to Modern Reactivity, Performance, and Migration
           </p>
           <p className="text-center text-sm leading-5 text-gray-500 dark:text-gray-400">
-            {authorCreds}
+            By {authorName} - {authorCreds}
           </p>
           {/* CTA Button below title */}
           <div className="flex justify-center mt-6">{ctaButton()}</div>
