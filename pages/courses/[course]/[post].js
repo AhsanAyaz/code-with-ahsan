@@ -135,6 +135,7 @@ export async function getStaticProps({ params }) {
   }
 
   const course = new Course(courseResp.data.data[0])
+  course.chapters.sort((a, b) => a.order - b.order)
   const post = new Post(postResp.data.data[0])
   const { nextPost, previousPost } = getNextAndPreviousPosts(course, post)
 

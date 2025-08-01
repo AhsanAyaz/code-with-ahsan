@@ -97,6 +97,7 @@ export async function getStaticProps({ params }) {
   }
 
   const course = new Course(coursesResp.data.data[0])
+  course.chapters.sort((a, b) => a.order - b.order)
   return {
     props: {
       courseStr: JSON.stringify(course),
