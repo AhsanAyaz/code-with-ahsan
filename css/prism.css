@@ -1,3 +1,5 @@
+@reference "./tailwind.css";
+
 /**
  * CSS Styles for code highlighting.
  * Feel free to customize token styles 
@@ -24,7 +26,7 @@
 }
 
 .highlight-line {
-  @apply -mx-4 bg-gray-700 bg-opacity-50 border-l-4 border-primary-500;
+  @apply -mx-4 bg-gray-700/50 border-l-4 border-primary-500;
 }
 
 .line-number::before {

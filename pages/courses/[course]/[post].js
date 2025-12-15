@@ -115,18 +115,31 @@ export async function getStaticProps({ params }) {
     }
   )
 
-  const [courseResp, postResp] = await Promise.all([
-    axios.get(`${strapiUrl}/api/courses?${courseQuery}`, {
+  const courseUrl = `${strapiUrl}/api/courses?${courseQuery}`
+  const postUrl = `${strapiUrl}/api/posts?${postQuery}`
+
+  let courseResp = { data: { data: [] } }
+  let postResp = { data: { data: [] } }
+
+  try {
+    courseResp = await axios.get(courseUrl, {
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${strapiAPIKey}`,
       },
-    }),
-    axios.get(`${strapiUrl}/api/posts?${postQuery}`, {
+    })
+    postResp = await axios.get(postUrl, {
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${strapiAPIKey}`,
       },
-    }),
-  ])
+    })
+  } catch (error) {
+    console.warn(`Failed to fetch data for ${courseId}/${postId}:`, error.message)
+    return {
+      notFound: true,
+    }
+  }
 
   if (!courseResp.data.data.length || !postResp.data.data.length) {
     return {

@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@config "../tailwind.config.js";
 
 @layer base {
   h1 {
@@ -23,7 +22,7 @@
   }
 
   .dark .dark\:prose-dark :where(a):not(:where([class~='not-prose'] *)) {
-    @apply text-primary-300 hover:text-primary-400 !important;
+    @apply !text-primary-300 hover:!text-primary-400;
   }
 }
 
@@ -38,7 +37,9 @@ html {
 /* https://stackoverflow.com/questions/61083813/how-to-avoid-internal-autofill-selected-style-to-be-applied */
 input:-webkit-autofill,
 input:-webkit-autofill:focus {
-  transition: background-color 600000s 0s, color 600000s 0s;
+  transition:
+    background-color 600000s 0s,
+    color 600000s 0s;
 }
 
 .embed-container {

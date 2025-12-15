@@ -1,11 +1,6 @@
 const YouTubeComment = ({ comment, videoLink }) => {
-  const {
-    authorDisplayName,
-    authorProfileImageUrl,
-    textDisplay,
-    likeCount,
-    publishedAt,
-  } = comment.topLevelComment.snippet
+  const { authorDisplayName, authorProfileImageUrl, textDisplay, likeCount, publishedAt } =
+    comment.topLevelComment.snippet
 
   return (
     <a

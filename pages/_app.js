@@ -8,7 +8,7 @@ import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import Analytics from '@/components/analytics'
 import LayoutWrapper from '@/components/LayoutWrapper'
-import { ClientReload } from '@/components/ClientReload'
+// import { ClientReload } from '@/components/ClientReload'
 const isDevelopment = process.env.NODE_ENV === 'development'
 import { initializeApp, getApps } from 'firebase/app'
 import CookieConsent from 'react-cookie-consent'
@@ -55,7 +55,7 @@ export default function App({ Component, pageProps }) {
             ></script>
           )}
         </Head>
-        {isDevelopment && <ClientReload />}
+        {/* {isDevelopment && <ClientReload />} */}
         <Analytics />
         <Wrapper>
           <LoginModal show={showAuthLoginPopup} />

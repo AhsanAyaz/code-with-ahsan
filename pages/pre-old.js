@@ -10,7 +10,7 @@ export const CourseModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
       <div className="bg-gray-800 p-8 rounded-lg shadow-xl max-w-2xl w-full m-4">
         <button onClick={onClose} className="float-right text-gray-400 hover:text-white">
           <svg

@@ -1,11 +1,7 @@
 import OpenAI from 'openai'
 
-const {
-  OPEN_AI_SECRET,
-  CODE_WITH_AHSAN_PAGE_ID,
-  QOD_EP_API_KEY,
-  FB_PAGE_ACCESS_TOKEN,
-} = process.env
+const { OPEN_AI_SECRET, CODE_WITH_AHSAN_PAGE_ID, QOD_EP_API_KEY, FB_PAGE_ACCESS_TOKEN } =
+  process.env
 const openai = new OpenAI({
   apiKey: OPEN_AI_SECRET,
 })

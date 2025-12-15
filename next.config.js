@@ -9,17 +9,17 @@ if (process.env.NODE_ENV === 'development') {
 module.exports = withBundleAnalyzer({
   reactStrictMode: true,
   pageExtensions: ['js', 'jsx', 'md', 'mdx'],
-  eslint: {
-    dirs: ['pages', 'components', 'lib', 'layouts', 'scripts'],
-  },
+  // eslint: {
+  //   dirs: ['pages', 'components', 'lib', 'layouts', 'scripts'],
+  // },
   images: {
-    domains: [
-      'media.giphy.com',
-      'github.com',
-      'res.cloudinary.com',
-      'img.buymeacoffee.com',
-      'media1.tenor.com',
-      'cdn.jsdelivr.net',
+    remotePatterns: [
+      { protocol: 'https', hostname: 'media.giphy.com' },
+      { protocol: 'https', hostname: 'github.com' },
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: 'img.buymeacoffee.com' },
+      { protocol: 'https', hostname: 'media1.tenor.com' },
+      { protocol: 'https', hostname: 'cdn.jsdelivr.net' },
     ],
   },
   async rewrites() {
@@ -99,18 +99,18 @@ module.exports = withBundleAnalyzer({
     ]
   },
   webpack: (config, { dev, isServer }) => {
-    config.module.rules.push({
-      test: /\.(png|jpe?g|gif|mp4)$/i,
-      use: [
-        {
-          loader: 'file-loader',
-          options: {
-            publicPath: '/_next',
-            name: 'static/media/[name].[hash].[ext]',
-          },
-        },
-      ],
-    })
+    // config.module.rules.push({
+    //   test: /\.(png|jpe?g|gif|mp4)$/i,
+    //   use: [
+    //     {
+    //       loader: 'file-loader',
+    //       options: {
+    //         publicPath: '/_next',
+    //         name: 'static/media/[name].[hash].[ext]',
+    //       },
+    //     },
+    //   ],
+    // })
 
     config.module.rules.push({
       test: /\.svg$/,

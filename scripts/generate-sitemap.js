@@ -39,8 +39,8 @@ const getCourses = async () => {
   const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
   const pages = await globby([
     'pages/*.js',
-    'data/blog/**/*.mdx',
-    'data/blog/**/*.md',
+    // 'data/blog/**/*.mdx',
+    // 'data/blog/**/*.md',
     'public/tags/**/*.xml',
     '!pages/_*.js',
     '!pages/api',
@@ -75,7 +75,7 @@ const getCourses = async () => {
                   .replace('.md', '')
                   .replace('/feed.xml', '')
                 const route = path === '/index' ? '' : path
-                if (page === `pages/404.js` || page === `pages/blog/[...slug].js`) {
+                if (page === `pages/404.js`) {
                   return
                 }
                 return `
@@ -88,7 +88,7 @@ const getCourses = async () => {
         </urlset>
     `
 
-  const formatted = prettier.format(sitemap, {
+  const formatted = await prettier.format(sitemap, {
     ...prettierConfig,
     parser: 'html',
   })
