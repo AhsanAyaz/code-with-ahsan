@@ -40,7 +40,7 @@ const getCourses = async () => {
   const prettierConfig = await prettier.resolveConfig("./.prettierrc.js");
   const pages = await globby([
     "src/app/**/page.{tsx,ts,jsx,js}",
-    "public/tags/**/*.xml",
+
     "!src/app/**/[*/**", // Exclude dynamic routes
     "!src/app/api/**",
   ]);
@@ -69,8 +69,7 @@ const getCourses = async () => {
                   .replace("src/app", "")
                   .replace("public/", "/")
                   .replace(/\/\([^)]+\)/g, "") // Remove route groups like (marketing)
-                  .replace(/\/page\.[a-z]+$/, "") // Remove /page.tsx, /page.js
-                  .replace(".xml", ""); // For tags
+                  .replace(/\/page\.[a-z]+$/, ""); // Remove /page.tsx, /page.js
 
                 const route = path === "/index" || path === "" ? "" : path;
                 if (page === `pages/404.js`) {
