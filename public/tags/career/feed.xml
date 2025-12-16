@@ -1,0 +1,24 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>CodeWithAhsan</title>
+      <link>https://codewithahsan.dev/blog</link>
+      <description>The one stop shop to have fun with amazing people, and to code of course.</description>
+      <language>en-us</language>
+      <managingEditor>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</managingEditor>
+      <webMaster>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</webMaster>
+      <lastBuildDate>Mon, 10 Jan 2022 00:00:00 GMT</lastBuildDate>
+      <atom:link href="https://codewithahsan.dev/tags/career/feed.xml" rel="self" type="application/rss+xml"/>
+      
+  <item>
+    <guid>https://codewithahsan.dev/blog/10-critical-mistakes-every-software-engineer-should-avoid</guid>
+    <title>10 CRITICAL MISTAKES every Software Engineer should avoid</title>
+    <link>https://codewithahsan.dev/blog/10-critical-mistakes-every-software-engineer-should-avoid</link>
+    <description>In this article, you&#39;ll learn 10 CRITICAL MISTAKES to avoid as a Software Engineer.</description>
+    <pubDate>Mon, 10 Jan 2022 00:00:00 GMT</pubDate>
+    <author>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</author>
+    <category>tips</category><category>growth</category><category>career</category>
+  </item>
+
+    </channel>
+  </rss>

@@ -1,0 +1,44 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>CodeWithAhsan</title>
+      <link>https://codewithahsan.dev/blog</link>
+      <description>The one stop shop to have fun with amazing people, and to code of course.</description>
+      <language>en-us</language>
+      <managingEditor>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</managingEditor>
+      <webMaster>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</webMaster>
+      <lastBuildDate>Wed, 23 Aug 2023 00:00:00 GMT</lastBuildDate>
+      <atom:link href="https://codewithahsan.dev/tags/javascript/feed.xml" rel="self" type="application/rss+xml"/>
+      
+  <item>
+    <guid>https://codewithahsan.dev/blog/angular-performance-budgets</guid>
+    <title>Boosting Angular App Performance with Performance Budgets</title>
+    <link>https://codewithahsan.dev/blog/angular-performance-budgets</link>
+    <description>In this article, we&#39;ll dive into the world of performance budgets, exploring their benefits, implementation, and why they&#39;re crucial for your Angular projects. 🚀</description>
+    <pubDate>Wed, 23 Aug 2023 00:00:00 GMT</pubDate>
+    <author>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</author>
+    <category>javascript</category><category>web development</category><category>angular</category>
+  </item>
+
+  <item>
+    <guid>https://codewithahsan.dev/blog/make-passive-income-by-selling-apis</guid>
+    <title>Make passive income by building and selling APIs</title>
+    <link>https://codewithahsan.dev/blog/make-passive-income-by-selling-apis</link>
+    null
+    <pubDate>Mon, 14 Aug 2023 00:00:00 GMT</pubDate>
+    <author>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</author>
+    <category>javascript</category><category>web development</category>
+  </item>
+
+  <item>
+    <guid>https://codewithahsan.dev/blog/8-techniques-to-write-cleaner-javscript-code</guid>
+    <title>8 techniques to write cleaner JavaScript code</title>
+    <link>https://codewithahsan.dev/blog/8-techniques-to-write-cleaner-javscript-code</link>
+    <description>In this article, you&#39;ll learn how to write cleaner JavaScript code using 8 amazing techniques.</description>
+    <pubDate>Mon, 03 Jan 2022 00:00:00 GMT</pubDate>
+    <author>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</author>
+    <category>javascript</category><category>code quality</category><category>web development</category>
+  </item>
+
+    </channel>
+  </rss>

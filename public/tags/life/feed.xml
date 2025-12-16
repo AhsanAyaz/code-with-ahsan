@@ -1,0 +1,44 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>CodeWithAhsan</title>
+      <link>https://codewithahsan.dev/blog</link>
+      <description>The one stop shop to have fun with amazing people, and to code of course.</description>
+      <language>en-us</language>
+      <managingEditor>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</managingEditor>
+      <webMaster>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</webMaster>
+      <lastBuildDate>Sun, 29 Sep 2024 12:00:00 GMT</lastBuildDate>
+      <atom:link href="https://codewithahsan.dev/tags/life/feed.xml" rel="self" type="application/rss+xml"/>
+      
+  <item>
+    <guid>https://codewithahsan.dev/blog/how-i-won-the-keychron-k2-at-whatthestack-conference</guid>
+    <title>How I Conquered the Keychron K2 Pro Challenge at WhatTheStack Conference</title>
+    <link>https://codewithahsan.dev/blog/how-i-won-the-keychron-k2-at-whatthestack-conference</link>
+    <description>I won an amazing Keychron K2 Pro keyboard at the WhatTheStack conference. Here&#39;s the story of how I turned a simple booth challenge into a victory.</description>
+    <pubDate>Sun, 29 Sep 2024 12:00:00 GMT</pubDate>
+    <author>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</author>
+    <category>life</category>
+  </item>
+
+  <item>
+    <guid>https://codewithahsan.dev/blog/i-failed-a-lot</guid>
+    <title>I failed...and I failed a lot</title>
+    <link>https://codewithahsan.dev/blog/i-failed-a-lot</link>
+    <description>In this article, I&#39;m sharing about my failures, what they&#39;ve taught me, and why you shouldn&#39;t be afraid to fail</description>
+    <pubDate>Tue, 17 Sep 2024 06:15:00 GMT</pubDate>
+    <author>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</author>
+    <category>life</category>
+  </item>
+
+  <item>
+    <guid>https://codewithahsan.dev/blog/tech-karo-first-meetup-2021</guid>
+    <title>Mentoring at the first Tech Karo Meetup in 2021</title>
+    <link>https://codewithahsan.dev/blog/tech-karo-first-meetup-2021</link>
+    <description>Wanted to share my experience of mentoring at tech karo this time. I have been part of the mentor meetups before for Tech Karo but this was yet another amazing one.</description>
+    <pubDate>Tue, 15 Jun 2021 00:00:00 GMT</pubDate>
+    <author>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</author>
+    <category>life</category><category>mentorship</category>
+  </item>
+
+    </channel>
+  </rss>

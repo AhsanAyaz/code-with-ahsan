@@ -1,0 +1,24 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>CodeWithAhsan</title>
+      <link>https://codewithahsan.dev/blog</link>
+      <description>The one stop shop to have fun with amazing people, and to code of course.</description>
+      <language>en-us</language>
+      <managingEditor>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</managingEditor>
+      <webMaster>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</webMaster>
+      <lastBuildDate>Sat, 18 Feb 2023 00:00:00 GMT</lastBuildDate>
+      <atom:link href="https://codewithahsan.dev/tags/css/feed.xml" rel="self" type="application/rss+xml"/>
+      
+  <item>
+    <guid>https://codewithahsan.dev/blog/css-box-model</guid>
+    <title>CSS Box Model - Understanding the Fundamentals</title>
+    <link>https://codewithahsan.dev/blog/css-box-model</link>
+    <description>This article discusses the CSS Box Model, a fundamental concept in web development that determines the layout of web pages. It explains the four components of the Box Model and how they affect the dimensions of elements on a web page. By understanding this concept, web developers can create effective and aesthetically pleasing designs.</description>
+    <pubDate>Sat, 18 Feb 2023 00:00:00 GMT</pubDate>
+    <author>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</author>
+    <category>css</category><category>web development</category>
+  </item>
+
+    </channel>
+  </rss>

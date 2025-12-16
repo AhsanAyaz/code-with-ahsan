@@ -1,0 +1,24 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>CodeWithAhsan</title>
+      <link>https://codewithahsan.dev/blog</link>
+      <description>The one stop shop to have fun with amazing people, and to code of course.</description>
+      <language>en-us</language>
+      <managingEditor>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</managingEditor>
+      <webMaster>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</webMaster>
+      <lastBuildDate>Sun, 07 Mar 2021 15:00:00 GMT</lastBuildDate>
+      <atom:link href="https://codewithahsan.dev/tags/testing/feed.xml" rel="self" type="application/rss+xml"/>
+      
+  <item>
+    <guid>https://codewithahsan.dev/blog/angular-unit-tests-constructor-not-compatible-with-angular-dependency-injection</guid>
+    <title>Angular Unit Tests with Jest - This constructor is not compatible with Angular Dependency Injection</title>
+    <link>https://codewithahsan.dev/blog/angular-unit-tests-constructor-not-compatible-with-angular-dependency-injection</link>
+    <description>In this article, you&#39;ll fix the error &quot;This constructor is not compatible with Angular Dependency Injection&quot; when working with Jest for unit tests.</description>
+    <pubDate>Sun, 07 Mar 2021 15:00:00 GMT</pubDate>
+    <author>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</author>
+    <category>angular</category><category>testing</category><category>jest</category>
+  </item>
+
+    </channel>
+  </rss>

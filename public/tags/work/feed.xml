@@ -1,0 +1,24 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>CodeWithAhsan</title>
+      <link>https://codewithahsan.dev/blog</link>
+      <description>The one stop shop to have fun with amazing people, and to code of course.</description>
+      <language>en-us</language>
+      <managingEditor>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</managingEditor>
+      <webMaster>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</webMaster>
+      <lastBuildDate>Sun, 16 Feb 2025 00:00:00 GMT</lastBuildDate>
+      <atom:link href="https://codewithahsan.dev/tags/work/feed.xml" rel="self" type="application/rss+xml"/>
+      
+  <item>
+    <guid>https://codewithahsan.dev/blog/understanding-ramadan-for-non-muslim-workspace-colleagues</guid>
+    <title>Understanding Ramadan 🌙 - A Guide for Non-Muslim Workplace Colleagues</title>
+    <link>https://codewithahsan.dev/blog/understanding-ramadan-for-non-muslim-workspace-colleagues</link>
+    <description>An informative article to help non-Muslims understand what to expect during the holy month of Ramadan</description>
+    <pubDate>Sun, 16 Feb 2025 00:00:00 GMT</pubDate>
+    <author>muhd.ahsanayaz@gmail.com (Muhammad Ahsan Ayaz)</author>
+    <category>ramadan</category><category>work</category>
+  </item>
+
+    </channel>
+  </rss>
