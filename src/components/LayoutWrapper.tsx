@@ -22,7 +22,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
     } else if (link.href.includes("hackstack")) {
       return "btn btn-sm btn-error btn-outline";
     }
-    return "btn btn-sm btn-ghost";
+    return "btn btn-ghost";
   };
 
   // Compute primary vs more links
@@ -110,7 +110,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                     tabIndex={0}
                     role="button"
                     ref={moreBtnRef}
-                    className="btn btn-ghost btn-sm gap-1"
+                    className="btn btn-ghost gap-1"
                     onClick={() => setIsMoreOpen(!isMoreOpen)}
                   >
                     More

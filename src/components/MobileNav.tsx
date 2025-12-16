@@ -121,7 +121,7 @@ const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
                 type="button"
                 aria-expanded={moreOpen}
                 onClick={() => setMoreOpen((v) => !v)}
-                className="text-2xl font-bold tracking-widest text-base-content flex items-center gap-2 hover:text-primary"
+                className="text-2xl font-bold tracking-widest text-base-content flex items-center gap-2 hover:text-primary btn btn-ghost"
               >
                 More
                 <svg
