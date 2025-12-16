@@ -1,8 +1,12 @@
-'use client'
-import { PageSEO } from '@/components/SEO'
-import Link from '@/components/Link'
+"use client";
+import { PageSEO } from "@/components/SEO";
 
-export default function SimpleLayout({ children, title, description, SideBarContent }) {
+export default function SimpleLayout({
+  children,
+  title,
+  description,
+  SideBarContent,
+}) {
   return (
     <>
       <PageSEO title={title} description={description} />
@@ -18,9 +22,11 @@ export default function SimpleLayout({ children, title, description, SideBarCont
               <SideBarContent />
             </div>
           )}
-          <div className="pt-8 pb-8 prose dark:prose-dark max-w-none xl:col-span-2">{children}</div>
+          <div className="pt-8 pb-8 prose dark:prose-invert max-w-none xl:col-span-2">
+            {children}
+          </div>
         </div>
       </div>
     </>
-  )
+  );
 }

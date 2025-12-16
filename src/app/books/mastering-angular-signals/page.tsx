@@ -1,21 +1,22 @@
-import { Metadata } from 'next'
+import { Metadata } from "next";
 // @ts-ignore
-import siteMetadata from '@/data/siteMetadata'
-import Image from 'next/image'
+import siteMetadata from "@/data/siteMetadata";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: `Mastering Angular Signals by Muhammad Ahsan Ayaz - ${siteMetadata.author}`,
   description:
-    'Unlock the power of Angular Signals! A comprehensive guide by Muhammad Ahsan Ayaz covering core concepts, advanced patterns, testing, and migration strategies for building performant and reactive Angular applications.',
-}
+    "Unlock the power of Angular Signals! A comprehensive guide by Muhammad Ahsan Ayaz covering core concepts, advanced patterns, testing, and migration strategies for building performant and reactive Angular applications.",
+};
 
 export default function ModernAngularSignalsBookPage() {
-  const bookTitle = 'Mastering Angular Signals'
-  const authorName = 'Muhammad Ahsan Ayaz'
-  const authorCreds = 'GDE in Angular, Speaker, Software Architect, Author of Angular Cookbook'
-  const githubRepo = 'https://github.com/AhsanAyaz/modern-angular-signals-book'
-  const ctaLink = 'https://www.amazon.com/dp/B0FF9LSHJN/'
-  const ctaText = 'Get your copy'
+  const bookTitle = "Mastering Angular Signals";
+  const authorName = "Muhammad Ahsan Ayaz";
+  const authorCreds =
+    "GDE in Angular, Speaker, Software Architect, Author of Angular Cookbook";
+  const githubRepo = "https://github.com/AhsanAyaz/modern-angular-signals-book";
+  const ctaLink = "https://www.amazon.com/dp/B0FF9LSHJN/";
+  const ctaText = "Get your copy";
 
   const ctaButton = () => (
     <div className="not-prose">
@@ -28,7 +29,7 @@ export default function ModernAngularSignalsBookPage() {
         {ctaText}
       </a>
     </div>
-  )
+  );
 
   return (
     <>
@@ -46,11 +47,11 @@ export default function ModernAngularSignalsBookPage() {
           <div className="flex justify-center mt-6">{ctaButton()}</div>
         </div>
 
-        <div className="prose dark:prose-dark max-w-none pt-8 pb-8">
+        <div className="prose dark:prose-invert max-w-none pt-8 pb-8">
           <div className="flex flex-col items-center md:flex-row md:items-start md:space-x-8">
             <div className="flex-shrink-0 mb-4 md:mb-0">
               <Image
-                src={'/static/images/books/mastering-angular-signals-3d.png'}
+                src={"/static/images/books/mastering-angular-signals-3d.png"}
                 alt={bookTitle}
                 width={250}
                 height={350}
@@ -60,46 +61,54 @@ export default function ModernAngularSignalsBookPage() {
             <div className="flex-grow">
               <h2>About This Book</h2>
               <p>
-                Angular Signals represent a fundamental shift in how we build reactive applications.
-                This book is your comprehensive guide to mastering this powerful new reactivity
-                model, enabling you to build more efficient, maintainable, and performant Angular
+                Angular Signals represent a fundamental shift in how we build
+                reactive applications. This book is your comprehensive guide to
+                mastering this powerful new reactivity model, enabling you to
+                build more efficient, maintainable, and performant Angular
                 applications.
               </p>
               <p>
-                Authored by Muhammad Ahsan Ayaz, a Google Developer Expert in Angular and seasoned
-                Software Architect, <em>Mastering Angular Signals</em> distills practical knowledge
+                Authored by Muhammad Ahsan Ayaz, a Google Developer Expert in
+                Angular and seasoned Software Architect,{" "}
+                <em>Mastering Angular Signals</em> distills practical knowledge
                 from years of experience working with Angular.
               </p>
 
               <h3>What You Will Learn</h3>
               <p>
-                Journey from the foundational building blocks to advanced techniques. This book
-                covers:
+                Journey from the foundational building blocks to advanced
+                techniques. This book covers:
               </p>
               <ul>
                 <li>
-                  The core concepts: <code>signal()</code>, <code>computed()</code>, and{' '}
-                  <code>effect()</code>
+                  The core concepts: <code>signal()</code>,{" "}
+                  <code>computed()</code>, and <code>effect()</code>
                 </li>
                 <li>
-                  Managing asynchronous operations with <code>resource()</code> and{' '}
-                  <code>rxResource()</code>
+                  Managing asynchronous operations with <code>resource()</code>{" "}
+                  and <code>rxResource()</code>
                 </li>
                 <li>
-                  Seamless component communication using signal-based <code>input()</code>,{' '}
-                  <code>output()</code>, and <code>model()</code> APIs
+                  Seamless component communication using signal-based{" "}
+                  <code>input()</code>, <code>output()</code>, and{" "}
+                  <code>model()</code> APIs
                 </li>
                 <li>Effective strategies for testing your Signal-based code</li>
-                <li>Practical techniques for migrating existing RxJS-heavy applications</li>
-                <li>Performance considerations and architectural best practices</li>
+                <li>
+                  Practical techniques for migrating existing RxJS-heavy
+                  applications
+                </li>
+                <li>
+                  Performance considerations and architectural best practices
+                </li>
               </ul>
 
               <div className="flex justify-center my-6"> {ctaButton()} </div>
 
               <h3>Dive into Practical Examples</h3>
               <p>
-                Build confidence with hands-on examples demonstrating real-world scenarios,
-                including:
+                Build confidence with hands-on examples demonstrating real-world
+                scenarios, including:
               </p>
               <ul>
                 <li>Managing component state and user input</li>
@@ -120,5 +129,5 @@ export default function ModernAngularSignalsBookPage() {
         </div>
       </div>
     </>
-  )
+  );
 }

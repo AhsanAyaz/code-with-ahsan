@@ -16,15 +16,15 @@ interface LinkItem {
 }
 
 const LayoutWrapper = ({ children }: { children: ReactNode }) => {
-  const linkClassOverrides = (link: LinkItem) => {
-    let classes = "p-1 font-bold text-base-content sm:p-4";
+  const getLinkClass = (link: LinkItem) => {
     if (link.href.includes("ng-book")) {
-      return `relative w-full sm:w-auto block text-sm font-bold outline-primary-600 ring-2 rounded-md text-primary py-4 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 hover:bg-primary-600 hover:text-white hover:outline-none hover:ring-0`;
+      return "btn btn-sm btn-primary";
     } else if (link.href.includes("hackstack")) {
-      return `${classes} text-red-500 hover:text-red-600 dark:text-red-800 dark:hover:text-red-900 hover:underline underline-offset-8	duration-200`;
+      return "btn btn-sm btn-error btn-outline";
     }
-    return classes;
+    return "btn btn-sm btn-ghost";
   };
+
   // Compute primary vs more links
   const allLinks = headerNavLinks;
   const primaryLinks = allLinks.filter(
@@ -46,7 +46,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
 
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
-  const moreBtnRef = useRef<HTMLButtonElement>(null);
+  const moreBtnRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -72,40 +72,46 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   return (
     <SectionContainer>
       <div className="flex flex-col h-screen">
-        <header className="flex items-center justify-between py-0 sm:py-4">
-          <nav>
-            <Link href="/" aria-label="Code with Ahsan">
+        <header className="navbar bg-base-100 px-0 sm:px-4 z-50">
+          <div className="navbar-start">
+            <Link
+              href="/"
+              aria-label="Code with Ahsan"
+              className="btn btn-ghost normal-case text-xl h-auto min-h-0 py-2 hover:bg-transparent"
+            >
               <div className="flex items-center justify-between">
                 <Image
                   src={siteMetadata.siteLogo}
                   alt="site logo"
-                  width={100}
-                  height={100}
+                  width={50}
+                  height={50}
                   style={{ objectFit: "cover" }}
                 />
               </div>
             </Link>
-          </nav>
-          <div className="flex items-center text-base leading-5">
-            <nav className="hidden sm:flex items-center relative">
+          </div>
+          <div className="navbar-center hidden md:flex">
+            <div className="flex items-center gap-1">
               {primaryLinks.map((link) => (
                 <Link
                   key={link.title}
                   href={link.href}
-                  className={`text-center ${linkClassOverrides(link)}`}
+                  className={getLinkClass(link)}
                 >
                   {link.title}
                 </Link>
               ))}
               {moreLinks.length > 0 && (
-                <div className="ml-2 relative" ref={moreRef}>
-                  <button
+                <div
+                  className={`dropdown dropdown-end ${isMoreOpen ? "dropdown-open" : ""}`}
+                  ref={moreRef}
+                >
+                  <div
+                    tabIndex={0}
+                    role="button"
                     ref={moreBtnRef}
-                    type="button"
-                    aria-haspopup="menu"
-                    aria-expanded={isMoreOpen}
-                    onClick={() => setIsMoreOpen((v) => !v)}
-                    className="p-1 font-bold text-base-content sm:p-4 inline-flex items-center gap-1 hover:underline underline-offset-8"
+                    className="btn btn-ghost btn-sm gap-1"
+                    onClick={() => setIsMoreOpen(!isMoreOpen)}
                   >
                     More
                     <svg
@@ -122,31 +128,32 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                         clipRule="evenodd"
                       />
                     </svg>
-                  </button>
-                  <div
-                    role="menu"
-                    className={`absolute right-0 mt-2 min-w-[10rem] rounded-md border border-gray-200 dark:border-gray-700 bg-base-100 shadow-lg py-1 z-50 ${
-                      isMoreOpen ? "block" : "hidden"
-                    }`}
+                  </div>
+                  <ul
+                    tabIndex={0}
+                    className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded-box w-52"
                   >
                     {moreLinks.map((link) => (
-                      <Link
-                        key={link.title}
-                        href={link.href}
-                        className="block w-full text-left px-4 py-2 text-sm text-base-content hover:bg-gray-100 dark:hover:bg-gray-700"
-                        onClick={() => setIsMoreOpen(false)}
-                      >
-                        {link.title}
-                      </Link>
+                      <li key={link.title}>
+                        <Link
+                          href={link.href}
+                          className="whitespace-nowrap px-4 py-2 block w-full text-left hover:bg-base-200"
+                          onClick={() => setIsMoreOpen(false)}
+                        >
+                          {link.title}
+                        </Link>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
               )}
-            </nav>
-            <ThemeSwitch />
-            <MobileNav linkClassOverrides={linkClassOverrides} />
+            </div>
           </div>
-          <ProfileMenu />
+          <div className="navbar-end gap-2">
+            <ThemeSwitch />
+            <MobileNav linkClassOverrides={getLinkClass} />
+            <ProfileMenu />
+          </div>
         </header>
         <main className="flex-1">{children}</main>
         <Footer />

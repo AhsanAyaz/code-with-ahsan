@@ -1,11 +1,20 @@
-'use client'
+"use client";
 
-import SocialIcon from '@/components/social-icons'
-import Image from '@/components/Image'
-import { youtube } from '../data/siteMetadata'
+import SocialIcon from "@/components/social-icons";
+import Image from "@/components/Image";
+import { youtube } from "../data/siteMetadata";
 
 export default function AuthorLayout({ children, frontMatter }) {
-  const { name, avatar, occupation, company, email, twitter, linkedin, github } = frontMatter
+  const {
+    name,
+    avatar,
+    occupation,
+    company,
+    email,
+    twitter,
+    linkedin,
+    github,
+  } = frontMatter;
 
   return (
     <>
@@ -24,7 +33,9 @@ export default function AuthorLayout({ children, frontMatter }) {
               height={192}
               className="w-48 h-48 rounded-full"
             />
-            <h3 className="pt-4 pb-2 text-2xl font-bold leading-8 tracking-tight">{name}</h3>
+            <h3 className="pt-4 pb-2 text-2xl font-bold leading-8 tracking-tight">
+              {name}
+            </h3>
             <div className="text-base-content/70 text-center">{occupation}</div>
             <div className="text-base-content/70 text-center">{company}</div>
             <div className="flex pt-6 space-x-3">
@@ -35,9 +46,11 @@ export default function AuthorLayout({ children, frontMatter }) {
               <SocialIcon kind="twitter" href={twitter} />
             </div>
           </div>
-          <div className="pt-8 pb-8 prose dark:prose-dark max-w-none xl:col-span-2">{children}</div>
+          <div className="pt-8 pb-8 prose dark:prose-invert max-w-none xl:col-span-2">
+            {children}
+          </div>
         </div>
       </div>
     </>
-  )
+  );
 }
