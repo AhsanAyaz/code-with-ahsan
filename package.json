@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
-    "postbuild": "node scripts/generate-sitemap.js && node scripts/generate-rss.js",
+    "postbuild": "node scripts/generate-sitemap.js",
     "start": "next start",
     "lint": "eslint"
   },

@@ -13,11 +13,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses</loc>
+    <loc>https://codewithahsan.dev/community</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/community</loc>
+    <loc>https://codewithahsan.dev/courses</loc>
   </url>
 
   <url>
@@ -41,19 +41,19 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/tags/chrome-extension/feed</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/tags/css/feed</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/tags/career/feed</loc>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/tags/code-quality/feed</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/tags/chrome-extension/feed</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/tags/css/feed</loc>
   </url>
 
   <url>
@@ -65,11 +65,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/tags/flutter/feed</loc>
+    <loc>https://codewithahsan.dev/tags/gatsbyjs/feed</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/tags/gatsbyjs/feed</loc>
+    <loc>https://codewithahsan.dev/tags/flutter/feed</loc>
   </url>
 
   <url>
@@ -105,11 +105,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/tags/payments/feed</loc>
+    <loc>https://codewithahsan.dev/tags/personal-development/feed</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/tags/personal-development/feed</loc>
+    <loc>https://codewithahsan.dev/tags/payments/feed</loc>
   </url>
 
   <url>
@@ -125,7 +125,7 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/tags/tips/feed</loc>
+    <loc>https://codewithahsan.dev/tags/web-development/feed</loc>
   </url>
 
   <url>
@@ -133,7 +133,7 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/tags/web-development/feed</loc>
+    <loc>https://codewithahsan.dev/tags/tips/feed</loc>
   </url>
 
   <url>
