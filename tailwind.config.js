@@ -16,7 +16,16 @@ module.exports = {
         14: "3.5rem",
       },
       fontFamily: {
-        sans: ["Nunito", ...defaultTheme.fontFamily.sans],
+        sans: [
+          "var(--font-rubik)",
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+          '"Apple Color Emoji"',
+          '"Segoe UI Emoji"',
+          '"Segoe UI Symbol"',
+          '"Noto Color Emoji"',
+        ],
       },
       colors: {
         primary: colors.purple,
