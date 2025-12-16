@@ -1,8 +1,8 @@
-<img src="https://raw.githubusercontent.com/AhsanAyaz/ahsanayaz/master/public/static/images/banner.png"/>
+<img style="border-radius: 50%;" src="./public/static/images/pfp.jpeg"/>
  <hr></hr>
 <div style="text-align: center">
   <div>
-    I'm a Software Architect working at <a href="https://www.syncron.com/">Syncron</a> and a <a href="https://codewithahsan.dev/gde">Google Developers Expert in Angular</a>. I create video tutorials on <a href="https://codewithahsan.dev/youtube">YouTube</a> and write articles at my blog <a href="https://codewithahsan.dev">https://codewithahsan.dev</a>. 
+    I'm a Muslim, an author of <a   href="https://codewithahsan.dev/books">3 world-wide published books</a>, a Google Developers Expert in AI & Angular, an international speaker, and a Software Architect. I create tech tutorials on <a href="https://codewithahsan.dev/youtube">YouTube</a> and write articles at my blog <a href="https://blog.codewithahsan.dev">https://blog.codewithahsan.dev</a>. 
   </div>
 </div>
 
@@ -12,7 +12,7 @@
   title="Like Ahsan's work? Buy him a coffee"
   class="bmac"
   href="https://www.buymeacoffee.com/codewithahsan">
-<img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=muhd.ahsanayaz&button_colour=BD5FFF&font_colour=ffffff&font_family=Comic&outline_colour=000000&coffee_colour=FFDD00" />
+<img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=codewithahsan&button_colour=BD5FFF&font_colour=ffffff&font_family=Comic&outline_colour=000000&coffee_colour=FFDD00" />
 </a>
 
 Or follow & connect with me on my Socials:

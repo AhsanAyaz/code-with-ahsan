@@ -5,7 +5,10 @@ const matter = require('gray-matter')
 
 const root = process.cwd()
 
-const pipe = (...fns) => (x) => fns.reduce((v, f) => f(v), x)
+const pipe =
+  (...fns) =>
+  (x) =>
+    fns.reduce((v, f) => f(v), x)
 const pathJoinPrefix = (prefix) => (extraPath) => path.join(prefix, extraPath)
 
 const walkDir = (fullPath) => {
