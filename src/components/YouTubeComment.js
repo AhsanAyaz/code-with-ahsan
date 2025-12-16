@@ -1,24 +1,33 @@
 const YouTubeComment = ({ comment, videoLink }) => {
-  const { authorDisplayName, authorProfileImageUrl, textDisplay, likeCount, publishedAt } =
-    comment.topLevelComment.snippet
+  const {
+    authorDisplayName,
+    authorProfileImageUrl,
+    textDisplay,
+    likeCount,
+    publishedAt,
+  } = comment.topLevelComment.snippet;
 
   return (
     <div
-      onClick={() => window.open(videoLink, '_blank')}
-      className="flex space-x-2 p-4 items-start text-base-content break-words gap-4 justify-between px-4 py-2 backdrop-blur border border-primary-500/20 dark:border-primary-500/30 hover:border-primary-500/40 dark:hover:border-primary-500/50 transition-colors rounded-lg shadow-lg cursor-pointer"
+      onClick={() => window.open(videoLink, "_blank")}
+      className="flex space-x-2 p-4 items-start text-base-content break-words gap-4 justify-between px-4 py-2 backdrop-blur border border-primary/20 dark:border-primary/30 hover:border-primary/40 dark:hover:border-primary/50 transition-colors rounded-lg shadow-lg cursor-pointer"
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter') window.open(videoLink, '_blank')
+        if (e.key === "Enter") window.open(videoLink, "_blank");
       }}
     >
-      <img src={authorProfileImageUrl} alt={authorDisplayName} className="w-10 h-10 rounded-full" />
+      <img
+        src={authorProfileImageUrl}
+        alt={authorDisplayName}
+        className="w-10 h-10 rounded-full"
+      />
       <div className="flex-1">
         <a
           href={`https://youtube.com/${authorDisplayName}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-primary-500 max-w-fit block"
+          className="hover:text-primary max-w-fit block"
           onClick={(e) => e.stopPropagation()}
         >
           <h3 className="text-sm font-semibold">{authorDisplayName}</h3>
@@ -29,7 +38,9 @@ const YouTubeComment = ({ comment, videoLink }) => {
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
         >
-          <p className="text-xs text-gray-500">{new Date(publishedAt).toLocaleDateString()}</p>
+          <p className="text-xs text-gray-500">
+            {new Date(publishedAt).toLocaleDateString()}
+          </p>
         </a>
         <div
           dangerouslySetInnerHTML={{ __html: textDisplay }}
@@ -54,7 +65,7 @@ const YouTubeComment = ({ comment, videoLink }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default YouTubeComment
+export default YouTubeComment;

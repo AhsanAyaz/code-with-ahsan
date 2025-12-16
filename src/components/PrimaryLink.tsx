@@ -1,22 +1,22 @@
-import Link from './Link'
-import { ReactNode } from 'react'
+import Link from "./Link";
+import { ReactNode } from "react";
 
 interface PrimaryLinkProps {
-  href: string
-  children: ReactNode
+  href: string;
+  children: ReactNode;
 }
 
 const PrimaryLink = ({ href, children }: PrimaryLinkProps) => {
   return (
     <Link
       href={href}
-      className="text-primary-500 dark:text-primary-300"
+      className="text-primary dark:text-primary"
       rel="noopener noreferrer"
-      target={'_blank'}
+      target={"_blank"}
     >
       {children}
     </Link>
-  )
-}
+  );
+};
 
-export default PrimaryLink
+export default PrimaryLink;

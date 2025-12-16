@@ -24,7 +24,7 @@
 }
 
 .highlight-line {
-  @apply -mx-4 bg-gray-700/50 border-l-4 border-primary-500;
+  @apply -mx-4 bg-gray-700/50 border-l-4 border-primary;
 }
 
 .line-number::before {

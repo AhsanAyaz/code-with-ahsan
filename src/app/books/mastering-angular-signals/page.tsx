@@ -24,7 +24,7 @@ export default function ModernAngularSignalsBookPage() {
         href={ctaLink}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center justify-center px-6 py-3 border border-transparent !font-medium rounded-md shadow !text-white bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600"
+        className="inline-flex items-center justify-center px-6 py-3 border border-transparent !font-medium rounded-md shadow !text-white bg-primary hover:brightness-90 dark:bg-primary dark:hover:brightness-90"
       >
         {ctaText}
       </a>

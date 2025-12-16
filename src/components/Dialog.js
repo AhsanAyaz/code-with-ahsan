@@ -1,24 +1,24 @@
-import React, { useCallback, useEffect } from 'react'
-import Spinner from './Spinner'
+import React, { useCallback, useEffect } from "react";
+import Spinner from "./Spinner";
 
 const Dialog = ({ show, onClose, actions, children, isLoading, title }) => {
   const toggleModal = useCallback(() => {
-    const body = document.querySelector('body')
-    const modal = document.querySelector('.modal')
+    const body = document.querySelector("body");
+    const modal = document.querySelector(".modal");
     if (!show) {
-      modal.classList.add('opacity-0')
-      modal.classList.add('pointer-events-none')
-      body.classList.remove('modal-active')
+      modal.classList.add("opacity-0");
+      modal.classList.add("pointer-events-none");
+      body.classList.remove("modal-active");
     } else {
-      modal.classList.remove('opacity-0')
-      modal.classList.remove('pointer-events-none')
-      body.classList.add('modal-active')
+      modal.classList.remove("opacity-0");
+      modal.classList.remove("pointer-events-none");
+      body.classList.add("modal-active");
     }
-  }, [show])
+  }, [show]);
 
   useEffect(() => {
-    toggleModal()
-  }, [show, toggleModal])
+    toggleModal();
+  }, [show, toggleModal]);
 
   return (
     <div className="modal z-50 opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center">
@@ -28,16 +28,16 @@ const Dialog = ({ show, onClose, actions, children, isLoading, title }) => {
         <div className="modal-content py-4 text-left px-6">
           <div className="flex justify-between items-center pb-3">
             <header>
-              <h2 className="text-2xl font-bold">{title || 'I am a dialog'}</h2>
+              <h2 className="text-2xl font-bold">{title || "I am a dialog"}</h2>
               <p className="text-sm my-1 pr-4">
-                Paste the link of your project (GitHub, CodePen, etc) and attach the screenshot of
-                the running project
+                Paste the link of your project (GitHub, CodePen, etc) and attach
+                the screenshot of the running project
               </p>
             </header>
             <button
               className="modal-close cursor-pointer z-50 text-lg"
               onClick={() => {
-                onClose()
+                onClose();
               }}
             >
               <svg
@@ -66,9 +66,9 @@ const Dialog = ({ show, onClose, actions, children, isLoading, title }) => {
             <div className="flex justify-end gap-2 pt-2">
               {actions.map((action) => {
                 const styles =
-                  action.type !== 'primary'
-                    ? 'disabled:bg-gray-300 disabled:cursor-not-allowed px-4 bg-transparent p-3 rounded-lg text-primary-500 hover:bg-gray-100 hover:text-primary-400'
-                    : 'disabled:bg-gray-300 disabled:cursor-not-allowed modal-close px-4 bg-primary-500 p-3 rounded-lg text-white hover:bg-primary-400'
+                  action.type !== "primary"
+                    ? "disabled:bg-gray-300 disabled:cursor-not-allowed px-4 bg-transparent p-3 rounded-lg text-primary hover:bg-gray-100 hover:text-primary"
+                    : "disabled:bg-gray-300 disabled:cursor-not-allowed modal-close px-4 bg-primary p-3 rounded-lg text-white hover:brightness-90";
 
                 return (
                   <button
@@ -79,14 +79,14 @@ const Dialog = ({ show, onClose, actions, children, isLoading, title }) => {
                   >
                     {action.label}
                   </button>
-                )
+                );
               })}
             </div>
           )}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Dialog
+export default Dialog;

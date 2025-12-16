@@ -44,7 +44,7 @@ const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
       link.href.includes("discord.gg")
   );
   const [moreOpen, setMoreOpen] = useState(false);
-  const highlightContext = `relative w-full sm:w-auto block text-sm font-semibold bg-primary-600 rounded-md text-white py-3 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 hover:bg-primary-500`;
+  const highlightContext = `relative w-full sm:w-auto block text-sm font-semibold bg-primary rounded-md text-white py-3 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 hover:bg-primary/90`;
   return (
     <div className="md:hidden z-[100]">
       <button

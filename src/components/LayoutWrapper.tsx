@@ -77,7 +77,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
             <Link
               href="/"
               aria-label="Code with Ahsan"
-              className="btn btn-ghost normal-case text-xl h-auto min-h-0 py-2 hover:bg-transparent"
+              className="btn btn-link normal-case text-xl h-auto min-h-0 py-2"
             >
               <div className="flex items-center justify-between">
                 <Image
@@ -155,7 +155,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
             <ProfileMenu />
           </div>
         </header>
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pt-4">{children}</main>
         <Footer />
       </div>
     </SectionContainer>

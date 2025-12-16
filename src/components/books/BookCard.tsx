@@ -22,7 +22,7 @@ interface BookCardProps {
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
   return (
     <article className="h-full">
-      <div className="flex flex-col relative h-full p-3 sm:p-4 overflow-hidden border transition-all duration-200 border-gray-600 rounded-lg shadow-md hover:shadow-xl hover:border-primary-500 dark:hover:border-primary-400">
+      <div className="flex flex-col relative h-full p-3 sm:p-4 overflow-hidden border transition-all duration-200 border-gray-600 rounded-lg shadow-md hover:shadow-xl hover:border-primary">
         {book.discount && (
           <div className="absolute top-0 right-0 z-10 bg-red-600 text-white font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg shadow-sm">
             {book.discount}

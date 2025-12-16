@@ -9,28 +9,6 @@ body.modal-active {
   overflow-y: visible !important;
 }
 
-.profile-dd--hidden .profile-dd__inner__menu {
-  display: none;
-}
-
-.profile-dd--shown .profile-dd__inner {
-  @apply border-primary-700;
-}
-
-.profile-dd--shown .profile-dd__inner__menu {
-  display: block;
-}
-
-.profile-dd--shown .bi-chevron-down {
-  transform: rotate(180deg);
-}
-
-@media (prefers-color-scheme: dark) {
-  .profile-dd--shown .profile-dd__inner {
-    @apply bg-gray-800;
-  }
-}
-
 .modal {
   transition: opacity 0.25s ease;
 }
@@ -44,14 +22,14 @@ body.modal-active {
 }
 
 .blog-post-item:hover h2 {
-  @apply text-primary-500;
+  @apply text-primary;
 }
 
 .post-cover-image.banner-img {
   view-transition-name: banner-img;
 }
 
-.dark .prose :where(pre):not(:where([class~='not-prose'] *)) {
+.dark .prose :where(pre):not(:where([class~="not-prose"] *)) {
   background-color: #262626 !important;
 }
 

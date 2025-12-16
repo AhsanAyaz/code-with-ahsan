@@ -1,39 +1,30 @@
-'use client'
-import React, { useContext } from 'react'
-import { getAuth, User } from 'firebase/auth'
-import { getApp } from 'firebase/app'
-import { useEffect, useState } from 'react'
-import { AuthContext } from '@/contexts/AuthContext'
+"use client";
+import React, { useContext } from "react";
+import { getAuth, User } from "firebase/auth";
+import { getApp } from "firebase/app";
+import { useEffect, useState } from "react";
+import { AuthContext } from "@/contexts/AuthContext";
 
 const ProfileMenu = () => {
-  const { setShowLoginPopup } = useContext(AuthContext)
-  const [currentUser, setCurrentUser] = useState<User | null | 'loading'>('loading')
+  const { setShowLoginPopup } = useContext(AuthContext);
+  const [currentUser, setCurrentUser] = useState<User | null | "loading">(
+    "loading"
+  );
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     // Lazy init auth on client
-    const auth = getAuth(getApp())
+    const auth = getAuth(getApp());
     const unsub = auth.onAuthStateChanged((user) => {
-      setCurrentUser(user)
-    })
+      setCurrentUser(user);
+    });
 
     return () => {
-      unsub()
-    }
-  }, [])
+      unsub();
+    };
+  }, []);
 
-  const toggleDropDown = (e?: React.MouseEvent | React.KeyboardEvent) => {
-    if (e && 'stopPropagation' in e) {
-      e.stopPropagation()
-    }
-    const menu = document.querySelector('.profile-dd')
-    if (menu && menu.classList.contains('profile-dd--hidden')) {
-      menu.classList.replace('profile-dd--hidden', 'profile-dd--shown')
-    } else if (menu) {
-      menu.classList.replace('profile-dd--shown', 'profile-dd--hidden')
-    }
-  }
-
-  if (currentUser === 'loading') {
+  if (currentUser === "loading") {
     return (
       <div className="z-50 overflow-hidden mx-4 relative flex items-center justify-center animate-spin w-10 h-10 bg-gray-100 border border-gray-500 dark:border-transparent rounded-full dark:bg-gray-600">
         <svg
@@ -51,7 +42,7 @@ const ProfileMenu = () => {
           />
         </svg>
       </div>
-    )
+    );
   }
 
   if (!currentUser) {
@@ -59,7 +50,7 @@ const ProfileMenu = () => {
       <button
         aria-label="Login Button"
         onClick={() => {
-          setShowLoginPopup(true)
+          setShowLoginPopup(true);
         }}
         className="overflow-hidden mx-4 relative w-10 h-10 bg-gray-100 border border-gray-500 dark:border-transparent rounded-full dark:bg-gray-600 cursor-pointer"
       >
@@ -76,81 +67,57 @@ const ProfileMenu = () => {
           ></path>
         </svg>
       </button>
-    )
+    );
   }
 
   return (
-    <div
-      onClick={toggleDropDown}
-      role="button"
-      tabIndex={-1}
-      onKeyDown={(e) => {
-        if (e.key !== 'Escape') {
-          return
-        }
-        toggleDropDown(e)
-      }}
-      className="profile-dd z-50 profile-dd--hidden flex justify-center items-center select-none cursor-pointer"
-    >
-      <div className="flex justify-center items-center">
-        <div className="relative profile-dd__inner border-b-4 border-transparent py-0.5 transform transition duration-300">
-          <div className="flex px-4 justify-center items-center space-x-2 cursor-pointer">
-            <div className="w-12 h-12 block rounded-full overflow-hidden">
-              <img
-                src={currentUser?.photoURL || ''}
-                alt={currentUser?.displayName || 'User'}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="currentColor"
-              className="bi bi-chevron-down transition-all ease-linear duration-100"
-              viewBox="0 0 16 16"
-            >
-              <path
-                fillRule="evenodd"
-                d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"
-              />
-            </svg>
-          </div>
-          <div className="profile-dd__inner__menu hidden absolute right-0 w-28 px-2 py-2 dark:bg-gray-800 bg-white rounded-lg shadow border dark:border-transparent mt-3">
-            <ul className="space-y-3 dark:text-white">
-              <li className="font-medium">
-                <button
-                  onClick={() => {
-                    const auth = getAuth(getApp())
-                    auth.signOut()
-                  }}
-                  className="w-full flex items-center text-sm transform transition-colors duration-200 border-r-4 border-transparent hover:border-primary-600"
-                >
-                  <div className=" text-primary-600">
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                      ></path>
-                    </svg>
-                  </div>
-                  <div className="flex-1 cursor-pointer">Logout</div>
-                </button>
-              </li>
-            </ul>
-          </div>
+    <div className={`dropdown dropdown-end ${isOpen ? "dropdown-open" : ""}`}>
+      <div
+        tabIndex={0}
+        role="button"
+        className="btn btn-ghost btn-circle avatar"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div className="w-10 rounded-full">
+          <img
+            src={currentUser?.photoURL || ""}
+            alt={currentUser?.displayName || "User"}
+          />
         </div>
       </div>
+      <ul
+        tabIndex={0}
+        className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
+      >
+        <li>
+          <button
+            onClick={() => {
+              const auth = getAuth(getApp());
+              auth.signOut();
+              setIsOpen(false);
+            }}
+            className="flex items-center gap-2"
+          >
+            <svg
+              className="w-5 h-5 text-current"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              ></path>
+            </svg>
+            Logout
+          </button>
+        </li>
+      </ul>
     </div>
-  )
-}
+  );
+};
 
-export default ProfileMenu
+export default ProfileMenu;

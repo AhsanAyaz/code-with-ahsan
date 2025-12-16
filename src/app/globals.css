@@ -3,20 +3,32 @@
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
 
-@theme {
-  /* Primary (Purple) */
-  --color-primary-50: #faf5ff;
-  --color-primary-100: #f3e8ff;
-  --color-primary-200: #e9d5ff;
-  --color-primary-300: #d8b4fe;
-  --color-primary-400: #c084fc;
-  --color-primary-500: #a855f7;
-  --color-primary-600: #9333ea;
-  --color-primary-700: #7e22ce;
-  --color-primary-800: #6b21a8;
-  --color-primary-900: #581c87;
-  --color-primary-950: #3b0764;
+@layer base {
+  :root,
+  [data-theme="light"] {
+    --color-primary: #8f27e0 !important;
+    --color-primary-content: #ffffff !important;
 
+    --color-secondary: #d926a9 !important;
+    --color-secondary-content: #ffffff !important;
+
+    --color-accent: #1fb2a6 !important;
+    --color-accent-content: #ffffff !important;
+  }
+
+  [data-theme="dark"] {
+    --color-primary: #8f27e0 !important;
+    --color-primary-content: #ffffff !important;
+
+    --color-secondary: #d926a9 !important;
+    --color-secondary-content: #ffffff !important;
+
+    --color-accent: #1fb2a6 !important;
+    --color-accent-content: #ffffff !important;
+  }
+}
+
+@theme {
   /* Gray (Neutral) */
   --color-gray-50: #fafafa;
   --color-gray-100: #f5f5f5;

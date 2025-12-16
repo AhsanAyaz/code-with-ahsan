@@ -24,7 +24,7 @@ export default async function Home() {
       <div className="flex flex-col justify-center">
         {banners.map((banner: any, index: number) => (
           <div
-            className="top-banner mb-4 relative bg-primary-700 text-primary-content px-6 py-3 rounded-md [&_a]:text-yellow-300 [&_a]:underline"
+            className="top-banner mb-4 relative bg-primary text-primary-content px-6 py-3 rounded-md [&_a]:text-yellow-300 [&_a]:underline"
             key={index}
           >
             <span className="animate-ping absolute -right-1 -top-1 inline-flex h-4 w-4 rounded-full bg-yellow-700 dark:bg-yellow-300 z-10 opacity-75"></span>
@@ -46,7 +46,7 @@ export default async function Home() {
 
             <div className="flex flex-col pr-6 py-10 bottom-0 top-0 items-center md:items-end justify-center h-full w-full gap-4">
               <Link href={"/courses"}>
-                <button className="btn btn-primary bg-primary-700 border-primary-700 btn-lg w-52 lg:w-72 text-xl lg:text-2xl text-primary-content">
+                <button className="btn btn-primary bg-primary border-primary btn-lg w-52 lg:w-72 text-xl lg:text-2xl text-primary-content">
                   Take a Course
                 </button>
               </Link>

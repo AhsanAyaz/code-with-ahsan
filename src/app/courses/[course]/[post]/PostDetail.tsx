@@ -1,39 +1,39 @@
-'use client'
+"use client";
 
-import React, { useEffect, useState, useCallback, useContext } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { getAuth } from 'firebase/auth'
-import { getApp } from 'firebase/app'
-import { onSnapshot, updateDoc } from 'firebase/firestore'
+import React, { useEffect, useState, useCallback, useContext } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { getAuth } from "firebase/auth";
+import { getApp } from "firebase/app";
+import { onSnapshot, updateDoc } from "firebase/firestore";
 
 // @ts-ignore
-import logAnalyticsEvent from '@/lib/utils/logAnalyticsEvent'
+import logAnalyticsEvent from "@/lib/utils/logAnalyticsEvent";
 // @ts-ignore
-import { getEnrollmentDoc, unEnroll } from '@/services/EnrollmentService'
+import { getEnrollmentDoc, unEnroll } from "@/services/EnrollmentService";
 // @ts-ignore
-import { getCurrentUser } from '@/services/AuthService'
+import { getCurrentUser } from "@/services/AuthService";
 // @ts-ignore
-import { CoursesList } from '@/components/courses/CoursesList'
-import Button from '@/components/Button'
+import { CoursesList } from "@/components/courses/CoursesList";
+import Button from "@/components/Button";
 // @ts-ignore
-import { AuthContext } from '@/contexts/AuthContext'
+import { AuthContext } from "@/contexts/AuthContext";
 // @ts-ignore
-import SubmissionWrapper from '@/components/SubmissionWrapper'
+import SubmissionWrapper from "@/components/SubmissionWrapper";
 // @ts-ignore
-import YoutubePlayer from '@/components/YouTubePlayer'
+import YoutubePlayer from "@/components/YouTubePlayer";
 // @ts-ignore
-import YouTubeComment from '@/components/YouTubeComment'
-import Spinner from '@/components/Spinner'
+import YouTubeComment from "@/components/YouTubeComment";
+import Spinner from "@/components/Spinner";
 // @ts-ignore
-import ResourcesLinks from '@/components/ResourcesLinks'
+import ResourcesLinks from "@/components/ResourcesLinks";
 // @ts-ignore
-import LegitMarkdown from '@/components/LegitMarkdown'
+import LegitMarkdown from "@/components/LegitMarkdown";
 // @ts-ignore
-import NewsletterForm from '@/components/NewsletterForm'
-import siteMetadata from '@/data/siteMetadata'
+import NewsletterForm from "@/components/NewsletterForm";
+import siteMetadata from "@/data/siteMetadata";
 
-const auth = getAuth(getApp())
+const auth = getAuth(getApp());
 
 export default function PostDetail({
   course,
@@ -41,161 +41,163 @@ export default function PostDetail({
   nextPost,
   previousPost,
 }: {
-  course: any
-  post: any
-  nextPost: any
-  previousPost: any
+  course: any;
+  post: any;
+  nextPost: any;
+  previousPost: any;
 }) {
-  const { setShowLoginPopup } = useContext(AuthContext)
-  const [marked, setMarked] = useState<Record<string, boolean>>({})
-  const [user, setUser] = useState<any>(null)
-  const [enrolled, setEnrolled] = useState(false)
-  const router = useRouter()
+  const { setShowLoginPopup } = useContext(AuthContext);
+  const [marked, setMarked] = useState<Record<string, boolean>>({});
+  const [user, setUser] = useState<any>(null);
+  const [enrolled, setEnrolled] = useState(false);
+  const router = useRouter();
   // @ts-ignore
-  const currentRoute = `/courses/${course.slug}/${post.slug}` // Approximated for now
+  const currentRoute = `/courses/${course.slug}/${post.slug}`; // Approximated for now
 
-  const [comments, setComments] = useState([])
-  const [loadingComments, setLoadingComments] = useState(false)
+  const [comments, setComments] = useState([]);
+  const [loadingComments, setLoadingComments] = useState(false);
 
   const goToPost = (slug: string) => {
-    router.push(`/courses/${course.slug}/${slug}`)
-  }
+    router.push(`/courses/${course.slug}/${slug}`);
+  };
 
   const getMarked = useCallback(
     async (user: any) => {
       if (!user) {
-        return
+        return;
       }
-      const enrollment = await getEnrollmentDoc({ course, attendee: user })
-      const isEnrolled = enrollment.exists()
-      setEnrolled(isEnrolled)
+      const enrollment = await getEnrollmentDoc({ course, attendee: user });
+      const isEnrolled = enrollment.exists();
+      setEnrolled(isEnrolled);
       if (isEnrolled) {
-        setMarked(enrollment.data().marked)
+        setMarked(enrollment.data().marked);
       }
     },
     [course]
-  )
+  );
 
   const enrollUser = async (event: any) => {
-    event?.stopPropagation()
-    const attendee = await getCurrentUser()
+    event?.stopPropagation();
+    const attendee = await getCurrentUser();
     if (!attendee) {
-      setShowLoginPopup(true)
-      return
+      setShowLoginPopup(true);
+      return;
     }
-    await getEnrollmentDoc({ course, attendee }, true)
-    router.push(`/courses/${course.slug}`)
-    setEnrolled(true)
-    logAnalyticsEvent('course_joined', {
+    await getEnrollmentDoc({ course, attendee }, true);
+    router.push(`/courses/${course.slug}`);
+    setEnrolled(true);
+    logAnalyticsEvent("course_joined", {
       courseSlug: course.slug,
-    })
-  }
+    });
+  };
 
   const markAsComplete = async () => {
-    const attendee = await getCurrentUser()
+    const attendee = await getCurrentUser();
     if (!attendee) {
-      setShowLoginPopup(true)
-      return
+      setShowLoginPopup(true);
+      return;
     }
-    const enrollmentDoc = await getEnrollmentDoc({ course, attendee }, true)
+    const enrollmentDoc = await getEnrollmentDoc({ course, attendee }, true);
     await updateDoc(enrollmentDoc.ref, {
       marked: {
         ...marked,
         [post.slug]: true,
       },
-    })
+    });
     setMarked({
       ...marked,
       [post.slug]: true,
-    })
+    });
     if (!enrolled) {
-      setEnrolled(true)
+      setEnrolled(true);
     }
-    logAnalyticsEvent('post_marked_complete', {
+    logAnalyticsEvent("post_marked_complete", {
       courseSlug: course.slug,
       postSlug: post.slug,
-    })
-  }
+    });
+  };
 
   const markAsIncomplete = async () => {
-    const attendee = await getCurrentUser()
+    const attendee = await getCurrentUser();
     if (!attendee) {
-      setShowLoginPopup(true)
-      return
+      setShowLoginPopup(true);
+      return;
     }
-    const enrollmentDoc = await getEnrollmentDoc({ course, attendee })
+    const enrollmentDoc = await getEnrollmentDoc({ course, attendee });
     await updateDoc(enrollmentDoc.ref, {
       marked: {
         ...marked,
         [post.slug]: false,
       },
-    })
+    });
     setMarked({
       ...marked,
       [post.slug]: false,
-    })
-    logAnalyticsEvent('post_marked_incomplete', {
+    });
+    logAnalyticsEvent("post_marked_incomplete", {
       courseSlug: course.slug,
       postSlug: post.slug,
-    })
-  }
+    });
+  };
 
   const getComments = async () => {
-    if (!post.embed?.id) return
-    setLoadingComments(true)
+    if (!post.embed?.id) return;
+    setLoadingComments(true);
     try {
-      const resp = await fetch(`/api/youtube/comments?videoId=${post.embed.id}`)
-      const data = await resp.json()
-      setComments(data.comments || [])
+      const resp = await fetch(
+        `/api/youtube/comments?videoId=${post.embed.id}`
+      );
+      const data = await resp.json();
+      setComments(data.comments || []);
     } catch (err) {
-      console.log({ err })
+      console.log({ err });
     } finally {
-      setLoadingComments(false)
+      setLoadingComments(false);
     }
-  }
+  };
 
   useEffect(() => {
     const sub = auth.onAuthStateChanged((user) => {
       if (user) {
-        getMarked(user)
+        getMarked(user);
       } else {
-        setMarked({})
-        setEnrolled(false)
+        setMarked({});
+        setEnrolled(false);
       }
-      setUser(user)
-    })
+      setUser(user);
+    });
 
     return () => {
-      sub()
-    }
+      sub();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [post?.slug])
+  }, [post?.slug]);
 
   useEffect(() => {
     if (!user) {
-      return
+      return;
     }
 
-    let enrollmentSub: any
+    let enrollmentSub: any;
     getEnrollmentDoc({ course: course, attendee: user }).then((doc) => {
       enrollmentSub = onSnapshot(doc.ref, (snapshot) => {
-        const exists = snapshot.exists()
-        setEnrolled(exists)
-      })
-    })
+        const exists = snapshot.exists();
+        setEnrolled(exists);
+      });
+    });
 
     return () => {
-      if (enrollmentSub) enrollmentSub()
-    }
-  }, [user, course.slug])
+      if (enrollmentSub) enrollmentSub();
+    };
+  }, [user, course.slug]);
 
   useEffect(() => {
-    logAnalyticsEvent('course_post_viewed', {
+    logAnalyticsEvent("course_post_viewed", {
       courseSlug: course.slug,
       postSlug: post.slug,
-    })
-    getComments()
-  }, [post.slug, course.slug])
+    });
+    getComments();
+  }, [post.slug, course.slug]);
 
   return (
     <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-4">
@@ -215,7 +217,7 @@ export default function PostDetail({
             {/* @ts-ignore */}
             <Link
               href={`/courses/${course.slug}/resources`}
-              className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-base-content dark:hover:bg-primary-800 cursor-pointer bg-gray-100 rounded-md hover:bg-primary-500 hover:text-white`}
+              className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-base-content dark:hover:bg-primary cursor-pointer bg-gray-100 rounded-md hover:bg-primary hover:text-white`}
             >
               <span className="break-words">View Resources</span>
             </Link>
@@ -226,7 +228,7 @@ export default function PostDetail({
           {/* @ts-ignore */}
           <Link
             href={`/courses/${course.slug}/submissions`}
-            className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-base-content dark:hover:bg-primary-800 cursor-pointer bg-gray-100 rounded-md hover:bg-primary-500 hover:text-white`}
+            className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-base-content dark:hover:bg-primary cursor-pointer bg-gray-100 rounded-md hover:bg-primary hover:text-white`}
           >
             <span className="break-words">View Submissions</span>
           </Link>
@@ -235,14 +237,14 @@ export default function PostDetail({
           {enrolled ? (
             <button
               onClick={async () => {
-                const attendee = await getCurrentUser()
+                const attendee = await getCurrentUser();
                 const sure = confirm(
                   `Are you sure you want to leave the course? This will delete all your progress in the course including any submitted assignments. Also, we hate to see you go :(`
-                )
+                );
                 if (sure) {
-                  await unEnroll({ course, attendee })
-                  setEnrolled(false)
-                  setMarked({})
+                  await unEnroll({ course, attendee });
+                  setEnrolled(false);
+                  setMarked({});
                 }
               }}
               className="px-4 text-white uppercase mb-6 hover:bg-red-500 hover:shadow-md rounded-md py-2 w-full bg-red-400 dark:bg-red-500 dark:hover:bg-red-600"
@@ -252,13 +254,13 @@ export default function PostDetail({
           ) : (
             <Button
               onClick={async () => {
-                const attendee = await getCurrentUser()
+                const attendee = await getCurrentUser();
                 if (!attendee) {
-                  setShowLoginPopup(true)
-                  return
+                  setShowLoginPopup(true);
+                  return;
                 }
-                await getEnrollmentDoc({ course, attendee }, true)
-                setEnrolled(true)
+                await getEnrollmentDoc({ course, attendee }, true);
+                setEnrolled(true);
               }}
               color="primary"
               className="px-4 uppercase mb-6 py-3 w-full border-none rounded-none"
@@ -282,10 +284,10 @@ export default function PostDetail({
               courseId: course.slug,
               postId: post.slug,
             }}
-            submitModalTitle={'Submit Assignment'}
-            submitButtonText={'Submit Assignment'}
+            submitModalTitle={"Submit Assignment"}
+            submitButtonText={"Submit Assignment"}
             submissionDone={() => {
-              console.log('submitted')
+              console.log("submitted");
             }}
             submissionUrl={`assignments/${course.slug}/${user?.uid}/${post.slug}`}
             enrollmentChanged={() => {}}
@@ -293,7 +295,7 @@ export default function PostDetail({
             {null}
           </SubmissionWrapper>
         )}
-        {post.type === 'video' && (
+        {post.type === "video" && (
           <section className="embed-container mb-4">
             {post.embed?.isYouTube ? (
               <YoutubePlayer
@@ -318,7 +320,7 @@ export default function PostDetail({
               <Button
                 color="primary"
                 onClick={() => {
-                  goToPost(previousPost)
+                  goToPost(previousPost);
                 }}
                 title="Previous Post"
                 className="px-4 py-2"
@@ -351,7 +353,7 @@ export default function PostDetail({
               <Button
                 color="primary"
                 onClick={() => {
-                  goToPost(nextPost)
+                  goToPost(nextPost);
                 }}
                 title="Next Post"
                 className="px-4 py-2"
@@ -369,7 +371,7 @@ export default function PostDetail({
             </section>
           )}
         </section>
-        {post.type === 'video' && post.embed?.isYouTube ? (
+        {post.type === "video" && post.embed?.isYouTube ? (
           <>
             <div className="flex gap-4 items-center justify-end mb-8">
               {/* @ts-ignore */}
@@ -405,7 +407,7 @@ export default function PostDetail({
                       comment={comment}
                       videoLink={`https://youtu.be/${post.embed.id}`}
                     />
-                  )
+                  );
                 })
               )}
             </ul>
@@ -418,7 +420,7 @@ export default function PostDetail({
               <LegitMarkdown
                 components={{
                   a: (props: any) => (
-                    <a className="text-yellow-300" target={'_blank'} {...props}>
+                    <a className="text-yellow-300" target={"_blank"} {...props}>
                       {props.children}
                     </a>
                   ),
@@ -433,7 +435,11 @@ export default function PostDetail({
         <section>
           {post.resources?.length > 0 && (
             <section className="mt-4">
-              <ResourcesLinks resources={post.resources} noHeading={false} heading={'Resources'} />
+              <ResourcesLinks
+                resources={post.resources}
+                noHeading={false}
+                heading={"Resources"}
+              />
             </section>
           )}
         </section>
@@ -442,5 +448,5 @@ export default function PostDetail({
         </div>
       </main>
     </div>
-  )
+  );
 }
