@@ -146,7 +146,7 @@ export default function LogicBuildingPage() {
   const generateBonusProblem = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/logic-building", {
+      const res = await fetch("/api/logic-buddy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode: "generate-problem" }),
@@ -197,7 +197,7 @@ export default function LogicBuildingPage() {
     setChatHistory((prev) => [...prev, { role: "user", content: userMsg }]);
 
     try {
-      const res = await fetch("/api/logic-building", {
+      const res = await fetch("/api/logic-buddy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
