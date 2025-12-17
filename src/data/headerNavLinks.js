@@ -11,7 +11,7 @@ const headerNavLinks = [
   // { href: '/gear', title: 'Gear' },
   // { href: '/community', title: 'Community' },
   { href: "/about", title: "About" },
-  { href: "/logic-building", title: "Logic Buddy 🧠" },
+  { href: "/logic-building", title: "Logic Buddy (beta) 🧠" },
 ];
 
 export default headerNavLinks;

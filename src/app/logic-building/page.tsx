@@ -355,7 +355,7 @@ export default function LogicBuildingPage() {
         <div className="hero-content text-center">
           <div className="max-w-md">
             <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-              Logic Buddy 🧠
+              Logic Buddy <span className="text-2xl align-top">(beta)</span> 🧠
             </h1>
             <p className="py-6">
               Master your programming logic. Solve the problems suggested by
@@ -644,6 +644,24 @@ export default function LogicBuildingPage() {
                     </tbody>
                   </table>
                 </div>
+              </div>
+            </div>
+
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title text-xl mb-4">Feedback 💭</h2>
+                <p className="mb-4">
+                  Help us improve Logic Buddy! Share your thoughts, report bugs,
+                  or suggest features.
+                </p>
+                <a
+                  href="https://discord.com/channels/814191682282717194/1450734264302964837"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary w-full"
+                >
+                  Join Discord Discussion
+                </a>
               </div>
             </div>
           </div>
