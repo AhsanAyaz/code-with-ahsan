@@ -1,0 +1,52 @@
+[
+  {
+    "id": "p1",
+    "title": "1. Even or Odd",
+    "description": "Write a logic to check if a number is even or odd. If the user enters 4, it should say 'Even'. If -5, 'Odd'. How would your program handle zero?"
+  },
+  {
+    "id": "p2",
+    "title": "2. Largest of Three Numbers",
+    "description": "You have three numbers: A, B, and C. Write the logic to find the largest among them without using any built-in 'max' function."
+  },
+  {
+    "id": "p3",
+    "title": "3. FizzBuzz Logic",
+    "description": "Print numbers from 1 to N. If a number is divisible by 3, print 'Fizz'. If divisible by 5, print 'Buzz'. If divisible by both, print 'FizzBuzz'. Otherwise, print the number."
+  },
+  {
+    "id": "p4",
+    "title": "4. Reverse a String",
+    "description": "Design an algorithm to reverse a given text string (e.g., 'hello' -> 'olleh') without using a built-in reverse function. Think about using a loop."
+  },
+  {
+    "id": "p5",
+    "title": "5. Factorial of a Number",
+    "description": "Calculate the factorial of a non-negative integer N. (Example: 5! = 5*4*3*2*1 = 120). How do you handle 0! ?"
+  },
+  {
+    "id": "p6",
+    "title": "6. Check for Palindrome",
+    "description": "A palindrome reads the same backwards as forwards (e.g., 'radar', 'madam'). Write logic to check if a given string is a palindrome."
+  },
+  {
+    "id": "p7",
+    "title": "7. Toggle To-Do Item",
+    "description": "You have a list of tasks. Each task has an ID and a status (completed: true/false). Write the logic to find a specific task by ID and toggle its status from true to pseudo-false (or vice versa)."
+  },
+  {
+    "id": "p8",
+    "title": "8. Shopping Cart Total",
+    "description": "A user adds items to a cart. Each item has a `price` and `quantity`. Write the logic to loop through the cart and calculate the final total. Apply a 10% discount if the total is over $100."
+  },
+  {
+    "id": "p9",
+    "title": "9. Authentication Flow (Token)",
+    "description": "Design a secure flow: User logs in -> Server verifies -> Server sends Token -> Client stores Token. How is this token used for the next request? What happens if the token expires?"
+  },
+  {
+    "id": "p10",
+    "title": "10. API Rate Limiter",
+    "description": "Design a system that limits a user to 5 requests per minute. How do you store the timestamps of their requests? How do you decide whether to allow or block a new request?"
+  }
+]
