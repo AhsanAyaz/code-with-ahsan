@@ -50,8 +50,3 @@
 @import "../css/prism.css";
 @import "../css/layout.css";
 @import "../css/tailwind.css";
-
-.top-banner p {
-  display: flex;
-  justify-content: space-between;
-}
