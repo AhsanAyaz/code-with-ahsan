@@ -7,10 +7,28 @@ if (!admin.apps.length) {
   // For this environment, we try default/inferred.
 
   // Check if we have explicit credentials strings (common in Vercel/local envs)
+  // Check if we have explicit credentials strings (common in Vercel/local envs)
   if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+    if (serviceAccount.private_key) {
+      serviceAccount.private_key = serviceAccount.private_key.replace(
+        /\\n/g,
+        "\n"
+      );
+    }
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
+    });
+  } else if (
+    process.env.FIREBASE_PRIVATE_KEY &&
+    process.env.FIREBASE_CLIENT_EMAIL
+  ) {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+      }),
     });
   } else if (process.env.NODE_ENV === "development") {
     try {
