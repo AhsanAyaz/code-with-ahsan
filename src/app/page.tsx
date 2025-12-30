@@ -66,6 +66,14 @@ async function getBanners() {
 export default async function Home() {
   const banners = await getBanners();
 
+  // Inject New Year Sale Banner
+  banners.unshift({
+    content:
+      "🎉 **New Year Sale!** Get [Mastering Angular Signals](https://leanpub.com/mastering-angular-signals/c/GO2026) at **75% OFF** until Jan 5th! (Includes future Signal Forms update). Happy New Year!",
+    isActive: true,
+    dismissable: true,
+  });
+
   return (
     <>
       <HomeBanners banners={banners} />

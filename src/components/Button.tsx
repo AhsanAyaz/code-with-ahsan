@@ -8,6 +8,8 @@ interface ButtonProps {
   title?: string;
   className?: string;
   href?: string;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -17,6 +19,8 @@ const Button: React.FC<ButtonProps> = ({
   title,
   className,
   href,
+  type = "button",
+  disabled,
 }) => {
   const baseClass = "btn";
   let colorClass = "btn-neutral";
@@ -50,7 +54,13 @@ const Button: React.FC<ButtonProps> = ({
       {children}
     </a>
   ) : (
-    <button onClick={onClick} title={title || ""} className={combinedClass}>
+    <button
+      onClick={onClick}
+      title={title || ""}
+      className={combinedClass}
+      type={type}
+      disabled={disabled}
+    >
       {children}
     </button>
   );
