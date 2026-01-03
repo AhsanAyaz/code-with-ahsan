@@ -10,6 +10,7 @@ const booksData = [
     link: null,
     btnText: "Get Notified",
     actionType: "interest-form",
+    discount: "Coming Soon",
   },
   {
     id: 3,
