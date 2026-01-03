@@ -5,7 +5,7 @@ const booksData = [
     description:
       "A Beginner's Guide to Building for the Web. From zero coding knowledge to a published website.",
     amazonLink: null,
-    imageUrl: null, // TODO: Add placeholder or actual image when available
+    imageUrl: "/static/images/books/zero-to-website-cover.png",
     author: "Ahsan Ayaz",
     link: null,
     btnText: "Get Notified",
