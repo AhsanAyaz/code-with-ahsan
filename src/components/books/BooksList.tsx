@@ -34,7 +34,7 @@ function BooksListContent() {
 
   return (
     <>
-      <div className="max-w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="max-w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {booksData.map((book: any) => (
           <BookCard book={book} key={book.id} />
         ))}

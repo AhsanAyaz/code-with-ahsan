@@ -18,7 +18,7 @@ const NewsletterForm = ({
       <Script
         src={`https://cdn.jsdelivr.net/ghost/signup-form@~0.2/umd/signup-form.min.js?ts=${Date.now()}`}
         {...{
-          "data-background-color": "#08090c",
+          "data-background-color": "#1B2228",
           "data-text-color": "#FFFFFF",
           "data-button-color": "#8f27e0",
           "data-button-text-color": "#FFFFFF",

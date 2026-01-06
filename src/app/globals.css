@@ -3,6 +3,30 @@
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
 
+@theme inline {
+  --font-mono: "JetBrains Mono", monospace;
+  --font-sans: "Inter", "Rubik", sans-serif;
+
+  /* Neon Color Palette - for accents only */
+  --color-neon-cyan: #00f0ff;
+  --color-neon-purple: #bc13fe;
+  --color-neon-green: #00ff41;
+  --color-void-black: #050505;
+
+  /* Gray scale */
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #e5e5e5;
+  --color-gray-300: #d4d4d4;
+  --color-gray-400: #a3a3a3;
+  --color-gray-500: #737373;
+  --color-gray-600: #525252;
+  --color-gray-700: #404040;
+  --color-gray-800: #262626;
+  --color-gray-900: #171717;
+  --color-gray-950: #0a0a0a;
+}
+
 @layer base {
   :root,
   [data-theme="light"] {
@@ -26,21 +50,35 @@
     --color-accent: #1fb2a6 !important;
     --color-accent-content: #ffffff !important;
   }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
 }
 
-@theme {
-  /* Gray (Neutral) */
-  --color-gray-50: #fafafa;
-  --color-gray-100: #f5f5f5;
-  --color-gray-200: #e5e5e5;
-  --color-gray-300: #d4d4d4;
-  --color-gray-400: #a3a3a3;
-  --color-gray-500: #737373;
-  --color-gray-600: #525252;
-  --color-gray-700: #404040;
-  --color-gray-800: #262626;
-  --color-gray-900: #171717;
-  --color-gray-950: #0a0a0a;
+@layer utilities {
+  .animate-gradient-x {
+    animation: gradient-x 3s ease infinite;
+    background-size: 200% 200%;
+  }
+
+  @keyframes gradient-x {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
 }
 
 :root {

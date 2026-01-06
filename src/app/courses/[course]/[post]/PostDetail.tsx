@@ -200,7 +200,7 @@ export default function PostDetail({
   }, [post.slug, course.slug]);
 
   return (
-    <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-4">
+    <div className="flex flex-col-reverse md:grid md:grid-cols-3 gap-4 px-4 sm:px-8 md:px-12 lg:px-16">
       <aside className="chapters col-span-1">
         {course && (
           <CoursesList
@@ -217,7 +217,7 @@ export default function PostDetail({
             {/* @ts-ignore */}
             <Link
               href={`/courses/${course.slug}/resources`}
-              className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-base-content dark:hover:bg-primary cursor-pointer bg-gray-100 rounded-md hover:bg-primary hover:text-white`}
+              className={`flex items-center gap-4 justify-between px-4 py-2 cursor-pointer bg-gray-700 text-white hover:bg-gray-600 rounded-lg border border-gray-600 hover:border-primary transition-colors shadow-lg`}
             >
               <span className="break-words">View Resources</span>
             </Link>
@@ -228,7 +228,7 @@ export default function PostDetail({
           {/* @ts-ignore */}
           <Link
             href={`/courses/${course.slug}/submissions`}
-            className={`flex items-center gap-4 justify-between px-4 py-2 dark:bg-gray-700 dark:text-base-content dark:hover:bg-primary cursor-pointer bg-gray-100 rounded-md hover:bg-primary hover:text-white`}
+            className={`flex items-center gap-4 justify-between px-4 py-2 cursor-pointer bg-gray-700 text-white hover:bg-gray-600 rounded-lg border border-gray-600 hover:border-primary transition-colors shadow-lg`}
           >
             <span className="break-words">View Submissions</span>
           </Link>

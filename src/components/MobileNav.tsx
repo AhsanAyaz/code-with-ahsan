@@ -26,6 +26,7 @@ const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
     });
   };
 
+  // Filter out Discord from primary links (we add it directly)
   const allLinks = headerNavLinks;
   const primaryLinks = allLinks.filter(
     (link) =>
@@ -36,15 +37,7 @@ const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
         link.href.includes("discord.gg")
       )
   );
-  const moreLinks = allLinks.filter(
-    (link) =>
-      link.href === "/rates" ||
-      link.title === "Rates" ||
-      link.title === "Discord" ||
-      link.href.includes("discord.gg")
-  );
-  const [moreOpen, setMoreOpen] = useState(false);
-  const highlightContext = `relative w-full sm:w-auto block text-sm font-semibold bg-primary rounded-md text-white py-3 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 hover:bg-primary/90`;
+
   return (
     <div className="md:hidden z-[100]">
       <button
@@ -115,47 +108,16 @@ const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
               </Link>
             </div>
           ))}
-          {moreLinks.length > 0 && (
-            <div className="px-12 py-4">
-              <button
-                type="button"
-                aria-expanded={moreOpen}
-                onClick={() => setMoreOpen((v) => !v)}
-                className="text-2xl font-bold tracking-widest text-base-content flex items-center gap-2 hover:text-primary btn btn-ghost"
-              >
-                More
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`h-5 w-5 transition-transform ${moreOpen ? "rotate-180" : ""}`}
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-              {moreOpen && (
-                <div className="mt-2 ml-6">
-                  {moreLinks.map((link) => (
-                    <div key={link.title} className="py-2">
-                      <Link
-                        href={link.href}
-                        className={`text-xl font-semibold tracking-wide text-base-content hover:text-primary ${linkClassOverrides(
-                          link
-                        )}`}
-                        onClick={onToggleNav}
-                      >
-                        {link.title}
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+          {/* Direct Discord link instead of More dropdown */}
+          <div className="px-12 py-4">
+            <Link
+              href="https://discord.gg/KSPpuxD8SG"
+              className="text-2xl font-bold tracking-widest text-base-content hover:text-primary btn btn-ghost"
+              onClick={onToggleNav}
+            >
+              Discord
+            </Link>
+          </div>
         </nav>
       </div>
     </div>

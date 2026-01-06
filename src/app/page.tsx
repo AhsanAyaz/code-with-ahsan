@@ -1,11 +1,8 @@
 import siteMetadata from "@/data/siteMetadata";
 import qs from "qs";
-import Image from "next/image";
-import SocialIcon from "@/components/social-icons";
+import Hero from "@/components/Hero";
+import Features from "@/components/Features";
 import NewsletterForm from "@/components/NewsletterForm";
-import AboutContent from "@/components/AboutContent";
-import Link from "next/link";
-import LegitMarkdown from "@/components/LegitMarkdown";
 import HomeBanners from "@/components/HomeBanners";
 
 // Mock fetch for banners - TODO: Implement actual data fetching via Server Action or API
@@ -76,75 +73,33 @@ export default async function Home() {
 
   return (
     <>
-      <HomeBanners banners={banners} />
+      <section className="px-4 sm:px-8 md:px-12 lg:px-16 border-t border-base-300 relative bg-base-100">
+        <HomeBanners banners={banners} />
+      </section>
 
-      <div className="flex flex-col justify-center">
-        <div className="flex flex-col md:flex-row items-center mb-16 px-24 md:px-0 relative">
-          <Image
-            src="/static/images/banner-dev.webp"
-            alt="banner dev"
-            width={800}
-            height={800}
-            className="w-84 md:w-auto md:flex-1"
-            style={{ objectFit: "contain" }}
-            property="true"
-          />
+      <Hero />
 
-          <div className="flex flex-col pr-6 py-10 bottom-0 top-0 items-center md:items-end justify-center h-full w-full gap-4">
-            <Link href={"/courses"}>
-              <button className="btn btn-primary bg-primary border-primary btn-lg w-52 lg:w-72 text-xl lg:text-2xl text-primary-content">
-                Take a Course
-              </button>
-            </Link>
-            <Link href={"https://blog.codewithahsan.dev/"}>
-              <button className="btn btn-neutral btn-lg w-52 lg:w-72 text-xl lg:text-2xl text-white">
-                Read the Blog
-              </button>
-            </Link>
-          </div>
+      <Features />
+
+      {/* Newsletter Section */}
+      <section className="py-16 px-4 sm:px-8 md:px-12 lg:px-16 border-t border-base-300 relative bg-base-100">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(143,39,224,0.05)_0%,transparent_70%)]"></div>
+        <div className="relative z-10 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-base-content">
+            Join the <span className="text-accent">Community</span>
+          </h2>
+          <p className="text-base-content/70 max-w-xl mx-auto mb-8">
+            Get the latest tutorials, articles, and course updates delivered
+            straight to your inbox. No spam, just code.
+          </p>
+
+          {siteMetadata.newsletter.provider !== "" && (
+            <div className="max-w-md mx-auto">
+              <NewsletterForm />
+            </div>
+          )}
         </div>
-
-        <figure className="md:flex bg-base-200 rounded-xl p-8 md:p-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            className="w-24 h-24 md:w-48 md:h-auto md:rounded-none md:rounded-l-xl object-cover rounded-full mx-auto"
-            src={siteMetadata.image}
-            alt=""
-            width="384"
-            height="512"
-          />
-          <div className="pt-6 md:p-8 text-center md:text-left space-y-4">
-            <blockquote>
-              <AboutContent />
-            </blockquote>
-          </div>
-        </figure>
-
-        <div className="text-center mt-5 parent-container">
-          <div className="inline-flex gap-10 icons-container my-8">
-            <SocialIcon kind="twitch" href={siteMetadata.twitch} size={42} />
-            <SocialIcon
-              color="text-red-700"
-              kind="youtube"
-              href={siteMetadata.youtube}
-              size={42}
-            />
-            <SocialIcon kind="github" href={siteMetadata.github} size={42} />
-          </div>
-        </div>
-
-        {siteMetadata.newsletter.provider !== "" && (
-          <div className="flex items-center justify-center pt-4">
-            <NewsletterForm />
-          </div>
-        )}
-
-        <div className="text-sm text-center mt-10">
-          <a href="https://www.vecteezy.com/free-vector/human">
-            Human Vectors by Vecteezy
-          </a>
-        </div>
-      </div>
+      </section>
     </>
   );
 }
