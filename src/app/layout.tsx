@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Rubik } from "next/font/google";
+import { Rubik, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import LayoutWrapper from "@/components/LayoutWrapper";
@@ -16,6 +16,12 @@ const rubik = Rubik({
   display: "swap",
 });
 
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: siteMetadata.title,
   description: siteMetadata.description,
@@ -28,7 +34,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang={siteMetadata.language} suppressHydrationWarning>
-      <body className={`${rubik.variable} antialiased`}>
+      <body
+        className={`${rubik.variable} ${jetbrainsMono.variable} antialiased`}
+      >
         <Providers>
           <LayoutWrapper>
             <Analytics />

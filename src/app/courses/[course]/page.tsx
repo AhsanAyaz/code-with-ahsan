@@ -1,19 +1,19 @@
-import qs from 'qs'
-import { notFound } from 'next/navigation'
+import qs from "qs";
+import { notFound } from "next/navigation";
 // @ts-ignore
-import { STRAPI_COURSE_POPULATE_OBJ } from '@/lib/strapiQueryHelpers'
+import { STRAPI_COURSE_POPULATE_OBJ } from "@/lib/strapiQueryHelpers";
 // @ts-ignore
-import Course from '@/classes/Course.class'
-import CourseDetail from './CourseDetail'
-import siteMetadata from '@/data/siteMetadata'
+import Course from "@/classes/Course.class";
+import CourseDetail from "./CourseDetail";
+import siteMetadata from "@/data/siteMetadata";
 
 async function getCourse(slug: string) {
-  const strapiUrl = process.env.STRAPI_URL
-  const strapiAPIKey = process.env.STRAPI_API_KEY
+  const strapiUrl = process.env.STRAPI_URL;
+  const strapiAPIKey = process.env.STRAPI_API_KEY;
 
   if (!strapiUrl || !strapiAPIKey) {
-    console.warn('Strapi URL or API Key missing. Returning null.')
-    return null
+    console.warn("Strapi URL or API Key missing. Returning null.");
+    return null;
   }
 
   const query = qs.stringify(
@@ -28,9 +28,9 @@ async function getCourse(slug: string) {
     {
       encodeValuesOnly: true,
     }
-  )
+  );
 
-  const url = `${strapiUrl}/api/courses?${query}`
+  const url = `${strapiUrl}/api/courses?${query}`;
 
   try {
     const coursesResp = await fetch(url, {
@@ -38,31 +38,35 @@ async function getCourse(slug: string) {
         Authorization: `Bearer ${strapiAPIKey}`,
       },
       next: { revalidate: 60 },
-    })
+    });
 
-    if (!coursesResp.ok) return null
+    if (!coursesResp.ok) return null;
 
-    const data = await coursesResp.json()
-    if (!data.data.length) return null
+    const data = await coursesResp.json();
+    if (!data.data.length) return null;
 
-    const course = new Course(data.data[0])
-    course.chapters.sort((a: any, b: any) => a.order - b.order)
-    return course
+    const course = new Course(data.data[0]);
+    course.chapters.sort((a: any, b: any) => a.order - b.order);
+    return course;
   } catch (error) {
-    console.error('Error fetching course:', error)
-    return null
+    console.error("Error fetching course:", error);
+    return null;
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ course: string }> }) {
-  const { course: slug } = await params
-  const course = await getCourse(slug)
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ course: string }>;
+}) {
+  const { course: slug } = await params;
+  const course = await getCourse(slug);
 
   if (!course) {
     return {
-      title: 'Course Not Found',
-      description: 'The requested course could not be found.',
-    }
+      title: "Course Not Found",
+      description: "The requested course could not be found.",
+    };
   }
 
   return {
@@ -73,15 +77,19 @@ export async function generateMetadata({ params }: { params: Promise<{ course: s
       description: course.description || siteMetadata.description,
       images: course.banner ? [course.banner] : [],
     },
-  }
+  };
 }
 
-export default async function Page({ params }: { params: Promise<{ course: string }> }) {
-  const { course: slug } = await params
-  const course = await getCourse(slug)
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ course: string }>;
+}) {
+  const { course: slug } = await params;
+  const course = await getCourse(slug);
 
   if (!course) {
-    notFound()
+    notFound();
   }
 
   // Pass course as JSON serializable object if class is not simple json
@@ -90,7 +98,11 @@ export default async function Page({ params }: { params: Promise<{ course: strin
   // The Course class has methods? Let's check.
   // It has a constructor. If it has prototypes methods, those won't pass.
   // We can pass {...course} to mimic serialization or use JSON.parse(JSON.stringify(course))
-  const coursePlain = JSON.parse(JSON.stringify(course))
+  const coursePlain = JSON.parse(JSON.stringify(course));
 
-  return <CourseDetail course={coursePlain} />
+  return (
+    <div className="px-4 sm:px-8 md:px-12 lg:px-16">
+      <CourseDetail course={coursePlain} />
+    </div>
+  );
 }

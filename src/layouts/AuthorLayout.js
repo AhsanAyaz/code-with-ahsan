@@ -18,7 +18,7 @@ export default function AuthorLayout({ children, frontMatter }) {
 
   return (
     <>
-      <div className="divide-y">
+      <div className="divide-y px-4 sm:px-8 md:px-12 lg:px-16">
         <div className="pt-6 pb-8 space-y-2 md:space-y-5">
           <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-base-content sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
             About

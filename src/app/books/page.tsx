@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 export default function Books() {
   return (
-    <>
+    <div className="px-4 sm:px-8 md:px-12 lg:px-16">
       <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-base-content sm:text-4xl sm:leading-10 md:text-6xl md:leading-14 text-center mt-4 mb-4 md:mb-8">
         Books
       </h1>
@@ -34,6 +34,6 @@ export default function Books() {
           <NewsletterForm />
         </div>
       </section>
-    </>
+    </div>
   );
 }
