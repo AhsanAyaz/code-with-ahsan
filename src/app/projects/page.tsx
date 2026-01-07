@@ -1,25 +1,25 @@
-import { Metadata } from 'next'
+import { Metadata } from "next";
 // @ts-ignore
-import siteMetadata from '@/data/siteMetadata'
+import siteMetadata from "@/data/siteMetadata";
 // @ts-ignore
-import projectsData from '@/data/projectsData'
+import projectsData from "@/data/projectsData";
 // @ts-ignore
-import Card from '@/components/Card'
+import Card from "@/components/Card";
 
 export const metadata: Metadata = {
   title: `Projects - ${siteMetadata.author}`,
   description: siteMetadata.description,
-}
+};
 
 export default function Projects() {
   return (
-    <>
+    <div className="px-4 sm:px-8 md:px-12 lg:px-16">
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
         <div className="pt-6 pb-8 space-y-2 md:space-y-5">
           <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-base-content sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
             Projects
           </h1>
-          <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
+          <p className="text-lg leading-7 text-base-content/70">
             Showcase your projects with a hero image (16 x 9)
           </p>
         </div>
@@ -37,6 +37,6 @@ export default function Projects() {
           </div>
         </div>
       </div>
-    </>
-  )
+    </div>
+  );
 }
