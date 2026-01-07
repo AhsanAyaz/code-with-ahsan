@@ -101,7 +101,7 @@ export default async function Page({
   const coursePlain = JSON.parse(JSON.stringify(course));
 
   return (
-    <div className="px-4 sm:px-8 md:px-12 lg:px-16">
+    <div className="page-padding">
       <CourseDetail course={coursePlain} />
     </div>
   );

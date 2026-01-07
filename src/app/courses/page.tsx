@@ -66,7 +66,7 @@ export default async function CoursesPage() {
   const courses = await getCourses();
 
   return (
-    <div className="px-4 sm:px-8 md:px-12 lg:px-16">
+    <div className="page-padding">
       <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-base-content sm:text-4xl sm:leading-10 md:text-6xl md:leading-14 text-center mt-4 mb-4 md:mb-8">
         Courses
       </h1>

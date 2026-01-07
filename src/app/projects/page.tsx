@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function Projects() {
   return (
-    <div className="px-4 sm:px-8 md:px-12 lg:px-16">
+    <div className="page-padding">
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
         <div className="pt-6 pb-8 space-y-2 md:space-y-5">
           <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-base-content sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">

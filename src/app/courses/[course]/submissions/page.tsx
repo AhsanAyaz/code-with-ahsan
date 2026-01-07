@@ -1,58 +1,66 @@
-'use client'
+"use client";
 
-import React, { useEffect, useState, useCallback } from 'react'
-import { getFirestore, collection, getDocs, doc, deleteDoc, getDoc } from 'firebase/firestore'
-import { getApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
-import { getStorage, ref, deleteObject } from 'firebase/storage'
-import { useParams } from 'next/navigation'
+import React, { useEffect, useState, useCallback } from "react";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+  getDoc,
+} from "firebase/firestore";
+import { getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getStorage, ref, deleteObject } from "firebase/storage";
+import { useParams } from "next/navigation";
 // @ts-ignore
-import SubmissionWrapper from '@/components/SubmissionWrapper'
+import SubmissionWrapper from "@/components/SubmissionWrapper";
 // @ts-ignore
-import { getCoursesForStaticPaths } from '@/services/CourseService'
-import axios from 'axios'
-import qs from 'qs'
+import { getCoursesForStaticPaths } from "@/services/CourseService";
+import axios from "axios";
+import qs from "qs";
 // @ts-ignore
-import Course from '@/classes/Course.class'
+import Course from "@/classes/Course.class";
 // @ts-ignore
-import { STRAPI_COURSE_POPULATE_OBJ } from '@/lib/strapiQueryHelpers'
+import { STRAPI_COURSE_POPULATE_OBJ } from "@/lib/strapiQueryHelpers";
 // @ts-ignore
-import Spinner from '@/components/Spinner'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import Spinner from "@/components/Spinner";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 // @ts-ignore
-import { getFireStorageFileName } from '@/lib/utils/queryParams'
+import { getFireStorageFileName } from "@/lib/utils/queryParams";
 
 const strapiUrl =
-  process.env.NEXT_PUBLIC_STRAPI_URL || 'https://strapi-production-7b84.up.railway.app'
+  process.env.NEXT_PUBLIC_STRAPI_URL ||
+  "https://strapi-production-7b84.up.railway.app";
 const strapiAPIKey =
   process.env.STRAPI_API_KEY ||
-  '2d28dddc977ac98d7e4e55b2f5cd7e1302d22f3e9033f705cb918185d5d178fd95768ae1d7e8406714022bccddc7c91a394fee9e276eba87b0e047948b22e4be58f0e97bd6e5295f52dd24fd943ad67fb0f85e7bc2d1a6487753cc704a160761b29ef8dda04f04c31fac2c1b9620103afe7a0eba541108738a5fc46c4083485d'
+  "2d28dddc977ac98d7e4e55b2f5cd7e1302d22f3e9033f705cb918185d5d178fd95768ae1d7e8406714022bccddc7c91a394fee9e276eba87b0e047948b22e4be58f0e97bd6e5295f52dd24fd943ad67fb0f85e7bc2d1a6487753cc704a160761b29ef8dda04f04c31fac2c1b9620103afe7a0eba541108738a5fc46c4083485d";
 
-const auth = getAuth(getApp())
-const storage = getStorage(getApp())
-const firestore = getFirestore(getApp())
+const auth = getAuth(getApp());
+const storage = getStorage(getApp());
+const firestore = getFirestore(getApp());
 
 export default function SubmissionsPage() {
-  const params = useParams()
-  const courseSlug = params.course
+  const params = useParams();
+  const courseSlug = params.course;
 
-  const [course, setCourse] = useState<any>(null)
-  const [submissions, setSubmissions] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState(auth.currentUser)
-  const [isDeletingSubmission, setIsDeletingSubmission] = useState(false)
+  const [course, setCourse] = useState<any>(null);
+  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(auth.currentUser);
+  const [isDeletingSubmission, setIsDeletingSubmission] = useState(false);
 
   useEffect(() => {
     const sub = auth.onAuthStateChanged((user) => {
-      setUser(user)
-    })
-    return () => sub()
-  }, [])
+      setUser(user);
+    });
+    return () => sub();
+  }, []);
 
   // Fetch Course Details
   useEffect(() => {
-    if (!courseSlug) return
+    if (!courseSlug) return;
 
     async function fetchCourse() {
       try {
@@ -71,80 +79,87 @@ export default function SubmissionsPage() {
           {
             encodeValuesOnly: true,
           }
-        )
-        const url = `${strapiUrl}/api/courses?${queryStr}`
+        );
+        const url = `${strapiUrl}/api/courses?${queryStr}`;
         const coursesResp = await axios.get(url, {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${strapiAPIKey}`,
           },
-        })
+        });
 
         if (coursesResp.data.data && coursesResp.data.data.length > 0) {
-          const courseObj = new Course(coursesResp.data.data[0])
-          setCourse(courseObj)
+          const courseObj = new Course(coursesResp.data.data[0]);
+          setCourse(courseObj);
         }
       } catch (e) {
-        console.error('Failed to fetch course', e)
+        console.error("Failed to fetch course", e);
       }
     }
-    fetchCourse()
-  }, [courseSlug])
+    fetchCourse();
+  }, [courseSlug]);
 
   const getSubmissions = useCallback(async () => {
-    if (!courseSlug) return
+    if (!courseSlug) return;
     const querySnapshot = await getDocs(
       collection(firestore, `cwa-web/project-submissions/${courseSlug}`)
-    )
-    const submissionsList: any[] = []
+    );
+    const submissionsList: any[] = [];
     querySnapshot.forEach((doc) => {
-      submissionsList.push(doc.data())
-    })
-    setSubmissions(submissionsList)
-    setLoading(false)
-  }, [courseSlug])
+      submissionsList.push(doc.data());
+    });
+    setSubmissions(submissionsList);
+    setLoading(false);
+  }, [courseSlug]);
 
   useEffect(() => {
-    getSubmissions()
-  }, [getSubmissions])
+    getSubmissions();
+  }, [getSubmissions]);
 
   const deleteProjectFileIfExists = async (docRef: any) => {
-    const existingDoc = await getDoc(docRef)
+    const existingDoc = await getDoc(docRef);
     if (existingDoc.exists()) {
-      const existingFileUrl = (existingDoc.data() as any)?.screenshotUrl
-      const filePath = getFireStorageFileName(existingFileUrl)
-      await deleteObject(ref(storage, filePath))
+      const existingFileUrl = (existingDoc.data() as any)?.screenshotUrl;
+      const filePath = getFireStorageFileName(existingFileUrl);
+      await deleteObject(ref(storage, filePath));
     }
-  }
+  };
 
   const deleteSubmission = async () => {
-    if (!user) return
-    setIsDeletingSubmission(true)
+    if (!user) return;
+    setIsDeletingSubmission(true);
     try {
-      const docRef = doc(firestore, `cwa-web/project-submissions/${courseSlug}/${user.uid}`)
-      await deleteProjectFileIfExists(docRef)
-      await deleteDoc(docRef)
-      getSubmissions()
+      const docRef = doc(
+        firestore,
+        `cwa-web/project-submissions/${courseSlug}/${user.uid}`
+      );
+      await deleteProjectFileIfExists(docRef);
+      await deleteDoc(docRef);
+      getSubmissions();
     } catch (e) {
-      console.log(e)
+      console.log(e);
     } finally {
-      setIsDeletingSubmission(false)
+      setIsDeletingSubmission(false);
     }
-  }
+  };
 
   if (loading && !course) {
     return (
       <div className="flex justify-center p-10">
         <Spinner color="primary" />
       </div>
-    )
+    );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="page-padding">
       <header className="mb-6">
         <h1 className="text-4xl text-center">Submissions</h1>
-        {course && <h2 className="text-xl mt-2 text-center text-base-content/70">{course.name}</h2>}
+        {course && (
+          <h2 className="text-xl mt-2 text-center text-base-content/70">
+            {course.name}
+          </h2>
+        )}
       </header>
 
       <SubmissionWrapper
@@ -169,7 +184,7 @@ export default function SubmissionsPage() {
                     onClick={deleteSubmission}
                     className="hover:opacity-50 cursor-pointer absolute top-3 right-3 z-10 bg-white rounded-full p-1"
                   >
-                    <FontAwesomeIcon icon={faTrash} color={'red'} />
+                    <FontAwesomeIcon icon={faTrash} color={"red"} />
                   </button>
                 )}
                 {isDeletingSubmission ? (
@@ -178,7 +193,7 @@ export default function SubmissionsPage() {
                   </div>
                 ) : (
                   <div
-                    onClick={() => window.open(sub.demoLink, '_blank')}
+                    onClick={() => window.open(sub.demoLink, "_blank")}
                     className="overflow-hidden rounded-t-md flex items-center justify-center aspect-video bg-black/80 w-full"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -214,9 +229,11 @@ export default function SubmissionsPage() {
             ))}
           </ul>
         ) : (
-          <h2 className="text-2xl text-center my-8 text-base-content/60">No submissions yet</h2>
+          <h2 className="text-2xl text-center my-8 text-base-content/60">
+            No submissions yet
+          </h2>
         )}
       </SubmissionWrapper>
     </div>
-  )
+  );
 }

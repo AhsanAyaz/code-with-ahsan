@@ -33,7 +33,7 @@ const HackStack2023Base = () => {
   return (
     <>
       <div
-        className={`flex flex-col gap-8 mt-8 ${
+        className={`page-padding flex flex-col gap-8 mt-8 ${
           theme !== "light" ? styles.dark : styles.light
         }`}
       >

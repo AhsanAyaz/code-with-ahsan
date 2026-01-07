@@ -350,8 +350,8 @@ export default function LogicBuildingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-base-200">
-      <div className="hero bg-base-100 py-8">
+    <div className="page-padding min-h-screen bg-base-200">
+      <div className="hero bg-base-100">
         <div className="hero-content text-center">
           <div className="max-w-md">
             <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">

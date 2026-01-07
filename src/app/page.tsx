@@ -73,7 +73,7 @@ export default async function Home() {
 
   return (
     <>
-      <section className="px-4 sm:px-8 md:px-12 lg:px-16 border-t border-base-300 relative bg-base-100">
+      <section className="page-padding border-t border-base-300 relative bg-base-100">
         <HomeBanners banners={banners} />
       </section>
 
@@ -82,7 +82,7 @@ export default async function Home() {
       <Features />
 
       {/* Newsletter Section */}
-      <section className="py-16 px-4 sm:px-8 md:px-12 lg:px-16 border-t border-base-300 relative bg-base-100">
+      <section className="py-16 page-padding border-t border-base-300 relative bg-base-100">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(143,39,224,0.05)_0%,transparent_70%)]"></div>
         <div className="relative z-10 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6 text-base-content">

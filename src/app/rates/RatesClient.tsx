@@ -5,7 +5,7 @@ import ResourcesLinks from "@/components/ResourcesLinks";
 
 export default function RatesClient({ post }: { post: any }) {
   return (
-    <div className="px-4 sm:px-8 md:px-12 lg:px-16 py-8">
+    <div className="page-padding">
       <header className="mb-6">
         <h1 className="text-4xl text-center">
           {post.title || "Creator Rate Card"}

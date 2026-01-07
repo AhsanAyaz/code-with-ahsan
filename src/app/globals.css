@@ -79,6 +79,11 @@
       background-position: 100% 50%;
     }
   }
+
+  /* Centralized page padding - update here to affect all pages */
+  .page-padding {
+    @apply px-4 sm:px-8 md:px-12 lg:px-16 py-8;
+  }
 }
 
 :root {
