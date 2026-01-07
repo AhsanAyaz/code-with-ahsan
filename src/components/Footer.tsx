@@ -4,7 +4,7 @@ import SocialIcon from "@/components/social-icons";
 
 export default function Footer() {
   return (
-    <footer className="footer footer-center p-10 bg-base-200 text-base-content rounded mt-16">
+    <footer className="footer footer-center flex flex-col md:flex-row md:justify-center md:gap-8 p-10 bg-base-200 text-base-content rounded mt-16">
       <nav>
         <div className="grid grid-flow-col gap-4">
           <SocialIcon kind="twitch" href={siteMetadata.twitch} size="24" />
