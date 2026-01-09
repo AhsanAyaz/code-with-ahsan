@@ -12,6 +12,10 @@ interface MentorCardProps {
 }
 
 export default function MentorCard({ mentor, onRequestMatch, isRequesting, requestStatus }: MentorCardProps) {
+  // Check if mentor is at capacity (these fields come from API)
+  const isAtCapacity = (mentor as MentorshipProfile & { isAtCapacity?: boolean }).isAtCapacity
+  const activeMenteeCount = (mentor as MentorshipProfile & { activeMenteeCount?: number }).activeMenteeCount || 0
+
   const renderActionButton = () => {
     switch (requestStatus) {
       case 'pending':
@@ -42,6 +46,22 @@ export default function MentorCard({ mentor, onRequestMatch, isRequesting, reque
           </button>
         )
       default:
+        // Check if mentor is at capacity
+        if (isAtCapacity) {
+          return (
+            <div className="space-y-2">
+              <button className="btn btn-ghost btn-block" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                </svg>
+                At Capacity
+              </button>
+              <p className="text-xs text-base-content/50 text-center">
+                Mentor has {activeMenteeCount}/{mentor.maxMentees || 3} mentees
+              </p>
+            </div>
+          )
+        }
         return (
           <button 
             className="btn btn-primary btn-block"
@@ -109,13 +129,12 @@ export default function MentorCard({ mentor, onRequestMatch, isRequesting, reque
         {/* Availability & Capacity */}
         <div className="flex items-center gap-4 mt-4 text-sm text-base-content/60">
           {mentor.availability && Object.keys(mentor.availability).length > 0 && (
-            <div className="flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="flex items-center gap-1 flex-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <span className="capitalize">
-                {Object.keys(mentor.availability).slice(0, 2).map(d => d.slice(0, 3)).join(', ')}
-                {Object.keys(mentor.availability).length > 2 && '...'}
+                {Object.keys(mentor.availability).map(d => d.charAt(0).toUpperCase() + d.slice(1, 3)).join(', ')}
               </span>
             </div>
           )}

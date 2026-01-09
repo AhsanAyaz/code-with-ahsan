@@ -9,7 +9,7 @@ import Link from 'next/link'
 export default function MentorshipPage() {
   const router = useRouter()
   const { setShowLoginPopup } = useContext(AuthContext)
-  const { user, profile, loading } = useMentorship()
+  const { user, profile, loading, pendingRequests, matches } = useMentorship()
 
   useEffect(() => {
     if (!loading && !user) {
@@ -169,23 +169,44 @@ export default function MentorshipPage() {
         )}
         
         {profile.role === 'mentor' && (
-          <Link href="/mentorship/requests" className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer">
+          <Link href="/mentorship/requests" className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer relative">
             <div className="card-body">
               <h3 className="card-title">
                 <span className="text-2xl">📬</span> Pending Requests
+                {pendingRequests.length > 0 && (
+                  <span className="badge badge-error badge-sm">{pendingRequests.length}</span>
+                )}
               </h3>
               <p className="text-base-content/70 text-sm">Review mentee applications</p>
             </div>
+            {pendingRequests.length > 0 && (
+              <div className="absolute -top-2 -right-2">
+                <span className="relative flex h-4 w-4">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-4 w-4 bg-error"></span>
+                </span>
+              </div>
+            )}
           </Link>
         )}
         
-        <Link href="/mentorship/my-matches" className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer">
+        <Link href="/mentorship/my-matches" className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer relative">
           <div className="card-body">
             <h3 className="card-title">
               <span className="text-2xl">🤝</span> My Matches
+              {matches.length > 0 && (
+                <span className="badge badge-success badge-sm">{matches.length}</span>
+              )}
             </h3>
             <p className="text-base-content/70 text-sm">View your active mentorship relationships</p>
           </div>
+          {matches.length > 0 && (
+            <div className="absolute -top-2 -right-2">
+              <span className="relative flex h-4 w-4">
+                <span className="relative inline-flex rounded-full h-4 w-4 bg-success"></span>
+              </span>
+            </div>
+          )}
         </Link>
         
         <Link href="/mentorship/goals" className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer">
@@ -194,6 +215,15 @@ export default function MentorshipPage() {
               <span className="text-2xl">🎯</span> Goals & Progress
             </h3>
             <p className="text-base-content/70 text-sm">Track your SMART objectives</p>
+          </div>
+        </Link>
+
+        <Link href="/mentorship/settings" className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer">
+          <div className="card-body">
+            <h3 className="card-title">
+              <span className="text-2xl">⚙️</span> Settings
+            </h3>
+            <p className="text-base-content/70 text-sm">Update your profile and preferences</p>
           </div>
         </Link>
       </div>

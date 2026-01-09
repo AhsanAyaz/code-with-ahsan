@@ -5,6 +5,14 @@ import { useState } from 'react'
 interface MentorRegistrationFormProps {
   onSubmit: (data: Record<string, unknown>) => Promise<void>
   isSubmitting: boolean
+  initialData?: {
+    expertise?: string[]
+    currentRole?: string
+    bio?: string
+    maxMentees?: number
+    availability?: Record<string, boolean>
+  }
+  mode?: 'create' | 'edit'
 }
 
 const EXPERTISE_OPTIONS = [
@@ -24,12 +32,12 @@ const EXPERTISE_OPTIONS = [
 
 const DAYS_OF_WEEK = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 
-export default function MentorRegistrationForm({ onSubmit, isSubmitting }: MentorRegistrationFormProps) {
-  const [expertise, setExpertise] = useState<string[]>([])
-  const [currentRole, setCurrentRole] = useState('')
-  const [bio, setBio] = useState('')
-  const [maxMentees, setMaxMentees] = useState(3)
-  const [availability, setAvailability] = useState<Record<string, boolean>>({})
+export default function MentorRegistrationForm({ onSubmit, isSubmitting, initialData, mode = 'create' }: MentorRegistrationFormProps) {
+  const [expertise, setExpertise] = useState<string[]>(initialData?.expertise || [])
+  const [currentRole, setCurrentRole] = useState(initialData?.currentRole || '')
+  const [bio, setBio] = useState(initialData?.bio || '')
+  const [maxMentees, setMaxMentees] = useState(initialData?.maxMentees || 3)
+  const [availability, setAvailability] = useState<Record<string, boolean>>(initialData?.availability || {})
 
   const toggleExpertise = (skill: string) => {
     setExpertise(prev => 
@@ -184,10 +192,10 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting }: Mento
           {isSubmitting ? (
             <>
               <span className="loading loading-spinner"></span>
-              Creating Profile...
+              {mode === 'edit' ? 'Saving Changes...' : 'Creating Profile...'}
             </>
           ) : (
-            'Complete Registration'
+            mode === 'edit' ? 'Save Changes' : 'Complete Registration'
           )}
         </button>
       </div>

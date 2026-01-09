@@ -5,6 +5,13 @@ import { useState } from 'react'
 interface MenteeRegistrationFormProps {
   onSubmit: (data: Record<string, unknown>) => Promise<void>
   isSubmitting: boolean
+  initialData?: {
+    education?: string
+    skillsSought?: string[]
+    careerGoals?: string
+    learningStyle?: 'self-study' | 'guided' | 'mixed'
+  }
+  mode?: 'create' | 'edit'
 }
 
 const SKILLS_OPTIONS = [
@@ -34,11 +41,11 @@ const LEARNING_STYLES = [
   { value: 'mixed', label: 'Mixed Approach', description: 'A combination of both self-study and guided sessions' },
 ]
 
-export default function MenteeRegistrationForm({ onSubmit, isSubmitting }: MenteeRegistrationFormProps) {
-  const [education, setEducation] = useState('')
-  const [skillsSought, setSkillsSought] = useState<string[]>([])
-  const [careerGoals, setCareerGoals] = useState('')
-  const [learningStyle, setLearningStyle] = useState<'self-study' | 'guided' | 'mixed'>('mixed')
+export default function MenteeRegistrationForm({ onSubmit, isSubmitting, initialData, mode = 'create' }: MenteeRegistrationFormProps) {
+  const [education, setEducation] = useState(initialData?.education || '')
+  const [skillsSought, setSkillsSought] = useState<string[]>(initialData?.skillsSought || [])
+  const [careerGoals, setCareerGoals] = useState(initialData?.careerGoals || '')
+  const [learningStyle, setLearningStyle] = useState<'self-study' | 'guided' | 'mixed'>(initialData?.learningStyle || 'mixed')
 
   const toggleSkill = (skill: string) => {
     setSkillsSought(prev => 
@@ -169,10 +176,10 @@ export default function MenteeRegistrationForm({ onSubmit, isSubmitting }: Mente
           {isSubmitting ? (
             <>
               <span className="loading loading-spinner"></span>
-              Creating Profile...
+              {mode === 'edit' ? 'Saving Changes...' : 'Creating Profile...'}
             </>
           ) : (
-            'Complete Registration'
+            mode === 'edit' ? 'Save Changes' : 'Complete Registration'
           )}
         </button>
       </div>
