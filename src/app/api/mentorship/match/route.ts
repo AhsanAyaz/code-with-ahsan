@@ -70,6 +70,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    // Check mentor capacity before creating request
+    const [mentorProfile, activeMatches] = await Promise.all([
+      db.collection('mentorship_profiles').doc(mentorId).get(),
+      db.collection('mentorship_sessions')
+        .where('mentorId', '==', mentorId)
+        .where('status', '==', 'active')
+        .get()
+    ])
+
+    if (!mentorProfile.exists) {
+      return NextResponse.json({ error: 'Mentor not found' }, { status: 404 })
+    }
+
+    const mentorData = mentorProfile.data()
+    const maxMentees = mentorData?.maxMentees || 3
+    const activeMenteeCount = activeMatches.size
+
+    if (activeMenteeCount >= maxMentees) {
+      return NextResponse.json({ 
+        error: 'Mentor is at capacity',
+        message: `This mentor can only take ${maxMentees} mentees and currently has ${activeMenteeCount} active mentees.`
+      }, { status: 409 })
+    }
+
     // Check if a match already exists
     const existingMatch = await db.collection('mentorship_sessions')
       .where('menteeId', '==', menteeId)
@@ -131,6 +155,28 @@ export async function PUT(request: NextRequest) {
     }
 
     if (action === 'approve') {
+      // Check mentor capacity before approving
+      const [mentorProfile, activeMatches] = await Promise.all([
+        db.collection('mentorship_profiles').doc(matchData?.mentorId).get(),
+        db.collection('mentorship_sessions')
+          .where('mentorId', '==', matchData?.mentorId)
+          .where('status', '==', 'active')
+          .get()
+      ])
+
+      const mentorData = mentorProfile.data()
+      const maxMentees = mentorData?.maxMentees || 3
+      const activeMenteeCount = activeMatches.size
+
+      if (activeMenteeCount >= maxMentees) {
+        return NextResponse.json({ 
+          error: 'Cannot accept - at capacity',
+          message: `You can only have ${maxMentees} active mentees. Please update your settings to increase capacity or complete an existing mentorship first.`,
+          activeMenteeCount,
+          maxMentees
+        }, { status: 409 })
+      }
+
       await matchRef.update({
         status: 'active',
         approvedAt: FieldValue.serverTimestamp(),

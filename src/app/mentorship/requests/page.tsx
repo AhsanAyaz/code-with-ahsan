@@ -20,10 +20,15 @@ interface RequestWithProfile extends MentorshipMatch {
 export default function MentorRequestsPage() {
   const router = useRouter()
   const { setShowLoginPopup } = useContext(AuthContext)
-  const { user, profile, loading, refreshMatches } = useMentorship()
+  const { user, profile, loading, refreshMatches, matches } = useMentorship()
   const [requests, setRequests] = useState<RequestWithProfile[]>([])
   const [loadingRequests, setLoadingRequests] = useState(true)
   const [processingId, setProcessingId] = useState<string | null>(null)
+
+  // Calculate capacity
+  const maxMentees = profile?.maxMentees || 3
+  const activeMenteeCount = matches.length
+  const isAtCapacity = activeMenteeCount >= maxMentees
 
   useEffect(() => {
     if (!loading && !user) {
@@ -127,14 +132,20 @@ export default function MentorRequestsPage() {
       </div>
 
       {/* Capacity Info */}
-      <div className="alert alert-info">
+      <div className={`alert ${isAtCapacity ? 'alert-warning' : 'alert-info'}`}>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
-        <span>
-          You can mentor up to <strong>{profile.maxMentees || 3} mentees</strong> at a time. 
-          Only accept requests you have bandwidth for.
-        </span>
+        <div>
+          <span>
+            <strong>Capacity: {activeMenteeCount}/{maxMentees} mentees</strong>
+            {isAtCapacity ? (
+              <> — You're at capacity. <Link href="/mentorship/settings" className="link">Update settings</Link> to accept more mentees.</>
+            ) : (
+              <> — You can accept {maxMentees - activeMenteeCount} more mentee{maxMentees - activeMenteeCount !== 1 ? 's' : ''}.</>
+            )}
+          </span>
+        </div>
       </div>
 
       {/* Requests List */}
@@ -208,17 +219,21 @@ export default function MentorRequestsPage() {
 
                   {/* Actions */}
                   <div className="flex flex-col gap-2 min-w-[160px]">
-                    <button
-                      className="btn btn-success"
-                      onClick={() => handleAction(request.id, 'approve')}
-                      disabled={processingId === request.id}
-                    >
-                      {processingId === request.id ? (
-                        <span className="loading loading-spinner loading-sm"></span>
-                      ) : (
-                        <>✓ Accept</>
-                      )}
-                    </button>
+                    <div className={isAtCapacity ? 'tooltip' : ''} data-tip={isAtCapacity ? 'Update your settings to increase capacity' : ''}>
+                      <button
+                        className="btn btn-success w-full"
+                        onClick={() => handleAction(request.id, 'approve')}
+                        disabled={processingId === request.id || isAtCapacity}
+                      >
+                        {processingId === request.id ? (
+                          <span className="loading loading-spinner loading-sm"></span>
+                        ) : isAtCapacity ? (
+                          <>🚫 At Capacity</>
+                        ) : (
+                          <>✓ Accept</>
+                        )}
+                      </button>
+                    </div>
                     <button
                       className="btn btn-outline btn-error"
                       onClick={() => handleAction(request.id, 'decline')}
