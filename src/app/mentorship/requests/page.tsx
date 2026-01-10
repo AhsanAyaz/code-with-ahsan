@@ -109,7 +109,7 @@ export default function MentorRequestsPage() {
             Please sign in and complete your mentor profile.
           </p>
           <div className="card-actions justify-center mt-6">
-            <Link href="/mentorship" className="btn btn-primary">
+            <Link href="/mentorship/dashboard" className="btn btn-primary">
               Go to Mentorship Home
             </Link>
           </div>
@@ -126,7 +126,7 @@ export default function MentorRequestsPage() {
           <h2 className="text-2xl font-bold">Pending Requests</h2>
           <p className="text-base-content/70">Review mentee applications and accept those you can support</p>
         </div>
-        <Link href="/mentorship" className="btn btn-ghost btn-sm">
+        <Link href="/mentorship/dashboard" className="btn btn-ghost btn-sm">
           ← Back to Dashboard
         </Link>
       </div>

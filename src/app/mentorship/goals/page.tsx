@@ -68,7 +68,7 @@ export default function GoalsPage() {
           <h2 className="card-title justify-center text-2xl">Access Required</h2>
           <p className="text-base-content/70 mt-2">Please sign in to view your goals.</p>
           <div className="card-actions justify-center mt-6">
-            <Link href="/mentorship" className="btn btn-primary">
+            <Link href="/mentorship/dashboard" className="btn btn-primary">
               Go to Mentorship Home
             </Link>
           </div>
@@ -89,7 +89,7 @@ export default function GoalsPage() {
           <h2 className="text-2xl font-bold">Goals & Progress</h2>
           <p className="text-base-content/70">Track all your mentorship objectives</p>
         </div>
-        <Link href="/mentorship" className="btn btn-ghost btn-sm">
+        <Link href="/mentorship/dashboard" className="btn btn-ghost btn-sm">
           ← Back to Dashboard
         </Link>
       </div>

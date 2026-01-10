@@ -62,7 +62,7 @@ export default function MyMatchesPage() {
             Please sign in and complete your profile.
           </p>
           <div className="card-actions justify-center mt-6">
-            <Link href="/mentorship" className="btn btn-primary">
+            <Link href="/mentorship/dashboard" className="btn btn-primary">
               Go to Mentorship Home
             </Link>
           </div>
@@ -81,7 +81,7 @@ export default function MyMatchesPage() {
             {profile.role === 'mentor' ? 'Your mentees' : 'Your mentors'}
           </p>
         </div>
-        <Link href="/mentorship" className="btn btn-ghost btn-sm">
+        <Link href="/mentorship/dashboard" className="btn btn-ghost btn-sm">
           ← Back to Dashboard
         </Link>
       </div>

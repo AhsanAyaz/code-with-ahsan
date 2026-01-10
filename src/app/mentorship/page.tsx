@@ -1,231 +1,281 @@
 'use client'
 
-import { useContext, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { AuthContext } from '@/contexts/AuthContext'
 import { useMentorship } from '@/contexts/MentorshipContext'
 import Link from 'next/link'
 
+interface PublicMentor {
+  uid: string
+  displayName: string
+  photoURL?: string
+  currentRole?: string
+  expertise?: string[]
+  bio?: string
+  activeMenteeCount: number
+  completedMentorships: number
+  maxMentees: number
+  avgRating?: number
+  ratingCount?: number
+  availability?: Record<string, string[]>
+}
+
 export default function MentorshipPage() {
   const router = useRouter()
   const { setShowLoginPopup } = useContext(AuthContext)
-  const { user, profile, loading, pendingRequests, matches } = useMentorship()
+  const { user, profile, loading } = useMentorship()
+  const [mentors, setMentors] = useState<PublicMentor[]>([])
+  const [loadingMentors, setLoadingMentors] = useState(true)
+  const [filter, setFilter] = useState('')
+  const [pendingRedirect, setPendingRedirect] = useState<'mentor' | 'mentee' | null>(null)
 
+  // Fetch public mentors
   useEffect(() => {
-    if (!loading && !user) {
-      // User not logged in - show login popup
-      setShowLoginPopup(true)
+    const fetchMentors = async () => {
+      try {
+        const response = await fetch('/api/mentorship/mentors?public=true')
+        if (response.ok) {
+          const data = await response.json()
+          setMentors(data.mentors || [])
+        }
+      } catch (error) {
+        console.error('Error fetching mentors:', error)
+      } finally {
+        setLoadingMentors(false)
+      }
     }
-  }, [loading, user, setShowLoginPopup])
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[50vh]">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    )
+    fetchMentors()
+  }, [])
+
+  // Handle redirect after login
+  useEffect(() => {
+    if (!loading && user && pendingRedirect) {
+      router.push(`/mentorship/onboarding?role=${pendingRedirect}`)
+      setPendingRedirect(null)
+    }
+  }, [loading, user, pendingRedirect, router])
+
+  const handleRoleClick = (role: 'mentor' | 'mentee') => {
+    if (!user) {
+      // Store pending redirect and show login
+      setPendingRedirect(role)
+      setShowLoginPopup(true)
+    } else if (!profile) {
+      // User logged in but no profile - go to onboarding
+      router.push(`/mentorship/onboarding?role=${role}`)
+    }
+    // If user has profile, they should see the dashboard button instead
   }
 
-  if (!user) {
-    return (
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body text-center">
-          <h2 className="card-title justify-center text-2xl">Welcome to the Mentorship Program</h2>
-          <p className="text-base-content/70 mt-2">
-            Please sign in with your Google account to get started.
-          </p>
-          <div className="card-actions justify-center mt-6">
-            <button 
-              className="btn btn-primary btn-lg"
-              onClick={() => setShowLoginPopup(true)}
-            >
-              Sign In to Continue
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const filteredMentors = filter
+    ? mentors.filter(m => 
+        m.expertise?.some(e => e.toLowerCase().includes(filter.toLowerCase())) ||
+        m.displayName?.toLowerCase().includes(filter.toLowerCase()) ||
+        m.currentRole?.toLowerCase().includes(filter.toLowerCase())
+      )
+    : mentors
 
-  // User is logged in but has no profile - redirect to onboarding
-  if (!profile) {
-    return (
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title text-2xl">Complete Your Profile</h2>
-          <p className="text-base-content/70 mt-2">
-            Welcome, <span className="font-semibold">{user.displayName}</span>! 
-            Let's set up your mentorship profile to connect you with the right people.
+  return (
+    <div className="space-y-8">
+      {/* Hero Section with CTAs */}
+      <div className="card bg-gradient-to-r from-primary to-secondary text-primary-content">
+        <div className="card-body text-center py-10">
+          <h2 className="text-3xl md:text-4xl font-bold">Join Our Mentorship Community</h2>
+          <p className="opacity-90 max-w-2xl mx-auto mt-2">
+            Connect with experienced professionals or share your expertise to help others grow. 
+            Our mentorship program is designed to accelerate career development through meaningful connections.
           </p>
           
-          <div className="grid md:grid-cols-2 gap-6 mt-8">
-            {/* Mentor Card */}
-            <div className="card bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
-              <div className="card-body">
-                <div className="text-4xl mb-4">🎯</div>
-                <h3 className="card-title">I want to be a Mentor</h3>
-                <p className="text-base-content/70 text-sm">
-                  Share your expertise and help others grow in their careers. 
-                  Guide mentees through challenges and celebrate their wins.
-                </p>
-                <div className="card-actions mt-4">
-                  <Link href="/mentorship/onboarding?role=mentor" className="btn btn-primary w-full">
-                    Register as Mentor
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* Mentee Card */}
-            <div className="card bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20">
-              <div className="card-body">
-                <div className="text-4xl mb-4">🚀</div>
-                <h3 className="card-title">I want to be a Mentee</h3>
-                <p className="text-base-content/70 text-sm">
-                  Get guidance from experienced professionals. 
-                  Accelerate your learning and achieve your career goals faster.
-                </p>
-                <div className="card-actions mt-4">
-                  <Link href="/mentorship/onboarding?role=mentee" className="btn btn-secondary w-full">
-                    Register as Mentee
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // User has a profile - show dashboard based on role
-  return (
-    <div className="space-y-6">
-      {/* Welcome Section */}
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body">
-          <div className="flex items-center gap-4">
-            {user.photoURL && (
-              <div className="avatar">
-                <div className="w-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                  <img src={user.photoURL} alt={user.displayName || 'Profile'} />
-                </div>
-              </div>
+          <div className="card-actions justify-center mt-6 gap-4 flex-wrap">
+            {loading ? (
+              <span className="loading loading-spinner loading-md"></span>
+            ) : profile ? (
+              // User has profile - show dashboard button
+              <Link href="/mentorship/dashboard" className="btn btn-lg bg-white/20 hover:bg-white/30 border-none">
+                <span className="text-xl">📊</span> Go to Dashboard
+              </Link>
+            ) : (
+              // No profile - show role selection buttons
+              <>
+                <button
+                  onClick={() => handleRoleClick('mentor')}
+                  className="btn btn-lg bg-white/20 hover:bg-white/30 border-none"
+                >
+                  <span className="text-xl">🎯</span> Become a Mentor
+                </button>
+                <button
+                  onClick={() => handleRoleClick('mentee')}
+                  className="btn btn-lg bg-white/20 hover:bg-white/30 border-none"
+                >
+                  <span className="text-xl">🚀</span> Be a Mentee
+                </button>
+              </>
             )}
-            <div>
-              <h2 className="text-2xl font-bold">Welcome back, {user.displayName}!</h2>
-              <div className="badge badge-primary badge-lg mt-1">
-                {profile.role === 'mentor' ? '🎯 Mentor' : '🚀 Mentee'}
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="stats shadow w-full bg-base-100">
+      {/* Stats Banner */}
+      <div className="stats shadow w-full bg-gradient-to-r from-primary/10 to-secondary/10">
         <div className="stat">
-          <div className="stat-figure text-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            </svg>
-          </div>
-          <div className="stat-title">Active Matches</div>
-          <div className="stat-value text-primary">0</div>
+          <div className="stat-title">Active Mentors</div>
+          <div className="stat-value text-primary">{mentors.length}</div>
+          <div className="stat-desc">Ready to help</div>
         </div>
-        
         <div className="stat">
-          <div className="stat-figure text-secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-            </svg>
+          <div className="stat-title">Active Mentorships</div>
+          <div className="stat-value text-secondary">
+            {mentors.reduce((sum, m) => sum + m.activeMenteeCount, 0)}
           </div>
-          <div className="stat-title">Goals Completed</div>
-          <div className="stat-value text-secondary">0</div>
+          <div className="stat-desc">Ongoing relationships</div>
         </div>
-        
         <div className="stat">
-          <div className="stat-figure text-accent">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
+          <div className="stat-title">Mentorships Completed</div>
+          <div className="stat-value text-accent">
+            {mentors.reduce((sum, m) => sum + m.completedMentorships, 0)}
           </div>
-          <div className="stat-title">Sessions</div>
-          <div className="stat-value text-accent">0</div>
+          <div className="stat-desc">Success stories</div>
         </div>
       </div>
 
-      {/* Navigation Cards */}
-      <div className="grid md:grid-cols-3 gap-4">
-        {profile.role === 'mentee' && (
-          <Link href="/mentorship/browse" className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer">
-            <div className="card-body">
-              <h3 className="card-title">
-                <span className="text-2xl">🔍</span> Browse Mentors
-              </h3>
-              <p className="text-base-content/70 text-sm">Find and connect with experienced mentors</p>
-            </div>
-          </Link>
-        )}
-        
-        {profile.role === 'mentor' && (
-          <Link href="/mentorship/requests" className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer relative">
-            <div className="card-body">
-              <h3 className="card-title">
-                <span className="text-2xl">📬</span> Pending Requests
-                {pendingRequests.length > 0 && (
-                  <span className="badge badge-error badge-sm">{pendingRequests.length}</span>
-                )}
-              </h3>
-              <p className="text-base-content/70 text-sm">Review mentee applications</p>
-            </div>
-            {pendingRequests.length > 0 && (
-              <div className="absolute -top-2 -right-2">
-                <span className="relative flex h-4 w-4">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-4 w-4 bg-error"></span>
-                </span>
-              </div>
-            )}
-          </Link>
-        )}
-        
-        <Link href="/mentorship/my-matches" className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer relative">
-          <div className="card-body">
-            <h3 className="card-title">
-              <span className="text-2xl">🤝</span> My Matches
-              {matches.length > 0 && (
-                <span className="badge badge-success badge-sm">{matches.length}</span>
-              )}
+      {/* Community Mentors Section */}
+      <div className="space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-2xl font-bold">
+              <span className="text-primary">🌟</span> Community Mentors
             </h3>
-            <p className="text-base-content/70 text-sm">View your active mentorship relationships</p>
+            <p className="text-base-content/70 text-sm">
+              Meet the amazing professionals who volunteer their time to guide and support others.
+            </p>
           </div>
-          {matches.length > 0 && (
-            <div className="absolute -top-2 -right-2">
-              <span className="relative flex h-4 w-4">
-                <span className="relative inline-flex rounded-full h-4 w-4 bg-success"></span>
-              </span>
-            </div>
-          )}
-        </Link>
-        
-        <Link href="/mentorship/goals" className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer">
-          <div className="card-body">
-            <h3 className="card-title">
-              <span className="text-2xl">🎯</span> Goals & Progress
-            </h3>
-            <p className="text-base-content/70 text-sm">Track your SMART objectives</p>
+          
+          {/* Search/Filter */}
+          <div className="form-control w-full md:w-80">
+            <input
+              type="text"
+              placeholder="Search by name, role, or expertise..."
+              className="input input-bordered w-full"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            />
           </div>
-        </Link>
+        </div>
 
-        <Link href="/mentorship/settings" className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer">
-          <div className="card-body">
-            <h3 className="card-title">
-              <span className="text-2xl">⚙️</span> Settings
-            </h3>
-            <p className="text-base-content/70 text-sm">Update your profile and preferences</p>
+        {/* Mentors Grid */}
+        {loadingMentors ? (
+          <div className="flex justify-center items-center py-12">
+            <span className="loading loading-spinner loading-lg text-primary"></span>
           </div>
-        </Link>
+        ) : filteredMentors.length === 0 ? (
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body text-center py-12">
+              <div className="text-5xl mb-4">🔍</div>
+              <h3 className="text-xl font-semibold">No mentors found</h3>
+              <p className="text-base-content/70">
+                {filter ? 'Try adjusting your search terms' : 'Be the first to become a public mentor!'}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredMentors.map(mentor => (
+              <div key={mentor.uid} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all">
+                <div className="card-body">
+                  {/* Header with Avatar */}
+                  <div className="flex items-start gap-4">
+                    <div className="avatar">
+                      <div className="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                        {mentor.photoURL ? (
+                          <img src={mentor.photoURL} alt={mentor.displayName || 'Mentor'} />
+                        ) : (
+                          <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold w-full h-full">
+                            {mentor.displayName?.charAt(0) || '?'}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="card-title text-lg">{mentor.displayName}</h3>
+                      <p className="text-sm text-base-content/70 truncate">{mentor.currentRole}</p>
+                      {/* Star Rating */}
+                      {(mentor.ratingCount ?? 0) > 0 && (
+                        <div className="flex items-center gap-1 mt-1">
+                          <div className="flex items-center gap-0.5">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <svg
+                                key={star}
+                                className={`w-4 h-4 ${star <= (mentor.avgRating ?? 0) ? 'text-yellow-400' : 'text-base-content/20'}`}
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            ))}
+                          </div>
+                          <span className="text-xs text-base-content/60">
+                            {mentor.avgRating} ({mentor.ratingCount})
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Expertise Tags */}
+                  {mentor.expertise && mentor.expertise.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {mentor.expertise.slice(0, 4).map(skill => (
+                        <span key={skill} className="badge badge-primary badge-sm">
+                          {skill}
+                        </span>
+                      ))}
+                      {mentor.expertise.length > 4 && (
+                        <span className="badge badge-ghost badge-sm">
+                          +{mentor.expertise.length - 4}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Bio */}
+                  {mentor.bio && (
+                    <p className="text-sm text-base-content/70 mt-3 line-clamp-2">
+                      {mentor.bio}
+                    </p>
+                  )}
+
+                  {/* Stats */}
+                  <div className="flex items-center gap-4 mt-4 pt-4 border-t border-base-200">
+                    <div className="text-center flex-1">
+                      <div className="text-lg font-bold text-primary">{mentor.activeMenteeCount}</div>
+                      <div className="text-xs text-base-content/60">Active</div>
+                    </div>
+                    <div className="text-center flex-1">
+                      <div className="text-lg font-bold text-secondary">{mentor.completedMentorships}</div>
+                      <div className="text-xs text-base-content/60">Completed</div>
+                    </div>
+                    <div className="text-center flex-1">
+                      <div className="text-lg font-bold text-accent">{mentor.maxMentees}</div>
+                      <div className="text-xs text-base-content/60">Max</div>
+                    </div>
+                  </div>
+
+                  {/* Availability */}
+                  {mentor.availability && Object.keys(mentor.availability).length > 0 && (
+                    <div className="flex items-center gap-1 mt-3 text-xs text-base-content/60">
+                      <span>📅</span>
+                      <span className="capitalize">
+                        {Object.keys(mentor.availability).map(d => d.charAt(0).toUpperCase() + d.slice(1, 3)).join(', ')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

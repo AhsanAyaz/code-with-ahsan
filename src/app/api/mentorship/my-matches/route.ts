@@ -26,6 +26,12 @@ export async function GET(request: NextRequest) {
       .where('status', '==', 'pending')
       .get()
 
+    // Get completed matches
+    const completedSnapshot = await db.collection('mentorship_sessions')
+      .where(fieldToQuery, '==', uid)
+      .where('status', '==', 'completed')
+      .get()
+
     const fetchPartnerProfile = async (partnerId: string) => {
       const profileDoc = await db.collection('mentorship_profiles').doc(partnerId).get()
       if (!profileDoc.exists) return null
@@ -66,7 +72,23 @@ export async function GET(request: NextRequest) {
       })
     )
 
-    return NextResponse.json({ activeMatches, pendingMatches }, { status: 200 })
+    const completedMatches = await Promise.all(
+      completedSnapshot.docs.map(async (doc) => {
+        const data = doc.data()
+        const partnerProfile = await fetchPartnerProfile(data[partnerField])
+        return {
+          id: doc.id,
+          ...data,
+          requestedAt: data.requestedAt?.toDate?.() || null,
+          approvedAt: data.approvedAt?.toDate?.() || null,
+          completedAt: data.completedAt?.toDate?.() || null,
+          hasRating: data.hasRating || false,
+          partnerProfile,
+        }
+      })
+    )
+
+    return NextResponse.json({ activeMatches, pendingMatches, completedMatches }, { status: 200 })
   } catch (error) {
     console.error('Error fetching my matches:', error)
     return NextResponse.json({ error: 'Failed to fetch matches' }, { status: 500 })

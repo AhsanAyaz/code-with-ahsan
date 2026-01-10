@@ -60,3 +60,63 @@ export async function GET(
     return NextResponse.json({ error: 'Failed to fetch match' }, { status: 500 })
   }
 }
+
+// PUT: Update match status (e.g., mark as completed)
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ matchId: string }> }
+) {
+  const resolvedParams = await params
+  
+  try {
+    const body = await request.json()
+    const { uid, action, completionNotes } = body
+
+    if (!uid) {
+      return NextResponse.json({ error: 'Missing uid' }, { status: 400 })
+    }
+
+    const matchDoc = await db.collection('mentorship_sessions').doc(resolvedParams.matchId).get()
+
+    if (!matchDoc.exists) {
+      return NextResponse.json({ error: 'Match not found' }, { status: 404 })
+    }
+
+    const matchData = matchDoc.data()!
+
+    // Verify user is part of this match
+    if (matchData.mentorId !== uid && matchData.menteeId !== uid) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    }
+
+    // Only mentors can mark as completed
+    const isMentor = matchData.mentorId === uid
+    
+    if (action === 'complete') {
+      if (!isMentor) {
+        return NextResponse.json({ error: 'Only mentors can mark mentorship as complete' }, { status: 403 })
+      }
+
+      if (matchData.status !== 'active') {
+        return NextResponse.json({ error: 'Can only complete active mentorships' }, { status: 400 })
+      }
+
+      await db.collection('mentorship_sessions').doc(resolvedParams.matchId).update({
+        status: 'completed',
+        completedAt: new Date(),
+        completedBy: uid,
+        completionNotes: completionNotes || null,
+      })
+
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Mentorship marked as complete!' 
+      }, { status: 200 })
+    }
+
+    return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+  } catch (error) {
+    console.error('Error updating match:', error)
+    return NextResponse.json({ error: 'Failed to update match' }, { status: 500 })
+  }
+}

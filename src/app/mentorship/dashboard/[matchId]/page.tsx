@@ -54,6 +54,9 @@ export default function RelationshipDashboard({ params }: { params: Promise<{ ma
   const [discordUrl, setDiscordUrl] = useState('')
   const [editingDiscord, setEditingDiscord] = useState(false)
   const [savingDiscord, setSavingDiscord] = useState(false)
+  const [showCompleteModal, setShowCompleteModal] = useState(false)
+  const [completionNotes, setCompletionNotes] = useState('')
+  const [completing, setCompleting] = useState(false)
 
   useEffect(() => {
     // Skip auth redirect in DEV_MODE
@@ -108,6 +111,35 @@ export default function RelationshipDashboard({ params }: { params: Promise<{ ma
       console.error('Error saving Discord URL:', error)
     } finally {
       setSavingDiscord(false)
+    }
+  }
+
+  const handleCompleteMentorship = async () => {
+    if (!matchDetails || !user) return
+    setCompleting(true)
+    try {
+      const response = await fetch(`/api/mentorship/dashboard/${resolvedParams.matchId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: user.uid,
+          action: 'complete',
+          completionNotes: completionNotes.trim() || null,
+        }),
+      })
+      if (response.ok) {
+        alert('🎉 Congratulations! This mentorship has been marked as complete.')
+        router.push('/mentorship/my-matches')
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Failed to complete mentorship')
+      }
+    } catch (error) {
+      console.error('Error completing mentorship:', error)
+      alert('Failed to complete mentorship. Please try again.')
+    } finally {
+      setCompleting(false)
+      setShowCompleteModal(false)
     }
   }
 
@@ -183,6 +215,16 @@ export default function RelationshipDashboard({ params }: { params: Promise<{ ma
               {currentMatchDetails.approvedAt ? new Date(currentMatchDetails.approvedAt).toLocaleDateString() : 'N/A'}
             </div>
             <div className="badge badge-success">Active</div>
+            
+            {/* Complete Mentorship Button (Mentor only) */}
+            {currentIsMentor && (
+              <button 
+                className="btn btn-sm btn-outline btn-success gap-2"
+                onClick={() => setShowCompleteModal(true)}
+              >
+                ✅ Mark as Complete
+              </button>
+            )}
             
             {/* Discord Channel Link */}
             {currentMatchDetails.discordChannelUrl ? (
@@ -291,6 +333,60 @@ export default function RelationshipDashboard({ params }: { params: Promise<{ ma
           <LearningHub />
         )}
       </div>
+
+      {/* Complete Mentorship Modal */}
+      {showCompleteModal && (
+        <dialog className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg flex items-center gap-2">
+              🎓 Complete Mentorship
+            </h3>
+            <p className="py-4 text-base-content/70">
+              Are you sure you want to mark this mentorship with <strong>{currentMatchDetails.partner.displayName}</strong> as complete?
+              This action will move it to your completed mentorships and cannot be undone.
+            </p>
+            
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">Completion Notes (Optional)</span>
+              </label>
+              <textarea
+                className="textarea textarea-bordered h-24"
+                placeholder="Share any final thoughts, achievements, or feedback about this mentorship journey..."
+                value={completionNotes}
+                onChange={(e) => setCompletionNotes(e.target.value)}
+              />
+            </div>
+
+            <div className="modal-action">
+              <button 
+                className="btn btn-ghost"
+                onClick={() => { setShowCompleteModal(false); setCompletionNotes('') }}
+                disabled={completing}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-success"
+                onClick={handleCompleteMentorship}
+                disabled={completing}
+              >
+                {completing ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Completing...
+                  </>
+                ) : (
+                  '✓ Confirm Completion'
+                )}
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={() => setShowCompleteModal(false)}>close</button>
+          </form>
+        </dialog>
+      )}
     </div>
   )
 }

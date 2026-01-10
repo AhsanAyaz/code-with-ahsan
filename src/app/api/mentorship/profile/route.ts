@@ -41,9 +41,14 @@ export async function POST(request: NextRequest) {
     }
 
     const now = new Date()
+    
+    // Set initial status: mentors require approval (pending), mentees are auto-accepted
+    const status = role === 'mentor' ? 'pending' : 'accepted'
+    
     const profile = {
       uid,
       role,
+      status,
       displayName: displayName || '',
       email: email || '',
       photoURL: photoURL || '',
