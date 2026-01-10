@@ -39,6 +39,19 @@ interface ProfileWithDetails extends MentorshipProfile {
   ratingCount?: number
 }
 
+interface Review {
+  id: string
+  mentorId: string
+  menteeId: string
+  sessionId: string
+  rating: number
+  feedback?: string
+  createdAt: string
+  menteeName?: string
+  menteeEmail?: string
+  menteePhoto?: string
+}
+
 type TabType = 'overview' | 'pending-mentors' | 'all-mentors' | 'all-mentees'
 
 const ADMIN_TOKEN_KEY = 'mentorship_admin_token'
@@ -62,6 +75,12 @@ export default function AdminPage() {
   const [profiles, setProfiles] = useState<ProfileWithDetails[]>([])
   const [loadingProfiles, setLoadingProfiles] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  
+  // Reviews modal state
+  const [showReviewsModal, setShowReviewsModal] = useState(false)
+  const [reviewMentor, setReviewMentor] = useState<ProfileWithDetails | null>(null)
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [loadingReviews, setLoadingReviews] = useState(false)
 
   // Check for existing admin session on mount
   useEffect(() => {
@@ -257,6 +276,24 @@ export default function AdminPage() {
       setAlerts(prev => prev.filter(a => a.id !== alertId))
     } catch (error) {
       console.error('Error resolving alert:', error)
+    }
+  }
+
+  const handleViewReviews = async (mentor: ProfileWithDetails) => {
+    setReviewMentor(mentor)
+    setShowReviewsModal(true)
+    setLoadingReviews(true)
+    
+    try {
+      const response = await fetch(`/api/mentorship/admin/reviews?mentorId=${mentor.uid}`)
+      if (response.ok) {
+        const data = await response.json()
+        setReviews(data.reviews || [])
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error)
+    } finally {
+      setLoadingReviews(false)
     }
   }
 
@@ -560,9 +597,12 @@ export default function AdminPage() {
                             </div>
                           )}
                           
-                          {/* Star Rating (for mentors) */}
+                          {/* Star Rating (for mentors) - clickable to view reviews */}
                           {p.role === 'mentor' && (p.ratingCount ?? 0) > 0 && (
-                            <div className="flex items-center gap-1 mt-2">
+                            <button 
+                              className="flex items-center gap-1 mt-2 hover:bg-base-200 rounded px-2 py-1 -mx-2 transition-colors cursor-pointer"
+                              onClick={() => handleViewReviews(p)}
+                            >
                               <div className="flex items-center gap-0.5">
                                 {[1, 2, 3, 4, 5].map((star) => (
                                   <svg
@@ -578,7 +618,10 @@ export default function AdminPage() {
                               <span className="text-xs text-base-content/60">
                                 {p.avgRating} ({p.ratingCount} reviews)
                               </span>
-                            </div>
+                              <svg className="w-3 h-3 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </button>
                           )}
                         </div>
                       </div>
@@ -747,6 +790,136 @@ export default function AdminPage() {
           </div>
         </div>
       </dialog>
+
+      {/* Reviews Modal */}
+      {showReviewsModal && reviewMentor && (
+        <dialog className="modal modal-open">
+          <div className="modal-box max-w-2xl">
+            <button 
+              className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"
+              onClick={() => setShowReviewsModal(false)}
+            >
+              ✕
+            </button>
+            
+            {/* Modal Header */}
+            <div className="flex items-center gap-4 mb-6">
+              <div className="avatar">
+                <div className="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                  {reviewMentor.photoURL ? (
+                    <img src={reviewMentor.photoURL} alt={reviewMentor.displayName || 'Mentor'} />
+                  ) : (
+                    <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold w-full h-full">
+                      {reviewMentor.displayName?.charAt(0) || '?'}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">{reviewMentor.displayName}</h3>
+                <p className="text-sm text-base-content/60">Reviews & Ratings</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-0.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <svg
+                        key={star}
+                        className={`w-5 h-5 ${star <= (reviewMentor.avgRating ?? 0) ? 'text-yellow-400' : 'text-base-content/20'}`}
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="font-semibold">{reviewMentor.avgRating}</span>
+                  <span className="text-base-content/50">({reviewMentor.ratingCount} reviews)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="divider"></div>
+
+            {/* Reviews List */}
+            {loadingReviews ? (
+              <div className="flex justify-center py-8">
+                <span className="loading loading-spinner loading-lg text-primary"></span>
+              </div>
+            ) : reviews.length === 0 ? (
+              <div className="text-center py-8 text-base-content/60">
+                <div className="text-4xl mb-2">📭</div>
+                <p>No reviews found</p>
+              </div>
+            ) : (
+              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                {reviews.map((review) => (
+                  <div key={review.id} className="card bg-base-200 shadow-sm">
+                    <div className="card-body p-4">
+                      {/* Reviewer Info */}
+                      <div className="flex items-start gap-3">
+                        <div className="avatar">
+                          <div className="w-10 h-10 rounded-full">
+                            {review.menteePhoto ? (
+                              <img src={review.menteePhoto} alt={review.menteeName || 'Mentee'} />
+                            ) : (
+                              <div className="bg-secondary text-secondary-content flex items-center justify-center text-sm font-bold w-full h-full">
+                                {review.menteeName?.charAt(0) || '?'}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between flex-wrap gap-2">
+                            <div>
+                              <p className="font-semibold">{review.menteeName || 'Anonymous'}</p>
+                              <p className="text-xs text-base-content/50">{review.menteeEmail}</p>
+                            </div>
+                            <div className="text-xs text-base-content/50">
+                              {review.createdAt ? new Date(review.createdAt).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              }) : 'N/A'}
+                            </div>
+                          </div>
+                          
+                          {/* Star Rating */}
+                          <div className="flex items-center gap-1 mt-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <svg
+                                key={star}
+                                className={`w-4 h-4 ${star <= review.rating ? 'text-yellow-400' : 'text-base-content/20'}`}
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            ))}
+                            <span className="text-sm font-medium ml-1">{review.rating}/5</span>
+                          </div>
+
+                          {/* Feedback */}
+                          {review.feedback && (
+                            <div className="mt-3 p-3 bg-base-100 rounded-lg">
+                              <p className="text-sm italic text-base-content/80">"{review.feedback}"</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="modal-action">
+              <button className="btn" onClick={() => setShowReviewsModal(false)}>Close</button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={() => setShowReviewsModal(false)}>close</button>
+          </form>
+        </dialog>
+      )}
     </div>
   )
 }

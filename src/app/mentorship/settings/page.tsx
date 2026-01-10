@@ -95,6 +95,8 @@ export default function SettingsPage() {
       ? Object.keys(profile.availability).reduce((acc, day) => ({ ...acc, [day]: true }), {})
       : {},
     isPublic: profile.isPublic ?? true,
+    cvUrl: profile.cvUrl || '',
+    majorProjects: profile.majorProjects || '',
   } : undefined
 
   const menteeInitialData = profile.role === 'mentee' ? {
