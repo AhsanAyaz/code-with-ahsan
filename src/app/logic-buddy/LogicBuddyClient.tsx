@@ -355,7 +355,7 @@ export default function LogicBuildingPage() {
         <div className="hero-content text-center">
           <div className="max-w-md">
             <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-              Logic Buddy <span className="text-2xl align-top">(beta)</span> 🧠
+              Logic Buddy 🧠
             </h1>
             <p className="py-6">
               Master your programming logic. Solve the problems suggested by

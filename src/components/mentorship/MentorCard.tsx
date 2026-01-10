@@ -1,20 +1,59 @@
 'use client'
 
+import { useState } from 'react'
 import { MentorshipProfile } from '@/contexts/MentorshipContext'
 
-type RequestStatus = 'none' | 'pending' | 'declined' | 'active'
+type RequestStatus = 'none' | 'pending' | 'declined' | 'active' | 'completed'
 
 interface MentorCardProps {
-  mentor: MentorshipProfile
+  mentor: MentorshipProfile & { avgRating?: number; ratingCount?: number; hasRated?: boolean; sessionId?: string }
   onRequestMatch: (mentorId: string) => Promise<void>
   isRequesting: boolean
   requestStatus: RequestStatus
+  onRateNow?: (mentorId: string, sessionId: string, rating: number, feedback: string) => Promise<void>
+  currentUserId?: string
 }
 
-export default function MentorCard({ mentor, onRequestMatch, isRequesting, requestStatus }: MentorCardProps) {
+export default function MentorCard({ mentor, onRequestMatch, isRequesting, requestStatus, onRateNow, currentUserId }: MentorCardProps) {
   // Check if mentor is at capacity (these fields come from API)
   const isAtCapacity = (mentor as MentorshipProfile & { isAtCapacity?: boolean }).isAtCapacity
   const activeMenteeCount = (mentor as MentorshipProfile & { activeMenteeCount?: number }).activeMenteeCount || 0
+  const avgRating = mentor.avgRating || 0
+  const ratingCount = mentor.ratingCount || 0
+  
+  // Rating state
+  const [showRatingModal, setShowRatingModal] = useState(false)
+  const [rating, setRating] = useState(5)
+  const [feedback, setFeedback] = useState('')
+  const [submittingRating, setSubmittingRating] = useState(false)
+
+  const handleSubmitRating = async () => {
+    if (!onRateNow || !mentor.sessionId) return
+    setSubmittingRating(true)
+    try {
+      await onRateNow(mentor.uid, mentor.sessionId, rating, feedback)
+      setShowRatingModal(false)
+    } finally {
+      setSubmittingRating(false)
+    }
+  }
+
+  const renderStars = (rating: number, size: string = 'sm') => {
+    return (
+      <div className="flex items-center gap-0.5">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <svg
+            key={star}
+            className={`${size === 'sm' ? 'w-4 h-4' : 'w-6 h-6'} ${star <= rating ? 'text-yellow-400' : 'text-base-content/20'}`}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        ))}
+      </div>
+    )
+  }
 
   const renderActionButton = () => {
     switch (requestStatus) {
@@ -44,6 +83,29 @@ export default function MentorCard({ mentor, onRequestMatch, isRequesting, reque
             </svg>
             Already Matched
           </button>
+        )
+      case 'completed':
+        return (
+          <div className="space-y-2">
+            <button className="btn btn-success btn-block" disabled>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Mentorship completed
+            </button>
+            {/* Show rate button if not rated yet and onRateNow is provided */}
+            {onRateNow && !mentor.hasRated && mentor.sessionId && (
+              <button 
+                className="btn btn-outline btn-warning btn-block gap-2"
+                onClick={() => setShowRatingModal(true)}
+              >
+                ⭐ Rate Your Experience
+              </button>
+            )}
+            {mentor.hasRated && (
+              <div className="text-center text-sm text-success">✓ You rated this mentor</div>
+            )}
+          </div>
         )
       default:
         // Check if mentor is at capacity
@@ -100,6 +162,15 @@ export default function MentorCard({ mentor, onRequestMatch, isRequesting, reque
           <div className="flex-1 min-w-0">
             <h3 className="card-title text-lg truncate">{mentor.displayName}</h3>
             <p className="text-sm text-base-content/70 truncate">{mentor.currentRole}</p>
+            {/* Star Rating Display */}
+            {ratingCount > 0 && (
+              <div className="flex items-center gap-1 mt-1">
+                {renderStars(avgRating)}
+                <span className="text-xs text-base-content/60">
+                  {avgRating} ({ratingCount})
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -153,6 +224,71 @@ export default function MentorCard({ mentor, onRequestMatch, isRequesting, reque
           {renderActionButton()}
         </div>
       </div>
+
+      {/* Rating Modal */}
+      {showRatingModal && (
+        <dialog className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">⭐ Rate Your Mentorship</h3>
+            <p className="py-2 text-base-content/70">
+              How was your experience with <strong>{mentor.displayName}</strong>?
+            </p>
+            
+            {/* Star selector */}
+            <div className="flex justify-center gap-2 my-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  className={`btn btn-circle btn-lg ${star <= rating ? 'btn-warning' : 'btn-ghost'}`}
+                  onClick={() => setRating(star)}
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                </button>
+              ))}
+            </div>
+            <p className="text-center font-semibold">{rating} out of 5 stars</p>
+
+            <div className="form-control mt-4">
+              <label className="label">
+                <span className="label-text">Feedback (optional)</span>
+              </label>
+              <textarea
+                className="textarea textarea-bordered h-24"
+                placeholder="Share your experience..."
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+              />
+            </div>
+
+            <div className="modal-action">
+              <button 
+                className="btn btn-ghost"
+                onClick={() => setShowRatingModal(false)}
+                disabled={submittingRating}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary"
+                onClick={handleSubmitRating}
+                disabled={submittingRating}
+              >
+                {submittingRating ? (
+                  <><span className="loading loading-spinner loading-sm"></span> Submitting...</>
+                ) : (
+                  'Submit Rating'
+                )}
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={() => setShowRatingModal(false)}>close</button>
+          </form>
+        </dialog>
+      )}
     </div>
   )
 }

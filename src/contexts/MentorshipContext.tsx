@@ -14,13 +14,18 @@ export interface MentorshipProfile {
   photoURL: string
   createdAt: Date
   updatedAt: Date
+  // Approval status
+  status?: 'pending' | 'accepted' | 'declined' | 'disabled'
   // Mentor-specific
   expertise?: string[]
   currentRole?: string
   bio?: string
   resumeURL?: string
+  cvUrl?: string  // CV/Resume link for scrutiny
+  majorProjects?: string  // Description of major projects and role
   availability?: Record<string, string[]>
   maxMentees?: number
+  isPublic?: boolean
   // Mentee-specific
   education?: string
   skillsSought?: string[]

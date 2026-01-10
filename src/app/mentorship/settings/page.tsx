@@ -76,7 +76,7 @@ export default function SettingsPage() {
             Please sign in and complete your profile.
           </p>
           <div className="card-actions justify-center mt-6">
-            <Link href="/mentorship" className="btn btn-primary">
+            <Link href="/mentorship/dashboard" className="btn btn-primary">
               Go to Mentorship Home
             </Link>
           </div>
@@ -94,6 +94,7 @@ export default function SettingsPage() {
     availability: profile.availability 
       ? Object.keys(profile.availability).reduce((acc, day) => ({ ...acc, [day]: true }), {})
       : {},
+    isPublic: profile.isPublic ?? true,
   } : undefined
 
   const menteeInitialData = profile.role === 'mentee' ? {
@@ -111,7 +112,7 @@ export default function SettingsPage() {
           <h2 className="text-2xl font-bold">Profile Settings</h2>
           <p className="text-base-content/70">Update your {profile.role} profile details</p>
         </div>
-        <Link href="/mentorship" className="btn btn-ghost btn-sm">
+        <Link href="/mentorship/dashboard" className="btn btn-ghost btn-sm">
           ← Back to Dashboard
         </Link>
       </div>

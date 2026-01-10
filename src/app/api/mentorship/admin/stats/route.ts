@@ -29,12 +29,15 @@ export async function GET() {
     // Get session stats
     const sessionsSnapshot = await db.collection('mentorship_sessions').get()
     const totalSessions = sessionsSnapshot.size
-    const ratingsSum = sessionsSnapshot.docs.reduce((sum, doc) => {
+
+    // Get ratings from mentor_ratings collection
+    const ratingsSnapshot = await db.collection('mentor_ratings').get()
+    const ratingsSum = ratingsSnapshot.docs.reduce((sum, doc) => {
       const rating = doc.data().rating
       return rating ? sum + rating : sum
     }, 0)
-    const ratedSessions = sessionsSnapshot.docs.filter(d => d.data().rating).length
-    const averageRating = ratedSessions > 0 ? ratingsSum / ratedSessions : 0
+    const totalRatings = ratingsSnapshot.size
+    const averageRating = totalRatings > 0 ? ratingsSum / totalRatings : 0
 
     // Get unresolved alerts
     const alertsSnapshot = await db.collection('mentorship_alerts')

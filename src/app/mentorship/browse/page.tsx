@@ -7,7 +7,7 @@ import { useMentorship, MentorshipProfile } from '@/contexts/MentorshipContext'
 import MentorCard from '@/components/mentorship/MentorCard'
 import Link from 'next/link'
 
-type RequestStatus = 'none' | 'pending' | 'declined' | 'active'
+type RequestStatus = 'none' | 'pending' | 'declined' | 'active' | 'completed'
 
 export default function BrowseMentorsPage() {
   const router = useRouter()
@@ -18,8 +18,10 @@ export default function BrowseMentorsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedExpertise, setSelectedExpertise] = useState<string>('')
   const [requestingMentor, setRequestingMentor] = useState<string | null>(null)
-  // Track request status per mentor (pending, declined, active, or none)
+  // Track request status per mentor (pending, declined, active, completed, or none)
   const [mentorRequestStatus, setMentorRequestStatus] = useState<Map<string, RequestStatus>>(new Map())
+  // Track session IDs and rating status for completed mentorships
+  const [mentorSessionInfo, setMentorSessionInfo] = useState<Map<string, { sessionId: string; hasRated: boolean }>>(new Map())
 
   useEffect(() => {
     if (!loading && !user) {
@@ -62,13 +64,22 @@ export default function BrowseMentorsPage() {
         if (response.ok) {
           const data = await response.json()
           const statusMap = new Map<string, RequestStatus>()
+          const sessionInfoMap = new Map<string, { sessionId: string; hasRated: boolean }>()
           
           // Map each mentor's request status
           for (const request of data.requests || []) {
             statusMap.set(request.mentorId, request.status as RequestStatus)
+            // Store session info for completed mentorships to enable rating
+            if (request.status === 'completed') {
+              sessionInfoMap.set(request.mentorId, {
+                sessionId: request.sessionId || request.id,
+                hasRated: request.hasRated || false,
+              })
+            }
           }
           
           setMentorRequestStatus(statusMap)
+          setMentorSessionInfo(sessionInfoMap)
         }
       } catch (error) {
         console.error('Error fetching mentee requests:', error)
@@ -114,6 +125,42 @@ export default function BrowseMentorsPage() {
     }
   }
 
+  const handleRateNow = async (mentorId: string, sessionId: string, rating: number, feedback: string) => {
+    if (!user) return
+    try {
+      const response = await fetch('/api/mentorship/ratings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mentorId,
+          menteeId: user.uid,
+          sessionId,
+          rating,
+          feedback,
+        }),
+      })
+
+      if (response.ok) {
+        // Update session info to mark as rated
+        setMentorSessionInfo(prev => {
+          const updated = new Map(prev)
+          const existing = updated.get(mentorId)
+          if (existing) {
+            updated.set(mentorId, { ...existing, hasRated: true })
+          }
+          return updated
+        })
+        alert('Thank you for your feedback!')
+      } else {
+        const error = await response.json()
+        alert(error.error || 'Failed to submit rating')
+      }
+    } catch (error) {
+      console.error('Error submitting rating:', error)
+      alert('An error occurred. Please try again.')
+    }
+  }
+
   const filteredMentors = mentors.filter(mentor => {
     const matchesSearch = searchQuery === '' || 
       mentor.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -145,7 +192,7 @@ export default function BrowseMentorsPage() {
             Please sign in and complete your mentee profile to browse mentors.
           </p>
           <div className="card-actions justify-center mt-6">
-            <Link href="/mentorship" className="btn btn-primary">
+            <Link href="/mentorship/dashboard" className="btn btn-primary">
               Go to Mentorship Home
             </Link>
           </div>
@@ -162,7 +209,7 @@ export default function BrowseMentorsPage() {
           <h2 className="text-2xl font-bold">Find Your Mentor</h2>
           <p className="text-base-content/70">Browse experienced professionals ready to guide you</p>
         </div>
-        <Link href="/mentorship" className="btn btn-ghost btn-sm">
+        <Link href="/mentorship/dashboard" className="btn btn-ghost btn-sm">
           ← Back to Dashboard
         </Link>
       </div>
@@ -215,15 +262,24 @@ export default function BrowseMentorsPage() {
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMentors.map(mentor => (
-            <MentorCard
-              key={mentor.uid}
-              mentor={mentor}
-              onRequestMatch={handleRequestMatch}
-              isRequesting={requestingMentor === mentor.uid}
-              requestStatus={mentorRequestStatus.get(mentor.uid) || 'none'}
-            />
-          ))}
+          {filteredMentors.map(mentor => {
+            const sessionInfo = mentorSessionInfo.get(mentor.uid)
+            return (
+              <MentorCard
+                key={mentor.uid}
+                mentor={{
+                  ...mentor,
+                  sessionId: sessionInfo?.sessionId,
+                  hasRated: sessionInfo?.hasRated,
+                }}
+                onRequestMatch={handleRequestMatch}
+                isRequesting={requestingMentor === mentor.uid}
+                requestStatus={mentorRequestStatus.get(mentor.uid) || 'none'}
+                onRateNow={handleRateNow}
+                currentUserId={user?.uid}
+              />
+            )
+          })}
         </div>
       )}
 

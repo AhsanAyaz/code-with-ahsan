@@ -9,8 +9,11 @@ interface MentorRegistrationFormProps {
     expertise?: string[]
     currentRole?: string
     bio?: string
+    cvUrl?: string
+    majorProjects?: string
     maxMentees?: number
     availability?: Record<string, boolean>
+    isPublic?: boolean
   }
   mode?: 'create' | 'edit'
 }
@@ -36,8 +39,11 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting, initial
   const [expertise, setExpertise] = useState<string[]>(initialData?.expertise || [])
   const [currentRole, setCurrentRole] = useState(initialData?.currentRole || '')
   const [bio, setBio] = useState(initialData?.bio || '')
+  const [cvUrl, setCvUrl] = useState(initialData?.cvUrl || '')
+  const [majorProjects, setMajorProjects] = useState(initialData?.majorProjects || '')
   const [maxMentees, setMaxMentees] = useState(initialData?.maxMentees || 3)
   const [availability, setAvailability] = useState<Record<string, boolean>>(initialData?.availability || {})
+  const [isPublic, setIsPublic] = useState(initialData?.isPublic ?? true)
 
   const toggleExpertise = (skill: string) => {
     setExpertise(prev => 
@@ -78,8 +84,11 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting, initial
       expertise,
       currentRole,
       bio,
+      cvUrl: cvUrl.trim() || undefined,
+      majorProjects: majorProjects.trim() || undefined,
       maxMentees,
       availability: availableDays,
+      isPublic,
     })
   }
 
@@ -138,6 +147,46 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting, initial
         />
       </div>
 
+      {/* CV/Resume URL */}
+      <div className="form-control">
+        <label className="label">
+          <span className="label-text font-semibold">CV / Resume Link</span>
+          <span className="label-text-alt text-base-content/60">Optional</span>
+        </label>
+        <input
+          type="url"
+          placeholder="https://drive.google.com/... or https://linkedin.com/in/..."
+          className="input input-bordered w-full"
+          value={cvUrl}
+          onChange={(e) => setCvUrl(e.target.value)}
+        />
+        <label className="label">
+          <span className="label-text-alt text-base-content/60">
+            Link to your CV, resume, or LinkedIn profile. Helps in verifying your experience.
+          </span>
+        </label>
+      </div>
+
+      {/* Major Projects */}
+      <div className="form-control">
+        <label className="label">
+          <span className="label-text font-semibold">Major Projects & Experience</span>
+          <span className="label-text-alt text-base-content/60">{majorProjects.length}/1000 characters</span>
+        </label>
+        <textarea
+          placeholder="Describe your major projects and your role in them. For example:&#10;&#10;• Led the frontend team at XYZ Corp, built a React dashboard serving 100k users&#10;• Open source contributor to Angular, created popular state management library&#10;• Mentored 5+ developers who got promoted to senior positions"
+          className="textarea textarea-bordered w-full h-40"
+          value={majorProjects}
+          onChange={(e) => setMajorProjects(e.target.value)}
+          maxLength={1000}
+        />
+        <label className="label">
+          <span className="label-text-alt text-base-content/60">
+            Helps others understand your expertise and mentoring credentials.
+          </span>
+        </label>
+      </div>
+
       {/* Max Mentees */}
       <div className="form-control">
         <label className="label">
@@ -179,6 +228,24 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting, initial
         </div>
         <label className="label">
           <span className="label-text-alt text-base-content/60">Select days you're generally available for mentorship sessions</span>
+        </label>
+      </div>
+
+      {/* Public Profile Toggle */}
+      <div className="form-control">
+        <label className="label cursor-pointer justify-start gap-4">
+          <input 
+            type="checkbox" 
+            className="toggle toggle-primary"
+            checked={isPublic}
+            onChange={(e) => setIsPublic(e.target.checked)}
+          />
+          <div>
+            <span className="label-text font-semibold">Show me in Community Mentors</span>
+            <p className="text-xs text-base-content/60 mt-1">
+              When enabled, your profile will appear in the public mentors showcase, helping you gain visibility and recognition in the community.
+            </p>
+          </div>
         </label>
       </div>
 
