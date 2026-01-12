@@ -55,6 +55,8 @@ export async function POST(request: NextRequest) {
 
     const docRef = await db.collection('mentorship_scheduled_sessions').add(sessionData)
 
+    // Note: Email notification skipped - Google Calendar invite handles this
+
     return NextResponse.json({
       scheduledSession: {
         id: docRef.id,
@@ -67,6 +69,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create session' }, { status: 500 })
   }
 }
+
 
 // PUT - Update a scheduled session (rating, feedback, notes)
 export async function PUT(request: NextRequest) {

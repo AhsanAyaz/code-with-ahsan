@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/firebaseAdmin'
 import { FieldValue } from 'firebase-admin/firestore'
+import { 
+  sendMentorshipRequestEmail, 
+  sendRequestAcceptedEmail, 
+  sendRequestDeclinedEmail,
+  sendMentorshipCompletedEmail 
+} from '@/lib/email'
+
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -120,6 +127,29 @@ export async function POST(request: NextRequest) {
 
     const docRef = await db.collection('mentorship_sessions').add(matchData)
 
+    // Send email notification to mentor about new request
+    const menteeProfile = await db.collection('mentorship_profiles').doc(menteeId).get()
+    if (menteeProfile.exists && mentorData) {
+      const menteeData = menteeProfile.data()
+      sendMentorshipRequestEmail(
+        {
+          uid: mentorId,
+          displayName: mentorData.displayName || '',
+          email: mentorData.email || '',
+          role: 'mentor',
+        },
+        {
+          uid: menteeId,
+          displayName: menteeData?.displayName || '',
+          email: menteeData?.email || '',
+          role: 'mentee',
+          education: menteeData?.education,
+          skillsSought: menteeData?.skillsSought,
+          careerGoals: menteeData?.careerGoals,
+        }
+      ).catch(err => console.error('Failed to send request email:', err))
+    }
+
     return NextResponse.json({ 
       success: true, 
       matchId: docRef.id,
@@ -164,8 +194,8 @@ export async function PUT(request: NextRequest) {
           .get()
       ])
 
-      const mentorData = mentorProfile.data()
-      const maxMentees = mentorData?.maxMentees || 3
+      const mentorProfileData = mentorProfile.data()
+      const maxMentees = mentorProfileData?.maxMentees || 3
       const activeMenteeCount = activeMatches.size
 
       if (activeMenteeCount >= maxMentees) {
@@ -182,16 +212,89 @@ export async function PUT(request: NextRequest) {
         approvedAt: FieldValue.serverTimestamp(),
         lastContactAt: FieldValue.serverTimestamp(),
       })
+
+      // Send acceptance email to mentee
+      const menteeProfile = await db.collection('mentorship_profiles').doc(matchData?.menteeId).get()
+      if (menteeProfile.exists && mentorProfileData) {
+        const menteeData = menteeProfile.data()
+        sendRequestAcceptedEmail(
+          {
+            uid: matchData?.menteeId,
+            displayName: menteeData?.displayName || '',
+            email: menteeData?.email || '',
+            role: 'mentee',
+          },
+          {
+            uid: matchData?.mentorId,
+            displayName: mentorProfileData.displayName || '',
+            email: mentorProfileData.email || '',
+            role: 'mentor',
+            expertise: mentorProfileData.expertise,
+            currentRole: mentorProfileData.currentRole,
+          }
+        ).catch(err => console.error('Failed to send acceptance email:', err))
+      }
+
       return NextResponse.json({ success: true, message: 'Match approved' }, { status: 200 })
     } else if (action === 'decline') {
       await matchRef.update({
         status: 'declined',
       })
+
+      // Send decline email to mentee
+      const [mentorProfile, menteeProfile] = await Promise.all([
+        db.collection('mentorship_profiles').doc(matchData?.mentorId).get(),
+        db.collection('mentorship_profiles').doc(matchData?.menteeId).get(),
+      ])
+      if (menteeProfile.exists && mentorProfile.exists) {
+        const menteeData = menteeProfile.data()
+        const mentorProfileData = mentorProfile.data()
+        sendRequestDeclinedEmail(
+          {
+            uid: matchData?.menteeId,
+            displayName: menteeData?.displayName || '',
+            email: menteeData?.email || '',
+            role: 'mentee',
+          },
+          {
+            uid: matchData?.mentorId,
+            displayName: mentorProfileData?.displayName || '',
+            email: mentorProfileData?.email || '',
+            role: 'mentor',
+          }
+        ).catch(err => console.error('Failed to send decline email:', err))
+      }
+
       return NextResponse.json({ success: true, message: 'Match declined' }, { status: 200 })
     } else if (action === 'complete') {
       await matchRef.update({
         status: 'completed',
       })
+
+      // Send completion email to both parties
+      const [mentorProfile, menteeProfile] = await Promise.all([
+        db.collection('mentorship_profiles').doc(matchData?.mentorId).get(),
+        db.collection('mentorship_profiles').doc(matchData?.menteeId).get(),
+      ])
+      if (menteeProfile.exists && mentorProfile.exists) {
+        const menteeData = menteeProfile.data()
+        const mentorProfileData = mentorProfile.data()
+        sendMentorshipCompletedEmail(
+          {
+            uid: matchData?.mentorId,
+            displayName: mentorProfileData?.displayName || '',
+            email: mentorProfileData?.email || '',
+            role: 'mentor',
+          },
+          {
+            uid: matchData?.menteeId,
+            displayName: menteeData?.displayName || '',
+            email: menteeData?.email || '',
+            role: 'mentee',
+          }
+        ).catch(err => console.error('Failed to send completion email:', err))
+      }
+
       return NextResponse.json({ success: true, message: 'Mentorship marked as complete' }, { status: 200 })
     }
 

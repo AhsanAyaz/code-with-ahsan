@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/firebaseAdmin'
+import { sendMentorshipCompletedEmail } from '@/lib/email'
 
 export async function GET(
   request: NextRequest,
@@ -107,6 +108,31 @@ export async function PUT(
         completedBy: uid,
         completionNotes: completionNotes || null,
       })
+
+      // Send completion email to both mentor and mentee
+      const [mentorProfile, menteeProfile] = await Promise.all([
+        db.collection('mentorship_profiles').doc(matchData.mentorId).get(),
+        db.collection('mentorship_profiles').doc(matchData.menteeId).get(),
+      ])
+      
+      if (mentorProfile.exists && menteeProfile.exists) {
+        const mentorData = mentorProfile.data()
+        const menteeData = menteeProfile.data()
+        sendMentorshipCompletedEmail(
+          {
+            uid: matchData.mentorId,
+            displayName: mentorData?.displayName || '',
+            email: mentorData?.email || '',
+            role: 'mentor',
+          },
+          {
+            uid: matchData.menteeId,
+            displayName: menteeData?.displayName || '',
+            email: menteeData?.email || '',
+            role: 'mentee',
+          }
+        ).catch(err => console.error('Failed to send completion email:', err))
+      }
 
       return NextResponse.json({ 
         success: true, 

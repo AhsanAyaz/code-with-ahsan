@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/firebaseAdmin'
+import { sendRegistrationStatusEmail, sendAccountStatusEmail } from '@/lib/email'
+
 
 // GET: Fetch all profiles with optional filters
 export async function GET(request: NextRequest) {
@@ -158,6 +160,35 @@ export async function PUT(request: NextRequest) {
       })
       
       await batch.commit()
+    }
+
+    // Send email notifications for status changes
+    const profileData = profileDoc.data()
+    if (profileData?.email) {
+      const userProfile = {
+        uid,
+        displayName: profileData.displayName || '',
+        email: profileData.email,
+        role: profileData.role,
+      }
+      
+      // Registration approval/decline emails (only for pending -> accepted/declined)
+      if (status === 'accepted' && previousStatus === 'pending') {
+        sendRegistrationStatusEmail(userProfile, true)
+          .catch(err => console.error('Failed to send approval email:', err))
+      } else if (status === 'declined' && previousStatus === 'pending') {
+        sendRegistrationStatusEmail(userProfile, false)
+          .catch(err => console.error('Failed to send decline email:', err))
+      }
+      
+      // Account disabled/enabled emails
+      if (status === 'disabled' && previousStatus !== 'disabled') {
+        sendAccountStatusEmail(userProfile, 'disabled', adminNotes)
+          .catch(err => console.error('Failed to send disabled email:', err))
+      } else if (status === 'accepted' && previousStatus === 'disabled') {
+        sendAccountStatusEmail(userProfile, 'enabled')
+          .catch(err => console.error('Failed to send enabled email:', err))
+      }
     }
 
     return NextResponse.json({ 
