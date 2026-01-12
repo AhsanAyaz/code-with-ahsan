@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/firebaseAdmin'
+import { sendAdminMentorPendingEmail } from '@/lib/email'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -59,6 +60,20 @@ export async function POST(request: NextRequest) {
 
     await db.collection('mentorship_profiles').doc(uid).set(profile)
 
+    // Send admin notification for pending mentor registration
+    if (role === 'mentor') {
+      // Fire and forget - don't block the response
+      sendAdminMentorPendingEmail({
+        uid,
+        displayName: displayName || '',
+        email: email || '',
+        role: 'mentor',
+        expertise: profileData.expertise,
+        currentRole: profileData.currentRole,
+        bio: profileData.bio,
+      }).catch(err => console.error('Failed to send admin notification:', err))
+    }
+
     return NextResponse.json({ 
       success: true, 
       profile: {
@@ -67,6 +82,7 @@ export async function POST(request: NextRequest) {
         updatedAt: profile.updatedAt.toISOString(),
       }
     }, { status: 201 })
+
   } catch (error) {
     console.error('Error creating mentorship profile:', error)
     return NextResponse.json({ error: 'Failed to create profile' }, { status: 500 })

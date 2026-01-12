@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/firebaseAdmin'
+import { sendRatingReceivedEmail } from '@/lib/email'
+
 
 // POST: Submit a rating for a completed mentorship
 export async function POST(request: NextRequest) {
@@ -57,6 +59,21 @@ export async function POST(request: NextRequest) {
       hasRating: true,
       ratingId: ratingDoc.id,
     })
+
+    // Send rating notification to mentor
+    const mentorProfile = await db.collection('mentorship_profiles').doc(mentorId).get()
+    if (mentorProfile.exists) {
+      const mentorData = mentorProfile.data()
+      sendRatingReceivedEmail(
+        {
+          uid: mentorId,
+          displayName: mentorData?.displayName || '',
+          email: mentorData?.email || '',
+          role: 'mentor',
+        },
+        { rating, feedback: feedback || undefined }
+      ).catch(err => console.error('Failed to send rating email:', err))
+    }
 
     return NextResponse.json({ 
       success: true, 
