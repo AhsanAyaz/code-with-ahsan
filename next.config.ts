@@ -84,6 +84,12 @@ const nextConfig: NextConfig = {
         destination: "https://discord.gg/KSPpuxD8SG",
         permanent: true,
       },
+      {
+        source: "/dinq-giveaway",
+        destination:
+          "https://n8n.codewithahsan.dev/form/42d5787c-cba9-457e-b05e-a1116d5d1c3f",
+        permanent: true,
+      },
     ];
   },
   turbopack: {
