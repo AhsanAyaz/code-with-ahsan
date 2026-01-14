@@ -1,0 +1,99 @@
+/**
+ * Centralized types for the Mentorship feature
+ * Import from '@/types/mentorship' instead of defining locally
+ */
+
+export type MentorshipRole = "mentor" | "mentee" | null;
+
+/**
+ * Full mentorship profile stored in Firestore
+ * Used in context, API routes, and components
+ */
+export interface MentorshipProfile {
+  uid: string;
+  username?: string; // Public username for profile URLs
+  role: MentorshipRole;
+  displayName: string;
+  email: string;
+  photoURL: string;
+  createdAt: Date;
+  updatedAt: Date;
+  // Approval status
+  status?: "pending" | "accepted" | "declined" | "disabled";
+  // Mentor-specific
+  expertise?: string[];
+  currentRole?: string;
+  bio?: string;
+  resumeURL?: string;
+  cvUrl?: string; // CV/Resume link for scrutiny
+  majorProjects?: string; // Description of major projects and role
+  availability?: Record<string, string[]>;
+  maxMentees?: number;
+  isPublic?: boolean;
+  // Mentee-specific
+  education?: string;
+  skillsSought?: string[];
+  careerGoals?: string;
+  learningStyle?: "self-study" | "guided" | "mixed";
+}
+
+/**
+ * Public mentor data returned from API
+ * Subset of MentorshipProfile with computed stats
+ */
+export interface PublicMentor {
+  uid: string;
+  username?: string;
+  displayName: string;
+  photoURL?: string;
+  currentRole?: string;
+  expertise?: string[];
+  bio?: string;
+  activeMenteeCount: number;
+  completedMentorships: number;
+  maxMentees: number;
+  avgRating?: number;
+  ratingCount?: number;
+  availability?: Record<string, string[]>;
+  isAtCapacity?: boolean;
+}
+
+/**
+ * Detailed mentor profile for the public profile page
+ * Extends PublicMentor with additional details
+ */
+export interface MentorProfileDetails extends PublicMentor {
+  majorProjects?: string;
+  createdAt: string | null;
+}
+
+/**
+ * Mentorship match/session between mentor and mentee
+ */
+export interface MentorshipMatch {
+  id: string;
+  mentorId: string;
+  menteeId: string;
+  status: "pending" | "active" | "declined" | "completed";
+  requestedAt: Date;
+  approvedAt?: Date;
+  lastContactAt?: Date;
+  matchScore?: number;
+}
+
+/**
+ * Match with partner profile details attached
+ */
+export interface MatchWithProfile extends MentorshipMatch {
+  partnerProfile?: Partial<MentorshipProfile>;
+}
+
+/**
+ * Request status for mentor-mentee matching
+ */
+export type RequestStatus =
+  | "none"
+  | "pending"
+  | "declined"
+  | "active"
+  | "completed";

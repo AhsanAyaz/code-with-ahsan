@@ -1,112 +1,109 @@
-'use client'
+"use client";
 
-import { useContext, useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { AuthContext } from '@/contexts/AuthContext'
-import { useMentorship } from '@/contexts/MentorshipContext'
-import Link from 'next/link'
-
-interface PublicMentor {
-  uid: string
-  displayName: string
-  photoURL?: string
-  currentRole?: string
-  expertise?: string[]
-  bio?: string
-  activeMenteeCount: number
-  completedMentorships: number
-  maxMentees: number
-  avgRating?: number
-  ratingCount?: number
-  availability?: Record<string, string[]>
-}
+import { useContext, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { AuthContext } from "@/contexts/AuthContext";
+import { useMentorship } from "@/contexts/MentorshipContext";
+import Link from "next/link";
+import type { PublicMentor } from "@/types/mentorship";
 
 export default function MentorshipPage() {
-  const router = useRouter()
-  const { setShowLoginPopup } = useContext(AuthContext)
-  const { user, profile, loading } = useMentorship()
-  const [mentors, setMentors] = useState<PublicMentor[]>([])
-  const [loadingMentors, setLoadingMentors] = useState(true)
-  const [filter, setFilter] = useState('')
-  const [pendingRedirect, setPendingRedirect] = useState<'mentor' | 'mentee' | null>(null)
+  const router = useRouter();
+  const { setShowLoginPopup } = useContext(AuthContext);
+  const { user, profile, loading } = useMentorship();
+  const [mentors, setMentors] = useState<PublicMentor[]>([]);
+  const [loadingMentors, setLoadingMentors] = useState(true);
+  const [filter, setFilter] = useState("");
+  const [pendingRedirect, setPendingRedirect] = useState<
+    "mentor" | "mentee" | null
+  >(null);
 
   // Fetch public mentors
   useEffect(() => {
     const fetchMentors = async () => {
       try {
-        const response = await fetch('/api/mentorship/mentors?public=true')
+        const response = await fetch("/api/mentorship/mentors?public=true");
         if (response.ok) {
-          const data = await response.json()
-          setMentors(data.mentors || [])
+          const data = await response.json();
+          setMentors(data.mentors || []);
         }
       } catch (error) {
-        console.error('Error fetching mentors:', error)
+        console.error("Error fetching mentors:", error);
       } finally {
-        setLoadingMentors(false)
+        setLoadingMentors(false);
       }
-    }
+    };
 
-    fetchMentors()
-  }, [])
+    fetchMentors();
+  }, []);
 
   // Handle redirect after login
   useEffect(() => {
     if (!loading && user && pendingRedirect) {
-      router.push(`/mentorship/onboarding?role=${pendingRedirect}`)
-      setPendingRedirect(null)
+      router.push(`/mentorship/onboarding?role=${pendingRedirect}`);
+      setPendingRedirect(null);
     }
-  }, [loading, user, pendingRedirect, router])
+  }, [loading, user, pendingRedirect, router]);
 
-  const handleRoleClick = (role: 'mentor' | 'mentee') => {
+  const handleRoleClick = (role: "mentor" | "mentee") => {
     if (!user) {
       // Store pending redirect and show login
-      setPendingRedirect(role)
-      setShowLoginPopup(true)
+      setPendingRedirect(role);
+      setShowLoginPopup(true);
     } else if (!profile) {
       // User logged in but no profile - go to onboarding
-      router.push(`/mentorship/onboarding?role=${role}`)
+      router.push(`/mentorship/onboarding?role=${role}`);
     }
     // If user has profile, they should see the dashboard button instead
-  }
+  };
 
   const filteredMentors = filter
-    ? mentors.filter(m => 
-        m.expertise?.some(e => e.toLowerCase().includes(filter.toLowerCase())) ||
-        m.displayName?.toLowerCase().includes(filter.toLowerCase()) ||
-        m.currentRole?.toLowerCase().includes(filter.toLowerCase())
+    ? mentors.filter(
+        (m) =>
+          m.expertise?.some((e) =>
+            e.toLowerCase().includes(filter.toLowerCase())
+          ) ||
+          m.displayName?.toLowerCase().includes(filter.toLowerCase()) ||
+          m.currentRole?.toLowerCase().includes(filter.toLowerCase())
       )
-    : mentors
+    : mentors;
 
   return (
     <div className="space-y-8">
       {/* Hero Section with CTAs */}
       <div className="card bg-gradient-to-r from-primary to-secondary text-primary-content">
         <div className="card-body text-center py-10">
-          <h2 className="text-3xl md:text-4xl font-bold">Join Our Mentorship Community</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">
+            Join Our Mentorship Community
+          </h2>
           <p className="opacity-90 max-w-2xl mx-auto mt-2">
-            Connect with experienced professionals or share your expertise to help others grow. 
-            Our mentorship program is designed to accelerate career development through meaningful connections.
+            Connect with experienced professionals or share your expertise to
+            help others grow. Our mentorship program is designed to accelerate
+            career development through meaningful connections.
           </p>
-          
+
           <div className="card-actions justify-center mt-6 gap-4 flex-wrap">
             {loading ? (
               <span className="loading loading-spinner loading-md"></span>
             ) : profile ? (
               // User has profile - show dashboard button
-              <Link href="/mentorship/dashboard" className="btn btn-lg bg-white/20 hover:bg-white/30 border-none">
+              <Link
+                href="/mentorship/dashboard"
+                className="btn btn-lg bg-white/20 hover:bg-white/30 border-none"
+              >
                 <span className="text-xl">📊</span> Go to Dashboard
               </Link>
             ) : (
               // No profile - show role selection buttons
               <>
                 <button
-                  onClick={() => handleRoleClick('mentor')}
+                  onClick={() => handleRoleClick("mentor")}
                   className="btn btn-lg bg-white/20 hover:bg-white/30 border-none"
                 >
                   <span className="text-xl">🎯</span> Become a Mentor
                 </button>
                 <button
-                  onClick={() => handleRoleClick('mentee')}
+                  onClick={() => handleRoleClick("mentee")}
                   className="btn btn-lg bg-white/20 hover:bg-white/30 border-none"
                 >
                   <span className="text-xl">🚀</span> Be a Mentee
@@ -148,10 +145,11 @@ export default function MentorshipPage() {
               <span className="text-primary">🌟</span> Community Mentors
             </h3>
             <p className="text-base-content/70 text-sm">
-              Meet the amazing professionals who volunteer their time to guide and support others.
+              Meet the amazing professionals who volunteer their time to guide
+              and support others.
             </p>
           </div>
-          
+
           {/* Search/Filter */}
           <div className="form-control w-full md:w-80">
             <input
@@ -175,39 +173,54 @@ export default function MentorshipPage() {
               <div className="text-5xl mb-4">🔍</div>
               <h3 className="text-xl font-semibold">No mentors found</h3>
               <p className="text-base-content/70">
-                {filter ? 'Try adjusting your search terms' : 'Be the first to become a public mentor!'}
+                {filter
+                  ? "Try adjusting your search terms"
+                  : "Be the first to become a public mentor!"}
               </p>
             </div>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMentors.map(mentor => (
-              <div key={mentor.uid} className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all">
+            {filteredMentors.map((mentor) => (
+              <div
+                key={mentor.uid}
+                className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all"
+              >
                 <div className="card-body">
                   {/* Header with Avatar */}
                   <div className="flex items-start gap-4">
                     <div className="avatar">
                       <div className="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
                         {mentor.photoURL ? (
-                          <img src={mentor.photoURL} alt={mentor.displayName || 'Mentor'} />
+                          <img
+                            src={mentor.photoURL}
+                            alt={mentor.displayName || "Mentor"}
+                          />
                         ) : (
                           <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold w-full h-full">
-                            {mentor.displayName?.charAt(0) || '?'}
+                            {mentor.displayName?.charAt(0) || "?"}
                           </div>
                         )}
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="card-title text-lg">{mentor.displayName}</h3>
-                      <p className="text-sm text-base-content/70 truncate">{mentor.currentRole}</p>
+                      <h3 className="card-title text-lg">
+                        {mentor.displayName}
+                      </h3>
+                      <p className="text-sm text-base-content/70 truncate">
+                        {mentor.currentRole}
+                      </p>
                     </div>
                   </div>
 
                   {/* Expertise Tags */}
                   {mentor.expertise && mentor.expertise.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-3">
-                      {mentor.expertise.slice(0, 4).map(skill => (
-                        <span key={skill} className="badge badge-primary badge-sm">
+                      {mentor.expertise.slice(0, 4).map((skill) => (
+                        <span
+                          key={skill}
+                          className="badge badge-primary badge-sm"
+                        >
                           {skill}
                         </span>
                       ))}
@@ -229,28 +242,51 @@ export default function MentorshipPage() {
                   {/* Stats */}
                   <div className="flex items-center gap-4 mt-4 pt-4 border-t border-base-200">
                     <div className="text-center flex-1">
-                      <div className="text-lg font-bold text-primary">{mentor.activeMenteeCount}</div>
+                      <div className="text-lg font-bold text-primary">
+                        {mentor.activeMenteeCount}
+                      </div>
                       <div className="text-xs text-base-content/60">Active</div>
                     </div>
                     <div className="text-center flex-1">
-                      <div className="text-lg font-bold text-secondary">{mentor.completedMentorships}</div>
-                      <div className="text-xs text-base-content/60">Completed</div>
+                      <div className="text-lg font-bold text-secondary">
+                        {mentor.completedMentorships}
+                      </div>
+                      <div className="text-xs text-base-content/60">
+                        Completed
+                      </div>
                     </div>
                     <div className="text-center flex-1">
-                      <div className="text-lg font-bold text-accent">{mentor.maxMentees}</div>
+                      <div className="text-lg font-bold text-accent">
+                        {mentor.maxMentees}
+                      </div>
                       <div className="text-xs text-base-content/60">Max</div>
                     </div>
                   </div>
 
                   {/* Availability */}
-                  {mentor.availability && Object.keys(mentor.availability).length > 0 && (
-                    <div className="flex items-center gap-1 mt-3 text-xs text-base-content/60">
-                      <span>📅</span>
-                      <span className="capitalize">
-                        {Object.keys(mentor.availability).map(d => d.charAt(0).toUpperCase() + d.slice(1, 3)).join(', ')}
-                      </span>
-                    </div>
-                  )}
+                  {mentor.availability &&
+                    Object.keys(mentor.availability).length > 0 && (
+                      <div className="flex items-center gap-1 mt-3 text-xs text-base-content/60">
+                        <span>📅</span>
+                        <span className="capitalize">
+                          {Object.keys(mentor.availability)
+                            .map(
+                              (d) => d.charAt(0).toUpperCase() + d.slice(1, 3)
+                            )
+                            .join(", ")}
+                        </span>
+                      </div>
+                    )}
+
+                  {/* View Profile */}
+                  <div className="card-actions mt-4">
+                    <Link
+                      href={`/mentorship/mentors/${mentor.username || mentor.uid}`}
+                      className="btn btn-primary btn-sm btn-block"
+                    >
+                      View Profile
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}
@@ -258,5 +294,5 @@ export default function MentorshipPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

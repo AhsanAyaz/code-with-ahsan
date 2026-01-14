@@ -1,84 +1,133 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
 
 interface MentorRegistrationFormProps {
-  onSubmit: (data: Record<string, unknown>) => Promise<void>
-  isSubmitting: boolean
+  onSubmit: (data: Record<string, unknown>) => Promise<void>;
+  isSubmitting: boolean;
   initialData?: {
-    expertise?: string[]
-    currentRole?: string
-    bio?: string
-    cvUrl?: string
-    majorProjects?: string
-    maxMentees?: number
-    availability?: Record<string, boolean>
-    isPublic?: boolean
-  }
-  mode?: 'create' | 'edit'
+    username?: string;
+    expertise?: string[];
+    currentRole?: string;
+    bio?: string;
+    cvUrl?: string;
+    majorProjects?: string;
+    maxMentees?: number;
+    availability?: Record<string, boolean>;
+    isPublic?: boolean;
+  };
+  mode?: "create" | "edit";
 }
 
 const EXPERTISE_OPTIONS = [
-  'Web Development',
-  'Mobile Development',
-  'Backend Development',
-  'DevOps & Cloud',
-  'Data Science',
-  'Machine Learning',
-  'UI/UX Design',
-  'Product Management',
-  'Career Growth',
-  'Interview Prep',
-  'System Design',
-  'Leadership',
-]
+  "Web Development",
+  "Mobile Development",
+  "Backend Development",
+  "DevOps & Cloud",
+  "Data Science",
+  "Machine Learning",
+  "UI/UX Design",
+  "Product Management",
+  "Career Growth",
+  "Interview Prep",
+  "System Design",
+  "Leadership",
+];
 
-const DAYS_OF_WEEK = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+const DAYS_OF_WEEK = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+];
 
-export default function MentorRegistrationForm({ onSubmit, isSubmitting, initialData, mode = 'create' }: MentorRegistrationFormProps) {
-  const [expertise, setExpertise] = useState<string[]>(initialData?.expertise || [])
-  const [currentRole, setCurrentRole] = useState(initialData?.currentRole || '')
-  const [bio, setBio] = useState(initialData?.bio || '')
-  const [cvUrl, setCvUrl] = useState(initialData?.cvUrl || '')
-  const [majorProjects, setMajorProjects] = useState(initialData?.majorProjects || '')
-  const [maxMentees, setMaxMentees] = useState(initialData?.maxMentees || 3)
-  const [availability, setAvailability] = useState<Record<string, boolean>>(initialData?.availability || {})
-  const [isPublic, setIsPublic] = useState(initialData?.isPublic ?? true)
+export default function MentorRegistrationForm({
+  onSubmit,
+  isSubmitting,
+  initialData,
+  mode = "create",
+}: MentorRegistrationFormProps) {
+  const [expertise, setExpertise] = useState<string[]>(
+    initialData?.expertise || []
+  );
+  const [currentRole, setCurrentRole] = useState(
+    initialData?.currentRole || ""
+  );
+  const [bio, setBio] = useState(initialData?.bio || "");
+  const [cvUrl, setCvUrl] = useState(initialData?.cvUrl || "");
+  const [majorProjects, setMajorProjects] = useState(
+    initialData?.majorProjects || ""
+  );
+  const [maxMentees, setMaxMentees] = useState(initialData?.maxMentees || 3);
+  const [availability, setAvailability] = useState<Record<string, boolean>>(
+    initialData?.availability || {}
+  );
+  const [isPublic, setIsPublic] = useState(initialData?.isPublic ?? true);
+  const [username, setUsername] = useState(initialData?.username || "");
+  const [customExpertiseInput, setCustomExpertiseInput] = useState("");
+
+  // Separate predefined and custom expertise
+  const customExpertise = expertise.filter(
+    (skill) => !EXPERTISE_OPTIONS.includes(skill)
+  );
 
   const toggleExpertise = (skill: string) => {
-    setExpertise(prev => 
-      prev.includes(skill) 
-        ? prev.filter(s => s !== skill)
-        : [...prev, skill]
-    )
-  }
+    setExpertise((prev) =>
+      prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill]
+    );
+  };
+
+  const addCustomExpertise = () => {
+    const trimmed = customExpertiseInput.trim();
+    if (!trimmed) return;
+    // Check for duplicates (case-insensitive)
+    const isDuplicate = expertise.some(
+      (s) => s.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (isDuplicate) {
+      setCustomExpertiseInput("");
+      return;
+    }
+    setExpertise((prev) => [...prev, trimmed]);
+    setCustomExpertiseInput("");
+  };
+
+  const removeCustomExpertise = (skill: string) => {
+    setExpertise((prev) => prev.filter((s) => s !== skill));
+  };
 
   const toggleDay = (day: string) => {
-    setAvailability(prev => ({
+    setAvailability((prev) => ({
       ...prev,
-      [day]: !prev[day]
-    }))
-  }
+      [day]: !prev[day],
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (expertise.length === 0) {
-      alert('Please select at least one area of expertise')
-      return
+      alert("Please select at least one area of expertise");
+      return;
     }
-    
+
     if (!currentRole.trim()) {
-      alert('Please enter your current role')
-      return
+      alert("Please enter your current role");
+      return;
     }
 
     const availableDays = Object.entries(availability)
       .filter(([, isAvailable]) => isAvailable)
-      .reduce((acc, [day]) => {
-        acc[day] = ['flexible']
-        return acc
-      }, {} as Record<string, string[]>)
+      .reduce(
+        (acc, [day]) => {
+          acc[day] = ["flexible"];
+          return acc;
+        },
+        {} as Record<string, string[]>
+      );
 
     await onSubmit({
       expertise,
@@ -89,15 +138,49 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting, initial
       maxMentees,
       availability: availableDays,
       isPublic,
-    })
-  }
+      ...(mode === "edit" && username ? { username: username.trim() } : {}),
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Username - Only shown in edit mode */}
+      {mode === "edit" && (
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text font-semibold">Username</span>
+          </label>
+          <div className="flex items-center gap-2">
+            <span className="text-base-content/60">@</span>
+            <input
+              type="text"
+              placeholder="your-username"
+              className="input input-bordered flex-1"
+              value={username}
+              onChange={(e) =>
+                setUsername(
+                  e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "")
+                )
+              }
+              minLength={3}
+              maxLength={30}
+            />
+          </div>
+          <label className="label">
+            <span className="label-text-alt text-base-content/60">
+              Your public profile URL: /mentorship/mentors/
+              {username || "your-username"}
+            </span>
+          </label>
+        </div>
+      )}
+
       {/* Current Role */}
       <div className="form-control">
         <label className="label">
-          <span className="label-text font-semibold">Current Role / Position *</span>
+          <span className="label-text font-semibold">
+            Current Role / Position *
+          </span>
         </label>
         <input
           type="text"
@@ -108,7 +191,9 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting, initial
           required
         />
         <label className="label">
-          <span className="label-text-alt text-base-content/60">This helps mentees understand your background</span>
+          <span className="label-text-alt text-base-content/60">
+            This helps mentees understand your background
+          </span>
         </label>
       </div>
 
@@ -119,24 +204,84 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting, initial
           <span className="label-text-alt">{expertise.length} selected</span>
         </label>
         <div className="flex flex-wrap gap-2">
-          {EXPERTISE_OPTIONS.map(skill => (
+          {EXPERTISE_OPTIONS.map((skill) => (
             <button
               key={skill}
               type="button"
               onClick={() => toggleExpertise(skill)}
-              className={`btn btn-sm ${expertise.includes(skill) ? 'btn-primary' : 'btn-outline'}`}
+              className={`btn btn-sm ${expertise.includes(skill) ? "btn-primary" : "btn-outline"}`}
             >
               {skill}
             </button>
           ))}
         </div>
+
+        {/* Custom Expertise Display */}
+        {customExpertise.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {customExpertise.map((skill) => (
+              <button
+                key={skill}
+                type="button"
+                onClick={() => removeCustomExpertise(skill)}
+                className="btn btn-sm btn-accent gap-1"
+              >
+                {skill}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Custom Expertise Input */}
+        <div className="flex gap-2 mt-3">
+          <input
+            type="text"
+            placeholder="Add custom expertise..."
+            className="input input-bordered input-sm flex-1"
+            value={customExpertiseInput}
+            onChange={(e) => setCustomExpertiseInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addCustomExpertise();
+              }
+            }}
+          />
+          <button
+            type="button"
+            onClick={addCustomExpertise}
+            className="btn btn-sm btn-outline btn-accent"
+            disabled={!customExpertiseInput.trim()}
+          >
+            + Add
+          </button>
+        </div>
+        <label className="label">
+          <span className="label-text-alt text-base-content/60">
+            Select from the options above or add your own custom expertise
+          </span>
+        </label>
       </div>
 
       {/* Bio */}
       <div className="form-control">
         <label className="label">
           <span className="label-text font-semibold">Short Bio</span>
-          <span className="label-text-alt text-base-content/60">{bio.length}/500 characters</span>
+          <span className="label-text-alt text-base-content/60">
+            {bio.length}/500 characters
+          </span>
         </label>
         <textarea
           placeholder="Tell potential mentees about yourself, your journey, and what you can help with..."
@@ -162,7 +307,8 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting, initial
         />
         <label className="label">
           <span className="label-text-alt text-base-content/60">
-            Link to your CV, resume, or LinkedIn profile. Helps in verifying your experience.
+            Link to your CV, resume, or LinkedIn profile. Helps in verifying
+            your experience.
           </span>
         </label>
       </div>
@@ -170,8 +316,12 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting, initial
       {/* Major Projects */}
       <div className="form-control">
         <label className="label">
-          <span className="label-text font-semibold">Major Projects & Experience</span>
-          <span className="label-text-alt text-base-content/60">{majorProjects.length}/1000 characters</span>
+          <span className="label-text font-semibold">
+            Major Projects & Experience
+          </span>
+          <span className="label-text-alt text-base-content/60">
+            {majorProjects.length}/1000 characters
+          </span>
         </label>
         <textarea
           placeholder="Describe your major projects and your role in them. For example:&#10;&#10;• Led the frontend team at XYZ Corp, built a React dashboard serving 100k users&#10;• Open source contributor to Angular, created popular state management library&#10;• Mentored 5+ developers who got promoted to senior positions"
@@ -190,8 +340,12 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting, initial
       {/* Max Mentees */}
       <div className="form-control">
         <label className="label">
-          <span className="label-text font-semibold">Maximum Mentees at a Time</span>
-          <span className="label-text-alt font-bold text-primary">{maxMentees}</span>
+          <span className="label-text font-semibold">
+            Maximum Mentees at a Time
+          </span>
+          <span className="label-text-alt font-bold text-primary">
+            {maxMentees}
+          </span>
         </label>
         <input
           type="range"
@@ -206,7 +360,9 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting, initial
           <span>5</span>
           <span>10</span>
         </div>
-        <p className="text-xs text-base-content/60 mt-2">Manage your availability by limiting active mentees</p>
+        <p className="text-xs text-base-content/60 mt-2">
+          Manage your availability by limiting active mentees
+        </p>
       </div>
 
       {/* Availability */}
@@ -215,35 +371,41 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting, initial
           <span className="label-text font-semibold">Available Days</span>
         </label>
         <div className="flex flex-wrap gap-2">
-          {DAYS_OF_WEEK.map(day => (
+          {DAYS_OF_WEEK.map((day) => (
             <button
               key={day}
               type="button"
               onClick={() => toggleDay(day)}
-              className={`btn btn-sm capitalize ${availability[day] ? 'btn-secondary' : 'btn-outline'}`}
+              className={`btn btn-sm capitalize ${availability[day] ? "btn-secondary" : "btn-outline"}`}
             >
               {day.slice(0, 3)}
             </button>
           ))}
         </div>
         <label className="label">
-          <span className="label-text-alt text-base-content/60">Select days you're generally available for mentorship sessions</span>
+          <span className="label-text-alt text-base-content/60">
+            Select days you're generally available for mentorship sessions
+          </span>
         </label>
       </div>
 
       {/* Public Profile Toggle */}
       <div className="form-control">
         <label className="label cursor-pointer justify-start gap-4">
-          <input 
-            type="checkbox" 
+          <input
+            type="checkbox"
             className="toggle toggle-primary"
             checked={isPublic}
             onChange={(e) => setIsPublic(e.target.checked)}
           />
           <div>
-            <span className="label-text font-semibold">Show me in Community Mentors</span>
+            <span className="label-text font-semibold">
+              Show me in Community Mentors
+            </span>
             <p className="text-xs text-base-content/60 mt-1">
-              When enabled, your profile will appear in the public mentors showcase, helping you gain visibility and recognition in the community.
+              When enabled, your profile will appear in the public mentors
+              showcase, helping you gain visibility and recognition in the
+              community.
             </p>
           </div>
         </label>
@@ -251,21 +413,23 @@ export default function MentorRegistrationForm({ onSubmit, isSubmitting, initial
 
       {/* Submit Button */}
       <div className="pt-4">
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="btn btn-primary btn-lg w-full"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
             <>
               <span className="loading loading-spinner"></span>
-              {mode === 'edit' ? 'Saving Changes...' : 'Creating Profile...'}
+              {mode === "edit" ? "Saving Changes..." : "Creating Profile..."}
             </>
+          ) : mode === "edit" ? (
+            "Save Changes"
           ) : (
-            mode === 'edit' ? 'Save Changes' : 'Complete Registration'
+            "Complete Registration"
           )}
         </button>
       </div>
     </form>
-  )
+  );
 }
