@@ -141,31 +141,22 @@ export async function generateMetadata({
       url: profileUrl,
       siteName: "Code with Ahsan",
       type: "profile",
-      images: mentor.photoURL
-        ? [
-            {
-              url: mentor.photoURL,
-              width: 400,
-              height: 400,
-              alt: `${mentor.displayName} - Mentor at Code with Ahsan`,
-            },
-          ]
-        : [
-            {
-              url: `${siteUrl}/images/mentorship-og.png`,
-              width: 1200,
-              height: 630,
-              alt: "Code with Ahsan Mentorship Program",
-            },
-          ],
+      // Always use branded OG image for reliable social sharing
+      // (Google profile photos are often blocked by social media crawlers)
+      images: [
+        {
+          url: `${siteUrl}/images/mentorship-og.png`,
+          width: 1200,
+          height: 630,
+          alt: `${mentor.displayName} - Mentor at Code with Ahsan`,
+        },
+      ],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
-      images: mentor.photoURL
-        ? [mentor.photoURL]
-        : [`${siteUrl}/images/mentorship-og.png`],
+      images: [`${siteUrl}/images/mentorship-og.png`],
     },
     alternates: {
       canonical: profileUrl,
