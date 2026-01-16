@@ -285,12 +285,34 @@ export async function PUT(request: NextRequest) {
         const mentorDiscord = mentorProfileData?.discordUsername;
         const menteeDiscord = menteeData?.discordUsername;
 
-        if (!mentorDiscord || !menteeDiscord) {
+        if (!mentorDiscord && !menteeDiscord) {
           return NextResponse.json(
             {
-              error: "Missing Discord username",
+              error: "Missing Discord usernames",
               message:
-                "Both mentor and mentee must have a Discord username to start mentorship. Please update profiles.",
+                "Both you and the mentee are missing Discord usernames. Please update your profile settings and ask the mentee to do the same.",
+            },
+            { status: 400 }
+          );
+        }
+
+        if (!mentorDiscord) {
+          return NextResponse.json(
+            {
+              error: "Missing your Discord username",
+              message:
+                "Your Discord username is not set. Please update your profile settings before approving.",
+            },
+            { status: 400 }
+          );
+        }
+
+        if (!menteeDiscord) {
+          return NextResponse.json(
+            {
+              error: "Missing mentee's Discord username",
+              message:
+                "The mentee's Discord username is not set. Please ask them to update their profile before you can approve.",
             },
             { status: 400 }
           );

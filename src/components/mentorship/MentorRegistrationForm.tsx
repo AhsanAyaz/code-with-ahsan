@@ -214,6 +214,26 @@ export default function MentorRegistrationForm({
       <div className="form-control">
         <label className="label">
           <span className="label-text font-semibold">Discord Username *</span>
+          <div
+            className="tooltip tooltip-left"
+            data-tip="Open Discord → Click your username (bottom left) → Settings (gear icon) → My Account → Copy your username (without the @)"
+          >
+            <button type="button" className="btn btn-ghost btn-xs btn-circle">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                className="w-4 h-4 stroke-current"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+            </button>
+          </div>
         </label>
         <input
           type="text"
