@@ -93,6 +93,7 @@ export default function SettingsPage() {
     profile.role === "mentor"
       ? {
           username: profile.username || "",
+          discordUsername: profile.discordUsername || "",
           expertise: profile.expertise || [],
           currentRole: profile.currentRole || "",
           bio: profile.bio || "",
@@ -116,6 +117,7 @@ export default function SettingsPage() {
           skillsSought: profile.skillsSought || [],
           careerGoals: profile.careerGoals || "",
           learningStyle: profile.learningStyle || "mixed",
+          discordUsername: profile.discordUsername || "",
         }
       : undefined;
 
@@ -167,6 +169,7 @@ export default function SettingsPage() {
 
           {profile.role === "mentor" ? (
             <MentorRegistrationForm
+              key={`mentor-${profile.updatedAt?.toString()}`}
               onSubmit={handleSubmit}
               isSubmitting={isSubmitting}
               initialData={mentorInitialData}
@@ -174,6 +177,7 @@ export default function SettingsPage() {
             />
           ) : (
             <MenteeRegistrationForm
+              key={`mentee-${profile.updatedAt?.toString()}`}
               onSubmit={handleSubmit}
               isSubmitting={isSubmitting}
               initialData={menteeInitialData}
