@@ -159,37 +159,47 @@ export async function POST(request: NextRequest) {
       .get();
     if (menteeProfile.exists && mentorData) {
       const menteeData = menteeProfile.data();
-      sendMentorshipRequestEmail(
-        {
-          uid: mentorId,
-          displayName: mentorData.displayName || "",
-          email: mentorData.email || "",
-          role: "mentor",
-        },
-        {
-          uid: menteeId,
-          displayName: menteeData?.displayName || "",
-          email: menteeData?.email || "",
-          role: "mentee",
-          education: menteeData?.education,
-          skillsSought: menteeData?.skillsSought,
-          careerGoals: menteeData?.careerGoals,
-        }
-      ).catch((err) => console.error("Failed to send request email:", err));
+      const notificationTasks = [];
 
-      // Send Discord DM to mentor about new request (non-blocking)
+      // Email task
+      notificationTasks.push(
+        sendMentorshipRequestEmail(
+          {
+            uid: mentorId,
+            displayName: mentorData.displayName || "",
+            email: mentorData.email || "",
+            role: "mentor",
+          },
+          {
+            uid: menteeId,
+            displayName: menteeData?.displayName || "",
+            email: menteeData?.email || "",
+            role: "mentee",
+            education: menteeData?.education,
+            skillsSought: menteeData?.skillsSought,
+            careerGoals: menteeData?.careerGoals,
+          }
+        ).catch((err) => console.error("Failed to send request email:", err))
+      );
+
+      // Discord DM task
       if (isDiscordConfigured() && mentorData?.discordUsername) {
-        sendDirectMessage(
-          mentorData.discordUsername,
-          `📬 **New Mentorship Request!**\n\n` +
-            `**${menteeData?.displayName || "A mentee"}** wants you to be their mentor!\n\n` +
-            `**Skills they want to learn:** ${menteeData?.skillsSought?.join(", ") || "Not specified"}\n` +
-            `**Career Goals:** ${menteeData?.careerGoals || "Not specified"}\n\n` +
-            `Review the request: https://codewithahsan.dev/mentorship/requests`
-        ).catch((err) =>
-          console.error("Failed to send Discord DM to mentor:", err)
+        notificationTasks.push(
+          sendDirectMessage(
+            mentorData.discordUsername,
+            `📬 **New Mentorship Request!**\n\n` +
+              `**${menteeData?.displayName || "A mentee"}** wants you to be their mentor!\n\n` +
+              `**Skills they want to learn:** ${menteeData?.skillsSought?.join(", ") || "Not specified"}\n` +
+              `**Career Goals:** ${menteeData?.careerGoals || "Not specified"}\n\n` +
+              `Review the request: https://codewithahsan.dev/mentorship/requests`
+          ).catch((err) =>
+            console.error("Failed to send Discord DM to mentor:", err)
+          )
         );
       }
+
+      // Wait for all notifications
+      await Promise.allSettled(notificationTasks);
     }
 
     return NextResponse.json(
@@ -276,33 +286,37 @@ export async function PUT(request: NextRequest) {
       const menteeData = menteeProfile.exists ? menteeProfile.data() : null;
 
       // Create Discord channel (non-blocking)
+      // Create Discord channel (blocking to ensure it survives Vercel function freeze)
       if (isDiscordConfigured() && mentorProfileData) {
-        createMentorshipChannel(
-          mentorProfileData.displayName || "Mentor",
-          menteeData?.displayName || "Mentee",
-          matchId,
-          mentorProfileData.discordUsername,
-          menteeData?.discordUsername
-        )
-          .then(async (result) => {
-            if (result) {
-              await matchRef.update({
-                discordChannelId: result.channelId,
-                discordChannelUrl: result.channelUrl,
-              });
-              // Send DM to mentee with channel link
-              if (menteeData?.discordUsername && mentorProfileData) {
-                sendDirectMessage(
-                  menteeData.discordUsername,
-                  `🎉 Great news! **${mentorProfileData.displayName}** has accepted your mentorship request!\n\n` +
-                    `Your private channel is ready: ${result.channelUrl}`
-                ).catch((err) => console.error("Discord DM failed:", err));
-              }
-            }
-          })
-          .catch((err) =>
-            console.error("Discord channel creation failed:", err)
+        try {
+          const result = await createMentorshipChannel(
+            mentorProfileData.displayName || "Mentor",
+            menteeData?.displayName || "Mentee",
+            matchId,
+            mentorProfileData.discordUsername,
+            menteeData?.discordUsername
           );
+
+          if (result) {
+            await matchRef.update({
+              discordChannelId: result.channelId,
+              discordChannelUrl: result.channelUrl,
+            });
+
+            // Send DM to mentee with channel link
+            if (menteeData?.discordUsername && mentorProfileData) {
+              // We CAN fire-and-forget this one as it's less critical,
+              // BUT for Vercel reliability it's safer to await or Promise.all if we had multiple
+              await sendDirectMessage(
+                menteeData.discordUsername,
+                `🎉 Great news! **${mentorProfileData.displayName}** has accepted your mentorship request!\n\n` +
+                  `Your private channel is ready: ${result.channelUrl}`
+              ).catch((err) => console.error("Discord DM failed:", err));
+            }
+          }
+        } catch (err) {
+          console.error("Discord channel creation failed:", err);
+        }
       }
 
       // Send acceptance email to mentee

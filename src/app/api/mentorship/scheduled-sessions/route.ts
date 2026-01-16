@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
           minute: "2-digit",
         });
 
-        sendChannelMessage(
+        await sendChannelMessage(
           mentorshipData.discordChannelId,
           `📅 **Session Scheduled!**\n\n` +
             `**Date:** ${formattedDate}\n` +

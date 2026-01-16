@@ -158,68 +158,86 @@ export async function PUT(
       const mentorData = mentorProfile.exists ? mentorProfile.data() : null;
       const menteeData = menteeProfile.exists ? menteeProfile.data() : null;
 
+      // Execute notification tasks in parallel but await them to ensure Vercel function stays alive
+      const notificationTasks = [];
+
       // Send congratulations message to the mentorship channel
       if (isDiscordConfigured() && matchData.discordChannelId) {
-        sendChannelMessage(
-          matchData.discordChannelId,
-          `🎓 **Congratulations! This mentorship has been completed!** 🎉\n\n` +
-            `Thank you both for your dedication to learning and growth.\n\n` +
-            `**${mentorData?.displayName || "Mentor"}**, thank you for sharing your knowledge!\n` +
-            `**${menteeData?.displayName || "Mentee"}**, we hope you learned a lot!\n\n` +
-            `This channel will remain available for you to reference past conversations.\n\n` +
-            `Best of luck on your continued journey! 🚀`
-        ).catch((err) =>
-          console.error("Completion channel message failed:", err)
+        notificationTasks.push(
+          sendChannelMessage(
+            matchData.discordChannelId,
+            `🎓 **Congratulations! This mentorship has been completed!** 🎉\n\n` +
+              `Thank you both for your dedication to learning and growth.\n\n` +
+              `**${mentorData?.displayName || "Mentor"}**, thank you for sharing your knowledge!\n` +
+              `**${menteeData?.displayName || "Mentee"}**, we hope you learned a lot!\n\n` +
+              `This channel will remain available for you to reference past conversations.\n\n` +
+              `Best of luck on your continued journey! 🚀`
+          ).catch((err) =>
+            console.error("Completion channel message failed:", err)
+          )
         );
       }
 
       // Send DM to mentee asking to rate the mentor
       if (isDiscordConfigured() && menteeData?.discordUsername && mentorData) {
-        sendDirectMessage(
-          menteeData.discordUsername,
-          `🌟 **Your mentorship with ${mentorData.displayName} is complete!**\n\n` +
-            `We hope you had a great experience! Please take a moment to rate your mentor.\n\n` +
-            `👉 Rate your mentor: https://codewithahsan.dev/mentorship/mentors/${mentorData.username || matchData.mentorId}\n\n` +
-            `Your feedback helps other mentees find great mentors. Thank you! 💜`
-        ).catch((err) => console.error("Mentee rating DM failed:", err));
+        notificationTasks.push(
+          sendDirectMessage(
+            menteeData.discordUsername,
+            `🌟 **Your mentorship with ${mentorData.displayName} is complete!**\n\n` +
+              `We hope you had a great experience! Please take a moment to rate your mentor.\n\n` +
+              `👉 Rate your mentor: https://codewithahsan.dev/mentorship/mentors/${mentorData.username || matchData.mentorId}\n\n` +
+              `Your feedback helps other mentees find great mentors. Thank you! 💜`
+          ).catch((err) => console.error("Mentee rating DM failed:", err))
+        );
       }
 
       // Send completion announcement to #find-a-mentor
       if (isDiscordConfigured() && mentorData && menteeData) {
-        sendMentorshipCompletionAnnouncement(
-          mentorData.displayName || "Mentor",
-          menteeData.displayName || "Mentee",
-          mentorData.discordUsername,
-          menteeData.discordUsername
-        ).catch((err) => console.error("Completion announcement failed:", err));
+        notificationTasks.push(
+          sendMentorshipCompletionAnnouncement(
+            mentorData.displayName || "Mentor",
+            menteeData.displayName || "Mentee",
+            mentorData.discordUsername,
+            menteeData.discordUsername
+          ).catch((err) =>
+            console.error("Completion announcement failed:", err)
+          )
+        );
       }
 
-      // Archive Discord channel (non-blocking)
+      // Archive Discord channel
       if (isDiscordConfigured() && matchData.discordChannelId) {
-        archiveMentorshipChannel(matchData.discordChannelId).catch((err) =>
-          console.error("Discord channel archiving failed:", err)
+        notificationTasks.push(
+          archiveMentorshipChannel(matchData.discordChannelId).catch((err) =>
+            console.error("Discord channel archiving failed:", err)
+          )
         );
       }
 
       // Send completion email to both
       if (mentorData && menteeData) {
-        sendMentorshipCompletedEmail(
-          {
-            uid: matchData.mentorId,
-            displayName: mentorData?.displayName || "",
-            email: mentorData?.email || "",
-            role: "mentor",
-          },
-          {
-            uid: matchData.menteeId,
-            displayName: menteeData?.displayName || "",
-            email: menteeData?.email || "",
-            role: "mentee",
-          }
-        ).catch((err) =>
-          console.error("Failed to send completion email:", err)
+        notificationTasks.push(
+          sendMentorshipCompletedEmail(
+            {
+              uid: matchData.mentorId,
+              displayName: mentorData?.displayName || "",
+              email: mentorData?.email || "",
+              role: "mentor",
+            },
+            {
+              uid: matchData.menteeId,
+              displayName: menteeData?.displayName || "",
+              email: menteeData?.email || "",
+              role: "mentee",
+            }
+          ).catch((err) =>
+            console.error("Failed to send completion email:", err)
+          )
         );
       }
+
+      // Wait for all notifications to complete (success or fail)
+      await Promise.allSettled(notificationTasks);
 
       return NextResponse.json(
         {

@@ -67,17 +67,16 @@ if (process.env.NODE_ENV === "development") {
   );
 }
 
-// Create the logger
-const logger = winston.createLogger({
+// Create the root logger (without default service)
+const rootLogger = winston.createLogger({
   level: LOG_LEVEL,
-  defaultMeta: { service: "app" },
   transports,
 });
 
 // Create child loggers for different services
 export function createLogger(service: string) {
-  return logger.child({ service });
+  return rootLogger.child({ service });
 }
 
-// Export default logger and createLogger function
-export default logger;
+// Export default logger (app service)
+export default rootLogger.child({ service: "app" });

@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       const sessionData = mentorshipSession.data();
 
       if (sessionData?.discordChannelId) {
-        sendChannelMessage(
+        await sendChannelMessage(
           sessionData.discordChannelId,
           `🎯 **New Goal Created!**\n\n` +
             `**${title}**\n` +
@@ -141,7 +141,7 @@ export async function PUT(request: NextRequest) {
         const sessionData = mentorshipSession.data();
 
         if (sessionData?.discordChannelId) {
-          sendChannelMessage(
+          await sendChannelMessage(
             sessionData.discordChannelId,
             `🎉 **Goal Completed!**\n\n` +
               `**${goalData.title}** has been marked as complete!\n\n` +
