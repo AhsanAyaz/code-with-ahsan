@@ -7,6 +7,7 @@ import { useMentorship } from "@/contexts/MentorshipContext";
 import MentorRegistrationForm from "@/components/mentorship/MentorRegistrationForm";
 import MenteeRegistrationForm from "@/components/mentorship/MenteeRegistrationForm";
 import Link from "next/link";
+import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -95,7 +96,7 @@ export default function SettingsPage() {
           expertise: profile.expertise || [],
           currentRole: profile.currentRole || "",
           bio: profile.bio || "",
-          maxMentees: profile.maxMentees || 3,
+          maxMentees: profile.maxMentees || DEFAULT_MAX_MENTEES,
           availability: profile.availability
             ? Object.keys(profile.availability).reduce(
                 (acc, day) => ({ ...acc, [day]: true }),

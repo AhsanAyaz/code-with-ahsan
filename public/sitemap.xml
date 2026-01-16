@@ -9,11 +9,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/books</loc>
+    <loc>https://codewithahsan.dev/community</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/community</loc>
+    <loc>https://codewithahsan.dev/books</loc>
   </url>
 
   <url>
@@ -29,6 +29,10 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/mentorship</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/projects</loc>
   </url>
 
@@ -38,6 +42,42 @@
 
   <url>
     <loc>https://codewithahsan.dev/books/mastering-angular-signals</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/admin</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/dashboard</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/browse</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/goals</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/mentors</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/my-matches</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/settings</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/requests</loc>
   </url>
 
   <url>

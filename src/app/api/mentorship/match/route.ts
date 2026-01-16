@@ -1,306 +1,379 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/firebaseAdmin'
-import { FieldValue } from 'firebase-admin/firestore'
-import { 
-  sendMentorshipRequestEmail, 
-  sendRequestAcceptedEmail, 
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/firebaseAdmin";
+import { FieldValue } from "firebase-admin/firestore";
+import {
+  sendMentorshipRequestEmail,
+  sendRequestAcceptedEmail,
   sendRequestDeclinedEmail,
-  sendMentorshipCompletedEmail 
-} from '@/lib/email'
-
+} from "@/lib/email";
+import {
+  createMentorshipChannel,
+  sendDirectMessage,
+  isDiscordConfigured,
+} from "@/lib/discord";
+import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const uid = searchParams.get('uid')
-  const role = searchParams.get('role')
+  const { searchParams } = new URL(request.url);
+  const uid = searchParams.get("uid");
+  const role = searchParams.get("role");
 
   if (!uid || !role) {
-    return NextResponse.json({ error: 'Missing uid or role parameter' }, { status: 400 })
+    return NextResponse.json(
+      { error: "Missing uid or role parameter" },
+      { status: 400 }
+    );
   }
 
   try {
-    let matchesQuery
-    let pendingQuery
+    let matchesQuery;
+    let pendingQuery;
 
-    if (role === 'mentor') {
+    if (role === "mentor") {
       // Mentor sees their mentees
-      matchesQuery = db.collection('mentorship_sessions')
-        .where('mentorId', '==', uid)
-        .where('status', '==', 'active')
-      
-      pendingQuery = db.collection('mentorship_sessions')
-        .where('mentorId', '==', uid)
-        .where('status', '==', 'pending')
+      matchesQuery = db
+        .collection("mentorship_sessions")
+        .where("mentorId", "==", uid)
+        .where("status", "==", "active");
+
+      pendingQuery = db
+        .collection("mentorship_sessions")
+        .where("mentorId", "==", uid)
+        .where("status", "==", "pending");
     } else {
       // Mentee sees their mentors
-      matchesQuery = db.collection('mentorship_sessions')
-        .where('menteeId', '==', uid)
-        .where('status', '==', 'active')
-      
-      pendingQuery = db.collection('mentorship_sessions')
-        .where('menteeId', '==', uid)
-        .where('status', '==', 'pending')
+      matchesQuery = db
+        .collection("mentorship_sessions")
+        .where("menteeId", "==", uid)
+        .where("status", "==", "active");
+
+      pendingQuery = db
+        .collection("mentorship_sessions")
+        .where("menteeId", "==", uid)
+        .where("status", "==", "pending");
     }
 
     const [matchesSnapshot, pendingSnapshot] = await Promise.all([
       matchesQuery.get(),
       pendingQuery.get(),
-    ])
+    ]);
 
-    const matches = matchesSnapshot.docs.map(doc => ({
+    const matches = matchesSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
       requestedAt: doc.data().requestedAt?.toDate?.() || null,
       approvedAt: doc.data().approvedAt?.toDate?.() || null,
       lastContactAt: doc.data().lastContactAt?.toDate?.() || null,
-    }))
+    }));
 
-    const pendingRequests = pendingSnapshot.docs.map(doc => ({
+    const pendingRequests = pendingSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
       requestedAt: doc.data().requestedAt?.toDate?.() || null,
-    }))
+    }));
 
-    return NextResponse.json({ matches, pendingRequests }, { status: 200 })
+    return NextResponse.json({ matches, pendingRequests }, { status: 200 });
   } catch (error) {
-    console.error('Error fetching matches:', error)
-    return NextResponse.json({ error: 'Failed to fetch matches' }, { status: 500 })
+    console.error("Error fetching matches:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch matches" },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { menteeId, mentorId, matchScore } = body
+    const body = await request.json();
+    const { menteeId, mentorId, matchScore } = body;
 
     if (!menteeId || !mentorId) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
     // Check mentor capacity before creating request
     const [mentorProfile, activeMatches] = await Promise.all([
-      db.collection('mentorship_profiles').doc(mentorId).get(),
-      db.collection('mentorship_sessions')
-        .where('mentorId', '==', mentorId)
-        .where('status', '==', 'active')
-        .get()
-    ])
+      db.collection("mentorship_profiles").doc(mentorId).get(),
+      db
+        .collection("mentorship_sessions")
+        .where("mentorId", "==", mentorId)
+        .where("status", "==", "active")
+        .get(),
+    ]);
 
     if (!mentorProfile.exists) {
-      return NextResponse.json({ error: 'Mentor not found' }, { status: 404 })
+      return NextResponse.json({ error: "Mentor not found" }, { status: 404 });
     }
 
-    const mentorData = mentorProfile.data()
-    const maxMentees = mentorData?.maxMentees || 3
-    const activeMenteeCount = activeMatches.size
+    const mentorData = mentorProfile.data();
+    const maxMentees = mentorData?.maxMentees || DEFAULT_MAX_MENTEES;
+    const activeMenteeCount = activeMatches.size;
 
     if (activeMenteeCount >= maxMentees) {
-      return NextResponse.json({ 
-        error: 'Mentor is at capacity',
-        message: `This mentor can only take ${maxMentees} mentees and currently has ${activeMenteeCount} active mentees.`
-      }, { status: 409 })
+      return NextResponse.json(
+        {
+          error: "Mentor is at capacity",
+          message: `This mentor can only take ${maxMentees} mentees and currently has ${activeMenteeCount} active mentees.`,
+        },
+        { status: 409 }
+      );
     }
 
     // Check if a match already exists
-    const existingMatch = await db.collection('mentorship_sessions')
-      .where('menteeId', '==', menteeId)
-      .where('mentorId', '==', mentorId)
-      .get()
+    const existingMatch = await db
+      .collection("mentorship_sessions")
+      .where("menteeId", "==", menteeId)
+      .where("mentorId", "==", mentorId)
+      .get();
 
     if (!existingMatch.empty) {
-      const existingDoc = existingMatch.docs[0]
-      const status = existingDoc.data().status
-      return NextResponse.json({ 
-        error: `Match request already exists with status: ${status}`,
-        existingMatchId: existingDoc.id,
-        status
-      }, { status: 409 })
+      const existingDoc = existingMatch.docs[0];
+      const status = existingDoc.data().status;
+      return NextResponse.json(
+        {
+          error: `Match request already exists with status: ${status}`,
+          existingMatchId: existingDoc.id,
+          status,
+        },
+        { status: 409 }
+      );
     }
 
     const matchData = {
       menteeId,
       mentorId,
-      status: 'pending',
+      status: "pending",
       requestedAt: FieldValue.serverTimestamp(),
       matchScore: matchScore || null,
-    }
+    };
 
-    const docRef = await db.collection('mentorship_sessions').add(matchData)
+    const docRef = await db.collection("mentorship_sessions").add(matchData);
 
     // Send email notification to mentor about new request
-    const menteeProfile = await db.collection('mentorship_profiles').doc(menteeId).get()
+    const menteeProfile = await db
+      .collection("mentorship_profiles")
+      .doc(menteeId)
+      .get();
     if (menteeProfile.exists && mentorData) {
-      const menteeData = menteeProfile.data()
+      const menteeData = menteeProfile.data();
       sendMentorshipRequestEmail(
         {
           uid: mentorId,
-          displayName: mentorData.displayName || '',
-          email: mentorData.email || '',
-          role: 'mentor',
+          displayName: mentorData.displayName || "",
+          email: mentorData.email || "",
+          role: "mentor",
         },
         {
           uid: menteeId,
-          displayName: menteeData?.displayName || '',
-          email: menteeData?.email || '',
-          role: 'mentee',
+          displayName: menteeData?.displayName || "",
+          email: menteeData?.email || "",
+          role: "mentee",
           education: menteeData?.education,
           skillsSought: menteeData?.skillsSought,
           careerGoals: menteeData?.careerGoals,
         }
-      ).catch(err => console.error('Failed to send request email:', err))
+      ).catch((err) => console.error("Failed to send request email:", err));
+
+      // Send Discord DM to mentor about new request (non-blocking)
+      if (isDiscordConfigured() && mentorData?.discordUsername) {
+        sendDirectMessage(
+          mentorData.discordUsername,
+          `📬 **New Mentorship Request!**\n\n` +
+            `**${menteeData?.displayName || "A mentee"}** wants you to be their mentor!\n\n` +
+            `**Skills they want to learn:** ${menteeData?.skillsSought?.join(", ") || "Not specified"}\n` +
+            `**Career Goals:** ${menteeData?.careerGoals || "Not specified"}\n\n` +
+            `Review the request: https://codewithahsan.dev/mentorship/requests`
+        ).catch((err) =>
+          console.error("Failed to send Discord DM to mentor:", err)
+        );
+      }
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      matchId: docRef.id,
-      message: 'Match request sent successfully'
-    }, { status: 201 })
+    return NextResponse.json(
+      {
+        success: true,
+        matchId: docRef.id,
+        message: "Match request sent successfully",
+      },
+      { status: 201 }
+    );
   } catch (error) {
-    console.error('Error creating match request:', error)
-    return NextResponse.json({ error: 'Failed to create match request' }, { status: 500 })
+    console.error("Error creating match request:", error);
+    return NextResponse.json(
+      { error: "Failed to create match request" },
+      { status: 500 }
+    );
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { matchId, action, mentorId } = body
+    const body = await request.json();
+    const { matchId, action, mentorId } = body;
 
     if (!matchId || !action) {
-      return NextResponse.json({ error: 'Missing matchId or action' }, { status: 400 })
+      return NextResponse.json(
+        { error: "Missing matchId or action" },
+        { status: 400 }
+      );
     }
 
-    const matchRef = db.collection('mentorship_sessions').doc(matchId)
-    const matchDoc = await matchRef.get()
+    const matchRef = db.collection("mentorship_sessions").doc(matchId);
+    const matchDoc = await matchRef.get();
 
     if (!matchDoc.exists) {
-      return NextResponse.json({ error: 'Match not found' }, { status: 404 })
+      return NextResponse.json({ error: "Match not found" }, { status: 404 });
     }
 
-    const matchData = matchDoc.data()
+    const matchData = matchDoc.data();
 
     // Verify the mentor is the one making the decision
     if (mentorId && matchData?.mentorId !== mentorId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    if (action === 'approve') {
+    if (action === "approve") {
       // Check mentor capacity before approving
       const [mentorProfile, activeMatches] = await Promise.all([
-        db.collection('mentorship_profiles').doc(matchData?.mentorId).get(),
-        db.collection('mentorship_sessions')
-          .where('mentorId', '==', matchData?.mentorId)
-          .where('status', '==', 'active')
-          .get()
-      ])
+        db.collection("mentorship_profiles").doc(matchData?.mentorId).get(),
+        db
+          .collection("mentorship_sessions")
+          .where("mentorId", "==", matchData?.mentorId)
+          .where("status", "==", "active")
+          .get(),
+      ]);
 
-      const mentorProfileData = mentorProfile.data()
-      const maxMentees = mentorProfileData?.maxMentees || 3
-      const activeMenteeCount = activeMatches.size
+      const mentorProfileData = mentorProfile.data();
+      const maxMentees = mentorProfileData?.maxMentees || DEFAULT_MAX_MENTEES;
+      const activeMenteeCount = activeMatches.size;
 
       if (activeMenteeCount >= maxMentees) {
-        return NextResponse.json({ 
-          error: 'Cannot accept - at capacity',
-          message: `You can only have ${maxMentees} active mentees. Please update your settings to increase capacity or complete an existing mentorship first.`,
-          activeMenteeCount,
-          maxMentees
-        }, { status: 409 })
+        return NextResponse.json(
+          {
+            error: "Cannot accept - at capacity",
+            message: `You can only have ${maxMentees} active mentees. Please update your settings to increase capacity or complete an existing mentorship first.`,
+            activeMenteeCount,
+            maxMentees,
+          },
+          { status: 409 }
+        );
       }
 
       await matchRef.update({
-        status: 'active',
+        status: "active",
         approvedAt: FieldValue.serverTimestamp(),
         lastContactAt: FieldValue.serverTimestamp(),
-      })
+      });
+
+      // Fetch mentee profile (needed for both Discord and email)
+      const menteeProfile = await db
+        .collection("mentorship_profiles")
+        .doc(matchData?.menteeId)
+        .get();
+      const menteeData = menteeProfile.exists ? menteeProfile.data() : null;
+
+      // Create Discord channel (non-blocking)
+      if (isDiscordConfigured() && mentorProfileData) {
+        createMentorshipChannel(
+          mentorProfileData.displayName || "Mentor",
+          menteeData?.displayName || "Mentee",
+          matchId,
+          mentorProfileData.discordUsername,
+          menteeData?.discordUsername
+        )
+          .then(async (result) => {
+            if (result) {
+              await matchRef.update({
+                discordChannelId: result.channelId,
+                discordChannelUrl: result.channelUrl,
+              });
+              // Send DM to mentee with channel link
+              if (menteeData?.discordUsername && mentorProfileData) {
+                sendDirectMessage(
+                  menteeData.discordUsername,
+                  `🎉 Great news! **${mentorProfileData.displayName}** has accepted your mentorship request!\n\n` +
+                    `Your private channel is ready: ${result.channelUrl}`
+                ).catch((err) => console.error("Discord DM failed:", err));
+              }
+            }
+          })
+          .catch((err) =>
+            console.error("Discord channel creation failed:", err)
+          );
+      }
 
       // Send acceptance email to mentee
-      const menteeProfile = await db.collection('mentorship_profiles').doc(matchData?.menteeId).get()
-      if (menteeProfile.exists && mentorProfileData) {
-        const menteeData = menteeProfile.data()
+      if (menteeData && mentorProfileData) {
         sendRequestAcceptedEmail(
           {
             uid: matchData?.menteeId,
-            displayName: menteeData?.displayName || '',
-            email: menteeData?.email || '',
-            role: 'mentee',
+            displayName: menteeData?.displayName || "",
+            email: menteeData?.email || "",
+            role: "mentee",
           },
           {
             uid: matchData?.mentorId,
-            displayName: mentorProfileData.displayName || '',
-            email: mentorProfileData.email || '',
-            role: 'mentor',
+            displayName: mentorProfileData.displayName || "",
+            email: mentorProfileData.email || "",
+            role: "mentor",
             expertise: mentorProfileData.expertise,
             currentRole: mentorProfileData.currentRole,
           }
-        ).catch(err => console.error('Failed to send acceptance email:', err))
+        ).catch((err) =>
+          console.error("Failed to send acceptance email:", err)
+        );
       }
 
-      return NextResponse.json({ success: true, message: 'Match approved' }, { status: 200 })
-    } else if (action === 'decline') {
+      return NextResponse.json(
+        { success: true, message: "Match approved" },
+        { status: 200 }
+      );
+    } else if (action === "decline") {
       await matchRef.update({
-        status: 'declined',
-      })
+        status: "declined",
+      });
 
       // Send decline email to mentee
       const [mentorProfile, menteeProfile] = await Promise.all([
-        db.collection('mentorship_profiles').doc(matchData?.mentorId).get(),
-        db.collection('mentorship_profiles').doc(matchData?.menteeId).get(),
-      ])
+        db.collection("mentorship_profiles").doc(matchData?.mentorId).get(),
+        db.collection("mentorship_profiles").doc(matchData?.menteeId).get(),
+      ]);
       if (menteeProfile.exists && mentorProfile.exists) {
-        const menteeData = menteeProfile.data()
-        const mentorProfileData = mentorProfile.data()
+        const menteeData = menteeProfile.data();
+        const mentorProfileData = mentorProfile.data();
         sendRequestDeclinedEmail(
           {
             uid: matchData?.menteeId,
-            displayName: menteeData?.displayName || '',
-            email: menteeData?.email || '',
-            role: 'mentee',
+            displayName: menteeData?.displayName || "",
+            email: menteeData?.email || "",
+            role: "mentee",
           },
           {
             uid: matchData?.mentorId,
-            displayName: mentorProfileData?.displayName || '',
-            email: mentorProfileData?.email || '',
-            role: 'mentor',
+            displayName: mentorProfileData?.displayName || "",
+            email: mentorProfileData?.email || "",
+            role: "mentor",
           }
-        ).catch(err => console.error('Failed to send decline email:', err))
+        ).catch((err) => console.error("Failed to send decline email:", err));
       }
 
-      return NextResponse.json({ success: true, message: 'Match declined' }, { status: 200 })
-    } else if (action === 'complete') {
-      await matchRef.update({
-        status: 'completed',
-      })
-
-      // Send completion email to both parties
-      const [mentorProfile, menteeProfile] = await Promise.all([
-        db.collection('mentorship_profiles').doc(matchData?.mentorId).get(),
-        db.collection('mentorship_profiles').doc(matchData?.menteeId).get(),
-      ])
-      if (menteeProfile.exists && mentorProfile.exists) {
-        const menteeData = menteeProfile.data()
-        const mentorProfileData = mentorProfile.data()
-        sendMentorshipCompletedEmail(
-          {
-            uid: matchData?.mentorId,
-            displayName: mentorProfileData?.displayName || '',
-            email: mentorProfileData?.email || '',
-            role: 'mentor',
-          },
-          {
-            uid: matchData?.menteeId,
-            displayName: menteeData?.displayName || '',
-            email: menteeData?.email || '',
-            role: 'mentee',
-          }
-        ).catch(err => console.error('Failed to send completion email:', err))
-      }
-
-      return NextResponse.json({ success: true, message: 'Mentorship marked as complete' }, { status: 200 })
+      return NextResponse.json(
+        { success: true, message: "Match declined" },
+        { status: 200 }
+      );
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+    // Note: 'complete' action is handled by /api/mentorship/dashboard/[matchId]
+
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('Error updating match:', error)
-    return NextResponse.json({ error: 'Failed to update match' }, { status: 500 })
+    console.error("Error updating match:", error);
+    return NextResponse.json(
+      { error: "Failed to update match" },
+      { status: 500 }
+    );
   }
 }

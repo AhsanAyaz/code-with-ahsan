@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 
 interface MentorRegistrationFormProps {
   onSubmit: (data: Record<string, unknown>) => Promise<void>;
   isSubmitting: boolean;
   initialData?: {
     username?: string;
+    discordUsername?: string;
     expertise?: string[];
     currentRole?: string;
     bio?: string;
@@ -61,12 +63,17 @@ export default function MentorRegistrationForm({
   const [majorProjects, setMajorProjects] = useState(
     initialData?.majorProjects || ""
   );
-  const [maxMentees, setMaxMentees] = useState(initialData?.maxMentees || 3);
+  const [maxMentees, setMaxMentees] = useState(
+    initialData?.maxMentees || DEFAULT_MAX_MENTEES
+  );
   const [availability, setAvailability] = useState<Record<string, boolean>>(
     initialData?.availability || {}
   );
   const [isPublic, setIsPublic] = useState(initialData?.isPublic ?? true);
   const [username, setUsername] = useState(initialData?.username || "");
+  const [discordUsername, setDiscordUsername] = useState(
+    initialData?.discordUsername || ""
+  );
   const [customExpertiseInput, setCustomExpertiseInput] = useState("");
 
   // Separate predefined and custom expertise
@@ -119,6 +126,11 @@ export default function MentorRegistrationForm({
       return;
     }
 
+    if (!discordUsername.trim()) {
+      alert("Please enter your Discord username");
+      return;
+    }
+
     const availableDays = Object.entries(availability)
       .filter(([, isAvailable]) => isAvailable)
       .reduce(
@@ -138,6 +150,7 @@ export default function MentorRegistrationForm({
       maxMentees,
       availability: availableDays,
       isPublic,
+      discordUsername: discordUsername.trim(),
       ...(mode === "edit" && username ? { username: username.trim() } : {}),
     });
   };
@@ -193,6 +206,28 @@ export default function MentorRegistrationForm({
         <label className="label">
           <span className="label-text-alt text-base-content/60">
             This helps mentees understand your background
+          </span>
+        </label>
+      </div>
+
+      {/* Discord Username */}
+      <div className="form-control">
+        <label className="label">
+          <span className="label-text font-semibold">Discord Username *</span>
+        </label>
+        <input
+          type="text"
+          placeholder="e.g., john_dev"
+          className="input input-bordered w-full"
+          value={discordUsername}
+          onChange={(e) =>
+            setDiscordUsername(e.target.value.toLowerCase().replace(/\s/g, ""))
+          }
+          required
+        />
+        <label className="label">
+          <span className="label-text-alt text-base-content/60">
+            Used to add you to private mentorship channels on Discord
           </span>
         </label>
       </div>

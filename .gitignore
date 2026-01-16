@@ -44,3 +44,6 @@ next-env.d.ts
 secure/
 codewithahsan-revamp*
 .env*.local
+
+# Logs
+logs/

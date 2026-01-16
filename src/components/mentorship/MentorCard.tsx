@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { MentorshipProfile } from "@/contexts/MentorshipContext";
+import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 
 type RequestStatus = "none" | "pending" | "declined" | "active" | "completed";
 
@@ -179,7 +180,8 @@ export default function MentorCard({
                 At Capacity
               </button>
               <p className="text-xs text-base-content/50 text-center">
-                Mentor has {activeMenteeCount}/{mentor.maxMentees || 3} mentees
+                Mentor has {activeMenteeCount}/
+                {mentor.maxMentees || DEFAULT_MAX_MENTEES} mentees
               </p>
             </div>
           );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { db } from "@/lib/firebaseAdmin";
 import MentorProfileClient from "./MentorProfileClient";
+import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 
 interface PageProps {
   params: Promise<{ username: string }>;
@@ -69,12 +70,13 @@ async function getMentorData(username: string) {
       majorProjects: profileData.majorProjects,
       expertise: profileData.expertise || [],
       availability: profileData.availability || {},
-      maxMentees: profileData.maxMentees || 3,
+      maxMentees: profileData.maxMentees || DEFAULT_MAX_MENTEES,
       activeMenteeCount,
       completedMentorships,
       avgRating,
       ratingCount,
-      isAtCapacity: activeMenteeCount >= (profileData.maxMentees || 3),
+      isAtCapacity:
+        activeMenteeCount >= (profileData.maxMentees || DEFAULT_MAX_MENTEES),
       createdAt: profileData.createdAt?.toDate?.()?.toISOString() || null,
     };
   } catch (error) {

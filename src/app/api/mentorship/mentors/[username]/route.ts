@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
+import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 
 interface RouteContext {
   params: Promise<{ username: string }>;
@@ -87,12 +88,13 @@ export async function GET(request: NextRequest, context: RouteContext) {
       majorProjects: profileData.majorProjects,
       expertise: profileData.expertise || [],
       availability: profileData.availability || {},
-      maxMentees: profileData.maxMentees || 3,
+      maxMentees: profileData.maxMentees || DEFAULT_MAX_MENTEES,
       activeMenteeCount,
       completedMentorships,
       avgRating,
       ratingCount,
-      isAtCapacity: activeMenteeCount >= (profileData.maxMentees || 3),
+      isAtCapacity:
+        activeMenteeCount >= (profileData.maxMentees || DEFAULT_MAX_MENTEES),
       createdAt: profileData.createdAt?.toDate?.() || null,
     };
 

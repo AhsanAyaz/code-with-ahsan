@@ -16,6 +16,7 @@ export interface MentorshipProfile {
   displayName: string;
   email: string;
   photoURL: string;
+  discordUsername?: string; // Discord username for bot interactions
   createdAt: Date;
   updatedAt: Date;
   // Approval status
@@ -79,6 +80,8 @@ export interface MentorshipMatch {
   approvedAt?: Date;
   lastContactAt?: Date;
   matchScore?: number;
+  discordChannelId?: string;
+  discordChannelUrl?: string;
 }
 
 /**

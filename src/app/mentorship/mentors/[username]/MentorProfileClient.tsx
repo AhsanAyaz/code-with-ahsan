@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Link from "next/link";
 import type { MentorProfileDetails } from "@/types/mentorship";
+import { useMentorship } from "@/contexts/MentorshipContext";
+import { AuthContext } from "@/contexts/AuthContext";
 
 const DAYS_OF_WEEK = [
   "monday",
@@ -13,6 +15,8 @@ const DAYS_OF_WEEK = [
   "saturday",
   "sunday",
 ];
+
+type RequestStatus = "none" | "pending" | "declined" | "active" | "completed";
 
 interface MentorProfileClientProps {
   username: string;
@@ -28,6 +32,24 @@ export default function MentorProfileClient({
   );
   const [loading, setLoading] = useState(!initialMentor);
   const [error, setError] = useState<string | null>(null);
+
+  // Mentorship context for user authentication
+  const { user, profile, loading: mentorshipLoading } = useMentorship();
+  const { setShowLoginPopup } = useContext(AuthContext);
+
+  // Request status state
+  const [requestStatus, setRequestStatus] = useState<RequestStatus>("none");
+  const [sessionInfo, setSessionInfo] = useState<{
+    sessionId: string;
+    hasRated: boolean;
+  } | null>(null);
+  const [requestingMentor, setRequestingMentor] = useState(false);
+
+  // Rating modal state
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [feedback, setFeedback] = useState("");
+  const [submittingRating, setSubmittingRating] = useState(false);
 
   useEffect(() => {
     // If we already have initial data, don't refetch
@@ -55,6 +77,301 @@ export default function MentorProfileClient({
       fetchMentor();
     }
   }, [username, initialMentor]);
+
+  // Fetch mentee's request status for this mentor
+  useEffect(() => {
+    const fetchRequestStatus = async () => {
+      if (!user || !mentor) return;
+
+      try {
+        const response = await fetch(
+          `/api/mentorship/mentee-requests?menteeId=${user.uid}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          // Find request for this specific mentor
+          const request = (data.requests || []).find(
+            (r: { mentorId: string }) => r.mentorId === mentor.uid
+          );
+          if (request) {
+            setRequestStatus(request.status as RequestStatus);
+            if (request.status === "completed") {
+              setSessionInfo({
+                sessionId: request.sessionId || request.id,
+                hasRated: request.hasRated || false,
+              });
+            }
+          } else {
+            setRequestStatus("none");
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching request status:", err);
+      }
+    };
+
+    if (user && profile?.role === "mentee" && mentor) {
+      fetchRequestStatus();
+    }
+  }, [user, profile, mentor]);
+
+  const handleRequestMatch = async () => {
+    if (!user || !mentor) return;
+
+    setRequestingMentor(true);
+    try {
+      const response = await fetch("/api/mentorship/match", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          menteeId: user.uid,
+          mentorId: mentor.uid,
+        }),
+      });
+
+      if (response.ok) {
+        setRequestStatus("pending");
+      } else {
+        const errorData = await response.json();
+        if (response.status === 409) {
+          // Already requested - update with actual status
+          setRequestStatus(errorData.status || "pending");
+        } else {
+          alert("Failed to send request: " + errorData.error);
+        }
+      }
+    } catch (err) {
+      console.error("Error requesting match:", err);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setRequestingMentor(false);
+    }
+  };
+
+  const handleRateNow = async () => {
+    if (!user || !mentor || !sessionInfo?.sessionId) return;
+
+    setSubmittingRating(true);
+    try {
+      const response = await fetch("/api/mentorship/ratings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mentorId: mentor.uid,
+          menteeId: user.uid,
+          sessionId: sessionInfo.sessionId,
+          rating,
+          feedback,
+        }),
+      });
+
+      if (response.ok) {
+        setSessionInfo((prev) => (prev ? { ...prev, hasRated: true } : null));
+        setShowRatingModal(false);
+        alert("Thank you for your feedback!");
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || "Failed to submit rating");
+      }
+    } catch (err) {
+      console.error("Error submitting rating:", err);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setSubmittingRating(false);
+    }
+  };
+
+  const renderActionButton = () => {
+    // User not logged in
+    if (!user) {
+      return (
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowLoginPopup(true)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+            />
+          </svg>
+          Sign in to Request Mentorship
+        </button>
+      );
+    }
+
+    // User is not a mentee
+    if (profile?.role !== "mentee") {
+      return (
+        <Link href="/mentorship" className="btn btn-primary">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          {profile?.role === "mentor"
+            ? "You are a mentor"
+            : "Register as mentee to request"}
+        </Link>
+      );
+    }
+
+    // Mentee with existing request statuses
+    switch (requestStatus) {
+      case "pending":
+        return (
+          <button className="btn btn-warning" disabled>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            Request Pending
+          </button>
+        );
+      case "declined":
+        return (
+          <button className="btn btn-error btn-outline" disabled>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+            Request Declined
+          </button>
+        );
+      case "active":
+        return (
+          <button className="btn btn-success" disabled>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            Already Matched
+          </button>
+        );
+      case "completed":
+        return (
+          <button className="btn btn-success" disabled>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            Mentorship Completed
+          </button>
+        );
+      default:
+        // No existing request - show request button or capacity warning
+        if (mentor?.isAtCapacity) {
+          return (
+            <button className="btn btn-ghost" disabled>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                />
+              </svg>
+              At Capacity ({mentor.activeMenteeCount}/{mentor.maxMentees})
+            </button>
+          );
+        }
+        return (
+          <button
+            className="btn btn-primary"
+            onClick={handleRequestMatch}
+            disabled={requestingMentor}
+          >
+            {requestingMentor ? (
+              <>
+                <span className="loading loading-spinner loading-sm"></span>
+                Sending Request...
+              </>
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                  />
+                </svg>
+                Request Mentorship
+              </>
+            )}
+          </button>
+        );
+    }
+  };
 
   if (loading) {
     return (
@@ -345,33 +662,139 @@ export default function MentorProfileClient({
         </div>
       )}
 
-      {/* CTA Section */}
+      {/* CTA Section - Dynamic based on user state */}
       <div className="card bg-gradient-to-r from-primary to-secondary text-primary-content">
         <div className="card-body text-center">
           <h3 className="card-title justify-center text-2xl">
-            Interested in getting mentored?
+            {user && profile?.role === "mentee"
+              ? requestStatus === "active"
+                ? `You're matched with ${mentor.displayName}!`
+                : requestStatus === "completed"
+                  ? `You completed mentorship with ${mentor.displayName}!`
+                  : `Want ${mentor.displayName} as your mentor?`
+              : "Interested in getting mentored?"}
           </h3>
-          <p className="opacity-90">
-            {mentor.isAtCapacity
-              ? "This mentor is at capacity, but you can explore other amazing mentors in our community."
-              : "Sign in to request a mentorship match with this mentor."}
+          <p className="opacity-90 mb-4">
+            {!user
+              ? "Sign in to request a mentorship match with this mentor."
+              : profile?.role !== "mentee"
+                ? "Register as a mentee to request mentorship."
+                : requestStatus === "active"
+                  ? "Continue your mentorship journey together."
+                  : requestStatus === "pending"
+                    ? "Your request is being reviewed. Please wait for a response."
+                    : requestStatus === "completed"
+                      ? sessionInfo?.hasRated
+                        ? "Thank you for rating your experience!"
+                        : "Don't forget to rate your mentorship experience."
+                      : requestStatus === "declined"
+                        ? "Your request was declined. You can explore other mentors."
+                        : mentor.isAtCapacity
+                          ? "This mentor is at capacity, but you can explore other amazing mentors."
+                          : "Click below to send a mentorship request."}
           </p>
-          <div className="card-actions justify-center mt-4 gap-3">
+          <div className="card-actions justify-center items-center flex-wrap gap-3">
+            {/* Main action button based on state */}
+            {!mentorshipLoading && renderActionButton()}
+
+            {/* Rating button for completed mentorships */}
+            {requestStatus === "completed" &&
+              sessionInfo &&
+              !sessionInfo.hasRated && (
+                <button
+                  className="btn btn-warning"
+                  onClick={() => setShowRatingModal(true)}
+                >
+                  ⭐ Rate Your Experience
+                </button>
+              )}
+            {requestStatus === "completed" && sessionInfo?.hasRated && (
+              <span className="badge badge-success badge-lg">✓ Rated</span>
+            )}
+
+            {/* Browse mentors link */}
             <Link
               href="/mentorship/browse"
               className="btn btn-ghost bg-white/20 hover:bg-white/30"
             >
               Browse Mentors
             </Link>
-            <Link
-              href="/mentorship"
-              className="btn btn-ghost bg-white/20 hover:bg-white/30"
-            >
-              Learn More
-            </Link>
           </div>
         </div>
       </div>
+
+      {/* Rating Modal */}
+      {showRatingModal && (
+        <dialog className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">⭐ Rate Your Mentorship</h3>
+            <p className="py-2 text-base-content/70">
+              How was your experience with <strong>{mentor.displayName}</strong>
+              ?
+            </p>
+
+            {/* Star selector */}
+            <div className="flex justify-center gap-2 my-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  className={`btn btn-circle btn-lg ${star <= rating ? "btn-warning" : "btn-ghost"}`}
+                  onClick={() => setRating(star)}
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                </button>
+              ))}
+            </div>
+            <p className="text-center font-semibold">{rating} out of 5 stars</p>
+
+            <div className="form-control mt-4">
+              <label className="label">
+                <span className="label-text">Feedback (optional)</span>
+              </label>
+              <textarea
+                className="textarea textarea-bordered h-24"
+                placeholder="Share your experience..."
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+              />
+            </div>
+
+            <div className="modal-action">
+              <button
+                className="btn btn-ghost"
+                onClick={() => setShowRatingModal(false)}
+                disabled={submittingRating}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handleRateNow}
+                disabled={submittingRating}
+              >
+                {submittingRating ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>{" "}
+                    Submitting...
+                  </>
+                ) : (
+                  "Submit Rating"
+                )}
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={() => setShowRatingModal(false)}>close</button>
+          </form>
+        </dialog>
+      )}
     </div>
   );
 }

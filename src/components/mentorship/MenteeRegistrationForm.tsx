@@ -6,6 +6,7 @@ interface MenteeRegistrationFormProps {
   onSubmit: (data: Record<string, unknown>) => Promise<void>;
   isSubmitting: boolean;
   initialData?: {
+    discordUsername?: string;
     education?: string;
     skillsSought?: string[];
     careerGoals?: string;
@@ -59,6 +60,9 @@ export default function MenteeRegistrationForm({
   initialData,
   mode = "create",
 }: MenteeRegistrationFormProps) {
+  const [discordUsername, setDiscordUsername] = useState(
+    initialData?.discordUsername || ""
+  );
   const [education, setEducation] = useState(initialData?.education || "");
   const [skillsSought, setSkillsSought] = useState<string[]>(
     initialData?.skillsSought || []
@@ -114,7 +118,13 @@ export default function MenteeRegistrationForm({
       return;
     }
 
+    if (!discordUsername.trim()) {
+      alert("Please enter your Discord username");
+      return;
+    }
+
     await onSubmit({
+      discordUsername: discordUsername.trim(),
       education,
       skillsSought,
       careerGoals,
@@ -124,6 +134,28 @@ export default function MenteeRegistrationForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Discord Username */}
+      <div className="form-control">
+        <label className="label">
+          <span className="label-text font-semibold">Discord Username *</span>
+        </label>
+        <input
+          type="text"
+          placeholder="e.g., jane_dev"
+          className="input input-bordered w-full"
+          value={discordUsername}
+          onChange={(e) =>
+            setDiscordUsername(e.target.value.toLowerCase().replace(/\s/g, ""))
+          }
+          required
+        />
+        <label className="label">
+          <span className="label-text-alt text-base-content/60">
+            Used to add you to private mentorship channels on Discord
+          </span>
+        </label>
+      </div>
+
       {/* Education Background */}
       <div className="form-control">
         <label className="label">

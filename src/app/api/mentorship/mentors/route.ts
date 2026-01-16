@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
+import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 
 interface MentorProfile {
   uid: string;
@@ -73,7 +74,7 @@ export async function GET(request: NextRequest) {
 
     let mentors: MentorProfile[] = snapshot.docs.map((doc) => {
       const data = doc.data();
-      const maxMentees = data.maxMentees || 3;
+      const maxMentees = data.maxMentees || DEFAULT_MAX_MENTEES;
       const activeMenteeCount = mentorMenteeCounts[doc.id] || 0;
       const completedMentorships = mentorCompletedCounts[doc.id] || 0;
       const ratings = mentorRatings[doc.id];
