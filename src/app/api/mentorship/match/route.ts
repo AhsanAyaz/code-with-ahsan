@@ -10,6 +10,7 @@ import {
   createMentorshipChannel,
   sendDirectMessage,
   isDiscordConfigured,
+  lookupMemberByUsername,
 } from "@/lib/discord";
 import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 
@@ -272,18 +273,60 @@ export async function PUT(request: NextRequest) {
         );
       }
 
-      await matchRef.update({
-        status: "active",
-        approvedAt: FieldValue.serverTimestamp(),
-        lastContactAt: FieldValue.serverTimestamp(),
-      });
-
       // Fetch mentee profile (needed for both Discord and email)
       const menteeProfile = await db
         .collection("mentorship_profiles")
         .doc(matchData?.menteeId)
         .get();
       const menteeData = menteeProfile.exists ? menteeProfile.data() : null;
+
+      // Validate Discord Users if configured
+      if (isDiscordConfigured()) {
+        const mentorDiscord = mentorProfileData?.discordUsername;
+        const menteeDiscord = menteeData?.discordUsername;
+
+        if (!mentorDiscord || !menteeDiscord) {
+          return NextResponse.json(
+            {
+              error: "Missing Discord username",
+              message:
+                "Both mentor and mentee must have a Discord username to start mentorship. Please update profiles.",
+            },
+            { status: 400 }
+          );
+        }
+
+        const [mentorMember, menteeMember] = await Promise.all([
+          lookupMemberByUsername(mentorDiscord),
+          lookupMemberByUsername(menteeDiscord),
+        ]);
+
+        if (!mentorMember) {
+          return NextResponse.json(
+            {
+              error: "Mentor not found on Discord",
+              message: `Could not find mentor's Discord user '${mentorDiscord}' in the server. Please join the server first.`,
+            },
+            { status: 400 }
+          );
+        }
+
+        if (!menteeMember) {
+          return NextResponse.json(
+            {
+              error: "Mentee not found on Discord",
+              message: `Could not find mentee's Discord user '${menteeDiscord}' in the server. Please join the server first.`,
+            },
+            { status: 400 }
+          );
+        }
+      }
+
+      await matchRef.update({
+        status: "active",
+        approvedAt: FieldValue.serverTimestamp(),
+        lastContactAt: FieldValue.serverTimestamp(),
+      });
 
       // Create Discord channel (non-blocking)
       // Create Discord channel (blocking to ensure it survives Vercel function freeze)

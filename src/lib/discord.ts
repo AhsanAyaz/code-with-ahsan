@@ -60,7 +60,7 @@ function getGuildId(): string {
  * Lookup a Discord user ID by their username in the guild
  * Returns null if not found
  */
-async function lookupMemberByUsername(
+export async function lookupMemberByUsername(
   username: string
 ): Promise<DiscordMember | null> {
   const guildId = getGuildId();

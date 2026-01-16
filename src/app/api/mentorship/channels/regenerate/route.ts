@@ -4,6 +4,7 @@ import {
   createMentorshipChannel,
   sendDirectMessage,
   isDiscordConfigured,
+  archiveMentorshipChannel,
 } from "@/lib/discord";
 
 export async function POST(request: NextRequest) {
@@ -98,7 +99,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 6. Regenerate Channel
+    // 6. Archive Old Channel (if exists)
+    if (matchData.discordChannelId) {
+      console.log(`Archiving old channel: ${matchData.discordChannelId}`);
+      try {
+        await archiveMentorshipChannel(matchData.discordChannelId);
+      } catch (err) {
+        console.error("Failed to archive old channel:", err);
+        // Continue with regeneration even if archiving fails
+      }
+    }
+
+    // 7. Regenerate Channel
     const result = await createMentorshipChannel(
       mentorData.displayName || "Mentor",
       menteeData.displayName || "Mentee",
@@ -116,13 +128,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 7. Update Session
+    // 8. Update Session
     await matchRef.update({
       discordChannelId: result.channelId,
       discordChannelUrl: result.channelUrl,
     });
 
-    // 8. Send New DM to Mentee (Fire and forget, but wrapped for safety)
+    // 9. Send New DM to Mentee (Fire and forget, but wrapped for safety)
     const notificationTasks = [];
     notificationTasks.push(
       sendDirectMessage(

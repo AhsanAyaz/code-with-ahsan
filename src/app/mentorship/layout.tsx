@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     siteName: "Code with Ahsan",
     images: [
       {
-        url: "https://codewithahsan.dev/images/mentorship-og.png",
+        url: "https://codewithahsan.dev/images/mentorship-og-v3.png",
         width: 1200,
         height: 630,
         alt: "Code with Ahsan Mentorship Program",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     title: "Mentorship Program | Code with Ahsan",
     description:
       "Connect with mentors and mentees to accelerate your career growth through structured guidance and support.",
-    images: ["https://codewithahsan.dev/images/mentorship-og.png"],
+    images: ["https://codewithahsan.dev/images/mentorship-og-v3.png"],
   },
 };
 
