@@ -39,31 +39,39 @@ const fileFormat = winston.format.combine(
 // Define log directory (relative to project root)
 const LOG_DIR = path.join(process.cwd(), "logs");
 
-// Create the logger
-const logger = winston.createLogger({
-  level: LOG_LEVEL,
-  defaultMeta: { service: "app" },
-  transports: [
-    // Console transport (always enabled)
-    new winston.transports.Console({
-      format: consoleFormat,
-    }),
-    // File transport for all logs
+// Create transport list
+const transports: winston.transport[] = [
+  new winston.transports.Console({
+    format: consoleFormat,
+  }),
+];
+
+// Only add file transports in development
+if (process.env.NODE_ENV === "development") {
+  transports.push(
     new winston.transports.File({
       filename: path.join(LOG_DIR, "app.log"),
       format: fileFormat,
       maxsize: 5242880, // 5MB
       maxFiles: 5,
-    }),
-    // Separate file for errors
+    })
+  );
+  transports.push(
     new winston.transports.File({
       filename: path.join(LOG_DIR, "error.log"),
       level: "error",
       format: fileFormat,
       maxsize: 5242880, // 5MB
       maxFiles: 5,
-    }),
-  ],
+    })
+  );
+}
+
+// Create the logger
+const logger = winston.createLogger({
+  level: LOG_LEVEL,
+  defaultMeta: { service: "app" },
+  transports,
 });
 
 // Create child loggers for different services
