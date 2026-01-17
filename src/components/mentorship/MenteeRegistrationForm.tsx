@@ -134,67 +134,70 @@ export default function MenteeRegistrationForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Discord Username */}
-      <div className="form-control">
-        <label className="label">
-          <span className="label-text font-semibold">Discord Username *</span>
-          <div
-            className="tooltip tooltip-left"
-            data-tip="Open Discord → Click your username (bottom left) → Settings (gear icon) → My Account → Copy your username (without the @)"
-          >
-            <button type="button" className="btn btn-ghost btn-xs btn-circle">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="w-4 h-4 stroke-current"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-            </button>
-          </div>
-        </label>
-        <input
-          type="text"
-          placeholder="e.g., jane_dev"
-          className="input input-bordered w-full"
-          value={discordUsername}
-          onChange={(e) =>
-            setDiscordUsername(e.target.value.toLowerCase().replace(/\s/g, ""))
-          }
-          required
-        />
-        <label className="label">
-          <span className="label-text-alt text-base-content/60">
-            Used to add you to private mentorship channels on Discord
-          </span>
-        </label>
-      </div>
+      {/* Discord Username + Education - Two column grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Discord Username */}
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text font-semibold">Discord Username *</span>
+            <div
+              className="tooltip tooltip-left"
+              data-tip="Open Discord → Click your username (bottom left) → Settings (gear icon) → My Account → Copy your username (without the @)"
+            >
+              <button type="button" className="btn btn-ghost btn-xs btn-circle">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  className="w-4 h-4 stroke-current"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </label>
+          <input
+            type="text"
+            placeholder="e.g., jane_dev"
+            className="input input-bordered w-full"
+            value={discordUsername}
+            onChange={(e) =>
+              setDiscordUsername(e.target.value.toLowerCase().replace(/\s/g, ""))
+            }
+            required
+          />
+          <label className="label">
+            <span className="label-text-alt text-base-content/60">
+              Used for private mentorship channels
+            </span>
+          </label>
+        </div>
 
-      {/* Education Background */}
-      <div className="form-control">
-        <label className="label">
-          <span className="label-text font-semibold">
-            Educational Background
-          </span>
-        </label>
-        <input
-          type="text"
-          placeholder="e.g., BS in Computer Science, Self-taught Developer, Bootcamp Graduate"
-          className="input input-bordered w-full"
-          value={education}
-          onChange={(e) => setEducation(e.target.value)}
-        />
-        <label className="label">
-          <span className="label-text-alt text-base-content/60">
-            This helps mentors understand your starting point
-          </span>
-        </label>
+        {/* Education Background */}
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text font-semibold">
+              Educational Background
+            </span>
+          </label>
+          <input
+            type="text"
+            placeholder="e.g., BS in Computer Science, Bootcamp Graduate"
+            className="input input-bordered w-full"
+            value={education}
+            onChange={(e) => setEducation(e.target.value)}
+          />
+          <label className="label">
+            <span className="label-text-alt text-base-content/60">
+              This helps mentors understand your background
+            </span>
+          </label>
+        </div>
       </div>
 
       {/* Skills Sought */}

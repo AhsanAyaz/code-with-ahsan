@@ -8,7 +8,7 @@ import MentorRegistrationForm from '@/components/mentorship/MentorRegistrationFo
 import MenteeRegistrationForm from '@/components/mentorship/MenteeRegistrationForm'
 
 // DEV_MODE: Set to true to bypass authentication for testing form layouts
-const DEV_MODE = false
+const DEV_MODE = false;
 
 function OnboardingContent() {
   const router = useRouter()

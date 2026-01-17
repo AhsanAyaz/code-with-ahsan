@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
+import { getApp } from "firebase/app";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 interface MentorRegistrationFormProps {
   onSubmit: (data: Record<string, unknown>) => Promise<void>;
   isSubmitting: boolean;
   initialData?: {
     username?: string;
+    displayName?: string;
+    photoURL?: string;
     discordUsername?: string;
     expertise?: string[];
     currentRole?: string;
@@ -18,6 +22,7 @@ interface MentorRegistrationFormProps {
     availability?: Record<string, boolean>;
     isPublic?: boolean;
   };
+  userId?: string;
   mode?: "create" | "edit";
 }
 
@@ -50,6 +55,7 @@ export default function MentorRegistrationForm({
   onSubmit,
   isSubmitting,
   initialData,
+  userId,
   mode = "create",
 }: MentorRegistrationFormProps) {
   const [expertise, setExpertise] = useState<string[]>(
@@ -75,6 +81,12 @@ export default function MentorRegistrationForm({
     initialData?.discordUsername || ""
   );
   const [customExpertiseInput, setCustomExpertiseInput] = useState("");
+  
+  // Profile photo and display name (edit mode only)
+  const [displayName, setDisplayName] = useState(initialData?.displayName || "");
+  const [photoURL, setPhotoURL] = useState(initialData?.photoURL || "");
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Separate predefined and custom expertise
   const customExpertise = expertise.filter(
@@ -111,6 +123,43 @@ export default function MentorRegistrationForm({
       ...prev,
       [day]: !prev[day],
     }));
+  };
+
+  // Handle profile image upload
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userId) return;
+
+    // Validate file type
+    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      alert("Please select a valid image file (JPEG, PNG, GIF, or WebP)");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size must be less than 5MB");
+      return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      const storage = getStorage(getApp());
+      const timestamp = Date.now();
+      const ext = file.name.split(".").pop() || "jpg";
+      const storagePath = `mentorship-profiles/${userId}/avatar-${timestamp}.${ext}`;
+      const storageRef = ref(storage, storagePath);
+
+      await uploadBytes(storageRef, file, { contentType: file.type });
+      const downloadURL = await getDownloadURL(storageRef);
+      setPhotoURL(downloadURL);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -152,6 +201,8 @@ export default function MentorRegistrationForm({
       isPublic,
       discordUsername: discordUsername.trim(),
       ...(mode === "edit" && username ? { username: username.trim() } : {}),
+      ...(mode === "edit" && displayName ? { displayName: displayName.trim() } : {}),
+      ...(mode === "edit" && photoURL ? { photoURL } : {}),
     });
   };
 
@@ -188,68 +239,142 @@ export default function MentorRegistrationForm({
         </div>
       )}
 
-      {/* Current Role */}
-      <div className="form-control">
-        <label className="label">
-          <span className="label-text font-semibold">
-            Current Role / Position *
-          </span>
-        </label>
-        <input
-          type="text"
-          placeholder="e.g., Senior Software Engineer at Google"
-          className="input input-bordered w-full"
-          value={currentRole}
-          onChange={(e) => setCurrentRole(e.target.value)}
-          required
-        />
-        <label className="label">
-          <span className="label-text-alt text-base-content/60">
-            This helps mentees understand your background
-          </span>
-        </label>
-      </div>
-
-      {/* Discord Username */}
-      <div className="form-control">
-        <label className="label">
-          <span className="label-text font-semibold">Discord Username *</span>
-          <div
-            className="tooltip tooltip-left"
-            data-tip="Open Discord → Click your username (bottom left) → Settings (gear icon) → My Account → Copy your username (without the @)"
-          >
-            <button type="button" className="btn btn-ghost btn-xs btn-circle">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="w-4 h-4 stroke-current"
+      {/* Display Name and Profile Image - Only shown in edit mode */}
+      {mode === "edit" && (
+        <div className="form-control">
+          <div className="flex flex-row gap-6 items-start">
+            {/* Profile Image */}
+            <div className="flex flex-col items-center gap-2">
+              <div className="relative">
+                <div className="avatar">
+                  <div className="w-20 h-20 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden bg-base-200">
+                    {photoURL ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={photoURL}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-2xl text-base-content/30">
+                        👤
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {isUploadingImage && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-base-100/50 rounded-full">
+                    <span className="loading loading-spinner loading-sm text-primary"></span>
+                  </div>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingImage}
+                className="btn btn-xs btn-outline btn-primary"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-            </button>
+                {isUploadingImage ? "Uploading..." : "Change Photo"}
+              </button>
+              <span className="text-xs text-base-content/60 text-center">
+                Max 5MB
+              </span>
+            </div>
+
+            {/* Display Name */}
+            <div className="flex-1">
+              <label className="label pt-0">
+                <span className="label-text font-semibold">Display Name</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Your display name"
+                className="input input-bordered w-full"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+              />
+              <label className="label">
+                <span className="label-text-alt text-base-content/60">
+                  This is how your name appears across the platform
+                </span>
+              </label>
+            </div>
           </div>
-        </label>
-        <input
-          type="text"
-          placeholder="e.g., john_dev"
-          className="input input-bordered w-full"
-          value={discordUsername}
-          onChange={(e) =>
-            setDiscordUsername(e.target.value.toLowerCase().replace(/\s/g, ""))
-          }
-          required
-        />
-        <label className="label">
-          <span className="label-text-alt text-base-content/60">
-            Used to add you to private mentorship channels on Discord
-          </span>
-        </label>
+        </div>
+      )}
+
+      {/* Current Role + Discord Username - Two column grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Current Role */}
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text font-semibold">
+              Current Role / Position *
+            </span>
+          </label>
+          <input
+            type="text"
+            placeholder="e.g., Senior Software Engineer at Google"
+            className="input input-bordered w-full"
+            value={currentRole}
+            onChange={(e) => setCurrentRole(e.target.value)}
+            required
+          />
+          <label className="label">
+            <span className="label-text-alt text-base-content/60">
+              This helps mentees understand your background
+            </span>
+          </label>
+        </div>
+
+        {/* Discord Username */}
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text font-semibold">Discord Username *</span>
+            <div
+              className="tooltip tooltip-left"
+              data-tip="Open Discord → Click your username (bottom left) → Settings (gear icon) → My Account → Copy your username (without the @)"
+            >
+              <button type="button" className="btn btn-ghost btn-xs btn-circle">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  className="w-4 h-4 stroke-current"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </label>
+          <input
+            type="text"
+            placeholder="e.g., john_dev"
+            className="input input-bordered w-full"
+            value={discordUsername}
+            onChange={(e) =>
+              setDiscordUsername(e.target.value.toLowerCase().replace(/\s/g, ""))
+            }
+            required
+          />
+          <label className="label">
+            <span className="label-text-alt text-base-content/60">
+              Used for private mentorship channels
+            </span>
+          </label>
+        </div>
       </div>
 
       {/* Areas of Expertise */}
@@ -347,27 +472,6 @@ export default function MentorRegistrationForm({
         />
       </div>
 
-      {/* CV/Resume URL */}
-      <div className="form-control">
-        <label className="label">
-          <span className="label-text font-semibold">CV / Resume Link</span>
-          <span className="label-text-alt text-base-content/60">Optional</span>
-        </label>
-        <input
-          type="url"
-          placeholder="https://drive.google.com/... or https://linkedin.com/in/..."
-          className="input input-bordered w-full"
-          value={cvUrl}
-          onChange={(e) => setCvUrl(e.target.value)}
-        />
-        <label className="label">
-          <span className="label-text-alt text-base-content/60">
-            Link to your CV, resume, or LinkedIn profile. Helps in verifying
-            your experience.
-          </span>
-        </label>
-      </div>
-
       {/* Major Projects */}
       <div className="form-control">
         <label className="label">
@@ -379,45 +483,65 @@ export default function MentorRegistrationForm({
           </span>
         </label>
         <textarea
-          placeholder="Describe your major projects and your role in them. For example:&#10;&#10;• Led the frontend team at XYZ Corp, built a React dashboard serving 100k users&#10;• Open source contributor to Angular, created popular state management library&#10;• Mentored 5+ developers who got promoted to senior positions"
-          className="textarea textarea-bordered w-full h-40"
+          placeholder="Describe your major projects and your role in them..."
+          className="textarea textarea-bordered w-full h-32"
           value={majorProjects}
           onChange={(e) => setMajorProjects(e.target.value)}
           maxLength={1000}
         />
         <label className="label">
           <span className="label-text-alt text-base-content/60">
-            Helps others understand your expertise and mentoring credentials.
+            Helps others understand your expertise and credentials
           </span>
         </label>
       </div>
 
-      {/* Max Mentees */}
-      <div className="form-control">
-        <label className="label">
-          <span className="label-text font-semibold">
-            Maximum Mentees at a Time
-          </span>
-          <span className="label-text-alt font-bold text-primary">
-            {maxMentees}
-          </span>
-        </label>
-        <input
-          type="range"
-          min={1}
-          max={10}
-          value={maxMentees}
-          onChange={(e) => setMaxMentees(Number(e.target.value))}
-          className="range range-primary w-full"
-        />
-        <div className="w-full flex justify-between text-xs px-2 mt-1">
-          <span>1</span>
-          <span>5</span>
-          <span>10</span>
+      {/* CV/Resume URL + Max Mentees - Two column grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* CV/Resume URL */}
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text font-semibold">CV / Resume Link</span>
+            <span className="label-text-alt text-base-content/60">Optional</span>
+          </label>
+          <input
+            type="url"
+            placeholder="https://linkedin.com/in/..."
+            className="input input-bordered w-full"
+            value={cvUrl}
+            onChange={(e) => setCvUrl(e.target.value)}
+          />
+          <label className="label">
+            <span className="label-text-alt text-base-content/60">
+              LinkedIn or CV link for verification
+            </span>
+          </label>
         </div>
-        <p className="text-xs text-base-content/60 mt-2">
-          Manage your availability by limiting active mentees
-        </p>
+
+        {/* Max Mentees */}
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text font-semibold">
+              Maximum Mentees at a Time
+            </span>
+            <span className="label-text-alt font-bold text-primary">
+              {maxMentees}
+            </span>
+          </label>
+          <input
+            type="range"
+            min={1}
+            max={10}
+            value={maxMentees}
+            onChange={(e) => setMaxMentees(Number(e.target.value))}
+            className="range range-primary w-full"
+          />
+          <div className="w-full flex justify-between text-xs px-2 mt-1">
+            <span>1</span>
+            <span>5</span>
+            <span>10</span>
+          </div>
+        </div>
       </div>
 
       {/* Availability */}
@@ -449,7 +573,7 @@ export default function MentorRegistrationForm({
         <label className="label cursor-pointer justify-start gap-4">
           <input
             type="checkbox"
-            className="toggle toggle-primary"
+            className="toggle toggle-primary [--tglbg:theme(colors.base-300)]"
             checked={isPublic}
             onChange={(e) => setIsPublic(e.target.checked)}
           />
