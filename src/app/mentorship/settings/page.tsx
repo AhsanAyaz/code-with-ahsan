@@ -93,6 +93,8 @@ export default function SettingsPage() {
     profile.role === "mentor"
       ? {
           username: profile.username || "",
+          displayName: profile.displayName || "",
+          photoURL: profile.photoURL || "",
           discordUsername: profile.discordUsername || "",
           expertise: profile.expertise || [],
           currentRole: profile.currentRole || "",
@@ -173,6 +175,7 @@ export default function SettingsPage() {
               onSubmit={handleSubmit}
               isSubmitting={isSubmitting}
               initialData={mentorInitialData}
+              userId={user.uid}
               mode="edit"
             />
           ) : (
