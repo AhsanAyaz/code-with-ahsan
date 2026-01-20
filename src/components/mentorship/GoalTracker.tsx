@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useToast } from "@/contexts/ToastContext";
 
 interface Goal {
   id: string;
@@ -22,6 +23,7 @@ export default function GoalTracker({
   currentUserId,
   isMentor,
 }: GoalTrackerProps) {
+  const toast = useToast();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -117,7 +119,7 @@ export default function GoalTracker({
         setGoals((prev) => prev.filter((g) => g.id !== goalId));
       } else {
         const error = await response.json();
-        alert(error.error || "Failed to delete goal");
+        toast.error(error.error || "Failed to delete goal");
       }
     } catch (error) {
       console.error("Error deleting goal:", error);

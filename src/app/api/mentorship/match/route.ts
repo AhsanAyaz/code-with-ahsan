@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if a match already exists
+    // Check if a match already exists with this specific mentor
     const existingMatch = await db
       .collection("mentorship_sessions")
       .where("menteeId", "==", menteeId)
@@ -138,6 +138,25 @@ export async function POST(request: NextRequest) {
           error: `Match request already exists with status: ${status}`,
           existingMatchId: existingDoc.id,
           status,
+        },
+        { status: 409 }
+      );
+    }
+
+    // Check if mentee already has an active mentorship (one mentor per mentee)
+    const existingActiveMentorship = await db
+      .collection("mentorship_sessions")
+      .where("menteeId", "==", menteeId)
+      .where("status", "==", "active")
+      .limit(1)
+      .get();
+
+    if (!existingActiveMentorship.empty) {
+      return NextResponse.json(
+        {
+          error: "Already has active mentorship",
+          message:
+            "You already have an active mentor. Complete or wait for that mentorship to end before requesting a new one.",
         },
         { status: 409 }
       );
@@ -406,6 +425,41 @@ export async function PUT(request: NextRequest) {
         ).catch((err) =>
           console.error("Failed to send acceptance email:", err)
         );
+      }
+
+      // Auto-cancel other pending requests for this mentee
+      const otherPendingRequests = await db
+        .collection("mentorship_sessions")
+        .where("menteeId", "==", matchData?.menteeId)
+        .where("status", "==", "pending")
+        .get();
+
+      const cancelledCount = otherPendingRequests.docs.filter(
+        (doc) => doc.id !== matchId
+      ).length;
+
+      if (cancelledCount > 0) {
+        const batch = db.batch();
+        for (const doc of otherPendingRequests.docs) {
+          if (doc.id !== matchId) {
+            batch.update(doc.ref, {
+              status: "cancelled",
+              cancellationReason: "auto_cancelled_mentee_matched",
+              cancelledAt: FieldValue.serverTimestamp(),
+            });
+          }
+        }
+        await batch.commit();
+
+        // Notify mentee about cancelled requests
+        if (menteeData?.discordUsername && mentorProfileData) {
+          sendDirectMessage(
+            menteeData.discordUsername,
+            `ℹ️ Since **${mentorProfileData.displayName}** accepted you as their mentee, your ${cancelledCount} other pending request(s) have been automatically cancelled.`
+          ).catch((err) =>
+            console.error("Failed to send cancelled requests DM:", err)
+          );
+        }
       }
 
       return NextResponse.json(

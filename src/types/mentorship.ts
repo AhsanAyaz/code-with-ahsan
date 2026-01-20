@@ -75,13 +75,16 @@ export interface MentorshipMatch {
   id: string;
   mentorId: string;
   menteeId: string;
-  status: "pending" | "active" | "declined" | "completed";
+  status: "pending" | "active" | "declined" | "completed" | "cancelled";
   requestedAt: Date;
   approvedAt?: Date;
   lastContactAt?: Date;
   matchScore?: number;
   discordChannelId?: string;
   discordChannelUrl?: string;
+  cancellationReason?: string;
+  cancelledAt?: Date;
+  cancelledBy?: string;
 }
 
 /**

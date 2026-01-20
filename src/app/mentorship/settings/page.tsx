@@ -3,6 +3,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { AuthContext } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import MentorRegistrationForm from "@/components/mentorship/MentorRegistrationForm";
 import MenteeRegistrationForm from "@/components/mentorship/MenteeRegistrationForm";
@@ -12,6 +13,7 @@ import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 export default function SettingsPage() {
   const router = useRouter();
   const { setShowLoginPopup } = useContext(AuthContext);
+  const toast = useToast();
   const { user, profile, loading, refreshProfile } = useMentorship();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -50,11 +52,11 @@ export default function SettingsPage() {
         setTimeout(() => setSuccess(false), 3000);
       } else {
         const error = await response.json();
-        alert("Failed to update profile: " + error.error);
+        toast.error("Failed to update profile: " + error.error);
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

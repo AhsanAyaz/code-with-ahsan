@@ -3,6 +3,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { AuthContext } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import { useMentorship, MentorshipMatch } from "@/contexts/MentorshipContext";
 import Link from "next/link";
 import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
@@ -21,6 +22,7 @@ interface RequestWithProfile extends MentorshipMatch {
 export default function MentorRequestsPage() {
   const router = useRouter();
   const { setShowLoginPopup } = useContext(AuthContext);
+  const toast = useToast();
   const { user, profile, loading, refreshMatches, matches } = useMentorship();
   const [requests, setRequests] = useState<RequestWithProfile[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
@@ -88,11 +90,11 @@ export default function MentorRequestsPage() {
         await refreshMatches();
       } else {
         const error = await response.json();
-        alert("Failed: " + error.error);
+        toast.error("Failed: " + error.error);
       }
     } catch (error) {
       console.error("Error processing request:", error);
-      alert("An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again.");
     } finally {
       setProcessingId(null);
     }

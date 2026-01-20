@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useToast } from "@/contexts/ToastContext";
 import {
   SESSION_TEMPLATES,
   SessionTemplate,
@@ -31,6 +32,7 @@ export default function SessionScheduler({
   isMentor,
   menteeEmail,
 }: SessionSchedulerProps) {
+  const toast = useToast();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -179,7 +181,7 @@ export default function SessionScheduler({
         setSessions((prev) => prev.filter((s) => s.id !== sessionId));
       } else {
         const error = await response.json();
-        alert(error.error || "Failed to delete session");
+        toast.error(error.error || "Failed to delete session");
       }
     } catch (error) {
       console.error("Error deleting session:", error);

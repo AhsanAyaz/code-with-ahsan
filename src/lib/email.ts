@@ -432,3 +432,23 @@ export async function sendRatingReceivedEmail(
 
   return sendEmail(mentor.email, subject, wrapEmailHtml(content, subject));
 }
+
+/**
+ * Send email to mentee when they are removed from a mentorship by the mentor
+ */
+export async function sendMentorshipRemovedEmail(
+  mentee: MentorshipProfile,
+  mentor: MentorshipProfile
+): Promise<boolean> {
+  const subject = `📝 Update on Your Mentorship`;
+  const content = `
+    <h2>Hi ${mentee.displayName},</h2>
+    <div class="highlight">
+      <p>Your mentorship with <strong>${mentor.displayName}</strong> has been ended.</p>
+    </div>
+    <p>This could happen for various reasons - mentors sometimes need to reduce their capacity or focus on other commitments.</p>
+    <p>Don't be discouraged! You can find a new mentor who's a great fit for your goals:</p>
+    <a href="${SITE_URL}/mentorship/browse" class="button">Browse Available Mentors</a>
+  `;
+  return sendEmail(mentee.email, subject, wrapEmailHtml(content, subject));
+}
