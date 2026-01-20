@@ -9,6 +9,7 @@ import Link from "next/link";
 import GoalTracker from "@/components/mentorship/GoalTracker";
 import SessionScheduler from "@/components/mentorship/SessionScheduler";
 import LearningHub from "@/components/mentorship/LearningHub";
+import ContactInfo from "@/components/mentorship/ContactInfo";
 
 interface MatchDetails {
   id: string;
@@ -55,7 +56,7 @@ export default function RelationshipDashboard({
   const toast = useToast();
   const { user, profile, loading } = useMentorship();
   const [matchDetails, setMatchDetails] = useState<MatchDetails | null>(
-    DEV_MODE ? MOCK_MATCH_DETAILS : null
+    DEV_MODE ? MOCK_MATCH_DETAILS : null,
   );
   const [loadingMatch, setLoadingMatch] = useState(!DEV_MODE);
   const [activeTab, setActiveTab] = useState<
@@ -82,7 +83,7 @@ export default function RelationshipDashboard({
 
       try {
         const response = await fetch(
-          `/api/mentorship/dashboard/${resolvedParams.matchId}?uid=${user.uid}`
+          `/api/mentorship/dashboard/${resolvedParams.matchId}?uid=${user.uid}`,
         );
         if (response.ok) {
           const data = await response.json();
@@ -116,11 +117,11 @@ export default function RelationshipDashboard({
             action: "complete",
             completionNotes: completionNotes.trim() || null,
           }),
-        }
+        },
       );
       if (response.ok) {
         toast.success(
-          "🎉 Congratulations! This mentorship has been marked as complete."
+          "🎉 Congratulations! This mentorship has been marked as complete.",
         );
         router.push("/mentorship/my-matches");
       } else {
@@ -150,7 +151,7 @@ export default function RelationshipDashboard({
             action: "remove",
             removalReason: removalReason.trim() || null,
           }),
-        }
+        },
       );
       if (response.ok) {
         toast.success("Mentee has been removed from your list.");
@@ -234,6 +235,11 @@ export default function RelationshipDashboard({
                     currentMatchDetails.partner.education ||
                     ""}
                 </p>
+                <ContactInfo
+                  email={currentMatchDetails.partner.email}
+                  discordUsername={currentMatchDetails.partner.discordUsername}
+                  className="mt-2"
+                />
               </div>
             </div>
             <Link

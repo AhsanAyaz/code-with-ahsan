@@ -92,7 +92,7 @@ function wrapEmailHtml(content: string, title: string): string {
 async function sendEmail(
   to: string,
   subject: string,
-  html: string
+  html: string,
 ): Promise<boolean> {
   // Check if emails are disabled (useful for local testing)
   if (process.env.DISABLE_EMAILS === "true") {
@@ -128,7 +128,7 @@ async function sendEmail(
  * Send email to admin when a new mentor registers (pending approval)
  */
 export async function sendAdminMentorPendingEmail(
-  mentor: MentorshipProfile
+  mentor: MentorshipProfile,
 ): Promise<boolean> {
   const subject = `🆕 New Mentor Registration: ${mentor.displayName}`;
   const content = `
@@ -151,7 +151,7 @@ export async function sendAdminMentorPendingEmail(
  */
 export async function sendRegistrationStatusEmail(
   mentor: MentorshipProfile,
-  approved: boolean
+  approved: boolean,
 ): Promise<boolean> {
   const subject = approved
     ? "🎉 Your Mentor Application Has Been Approved!"
@@ -189,7 +189,7 @@ export async function sendRegistrationStatusEmail(
 export async function sendAccountStatusEmail(
   user: MentorshipProfile,
   status: "disabled" | "enabled",
-  reason?: string
+  reason?: string,
 ): Promise<boolean> {
   const subject =
     status === "disabled"
@@ -224,7 +224,7 @@ export async function sendAccountStatusEmail(
  */
 export async function sendMentorshipRequestEmail(
   mentor: MentorshipProfile,
-  mentee: MentorshipProfile
+  mentee: MentorshipProfile,
 ): Promise<boolean> {
   const subject = `🙋 New Mentorship Request from ${mentee.displayName}`;
   const content = `
@@ -247,7 +247,7 @@ export async function sendMentorshipRequestEmail(
  */
 export async function sendRequestAcceptedEmail(
   mentee: MentorshipProfile,
-  mentor: MentorshipProfile
+  mentor: MentorshipProfile,
 ): Promise<boolean> {
   const subject = `🎉 ${mentor.displayName} Accepted Your Mentorship Request!`;
   const content = `
@@ -276,7 +276,7 @@ export async function sendRequestAcceptedEmail(
  */
 export async function sendRequestDeclinedEmail(
   mentee: MentorshipProfile,
-  mentor: MentorshipProfile
+  mentor: MentorshipProfile,
 ): Promise<boolean> {
   const subject = `📝 Update on Your Mentorship Request`;
   const content = `
@@ -302,7 +302,7 @@ export async function sendRequestDeclinedEmail(
 export async function sendSessionScheduledEmail(
   mentor: MentorshipProfile,
   mentee: MentorshipProfile,
-  session: ScheduledSession
+  session: ScheduledSession,
 ): Promise<boolean> {
   const sessionDate = new Date(session.scheduledAt);
   const formattedDate = sessionDate.toLocaleDateString("en-US", {
@@ -321,7 +321,7 @@ export async function sendSessionScheduledEmail(
 
   const createContent = (
     recipient: MentorshipProfile,
-    partner: MentorshipProfile
+    partner: MentorshipProfile,
   ) => `
     <h2>Session Scheduled!</h2>
     <p>Hi ${recipient.displayName}, a mentorship session has been scheduled.</p>
@@ -341,12 +341,12 @@ export async function sendSessionScheduledEmail(
     sendEmail(
       mentor.email,
       subject,
-      wrapEmailHtml(createContent(mentor, mentee), subject)
+      wrapEmailHtml(createContent(mentor, mentee), subject),
     ),
     sendEmail(
       mentee.email,
       subject,
-      wrapEmailHtml(createContent(mentee, mentor), subject)
+      wrapEmailHtml(createContent(mentee, mentor), subject),
     ),
   ]);
 
@@ -358,7 +358,7 @@ export async function sendSessionScheduledEmail(
  */
 export async function sendMentorshipCompletedEmail(
   mentor: MentorshipProfile,
-  mentee: MentorshipProfile
+  mentee: MentorshipProfile,
 ): Promise<boolean> {
   const mentorSubject = `🎓 Mentorship Completed with ${mentee.displayName}`;
   const menteeSubject = `🎓 Mentorship Completed with ${mentor.displayName}`;
@@ -387,12 +387,12 @@ export async function sendMentorshipCompletedEmail(
     sendEmail(
       mentor.email,
       mentorSubject,
-      wrapEmailHtml(mentorContent, mentorSubject)
+      wrapEmailHtml(mentorContent, mentorSubject),
     ),
     sendEmail(
       mentee.email,
       menteeSubject,
-      wrapEmailHtml(menteeContent, menteeSubject)
+      wrapEmailHtml(menteeContent, menteeSubject),
     ),
   ]);
 
@@ -404,7 +404,7 @@ export async function sendMentorshipCompletedEmail(
  */
 export async function sendRatingReceivedEmail(
   mentor: MentorshipProfile,
-  ratingInfo: RatingInfo
+  ratingInfo: RatingInfo,
 ): Promise<boolean> {
   const stars = "⭐".repeat(ratingInfo.rating);
   const subject = `${stars} You Received a ${ratingInfo.rating}-Star Rating!`;
@@ -438,7 +438,7 @@ export async function sendRatingReceivedEmail(
  */
 export async function sendMentorshipRemovedEmail(
   mentee: MentorshipProfile,
-  mentor: MentorshipProfile
+  mentor: MentorshipProfile,
 ): Promise<boolean> {
   const subject = `📝 Update on Your Mentorship`;
   const content = `
@@ -451,4 +451,58 @@ export async function sendMentorshipRemovedEmail(
     <a href="${SITE_URL}/mentorship/browse" class="button">Browse Available Mentors</a>
   `;
   return sendEmail(mentee.email, subject, wrapEmailHtml(content, subject));
+}
+
+/**
+ * Send email to mentor or mentee reminding them to set their Discord username
+ */
+export async function sendDiscordUsernameReminderEmail(
+  user: { displayName: string; email: string },
+  role: "mentor" | "mentee",
+  partnerName?: string,
+): Promise<boolean> {
+  const subject = `🔔 Action Required: Set Your Discord Username`;
+
+  const partnerInfo =
+    role === "mentor"
+      ? `Your mentee(s) are waiting to connect with you on Discord.`
+      : `Your mentor <strong>${partnerName}</strong> is ready to connect with you on Discord.`;
+
+  const content = `
+    <h2>Hi ${user.displayName}!</h2>
+    <div class="highlight">
+      <p>${partnerInfo}</p>
+      <p>To enable Discord communication for your mentorship, please set your Discord username in your profile settings.</p>
+    </div>
+    
+    <h3>How to find your Discord username:</h3>
+    <ol>
+      <li>Open Discord (app or web)</li>
+      <li>Click on your profile icon (bottom left)</li>
+      <li>Your username is shown under your display name (e.g., <code>yourname</code> or <code>yourname#1234</code>)</li>
+      <li>Copy just the username part (without the #numbers if present)</li>
+    </ol>
+    
+    <h3>How to update your profile:</h3>
+    <ol>
+      <li>Go to your <a href="${SITE_URL}/mentorship/settings">Mentorship Settings</a></li>
+      <li>Find the "Discord Username" field</li>
+      <li>Enter your Discord username</li>
+      <li>Click "Save"</li>
+    </ol>
+    
+    <div class="info-box">
+      <p><strong>Why is this important?</strong></p>
+      <p>We create a private Discord channel for each mentorship pair to facilitate easy communication. Without your Discord username, we can't add you to this channel.</p>
+    </div>
+    
+    <a href="${SITE_URL}/mentorship/settings" class="button">Update Your Profile Now</a>
+    
+    <p style="margin-top: 20px; color: #6b7280; font-size: 14px;">
+      If you don't have a Discord account yet, you can create one for free at <a href="https://discord.com">discord.com</a>. 
+      Then join our community server at <a href="https://discord.gg/J7JHsuh">discord.gg/J7JHsuh</a>.
+    </p>
+  `;
+
+  return sendEmail(user.email, subject, wrapEmailHtml(content, subject));
 }
