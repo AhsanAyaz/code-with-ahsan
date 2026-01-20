@@ -9,11 +9,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/community</loc>
+    <loc>https://codewithahsan.dev/books</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/books</loc>
+    <loc>https://codewithahsan.dev/community</loc>
   </url>
 
   <url>
@@ -49,11 +49,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/dashboard</loc>
+    <loc>https://codewithahsan.dev/mentorship/browse</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/browse</loc>
+    <loc>https://codewithahsan.dev/mentorship/dashboard</loc>
   </url>
 
   <url>
@@ -61,19 +61,19 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/mentors</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/mentorship/my-matches</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/settings</loc>
+    <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
+    <loc>https://codewithahsan.dev/mentorship/mentors</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/settings</loc>
   </url>
 
   <url>

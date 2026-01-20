@@ -57,6 +57,43 @@ function getGuildId(): string {
 }
 
 /**
+ * Sleep for a specified number of milliseconds
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Fetch with automatic rate limit handling
+ * Retries the request after waiting for the rate limit to clear (up to 3 retries)
+ */
+async function fetchWithRateLimit(
+  url: string,
+  options?: RequestInit,
+  maxRetries = 3
+): Promise<Response> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const response = await fetch(url, options);
+
+    if (response.status === 429) {
+      const data = await response.json();
+      const retryAfter = (data.retry_after || 1) * 1000; // Convert to ms
+      log.debug(`Rate limited. Waiting ${retryAfter}ms before retry...`);
+
+      if (attempt < maxRetries) {
+        await sleep(retryAfter + 100); // Add 100ms buffer
+        continue;
+      }
+    }
+
+    return response;
+  }
+
+  // This shouldn't happen, but TypeScript needs it
+  throw new Error("Max retries exceeded");
+}
+
+/**
  * Lookup a Discord user ID by their username in the guild
  * Returns null if not found
  */
@@ -67,17 +104,16 @@ export async function lookupMemberByUsername(
   log.debug(` Looking up member by username: ${username}`);
 
   try {
-    // Search for members matching the username
-    const response = await fetch(
+    // Search for members matching the username (with rate limit handling)
+    const response = await fetchWithRateLimit(
       `${DISCORD_API}/guilds/${guildId}/members/search?query=${encodeURIComponent(username)}&limit=10`,
       { headers: getHeaders() }
     );
 
     if (!response.ok) {
+      const errorText = await response.text();
       log.error(
-        "Discord member search failed:",
-        response.status,
-        await response.text()
+        `Discord member search failed: ${response.status} - ${errorText}`
       );
       return null;
     }
@@ -106,6 +142,162 @@ export async function lookupMemberByUsername(
   }
 }
 
+// Maximum channels per category (Discord limit is 50, we use 45 for safety margin)
+const MAX_CHANNELS_PER_CATEGORY = 45;
+
+/**
+ * Get or create a monthly category for mentorship channels
+ * Creates categories like "Mentorship Jan 2026", "Mentorship Jan 2026 - Batch 2", etc.
+ * Automatically creates a new batch when the current one approaches 50 channels.
+ *
+ * @returns Category ID to use for new channels, or null if creation failed
+ */
+async function getOrCreateMonthlyCategory(): Promise<string | null> {
+  const guildId = getGuildId();
+
+  // Format: "Mentorship Jan 2026"
+  const now = new Date();
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const baseNamePrefix = `Mentorship ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+
+  log.debug(`Looking for category with prefix: ${baseNamePrefix}`);
+
+  try {
+    // Get all channels in the guild
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/guilds/${guildId}/channels`,
+      {
+        headers: getHeaders(),
+      }
+    );
+
+    if (!response.ok) {
+      log.error(
+        `Failed to fetch guild channels: ${response.status} - ${await response.text()}`
+      );
+      return null;
+    }
+
+    const channels = await response.json();
+
+    // Find all categories matching this month (base name or with batch suffix)
+    const monthCategories = channels.filter(
+      (ch: { type: number; name: string }) =>
+        ch.type === 4 &&
+        (ch.name.toLowerCase() === baseNamePrefix.toLowerCase() ||
+          ch.name
+            .toLowerCase()
+            .startsWith(baseNamePrefix.toLowerCase() + " - batch"))
+    );
+
+    // Sort by batch number (base name = batch 1, then Batch 2, Batch 3, etc.)
+    monthCategories.sort((a: { name: string }, b: { name: string }) => {
+      const getBatchNum = (name: string): number => {
+        const match = name.match(/batch\s*(\d+)/i);
+        return match ? parseInt(match[1], 10) : 1;
+      };
+      return getBatchNum(a.name) - getBatchNum(b.name);
+    });
+
+    // Check the latest batch for available space
+    if (monthCategories.length > 0) {
+      const latestCategory = monthCategories[monthCategories.length - 1];
+
+      // Count channels in this category
+      const channelsInCategory = channels.filter(
+        (ch: { parent_id?: string }) => ch.parent_id === latestCategory.id
+      ).length;
+
+      log.debug(
+        `Latest category: ${latestCategory.name} has ${channelsInCategory}/${MAX_CHANNELS_PER_CATEGORY} channels`
+      );
+
+      if (channelsInCategory < MAX_CHANNELS_PER_CATEGORY) {
+        // Still has space, use this category
+        return latestCategory.id;
+      }
+
+      // Need a new batch
+      const currentBatch =
+        latestCategory.name.toLowerCase() === baseNamePrefix.toLowerCase()
+          ? 1
+          : parseInt(
+              latestCategory.name.match(/batch\s*(\d+)/i)?.[1] || "1",
+              10
+            );
+      const newBatchNum = currentBatch + 1;
+      const newCategoryName = `${baseNamePrefix} - Batch ${newBatchNum}`;
+
+      log.debug(`Creating new batch category: ${newCategoryName}`);
+      return await createCategory(guildId, newCategoryName);
+    }
+
+    // No category exists for this month, create the first one (no batch suffix)
+    log.debug(`Creating new category: ${baseNamePrefix}`);
+    return await createCategory(guildId, baseNamePrefix);
+  } catch (error) {
+    log.error(`Error getting/creating monthly category: ${error}`);
+    return null;
+  }
+}
+
+/**
+ * Helper to create a category with standard permissions
+ */
+async function createCategory(
+  guildId: string,
+  categoryName: string
+): Promise<string | null> {
+  // Category permission: @everyone cannot view (private by default)
+  const permissionOverwrites = [
+    {
+      id: guildId, // @everyone role
+      type: 0,
+      allow: "0",
+      deny: "1024", // VIEW_CHANNEL denied
+    },
+  ];
+
+  const createResponse = await fetch(
+    `${DISCORD_API}/guilds/${guildId}/channels`,
+    {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({
+        name: categoryName,
+        type: 4, // GUILD_CATEGORY
+        permission_overwrites: permissionOverwrites,
+      }),
+    }
+  );
+
+  if (!createResponse.ok) {
+    log.error(
+      `Failed to create category: ${createResponse.status} - ${await createResponse.text()}`
+    );
+    return null;
+  }
+
+  const newCategory = await createResponse.json();
+  log.debug(
+    `Created new category: ${newCategory.name} (ID: ${newCategory.id})`
+  );
+  return newCategory.id;
+}
+
 /**
  * Create a private text channel for a mentorship session
  *
@@ -129,7 +321,9 @@ export async function createMentorshipChannel(
   );
 
   const guildId = getGuildId();
-  const categoryId = process.env.DISCORD_MENTORSHIP_CATEGORY_ID;
+
+  // Use dynamic monthly category instead of static env var
+  const categoryId = await getOrCreateMonthlyCategory();
 
   // Create URL-safe channel name
   const sanitize = (name: string) =>
@@ -197,18 +391,19 @@ export async function createMentorshipChannel(
       channelPayload.parent_id = categoryId;
     }
 
-    const response = await fetch(`${DISCORD_API}/guilds/${guildId}/channels`, {
-      method: "POST",
-      headers: getHeaders(),
-      body: JSON.stringify(channelPayload),
-    });
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/guilds/${guildId}/channels`,
+      {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify(channelPayload),
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
       log.error(
-        "[Discord] Channel creation failed:",
-        response.status,
-        errorText
+        `[Discord] Channel creation failed: ${response.status} - ${errorText}`
       );
       return null;
     }
@@ -274,9 +469,7 @@ export async function sendChannelMessage(
     } else {
       const errorText = await response.text();
       log.error(
-        `[Discord] Failed to send message to channel ${channelId}:`,
-        response.status,
-        errorText
+        `[Discord] Failed to send message to channel ${channelId}: ${response.status} - ${errorText}`
       );
       return false;
     }
@@ -344,10 +537,12 @@ export async function sendDirectMessage(
  * This renames the channel with [ARCHIVED] prefix and removes send permissions
  *
  * @param channelId - The Discord channel ID
+ * @param reason - Optional custom message explaining why the channel was archived
  * @returns true if archived successfully, false otherwise
  */
 export async function archiveMentorshipChannel(
-  channelId: string
+  channelId: string,
+  reason?: string
 ): Promise<boolean> {
   log.debug(` Archiving channel: ${channelId}`);
 
@@ -382,12 +577,13 @@ export async function archiveMentorshipChannel(
       return false;
     }
 
-    // Send archive message
-    await sendChannelMessage(
-      channelId,
+    // Send archive message (use custom reason or default completion message)
+    const archiveMessage =
+      reason ||
       `📦 **This mentorship session has been completed.**\n\n` +
-        `This channel is now archived. Thank you for being part of the mentorship program!`
-    );
+        `This channel is now archived. Thank you for being part of the mentorship program!`;
+
+    await sendChannelMessage(channelId, archiveMessage);
 
     log.debug(` Channel archived successfully: ${channelId}`);
     return true;
