@@ -26,7 +26,8 @@ export default function MentorRequestsPage() {
   const router = useRouter();
   const { setShowLoginPopup } = useContext(AuthContext);
   const toast = useToast();
-  const { user, profile, loading, refreshMatches, matches } = useMentorship();
+  const { user, profile, loading, profileLoading, refreshMatches, matches } =
+    useMentorship();
   const [requests, setRequests] = useState<RequestWithProfile[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
@@ -37,16 +38,16 @@ export default function MentorRequestsPage() {
   const isAtCapacity = activeMenteeCount >= maxMentees;
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !profileLoading && !user) {
       setShowLoginPopup(true);
     }
-  }, [loading, user, setShowLoginPopup]);
+  }, [loading, profileLoading, user, setShowLoginPopup]);
 
   useEffect(() => {
-    if (!loading && profile && profile.role !== "mentor") {
+    if (!loading && !profileLoading && profile && profile.role !== "mentor") {
       router.push("/mentorship");
     }
-  }, [loading, profile, router]);
+  }, [loading, profileLoading, profile, router]);
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -103,7 +104,7 @@ export default function MentorRequestsPage() {
     }
   };
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <span className="loading loading-spinner loading-lg text-primary"></span>

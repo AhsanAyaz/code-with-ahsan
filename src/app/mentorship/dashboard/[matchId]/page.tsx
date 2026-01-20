@@ -54,7 +54,7 @@ export default function RelationshipDashboard({
   const router = useRouter();
   const { setShowLoginPopup } = useContext(AuthContext);
   const toast = useToast();
-  const { user, profile, loading } = useMentorship();
+  const { user, profile, loading, profileLoading } = useMentorship();
   const [matchDetails, setMatchDetails] = useState<MatchDetails | null>(
     DEV_MODE ? MOCK_MATCH_DETAILS : null,
   );
@@ -71,10 +71,10 @@ export default function RelationshipDashboard({
 
   useEffect(() => {
     // Skip auth redirect in DEV_MODE
-    if (!DEV_MODE && !loading && !user) {
+    if (!DEV_MODE && !loading && !profileLoading && !user) {
       setShowLoginPopup(true);
     }
-  }, [loading, user, setShowLoginPopup]);
+  }, [loading, profileLoading, user, setShowLoginPopup]);
 
   useEffect(() => {
     const fetchMatchDetails = async () => {
@@ -169,7 +169,7 @@ export default function RelationshipDashboard({
     }
   };
 
-  if (!DEV_MODE && (loading || loadingMatch)) {
+  if (!DEV_MODE && (loading || profileLoading || loadingMatch)) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <span className="loading loading-spinner loading-lg text-primary"></span>

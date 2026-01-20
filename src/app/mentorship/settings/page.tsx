@@ -14,21 +14,22 @@ export default function SettingsPage() {
   const router = useRouter();
   const { setShowLoginPopup } = useContext(AuthContext);
   const toast = useToast();
-  const { user, profile, loading, refreshProfile } = useMentorship();
+  const { user, profile, loading, profileLoading, refreshProfile } =
+    useMentorship();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !profileLoading && !user) {
       setShowLoginPopup(true);
     }
-  }, [loading, user, setShowLoginPopup]);
+  }, [loading, profileLoading, user, setShowLoginPopup]);
 
   useEffect(() => {
-    if (!loading && user && !profile) {
+    if (!loading && !profileLoading && user && !profile) {
       router.push("/mentorship/onboarding");
     }
-  }, [loading, user, profile, router]);
+  }, [loading, profileLoading, user, profile, router]);
 
   const handleSubmit = async (data: Record<string, unknown>) => {
     if (!user) return;
@@ -62,7 +63,7 @@ export default function SettingsPage() {
     }
   };
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <span className="loading loading-spinner loading-lg text-primary"></span>
@@ -105,7 +106,7 @@ export default function SettingsPage() {
           availability: profile.availability
             ? Object.keys(profile.availability).reduce(
                 (acc, day) => ({ ...acc, [day]: true }),
-                {}
+                {},
               )
             : {},
           isPublic: profile.isPublic ?? true,

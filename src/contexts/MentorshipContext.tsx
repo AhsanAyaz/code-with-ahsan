@@ -22,6 +22,7 @@ interface MentorshipContextType {
   user: User | null;
   profile: MentorshipProfile | null;
   loading: boolean;
+  profileLoading: boolean;
   matches: MentorshipMatch[];
   pendingRequests: MentorshipMatch[];
   refreshProfile: () => Promise<void>;
@@ -29,7 +30,7 @@ interface MentorshipContextType {
 }
 
 const MentorshipContext = createContext<MentorshipContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export function useMentorship() {
@@ -48,14 +49,17 @@ export function MentorshipProvider({ children }: MentorshipProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<MentorshipProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(true);
   const [matches, setMatches] = useState<MentorshipMatch[]>([]);
   const [pendingRequests, setPendingRequests] = useState<MentorshipMatch[]>([]);
 
   const refreshProfile = async () => {
     if (!user) {
       setProfile(null);
+      setProfileLoading(false);
       return;
     }
+    setProfileLoading(true);
     try {
       const response = await fetch(`/api/mentorship/profile?uid=${user.uid}`);
       if (response.ok) {
@@ -67,6 +71,8 @@ export function MentorshipProvider({ children }: MentorshipProviderProps) {
     } catch (error) {
       console.error("Error fetching mentorship profile:", error);
       setProfile(null);
+    } finally {
+      setProfileLoading(false);
     }
   };
 
@@ -78,7 +84,7 @@ export function MentorshipProvider({ children }: MentorshipProviderProps) {
     }
     try {
       const response = await fetch(
-        `/api/mentorship/match?uid=${user.uid}&role=${profile.role}`
+        `/api/mentorship/match?uid=${user.uid}&role=${profile.role}`,
       );
       if (response.ok) {
         const data = await response.json();
@@ -94,20 +100,43 @@ export function MentorshipProvider({ children }: MentorshipProviderProps) {
     const auth = getAuth(getApp());
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
+      if (firebaseUser) {
+        // Fetch profile before marking loading as complete
+        setProfileLoading(true);
+        try {
+          const response = await fetch(
+            `/api/mentorship/profile?uid=${firebaseUser.uid}`,
+          );
+          if (response.ok) {
+            const data = await response.json();
+            setProfile(data.profile);
+          } else {
+            setProfile(null);
+          }
+        } catch (error) {
+          console.error("Error fetching mentorship profile:", error);
+          setProfile(null);
+        } finally {
+          setProfileLoading(false);
+        }
+      } else {
+        setProfile(null);
+        setProfileLoading(false);
+        setMatches([]);
+        setPendingRequests([]);
+      }
       setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    if (user) {
-      refreshProfile();
-    } else {
-      setProfile(null);
-      setMatches([]);
-      setPendingRequests([]);
+    // Only refresh profile on subsequent user changes (not initial load)
+    // Initial profile fetch is handled in the auth callback above
+    if (!loading && user) {
+      // This effect runs for refreshes triggered by other parts of the app
     }
-  }, [user]);
+  }, [loading, user]);
 
   useEffect(() => {
     if (profile) {
@@ -121,6 +150,7 @@ export function MentorshipProvider({ children }: MentorshipProviderProps) {
         user,
         profile,
         loading,
+        profileLoading,
         matches,
         pendingRequests,
         refreshProfile,

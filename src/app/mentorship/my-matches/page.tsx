@@ -16,16 +16,16 @@ interface MatchWithProfile extends MentorshipMatch {
 
 export default function MyMatchesPage() {
   const { setShowLoginPopup } = useContext(AuthContext);
-  const { user, profile, loading } = useMentorship();
+  const { user, profile, loading, profileLoading } = useMentorship();
   const [activeMatches, setActiveMatches] = useState<MatchWithProfile[]>([]);
   const [pendingMatches, setPendingMatches] = useState<MatchWithProfile[]>([]);
   const [loadingMatches, setLoadingMatches] = useState(true);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !profileLoading && !user) {
       setShowLoginPopup(true);
     }
-  }, [loading, user, setShowLoginPopup]);
+  }, [loading, profileLoading, user, setShowLoginPopup]);
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -52,7 +52,7 @@ export default function MyMatchesPage() {
     }
   }, [user, profile]);
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <span className="loading loading-spinner loading-lg text-primary"></span>

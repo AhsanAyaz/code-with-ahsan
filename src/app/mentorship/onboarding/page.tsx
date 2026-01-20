@@ -16,10 +16,11 @@ function OnboardingContent() {
   const searchParams = useSearchParams();
   const { setShowLoginPopup } = useContext(AuthContext);
   const toast = useToast();
-  const { user, profile, loading, refreshProfile } = useMentorship();
+  const { user, profile, loading, profileLoading, refreshProfile } =
+    useMentorship();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState<"mentor" | "mentee" | null>(
-    null
+    null,
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -33,20 +34,20 @@ function OnboardingContent() {
 
   useEffect(() => {
     // Skip auth redirect in DEV_MODE
-    if (!DEV_MODE && !loading && !user) {
+    if (!DEV_MODE && !loading && !profileLoading && !user) {
       setShowLoginPopup(true);
     }
-  }, [loading, user, setShowLoginPopup]);
+  }, [loading, profileLoading, user, setShowLoginPopup]);
 
   useEffect(() => {
     // Skip profile redirect in DEV_MODE
-    if (!DEV_MODE && !loading && profile) {
+    if (!DEV_MODE && !loading && !profileLoading && profile) {
       // User already has a profile, redirect to dashboard
       router.push("/mentorship/dashboard");
     }
-  }, [loading, profile, router]);
+  }, [loading, profileLoading, profile, router]);
 
-  if (!DEV_MODE && loading) {
+  if (!DEV_MODE && (loading || profileLoading)) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <span className="loading loading-spinner loading-lg text-primary"></span>

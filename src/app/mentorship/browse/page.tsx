@@ -14,7 +14,7 @@ export default function BrowseMentorsPage() {
   const router = useRouter();
   const { setShowLoginPopup } = useContext(AuthContext);
   const toast = useToast();
-  const { user, profile, loading } = useMentorship();
+  const { user, profile, loading, profileLoading } = useMentorship();
   const [mentors, setMentors] = useState<MentorshipProfile[]>([]);
   const [loadingMentors, setLoadingMentors] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,16 +30,16 @@ export default function BrowseMentorsPage() {
   >(new Map());
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !profileLoading && !user) {
       setShowLoginPopup(true);
     }
-  }, [loading, user, setShowLoginPopup]);
+  }, [loading, profileLoading, user, setShowLoginPopup]);
 
   useEffect(() => {
-    if (!loading && profile && profile.role !== "mentee") {
+    if (!loading && !profileLoading && profile && profile.role !== "mentee") {
       router.push("/mentorship");
     }
-  }, [loading, profile, router]);
+  }, [loading, profileLoading, profile, router]);
 
   useEffect(() => {
     const fetchMentors = async () => {
@@ -67,7 +67,7 @@ export default function BrowseMentorsPage() {
       if (!user) return;
       try {
         const response = await fetch(
-          `/api/mentorship/mentee-requests?menteeId=${user.uid}`
+          `/api/mentorship/mentee-requests?menteeId=${user.uid}`,
         );
         if (response.ok) {
           const data = await response.json();
@@ -119,14 +119,14 @@ export default function BrowseMentorsPage() {
       if (response.ok) {
         // Update status to pending
         setMentorRequestStatus((prev) =>
-          new Map(prev).set(mentorId, "pending")
+          new Map(prev).set(mentorId, "pending"),
         );
       } else {
         const error = await response.json();
         if (response.status === 409) {
           // Already requested - update with actual status
           setMentorRequestStatus((prev) =>
-            new Map(prev).set(mentorId, error.status || "pending")
+            new Map(prev).set(mentorId, error.status || "pending"),
           );
         } else {
           toast.error("Failed to send request: " + error.error);
@@ -144,7 +144,7 @@ export default function BrowseMentorsPage() {
     mentorId: string,
     sessionId: string,
     rating: number,
-    feedback: string
+    feedback: string,
   ) => {
     if (!user) return;
     try {
@@ -196,7 +196,7 @@ export default function BrowseMentorsPage() {
 
   const allExpertise = [...new Set(mentors.flatMap((m) => m.expertise || []))];
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <span className="loading loading-spinner loading-lg text-primary"></span>
