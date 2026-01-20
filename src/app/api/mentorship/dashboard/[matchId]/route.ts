@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
-import { sendMentorshipCompletedEmail } from "@/lib/email";
+import {
+  sendMentorshipCompletedEmail,
+  sendMentorshipRemovedEmail,
+} from "@/lib/email";
 import {
   sendChannelMessage,
   sendDirectMessage,
@@ -99,7 +102,7 @@ export async function PUT(
 
   try {
     const body = await request.json();
-    const { uid, action, completionNotes } = body;
+    const { uid, action, completionNotes, removalReason } = body;
 
     if (!uid) {
       return NextResponse.json({ error: "Missing uid" }, { status: 400 });
@@ -243,6 +246,104 @@ export async function PUT(
         {
           success: true,
           message: "Mentorship marked as complete!",
+        },
+        { status: 200 }
+      );
+    } else if (action === "remove") {
+      // Only mentors can remove mentees
+      if (!isMentor) {
+        return NextResponse.json(
+          { error: "Only mentors can remove mentees from their list" },
+          { status: 403 }
+        );
+      }
+
+      if (matchData.status !== "active") {
+        return NextResponse.json(
+          { error: "Can only remove active mentorships" },
+          { status: 400 }
+        );
+      }
+
+      await db
+        .collection("mentorship_sessions")
+        .doc(resolvedParams.matchId)
+        .update({
+          status: "cancelled",
+          cancellationReason: removalReason || "removed_by_mentor",
+          cancelledAt: new Date(),
+          cancelledBy: uid,
+        });
+
+      // Fetch profiles for notifications
+      const [mentorProfile, menteeProfile] = await Promise.all([
+        db.collection("mentorship_profiles").doc(matchData.mentorId).get(),
+        db.collection("mentorship_profiles").doc(matchData.menteeId).get(),
+      ]);
+
+      const mentorData = mentorProfile.exists ? mentorProfile.data() : null;
+      const menteeData = menteeProfile.exists ? menteeProfile.data() : null;
+
+      const notificationTasks = [];
+
+      // Send message to channel before archiving
+      if (isDiscordConfigured() && matchData.discordChannelId) {
+        notificationTasks.push(
+          sendChannelMessage(
+            matchData.discordChannelId,
+            `📢 This mentorship has been ended by the mentor. The channel will be archived.`
+          ).catch((err) =>
+            console.error("Channel message before archive failed:", err)
+          )
+        );
+      }
+
+      // Archive Discord channel
+      if (isDiscordConfigured() && matchData.discordChannelId) {
+        notificationTasks.push(
+          archiveMentorshipChannel(matchData.discordChannelId).catch((err) =>
+            console.error("Discord channel archiving failed:", err)
+          )
+        );
+      }
+
+      // Notify mentee via DM
+      if (isDiscordConfigured() && menteeData?.discordUsername && mentorData) {
+        notificationTasks.push(
+          sendDirectMessage(
+            menteeData.discordUsername,
+            `📢 Your mentorship with **${mentorData.displayName}** has been ended.\n\n` +
+              `You can browse for a new mentor: https://codewithahsan.dev/mentorship/browse`
+          ).catch((err) => console.error("Mentee removal DM failed:", err))
+        );
+      }
+
+      // Send email to mentee
+      if (menteeData && mentorData) {
+        notificationTasks.push(
+          sendMentorshipRemovedEmail(
+            {
+              uid: matchData.menteeId,
+              displayName: menteeData.displayName || "",
+              email: menteeData.email || "",
+              role: "mentee",
+            },
+            {
+              uid: matchData.mentorId,
+              displayName: mentorData.displayName || "",
+              email: mentorData.email || "",
+              role: "mentor",
+            }
+          ).catch((err) => console.error("Failed to send removal email:", err))
+        );
+      }
+
+      await Promise.allSettled(notificationTasks);
+
+      return NextResponse.json(
+        {
+          success: true,
+          message: "Mentee removed from your list",
         },
         { status: 200 }
       );

@@ -3,6 +3,7 @@
 import { useState, useEffect, useContext, use } from "react";
 import { useRouter } from "next/navigation";
 import { AuthContext } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import { useMentorship, MentorshipProfile } from "@/contexts/MentorshipContext";
 import Link from "next/link";
 import GoalTracker from "@/components/mentorship/GoalTracker";
@@ -51,6 +52,7 @@ export default function RelationshipDashboard({
   const resolvedParams = use(params);
   const router = useRouter();
   const { setShowLoginPopup } = useContext(AuthContext);
+  const toast = useToast();
   const { user, profile, loading } = useMentorship();
   const [matchDetails, setMatchDetails] = useState<MatchDetails | null>(
     DEV_MODE ? MOCK_MATCH_DETAILS : null
@@ -62,6 +64,9 @@ export default function RelationshipDashboard({
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [completionNotes, setCompletionNotes] = useState("");
   const [completing, setCompleting] = useState(false);
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [removalReason, setRemovalReason] = useState("");
+  const [removing, setRemoving] = useState(false);
 
   useEffect(() => {
     // Skip auth redirect in DEV_MODE
@@ -114,20 +119,52 @@ export default function RelationshipDashboard({
         }
       );
       if (response.ok) {
-        alert(
+        toast.success(
           "🎉 Congratulations! This mentorship has been marked as complete."
         );
         router.push("/mentorship/my-matches");
       } else {
         const data = await response.json();
-        alert(data.error || "Failed to complete mentorship");
+        toast.error(data.error || "Failed to complete mentorship");
       }
     } catch (error) {
       console.error("Error completing mentorship:", error);
-      alert("Failed to complete mentorship. Please try again.");
+      toast.error("Failed to complete mentorship. Please try again.");
     } finally {
       setCompleting(false);
       setShowCompleteModal(false);
+    }
+  };
+
+  const handleRemoveMentee = async () => {
+    if (!matchDetails || !user) return;
+    setRemoving(true);
+    try {
+      const response = await fetch(
+        `/api/mentorship/dashboard/${resolvedParams.matchId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            uid: user.uid,
+            action: "remove",
+            removalReason: removalReason.trim() || null,
+          }),
+        }
+      );
+      if (response.ok) {
+        toast.success("Mentee has been removed from your list.");
+        router.push("/mentorship/my-matches");
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to remove mentee");
+      }
+    } catch (error) {
+      console.error("Error removing mentee:", error);
+      toast.error("Failed to remove mentee. Please try again.");
+    } finally {
+      setRemoving(false);
+      setShowRemoveModal(false);
     }
   };
 
@@ -224,6 +261,16 @@ export default function RelationshipDashboard({
                 onClick={() => setShowCompleteModal(true)}
               >
                 ✅ Mark as Complete
+              </button>
+            )}
+
+            {/* Remove Mentee Button (Mentor only) */}
+            {currentIsMentor && (
+              <button
+                className="btn btn-sm btn-outline btn-error gap-2"
+                onClick={() => setShowRemoveModal(true)}
+              >
+                ❌ Remove Mentee
               </button>
             )}
 
@@ -359,6 +406,67 @@ export default function RelationshipDashboard({
           </div>
           <form method="dialog" className="modal-backdrop">
             <button onClick={() => setShowCompleteModal(false)}>close</button>
+          </form>
+        </dialog>
+      )}
+
+      {/* Remove Mentee Modal */}
+      {showRemoveModal && (
+        <dialog className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg flex items-center gap-2 text-error">
+              ❌ Remove Mentee
+            </h3>
+            <p className="py-4 text-base-content/70">
+              Are you sure you want to remove{" "}
+              <strong>{currentMatchDetails.partner.displayName}</strong> from
+              your mentee list? This will end the mentorship and archive the
+              Discord channel.
+            </p>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">
+                  Reason (Optional)
+                </span>
+              </label>
+              <textarea
+                className="textarea textarea-bordered h-24"
+                placeholder="This is for internal records only and won't be shared with the mentee..."
+                value={removalReason}
+                onChange={(e) => setRemovalReason(e.target.value)}
+              />
+            </div>
+
+            <div className="modal-action">
+              <button
+                className="btn btn-ghost"
+                onClick={() => {
+                  setShowRemoveModal(false);
+                  setRemovalReason("");
+                }}
+                disabled={removing}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-error"
+                onClick={handleRemoveMentee}
+                disabled={removing}
+              >
+                {removing ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Removing...
+                  </>
+                ) : (
+                  "Confirm Removal"
+                )}
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={() => setShowRemoveModal(false)}>close</button>
           </form>
         </dialog>
       )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useToast } from "@/contexts/ToastContext";
 
 interface MenteeRegistrationFormProps {
   onSubmit: (data: Record<string, unknown>) => Promise<void>;
@@ -60,6 +61,7 @@ export default function MenteeRegistrationForm({
   initialData,
   mode = "create",
 }: MenteeRegistrationFormProps) {
+  const toast = useToast();
   const [discordUsername, setDiscordUsername] = useState(
     initialData?.discordUsername || ""
   );
@@ -109,17 +111,17 @@ export default function MenteeRegistrationForm({
     e.preventDefault();
 
     if (skillsSought.length === 0) {
-      alert("Please select at least one skill you want to learn");
+      toast.error("Please select at least one skill you want to learn");
       return;
     }
 
     if (!careerGoals.trim()) {
-      alert("Please describe your career goals");
+      toast.error("Please describe your career goals");
       return;
     }
 
     if (!discordUsername.trim()) {
-      alert("Please enter your Discord username");
+      toast.error("Please enter your Discord username");
       return;
     }
 
@@ -167,7 +169,9 @@ export default function MenteeRegistrationForm({
             className="input input-bordered w-full"
             value={discordUsername}
             onChange={(e) =>
-              setDiscordUsername(e.target.value.toLowerCase().replace(/\s/g, ""))
+              setDiscordUsername(
+                e.target.value.toLowerCase().replace(/\s/g, "")
+              )
             }
             required
           />

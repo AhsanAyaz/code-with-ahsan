@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
+import { useToast } from "@/contexts/ToastContext";
 import { getApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -58,6 +59,7 @@ export default function MentorRegistrationForm({
   userId,
   mode = "create",
 }: MentorRegistrationFormProps) {
+  const toast = useToast();
   const [expertise, setExpertise] = useState<string[]>(
     initialData?.expertise || []
   );
@@ -81,9 +83,11 @@ export default function MentorRegistrationForm({
     initialData?.discordUsername || ""
   );
   const [customExpertiseInput, setCustomExpertiseInput] = useState("");
-  
+
   // Profile photo and display name (edit mode only)
-  const [displayName, setDisplayName] = useState(initialData?.displayName || "");
+  const [displayName, setDisplayName] = useState(
+    initialData?.displayName || ""
+  );
   const [photoURL, setPhotoURL] = useState(initialData?.photoURL || "");
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -133,13 +137,13 @@ export default function MentorRegistrationForm({
     // Validate file type
     const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!validTypes.includes(file.type)) {
-      alert("Please select a valid image file (JPEG, PNG, GIF, or WebP)");
+      toast.error("Please select a valid image file (JPEG, PNG, GIF, or WebP)");
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert("Image size must be less than 5MB");
+      toast.error("Image size must be less than 5MB");
       return;
     }
 
@@ -156,7 +160,7 @@ export default function MentorRegistrationForm({
       setPhotoURL(downloadURL);
     } catch (error) {
       console.error("Error uploading image:", error);
-      alert("Failed to upload image. Please try again.");
+      toast.error("Failed to upload image. Please try again.");
     } finally {
       setIsUploadingImage(false);
     }
@@ -166,17 +170,17 @@ export default function MentorRegistrationForm({
     e.preventDefault();
 
     if (expertise.length === 0) {
-      alert("Please select at least one area of expertise");
+      toast.error("Please select at least one area of expertise");
       return;
     }
 
     if (!currentRole.trim()) {
-      alert("Please enter your current role");
+      toast.error("Please enter your current role");
       return;
     }
 
     if (!discordUsername.trim()) {
-      alert("Please enter your Discord username");
+      toast.error("Please enter your Discord username");
       return;
     }
 
@@ -201,7 +205,9 @@ export default function MentorRegistrationForm({
       isPublic,
       discordUsername: discordUsername.trim(),
       ...(mode === "edit" && username ? { username: username.trim() } : {}),
-      ...(mode === "edit" && displayName ? { displayName: displayName.trim() } : {}),
+      ...(mode === "edit" && displayName
+        ? { displayName: displayName.trim() }
+        : {}),
       ...(mode === "edit" && photoURL ? { photoURL } : {}),
     });
   };
@@ -365,7 +371,9 @@ export default function MentorRegistrationForm({
             className="input input-bordered w-full"
             value={discordUsername}
             onChange={(e) =>
-              setDiscordUsername(e.target.value.toLowerCase().replace(/\s/g, ""))
+              setDiscordUsername(
+                e.target.value.toLowerCase().replace(/\s/g, "")
+              )
             }
             required
           />
@@ -502,7 +510,9 @@ export default function MentorRegistrationForm({
         <div className="form-control">
           <label className="label">
             <span className="label-text font-semibold">CV / Resume Link</span>
-            <span className="label-text-alt text-base-content/60">Optional</span>
+            <span className="label-text-alt text-base-content/60">
+              Optional
+            </span>
           </label>
           <input
             type="url"

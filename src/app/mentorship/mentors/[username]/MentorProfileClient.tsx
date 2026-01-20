@@ -4,6 +4,7 @@ import { useState, useEffect, useContext } from "react";
 import Link from "next/link";
 import type { MentorProfileDetails } from "@/types/mentorship";
 import { useMentorship } from "@/contexts/MentorshipContext";
+import { useToast } from "@/contexts/ToastContext";
 import { AuthContext } from "@/contexts/AuthContext";
 
 const DAYS_OF_WEEK = [
@@ -35,6 +36,7 @@ export default function MentorProfileClient({
 
   // Mentorship context for user authentication
   const { user, profile, loading: mentorshipLoading } = useMentorship();
+  const toast = useToast();
   const { setShowLoginPopup } = useContext(AuthContext);
 
   // Request status state
@@ -137,12 +139,12 @@ export default function MentorProfileClient({
           // Already requested - update with actual status
           setRequestStatus(errorData.status || "pending");
         } else {
-          alert("Failed to send request: " + errorData.error);
+          toast.error("Failed to send request: " + errorData.error);
         }
       }
     } catch (err) {
       console.error("Error requesting match:", err);
-      alert("An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again.");
     } finally {
       setRequestingMentor(false);
     }
@@ -168,14 +170,14 @@ export default function MentorProfileClient({
       if (response.ok) {
         setSessionInfo((prev) => (prev ? { ...prev, hasRated: true } : null));
         setShowRatingModal(false);
-        alert("Thank you for your feedback!");
+        toast.success("Thank you for your feedback!");
       } else {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to submit rating");
+        toast.error(errorData.error || "Failed to submit rating");
       }
     } catch (err) {
       console.error("Error submitting rating:", err);
-      alert("An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again.");
     } finally {
       setSubmittingRating(false);
     }
