@@ -59,7 +59,6 @@ export default function RelationshipDashboard({
   const [activeTab, setActiveTab] = useState<
     "discord" | "goals" | "sessions" | "resources"
   >(DEV_MODE ? "sessions" : "goals");
-  const [regeneratingChannel, setRegeneratingChannel] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [completionNotes, setCompletionNotes] = useState("");
   const [completing, setCompleting] = useState(false);
@@ -97,50 +96,6 @@ export default function RelationshipDashboard({
       fetchMatchDetails();
     }
   }, [user, profile, resolvedParams.matchId, router]);
-
-  const handleRegenerateChannel = async () => {
-    if (!matchDetails || !user) return;
-
-    // Confirm first to avoid accidental clicks
-    if (
-      !confirm(
-        "Are you sure you want to regenerate the Discord channel? This will create a new channel and verify permissions."
-      )
-    ) {
-      return;
-    }
-
-    setRegeneratingChannel(true);
-    try {
-      const response = await fetch(`/api/mentorship/channels/regenerate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          matchId: matchDetails.id,
-          mentorId: user.uid,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMatchDetails((prev) =>
-          prev ? { ...prev, discordChannelUrl: data.channelUrl } : null
-        );
-        alert(
-          "🎉 Discord channel regenerated successfully! The new link has been updated."
-        );
-      } else {
-        // Display specific error message from server
-        alert(data.error || "Failed to regenerate channel");
-      }
-    } catch (error) {
-      console.error("Error regenerating channel:", error);
-      alert("An error occurred. Please try again.");
-    } finally {
-      setRegeneratingChannel(false);
-    }
-  };
 
   const handleCompleteMentorship = async () => {
     if (!matchDetails || !user) return;
@@ -291,72 +246,12 @@ export default function RelationshipDashboard({
                 </svg>
                 Open Discord
               </a>
-            ) : currentIsMentor ? (
-              <button
-                className="btn btn-sm btn-outline gap-2"
-                onClick={handleRegenerateChannel}
-                disabled={regeneratingChannel}
-              >
-                {regeneratingChannel ? (
-                  <>
-                    <span className="loading loading-spinner loading-xs"></span>
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
-                    </svg>
-                    Create Discord Channel
-                  </>
-                )}
-              </button>
             ) : (
               <span className="text-sm text-base-content/50">
-                Mentor will add Discord link
+                Discord channel pending...
               </span>
             )}
           </div>
-
-          {/* Regenerate Button (Mentor only, when URL exists) */}
-          {currentMatchDetails.discordChannelUrl && currentIsMentor && (
-            <button
-              className="btn btn-xs btn-ghost mt-2 gap-1 text-base-content/60 hover:text-primary"
-              onClick={handleRegenerateChannel}
-              disabled={regeneratingChannel}
-            >
-              {regeneratingChannel ? (
-                <span className="loading loading-spinner loading-xs"></span>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3 w-3"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-              )}
-              Regenerate Channel
-            </button>
-          )}
         </div>
       </div>
 

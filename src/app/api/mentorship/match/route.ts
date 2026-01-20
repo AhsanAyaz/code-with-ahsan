@@ -326,7 +326,8 @@ export async function PUT(request: NextRequest) {
         if (!mentorMember) {
           return NextResponse.json(
             {
-              error: "Mentor not found on Discord",
+              error:
+                "Mentor not found on Discord. Please update your discord username.",
               message: `Could not find mentor's Discord user '${mentorDiscord}' in the server. Please join the server first.`,
             },
             { status: 400 }
@@ -336,7 +337,8 @@ export async function PUT(request: NextRequest) {
         if (!menteeMember) {
           return NextResponse.json(
             {
-              error: "Mentee not found on Discord",
+              error:
+                "Mentee not found on Discord. Please ask mentee to update their discord username.",
               message: `Could not find mentee's Discord user '${menteeDiscord}' in the server. Please join the server first.`,
             },
             { status: 400 }
