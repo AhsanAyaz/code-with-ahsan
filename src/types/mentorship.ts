@@ -85,6 +85,7 @@ export interface MentorshipMatch {
   cancellationReason?: string;
   cancelledAt?: Date;
   cancelledBy?: string;
+  announcementImageUrl?: string; // Firebase Storage URL for the announcement image
 }
 
 /**

@@ -13,7 +13,7 @@ if (!admin.apps.length) {
     if (serviceAccount.private_key) {
       serviceAccount.private_key = serviceAccount.private_key.replace(
         /\\n/g,
-        "\n"
+        "\n",
       );
     }
     admin.initializeApp({
@@ -53,3 +53,8 @@ if (!admin.apps.length) {
 }
 
 export const db = admin.firestore();
+
+// Storage bucket for file uploads
+export const storage = admin
+  .storage()
+  .bucket(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET);

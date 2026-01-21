@@ -18,6 +18,7 @@ interface MatchDetails {
   status: string;
   approvedAt: string;
   discordChannelUrl?: string;
+  announcementImageUrl?: string;
   partner: MentorshipProfile;
 }
 
@@ -68,6 +69,15 @@ export default function RelationshipDashboard({
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [removalReason, setRemovalReason] = useState("");
   const [removing, setRemoving] = useState(false);
+
+  // Announcement image state
+  const [announcementImage, setAnnouncementImage] = useState<string | null>(
+    null,
+  );
+  const [loadingAnnouncementImage, setLoadingAnnouncementImage] =
+    useState(false);
+  const [generatingImage, setGeneratingImage] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   useEffect(() => {
     // Skip auth redirect in DEV_MODE
@@ -169,6 +179,104 @@ export default function RelationshipDashboard({
     }
   };
 
+  // Fetch existing announcement image on load
+  useEffect(() => {
+    const fetchAnnouncementImage = async () => {
+      if (!matchDetails?.id) return;
+      setLoadingAnnouncementImage(true);
+      try {
+        const response = await fetch(
+          `/api/mentorship/announcement-image?matchId=${matchDetails.id}`,
+        );
+        if (response.ok) {
+          const data = await response.json();
+          if (data.announcementImageUrl) {
+            setAnnouncementImage(data.announcementImageUrl);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching announcement image:", error);
+      } finally {
+        setLoadingAnnouncementImage(false);
+      }
+    };
+    fetchAnnouncementImage();
+  }, [matchDetails?.id]);
+
+  const generateAnnouncementImage = async (regenerate = false) => {
+    if (!matchDetails || !profile) return;
+
+    setGeneratingImage(true);
+    try {
+      // If regenerating, delete existing first
+      if (regenerate && announcementImage) {
+        await fetch(
+          `/api/mentorship/announcement-image?matchId=${matchDetails.id}`,
+          { method: "DELETE" },
+        );
+      }
+
+      // Get mentor info
+      const mentorProfile =
+        profile.role === "mentor" ? profile : matchDetails.partner;
+      const menteeProfile =
+        profile.role === "mentee" ? profile : matchDetails.partner;
+
+      const response = await fetch("/api/mentorship/announcement-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          matchId: matchDetails.id,
+          menteeName: menteeProfile.displayName,
+          mentorName: mentorProfile.displayName,
+          menteePhotoURL: menteeProfile.photoURL || undefined,
+          mentorPhotoURL: mentorProfile.photoURL || undefined,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setAnnouncementImage(data.announcementImageUrl || data.image);
+        setShowImageModal(true);
+        toast.success(
+          regenerate ? "Image regenerated!" : "Announcement image created!",
+        );
+      } else {
+        toast.error(data.error || "Failed to generate image");
+      }
+    } catch (error) {
+      console.error("Error generating announcement image:", error);
+      toast.error("Failed to generate announcement image");
+    } finally {
+      setGeneratingImage(false);
+    }
+  };
+
+  const shareToTwitter = () => {
+    const mentorName =
+      profile?.role === "mentor"
+        ? profile.displayName
+        : matchDetails?.partner.displayName;
+    const text = encodeURIComponent(
+      `🎉 I am now a mentee of ${mentorName} in the Code with Ahsan Mentorship Program! #Mentorship #CodeWithAhsan #LearningJourney`,
+    );
+    window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
+  };
+
+  const shareToLinkedIn = () => {
+    window.open(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://codewithahsan.dev/mentorship")}`,
+      "_blank",
+    );
+  };
+
+  const shareToFacebook = () => {
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://codewithahsan.dev/mentorship")}`,
+      "_blank",
+    );
+  };
+
   if (!DEV_MODE && (loading || profileLoading || loadingMatch)) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
@@ -198,7 +306,7 @@ export default function RelationshipDashboard({
   // In DEV_MODE, matchDetails is always MOCK_MATCH_DETAILS which is non-null
   // Need to ensure TypeScript knows this
   const currentMatchDetails = matchDetails!;
-  const currentIsMentor = DEV_MODE ? true : profile?.role === "mentor";
+  const currentIsMentor = DEV_MODE ? false : profile?.role === "mentor";
   const currentUserId = DEV_MODE ? "dev-user-123" : (user?.uid ?? "");
 
   return (
@@ -354,6 +462,173 @@ export default function RelationshipDashboard({
         )}
         {activeTab === "resources" && <LearningHub />}
       </div>
+
+      {/* Announcement Image Section - Mentees Only */}
+      {!currentIsMentor && (
+        <div className="card bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20 shadow-xl">
+          <div className="card-body">
+            <h3 className="card-title">
+              <span className="text-2xl">🎉</span> Share Your Mentorship Journey
+            </h3>
+            <p className="text-base-content/70 text-sm">
+              Create and share an announcement image to celebrate your
+              mentorship!
+            </p>
+
+            {loadingAnnouncementImage ? (
+              <div className="flex justify-center py-4">
+                <span className="loading loading-spinner loading-md"></span>
+              </div>
+            ) : announcementImage ? (
+              <div className="space-y-4">
+                <div className="flex justify-center">
+                  <img
+                    src={announcementImage}
+                    alt="Mentorship Announcement"
+                    className="max-w-full max-h-48 rounded-lg shadow cursor-pointer hover:opacity-90 transition-opacity"
+                    onClick={() => setShowImageModal(true)}
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => setShowImageModal(true)}
+                  >
+                    View & Share
+                  </button>
+                  <button
+                    className="btn btn-outline btn-sm"
+                    onClick={() => generateAnnouncementImage(true)}
+                    disabled={generatingImage}
+                  >
+                    {generatingImage ? (
+                      <>
+                        <span className="loading loading-spinner loading-sm"></span>
+                        Regenerating...
+                      </>
+                    ) : (
+                      "Regenerate Image"
+                    )}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="card-actions mt-2">
+                <button
+                  className="btn btn-accent"
+                  onClick={() => generateAnnouncementImage(false)}
+                  disabled={generatingImage}
+                >
+                  {generatingImage ? (
+                    <>
+                      <span className="loading loading-spinner loading-sm"></span>
+                      Generating...
+                    </>
+                  ) : (
+                    "Generate Announcement Image"
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Announcement Image Modal */}
+      {showImageModal && announcementImage && (
+        <dialog className="modal modal-open">
+          <div className="modal-box max-w-4xl">
+            <h3 className="font-bold text-lg mb-4">
+              🎉 Share Your Mentorship Announcement!
+            </h3>
+            <div className="flex justify-center">
+              <img
+                src={announcementImage}
+                alt="Mentorship Announcement"
+                className="max-w-full rounded-lg shadow-lg"
+              />
+            </div>
+
+            {/* Share Buttons */}
+            <div className="mt-6">
+              <p className="text-sm text-base-content/70 mb-3 text-center">
+                Share your achievement with the world! 🌍
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                <button className="btn btn-info gap-2" onClick={shareToTwitter}>
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                  Share on X
+                </button>
+                <button
+                  className="btn btn-primary gap-2"
+                  onClick={shareToLinkedIn}
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                  </svg>
+                  Share on LinkedIn
+                </button>
+                <button
+                  className="btn gap-2"
+                  style={{ backgroundColor: "#1877F2", color: "white" }}
+                  onClick={shareToFacebook}
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  </svg>
+                  Share on Facebook
+                </button>
+              </div>
+            </div>
+
+            <div className="modal-action">
+              <a
+                href={announcementImage}
+                download={`mentorship-announcement-${resolvedParams.matchId}.png`}
+                className="btn btn-success gap-2"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  />
+                </svg>
+                Download Image
+              </a>
+              <button
+                className="btn btn-ghost"
+                onClick={() => setShowImageModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={() => setShowImageModal(false)}>close</button>
+          </form>
+        </dialog>
+      )}
 
       {/* Complete Mentorship Modal */}
       {showCompleteModal && (

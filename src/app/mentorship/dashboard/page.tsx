@@ -5,24 +5,60 @@ import { useRouter } from "next/navigation";
 import { AuthContext } from "@/contexts/AuthContext";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import Link from "next/link";
+import type { MentorshipProfile } from "@/types/mentorship";
 
 interface DashboardStats {
   activeMatches: number;
   completedMentorships: number;
 }
 
+// DEV_MODE: Set to true to bypass authentication for testing form layouts
+const DEV_MODE = false;
+
+// Mock data for DEV_MODE testing
+const MOCK_USER = {
+  uid: "dev-test-user",
+  displayName: "Muhammad Ahsan Ayaz",
+  photoURL: "https://avatars.githubusercontent.com/u/9844254",
+  email: "ahsan@test.com",
+};
+
+const MOCK_PROFILE: MentorshipProfile = {
+  uid: "dev-test-user",
+  role: "mentee",
+  displayName: "Muhammad Ahsan Ayaz",
+  email: "ahsan@test.com",
+  photoURL: "https://avatars.githubusercontent.com/u/9844254",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
 export default function MentorshipDashboardPage() {
   const router = useRouter();
   const { setShowLoginPopup } = useContext(AuthContext);
-  const { user, profile, loading, profileLoading, pendingRequests, matches } =
-    useMentorship();
+  const {
+    user: authUser,
+    profile: authProfile,
+    loading,
+    profileLoading,
+    pendingRequests: authPendingRequests,
+    matches: authMatches,
+  } = useMentorship();
+
+  // In DEV_MODE, use mock data; otherwise use real auth data
+  const user = DEV_MODE ? MOCK_USER : authUser;
+  const profile = DEV_MODE ? MOCK_PROFILE : authProfile;
+  const pendingRequests = DEV_MODE ? [] : authPendingRequests;
+  const matches = DEV_MODE ? [] : authMatches;
+
   const [stats, setStats] = useState<DashboardStats>({
     activeMatches: 0,
     completedMentorships: 0,
   });
 
   useEffect(() => {
-    if (!loading && !profileLoading && !user) {
+    // Skip auth redirect in DEV_MODE
+    if (!DEV_MODE && !loading && !profileLoading && !user) {
       // User not logged in - show login popup
       setShowLoginPopup(true);
     }
@@ -31,7 +67,8 @@ export default function MentorshipDashboardPage() {
   // Only redirect to onboarding if user is logged in AND profile fetch completed with no profile
   // The profile being undefined during initial load should not trigger redirect
   useEffect(() => {
-    if (!loading && !profileLoading && user && profile === null) {
+    // Skip redirect in DEV_MODE
+    if (!DEV_MODE && !loading && !profileLoading && user && profile === null) {
       // User logged in but confirmed no profile exists - redirect to onboarding
       router.push("/mentorship/onboarding");
     }
@@ -60,7 +97,7 @@ export default function MentorshipDashboardPage() {
     }
   }, [user, profile]);
 
-  if (loading || profileLoading) {
+  if (!DEV_MODE && (loading || profileLoading)) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <span className="loading loading-spinner loading-lg text-primary"></span>
@@ -68,7 +105,7 @@ export default function MentorshipDashboardPage() {
     );
   }
 
-  if (!user) {
+  if (!DEV_MODE && !user) {
     return (
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body text-center">
@@ -91,7 +128,7 @@ export default function MentorshipDashboardPage() {
     );
   }
 
-  if (!profile) {
+  if (!profile || !user) {
     // User is logged in but has no profile - redirect to onboarding
     // This case only triggers after profileLoading is false
     return null;
