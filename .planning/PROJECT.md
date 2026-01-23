@@ -26,18 +26,18 @@ Administrators can see the complete picture of who is mentoring whom, and take a
 
 ### Active
 
-<!-- New capabilities to build -->
+<!-- v1.0 Complete - All capabilities delivered -->
 
-- [ ] View mentor-mentee mapping (which mentees a mentor has)
-- [ ] View mentee-mentor mapping (which mentors a mentee has)
-- [ ] Update Discord username for mentors from admin
-- [ ] Update Discord username for mentees from admin
-- [ ] Regenerate Discord channel for a mentorship
-- [ ] Mark mentorship as completed
-- [ ] Revert mentorship from completed to active
-- [ ] Delete mentorship entirely
-- [ ] Filter declined mentors on All Mentors tab
-- [ ] Restore declined mentors (change status to accepted)
+- [x] View mentor-mentee mapping (which mentees a mentor has)
+- [x] View mentee-mentor mapping (which mentors a mentee has)
+- [x] Update Discord username for mentors from admin
+- [x] Update Discord username for mentees from admin
+- [x] Regenerate Discord channel for a mentorship
+- [x] Mark mentorship as completed
+- [x] Revert mentorship from completed to active
+- [x] Delete mentorship entirely
+- [x] Filter profiles via comprehensive filter modal (status, relationships, rating, discord)
+- [x] Restore declined mentors (change status to accepted)
 
 ### Out of Scope
 
@@ -76,9 +76,18 @@ Administrators can see the complete picture of who is mentoring whom, and take a
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Add new "Mentorships" tab vs extend existing | New tab cleaner than overloading existing views | — Pending |
-| Filter for declined mentors | User preference over separate tab | — Pending |
-| Inline Discord username editing | Simpler than modal for single field | — Pending |
+| Extend existing tabs vs new tab | Show relationships inline with profiles | ✓ Extended All Mentors/Mentees tabs |
+| Filter modal vs toggle for declined | Toggle showed declined on page 3, modal shows only filtered | ✓ Comprehensive filter modal |
+| Inline Discord username editing | Simpler than modal for single field | ✓ Inline edit with validation |
+| Composite keys for edit state | Prevents jumps when same user in multiple cards | ✓ `${profileId}-${mentorshipId}` |
+| State machine for status transitions | Prevents invalid status changes | ✓ ALLOWED_TRANSITIONS map |
+| Batch fetching (30-item chunks) | Firestore 'in' query limit workaround | ✓ Chunked batch queries |
+
+## Milestones
+
+| Version | Status | Completed |
+|---------|--------|-----------|
+| v1.0 | Complete | 2026-01-23 |
 
 ---
-*Last updated: 2026-01-23 after initialization*
+*Last updated: 2026-01-23 after v1.0 milestone completion*
