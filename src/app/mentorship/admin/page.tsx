@@ -136,8 +136,15 @@ export default function AdminPage() {
   const [sessionToDelete, setSessionToDelete] = useState<{id: string, partnerName: string} | null>(null);
   const [regeneratingChannel, setRegeneratingChannel] = useState<string | null>(null); // sessionId being regenerated
 
-  // Declined mentor filter state
-  const [showDeclined, setShowDeclined] = useState(false);
+  // Mentor filter state
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [filters, setFilters] = useState({
+    status: "all" as "all" | "accepted" | "declined" | "pending" | "disabled",
+    mentees: "all" as "all" | "with" | "without",
+    rating: "all" as "all" | "rated" | "unrated",
+    discord: "all" as "all" | "with" | "without",
+  });
+  const activeFilterCount = Object.values(filters).filter(v => v !== "all").length;
 
   // Debounced search handler
   const debouncedSearch = useDebouncedCallback((value: string) => {
@@ -583,24 +590,46 @@ export default function AdminPage() {
     }
   };
 
-  // Filter mentorship data by search query
+  // Filter mentorship data by search query and filters
   const filteredMentorshipData = mentorshipData.filter((item) => {
-    if (!searchQuery && !showDeclined && activeTab === "all-mentors") {
-      // Hide declined mentors when toggle is OFF on All Mentors tab
-      if (item.profile.status === "declined") return false;
+    const profile = item.profile;
+
+    // Apply filters only on All Mentors tab
+    if (activeTab === "all-mentors") {
+      // Status filter
+      if (filters.status !== "all" && profile.status !== filters.status) {
+        return false;
+      }
+      // Default: hide declined unless explicitly filtering for them
+      if (filters.status === "all" && profile.status === "declined") {
+        return false;
+      }
+
+      // Mentees filter (has active mentorships or not)
+      const hasMentees = item.mentorships.some(m => m.status === "active");
+      if (filters.mentees === "with" && !hasMentees) return false;
+      if (filters.mentees === "without" && hasMentees) return false;
+
+      // Rating filter
+      const profileWithDetails = profile as ProfileWithDetails;
+      const hasRating = profileWithDetails.avgRating !== undefined && profileWithDetails.avgRating > 0;
+      if (filters.rating === "rated" && !hasRating) return false;
+      if (filters.rating === "unrated" && hasRating) return false;
+
+      // Discord filter
+      const hasDiscord = profile.discordUsername && profile.discordUsername.trim() !== "";
+      if (filters.discord === "with" && !hasDiscord) return false;
+      if (filters.discord === "without" && hasDiscord) return false;
     }
+
+    // Search query filter
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
-    const profile = item.profile;
     const matchesSearch = (
       profile.displayName?.toLowerCase().includes(query) ||
       profile.email?.toLowerCase().includes(query) ||
       profile.discordUsername?.toLowerCase().includes(query)
     );
-    // Also filter by declined status on All Mentors tab
-    if (!showDeclined && activeTab === "all-mentors" && profile.status === "declined") {
-      return false;
-    }
     return matchesSearch;
   });
 
@@ -1251,19 +1280,34 @@ export default function AdminPage() {
             />
           </div>
 
-          {/* Declined Mentor Toggle - Only on All Mentors tab */}
+          {/* Filter Button - Only on All Mentors tab */}
           {activeTab === "all-mentors" && (
-            <div className="form-control">
-              <label className="label cursor-pointer justify-start gap-3">
-                <span className="label-text font-medium">Show declined mentors</span>
-                <input
-                  type="checkbox"
-                  className="toggle toggle-primary"
-                  checked={showDeclined}
-                  onChange={(e) => setShowDeclined(e.target.checked)}
-                  aria-label="Toggle visibility of declined mentors in the list"
-                />
-              </label>
+            <div className="flex items-center gap-2">
+              <button
+                className="btn btn-outline btn-sm gap-2"
+                onClick={() => setShowFilterModal(true)}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Filters
+                {activeFilterCount > 0 && (
+                  <span className="badge badge-primary badge-sm">{activeFilterCount}</span>
+                )}
+              </button>
+              {activeFilterCount > 0 && (
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setFilters({
+                    status: "all",
+                    mentees: "all",
+                    rating: "all",
+                    discord: "all",
+                  })}
+                >
+                  Clear
+                </button>
+              )}
             </div>
           )}
 
@@ -1295,8 +1339,8 @@ export default function AdminPage() {
                 <p className="text-base-content/70">
                   {searchQuery
                     ? "Try adjusting your search query."
-                    : activeTab === "all-mentors" && !showDeclined
-                      ? "No mentors found. Toggle 'Show declined mentors' to see declined profiles."
+                    : activeTab === "all-mentors" && activeFilterCount > 0
+                      ? "No mentors match your filters. Try adjusting or clearing filters."
                       : "No profiles found in this category."}
                 </p>
               </div>
@@ -2368,6 +2412,109 @@ export default function AdminPage() {
           </div>
           <form method="dialog" className="modal-backdrop">
             <button onClick={() => setShowReviewsModal(false)}>close</button>
+          </form>
+        </dialog>
+      )}
+
+      {/* Filter Modal */}
+      {showFilterModal && (
+        <dialog className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg mb-4">Filter Mentors</h3>
+
+            {/* Status Filter */}
+            <div className="form-control mb-4">
+              <label className="label">
+                <span className="label-text font-medium">Status</span>
+              </label>
+              <select
+                className="select select-bordered w-full"
+                value={filters.status}
+                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value as typeof filters.status }))}
+              >
+                <option value="all">All Statuses</option>
+                <option value="accepted">Accepted</option>
+                <option value="declined">Declined</option>
+                <option value="pending">Pending</option>
+                <option value="disabled">Disabled</option>
+              </select>
+            </div>
+
+            {/* Mentees Filter */}
+            <div className="form-control mb-4">
+              <label className="label">
+                <span className="label-text font-medium">Mentees</span>
+              </label>
+              <select
+                className="select select-bordered w-full"
+                value={filters.mentees}
+                onChange={(e) => setFilters(prev => ({ ...prev, mentees: e.target.value as typeof filters.mentees }))}
+              >
+                <option value="all">All</option>
+                <option value="with">With Active Mentees</option>
+                <option value="without">Without Active Mentees</option>
+              </select>
+            </div>
+
+            {/* Rating Filter */}
+            <div className="form-control mb-4">
+              <label className="label">
+                <span className="label-text font-medium">Rating</span>
+              </label>
+              <select
+                className="select select-bordered w-full"
+                value={filters.rating}
+                onChange={(e) => setFilters(prev => ({ ...prev, rating: e.target.value as typeof filters.rating }))}
+              >
+                <option value="all">All</option>
+                <option value="rated">Rated</option>
+                <option value="unrated">Unrated</option>
+              </select>
+            </div>
+
+            {/* Discord Filter */}
+            <div className="form-control mb-4">
+              <label className="label">
+                <span className="label-text font-medium">Discord Username</span>
+              </label>
+              <select
+                className="select select-bordered w-full"
+                value={filters.discord}
+                onChange={(e) => setFilters(prev => ({ ...prev, discord: e.target.value as typeof filters.discord }))}
+              >
+                <option value="all">All</option>
+                <option value="with">Has Discord Username</option>
+                <option value="without">Missing Discord Username</option>
+              </select>
+            </div>
+
+            <div className="modal-action">
+              <button
+                className="btn btn-ghost"
+                onClick={() => {
+                  setFilters({
+                    status: "all",
+                    mentees: "all",
+                    rating: "all",
+                    discord: "all",
+                  });
+                }}
+              >
+                Clear All
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  setShowFilterModal(false);
+                  setCurrentPage(1); // Reset pagination when filters change
+                }}
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={() => setShowFilterModal(false)}>close</button>
           </form>
         </dialog>
       )}
