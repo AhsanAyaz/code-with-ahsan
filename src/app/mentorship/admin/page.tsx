@@ -1356,6 +1356,20 @@ export default function AdminPage() {
                               >
                                 {activeRelationshipCount} {relationshipLabel}
                               </span>
+                              {/* Restore button for declined mentors */}
+                              {activeTab === "all-mentors" && p.status === "declined" && (
+                                <button
+                                  className="btn btn-success btn-sm"
+                                  disabled={actionLoading === p.uid}
+                                  onClick={() => handleStatusChange(p.uid, "accepted")}
+                                >
+                                  {actionLoading === p.uid ? (
+                                    <span className="loading loading-spinner loading-xs"></span>
+                                  ) : (
+                                    "Restore"
+                                  )}
+                                </button>
+                              )}
                             </div>
                             <p className="text-sm text-base-content/70">
                               {p.email}
