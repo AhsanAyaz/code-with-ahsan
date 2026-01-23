@@ -136,6 +136,9 @@ export default function AdminPage() {
   const [sessionToDelete, setSessionToDelete] = useState<{id: string, partnerName: string} | null>(null);
   const [regeneratingChannel, setRegeneratingChannel] = useState<string | null>(null); // sessionId being regenerated
 
+  // Declined mentor filter state
+  const [showDeclined, setShowDeclined] = useState(false);
+
   // Debounced search handler
   const debouncedSearch = useDebouncedCallback((value: string) => {
     setSearchQuery(value);
@@ -582,14 +585,23 @@ export default function AdminPage() {
 
   // Filter mentorship data by search query
   const filteredMentorshipData = mentorshipData.filter((item) => {
+    if (!searchQuery && !showDeclined && activeTab === "all-mentors") {
+      // Hide declined mentors when toggle is OFF on All Mentors tab
+      if (item.profile.status === "declined") return false;
+    }
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     const profile = item.profile;
-    return (
+    const matchesSearch = (
       profile.displayName?.toLowerCase().includes(query) ||
       profile.email?.toLowerCase().includes(query) ||
       profile.discordUsername?.toLowerCase().includes(query)
     );
+    // Also filter by declined status on All Mentors tab
+    if (!showDeclined && activeTab === "all-mentors" && profile.status === "declined") {
+      return false;
+    }
+    return matchesSearch;
   });
 
   // Paginate filtered data
@@ -1239,6 +1251,22 @@ export default function AdminPage() {
             />
           </div>
 
+          {/* Declined Mentor Toggle - Only on All Mentors tab */}
+          {activeTab === "all-mentors" && (
+            <div className="form-control">
+              <label className="label cursor-pointer justify-start gap-3">
+                <span className="label-text font-medium">Show declined mentors</span>
+                <input
+                  type="checkbox"
+                  className="toggle toggle-primary"
+                  checked={showDeclined}
+                  onChange={(e) => setShowDeclined(e.target.checked)}
+                  aria-label="Toggle visibility of declined mentors in the list"
+                />
+              </label>
+            </div>
+          )}
+
           {/* Loading State */}
           {loadingMentorships ? (
             <div className="grid gap-4">
@@ -1267,7 +1295,9 @@ export default function AdminPage() {
                 <p className="text-base-content/70">
                   {searchQuery
                     ? "Try adjusting your search query."
-                    : "No profiles found in this category."}
+                    : activeTab === "all-mentors" && !showDeclined
+                      ? "No mentors found. Toggle 'Show declined mentors' to see declined profiles."
+                      : "No profiles found in this category."}
                 </p>
               </div>
             </div>
