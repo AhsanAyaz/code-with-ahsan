@@ -122,6 +122,26 @@ export async function GET(request: NextRequest) {
         })
       })
 
+      // Fetch ALL mentor profiles to include those with no matches
+      const allMentorsSnapshot = await db.collection('mentorship_profiles')
+        .where('role', '==', 'mentor')
+        .get()
+
+      allMentorsSnapshot.docs.forEach(doc => {
+        if (!mentorGroupMap.has(doc.id)) {
+          const data = doc.data()
+          mentorGroupMap.set(doc.id, {
+            profile: {
+              uid: doc.id,
+              ...data,
+              createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+              updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+            },
+            mentorships: []
+          })
+        }
+      })
+
       grouped = Array.from(mentorGroupMap.values())
     } else {
       // Group by mentee
@@ -151,14 +171,36 @@ export async function GET(request: NextRequest) {
         })
       })
 
+      // Fetch ALL mentee profiles to include those with no matches
+      const allMenteesSnapshot = await db.collection('mentorship_profiles')
+        .where('role', '==', 'mentee')
+        .get()
+
+      allMenteesSnapshot.docs.forEach(doc => {
+        if (!menteeGroupMap.has(doc.id)) {
+          const data = doc.data()
+          menteeGroupMap.set(doc.id, {
+            profile: {
+              uid: doc.id,
+              ...data,
+              createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+              updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+            },
+            mentorships: []
+          })
+        }
+      })
+
       grouped = Array.from(menteeGroupMap.values())
     }
 
     // Calculate summary stats
     const activeMentorships = matchesWithProfiles.filter(m => m.status === 'active').length
     const completedMentorships = matchesWithProfiles.filter(m => m.status === 'completed').length
-    const totalMentors = mentorMap.size
-    const totalMentees = menteeMap.size
+
+    // Update stats to reflect ALL mentors/mentees (including those with no matches)
+    const totalMentors = grouped.filter(g => g.profile?.role === 'mentor').length || grouped.length
+    const totalMentees = grouped.filter(g => g.profile?.role === 'mentee').length || grouped.length
 
     return NextResponse.json({
       matches: grouped,
