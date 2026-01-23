@@ -5,34 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-01-23)
 
 **Core value:** Administrators can see the complete picture of who is mentoring whom, and take action on mentorships without direct database access.
-**Current focus:** Phase 2 - Discord & Status Management
+**Current focus:** Phase 3 - Declined Mentor Management
 
 ## Current Position
 
-Phase: 2 of 3 (Discord & Status Management)
-Plan: 1 of TBD in current phase
-Status: In progress
-Last activity: 2026-01-23 - Completed 02-01-PLAN.md (Admin API Endpoints)
+Phase: 3 of 3 (Declined Mentor Management)
+Plan: 0 of TBD in current phase
+Status: Not started (planning required)
+Last activity: 2026-01-23 - Completed Phase 2 (Discord & Status Management)
 
-Progress: [████░░░░░░] 40%
+Progress: [██████░░░░] 67%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 63 min
-- Total execution time: 3.03 hours
+- Total plans completed: 4
+- Average duration: ~60 min
+- Total execution time: ~4 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 2 | 178 min | 89 min |
-| 02 | 1 | 4 min | 4 min |
+| 02 | 2 | ~60 min | ~30 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2min), 01-02 (176min), 02-01 (4min)
-- Trend: API-only plans execute much faster than UI plans
+- Last 5 plans: 01-01 (2min), 01-02 (176min), 02-01 (4min), 02-02 (~55min)
+- Trend: API-only plans execute faster; UI plans with bug fixes take longer
 
 *Updated after each plan completion*
 
@@ -57,6 +57,8 @@ Recent decisions affecting current work:
 | Discord username regex: /^[a-z0-9_.]{2,32}$/ | 02-01 | Discord 2023+ format validation |
 | State machine for status transitions | 02-01 | Prevents invalid status changes with ALLOWED_TRANSITIONS map |
 | Add completedAt/revertedAt timestamps | 02-01 | Audit trail for status changes |
+| Composite keys for Discord edit state | 02-02 | Prevents multi-instance edit jumps when same user in multiple cards |
+| Badge shows active count only | 02-02 | Clearer at-a-glance view of ongoing mentorships |
 
 ### Pending Todos
 
@@ -69,5 +71,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-23
-Stopped at: Completed 02-01-PLAN.md (Admin API Endpoints)
+Stopped at: Completed Phase 2 (Discord & Status Management)
 Resume file: None
+Next action: Plan Phase 3 (Declined Mentor Management)
