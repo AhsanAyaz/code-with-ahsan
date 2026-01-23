@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { AuthContext } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useMentorship, MentorshipProfile } from "@/contexts/MentorshipContext";
 import Link from "next/link";
+import { useDebouncedCallback } from "use-debounce";
 
 interface AdminStats {
   totalMentors: number;
@@ -53,12 +54,40 @@ interface Review {
   menteePhoto?: string;
 }
 
+interface MentorshipWithPartner {
+  id: string;
+  status: string;
+  discordChannelId?: string;
+  discordChannelUrl?: string;
+  approvedAt?: string;
+  lastContactAt?: string;
+  requestedAt?: string;
+  cancelledAt?: string;
+  cancelledBy?: string;
+  cancellationReason?: string;
+  partnerProfile?: MentorshipProfile;
+}
+
+interface GroupedMentorship {
+  profile: MentorshipProfile;
+  mentorships: MentorshipWithPartner[];
+}
+
+interface MentorshipSummary {
+  totalMentors: number;
+  totalMentees: number;
+  activeMentorships: number;
+  completedMentorships: number;
+}
+
 type TabType = "overview" | "pending-mentors" | "all-mentors" | "all-mentees";
 
 const ADMIN_TOKEN_KEY = "mentorship_admin_token";
 
 export default function AdminPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const { setShowLoginPopup } = useContext(AuthContext);
   const toast = useToast();
   const { user, profile, loading } = useMentorship();
@@ -85,6 +114,20 @@ export default function AdminPage() {
   );
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
+
+  // Mentorship mapping state
+  const [mentorshipData, setMentorshipData] = useState<GroupedMentorship[]>([]);
+  const [loadingMentorships, setLoadingMentorships] = useState(false);
+  const [mentorshipSummary, setMentorshipSummary] = useState<MentorshipSummary | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 15;
+
+  // Debounced search handler
+  const debouncedSearch = useDebouncedCallback((value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1); // Reset to first page on search
+  }, 300);
 
   // Check for existing admin session on mount
   useEffect(() => {
@@ -216,6 +259,36 @@ export default function AdminPage() {
 
     if (isAdminAuthenticated) {
       fetchProfiles();
+    }
+  }, [isAdminAuthenticated, activeTab]);
+
+  // Fetch mentorship data for All Mentors and All Mentees tabs
+  useEffect(() => {
+    const fetchMentorshipData = async () => {
+      if (activeTab !== "all-mentors" && activeTab !== "all-mentees") {
+        setMentorshipData([]);
+        setMentorshipSummary(null);
+        return;
+      }
+
+      setLoadingMentorships(true);
+      try {
+        const role = activeTab === "all-mentors" ? "mentor" : "mentee";
+        const response = await fetch(`/api/mentorship/admin/matches?role=${role}`);
+        if (response.ok) {
+          const data = await response.json();
+          setMentorshipData(data.matches || []);
+          setMentorshipSummary(data.summary || null);
+        }
+      } catch (error) {
+        console.error("Error fetching mentorship data:", error);
+      } finally {
+        setLoadingMentorships(false);
+      }
+    };
+
+    if (isAdminAuthenticated) {
+      fetchMentorshipData();
     }
   }, [isAdminAuthenticated, activeTab]);
 
