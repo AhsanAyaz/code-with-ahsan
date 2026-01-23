@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-23)
 
 **Core value:** Administrators can see the complete picture of who is mentoring whom, and take action on mentorships without direct database access.
-**Current focus:** Phase 1 - Mentorship Mapping View
+**Current focus:** Phase 2 - Discord & Status Management
 
 ## Current Position
 
-Phase: 1 of 3 (Mentorship Mapping View)
-Plan: 2 of TBD in current phase
-Status: In progress
-Last activity: 2026-01-23 — Completed 01-02-PLAN.md (Mentorship UI)
+Phase: 2 of 3 (Discord & Status Management)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-01-23 — Phase 1 complete (Mentorship Mapping View verified)
 
-Progress: [██░░░░░░░░] 20%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -51,6 +51,8 @@ Recent decisions affecting current work:
 | Client-side filtering by displayName, email, and discordUsername | 01-02 | Data set size supports client-side approach |
 | Expand Active Mentorships by default, collapse others | 01-02 | Immediate visibility of most important status |
 | Page size of 15 items per page | 01-02 | Balances screen space and scroll requirements |
+| Use mentorship_sessions collection (not mentorship_matches) | 01-02 | Discovered during bug fix - correct collection name |
+| Display all mentorship statuses in separate collapse sections | 01-02 | Active, Completed, Pending, Cancelled all visible |
 
 ### Pending Todos
 
@@ -62,6 +64,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-23T13:39:09Z
-Stopped at: Completed 01-02-PLAN.md - UI ready for admin actions
+Last session: 2026-01-23
+Stopped at: Phase 1 complete, ready for Phase 2 planning
 Resume file: None

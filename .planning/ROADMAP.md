@@ -12,7 +12,7 @@ This roadmap extends the existing mentorship admin dashboard with mentor-mentee 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Mentorship Mapping View** - Display mentor-mentee relationships in existing dashboard tabs
+- [x] **Phase 1: Mentorship Mapping View** - Display mentor-mentee relationships in existing dashboard tabs
 - [ ] **Phase 2: Discord & Status Management** - Enable Discord updates, channel regeneration, and mentorship status changes
 - [ ] **Phase 3: Declined Mentor Management** - Filter and restore declined mentors on All Mentors tab
 
@@ -30,8 +30,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — API endpoint for mentorship matches with profile joins
-- [ ] 01-02-PLAN.md — UI enhancement for relationship display in existing tabs
+- [x] 01-01-PLAN.md — API endpoint for mentorship matches with profile joins
+- [x] 01-02-PLAN.md — UI enhancement for relationship display in existing tabs
 
 ### Phase 2: Discord & Status Management
 **Goal**: Administrators can update Discord usernames, regenerate channels, and manage mentorship lifecycle
@@ -69,6 +69,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Mentorship Mapping View | 0/2 | Ready to execute | - |
+| 1. Mentorship Mapping View | 2/2 | Complete | 2026-01-23 |
 | 2. Discord & Status Management | 0/TBD | Not started | - |
 | 3. Declined Mentor Management | 0/TBD | Not started | - |
