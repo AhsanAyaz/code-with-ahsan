@@ -114,9 +114,29 @@ export async function POST(req: NextRequest) {
     const outlineSrc = `data:image/png;base64,${outlineData.toString("base64")}`;
 
     // Get profile photo or use placeholder
-    const mentorPhoto =
+    // Enhance photo URL to request higher resolution for better quality
+    let mentorPhoto =
       photoURL ||
-      "https://ui-avatars.com/api/?name=" + encodeURIComponent(name);
+      "https://ui-avatars.com/api/?name=" + encodeURIComponent(name) + "&size=400";
+
+    // For Google/Firebase profile photos, request a larger size (400px instead of default 96px)
+    // Google photo URLs often have size parameters like =s96-c or ?sz=96
+    if (mentorPhoto) {
+      // Handle Google profile photos with =s{size}-c format
+      if (mentorPhoto.includes("googleusercontent.com")) {
+        // Replace size parameter like =s96-c with =s400-c for higher resolution
+        mentorPhoto = mentorPhoto.replace(/=s\d+-c/, "=s400-c");
+        // If no size parameter exists, append one
+        if (!mentorPhoto.includes("=s400-c")) {
+          mentorPhoto = mentorPhoto + (mentorPhoto.includes("?") ? "&" : "?") + "sz=400";
+        }
+      }
+      // Handle Firebase Storage URLs or other providers - they usually serve full resolution
+      // Handle Gravatar URLs
+      if (mentorPhoto.includes("gravatar.com")) {
+        mentorPhoto = mentorPhoto.replace(/[?&]s=\d+/, "") + "?s=400";
+      }
+    }
 
     // Using Import from next/og dynamically to avoid edgy runtime errors if not standard
     const { ImageResponse } = await import("next/og");

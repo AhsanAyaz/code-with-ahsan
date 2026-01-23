@@ -124,12 +124,36 @@ export async function POST(req: NextRequest) {
     const outlineSrc = `data:image/png;base64,${outlineData.toString("base64")}`;
 
     // Get profile photos or use placeholders
-    const menteePhoto =
+    // Enhance photo URLs to request higher resolution for better quality
+    let menteePhoto =
       menteePhotoURL ||
-      "https://ui-avatars.com/api/?name=" + encodeURIComponent(menteeName);
-    const mentorPhoto =
+      "https://ui-avatars.com/api/?name=" + encodeURIComponent(menteeName) + "&size=400";
+    let mentorPhoto =
       mentorPhotoURL ||
-      "https://ui-avatars.com/api/?name=" + encodeURIComponent(mentorName);
+      "https://ui-avatars.com/api/?name=" + encodeURIComponent(mentorName) + "&size=400";
+
+    // Helper function to enhance photo URL for higher resolution
+    const enhancePhotoUrl = (photoUrl: string): string => {
+      let enhanced = photoUrl;
+      // Handle Google profile photos with =s{size}-c format
+      if (enhanced.includes("googleusercontent.com")) {
+        // Replace size parameter like =s96-c with =s400-c for higher resolution
+        enhanced = enhanced.replace(/=s\d+-c/, "=s400-c");
+        // If no size parameter exists, append one
+        if (!enhanced.includes("=s400-c")) {
+          enhanced = enhanced + (enhanced.includes("?") ? "&" : "?") + "sz=400";
+        }
+      }
+      // Handle Gravatar URLs
+      if (enhanced.includes("gravatar.com")) {
+        enhanced = enhanced.replace(/[?&]s=\d+/, "") + "?s=400";
+      }
+      return enhanced;
+    };
+
+    // Apply enhancement to both photos
+    menteePhoto = enhancePhotoUrl(menteePhoto);
+    mentorPhoto = enhancePhotoUrl(mentorPhoto);
 
     // Using Import from next/og dynamically to avoid edgy runtime errors if not standard
     const { ImageResponse } = await import("next/og");
