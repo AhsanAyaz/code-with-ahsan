@@ -31,6 +31,7 @@ export interface MentorshipProfile {
   availability?: Record<string, string[]>;
   maxMentees?: number;
   isPublic?: boolean;
+  mentor_announcement?: string; // URL for the mentor announcement image
   // Mentee-specific
   education?: string;
   skillsSought?: string[];

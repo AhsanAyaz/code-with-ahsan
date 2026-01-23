@@ -9,6 +9,7 @@ import MentorRegistrationForm from "@/components/mentorship/MentorRegistrationFo
 import MenteeRegistrationForm from "@/components/mentorship/MenteeRegistrationForm";
 import Link from "next/link";
 import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
+import MentorAnnouncementCard from "@/components/mentorship/MentorAnnouncementCard";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -189,6 +190,19 @@ export default function SettingsPage() {
               initialData={menteeInitialData}
               mode="edit"
             />
+          )}
+
+          {/* Mentor Announcement Section - Moved to Bottom */}
+          {profile.role === "mentor" && user && (
+            <div className="mt-12">
+              <div className="divider"></div>
+              <MentorAnnouncementCard
+                userId={user.uid}
+                userName={profile.displayName}
+                userPhotoURL={profile.photoURL}
+                announcementUrl={profile.mentor_announcement}
+              />
+            </div>
           )}
         </div>
       </div>
