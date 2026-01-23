@@ -58,10 +58,10 @@ Plans:
   1. Admin can toggle a filter on All Mentors tab to show or hide declined mentors
   2. Admin can restore a declined mentor to accepted status
   3. Restored mentors appear in the default (non-declined) mentor list
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 03-01: TBD during planning
+- [ ] 03-01-PLAN.md — Toggle filter and restore button for declined mentors
 
 ## Progress
 
@@ -72,4 +72,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Mentorship Mapping View | 2/2 | Complete | 2026-01-23 |
 | 2. Discord & Status Management | 2/2 | Complete | 2026-01-23 |
-| 3. Declined Mentor Management | 0/TBD | Not started | - |
+| 3. Declined Mentor Management | 0/1 | Not started | - |
