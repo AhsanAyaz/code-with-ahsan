@@ -38,58 +38,66 @@ completed: 2026-01-23
 
 # Phase 03 Plan 01: Declined Mentor Management Summary
 
-**Toggle filter and restore button enable admins to view and reinstate declined mentors without database access**
+**Comprehensive filter modal and restore button enable admins to filter profiles by multiple criteria and reinstate declined mentors without database access**
 
 ## Performance
 
-- **Duration:** 2 min
+- **Duration:** ~15 min (including user feedback iteration)
 - **Started:** 2026-01-23T15:00:17Z
-- **Completed:** 2026-01-23T15:03:06Z
-- **Tasks:** 2
+- **Completed:** 2026-01-23T16:15:00Z
+- **Tasks:** 2 (original) + user-requested improvements
 - **Files modified:** 1
 
 ## Accomplishments
-- Added toggle control to show/hide declined mentors on All Mentors tab
-- Default filter hides declined mentors for cleaner default view
+- Added comprehensive filter modal with 4 filter criteria (status, relationships, rating, discord)
+- Filter button shows badge with active filter count
+- Clear buttons in modal and next to filter button
 - Restore button changes declined mentors to accepted status
-- Leveraged existing status change infrastructure (handleStatusChange)
+- Extended filter functionality to All Mentees tab (user request)
+- Dynamic labels based on active tab (Mentors/Mentees)
+- Rating filter only shown on Mentors tab (not applicable to mentees)
 
 ## Task Commits
 
-Each task was committed atomically:
+Original plan + user-requested improvements:
 
 1. **Task 1: Add declined mentor toggle filter** - `fff31b0` (feat)
 2. **Task 2: Add restore button for declined mentors** - `5e9b26d` (feat)
+3. **User feedback: Replace toggle with filter modal** - `5cfbd58` (feat)
+4. **User feedback: Extend to All Mentees tab** - `f526bf4` (feat)
 
 ## Files Created/Modified
-- `src/app/mentorship/admin/page.tsx` - Added showDeclined state, filter logic, toggle UI, and restore button
+- `src/app/mentorship/admin/page.tsx` - Added filter state, filter modal UI, restore button, extended to both tabs
 
 ## Decisions Made
 
-1. **Toggle defaults to OFF** - Hides declined mentors from default view to keep All Mentors tab focused on active/accepted mentors
-2. **Reuse handleStatusChange** - Leveraged existing status update function instead of creating new endpoint/handler
-3. **All Mentors tab only** - Toggle and restore button only appear on All Mentors tab since declined status only applies to mentors
+1. **Filter modal instead of toggle** - User feedback: toggle showed declined at end of list (page 3), filter modal shows ONLY filtered items
+2. **Comprehensive filter criteria** - Status, relationships (with/without mentees), rating (rated/unrated), discord (has/missing)
+3. **Extended to both tabs** - User request: same filter functionality on All Mentees tab
+4. **Rating filter mentor-only** - Rating only applies to mentors, hidden on mentees tab
+5. **Reuse handleStatusChange** - Leveraged existing status update function for restore action
 
 ## Deviations from Plan
 
-None - plan executed exactly as written.
+User requested improvements after initial implementation:
+- Replaced toggle with comprehensive filter modal (better UX for seeing specific subsets)
+- Extended to All Mentees tab (same filtering needs apply)
 
 ## Issues Encountered
 
 None.
 
-## Next Phase Readiness
+## Milestone Readiness
 
-Phase 3 objective complete. All declined mentor management requirements satisfied:
-- DECL-01: Filter declined mentors via toggle control ✓
+All v1 requirements satisfied:
+- DECL-01: Filter profiles by status (including declined) via filter modal ✓
 - DECL-02: Restore declined mentors to accepted status ✓
+- BONUS: Filter by relationships, rating, discord username
 
-Administrators now have complete control over mentor lifecycle:
+Administrators now have complete control over profiles:
 - Accept/decline pending mentors (Phase 1)
 - Disable/re-enable profiles (Phase 2)
-- View/restore declined mentors (Phase 3)
-
-No blockers for future work.
+- Filter and restore profiles (Phase 3)
 
 ---
 *Phase: 03-declined-mentor-management*

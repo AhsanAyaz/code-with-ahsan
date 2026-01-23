@@ -14,20 +14,20 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Discord Management
 
-- [ ] **DISC-01**: Admin can edit Discord username for a mentor
-- [ ] **DISC-02**: Admin can edit Discord username for a mentee
-- [ ] **DISC-03**: Admin can regenerate Discord channel for a mentorship
+- [x] **DISC-01**: Admin can edit Discord username for a mentor
+- [x] **DISC-02**: Admin can edit Discord username for a mentee
+- [x] **DISC-03**: Admin can regenerate Discord channel for a mentorship
 
 ### Mentorship Status
 
-- [ ] **STAT-01**: Admin can mark a mentorship as completed
-- [ ] **STAT-02**: Admin can revert a completed mentorship to active
-- [ ] **STAT-03**: Admin can delete a mentorship entirely
+- [x] **STAT-01**: Admin can mark a mentorship as completed
+- [x] **STAT-02**: Admin can revert a completed mentorship to active
+- [x] **STAT-03**: Admin can delete a mentorship entirely
 
 ### Declined Mentors
 
-- [ ] **DECL-01**: Admin can filter All Mentors tab to show/hide declined mentors
-- [ ] **DECL-02**: Admin can restore a declined mentor (change status to accepted)
+- [x] **DECL-01**: Admin can filter profiles by status (including declined) via filter modal
+- [x] **DECL-02**: Admin can restore a declined mentor (change status to accepted)
 
 ## v2 Requirements
 
@@ -62,20 +62,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | MAP-01 | Phase 1 | Complete |
 | MAP-02 | Phase 1 | Complete |
-| DISC-01 | Phase 2 | Pending |
-| DISC-02 | Phase 2 | Pending |
-| DISC-03 | Phase 2 | Pending |
-| STAT-01 | Phase 2 | Pending |
-| STAT-02 | Phase 2 | Pending |
-| STAT-03 | Phase 2 | Pending |
-| DECL-01 | Phase 3 | Pending |
-| DECL-02 | Phase 3 | Pending |
+| DISC-01 | Phase 2 | Complete |
+| DISC-02 | Phase 2 | Complete |
+| DISC-03 | Phase 2 | Complete |
+| STAT-01 | Phase 2 | Complete |
+| STAT-02 | Phase 2 | Complete |
+| STAT-03 | Phase 2 | Complete |
+| DECL-01 | Phase 3 | Complete |
+| DECL-02 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 10 total
-- Mapped to phases: 10
-- Unmapped: 0
+- Completed: 10
+- Pending: 0
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-23 after Phase 1 completion*
+*Last updated: 2026-01-23 after v1 milestone completion*

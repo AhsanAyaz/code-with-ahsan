@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Mentorship Mapping View** - Display mentor-mentee relationships in existing dashboard tabs
 - [x] **Phase 2: Discord & Status Management** - Enable Discord updates, channel regeneration, and mentorship status changes
-- [ ] **Phase 3: Declined Mentor Management** - Filter and restore declined mentors on All Mentors tab
+- [x] **Phase 3: Declined Mentor Management** - Comprehensive filter modal and restore functionality on All Mentors/Mentees tabs
 
 ## Phase Details
 
@@ -51,17 +51,18 @@ Plans:
 - [x] 02-02-PLAN.md — UI for inline Discord editing, status buttons, and delete confirmation
 
 ### Phase 3: Declined Mentor Management
-**Goal**: Administrators can filter declined mentors and restore them if needed
+**Goal**: Administrators can filter profiles by multiple criteria and restore declined mentors
 **Depends on**: Phase 2
 **Requirements**: DECL-01, DECL-02
 **Success Criteria** (what must be TRUE):
-  1. Admin can toggle a filter on All Mentors tab to show or hide declined mentors
+  1. Admin can filter profiles using comprehensive filter modal (status, relationships, rating, discord)
   2. Admin can restore a declined mentor to accepted status
   3. Restored mentors appear in the default (non-declined) mentor list
+  4. Filter functionality works on both All Mentors and All Mentees tabs
 **Plans**: 1 plan
 
 Plans:
-- [ ] 03-01-PLAN.md — Toggle filter and restore button for declined mentors
+- [x] 03-01-PLAN.md — Filter modal and restore button (evolved from toggle per user feedback)
 
 ## Progress
 
@@ -72,4 +73,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Mentorship Mapping View | 2/2 | Complete | 2026-01-23 |
 | 2. Discord & Status Management | 2/2 | Complete | 2026-01-23 |
-| 3. Declined Mentor Management | 0/1 | Not started | - |
+| 3. Declined Mentor Management | 1/1 | Complete | 2026-01-23 |
