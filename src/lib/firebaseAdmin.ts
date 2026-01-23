@@ -31,6 +31,7 @@ if (!admin.apps.length) {
       }),
     });
   } else if (process.env.NODE_ENV === "development") {
+    console.log("Loading local service account");
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const serviceAccount = require("../../secure/code-with-ahsan-45496-firebase-adminsdk-7axo0-3127308aba.json");

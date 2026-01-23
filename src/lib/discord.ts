@@ -594,6 +594,128 @@ export async function archiveMentorshipChannel(
 }
 
 /**
+ * Unarchive a mentorship channel
+ * This removes the [ARCHIVED] prefix from name/topic and ensures participants have access
+ */
+export async function unarchiveMentorshipChannel(
+  channelId: string,
+  mentorDiscordId?: string,
+  menteeDiscordId?: string
+): Promise<{ success: boolean; channelUrl?: string }> {
+  log.debug(` Unarchiving channel: ${channelId}`);
+  const guildId = getGuildId();
+
+  try {
+    // Get current channel info
+    const channelResponse = await fetch(
+      `${DISCORD_API}/channels/${channelId}`,
+      { headers: getHeaders() }
+    );
+
+    if (!channelResponse.ok) {
+      log.error("Failed to get channel:", await channelResponse.text());
+      return { success: false };
+    }
+
+    const channel = await channelResponse.json();
+    let newName = channel.name.replace(/^archived-/, "");
+    // If it didn't have archived- prefix, maybe just ensure permissions? 
+    // But let's assume we want to clean it up.
+
+    let newTopic = channel.topic?.replace(/^\[ARCHIVED\]\s*/, "") || "";
+
+    // Prepare permission updates if IDs provided
+    // We need to fetch existing overwrites first if we want to preserve others, 
+    // but typically we just want to ensure these two have access.
+    // However, PATCH /channels/{id} expects the FULL list of overwrites if provided, 
+    // OR we can use PUT /channels/{id}/permissions/{trigger_id} for individual updates.
+    // Using individual PUTs is safer to not wipe other permissions (like bots/mods).
+
+    // 1. Rename and update topic
+    const updateResponse = await fetch(`${DISCORD_API}/channels/${channelId}`, {
+      method: "PATCH",
+      headers: getHeaders(),
+      body: JSON.stringify({
+        name: newName,
+        topic: newTopic,
+      }),
+    });
+
+    if (!updateResponse.ok) {
+      log.error("Failed to unarchive channel (rename):", await updateResponse.text());
+      return { success: false };
+    }
+    
+    // 2. Restore permissions for Mentor
+    if (mentorDiscordId) {
+      await fetch(`${DISCORD_API}/channels/${channelId}/permissions/${mentorDiscordId}`, {
+         method: "PUT",
+         headers: getHeaders(),
+         body: JSON.stringify({
+           allow: "3072", // VIEW_CHANNEL + SEND_MESSAGES
+           deny: "0",
+           type: 1 // Member
+         })
+      });
+    }
+
+    // 3. Restore permissions for Mentee
+    if (menteeDiscordId) {
+      await fetch(`${DISCORD_API}/channels/${channelId}/permissions/${menteeDiscordId}`, {
+         method: "PUT",
+         headers: getHeaders(),
+         body: JSON.stringify({
+           allow: "3072", // VIEW_CHANNEL + SEND_MESSAGES
+           deny: "0",
+           type: 1 // Member
+         })
+      });
+    }
+
+    
+    const channelUrl = `https://discord.com/channels/${guildId}/${channelId}`;
+    await sendChannelMessage(channelId, "♻️ **This channel has been restored/unarchived.**");
+
+    log.debug(` Channel unarchived successfully: ${channelId}`);
+    return { success: true, channelUrl };
+
+  } catch (error) {
+    log.error("[Discord] Error unarchiving channel:", error);
+    return { success: false };
+  }
+}
+
+
+/**
+ * Get a Discord channel by ID to check if it exists
+ * returns null if not found (404) or other error
+ */
+export async function getChannel(channelId: string): Promise<any | null> {
+  const channelUrl = `${DISCORD_API}/channels/${channelId}`;
+  log.debug(` Checking if channel exists: ${channelId}`);
+
+  try {
+    const response = await fetchWithRateLimit(channelUrl, {
+      headers: getHeaders(),
+    });
+
+    if (response.ok) {
+      return await response.json();
+    } else if (response.status === 404) {
+      log.debug(` Channel ${channelId} not found (404)`);
+      return null;
+    } else {
+      const errorText = await response.text();
+      log.error(` Failed to get channel ${channelId}: ${response.status} - ${errorText}`);
+      return null;
+    }
+  } catch (error) {
+    log.error(` Error getting channel ${channelId}:`, error);
+    return null;
+  }
+}
+
+/**
  * Check if Discord integration is properly configured
  */
 export function isDiscordConfigured(): boolean {
