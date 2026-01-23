@@ -44,10 +44,11 @@ Plans:
   4. Admin can mark an active mentorship as completed and see status reflect completion
   5. Admin can revert a completed mentorship back to active status
   6. Admin can delete a mentorship entirely and it disappears from the list
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: TBD during planning
+- [ ] 02-01-PLAN.md — API endpoints for Discord username updates and mentorship status/deletion
+- [ ] 02-02-PLAN.md — UI for inline Discord editing, status buttons, and delete confirmation
 
 ### Phase 3: Declined Mentor Management
 **Goal**: Administrators can filter declined mentors and restore them if needed
@@ -70,5 +71,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Mentorship Mapping View | 2/2 | Complete | 2026-01-23 |
-| 2. Discord & Status Management | 0/TBD | Not started | - |
+| 2. Discord & Status Management | 0/2 | Not started | - |
 | 3. Declined Mentor Management | 0/TBD | Not started | - |
