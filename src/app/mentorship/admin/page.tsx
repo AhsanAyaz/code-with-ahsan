@@ -125,7 +125,7 @@ export default function AdminPage() {
   const pageSize = 15;
 
   // Inline Discord edit state
-  const [editingDiscord, setEditingDiscord] = useState<string | null>(null); // uid of profile being edited
+  const [editingDiscord, setEditingDiscord] = useState<string | null>(null); // composite key: "profile-{uid}" for main profile, "{mentorshipId}-{uid}" for partner
   const [editingDiscordValue, setEditingDiscordValue] = useState("");
   const [savingDiscord, setSavingDiscord] = useState(false);
 
@@ -1334,7 +1334,7 @@ export default function AdminPage() {
                             <div className="text-sm text-base-content/70">
                               <span className="inline-flex items-center gap-1">
                                 Discord:{" "}
-                                {editingDiscord === p.uid ? (
+                                {editingDiscord === `profile-${p.uid}` ? (
                                   <span className="inline-flex items-center gap-1">
                                     <input
                                       type="text"
@@ -1351,7 +1351,7 @@ export default function AdminPage() {
                                       onBlur={() => {
                                         // Small delay to allow button click to register
                                         setTimeout(() => {
-                                          if (editingDiscord === p.uid && !savingDiscord) {
+                                          if (editingDiscord === `profile-${p.uid}` && !savingDiscord) {
                                             handleDiscordSave(p.uid, editingDiscordValue);
                                           }
                                         }, 150);
@@ -1368,7 +1368,7 @@ export default function AdminPage() {
                                   <button
                                     className="inline-flex items-center gap-1 hover:bg-base-200 rounded px-1 -ml-1 cursor-pointer"
                                     onClick={() => {
-                                      setEditingDiscord(p.uid);
+                                      setEditingDiscord(`profile-${p.uid}`);
                                       setEditingDiscordValue(p.discordUsername || "");
                                     }}
                                   >
@@ -1459,7 +1459,7 @@ export default function AdminPage() {
                                             <div className="text-xs text-base-content/60">
                                               <span className="inline-flex items-center gap-1">
                                                 Discord:{" "}
-                                                {editingDiscord === mentorship.partnerProfile.uid ? (
+                                                {editingDiscord === `${mentorship.id}-${mentorship.partnerProfile.uid}` ? (
                                                   <span className="inline-flex items-center gap-1">
                                                     <input
                                                       type="text"
@@ -1475,7 +1475,7 @@ export default function AdminPage() {
                                                       }}
                                                       onBlur={() => {
                                                         setTimeout(() => {
-                                                          if (editingDiscord === mentorship.partnerProfile?.uid && !savingDiscord) {
+                                                          if (editingDiscord === `${mentorship.id}-${mentorship.partnerProfile?.uid}` && !savingDiscord) {
                                                             handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
                                                           }
                                                         }, 150);
@@ -1492,7 +1492,7 @@ export default function AdminPage() {
                                                   <button
                                                     className="inline-flex items-center gap-1 hover:bg-base-200 rounded px-1 -ml-1 cursor-pointer"
                                                     onClick={() => {
-                                                      setEditingDiscord(mentorship.partnerProfile!.uid);
+                                                      setEditingDiscord(`${mentorship.id}-${mentorship.partnerProfile!.uid}`);
                                                       setEditingDiscordValue(mentorship.partnerProfile?.discordUsername || "");
                                                     }}
                                                   >
@@ -1666,7 +1666,7 @@ export default function AdminPage() {
                                             <div className="text-xs text-base-content/60">
                                               <span className="inline-flex items-center gap-1">
                                                 Discord:{" "}
-                                                {editingDiscord === mentorship.partnerProfile.uid ? (
+                                                {editingDiscord === `${mentorship.id}-${mentorship.partnerProfile.uid}` ? (
                                                   <span className="inline-flex items-center gap-1">
                                                     <input
                                                       type="text"
@@ -1682,7 +1682,7 @@ export default function AdminPage() {
                                                       }}
                                                       onBlur={() => {
                                                         setTimeout(() => {
-                                                          if (editingDiscord === mentorship.partnerProfile?.uid && !savingDiscord) {
+                                                          if (editingDiscord === `${mentorship.id}-${mentorship.partnerProfile?.uid}` && !savingDiscord) {
                                                             handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
                                                           }
                                                         }, 150);
@@ -1699,7 +1699,7 @@ export default function AdminPage() {
                                                   <button
                                                     className="inline-flex items-center gap-1 hover:bg-base-200 rounded px-1 -ml-1 cursor-pointer"
                                                     onClick={() => {
-                                                      setEditingDiscord(mentorship.partnerProfile!.uid);
+                                                      setEditingDiscord(`${mentorship.id}-${mentorship.partnerProfile!.uid}`);
                                                       setEditingDiscordValue(mentorship.partnerProfile?.discordUsername || "");
                                                     }}
                                                   >
@@ -1830,7 +1830,7 @@ export default function AdminPage() {
                                             <div className="text-xs text-base-content/60">
                                               <span className="inline-flex items-center gap-1">
                                                 Discord:{" "}
-                                                {editingDiscord === mentorship.partnerProfile.uid ? (
+                                                {editingDiscord === `${mentorship.id}-${mentorship.partnerProfile.uid}` ? (
                                                   <span className="inline-flex items-center gap-1">
                                                     <input
                                                       type="text"
@@ -1846,7 +1846,7 @@ export default function AdminPage() {
                                                       }}
                                                       onBlur={() => {
                                                         setTimeout(() => {
-                                                          if (editingDiscord === mentorship.partnerProfile?.uid && !savingDiscord) {
+                                                          if (editingDiscord === `${mentorship.id}-${mentorship.partnerProfile?.uid}` && !savingDiscord) {
                                                             handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
                                                           }
                                                         }, 150);
@@ -1863,7 +1863,7 @@ export default function AdminPage() {
                                                   <button
                                                     className="inline-flex items-center gap-1 hover:bg-base-200 rounded px-1 -ml-1 cursor-pointer"
                                                     onClick={() => {
-                                                      setEditingDiscord(mentorship.partnerProfile!.uid);
+                                                      setEditingDiscord(`${mentorship.id}-${mentorship.partnerProfile!.uid}`);
                                                       setEditingDiscordValue(mentorship.partnerProfile?.discordUsername || "");
                                                     }}
                                                   >
@@ -1972,7 +1972,7 @@ export default function AdminPage() {
                                             <div className="text-xs text-base-content/60">
                                               <span className="inline-flex items-center gap-1">
                                                 Discord:{" "}
-                                                {editingDiscord === mentorship.partnerProfile.uid ? (
+                                                {editingDiscord === `${mentorship.id}-${mentorship.partnerProfile.uid}` ? (
                                                   <span className="inline-flex items-center gap-1">
                                                     <input
                                                       type="text"
@@ -1988,7 +1988,7 @@ export default function AdminPage() {
                                                       }}
                                                       onBlur={() => {
                                                         setTimeout(() => {
-                                                          if (editingDiscord === mentorship.partnerProfile?.uid && !savingDiscord) {
+                                                          if (editingDiscord === `${mentorship.id}-${mentorship.partnerProfile?.uid}` && !savingDiscord) {
                                                             handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
                                                           }
                                                         }, 150);
@@ -2005,7 +2005,7 @@ export default function AdminPage() {
                                                   <button
                                                     className="inline-flex items-center gap-1 hover:bg-base-200 rounded px-1 -ml-1 cursor-pointer"
                                                     onClick={() => {
-                                                      setEditingDiscord(mentorship.partnerProfile!.uid);
+                                                      setEditingDiscord(`${mentorship.id}-${mentorship.partnerProfile!.uid}`);
                                                       setEditingDiscordValue(mentorship.partnerProfile?.discordUsername || "");
                                                     }}
                                                   >
