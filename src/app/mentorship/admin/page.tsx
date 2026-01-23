@@ -124,6 +124,18 @@ export default function AdminPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 15;
 
+  // Inline Discord edit state
+  const [editingDiscord, setEditingDiscord] = useState<string | null>(null); // uid of profile being edited
+  const [editingDiscordValue, setEditingDiscordValue] = useState("");
+  const [savingDiscord, setSavingDiscord] = useState(false);
+
+  // Mentorship status management state
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null); // sessionId being updated
+  const [deletingSession, setDeletingSession] = useState<string | null>(null); // sessionId being deleted
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState<{id: string, partnerName: string} | null>(null);
+  const [regeneratingChannel, setRegeneratingChannel] = useState<string | null>(null); // sessionId being regenerated
+
   // Debounced search handler
   const debouncedSearch = useDebouncedCallback((value: string) => {
     setSearchQuery(value);
@@ -420,6 +432,151 @@ export default function AdminPage() {
         return <span className="badge badge-error badge-sm">Cancelled</span>;
       default:
         return <span className="badge badge-ghost badge-sm">{status}</span>;
+    }
+  };
+
+  // Handle inline Discord username save
+  const handleDiscordSave = async (uid: string, newUsername: string) => {
+    // Validate format client-side first
+    if (newUsername && !/^[a-z0-9_.]{2,32}$/.test(newUsername)) {
+      toast.error("Invalid Discord username format. Use 2-32 lowercase characters (letters, numbers, underscore, period).");
+      return;
+    }
+
+    setSavingDiscord(true);
+    try {
+      const response = await fetch("/api/mentorship/admin/profiles", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, discordUsername: newUsername })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Update failed");
+      }
+
+      // Update local state - find and update the profile in mentorshipData
+      setMentorshipData(prev => prev.map(group => ({
+        ...group,
+        profile: group.profile.uid === uid
+          ? { ...group.profile, discordUsername: newUsername || undefined }
+          : group.profile,
+        mentorships: group.mentorships.map(m => ({
+          ...m,
+          partnerProfile: m.partnerProfile?.uid === uid
+            ? { ...m.partnerProfile, discordUsername: newUsername || undefined }
+            : m.partnerProfile
+        }))
+      })));
+
+      // Also update profiles state if on pending-mentors tab
+      setProfiles(prev => prev.map(p =>
+        p.uid === uid ? { ...p, discordUsername: newUsername || undefined } : p
+      ));
+
+      toast.success("Discord username updated");
+      setEditingDiscord(null);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to update Discord username");
+    } finally {
+      setSavingDiscord(false);
+    }
+  };
+
+  // Handle mentorship session status change (complete/revert)
+  const handleSessionStatusChange = async (sessionId: string, newStatus: "active" | "completed") => {
+    setUpdatingStatus(sessionId);
+    try {
+      const response = await fetch("/api/mentorship/admin/sessions", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, status: newStatus })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Update failed");
+      }
+
+      // Update local state - move the mentorship to the correct status group
+      setMentorshipData(prev => prev.map(group => ({
+        ...group,
+        mentorships: group.mentorships.map(m =>
+          m.id === sessionId ? { ...m, status: newStatus } : m
+        )
+      })));
+
+      toast.success(newStatus === "completed" ? "Mentorship marked as completed" : "Mentorship reverted to active");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to update mentorship status");
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
+
+  // Handle mentorship session deletion
+  const handleDeleteMentorship = async () => {
+    if (!sessionToDelete) return;
+
+    setDeletingSession(sessionToDelete.id);
+    try {
+      const response = await fetch(`/api/mentorship/admin/sessions?id=${sessionToDelete.id}`, {
+        method: "DELETE"
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Delete failed");
+      }
+
+      // Update local state - remove the mentorship from the list
+      setMentorshipData(prev => prev.map(group => ({
+        ...group,
+        mentorships: group.mentorships.filter(m => m.id !== sessionToDelete.id)
+      })));
+
+      toast.success("Mentorship deleted successfully");
+      setShowDeleteModal(false);
+      setSessionToDelete(null);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to delete mentorship");
+    } finally {
+      setDeletingSession(null);
+    }
+  };
+
+  // Handle Discord channel regeneration
+  const handleRegenerateChannel = async (sessionId: string) => {
+    setRegeneratingChannel(sessionId);
+    try {
+      const response = await fetch("/api/mentorship/admin/sessions/regenerate-channel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Channel regeneration failed");
+      }
+
+      const data = await response.json();
+
+      // Update local state with new channel URL
+      setMentorshipData(prev => prev.map(group => ({
+        ...group,
+        mentorships: group.mentorships.map(m =>
+          m.id === sessionId ? { ...m, discordChannelUrl: data.channelUrl } : m
+        )
+      })));
+
+      // Show success toast with channel URL info
+      toast.success(`Discord channel created! URL: ${data.channelUrl}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to regenerate Discord channel");
+    } finally {
+      setRegeneratingChannel(null);
     }
   };
 
@@ -1173,11 +1330,58 @@ export default function AdminPage() {
                             <p className="text-sm text-base-content/70">
                               {p.email}
                             </p>
-                            {p.discordUsername && (
-                              <p className="text-sm text-base-content/70">
-                                Discord: {p.discordUsername}
-                              </p>
-                            )}
+                            {/* Inline Discord Edit for main profile */}
+                            <div className="text-sm text-base-content/70">
+                              <span className="inline-flex items-center gap-1">
+                                Discord:{" "}
+                                {editingDiscord === p.uid ? (
+                                  <span className="inline-flex items-center gap-1">
+                                    <input
+                                      type="text"
+                                      className="input input-xs input-bordered w-32"
+                                      value={editingDiscordValue}
+                                      onChange={(e) => setEditingDiscordValue(e.target.value.toLowerCase())}
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                          handleDiscordSave(p.uid, editingDiscordValue);
+                                        } else if (e.key === "Escape") {
+                                          setEditingDiscord(null);
+                                        }
+                                      }}
+                                      onBlur={() => {
+                                        // Small delay to allow button click to register
+                                        setTimeout(() => {
+                                          if (editingDiscord === p.uid && !savingDiscord) {
+                                            handleDiscordSave(p.uid, editingDiscordValue);
+                                          }
+                                        }, 150);
+                                      }}
+                                      placeholder="username"
+                                      disabled={savingDiscord}
+                                      autoFocus
+                                    />
+                                    {savingDiscord && (
+                                      <span className="loading loading-spinner loading-xs"></span>
+                                    )}
+                                  </span>
+                                ) : (
+                                  <button
+                                    className="inline-flex items-center gap-1 hover:bg-base-200 rounded px-1 -ml-1 cursor-pointer"
+                                    onClick={() => {
+                                      setEditingDiscord(p.uid);
+                                      setEditingDiscordValue(p.discordUsername || "");
+                                    }}
+                                  >
+                                    <span className={p.discordUsername ? "" : "italic text-base-content/40"}>
+                                      {p.discordUsername || "not set"}
+                                    </span>
+                                    <svg className="w-3 h-3 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                  </button>
+                                )}
+                              </span>
+                            </div>
                             {p.currentRole && (
                               <p className="text-sm text-base-content/70 mt-1">
                                 {p.currentRole}
@@ -1250,15 +1454,58 @@ export default function AdminPage() {
                                           <p className="text-xs text-base-content/60">
                                             {mentorship.partnerProfile?.email}
                                           </p>
-                                          {mentorship.partnerProfile
-                                            ?.discordUsername && (
-                                            <p className="text-xs text-base-content/60">
-                                              Discord:{" "}
-                                              {
-                                                mentorship.partnerProfile
-                                                  .discordUsername
-                                              }
-                                            </p>
+                                          {/* Inline Discord Edit for partner */}
+                                          {mentorship.partnerProfile && (
+                                            <div className="text-xs text-base-content/60">
+                                              <span className="inline-flex items-center gap-1">
+                                                Discord:{" "}
+                                                {editingDiscord === mentorship.partnerProfile.uid ? (
+                                                  <span className="inline-flex items-center gap-1">
+                                                    <input
+                                                      type="text"
+                                                      className="input input-xs input-bordered w-28"
+                                                      value={editingDiscordValue}
+                                                      onChange={(e) => setEditingDiscordValue(e.target.value.toLowerCase())}
+                                                      onKeyDown={(e) => {
+                                                        if (e.key === "Enter") {
+                                                          handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
+                                                        } else if (e.key === "Escape") {
+                                                          setEditingDiscord(null);
+                                                        }
+                                                      }}
+                                                      onBlur={() => {
+                                                        setTimeout(() => {
+                                                          if (editingDiscord === mentorship.partnerProfile?.uid && !savingDiscord) {
+                                                            handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
+                                                          }
+                                                        }, 150);
+                                                      }}
+                                                      placeholder="username"
+                                                      disabled={savingDiscord}
+                                                      autoFocus
+                                                    />
+                                                    {savingDiscord && (
+                                                      <span className="loading loading-spinner loading-xs"></span>
+                                                    )}
+                                                  </span>
+                                                ) : (
+                                                  <button
+                                                    className="inline-flex items-center gap-1 hover:bg-base-200 rounded px-1 -ml-1 cursor-pointer"
+                                                    onClick={() => {
+                                                      setEditingDiscord(mentorship.partnerProfile!.uid);
+                                                      setEditingDiscordValue(mentorship.partnerProfile?.discordUsername || "");
+                                                    }}
+                                                  >
+                                                    <span className={mentorship.partnerProfile.discordUsername ? "" : "italic text-base-content/40"}>
+                                                      {mentorship.partnerProfile.discordUsername || "not set"}
+                                                    </span>
+                                                    <svg className="w-3 h-3 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                  </button>
+                                                )}
+                                              </span>
+                                            </div>
                                           )}
 
                                           {/* Discord Channel Link */}
@@ -1315,6 +1562,44 @@ export default function AdminPage() {
                                                 )}
                                               </div>
                                             )}
+                                          </div>
+
+                                          {/* Action Buttons */}
+                                          <div className="flex flex-wrap gap-2 mt-3">
+                                            <button
+                                              className="btn btn-success btn-xs"
+                                              disabled={updatingStatus === mentorship.id}
+                                              onClick={() => handleSessionStatusChange(mentorship.id, "completed")}
+                                            >
+                                              {updatingStatus === mentorship.id ? (
+                                                <span className="loading loading-spinner loading-xs"></span>
+                                              ) : (
+                                                "Complete"
+                                              )}
+                                            </button>
+                                            <button
+                                              className="btn btn-info btn-xs"
+                                              disabled={regeneratingChannel === mentorship.id}
+                                              onClick={() => handleRegenerateChannel(mentorship.id)}
+                                            >
+                                              {regeneratingChannel === mentorship.id ? (
+                                                <span className="loading loading-spinner loading-xs"></span>
+                                              ) : (
+                                                "Regenerate Channel"
+                                              )}
+                                            </button>
+                                            <button
+                                              className="btn btn-error btn-xs btn-outline"
+                                              onClick={() => {
+                                                setSessionToDelete({
+                                                  id: mentorship.id,
+                                                  partnerName: mentorship.partnerProfile?.displayName || "Unknown"
+                                                });
+                                                setShowDeleteModal(true);
+                                              }}
+                                            >
+                                              Delete
+                                            </button>
                                           </div>
                                         </div>
                                       </div>
@@ -1376,6 +1661,59 @@ export default function AdminPage() {
                                           <p className="text-xs text-base-content/60">
                                             {mentorship.partnerProfile?.email}
                                           </p>
+                                          {/* Inline Discord Edit for partner */}
+                                          {mentorship.partnerProfile && (
+                                            <div className="text-xs text-base-content/60">
+                                              <span className="inline-flex items-center gap-1">
+                                                Discord:{" "}
+                                                {editingDiscord === mentorship.partnerProfile.uid ? (
+                                                  <span className="inline-flex items-center gap-1">
+                                                    <input
+                                                      type="text"
+                                                      className="input input-xs input-bordered w-28"
+                                                      value={editingDiscordValue}
+                                                      onChange={(e) => setEditingDiscordValue(e.target.value.toLowerCase())}
+                                                      onKeyDown={(e) => {
+                                                        if (e.key === "Enter") {
+                                                          handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
+                                                        } else if (e.key === "Escape") {
+                                                          setEditingDiscord(null);
+                                                        }
+                                                      }}
+                                                      onBlur={() => {
+                                                        setTimeout(() => {
+                                                          if (editingDiscord === mentorship.partnerProfile?.uid && !savingDiscord) {
+                                                            handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
+                                                          }
+                                                        }, 150);
+                                                      }}
+                                                      placeholder="username"
+                                                      disabled={savingDiscord}
+                                                      autoFocus
+                                                    />
+                                                    {savingDiscord && (
+                                                      <span className="loading loading-spinner loading-xs"></span>
+                                                    )}
+                                                  </span>
+                                                ) : (
+                                                  <button
+                                                    className="inline-flex items-center gap-1 hover:bg-base-200 rounded px-1 -ml-1 cursor-pointer"
+                                                    onClick={() => {
+                                                      setEditingDiscord(mentorship.partnerProfile!.uid);
+                                                      setEditingDiscordValue(mentorship.partnerProfile?.discordUsername || "");
+                                                    }}
+                                                  >
+                                                    <span className={mentorship.partnerProfile.discordUsername ? "" : "italic text-base-content/40"}>
+                                                      {mentorship.partnerProfile.discordUsername || "not set"}
+                                                    </span>
+                                                    <svg className="w-3 h-3 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                  </button>
+                                                )}
+                                              </span>
+                                            </div>
+                                          )}
 
                                           {/* Dates */}
                                           <div className="text-xs text-base-content/50 mt-2 space-y-1">
@@ -1388,6 +1726,44 @@ export default function AdminPage() {
                                                 )}
                                               </div>
                                             )}
+                                          </div>
+
+                                          {/* Action Buttons */}
+                                          <div className="flex flex-wrap gap-2 mt-3">
+                                            <button
+                                              className="btn btn-warning btn-xs"
+                                              disabled={updatingStatus === mentorship.id}
+                                              onClick={() => handleSessionStatusChange(mentorship.id, "active")}
+                                            >
+                                              {updatingStatus === mentorship.id ? (
+                                                <span className="loading loading-spinner loading-xs"></span>
+                                              ) : (
+                                                "Revert to Active"
+                                              )}
+                                            </button>
+                                            <button
+                                              className="btn btn-info btn-xs"
+                                              disabled={regeneratingChannel === mentorship.id}
+                                              onClick={() => handleRegenerateChannel(mentorship.id)}
+                                            >
+                                              {regeneratingChannel === mentorship.id ? (
+                                                <span className="loading loading-spinner loading-xs"></span>
+                                              ) : (
+                                                "Regenerate Channel"
+                                              )}
+                                            </button>
+                                            <button
+                                              className="btn btn-error btn-xs btn-outline"
+                                              onClick={() => {
+                                                setSessionToDelete({
+                                                  id: mentorship.id,
+                                                  partnerName: mentorship.partnerProfile?.displayName || "Unknown"
+                                                });
+                                                setShowDeleteModal(true);
+                                              }}
+                                            >
+                                              Delete
+                                            </button>
                                           </div>
                                         </div>
                                       </div>
@@ -1449,6 +1825,59 @@ export default function AdminPage() {
                                           <p className="text-xs text-base-content/60">
                                             {mentorship.partnerProfile?.email}
                                           </p>
+                                          {/* Inline Discord Edit for partner */}
+                                          {mentorship.partnerProfile && (
+                                            <div className="text-xs text-base-content/60">
+                                              <span className="inline-flex items-center gap-1">
+                                                Discord:{" "}
+                                                {editingDiscord === mentorship.partnerProfile.uid ? (
+                                                  <span className="inline-flex items-center gap-1">
+                                                    <input
+                                                      type="text"
+                                                      className="input input-xs input-bordered w-28"
+                                                      value={editingDiscordValue}
+                                                      onChange={(e) => setEditingDiscordValue(e.target.value.toLowerCase())}
+                                                      onKeyDown={(e) => {
+                                                        if (e.key === "Enter") {
+                                                          handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
+                                                        } else if (e.key === "Escape") {
+                                                          setEditingDiscord(null);
+                                                        }
+                                                      }}
+                                                      onBlur={() => {
+                                                        setTimeout(() => {
+                                                          if (editingDiscord === mentorship.partnerProfile?.uid && !savingDiscord) {
+                                                            handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
+                                                          }
+                                                        }, 150);
+                                                      }}
+                                                      placeholder="username"
+                                                      disabled={savingDiscord}
+                                                      autoFocus
+                                                    />
+                                                    {savingDiscord && (
+                                                      <span className="loading loading-spinner loading-xs"></span>
+                                                    )}
+                                                  </span>
+                                                ) : (
+                                                  <button
+                                                    className="inline-flex items-center gap-1 hover:bg-base-200 rounded px-1 -ml-1 cursor-pointer"
+                                                    onClick={() => {
+                                                      setEditingDiscord(mentorship.partnerProfile!.uid);
+                                                      setEditingDiscordValue(mentorship.partnerProfile?.discordUsername || "");
+                                                    }}
+                                                  >
+                                                    <span className={mentorship.partnerProfile.discordUsername ? "" : "italic text-base-content/40"}>
+                                                      {mentorship.partnerProfile.discordUsername || "not set"}
+                                                    </span>
+                                                    <svg className="w-3 h-3 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                  </button>
+                                                )}
+                                              </span>
+                                            </div>
+                                          )}
 
                                           {/* Dates */}
                                           <div className="text-xs text-base-content/50 mt-2 space-y-1">
@@ -1461,6 +1890,22 @@ export default function AdminPage() {
                                                 )}
                                               </div>
                                             )}
+                                          </div>
+
+                                          {/* Action Buttons */}
+                                          <div className="flex flex-wrap gap-2 mt-3">
+                                            <button
+                                              className="btn btn-error btn-xs btn-outline"
+                                              onClick={() => {
+                                                setSessionToDelete({
+                                                  id: mentorship.id,
+                                                  partnerName: mentorship.partnerProfile?.displayName || "Unknown"
+                                                });
+                                                setShowDeleteModal(true);
+                                              }}
+                                            >
+                                              Delete
+                                            </button>
                                           </div>
                                         </div>
                                       </div>
@@ -1522,6 +1967,59 @@ export default function AdminPage() {
                                           <p className="text-xs text-base-content/60">
                                             {mentorship.partnerProfile?.email}
                                           </p>
+                                          {/* Inline Discord Edit for partner */}
+                                          {mentorship.partnerProfile && (
+                                            <div className="text-xs text-base-content/60">
+                                              <span className="inline-flex items-center gap-1">
+                                                Discord:{" "}
+                                                {editingDiscord === mentorship.partnerProfile.uid ? (
+                                                  <span className="inline-flex items-center gap-1">
+                                                    <input
+                                                      type="text"
+                                                      className="input input-xs input-bordered w-28"
+                                                      value={editingDiscordValue}
+                                                      onChange={(e) => setEditingDiscordValue(e.target.value.toLowerCase())}
+                                                      onKeyDown={(e) => {
+                                                        if (e.key === "Enter") {
+                                                          handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
+                                                        } else if (e.key === "Escape") {
+                                                          setEditingDiscord(null);
+                                                        }
+                                                      }}
+                                                      onBlur={() => {
+                                                        setTimeout(() => {
+                                                          if (editingDiscord === mentorship.partnerProfile?.uid && !savingDiscord) {
+                                                            handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
+                                                          }
+                                                        }, 150);
+                                                      }}
+                                                      placeholder="username"
+                                                      disabled={savingDiscord}
+                                                      autoFocus
+                                                    />
+                                                    {savingDiscord && (
+                                                      <span className="loading loading-spinner loading-xs"></span>
+                                                    )}
+                                                  </span>
+                                                ) : (
+                                                  <button
+                                                    className="inline-flex items-center gap-1 hover:bg-base-200 rounded px-1 -ml-1 cursor-pointer"
+                                                    onClick={() => {
+                                                      setEditingDiscord(mentorship.partnerProfile!.uid);
+                                                      setEditingDiscordValue(mentorship.partnerProfile?.discordUsername || "");
+                                                    }}
+                                                  >
+                                                    <span className={mentorship.partnerProfile.discordUsername ? "" : "italic text-base-content/40"}>
+                                                      {mentorship.partnerProfile.discordUsername || "not set"}
+                                                    </span>
+                                                    <svg className="w-3 h-3 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                  </button>
+                                                )}
+                                              </span>
+                                            </div>
+                                          )}
 
                                           {/* Cancellation Info */}
                                           <div className="text-xs text-base-content/50 mt-2 space-y-1">
@@ -1539,6 +2037,22 @@ export default function AdminPage() {
                                                 Reason: {mentorship.cancellationReason}
                                               </div>
                                             )}
+                                          </div>
+
+                                          {/* Action Buttons */}
+                                          <div className="flex flex-wrap gap-2 mt-3">
+                                            <button
+                                              className="btn btn-error btn-xs btn-outline"
+                                              onClick={() => {
+                                                setSessionToDelete({
+                                                  id: mentorship.id,
+                                                  partnerName: mentorship.partnerProfile?.displayName || "Unknown"
+                                                });
+                                                setShowDeleteModal(true);
+                                              }}
+                                            >
+                                              Delete
+                                            </button>
                                           </div>
                                         </div>
                                       </div>
@@ -1810,6 +2324,58 @@ export default function AdminPage() {
           </div>
           <form method="dialog" className="modal-backdrop">
             <button onClick={() => setShowReviewsModal(false)}>close</button>
+          </form>
+        </dialog>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && sessionToDelete && (
+        <dialog className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg text-error">Delete Mentorship</h3>
+            <p className="py-4">
+              Are you sure you want to delete the mentorship with{" "}
+              <span className="font-semibold">{sessionToDelete.partnerName}</span>?
+            </p>
+            <p className="text-sm text-base-content/70">
+              This action cannot be undone. The mentorship session will be permanently removed.
+            </p>
+            <div className="modal-action">
+              <button
+                className="btn btn-ghost"
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setSessionToDelete(null);
+                }}
+                disabled={deletingSession === sessionToDelete.id}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-error"
+                onClick={handleDeleteMentorship}
+                disabled={deletingSession === sessionToDelete.id}
+              >
+                {deletingSession === sessionToDelete.id ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete Mentorship"
+                )}
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button
+              onClick={() => {
+                setShowDeleteModal(false);
+                setSessionToDelete(null);
+              }}
+            >
+              close
+            </button>
           </form>
         </dialog>
       )}
