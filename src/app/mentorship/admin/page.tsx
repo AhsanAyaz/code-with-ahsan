@@ -1126,6 +1126,12 @@ export default function AdminPage() {
                   const completedMentorships = item.mentorships.filter(
                     (m) => m.status === "completed"
                   );
+                  const pendingMentorships = item.mentorships.filter(
+                    (m) => m.status === "pending"
+                  );
+                  const cancelledMentorships = item.mentorships.filter(
+                    (m) => m.status === "cancelled"
+                  );
                   const relationshipCount = item.mentorships.length;
                   const relationshipLabel =
                     activeTab === "all-mentors" ? "mentees" : "mentors";
@@ -1380,6 +1386,157 @@ export default function AdminPage() {
                                                   new Date(mentorship.approvedAt),
                                                   "MMM d, yyyy"
                                                 )}
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Pending Mentorships Collapse */}
+                        {pendingMentorships.length > 0 && (
+                          <div className="collapse collapse-arrow bg-base-200 mt-4">
+                            <input type="checkbox" />
+                            <div className="collapse-title font-medium">
+                              Pending Mentorships ({pendingMentorships.length})
+                            </div>
+                            <div className="collapse-content">
+                              <div className="space-y-3 pt-2">
+                                {pendingMentorships.map((mentorship) => (
+                                  <div
+                                    key={mentorship.id}
+                                    className="card bg-base-100"
+                                  >
+                                    <div className="card-body p-4">
+                                      <div className="flex items-start gap-3">
+                                        <div className="avatar">
+                                          <div className="w-12 h-12 rounded-full">
+                                            {mentorship.partnerProfile?.photoURL ? (
+                                              <img
+                                                src={
+                                                  mentorship.partnerProfile.photoURL
+                                                }
+                                                alt={
+                                                  mentorship.partnerProfile
+                                                    ?.displayName || "Partner"
+                                                }
+                                              />
+                                            ) : (
+                                              <div className="bg-secondary text-secondary-content flex items-center justify-center text-lg font-bold w-full h-full">
+                                                {mentorship.partnerProfile?.displayName?.charAt(
+                                                  0
+                                                ) || "?"}
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex items-center gap-2 flex-wrap">
+                                            <h4 className="font-semibold">
+                                              {mentorship.partnerProfile
+                                                ?.displayName || "Unknown"}
+                                            </h4>
+                                            {getMentorshipStatusBadge(
+                                              mentorship.status
+                                            )}
+                                          </div>
+                                          <p className="text-xs text-base-content/60">
+                                            {mentorship.partnerProfile?.email}
+                                          </p>
+
+                                          {/* Dates */}
+                                          <div className="text-xs text-base-content/50 mt-2 space-y-1">
+                                            {mentorship.requestedAt && (
+                                              <div>
+                                                Requested:{" "}
+                                                {format(
+                                                  new Date(mentorship.requestedAt),
+                                                  "MMM d, yyyy"
+                                                )}
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Cancelled Mentorships Collapse */}
+                        {cancelledMentorships.length > 0 && (
+                          <div className="collapse collapse-arrow bg-base-200 mt-4">
+                            <input type="checkbox" />
+                            <div className="collapse-title font-medium">
+                              Cancelled Mentorships ({cancelledMentorships.length})
+                            </div>
+                            <div className="collapse-content">
+                              <div className="space-y-3 pt-2">
+                                {cancelledMentorships.map((mentorship) => (
+                                  <div
+                                    key={mentorship.id}
+                                    className="card bg-base-100"
+                                  >
+                                    <div className="card-body p-4">
+                                      <div className="flex items-start gap-3">
+                                        <div className="avatar">
+                                          <div className="w-12 h-12 rounded-full">
+                                            {mentorship.partnerProfile?.photoURL ? (
+                                              <img
+                                                src={
+                                                  mentorship.partnerProfile.photoURL
+                                                }
+                                                alt={
+                                                  mentorship.partnerProfile
+                                                    ?.displayName || "Partner"
+                                                }
+                                              />
+                                            ) : (
+                                              <div className="bg-secondary text-secondary-content flex items-center justify-center text-lg font-bold w-full h-full">
+                                                {mentorship.partnerProfile?.displayName?.charAt(
+                                                  0
+                                                ) || "?"}
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex items-center gap-2 flex-wrap">
+                                            <h4 className="font-semibold">
+                                              {mentorship.partnerProfile
+                                                ?.displayName || "Unknown"}
+                                            </h4>
+                                            {getMentorshipStatusBadge(
+                                              mentorship.status
+                                            )}
+                                          </div>
+                                          <p className="text-xs text-base-content/60">
+                                            {mentorship.partnerProfile?.email}
+                                          </p>
+
+                                          {/* Cancellation Info */}
+                                          <div className="text-xs text-base-content/50 mt-2 space-y-1">
+                                            {mentorship.cancelledAt && (
+                                              <div>
+                                                Cancelled:{" "}
+                                                {format(
+                                                  new Date(mentorship.cancelledAt),
+                                                  "MMM d, yyyy"
+                                                )}
+                                              </div>
+                                            )}
+                                            {mentorship.cancellationReason && (
+                                              <div>
+                                                Reason: {mentorship.cancellationReason}
                                               </div>
                                             )}
                                           </div>
