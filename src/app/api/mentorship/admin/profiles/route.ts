@@ -75,18 +75,37 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PUT: Update profile status (accept/decline/disable)
+// Discord username validation regex (Discord 2023+ format)
+// Lowercase alphanumeric + underscore/period, 2-32 characters
+const DISCORD_USERNAME_REGEX = /^[a-z0-9_.]{2,32}$/
+
+// PUT: Update profile status (accept/decline/disable) and/or Discord username
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { uid, status, adminNotes, reactivateSessions } = body
+    const { uid, status, adminNotes, reactivateSessions, discordUsername } = body
 
     if (!uid) {
       return NextResponse.json({ error: 'Missing uid' }, { status: 400 })
     }
 
-    if (!status || !['pending', 'accepted', 'declined', 'disabled'].includes(status)) {
+    // Validate Discord username format if provided
+    if (discordUsername !== undefined && discordUsername !== null && discordUsername !== '') {
+      if (!DISCORD_USERNAME_REGEX.test(discordUsername)) {
+        return NextResponse.json({
+          error: 'Invalid Discord username format. Must be 2-32 lowercase characters (letters, numbers, underscore, period).'
+        }, { status: 400 })
+      }
+    }
+
+    // If status is provided, validate it
+    if (status !== undefined && !['pending', 'accepted', 'declined', 'disabled'].includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+    }
+
+    // Require at least one update field
+    if (status === undefined && discordUsername === undefined) {
+      return NextResponse.json({ error: 'Must provide status or discordUsername to update' }, { status: 400 })
     }
 
     const profileRef = db.collection('mentorship_profiles').doc(uid)
@@ -97,13 +116,22 @@ export async function PUT(request: NextRequest) {
     }
 
     const previousStatus = profileDoc.data()?.status
-    
-    // Update the profile status
+
+    // Build update data object
     const updateData: Record<string, unknown> = {
-      status,
       updatedAt: new Date(),
     }
-    
+
+    // Add status if provided
+    if (status !== undefined) {
+      updateData.status = status
+    }
+
+    // Add discordUsername if provided (including empty string to clear it)
+    if (discordUsername !== undefined) {
+      updateData.discordUsername = discordUsername === '' ? null : discordUsername
+    }
+
     if (adminNotes !== undefined) {
       updateData.adminNotes = adminNotes
     }
@@ -191,11 +219,21 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ 
+    // Build response
+    const response: Record<string, unknown> = {
       success: true,
-      message: `Profile ${status === 'accepted' ? 'approved' : status === 'declined' ? 'declined' : status === 'disabled' ? 'disabled' : 'updated'} successfully`,
-      reactivatedSessions: reactivatedCount
-    }, { status: 200 })
+      uid,
+    }
+
+    if (status !== undefined) {
+      response.message = `Profile ${status === 'accepted' ? 'approved' : status === 'declined' ? 'declined' : status === 'disabled' ? 'disabled' : 'updated'} successfully`
+      response.reactivatedSessions = reactivatedCount
+    } else if (discordUsername !== undefined) {
+      response.message = 'Discord username updated successfully'
+      response.discordUsername = discordUsername === '' ? null : discordUsername
+    }
+
+    return NextResponse.json(response, { status: 200 })
   } catch (error) {
     console.error('Error updating profile status:', error)
     return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
