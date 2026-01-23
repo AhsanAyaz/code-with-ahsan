@@ -1289,7 +1289,7 @@ export default function AdminPage() {
                   const cancelledMentorships = item.mentorships.filter(
                     (m) => m.status === "cancelled"
                   );
-                  const relationshipCount = item.mentorships.length;
+                  const activeRelationshipCount = activeMentorships.length;
                   const relationshipLabel =
                     activeTab === "all-mentors" ? "mentees" : "mentors";
 
@@ -1322,9 +1322,9 @@ export default function AdminPage() {
                                 {p.role === "mentor" ? "🎯 Mentor" : "🚀 Mentee"}
                               </span>
                               <span
-                                className={`badge ${relationshipCount === 0 ? "badge-ghost" : "badge-info"}`}
+                                className={`badge ${activeRelationshipCount === 0 ? "badge-ghost" : "badge-info"}`}
                               >
-                                {relationshipCount} {relationshipLabel}
+                                {activeRelationshipCount} {relationshipLabel}
                               </span>
                             </div>
                             <p className="text-sm text-base-content/70">
@@ -2065,7 +2065,7 @@ export default function AdminPage() {
                         )}
 
                         {/* No Relationships Message */}
-                        {relationshipCount === 0 && (
+                        {item.mentorships.length === 0 && (
                           <div className="collapse collapse-arrow bg-base-200 mt-4">
                             <input type="checkbox" />
                             <div className="collapse-title font-medium">
