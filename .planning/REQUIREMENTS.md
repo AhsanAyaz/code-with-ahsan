@@ -9,8 +9,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Mapping
 
-- [ ] **MAP-01**: Admin can view a list of mentors with their assigned mentees
-- [ ] **MAP-02**: Admin can view a list of mentees with their assigned mentors
+- [x] **MAP-01**: Admin can view a list of mentors with their assigned mentees
+- [x] **MAP-02**: Admin can view a list of mentees with their assigned mentors
 
 ### Discord Management
 
@@ -60,8 +60,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MAP-01 | Phase 1 | Pending |
-| MAP-02 | Phase 1 | Pending |
+| MAP-01 | Phase 1 | Complete |
+| MAP-02 | Phase 1 | Complete |
 | DISC-01 | Phase 2 | Pending |
 | DISC-02 | Phase 2 | Pending |
 | DISC-03 | Phase 2 | Pending |
@@ -78,4 +78,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-23*
-*Last updated: 2026-01-23 after roadmap creation*
+*Last updated: 2026-01-23 after Phase 1 completion*
