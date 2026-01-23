@@ -52,6 +52,7 @@
     "remark-math": "^6.0.0",
     "smoothscroll-polyfill": "^0.4.4",
     "unist-util-visit": "^5.0.0",
+    "use-debounce": "^10.1.0",
     "winston": "^3.19.0"
   },
   "devDependencies": {
