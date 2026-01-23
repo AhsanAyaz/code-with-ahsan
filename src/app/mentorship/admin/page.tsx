@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { AuthContext } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useMentorship, MentorshipProfile } from "@/contexts/MentorshipContext";
@@ -86,12 +85,9 @@ type TabType = "overview" | "pending-mentors" | "all-mentors" | "all-mentees";
 const ADMIN_TOKEN_KEY = "mentorship_admin_token";
 
 export default function AdminPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
   const { setShowLoginPopup } = useContext(AuthContext);
   const toast = useToast();
-  const { user, profile, loading } = useMentorship();
+  const { user, loading } = useMentorship();
 
   // Admin password authentication state
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
