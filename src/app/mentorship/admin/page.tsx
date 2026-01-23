@@ -594,8 +594,8 @@ export default function AdminPage() {
   const filteredMentorshipData = mentorshipData.filter((item) => {
     const profile = item.profile;
 
-    // Apply filters only on All Mentors tab
-    if (activeTab === "all-mentors") {
+    // Apply filters on All Mentors and All Mentees tabs
+    if (activeTab === "all-mentors" || activeTab === "all-mentees") {
       // Status filter
       if (filters.status !== "all" && profile.status !== filters.status) {
         return false;
@@ -605,16 +605,18 @@ export default function AdminPage() {
         return false;
       }
 
-      // Mentees filter (has active mentorships or not)
-      const hasMentees = item.mentorships.some(m => m.status === "active");
-      if (filters.mentees === "with" && !hasMentees) return false;
-      if (filters.mentees === "without" && hasMentees) return false;
+      // Relationships filter (has active mentorships or not)
+      const hasRelationships = item.mentorships.some(m => m.status === "active");
+      if (filters.mentees === "with" && !hasRelationships) return false;
+      if (filters.mentees === "without" && hasRelationships) return false;
 
-      // Rating filter
-      const profileWithDetails = profile as ProfileWithDetails;
-      const hasRating = profileWithDetails.avgRating !== undefined && profileWithDetails.avgRating > 0;
-      if (filters.rating === "rated" && !hasRating) return false;
-      if (filters.rating === "unrated" && hasRating) return false;
+      // Rating filter (only applicable to mentors)
+      if (activeTab === "all-mentors") {
+        const profileWithDetails = profile as ProfileWithDetails;
+        const hasRating = profileWithDetails.avgRating !== undefined && profileWithDetails.avgRating > 0;
+        if (filters.rating === "rated" && !hasRating) return false;
+        if (filters.rating === "unrated" && hasRating) return false;
+      }
 
       // Discord filter
       const hasDiscord = profile.discordUsername && profile.discordUsername.trim() !== "";
@@ -1280,8 +1282,8 @@ export default function AdminPage() {
             />
           </div>
 
-          {/* Filter Button - Only on All Mentors tab */}
-          {activeTab === "all-mentors" && (
+          {/* Filter Button - On All Mentors and All Mentees tabs */}
+          {(activeTab === "all-mentors" || activeTab === "all-mentees") && (
             <div className="flex items-center gap-2">
               <button
                 className="btn btn-outline btn-sm gap-2"
@@ -1339,8 +1341,8 @@ export default function AdminPage() {
                 <p className="text-base-content/70">
                   {searchQuery
                     ? "Try adjusting your search query."
-                    : activeTab === "all-mentors" && activeFilterCount > 0
-                      ? "No mentors match your filters. Try adjusting or clearing filters."
+                    : (activeTab === "all-mentors" || activeTab === "all-mentees") && activeFilterCount > 0
+                      ? `No ${activeTab === "all-mentors" ? "mentors" : "mentees"} match your filters. Try adjusting or clearing filters.`
                       : "No profiles found in this category."}
                 </p>
               </div>
@@ -2420,7 +2422,9 @@ export default function AdminPage() {
       {showFilterModal && (
         <dialog className="modal modal-open">
           <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4">Filter Mentors</h3>
+            <h3 className="font-bold text-lg mb-4">
+              Filter {activeTab === "all-mentors" ? "Mentors" : "Mentees"}
+            </h3>
 
             {/* Status Filter */}
             <div className="form-control mb-4">
@@ -2440,10 +2444,12 @@ export default function AdminPage() {
               </select>
             </div>
 
-            {/* Mentees Filter */}
+            {/* Relationships Filter */}
             <div className="form-control mb-4">
               <label className="label">
-                <span className="label-text font-medium">Mentees</span>
+                <span className="label-text font-medium">
+                  {activeTab === "all-mentors" ? "Mentees" : "Mentors"}
+                </span>
               </label>
               <select
                 className="select select-bordered w-full"
@@ -2451,26 +2457,32 @@ export default function AdminPage() {
                 onChange={(e) => setFilters(prev => ({ ...prev, mentees: e.target.value as typeof filters.mentees }))}
               >
                 <option value="all">All</option>
-                <option value="with">With Active Mentees</option>
-                <option value="without">Without Active Mentees</option>
+                <option value="with">
+                  With Active {activeTab === "all-mentors" ? "Mentees" : "Mentors"}
+                </option>
+                <option value="without">
+                  Without Active {activeTab === "all-mentors" ? "Mentees" : "Mentors"}
+                </option>
               </select>
             </div>
 
-            {/* Rating Filter */}
-            <div className="form-control mb-4">
-              <label className="label">
-                <span className="label-text font-medium">Rating</span>
-              </label>
-              <select
-                className="select select-bordered w-full"
-                value={filters.rating}
-                onChange={(e) => setFilters(prev => ({ ...prev, rating: e.target.value as typeof filters.rating }))}
-              >
-                <option value="all">All</option>
-                <option value="rated">Rated</option>
-                <option value="unrated">Unrated</option>
-              </select>
-            </div>
+            {/* Rating Filter - Only for Mentors */}
+            {activeTab === "all-mentors" && (
+              <div className="form-control mb-4">
+                <label className="label">
+                  <span className="label-text font-medium">Rating</span>
+                </label>
+                <select
+                  className="select select-bordered w-full"
+                  value={filters.rating}
+                  onChange={(e) => setFilters(prev => ({ ...prev, rating: e.target.value as typeof filters.rating }))}
+                >
+                  <option value="all">All</option>
+                  <option value="rated">Rated</option>
+                  <option value="unrated">Unrated</option>
+                </select>
+              </div>
+            )}
 
             {/* Discord Filter */}
             <div className="form-control mb-4">
