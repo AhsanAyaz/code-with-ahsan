@@ -7,6 +7,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { useMentorship, MentorshipProfile } from "@/contexts/MentorshipContext";
 import Link from "next/link";
 import { useDebouncedCallback } from "use-debounce";
+import { format } from "date-fns";
 
 interface AdminStats {
   totalMentors: number;
@@ -407,6 +408,40 @@ export default function AdminPage() {
     }
   };
 
+  const getMentorshipStatusBadge = (status: string) => {
+    switch (status) {
+      case "active":
+        return <span className="badge badge-success badge-sm">Active</span>;
+      case "completed":
+        return <span className="badge badge-neutral badge-sm">Completed</span>;
+      case "pending":
+        return <span className="badge badge-warning badge-sm">Pending</span>;
+      case "cancelled":
+        return <span className="badge badge-error badge-sm">Cancelled</span>;
+      default:
+        return <span className="badge badge-ghost badge-sm">{status}</span>;
+    }
+  };
+
+  // Filter mentorship data by search query
+  const filteredMentorshipData = mentorshipData.filter((item) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    const profile = item.profile;
+    return (
+      profile.displayName?.toLowerCase().includes(query) ||
+      profile.email?.toLowerCase().includes(query) ||
+      profile.discordUsername?.toLowerCase().includes(query)
+    );
+  });
+
+  // Paginate filtered data
+  const totalPages = Math.ceil(filteredMentorshipData.length / pageSize);
+  const paginatedData = filteredMentorshipData.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
   // Loading states
   if (loading || checkingAuth) {
     return (
@@ -733,7 +768,7 @@ export default function AdminPage() {
       )}
 
       {/* Profile Lists */}
-      {activeTab !== "overview" && (
+      {activeTab === "pending-mentors" && (
         <div className="space-y-4">
           {loadingProfiles ? (
             <div className="flex justify-center py-12">
@@ -743,13 +778,9 @@ export default function AdminPage() {
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body text-center py-12">
                 <div className="text-5xl mb-4">📭</div>
-                <h3 className="text-xl font-semibold">
-                  No {activeTab.replace("-", " ")}
-                </h3>
+                <h3 className="text-xl font-semibold">No pending mentors</h3>
                 <p className="text-base-content/70">
-                  {activeTab === "pending-mentors"
-                    ? "All mentor registrations have been reviewed!"
-                    : "No profiles found in this category."}
+                  All mentor registrations have been reviewed!
                 </p>
               </div>
             </div>
@@ -1010,6 +1041,415 @@ export default function AdminPage() {
                 </div>
               ))}
             </div>
+          )}
+        </div>
+      )}
+
+      {/* All Mentors / All Mentees Tabs - Relationship View */}
+      {(activeTab === "all-mentors" || activeTab === "all-mentees") && (
+        <div className="space-y-4">
+          {/* Summary Stats Header */}
+          {mentorshipSummary && (
+            <div className="stats shadow bg-base-100 w-full">
+              <div className="stat">
+                <div className="stat-title">Total Mentors</div>
+                <div className="stat-value text-primary text-2xl">
+                  {mentorshipSummary.totalMentors}
+                </div>
+              </div>
+              <div className="stat">
+                <div className="stat-title">Total Mentees</div>
+                <div className="stat-value text-secondary text-2xl">
+                  {mentorshipSummary.totalMentees}
+                </div>
+              </div>
+              <div className="stat">
+                <div className="stat-title">Active Mentorships</div>
+                <div className="stat-value text-success text-2xl">
+                  {mentorshipSummary.activeMentorships}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Search Input */}
+          <div className="form-control">
+            <input
+              type="text"
+              placeholder="Search by name, email, or Discord..."
+              className="input input-bordered w-full"
+              onChange={(e) => debouncedSearch(e.target.value)}
+            />
+          </div>
+
+          {/* Loading State */}
+          {loadingMentorships ? (
+            <div className="grid gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="card bg-base-100 shadow-xl">
+                  <div className="card-body">
+                    <div className="flex items-start gap-4">
+                      <div className="skeleton w-16 h-16 rounded-full shrink-0"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="skeleton h-4 w-1/3"></div>
+                        <div className="skeleton h-3 w-1/2"></div>
+                        <div className="skeleton h-3 w-2/3"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredMentorshipData.length === 0 ? (
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body text-center py-12">
+                <div className="text-5xl mb-4">📭</div>
+                <h3 className="text-xl font-semibold">
+                  No {activeTab === "all-mentors" ? "mentors" : "mentees"} found
+                </h3>
+                <p className="text-base-content/70">
+                  {searchQuery
+                    ? "Try adjusting your search query."
+                    : "No profiles found in this category."}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Relationship Cards */}
+              <div className="grid gap-4">
+                {paginatedData.map((item) => {
+                  const p = item.profile;
+                  const activeMentorships = item.mentorships.filter(
+                    (m) => m.status === "active"
+                  );
+                  const completedMentorships = item.mentorships.filter(
+                    (m) => m.status === "completed"
+                  );
+                  const relationshipCount = item.mentorships.length;
+                  const relationshipLabel =
+                    activeTab === "all-mentors" ? "mentees" : "mentors";
+
+                  return (
+                    <div key={p.uid} className="card bg-base-100 shadow-xl">
+                      <div className="card-body">
+                        {/* Profile Header */}
+                        <div className="flex items-start gap-4">
+                          <div className="avatar">
+                            <div className="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                              {p.photoURL ? (
+                                <img
+                                  src={p.photoURL}
+                                  alt={p.displayName || "Profile"}
+                                />
+                              ) : (
+                                <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold w-full h-full">
+                                  {p.displayName?.charAt(0) || "?"}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="text-lg font-bold">
+                                {p.displayName}
+                              </h3>
+                              {getStatusBadge(p.status)}
+                              <span className="badge badge-outline">
+                                {p.role === "mentor" ? "🎯 Mentor" : "🚀 Mentee"}
+                              </span>
+                              <span
+                                className={`badge ${relationshipCount === 0 ? "badge-ghost" : "badge-info"}`}
+                              >
+                                {relationshipCount} {relationshipLabel}
+                              </span>
+                            </div>
+                            <p className="text-sm text-base-content/70">
+                              {p.email}
+                            </p>
+                            {p.discordUsername && (
+                              <p className="text-sm text-base-content/70">
+                                Discord: {p.discordUsername}
+                              </p>
+                            )}
+                            {p.currentRole && (
+                              <p className="text-sm text-base-content/70 mt-1">
+                                {p.currentRole}
+                              </p>
+                            )}
+
+                            {/* Expertise Tags */}
+                            {p.expertise && p.expertise.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {p.expertise.map((skill) => (
+                                  <span
+                                    key={skill}
+                                    className="badge badge-primary badge-sm"
+                                  >
+                                    {skill}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Active Mentorships Collapse */}
+                        {activeMentorships.length > 0 && (
+                          <div className="collapse collapse-arrow bg-base-200 mt-4">
+                            <input type="checkbox" defaultChecked />
+                            <div className="collapse-title font-medium">
+                              Active Mentorships ({activeMentorships.length})
+                            </div>
+                            <div className="collapse-content">
+                              <div className="space-y-3 pt-2">
+                                {activeMentorships.map((mentorship) => (
+                                  <div
+                                    key={mentorship.id}
+                                    className="card bg-base-100"
+                                  >
+                                    <div className="card-body p-4">
+                                      <div className="flex items-start gap-3">
+                                        <div className="avatar">
+                                          <div className="w-12 h-12 rounded-full">
+                                            {mentorship.partnerProfile?.photoURL ? (
+                                              <img
+                                                src={
+                                                  mentorship.partnerProfile.photoURL
+                                                }
+                                                alt={
+                                                  mentorship.partnerProfile
+                                                    ?.displayName || "Partner"
+                                                }
+                                              />
+                                            ) : (
+                                              <div className="bg-secondary text-secondary-content flex items-center justify-center text-lg font-bold w-full h-full">
+                                                {mentorship.partnerProfile?.displayName?.charAt(
+                                                  0
+                                                ) || "?"}
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex items-center gap-2 flex-wrap">
+                                            <h4 className="font-semibold">
+                                              {mentorship.partnerProfile
+                                                ?.displayName || "Unknown"}
+                                            </h4>
+                                            {getMentorshipStatusBadge(
+                                              mentorship.status
+                                            )}
+                                          </div>
+                                          <p className="text-xs text-base-content/60">
+                                            {mentorship.partnerProfile?.email}
+                                          </p>
+                                          {mentorship.partnerProfile
+                                            ?.discordUsername && (
+                                            <p className="text-xs text-base-content/60">
+                                              Discord:{" "}
+                                              {
+                                                mentorship.partnerProfile
+                                                  .discordUsername
+                                              }
+                                            </p>
+                                          )}
+
+                                          {/* Discord Channel Link */}
+                                          <div className="mt-2">
+                                            {mentorship.discordChannelUrl ? (
+                                              <a
+                                                href={mentorship.discordChannelUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="link link-primary text-sm"
+                                              >
+                                                Discord Channel
+                                              </a>
+                                            ) : (
+                                              <div className="badge badge-warning badge-sm gap-1">
+                                                <svg
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                                  className="h-3 w-3"
+                                                  fill="none"
+                                                  viewBox="0 0 24 24"
+                                                  stroke="currentColor"
+                                                >
+                                                  <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                                  />
+                                                </svg>
+                                                No Discord channel
+                                              </div>
+                                            )}
+                                          </div>
+
+                                          {/* Dates */}
+                                          <div className="text-xs text-base-content/50 mt-2 space-y-1">
+                                            {mentorship.approvedAt && (
+                                              <div>
+                                                Started:{" "}
+                                                {format(
+                                                  new Date(mentorship.approvedAt),
+                                                  "MMM d, yyyy"
+                                                )}
+                                              </div>
+                                            )}
+                                            {mentorship.lastContactAt && (
+                                              <div>
+                                                Last activity:{" "}
+                                                {format(
+                                                  new Date(
+                                                    mentorship.lastContactAt
+                                                  ),
+                                                  "MMM d, yyyy"
+                                                )}
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Completed Mentorships Collapse */}
+                        {completedMentorships.length > 0 && (
+                          <div className="collapse collapse-arrow bg-base-200 mt-4">
+                            <input type="checkbox" />
+                            <div className="collapse-title font-medium">
+                              Completed Mentorships ({completedMentorships.length})
+                            </div>
+                            <div className="collapse-content">
+                              <div className="space-y-3 pt-2">
+                                {completedMentorships.map((mentorship) => (
+                                  <div
+                                    key={mentorship.id}
+                                    className="card bg-base-100"
+                                  >
+                                    <div className="card-body p-4">
+                                      <div className="flex items-start gap-3">
+                                        <div className="avatar">
+                                          <div className="w-12 h-12 rounded-full">
+                                            {mentorship.partnerProfile?.photoURL ? (
+                                              <img
+                                                src={
+                                                  mentorship.partnerProfile.photoURL
+                                                }
+                                                alt={
+                                                  mentorship.partnerProfile
+                                                    ?.displayName || "Partner"
+                                                }
+                                              />
+                                            ) : (
+                                              <div className="bg-secondary text-secondary-content flex items-center justify-center text-lg font-bold w-full h-full">
+                                                {mentorship.partnerProfile?.displayName?.charAt(
+                                                  0
+                                                ) || "?"}
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex items-center gap-2 flex-wrap">
+                                            <h4 className="font-semibold">
+                                              {mentorship.partnerProfile
+                                                ?.displayName || "Unknown"}
+                                            </h4>
+                                            {getMentorshipStatusBadge(
+                                              mentorship.status
+                                            )}
+                                          </div>
+                                          <p className="text-xs text-base-content/60">
+                                            {mentorship.partnerProfile?.email}
+                                          </p>
+
+                                          {/* Dates */}
+                                          <div className="text-xs text-base-content/50 mt-2 space-y-1">
+                                            {mentorship.approvedAt && (
+                                              <div>
+                                                Started:{" "}
+                                                {format(
+                                                  new Date(mentorship.approvedAt),
+                                                  "MMM d, yyyy"
+                                                )}
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* No Relationships Message */}
+                        {relationshipCount === 0 && (
+                          <div className="collapse collapse-arrow bg-base-200 mt-4">
+                            <input type="checkbox" />
+                            <div className="collapse-title font-medium">
+                              Mentorships (0)
+                            </div>
+                            <div className="collapse-content">
+                              <p className="text-sm text-base-content/60 pt-2">
+                                {activeTab === "all-mentors"
+                                  ? "No mentees assigned"
+                                  : "No mentors assigned"}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-6">
+                  <div className="join">
+                    <button
+                      className="join-item btn btn-sm"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      «
+                    </button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <button
+                          key={page}
+                          className={`join-item btn btn-sm ${currentPage === page ? "btn-active" : ""}`}
+                          onClick={() => setCurrentPage(page)}
+                        >
+                          {page}
+                        </button>
+                      )
+                    )}
+                    <button
+                      className="join-item btn btn-sm"
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      disabled={currentPage === totalPages}
+                    >
+                      »
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
