@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Fetch all matches with relevant statuses
-    const matchesSnapshot = await db.collection('mentorship_matches')
+    const matchesSnapshot = await db.collection('mentorship_sessions')
       .where('status', 'in', ['active', 'completed', 'pending', 'cancelled'])
       .get()
 
