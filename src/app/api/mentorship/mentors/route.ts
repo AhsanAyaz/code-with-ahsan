@@ -97,14 +97,12 @@ export async function GET(request: NextRequest) {
       } as MentorProfile;
     });
 
-    // Always exclude disabled mentors from listings
-    mentors = mentors.filter((m) => m.status !== "disabled");
+    // Always filter: only show accepted mentors (not pending, declined, or disabled)
+    mentors = mentors.filter((m) => m.status === "accepted");
 
-    // Filter by public only if requested - only show accepted and public mentors
+    // Filter by public only if requested
     if (publicOnly) {
-      mentors = mentors.filter(
-        (m) => m.isPublic !== false && m.status === "accepted"
-      );
+      mentors = mentors.filter((m) => m.isPublic !== false);
     }
 
     // Filter by expertise if specified
