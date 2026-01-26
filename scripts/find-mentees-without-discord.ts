@@ -22,6 +22,7 @@ config({ path: ".env.local" });
 
 import { db } from "../src/lib/firebaseAdmin";
 import { sendChannelMessage, isDiscordConfigured } from "../src/lib/discord";
+import { maskName, maskEmail, maskDiscord } from "./utils";
 // Note: email module is dynamically imported to ensure env vars are loaded first
 
 const DRY_RUN = process.env.DRY_RUN === "true";
@@ -90,7 +91,7 @@ async function sendReminderEmails(
       continue;
     }
 
-    console.log(`  📧 Sending to mentor: ${entry.name} (${entry.email})`);
+    console.log(`  📧 Sending to mentor: ${maskName(entry.name)} (${maskEmail(entry.email || undefined)})`);
     const success = await sendDiscordUsernameReminderEmail(
       { displayName: entry.name, email: entry.email },
       "mentor",
@@ -108,12 +109,12 @@ async function sendReminderEmails(
   // Send to mentees
   for (const entry of menteeEntries) {
     if (!entry.email) {
-      console.log(`  ⚠️  Skipping ${entry.name}: No email address`);
+      console.log(`  ⚠️  Skipping ${maskName(entry.name)}: No email address`);
       failed++;
       continue;
     }
 
-    console.log(`  📧 Sending to mentee: ${entry.name} (${entry.email})`);
+    console.log(`  📧 Sending to mentee: ${maskName(entry.name)} (${maskEmail(entry.email || undefined)})`);
     const success = await sendDiscordUsernameReminderEmail(
       { displayName: entry.name, email: entry.email },
       "mentee",
@@ -260,7 +261,7 @@ async function main() {
 
     if (!discordUsername) {
       console.log(
-        `  ❌ ${name}: Discord username NOT SET (${email || "no email"}) - ${menteeCount} mentee(s)`,
+        `  ❌ ${maskName(name)}: Discord username NOT SET (${maskEmail(email || undefined) || "no email"}) - ${menteeCount} mentee(s)`,
       );
       mentorsMissingDiscord.push({
         odId: mentorId,
@@ -270,7 +271,7 @@ async function main() {
         menteeCount,
       });
     } else {
-      console.log(`  ✅ ${name}: @${discordUsername}`);
+      console.log(`  ✅ ${maskName(name)}: @${maskDiscord(discordUsername)}`);
     }
   }
 
@@ -298,7 +299,7 @@ async function main() {
 
     if (!discordUsername) {
       console.log(
-        `  ❌ ${name}: Discord username NOT SET (${email || "no email"})`,
+        `  ❌ ${maskName(name)}: Discord username NOT SET (${maskEmail(email || undefined) || "no email"})`,
       );
       menteesMissingDiscord.push({
         odId: session.menteeId,
@@ -309,7 +310,7 @@ async function main() {
         mentorEmail: mentorProfile?.email || undefined,
       });
     } else {
-      console.log(`  ✅ ${name}: @${discordUsername}`);
+      console.log(`  ✅ ${maskName(name)}: @${maskDiscord(discordUsername)}`);
     }
   }
 
@@ -332,7 +333,7 @@ async function main() {
     console.log("-".repeat(60));
     for (const entry of mentorsMissingDiscord) {
       console.log(
-        `${entry.name} | ${entry.email || "N/A"} | ${entry.menteeCount}`,
+        `${maskName(entry.name)} | ${maskEmail(entry.email || undefined)} | ${entry.menteeCount}`,
       );
     }
 
@@ -340,7 +341,7 @@ async function main() {
     console.log("Name,Email,ActiveMentees");
     for (const entry of mentorsMissingDiscord) {
       console.log(
-        `"${entry.name}","${entry.email || ""}","${entry.menteeCount}"`,
+        `"${maskName(entry.name)}","${maskEmail(entry.email || undefined)}","${entry.menteeCount}"`,
       );
     }
   }
@@ -352,7 +353,7 @@ async function main() {
     console.log("-".repeat(60));
     for (const entry of menteesMissingDiscord) {
       console.log(
-        `${entry.name} | ${entry.email || "N/A"} | ${entry.mentorName} | ${entry.mentorEmail || "N/A"}`,
+        `${maskName(entry.name)} | ${maskEmail(entry.email || undefined)} | ${maskName(entry.mentorName)} | ${maskEmail(entry.mentorEmail || undefined)}`,
       );
     }
 
@@ -360,7 +361,7 @@ async function main() {
     console.log("Name,Email,MentorName,MentorEmail");
     for (const entry of menteesMissingDiscord) {
       console.log(
-        `"${entry.name}","${entry.email || ""}","${entry.mentorName}","${entry.mentorEmail || ""}"`,
+        `"${maskName(entry.name)}","${maskEmail(entry.email || undefined)}","${maskName(entry.mentorName)}","${maskEmail(entry.mentorEmail || undefined)}"`,
       );
     }
   }

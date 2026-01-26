@@ -5,22 +5,31 @@ import { createLogger } from "./logger";
 // Create Email-specific logger
 const log = createLogger("email");
 
-// Initialize Mailgun with API key
-const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY;
-const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN || "codewithahsan.dev";
-const FROM_EMAIL =
-  process.env.EMAIL_FROM_ADDRESS || "noreply@codewithahsan.dev";
-const FROM_NAME = process.env.EMAIL_FROM_NAME || "Code with Ahsan Mentorship";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "ahsan.ubitian@gmail.com";
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://codewithahsan.dev";
-log.debug(`Site URL: ${SITE_URL}`);
+// Helper to get config values at runtime
+function getSiteUrl() {
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "https://codewithahsan.dev";
+}
 
-// Initialize Mailgun client
-const mailgun = new Mailgun(formData);
-const mg = MAILGUN_API_KEY
-  ? mailgun.client({ username: "api", key: MAILGUN_API_KEY })
-  : null;
+function getAdminEmail() {
+  return process.env.ADMIN_EMAIL || "ahsan.ubitian@gmail.com";
+}
+
+// Initialize Mailgun client - lazy loaded
+let mg: ReturnType<Mailgun["client"]> | null = null;
+let initialized = false;
+
+function getMailgunClient() {
+  if (initialized) return mg;
+
+  const apiKey = process.env.MAILGUN_API_KEY;
+  if (apiKey) {
+    const mailgun = new Mailgun(formData);
+    mg = mailgun.client({ username: "api", key: apiKey });
+  }
+
+  initialized = true;
+  return mg;
+}
 
 // Types
 interface MentorshipProfile {
@@ -63,6 +72,7 @@ const emailStyles = `
 `;
 
 function wrapEmailHtml(content: string, title: string): string {
+  const siteUrl = getSiteUrl();
   return `
 <!DOCTYPE html>
 <html>
@@ -81,7 +91,7 @@ function wrapEmailHtml(content: string, title: string): string {
   </div>
   <div class="footer">
     <p>This is an automated message from the Code with Ahsan Mentorship Platform.</p>
-    <p><a href="${SITE_URL}/mentorship">Visit Mentorship Dashboard</a></p>
+    <p><a href="${siteUrl}/mentorship">Visit Mentorship Dashboard</a></p>
   </div>
 </body>
 </html>
@@ -93,6 +103,7 @@ async function sendEmail(
   to: string,
   subject: string,
   html: string,
+  cc?: string,
 ): Promise<boolean> {
   // Check if emails are disabled (useful for local testing)
   if (process.env.DISABLE_EMAILS === "true") {
@@ -100,15 +111,23 @@ async function sendEmail(
     return true;
   }
 
-  if (!mg) {
+  const client = getMailgunClient();
+
+  if (!client) {
     log.warn("Mailgun API key not configured, skipping email");
     return false;
   }
 
+  const domain = process.env.MAILGUN_DOMAIN || "codewithahsan.dev";
+  const fromName = process.env.EMAIL_FROM_NAME || "Code with Ahsan Mentorship";
+  const fromEmail =
+    process.env.EMAIL_FROM_ADDRESS || "noreply@codewithahsan.dev";
+
   try {
-    await mg.messages.create(MAILGUN_DOMAIN, {
-      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+    await client.messages.create(domain, {
+      from: `${fromName} <${fromEmail}>`,
       to: [to],
+      cc: cc ? [cc] : undefined,
       subject,
       html,
     });
@@ -141,9 +160,9 @@ export async function sendAdminMentorPendingEmail(
       ${mentor.bio ? `<p><strong>Bio:</strong> ${mentor.bio}</p>` : ""}
     </div>
     <p>Please review this mentor application and approve or decline.</p>
-    <a href="${SITE_URL}/mentorship/admin" class="button">Review in Admin Dashboard</a>
+    <a href="${getSiteUrl()}/mentorship/admin" class="button">Review in Admin Dashboard</a>
   `;
-  return sendEmail(ADMIN_EMAIL, subject, wrapEmailHtml(content, subject));
+  return sendEmail(getAdminEmail(), subject, wrapEmailHtml(content, subject));
 }
 
 /**
@@ -169,7 +188,7 @@ export async function sendRegistrationStatusEmail(
         <li>Set your maximum number of mentees</li>
         <li>Wait for mentee requests or browse the platform</li>
       </ul>
-      <a href="${SITE_URL}/mentorship/dashboard" class="button">Go to Dashboard</a>
+      <a href="${getSiteUrl()}/mentorship/dashboard" class="button">Go to Dashboard</a>
     `
     : `
       <h2>Hi ${mentor.displayName},</h2>
@@ -213,7 +232,7 @@ export async function sendAccountStatusEmail(
         <p>Great news! Your mentorship account has been <strong>re-enabled</strong>.</p>
       </div>
       <p>You can now access all mentorship features again.</p>
-      <a href="${SITE_URL}/mentorship/dashboard" class="button">Go to Dashboard</a>
+      <a href="${getSiteUrl()}/mentorship/dashboard" class="button">Go to Dashboard</a>
     `;
 
   return sendEmail(user.email, subject, wrapEmailHtml(content, subject));
@@ -237,7 +256,7 @@ export async function sendMentorshipRequestEmail(
       <p><strong>Career Goals:</strong> ${mentee.careerGoals || "Not specified"}</p>
     </div>
     <p>Please review their profile and decide if you'd like to mentor them.</p>
-    <a href="${SITE_URL}/mentorship/requests" class="button">View Request</a>
+    <a href="${getSiteUrl()}/mentorship/requests" class="button">View Request</a>
   `;
   return sendEmail(mentor.email, subject, wrapEmailHtml(content, subject));
 }
@@ -266,7 +285,7 @@ export async function sendRequestAcceptedEmail(
       <li>Set up your goals to track progress</li>
       <li>Prepare questions for your first meeting</li>
     </ul>
-    <a href="${SITE_URL}/mentorship/my-matches" class="button">View Your Mentorship</a>
+    <a href="${getSiteUrl()}/mentorship/my-matches" class="button">View Your Mentorship</a>
   `;
   return sendEmail(mentee.email, subject, wrapEmailHtml(content, subject));
 }
@@ -291,7 +310,7 @@ export async function sendRequestDeclinedEmail(
       <li>Update your profile to highlight your goals</li>
       <li>Try connecting with mentors whose expertise matches your interests</li>
     </ul>
-    <a href="${SITE_URL}/mentorship/browse" class="button">Browse Mentors</a>
+    <a href="${getSiteUrl()}/mentorship/browse" class="button">Browse Mentors</a>
   `;
   return sendEmail(mentee.email, subject, wrapEmailHtml(content, subject));
 }
@@ -333,7 +352,7 @@ export async function sendSessionScheduledEmail(
       ${session.agenda ? `<p><strong>📝 Agenda:</strong> ${session.agenda}</p>` : ""}
     </div>
     <p>Make sure to prepare any questions or topics you'd like to discuss!</p>
-    <a href="${SITE_URL}/mentorship/my-matches" class="button">View Session Details</a>
+    <a href="${getSiteUrl()}/mentorship/my-matches" class="button">View Session Details</a>
   `;
 
   // Send to both mentor and mentee
@@ -370,7 +389,7 @@ export async function sendMentorshipCompletedEmail(
     </div>
     <p>Thank you for sharing your knowledge and helping others grow in their careers!</p>
     <p>Your contribution makes a real difference in the developer community.</p>
-    <a href="${SITE_URL}/mentorship/dashboard" class="button">View Dashboard</a>
+    <a href="${getSiteUrl()}/mentorship/dashboard" class="button">View Dashboard</a>
   `;
 
   const menteeContent = `
@@ -380,7 +399,7 @@ export async function sendMentorshipCompletedEmail(
     </div>
     <p>We hope this mentorship has been valuable for your growth!</p>
     <p>Please take a moment to rate your experience - your feedback helps us improve and helps other mentees find great mentors.</p>
-    <a href="${SITE_URL}/mentorship/my-matches" class="button">Rate Your Experience</a>
+    <a href="${getSiteUrl()}/mentorship/my-matches" class="button">Rate Your Experience</a>
   `;
 
   const [mentorResult, menteeResult] = await Promise.all([
@@ -427,7 +446,7 @@ export async function sendRatingReceivedEmail(
         : ""
     }
     <p>Thank you for being an amazing mentor! Your ratings help build trust in the community.</p>
-    <a href="${SITE_URL}/mentorship/dashboard" class="button">View Dashboard</a>
+    <a href="${getSiteUrl()}/mentorship/dashboard" class="button">View Dashboard</a>
   `;
 
   return sendEmail(mentor.email, subject, wrapEmailHtml(content, subject));
@@ -448,7 +467,7 @@ export async function sendMentorshipRemovedEmail(
     </div>
     <p>This could happen for various reasons - mentors sometimes need to reduce their capacity or focus on other commitments.</p>
     <p>Don't be discouraged! You can find a new mentor who's a great fit for your goals:</p>
-    <a href="${SITE_URL}/mentorship/browse" class="button">Browse Available Mentors</a>
+    <a href="${getSiteUrl()}/mentorship/browse" class="button">Browse Available Mentors</a>
   `;
   return sendEmail(mentee.email, subject, wrapEmailHtml(content, subject));
 }
@@ -460,6 +479,7 @@ export async function sendDiscordUsernameReminderEmail(
   user: { displayName: string; email: string },
   role: "mentor" | "mentee",
   partnerName?: string,
+  cc?: string,
 ): Promise<boolean> {
   const subject = `🔔 Action Required: Set Your Discord Username`;
 
@@ -485,7 +505,7 @@ export async function sendDiscordUsernameReminderEmail(
     
     <h3>How to update your profile:</h3>
     <ol>
-      <li>Go to your <a href="${SITE_URL}/mentorship/settings">Mentorship Settings</a></li>
+      <li>Go to your <a href="${getSiteUrl()}/mentorship/settings">Mentorship Settings</a></li>
       <li>Find the "Discord Username" field</li>
       <li>Enter your Discord username</li>
       <li>Click "Save"</li>
@@ -496,7 +516,7 @@ export async function sendDiscordUsernameReminderEmail(
       <p>We create a private Discord channel for each mentorship pair to facilitate easy communication. Without your Discord username, we can't add you to this channel.</p>
     </div>
     
-    <a href="${SITE_URL}/mentorship/settings" class="button">Update Your Profile Now</a>
+    <a href="${getSiteUrl()}/mentorship/settings" class="button">Update Your Profile Now</a>
     
     <p style="margin-top: 20px; color: #6b7280; font-size: 14px;">
       If you don't have a Discord account yet, you can create one for free at <a href="https://discord.com">discord.com</a>. 
@@ -504,5 +524,5 @@ export async function sendDiscordUsernameReminderEmail(
     </p>
   `;
 
-  return sendEmail(user.email, subject, wrapEmailHtml(content, subject));
+  return sendEmail(user.email, subject, wrapEmailHtml(content, subject), cc);
 }
