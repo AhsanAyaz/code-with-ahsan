@@ -16,6 +16,7 @@ interface MentorRegistrationFormProps {
     displayName?: string;
     photoURL?: string;
     discordUsername?: string;
+    discordUsernameValidated?: boolean;
     expertise?: string[];
     currentRole?: string;
     bio?: string;
@@ -97,11 +98,19 @@ export default function MentorRegistrationForm({
   // Discord validation state
   const [isValidatingDiscord, setIsValidatingDiscord] = useState(false);
   const [discordValidated, setDiscordValidated] = useState(
-    mode === "edit" && !!initialData?.discordUsername
+    mode === "edit"
+      ? initialData?.discordUsernameValidated ?? !!initialData?.discordUsername
+      : false
   );
   const [discordValidationError, setDiscordValidationError] = useState<
     string | null
-  >(null);
+  >(
+    mode === "edit" &&
+      initialData?.discordUsername &&
+      initialData?.discordUsernameValidated === false
+      ? "Username not found on Discord server"
+      : null
+  );
 
   // Helper function to validate Discord username
   const validateDiscordUser = async (username: string) => {

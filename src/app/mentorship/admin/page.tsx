@@ -7,6 +7,8 @@ import { useMentorship, MentorshipProfile } from "@/contexts/MentorshipContext";
 import Link from "next/link";
 import { useDebouncedCallback } from "use-debounce";
 import { format } from "date-fns";
+import { useStreamerMode } from "@/hooks/useStreamerMode";
+import { getAnonymizedDisplayName, getAnonymizedEmail, getAnonymizedDiscord } from "@/utils/streamer-mode";
 
 interface AdminStats {
   totalMentors: number;
@@ -88,6 +90,7 @@ export default function AdminPage() {
   const { setShowLoginPopup } = useContext(AuthContext);
   const toast = useToast();
   const { user, loading } = useMentorship();
+  const { isStreamerMode, toggleStreamerMode } = useStreamerMode();
 
   // Admin password authentication state
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
@@ -753,6 +756,9 @@ export default function AdminPage() {
           </p>
         </div>
         <div className="flex gap-2">
+          <button onClick={toggleStreamerMode} className={`btn btn-sm ${isStreamerMode ? 'btn-secondary' : 'btn-ghost'}`}>
+            {isStreamerMode ? '🎥 Streamer Mode: ON' : '👁️ Streamer Mode: OFF'}
+          </button>
           <button onClick={handleAdminLogout} className="btn btn-ghost btn-sm">
             🔓 Logout Admin
           </button>
@@ -993,11 +999,11 @@ export default function AdminPage() {
                             {p.photoURL ? (
                               <img
                                 src={p.photoURL}
-                                alt={p.displayName || "Profile"}
+                                alt={getAnonymizedDisplayName(p.displayName, p.uid, isStreamerMode) || "Profile"}
                               />
                             ) : (
                               <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold w-full h-full">
-                                {p.displayName?.charAt(0) || "?"}
+                                {getAnonymizedDisplayName(p.displayName, p.uid, isStreamerMode)?.charAt(0) || "?"}
                               </div>
                             )}
                           </div>
@@ -1005,7 +1011,7 @@ export default function AdminPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <h3 className="text-lg font-bold">
-                              {p.displayName}
+                              {getAnonymizedDisplayName(p.displayName, p.uid, isStreamerMode)}
                             </h3>
                             {getStatusBadge(p.status)}
                             <span className="badge badge-outline">
@@ -1013,7 +1019,7 @@ export default function AdminPage() {
                             </span>
                           </div>
                           <p className="text-sm text-base-content/70">
-                            {p.email}
+                            {getAnonymizedEmail(p.email, p.uid, isStreamerMode)}
                           </p>
                           {p.currentRole && (
                             <p className="text-sm text-base-content/70 mt-1">
@@ -1375,11 +1381,11 @@ export default function AdminPage() {
                               {p.photoURL ? (
                                 <img
                                   src={p.photoURL}
-                                  alt={p.displayName || "Profile"}
+                                  alt={getAnonymizedDisplayName(p.displayName, p.uid, isStreamerMode) || "Profile"}
                                 />
                               ) : (
                                 <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold w-full h-full">
-                                  {p.displayName?.charAt(0) || "?"}
+                                  {getAnonymizedDisplayName(p.displayName, p.uid, isStreamerMode)?.charAt(0) || "?"}
                                 </div>
                               )}
                             </div>
@@ -1387,7 +1393,7 @@ export default function AdminPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="text-lg font-bold">
-                                {p.displayName}
+                                {getAnonymizedDisplayName(p.displayName, p.uid, isStreamerMode)}
                               </h3>
                               {getStatusBadge(p.status)}
                               <span className="badge badge-outline">
@@ -1414,7 +1420,7 @@ export default function AdminPage() {
                               )}
                             </div>
                             <p className="text-sm text-base-content/70">
-                              {p.email}
+                              {getAnonymizedEmail(p.email, p.uid, isStreamerMode)}
                             </p>
                             {/* Inline Discord Edit for main profile */}
                             <div className="text-sm text-base-content/70">
@@ -1459,7 +1465,7 @@ export default function AdminPage() {
                                     }}
                                   >
                                     <span className={p.discordUsername ? "" : "italic text-base-content/40"}>
-                                      {p.discordUsername || "not set"}
+                                      {getAnonymizedDiscord(p.discordUsername, p.uid, isStreamerMode) || "not set"}
                                     </span>
                                     <svg className="w-3 h-3 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -1513,16 +1519,11 @@ export default function AdminPage() {
                                                 src={
                                                   mentorship.partnerProfile.photoURL
                                                 }
-                                                alt={
-                                                  mentorship.partnerProfile
-                                                    ?.displayName || "Partner"
-                                                }
+                                                alt={getAnonymizedDisplayName(mentorship.partnerProfile?.displayName, mentorship.partnerProfile?.uid || "partner", isStreamerMode) || "Partner"}
                                               />
                                             ) : (
                                               <div className="bg-secondary text-secondary-content flex items-center justify-center text-lg font-bold w-full h-full">
-                                                {mentorship.partnerProfile?.displayName?.charAt(
-                                                  0
-                                                ) || "?"}
+                                                {getAnonymizedDisplayName(mentorship.partnerProfile?.displayName, mentorship.partnerProfile?.uid || "partner", isStreamerMode)?.charAt(0) || "?"}
                                               </div>
                                             )}
                                           </div>
@@ -1530,15 +1531,14 @@ export default function AdminPage() {
                                         <div className="flex-1 min-w-0">
                                           <div className="flex items-center gap-2 flex-wrap">
                                             <h4 className="font-semibold">
-                                              {mentorship.partnerProfile
-                                                ?.displayName || "Unknown"}
+                                              {getAnonymizedDisplayName(mentorship.partnerProfile?.displayName, mentorship.partnerProfile?.uid || "partner", isStreamerMode) || "Unknown"}
                                             </h4>
                                             {getMentorshipStatusBadge(
                                               mentorship.status
                                             )}
                                           </div>
                                           <p className="text-xs text-base-content/60">
-                                            {mentorship.partnerProfile?.email}
+                                            {getAnonymizedEmail(mentorship.partnerProfile?.email, mentorship.partnerProfile?.uid || "partner", isStreamerMode)}
                                           </p>
                                           {/* Inline Discord Edit for partner */}
                                           {mentorship.partnerProfile && (
@@ -1583,7 +1583,7 @@ export default function AdminPage() {
                                                     }}
                                                   >
                                                     <span className={mentorship.partnerProfile.discordUsername ? "" : "italic text-base-content/40"}>
-                                                      {mentorship.partnerProfile.discordUsername || "not set"}
+                                                      {getAnonymizedDiscord(mentorship.partnerProfile.discordUsername, mentorship.partnerProfile.uid, isStreamerMode) || "not set"}
                                                     </span>
                                                     <svg className="w-3 h-3 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -1720,16 +1720,11 @@ export default function AdminPage() {
                                                 src={
                                                   mentorship.partnerProfile.photoURL
                                                 }
-                                                alt={
-                                                  mentorship.partnerProfile
-                                                    ?.displayName || "Partner"
-                                                }
+                                                alt={getAnonymizedDisplayName(mentorship.partnerProfile?.displayName, mentorship.partnerProfile?.uid || "partner", isStreamerMode) || "Partner"}
                                               />
                                             ) : (
                                               <div className="bg-secondary text-secondary-content flex items-center justify-center text-lg font-bold w-full h-full">
-                                                {mentorship.partnerProfile?.displayName?.charAt(
-                                                  0
-                                                ) || "?"}
+                                                {getAnonymizedDisplayName(mentorship.partnerProfile?.displayName, mentorship.partnerProfile?.uid || "partner", isStreamerMode)?.charAt(0) || "?"}
                                               </div>
                                             )}
                                           </div>
@@ -1737,15 +1732,14 @@ export default function AdminPage() {
                                         <div className="flex-1 min-w-0">
                                           <div className="flex items-center gap-2 flex-wrap">
                                             <h4 className="font-semibold">
-                                              {mentorship.partnerProfile
-                                                ?.displayName || "Unknown"}
+                                              {getAnonymizedDisplayName(mentorship.partnerProfile?.displayName, mentorship.partnerProfile?.uid || "partner", isStreamerMode) || "Unknown"}
                                             </h4>
                                             {getMentorshipStatusBadge(
                                               mentorship.status
                                             )}
                                           </div>
                                           <p className="text-xs text-base-content/60">
-                                            {mentorship.partnerProfile?.email}
+                                            {getAnonymizedEmail(mentorship.partnerProfile?.email, mentorship.partnerProfile?.uid || "partner", isStreamerMode)}
                                           </p>
                                           {/* Inline Discord Edit for partner */}
                                           {mentorship.partnerProfile && (
@@ -1790,7 +1784,7 @@ export default function AdminPage() {
                                                     }}
                                                   >
                                                     <span className={mentorship.partnerProfile.discordUsername ? "" : "italic text-base-content/40"}>
-                                                      {mentorship.partnerProfile.discordUsername || "not set"}
+                                                      {getAnonymizedDiscord(mentorship.partnerProfile.discordUsername, mentorship.partnerProfile.uid, isStreamerMode) || "not set"}
                                                     </span>
                                                     <svg className="w-3 h-3 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -1884,16 +1878,11 @@ export default function AdminPage() {
                                                 src={
                                                   mentorship.partnerProfile.photoURL
                                                 }
-                                                alt={
-                                                  mentorship.partnerProfile
-                                                    ?.displayName || "Partner"
-                                                }
+                                                alt={getAnonymizedDisplayName(mentorship.partnerProfile?.displayName, mentorship.partnerProfile?.uid || "partner", isStreamerMode) || "Partner"}
                                               />
                                             ) : (
                                               <div className="bg-secondary text-secondary-content flex items-center justify-center text-lg font-bold w-full h-full">
-                                                {mentorship.partnerProfile?.displayName?.charAt(
-                                                  0
-                                                ) || "?"}
+                                                {getAnonymizedDisplayName(mentorship.partnerProfile?.displayName, mentorship.partnerProfile?.uid || "partner", isStreamerMode)?.charAt(0) || "?"}
                                               </div>
                                             )}
                                           </div>
@@ -1901,15 +1890,14 @@ export default function AdminPage() {
                                         <div className="flex-1 min-w-0">
                                           <div className="flex items-center gap-2 flex-wrap">
                                             <h4 className="font-semibold">
-                                              {mentorship.partnerProfile
-                                                ?.displayName || "Unknown"}
+                                              {getAnonymizedDisplayName(mentorship.partnerProfile?.displayName, mentorship.partnerProfile?.uid || "partner", isStreamerMode) || "Unknown"}
                                             </h4>
                                             {getMentorshipStatusBadge(
                                               mentorship.status
                                             )}
                                           </div>
                                           <p className="text-xs text-base-content/60">
-                                            {mentorship.partnerProfile?.email}
+                                            {getAnonymizedEmail(mentorship.partnerProfile?.email, mentorship.partnerProfile?.uid || "partner", isStreamerMode)}
                                           </p>
                                           {/* Inline Discord Edit for partner */}
                                           {mentorship.partnerProfile && (
@@ -1954,7 +1942,7 @@ export default function AdminPage() {
                                                     }}
                                                   >
                                                     <span className={mentorship.partnerProfile.discordUsername ? "" : "italic text-base-content/40"}>
-                                                      {mentorship.partnerProfile.discordUsername || "not set"}
+                                                      {getAnonymizedDiscord(mentorship.partnerProfile.discordUsername, mentorship.partnerProfile.uid, isStreamerMode) || "not set"}
                                                     </span>
                                                     <svg className="w-3 h-3 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -2026,16 +2014,11 @@ export default function AdminPage() {
                                                 src={
                                                   mentorship.partnerProfile.photoURL
                                                 }
-                                                alt={
-                                                  mentorship.partnerProfile
-                                                    ?.displayName || "Partner"
-                                                }
+                                                alt={getAnonymizedDisplayName(mentorship.partnerProfile?.displayName, mentorship.partnerProfile?.uid || "partner", isStreamerMode) || "Partner"}
                                               />
                                             ) : (
                                               <div className="bg-secondary text-secondary-content flex items-center justify-center text-lg font-bold w-full h-full">
-                                                {mentorship.partnerProfile?.displayName?.charAt(
-                                                  0
-                                                ) || "?"}
+                                                {getAnonymizedDisplayName(mentorship.partnerProfile?.displayName, mentorship.partnerProfile?.uid || "partner", isStreamerMode)?.charAt(0) || "?"}
                                               </div>
                                             )}
                                           </div>
@@ -2043,15 +2026,14 @@ export default function AdminPage() {
                                         <div className="flex-1 min-w-0">
                                           <div className="flex items-center gap-2 flex-wrap">
                                             <h4 className="font-semibold">
-                                              {mentorship.partnerProfile
-                                                ?.displayName || "Unknown"}
+                                              {getAnonymizedDisplayName(mentorship.partnerProfile?.displayName, mentorship.partnerProfile?.uid || "partner", isStreamerMode) || "Unknown"}
                                             </h4>
                                             {getMentorshipStatusBadge(
                                               mentorship.status
                                             )}
                                           </div>
                                           <p className="text-xs text-base-content/60">
-                                            {mentorship.partnerProfile?.email}
+                                            {getAnonymizedEmail(mentorship.partnerProfile?.email, mentorship.partnerProfile?.uid || "partner", isStreamerMode)}
                                           </p>
                                           {/* Inline Discord Edit for partner */}
                                           {mentorship.partnerProfile && (
@@ -2096,7 +2078,7 @@ export default function AdminPage() {
                                                     }}
                                                   >
                                                     <span className={mentorship.partnerProfile.discordUsername ? "" : "italic text-base-content/40"}>
-                                                      {mentorship.partnerProfile.discordUsername || "not set"}
+                                                      {getAnonymizedDiscord(mentorship.partnerProfile.discordUsername, mentorship.partnerProfile.uid, isStreamerMode) || "not set"}
                                                     </span>
                                                     <svg className="w-3 h-3 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -2270,18 +2252,18 @@ export default function AdminPage() {
                   {reviewMentor.photoURL ? (
                     <img
                       src={reviewMentor.photoURL}
-                      alt={reviewMentor.displayName || "Mentor"}
+                      alt={getAnonymizedDisplayName(reviewMentor.displayName, reviewMentor.uid, isStreamerMode) || "Mentor"}
                     />
                   ) : (
                     <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold w-full h-full">
-                      {reviewMentor.displayName?.charAt(0) || "?"}
+                      {getAnonymizedDisplayName(reviewMentor.displayName, reviewMentor.uid, isStreamerMode)?.charAt(0) || "?"}
                     </div>
                   )}
                 </div>
               </div>
               <div>
                 <h3 className="text-xl font-bold">
-                  {reviewMentor.displayName}
+                  {getAnonymizedDisplayName(reviewMentor.displayName, reviewMentor.uid, isStreamerMode)}
                 </h3>
                 <p className="text-sm text-base-content/60">
                   Reviews & Ratings
@@ -2333,11 +2315,11 @@ export default function AdminPage() {
                             {review.menteePhoto ? (
                               <img
                                 src={review.menteePhoto}
-                                alt={review.menteeName || "Mentee"}
+                                alt={getAnonymizedDisplayName(review.menteeName, review.menteeId, isStreamerMode) || "Mentee"}
                               />
                             ) : (
                               <div className="bg-secondary text-secondary-content flex items-center justify-center text-sm font-bold w-full h-full">
-                                {review.menteeName?.charAt(0) || "?"}
+                                {getAnonymizedDisplayName(review.menteeName, review.menteeId, isStreamerMode)?.charAt(0) || "?"}
                               </div>
                             )}
                           </div>
@@ -2346,10 +2328,10 @@ export default function AdminPage() {
                           <div className="flex items-center justify-between flex-wrap gap-2">
                             <div>
                               <p className="font-semibold">
-                                {review.menteeName || "Anonymous"}
+                                {getAnonymizedDisplayName(review.menteeName, review.menteeId, isStreamerMode) || "Anonymous"}
                               </p>
                               <p className="text-xs text-base-content/50">
-                                {review.menteeEmail}
+                                {getAnonymizedEmail(review.menteeEmail, review.menteeId, isStreamerMode)}
                               </p>
                             </div>
                             <div className="text-xs text-base-content/50">

@@ -7,6 +7,8 @@ import { useMentorship } from "@/contexts/MentorshipContext";
 import Link from "next/link";
 import type { PublicMentor } from "@/types/mentorship";
 
+import DiscordValidationBanner from "@/components/mentorship/DiscordValidationBanner";
+
 export default function MentorshipPage() {
   const router = useRouter();
   const { setShowLoginPopup } = useContext(AuthContext);
@@ -70,6 +72,13 @@ export default function MentorshipPage() {
 
   return (
     <div className="space-y-8">
+      {/* Discord Validation Warning */}
+      {profile && (
+        <DiscordValidationBanner
+          discordUsernameValidated={profile.discordUsernameValidated}
+        />
+      )}
+
       {/* Hero Section with CTAs */}
       <div className="card bg-gradient-to-r from-primary to-secondary text-primary-content">
         <div className="card-body text-center py-10">

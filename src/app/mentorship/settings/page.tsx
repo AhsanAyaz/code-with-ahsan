@@ -18,7 +18,7 @@ export default function SettingsPage() {
   const { user, profile, loading, profileLoading, refreshProfile } =
     useMentorship();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+
 
   useEffect(() => {
     if (!loading && !profileLoading && !user) {
@@ -36,7 +36,7 @@ export default function SettingsPage() {
     if (!user) return;
 
     setIsSubmitting(true);
-    setSuccess(false);
+
 
     try {
       const response = await fetch("/api/mentorship/profile", {
@@ -50,8 +50,7 @@ export default function SettingsPage() {
 
       if (response.ok) {
         await refreshProfile();
-        setSuccess(true);
-        setTimeout(() => setSuccess(false), 3000);
+        toast.success("Your profile has been updated successfully!");
       } else {
         const error = await response.json();
         toast.error("Failed to update profile: " + error.error);
@@ -100,6 +99,7 @@ export default function SettingsPage() {
           displayName: profile.displayName || "",
           photoURL: profile.photoURL || "",
           discordUsername: profile.discordUsername || "",
+          discordUsernameValidated: profile.discordUsernameValidated,
           expertise: profile.expertise || [],
           currentRole: profile.currentRole || "",
           bio: profile.bio || "",
@@ -124,6 +124,7 @@ export default function SettingsPage() {
           careerGoals: profile.careerGoals || "",
           learningStyle: profile.learningStyle || "mixed",
           discordUsername: profile.discordUsername || "",
+          discordUsernameValidated: profile.discordUsernameValidated,
         }
       : undefined;
 
@@ -143,24 +144,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Success Message */}
-      {success && (
-        <div className="alert alert-success">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>Your profile has been updated successfully!</span>
-        </div>
-      )}
+
 
       {/* Form Card */}
       <div className="card bg-base-100 shadow-xl">

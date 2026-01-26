@@ -6,6 +6,7 @@ import { AuthContext } from "@/contexts/AuthContext";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import Link from "next/link";
 import type { MentorshipProfile } from "@/types/mentorship";
+import DiscordValidationBanner from "@/components/mentorship/DiscordValidationBanner";
 
 interface DashboardStats {
   activeMatches: number;
@@ -169,6 +170,11 @@ export default function MentorshipDashboardPage() {
   // User has a profile - show dashboard
   return (
     <div className="space-y-6">
+      {/* Discord Validation Warning */}
+      <DiscordValidationBanner
+        discordUsernameValidated={profile.discordUsernameValidated}
+      />
+
       {/* Welcome Section */}
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body">
