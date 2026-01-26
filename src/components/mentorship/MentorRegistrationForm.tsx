@@ -6,6 +6,8 @@ import { useToast } from "@/contexts/ToastContext";
 import { getApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
+const DISCORD_INVITE_URL = "https://codewithahsan.dev/discord";
+
 interface MentorRegistrationFormProps {
   onSubmit: (data: Record<string, unknown>) => Promise<void>;
   isSubmitting: boolean;
@@ -91,6 +93,71 @@ export default function MentorRegistrationForm({
   const [photoURL, setPhotoURL] = useState(initialData?.photoURL || "");
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Discord validation state
+  const [isValidatingDiscord, setIsValidatingDiscord] = useState(false);
+  const [discordValidated, setDiscordValidated] = useState(
+    mode === "edit" && !!initialData?.discordUsername
+  );
+  const [discordValidationError, setDiscordValidationError] = useState<
+    string | null
+  >(null);
+
+  // Verify Discord username against server
+  const verifyDiscordUsername = async () => {
+    if (!discordUsername.trim()) {
+      toast.error("Please enter your Discord username first");
+      return;
+    }
+
+    setIsValidatingDiscord(true);
+    setDiscordValidationError(null);
+
+    try {
+      const response = await fetch("/api/mentorship/validate-discord", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ discordUsername: discordUsername.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Validation failed");
+      }
+
+      if (data.valid) {
+        setDiscordValidated(true);
+        setDiscordValidationError(null);
+        // Update username to the exact one found on Discord
+        if (data.username) {
+          setDiscordUsername(data.username);
+        }
+        toast.success("Discord username verified!");
+      } else {
+        setDiscordValidated(false);
+        setDiscordValidationError(data.message || "User not found on Discord");
+      }
+    } catch (error) {
+      console.error("Discord validation error:", error);
+      setDiscordValidated(false);
+      setDiscordValidationError("Failed to verify Discord username");
+      toast.error("Failed to verify Discord username");
+    } finally {
+      setIsValidatingDiscord(false);
+    }
+  };
+
+  // Reset validation when username changes
+  const handleDiscordUsernameChange = (value: string) => {
+    const cleanValue = value.toLowerCase().replace(/\s/g, "");
+    setDiscordUsername(cleanValue);
+    // Reset validation if username changed
+    if (discordValidated) {
+      setDiscordValidated(false);
+    }
+    setDiscordValidationError(null);
+  };
 
   // Separate predefined and custom expertise
   const customExpertise = expertise.filter(
@@ -181,6 +248,14 @@ export default function MentorRegistrationForm({
 
     if (!discordUsername.trim()) {
       toast.error("Please enter your Discord username");
+      return;
+    }
+
+    // Require Discord validation for new registrations
+    if (mode === "create" && !discordValidated) {
+      toast.error(
+        "Please verify your Discord username before registering"
+      );
       return;
     }
 
@@ -344,42 +419,114 @@ export default function MentorRegistrationForm({
         <div className="form-control">
           <label className="label">
             <span className="label-text font-semibold">Discord Username *</span>
-            <div
-              className="tooltip tooltip-left"
-              data-tip="Open Discord → Click your username (bottom left) → Settings (gear icon) → My Account → Copy your username (without the @)"
-            >
-              <button type="button" className="btn btn-ghost btn-xs btn-circle">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  className="w-4 h-4 stroke-current"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  ></path>
-                </svg>
-              </button>
+            <div className="flex items-center gap-2">
+              {discordValidated && (
+                <span className="text-success flex items-center gap-1 text-sm">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Verified
+                </span>
+              )}
+              <div
+                className="tooltip tooltip-left"
+                data-tip="Open Discord → Click your username (bottom left) → Settings (gear icon) → My Account → Copy your username (without the @)"
+              >
+                <button type="button" className="btn btn-ghost btn-xs btn-circle">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    className="w-4 h-4 stroke-current"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
             </div>
           </label>
-          <input
-            type="text"
-            placeholder="e.g., john_dev"
-            className="input input-bordered w-full"
-            value={discordUsername}
-            onChange={(e) =>
-              setDiscordUsername(
-                e.target.value.toLowerCase().replace(/\s/g, "")
-              )
-            }
-            required
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="e.g., john_dev"
+              className={`input input-bordered flex-1 ${
+                discordValidated
+                  ? "input-success"
+                  : discordValidationError
+                    ? "input-error"
+                    : ""
+              }`}
+              value={discordUsername}
+              onChange={(e) => handleDiscordUsernameChange(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              onClick={verifyDiscordUsername}
+              disabled={isValidatingDiscord || !discordUsername.trim() || discordValidated}
+              className={`btn ${
+                discordValidated ? "btn-success" : "btn-primary"
+              }`}
+            >
+              {isValidatingDiscord ? (
+                <>
+                  <span className="loading loading-spinner loading-sm"></span>
+                  Verifying...
+                </>
+              ) : discordValidated ? (
+                "✓ Verified"
+              ) : (
+                "Verify"
+              )}
+            </button>
+          </div>
+          {discordValidationError && (
+            <div className="alert alert-warning mt-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="stroke-current shrink-0 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+              <div className="flex flex-col">
+                <span>{discordValidationError}</span>
+                <a
+                  href={DISCORD_INVITE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link link-primary font-semibold"
+                >
+                  Join our Discord server →
+                </a>
+              </div>
+            </div>
+          )}
           <label className="label">
             <span className="label-text-alt text-base-content/60">
-              Used for private mentorship channels
+              {mode === "create"
+                ? "You must be on our Discord server to register"
+                : "Used for private mentorship channels"}
             </span>
           </label>
         </div>
@@ -573,7 +720,7 @@ export default function MentorRegistrationForm({
         </div>
         <label className="label">
           <span className="label-text-alt text-base-content/60">
-            Select days you're generally available for mentorship sessions
+            Select days you&apos;re generally available for mentorship sessions
           </span>
         </label>
       </div>
