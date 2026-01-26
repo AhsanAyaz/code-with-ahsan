@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { sendAdminMentorPendingEmail } from "@/lib/email";
+import { lookupMemberByUsername, isDiscordConfigured } from "@/lib/discord";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -193,12 +194,44 @@ export async function PUT(request: NextRequest) {
       updates.username = username.toLowerCase();
     }
 
+    // If discordUsername is being updated, validate it against the Discord server
+    if (updates.discordUsername !== undefined && isDiscordConfigured()) {
+      const cleanDiscordUsername = updates.discordUsername
+        .trim()
+        .toLowerCase()
+        .replace(/^@/, "");
+      
+      if (cleanDiscordUsername) {
+        try {
+          const member = await lookupMemberByUsername(cleanDiscordUsername);
+          updates.discordUsernameValidated = !!member;
+          // Use the exact username from Discord if found
+          if (member?.username) {
+            updates.discordUsername = member.username;
+          }
+        } catch (error) {
+          console.error("Discord validation error:", error);
+          // Don't fail the update, just mark as not validated
+          updates.discordUsernameValidated = false;
+        }
+      } else {
+        // Empty discord username
+        updates.discordUsernameValidated = undefined;
+      }
+    }
+
     await profileRef.update({
       ...updates,
       updatedAt: new Date(),
     });
 
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json(
+      {
+        success: true,
+        discordUsernameValidated: updates.discordUsernameValidated,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error updating mentorship profile:", error);
     return NextResponse.json(
