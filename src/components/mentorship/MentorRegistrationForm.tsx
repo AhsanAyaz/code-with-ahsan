@@ -103,6 +103,28 @@ export default function MentorRegistrationForm({
     string | null
   >(null);
 
+  // Helper function to validate Discord username
+  const validateDiscordUser = async (username: string) => {
+    try {
+      const response = await fetch("/api/mentorship/validate-discord", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ discordUsername: username }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Validation failed");
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Discord validation error:", error);
+      throw error;
+    }
+  };
+
   // Verify Discord username against server
   const verifyDiscordUsername = async () => {
     if (!discordUsername.trim()) {
@@ -114,17 +136,7 @@ export default function MentorRegistrationForm({
     setDiscordValidationError(null);
 
     try {
-      const response = await fetch("/api/mentorship/validate-discord", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ discordUsername: discordUsername.trim() }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Validation failed");
-      }
+      const data = await validateDiscordUser(discordUsername.trim());
 
       if (data.valid) {
         setDiscordValidated(true);
@@ -251,11 +263,36 @@ export default function MentorRegistrationForm({
       return;
     }
 
-    // Require Discord validation for new registrations
-    if (mode === "create" && !discordValidated) {
-      toast.error(
-        "Please verify your Discord username before registering"
-      );
+    // Validate Discord username on submit
+    let finalDiscordUsername = discordUsername.trim();
+    try {
+      // Show loading toast if we're doing a background validation
+      // But since we block submit, maybe just rely on isSubmitting?
+      // Actually isSubmitting is passed in, so we can't control it easily here before onSubmit.
+      // We'll proceed with validation.
+
+      const validationData = await validateDiscordUser(finalDiscordUsername);
+
+      if (!validationData.valid) {
+        setDiscordValidated(false);
+        setDiscordValidationError(
+          validationData.message || "User not found on Discord"
+        );
+        toast.error(
+          validationData.message ||
+            "Please verify your Discord username before saving"
+        );
+        return;
+      }
+
+      if (validationData.username) {
+        finalDiscordUsername = validationData.username;
+        setDiscordUsername(finalDiscordUsername);
+        setDiscordValidated(true);
+      }
+    } catch (error) {
+      console.error("Submit validation error:", error);
+      toast.error("Failed to validate Discord username");
       return;
     }
 
@@ -278,7 +315,7 @@ export default function MentorRegistrationForm({
       maxMentees,
       availability: availableDays,
       isPublic,
-      discordUsername: discordUsername.trim(),
+      discordUsername: finalDiscordUsername,
       ...(mode === "edit" && username ? { username: username.trim() } : {}),
       ...(mode === "edit" && displayName
         ? { displayName: displayName.trim() }

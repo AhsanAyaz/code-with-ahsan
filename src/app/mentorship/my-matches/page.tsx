@@ -9,6 +9,7 @@ import {
 } from "@/contexts/MentorshipContext";
 import Link from "next/link";
 import ContactInfo from "@/components/mentorship/ContactInfo";
+import DiscordValidationBanner from "@/components/mentorship/DiscordValidationBanner";
 
 interface MatchWithProfile extends MentorshipMatch {
   partnerProfile?: MentorshipProfile;
@@ -82,6 +83,11 @@ export default function MyMatchesPage() {
 
   return (
     <div className="space-y-6">
+      {/* Discord Validation Banner */}
+      <DiscordValidationBanner
+        discordUsernameValidated={profile.discordUsernameValidated}
+      />
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

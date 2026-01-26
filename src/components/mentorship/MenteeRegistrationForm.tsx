@@ -88,6 +88,28 @@ export default function MenteeRegistrationForm({
     string | null
   >(null);
 
+  // Helper function to validate Discord username
+  const validateDiscordUser = async (username: string) => {
+    try {
+      const response = await fetch("/api/mentorship/validate-discord", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ discordUsername: username }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Validation failed");
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Discord validation error:", error);
+      throw error;
+    }
+  };
+
   // Verify Discord username against server
   const verifyDiscordUsername = async () => {
     if (!discordUsername.trim()) {
@@ -99,17 +121,7 @@ export default function MenteeRegistrationForm({
     setDiscordValidationError(null);
 
     try {
-      const response = await fetch("/api/mentorship/validate-discord", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ discordUsername: discordUsername.trim() }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Validation failed");
-      }
+      const data = await validateDiscordUser(discordUsername.trim());
 
       if (data.valid) {
         setDiscordValidated(true);
@@ -192,16 +204,36 @@ export default function MenteeRegistrationForm({
       return;
     }
 
-    // Require Discord validation for new registrations
-    if (mode === "create" && !discordValidated) {
-      toast.error(
-        "Please verify your Discord username before registering"
-      );
+    // Validate Discord username on submit
+    let finalDiscordUsername = discordUsername.trim();
+    try {
+      const validationData = await validateDiscordUser(finalDiscordUsername);
+
+      if (!validationData.valid) {
+        setDiscordValidated(false);
+        setDiscordValidationError(
+          validationData.message || "User not found on Discord"
+        );
+        toast.error(
+          validationData.message ||
+            "Please verify your Discord username before saving"
+        );
+        return;
+      }
+
+      if (validationData.username) {
+        finalDiscordUsername = validationData.username;
+        setDiscordUsername(finalDiscordUsername);
+        setDiscordValidated(true);
+      }
+    } catch (error) {
+      console.error("Submit validation error:", error);
+      toast.error("Failed to validate Discord username");
       return;
     }
 
     await onSubmit({
-      discordUsername: discordUsername.trim(),
+      discordUsername: finalDiscordUsername,
       education,
       skillsSought,
       careerGoals,

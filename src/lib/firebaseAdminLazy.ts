@@ -1,19 +1,22 @@
+/**
+ * Firebase Admin for Scripts (Lazy Storage Initialization)
+ *
+ * Use this module instead of firebaseAdmin in scripts to avoid the
+ * storage bucket initialization error when NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+ * is not set.
+ *
+ * This module only exports `db` (Firestore) and does not initialize storage.
+ */
+
 import * as admin from "firebase-admin";
 
 if (!admin.apps.length) {
-  // If we have a service account env var, use it. Otherwise, rely on default Google Cloud credentials (ADC)
-  // or assume we are just using the project ID if locally authenticated via gcloud.
-  // Ideally, for production, you'd use cert(serviceAccount).
-  // For this environment, we try default/inferred.
-
-  // Check if we have explicit credentials strings (common in Vercel/local envs)
-  // Check if we have explicit credentials strings (common in Vercel/local envs)
   if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
     if (serviceAccount.private_key) {
       serviceAccount.private_key = serviceAccount.private_key.replace(
         /\\n/g,
-        "\n",
+        "\n"
       );
     }
     admin.initializeApp({
@@ -41,22 +44,17 @@ if (!admin.apps.length) {
     } catch (e) {
       console.warn("Could not load local service account", e);
       admin.initializeApp({
-        credential: admin.credential.applicationDefault(), // Fallback to ADC
+        credential: admin.credential.applicationDefault(),
         projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
       });
     }
   } else {
     admin.initializeApp({
-      credential: admin.credential.applicationDefault(), // Fallback to ADC
+      credential: admin.credential.applicationDefault(),
       projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
     });
   }
 }
 
+// Only export Firestore - no storage initialization
 export const db = admin.firestore();
-
-// Storage bucket for file uploads
-export const storage = admin
-  .storage()
-  .bucket(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET);
-

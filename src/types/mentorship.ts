@@ -17,6 +17,7 @@ export interface MentorshipProfile {
   email: string;
   photoURL: string;
   discordUsername?: string; // Discord username for bot interactions
+  discordUsernameValidated?: boolean; // Whether Discord username exists on server
   createdAt: Date;
   updatedAt: Date;
   // Approval status
