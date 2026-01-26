@@ -198,9 +198,15 @@ export async function GET(request: NextRequest) {
     const activeMentorships = matchesWithProfiles.filter(m => m.status === 'active').length
     const completedMentorships = matchesWithProfiles.filter(m => m.status === 'completed').length
 
-    // Update stats to reflect ALL mentors/mentees (including those with no matches)
-    const totalMentors = grouped.filter(g => g.profile?.role === 'mentor').length || grouped.length
-    const totalMentees = grouped.filter(g => g.profile?.role === 'mentee').length || grouped.length
+    // Fetch actual total counts for both mentors and mentees (not based on the filtered grouped array)
+    // This ensures the stats stay consistent regardless of which tab is active
+    const [mentorCountSnapshot, menteeCountSnapshot] = await Promise.all([
+      db.collection('mentorship_profiles').where('role', '==', 'mentor').count().get(),
+      db.collection('mentorship_profiles').where('role', '==', 'mentee').count().get()
+    ])
+    
+    const totalMentors = mentorCountSnapshot.data().count
+    const totalMentees = menteeCountSnapshot.data().count
 
     return NextResponse.json({
       matches: grouped,
