@@ -109,13 +109,13 @@ export default function MentorshipPage() {
                   onClick={() => handleRoleClick("mentor")}
                   className="btn btn-lg bg-white/20 hover:bg-white/30 border-none"
                 >
-                  <span className="text-xl">🎯</span> Become a Mentor
+                  <span className="text-xl">🎯</span> Register as Mentor
                 </button>
                 <button
                   onClick={() => handleRoleClick("mentee")}
                   className="btn btn-lg bg-white/20 hover:bg-white/30 border-none"
                 >
-                  <span className="text-xl">🚀</span> Be a Mentee
+                  <span className="text-xl">🚀</span> Register as Mentee
                 </button>
               </>
             )}

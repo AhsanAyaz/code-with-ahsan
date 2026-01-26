@@ -149,7 +149,7 @@ function OnboardingContent() {
               >
                 <div className="card-body text-left">
                   <div className="text-5xl mb-4">🎯</div>
-                  <h3 className="card-title text-xl">I&apos;m a Mentor</h3>
+                  <h3 className="card-title text-xl">Register as a Mentor</h3>
                   <p className="text-base-content/70">
                     I have experience to share and want to help others grow.
                   </p>
@@ -162,7 +162,7 @@ function OnboardingContent() {
               >
                 <div className="card-body text-left">
                   <div className="text-5xl mb-4">🚀</div>
-                  <h3 className="card-title text-xl">I&apos;m a Mentee</h3>
+                  <h3 className="card-title text-xl">Register as a Mentee</h3>
                   <p className="text-base-content/70">
                     I want to learn from experienced professionals.
                   </p>
