@@ -44,7 +44,7 @@ export default function BrowseMentorsPage() {
   useEffect(() => {
     const fetchMentors = async () => {
       try {
-        const response = await fetch("/api/mentorship/mentors");
+        const response = await fetch("/api/mentorship/mentors?public=true");
         if (response.ok) {
           const data = await response.json();
           setMentors(data.mentors || []);
