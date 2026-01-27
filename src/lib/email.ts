@@ -44,6 +44,7 @@ interface MentorshipProfile {
   education?: string;
   skillsSought?: string[];
   careerGoals?: string;
+  mentorshipGoals?: string;
 }
 
 interface ScheduledSession {
@@ -255,6 +256,12 @@ export async function sendMentorshipRequestEmail(
       <p><strong>Skills Sought:</strong> ${mentee.skillsSought?.join(", ") || "Not specified"}</p>
       <p><strong>Career Goals:</strong> ${mentee.careerGoals || "Not specified"}</p>
     </div>
+    ${mentee.mentorshipGoals ? `
+    <div class="highlight">
+      <p><strong>What they're looking for in a mentorship:</strong></p>
+      <p>${mentee.mentorshipGoals}</p>
+    </div>
+    ` : ""}
     <p>Please review their profile and decide if you'd like to mentor them.</p>
     <a href="${getSiteUrl()}/mentorship/requests" class="button">View Request</a>
   `;

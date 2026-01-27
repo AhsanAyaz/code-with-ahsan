@@ -18,6 +18,7 @@ interface RequestWithProfile extends MentorshipMatch {
     education?: string;
     skillsSought?: string[];
     careerGoals?: string;
+    mentorshipGoals?: string;
     learningStyle?: string;
   };
 }
@@ -264,6 +265,18 @@ export default function MentorRequestsPage() {
                           </div>
                           <p className="text-sm text-base-content/70 line-clamp-2">
                             {request.menteeProfile.careerGoals}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Mentorship Goals */}
+                      {request.menteeProfile?.mentorshipGoals && (
+                        <div className="mt-3 p-3 bg-secondary/10 rounded-lg border border-secondary/20">
+                          <div className="text-sm font-semibold text-secondary">
+                            What they're looking for in a mentorship:
+                          </div>
+                          <p className="text-sm text-base-content/80 mt-1">
+                            {request.menteeProfile.mentorshipGoals}
                           </p>
                         </div>
                       )}

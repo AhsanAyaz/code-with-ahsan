@@ -198,6 +198,7 @@ export async function POST(request: NextRequest) {
             education: menteeData?.education,
             skillsSought: menteeData?.skillsSought,
             careerGoals: menteeData?.careerGoals,
+            mentorshipGoals: menteeData?.mentorshipGoals,
           }
         ).catch((err) => console.error("Failed to send request email:", err))
       );
@@ -210,7 +211,8 @@ export async function POST(request: NextRequest) {
             `📬 **New Mentorship Request!**\n\n` +
               `**${menteeData?.displayName || "A mentee"}** wants you to be their mentor!\n\n` +
               `**Skills they want to learn:** ${menteeData?.skillsSought?.join(", ") || "Not specified"}\n` +
-              `**Career Goals:** ${menteeData?.careerGoals || "Not specified"}\n\n` +
+              `**Career Goals:** ${menteeData?.careerGoals || "Not specified"}\n` +
+              `**What they're looking for:** ${menteeData?.mentorshipGoals || "Not specified"}\n\n` +
               `Review the request: https://codewithahsan.dev/mentorship/requests`
           ).catch((err) =>
             console.error("Failed to send Discord DM to mentor:", err)

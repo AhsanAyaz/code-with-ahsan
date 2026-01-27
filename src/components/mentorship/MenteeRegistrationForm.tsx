@@ -14,6 +14,7 @@ interface MenteeRegistrationFormProps {
     education?: string;
     skillsSought?: string[];
     careerGoals?: string;
+    mentorshipGoals?: string;
     learningStyle?: "self-study" | "guided" | "mixed";
   };
   mode?: "create" | "edit";
@@ -74,6 +75,9 @@ export default function MenteeRegistrationForm({
   );
   const [careerGoals, setCareerGoals] = useState(
     initialData?.careerGoals || ""
+  );
+  const [mentorshipGoals, setMentorshipGoals] = useState(
+    initialData?.mentorshipGoals || ""
   );
   const [learningStyle, setLearningStyle] = useState<
     "self-study" | "guided" | "mixed"
@@ -208,6 +212,11 @@ export default function MenteeRegistrationForm({
       return;
     }
 
+    if (!mentorshipGoals.trim()) {
+      toast.error("Please describe what you're looking for in a mentorship");
+      return;
+    }
+
     if (!discordUsername.trim()) {
       toast.error("Please enter your Discord username");
       return;
@@ -246,6 +255,7 @@ export default function MenteeRegistrationForm({
       education,
       skillsSought,
       careerGoals,
+      mentorshipGoals,
       learningStyle,
     });
   };
@@ -488,6 +498,29 @@ export default function MenteeRegistrationForm({
           required
           maxLength={500}
         />
+      </div>
+
+      {/* Mentorship Goals */}
+      <div className="form-control">
+        <label className="label">
+          <span className="label-text font-semibold">What are you looking for in a mentorship? *</span>
+          <span className="label-text-alt text-base-content/60">
+            {mentorshipGoals.length}/800 characters
+          </span>
+        </label>
+        <textarea
+          placeholder="Describe what you hope to gain from this mentorship. Are you looking for career growth advice, help learning a specific technology, guidance on a project, interview preparation, or something else? Be specific so mentors can determine if they're a good fit."
+          className="textarea textarea-bordered w-full h-36"
+          value={mentorshipGoals}
+          onChange={(e) => setMentorshipGoals(e.target.value)}
+          required
+          maxLength={800}
+        />
+        <label className="label">
+          <span className="label-text-alt text-base-content/60">
+            This helps mentors understand if their skills align with your needs
+          </span>
+        </label>
       </div>
 
       {/* Learning Style */}

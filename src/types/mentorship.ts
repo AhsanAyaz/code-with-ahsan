@@ -37,6 +37,7 @@ export interface MentorshipProfile {
   education?: string;
   skillsSought?: string[];
   careerGoals?: string;
+  mentorshipGoals?: string; // What the mentee is looking for in a mentorship
   learningStyle?: "self-study" | "guided" | "mixed";
 }
 

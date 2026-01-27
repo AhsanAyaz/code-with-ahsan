@@ -45,6 +45,7 @@ export async function GET(request: NextRequest) {
                 education: menteeProfile.education,
                 skillsSought: menteeProfile.skillsSought,
                 careerGoals: menteeProfile.careerGoals,
+                mentorshipGoals: menteeProfile.mentorshipGoals,
                 learningStyle: menteeProfile.learningStyle,
               }
             : null,

@@ -122,6 +122,7 @@ export default function SettingsPage() {
           education: profile.education || "",
           skillsSought: profile.skillsSought || [],
           careerGoals: profile.careerGoals || "",
+          mentorshipGoals: profile.mentorshipGoals || "",
           learningStyle: profile.learningStyle || "mixed",
           discordUsername: profile.discordUsername || "",
           discordUsernameValidated: profile.discordUsernameValidated,
