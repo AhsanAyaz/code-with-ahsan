@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { sendAdminMentorPendingEmail } from "@/lib/email";
-import { lookupMemberByUsername, isDiscordConfigured } from "@/lib/discord";
+import {
+  lookupMemberByUsername,
+  isDiscordConfigured,
+  assignDiscordRole,
+  DISCORD_MENTOR_ROLE_ID,
+  DISCORD_MENTEE_ROLE_ID
+} from "@/lib/discord";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -103,6 +109,14 @@ export async function POST(request: NextRequest) {
     };
 
     await db.collection("mentorship_profiles").doc(uid).set(profile);
+
+    // Assign Discord role (fire-and-forget)
+    if (isDiscordConfigured() && profileData.discordUsername) {
+      const roleId = role === "mentor" ? DISCORD_MENTOR_ROLE_ID : DISCORD_MENTEE_ROLE_ID;
+      assignDiscordRole(profileData.discordUsername, roleId).catch((err) =>
+        console.error("Failed to assign Discord role:", err)
+      );
+    }
 
     // Send admin notification for pending mentor registration
     if (role === "mentor") {
