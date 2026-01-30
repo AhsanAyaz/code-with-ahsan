@@ -119,6 +119,7 @@ export default function SettingsPage() {
   const menteeInitialData =
     profile.role === "mentee"
       ? {
+          displayName: profile.displayName || "",
           education: profile.education || "",
           skillsSought: profile.skillsSought || [],
           careerGoals: profile.careerGoals || "",
