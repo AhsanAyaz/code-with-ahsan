@@ -272,6 +272,11 @@ export default function MentorRegistrationForm({
       return;
     }
 
+    if (!cvUrl.trim()) {
+      toast.error("Please provide your CV or Resume link");
+      return;
+    }
+
     if (!discordUsername.trim()) {
       toast.error("Please enter your Discord username");
       return;
@@ -325,7 +330,7 @@ export default function MentorRegistrationForm({
       expertise,
       currentRole,
       bio,
-      cvUrl: cvUrl.trim() || undefined,
+      cvUrl: cvUrl.trim(),
       majorProjects: majorProjects.trim() || undefined,
       maxMentees,
       availability: availableDays,
@@ -719,8 +724,8 @@ export default function MentorRegistrationForm({
         <div className="form-control">
           <label className="label">
             <span className="label-text font-semibold">CV / Resume Link</span>
-            <span className="label-text-alt text-base-content/60">
-              Optional
+            <span className="label-text-alt text-error">
+              *Required
             </span>
           </label>
           <input
@@ -729,6 +734,7 @@ export default function MentorRegistrationForm({
             className="input input-bordered w-full"
             value={cvUrl}
             onChange={(e) => setCvUrl(e.target.value)}
+            required
           />
           <label className="label">
             <span className="label-text-alt text-base-content/60">
