@@ -574,9 +574,21 @@ export default function MentorRegistrationForm({
           )}
           <label className="label">
             <span className="label-text-alt text-base-content/60">
-              {mode === "create"
-                ? "You must be on our Discord server to register"
-                : "Used for private mentorship channels"}
+              {mode === "create" ? (
+                <>
+                  You must be on our Discord (CodeWithAhsan) server to register.{" "}
+                  <a
+                    href={DISCORD_INVITE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link link-primary"
+                  >
+                    Join here
+                  </a>
+                </>
+              ) : (
+                "Used for private mentorship channels"
+              )}
             </span>
           </label>
         </div>
