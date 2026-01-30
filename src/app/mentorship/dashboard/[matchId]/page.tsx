@@ -69,6 +69,9 @@ export default function RelationshipDashboard({
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [removalReason, setRemovalReason] = useState("");
   const [removing, setRemoving] = useState(false);
+  const [showEndModal, setShowEndModal] = useState(false);
+  const [endReason, setEndReason] = useState("");
+  const [ending, setEnding] = useState(false);
 
   // Announcement image state
   const [announcementImage, setAnnouncementImage] = useState<string | null>(
@@ -176,6 +179,38 @@ export default function RelationshipDashboard({
     } finally {
       setRemoving(false);
       setShowRemoveModal(false);
+    }
+  };
+
+  const handleEndMentorship = async () => {
+    if (!matchDetails || !user) return;
+    setEnding(true);
+    try {
+      const response = await fetch(
+        `/api/mentorship/dashboard/${resolvedParams.matchId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            uid: user.uid,
+            action: "end",
+            removalReason: endReason.trim() || null,
+          }),
+        },
+      );
+      if (response.ok) {
+        toast.success("Mentorship has been ended.");
+        router.push("/mentorship/my-matches");
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to end mentorship");
+      }
+    } catch (error) {
+      console.error("Error ending mentorship:", error);
+      toast.error("Failed to end mentorship. Please try again.");
+    } finally {
+      setEnding(false);
+      setShowEndModal(false);
     }
   };
 
@@ -385,6 +420,16 @@ export default function RelationshipDashboard({
                 onClick={() => setShowRemoveModal(true)}
               >
                 ❌ Remove Mentee
+              </button>
+            )}
+
+            {/* End Mentorship Button (Mentee only) */}
+            {!currentIsMentor && (
+              <button
+                className="btn btn-sm btn-outline btn-error gap-2"
+                onClick={() => setShowEndModal(true)}
+              >
+                ❌ End Mentorship
               </button>
             )}
 
@@ -687,6 +732,66 @@ export default function RelationshipDashboard({
           </div>
           <form method="dialog" className="modal-backdrop">
             <button onClick={() => setShowCompleteModal(false)}>close</button>
+          </form>
+        </dialog>
+      )}
+
+      {/* End Mentorship Modal (Mentee) */}
+      {showEndModal && (
+        <dialog className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg flex items-center gap-2 text-error">
+              ❌ End Mentorship
+            </h3>
+            <p className="py-4 text-base-content/70">
+              Are you sure you want to end your mentorship with{" "}
+              <strong>{currentMatchDetails.partner.displayName}</strong>? This
+              will archive the Discord channel and cannot be undone.
+            </p>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">
+                  Reason (Optional)
+                </span>
+              </label>
+              <textarea
+                className="textarea textarea-bordered h-24"
+                placeholder="Let us know why you're ending the mentorship..."
+                value={endReason}
+                onChange={(e) => setEndReason(e.target.value)}
+              />
+            </div>
+
+            <div className="modal-action">
+              <button
+                className="btn btn-ghost"
+                onClick={() => {
+                  setShowEndModal(false);
+                  setEndReason("");
+                }}
+                disabled={ending}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-error"
+                onClick={handleEndMentorship}
+                disabled={ending}
+              >
+                {ending ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Ending...
+                  </>
+                ) : (
+                  "Confirm End"
+                )}
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={() => setShowEndModal(false)}>close</button>
           </form>
         </dialog>
       )}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import {
   useMentorship,
   MentorshipMatch,
@@ -17,10 +18,12 @@ interface MatchWithProfile extends MentorshipMatch {
 
 export default function MyMatchesPage() {
   const { setShowLoginPopup } = useContext(AuthContext);
+  const toast = useToast();
   const { user, profile, loading, profileLoading } = useMentorship();
   const [activeMatches, setActiveMatches] = useState<MatchWithProfile[]>([]);
   const [pendingMatches, setPendingMatches] = useState<MatchWithProfile[]>([]);
   const [loadingMatches, setLoadingMatches] = useState(true);
+  const [withdrawingId, setWithdrawingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !profileLoading && !user) {
@@ -52,6 +55,34 @@ export default function MyMatchesPage() {
       fetchMatches();
     }
   }, [user, profile]);
+
+  const handleWithdraw = async (matchId: string) => {
+    if (!user) return;
+    setWithdrawingId(matchId);
+    try {
+      const response = await fetch("/api/mentorship/match", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          matchId,
+          action: "withdraw",
+          menteeId: user.uid,
+        }),
+      });
+      if (response.ok) {
+        setPendingMatches((prev) => prev.filter((m) => m.id !== matchId));
+        toast.success("Request withdrawn successfully.");
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to withdraw request");
+      }
+    } catch (error) {
+      console.error("Error withdrawing request:", error);
+      toast.error("Failed to withdraw request. Please try again.");
+    } finally {
+      setWithdrawingId(null);
+    }
+  };
 
   if (loading || profileLoading) {
     return (
@@ -143,8 +174,21 @@ export default function MyMatchesPage() {
                     </div>
                   </div>
                   {profile.role === "mentee" && (
-                    <div className="text-sm text-warning mt-2">
-                      ⏳ Waiting for mentor approval
+                    <div className="flex items-center justify-between mt-2">
+                      <div className="text-sm text-warning">
+                        ⏳ Waiting for mentor approval
+                      </div>
+                      <button
+                        className="btn btn-ghost btn-xs text-error"
+                        onClick={() => handleWithdraw(match.id)}
+                        disabled={withdrawingId === match.id}
+                      >
+                        {withdrawingId === match.id ? (
+                          <span className="loading loading-spinner loading-xs"></span>
+                        ) : (
+                          "Withdraw"
+                        )}
+                      </button>
                     </div>
                   )}
                 </div>
