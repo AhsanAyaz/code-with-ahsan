@@ -74,7 +74,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-23
-Milestone: v1.0 archived
+Last session: 2026-01-30
+Quick task: 001 completed (Discord channel name fallback + timezone)
 Resume file: None
 Next action: Ready for v2 planning or PR creation
