@@ -72,9 +72,14 @@ None yet.
 
 None yet.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 001 | Fix Discord channel name fallback and timezone handling | 2026-01-30 | 43536a6 | [001-fix-discord-channel-name-and-timezone](./quick/001-fix-discord-channel-name-and-timezone/) |
+
 ## Session Continuity
 
-Last session: 2026-01-30
-Quick task: 001 completed (Discord channel name fallback + timezone)
+Last activity: 2026-01-30 - Completed quick task 001: Fix Discord channel name fallback and timezone handling
 Resume file: None
 Next action: Ready for v2 planning or PR creation
