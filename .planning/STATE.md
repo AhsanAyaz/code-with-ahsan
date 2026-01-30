@@ -68,6 +68,16 @@ Recent decisions affecting current work:
 
 None yet.
 
+### Workflow Notes
+
+**Quick task + PR workflow:**
+For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
+1. Checkout `main`, pull latest, create a `fix/<issue>-<slug>` branch
+2. Cherry-pick the implementation commits (not docs commits) onto the new branch
+3. `git rebase main`
+4. Push and `gh pr create --base main` with "Closes #NNN" in the body
+5. Update STATE.md with the quick task record
+
 ### Blockers/Concerns
 
 None yet.
