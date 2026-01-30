@@ -33,6 +33,8 @@ export default function SessionScheduler({
   menteeEmail,
 }: SessionSchedulerProps) {
   const toast = useToast();
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const tzAbbreviation = new Date().toLocaleTimeString("en-US", { timeZoneName: "short" }).split(" ").pop() || "";
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -99,6 +101,7 @@ export default function SessionScheduler({
           duration: formData.duration,
           agenda: formData.agenda,
           templateId: formData.templateId || null,
+          mentorTimezone: userTimezone,
         }),
       });
 
@@ -271,7 +274,7 @@ export default function SessionScheduler({
               </div>
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text font-semibold">Time *</span>
+                  <span className="label-text font-semibold">Time * <span className="font-normal text-base-content/60">({tzAbbreviation})</span></span>
                 </label>
                 <input
                   type="time"
