@@ -9,6 +9,7 @@ interface MenteeRegistrationFormProps {
   onSubmit: (data: Record<string, unknown>) => Promise<void>;
   isSubmitting: boolean;
   initialData?: {
+    displayName?: string;
     discordUsername?: string;
     discordUsernameValidated?: boolean;
     education?: string;
@@ -66,6 +67,9 @@ export default function MenteeRegistrationForm({
   mode = "create",
 }: MenteeRegistrationFormProps) {
   const toast = useToast();
+  const [displayName, setDisplayName] = useState(
+    initialData?.displayName || ""
+  );
   const [discordUsername, setDiscordUsername] = useState(
     initialData?.discordUsername || ""
   );
@@ -202,6 +206,11 @@ export default function MenteeRegistrationForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!displayName.trim()) {
+      toast.error("Please enter your display name");
+      return;
+    }
+
     if (skillsSought.length === 0) {
       toast.error("Please select at least one skill you want to learn");
       return;
@@ -251,6 +260,7 @@ export default function MenteeRegistrationForm({
     }
 
     await onSubmit({
+      displayName: displayName.trim(),
       discordUsername: finalDiscordUsername,
       education,
       skillsSought,
@@ -262,6 +272,26 @@ export default function MenteeRegistrationForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Display Name */}
+      <div className="form-control">
+        <label className="label">
+          <span className="label-text font-semibold">Display Name *</span>
+        </label>
+        <input
+          type="text"
+          placeholder="Your full name"
+          className="input input-bordered w-full"
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+          required
+        />
+        <label className="label">
+          <span className="label-text-alt text-base-content/60">
+            This is how your name appears across the platform
+          </span>
+        </label>
+      </div>
+
       {/* Discord Username + Education - Two column grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Discord Username */}

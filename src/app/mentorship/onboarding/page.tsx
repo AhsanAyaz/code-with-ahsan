@@ -91,7 +91,7 @@ function OnboardingContent() {
       const profileData = {
         uid: user.uid,
         role: selectedRole,
-        displayName: user.displayName,
+        displayName: formData.displayName || user.displayName,
         email: user.email,
         photoURL: user.photoURL,
         ...formData,
@@ -234,11 +234,13 @@ function OnboardingContent() {
               <MentorRegistrationForm
                 onSubmit={handleFormSubmit}
                 isSubmitting={isSubmitting}
+                initialData={{ displayName: user?.displayName || "" }}
               />
             ) : (
               <MenteeRegistrationForm
                 onSubmit={handleFormSubmit}
                 isSubmitting={isSubmitting}
+                initialData={{ displayName: user?.displayName || "" }}
               />
             )}
           </div>
