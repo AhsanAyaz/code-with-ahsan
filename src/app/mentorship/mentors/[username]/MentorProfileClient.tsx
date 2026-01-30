@@ -46,6 +46,8 @@ export default function MentorProfileClient({
     hasRated: boolean;
   } | null>(null);
   const [requestingMentor, setRequestingMentor] = useState(false);
+  const [pendingMatchId, setPendingMatchId] = useState<string | null>(null);
+  const [withdrawing, setWithdrawing] = useState(false);
 
   // Rating modal state
   const [showRatingModal, setShowRatingModal] = useState(false);
@@ -103,6 +105,9 @@ export default function MentorProfileClient({
                 hasRated: request.hasRated || false,
               });
             }
+            if (request.status === "pending") {
+              setPendingMatchId(request.sessionId || request.id);
+            }
           } else {
             setRequestStatus("none");
           }
@@ -147,6 +152,37 @@ export default function MentorProfileClient({
       toast.error("An error occurred. Please try again.");
     } finally {
       setRequestingMentor(false);
+    }
+  };
+
+  const handleWithdraw = async () => {
+    if (!user || !pendingMatchId) return;
+
+    setWithdrawing(true);
+    try {
+      const response = await fetch("/api/mentorship/match", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          matchId: pendingMatchId,
+          action: "withdraw",
+          menteeId: user.uid,
+        }),
+      });
+
+      if (response.ok) {
+        setRequestStatus("none");
+        setPendingMatchId(null);
+        toast.success("Request withdrawn successfully.");
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Failed to withdraw request");
+      }
+    } catch (err) {
+      console.error("Error withdrawing request:", err);
+      toast.error("Failed to withdraw request. Please try again.");
+    } finally {
+      setWithdrawing(false);
     }
   };
 
@@ -239,23 +275,39 @@ export default function MentorProfileClient({
     switch (requestStatus) {
       case "pending":
         return (
-          <button className="btn btn-warning" disabled>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          <>
+            <button className="btn btn-warning" disabled>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Request Pending
+            </button>
+            <button
+              className="btn btn-error btn-outline"
+              onClick={handleWithdraw}
+              disabled={withdrawing}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            Request Pending
-          </button>
+              {withdrawing ? (
+                <>
+                  <span className="loading loading-spinner loading-sm"></span>
+                  Withdrawing...
+                </>
+              ) : (
+                "Withdraw Request"
+              )}
+            </button>
+          </>
         );
       case "declined":
         return (

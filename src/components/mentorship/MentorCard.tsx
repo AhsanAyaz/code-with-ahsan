@@ -23,6 +23,8 @@ interface MentorCardProps {
     rating: number,
     feedback: string
   ) => Promise<void>;
+  onWithdraw?: (mentorId: string) => Promise<void>;
+  isWithdrawing?: boolean;
   currentUserId?: string;
 }
 
@@ -32,6 +34,8 @@ export default function MentorCard({
   isRequesting,
   requestStatus,
   onRateNow,
+  onWithdraw,
+  isWithdrawing,
   currentUserId,
 }: MentorCardProps) {
   // Check if mentor is at capacity (these fields come from API)
@@ -63,23 +67,38 @@ export default function MentorCard({
     switch (requestStatus) {
       case "pending":
         return (
-          <button className="btn btn-warning btn-block" disabled>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            Request Pending
-          </button>
+          <div className="flex gap-2">
+            <button className="btn btn-warning flex-1" disabled>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Request Pending
+            </button>
+            {onWithdraw && (
+              <button
+                className="btn btn-error btn-outline"
+                onClick={() => onWithdraw(mentor.uid)}
+                disabled={isWithdrawing}
+              >
+                {isWithdrawing ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  "Withdraw"
+                )}
+              </button>
+            )}
+          </div>
         );
       case "declined":
         return (
