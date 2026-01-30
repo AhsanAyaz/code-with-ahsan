@@ -107,8 +107,9 @@ export default function SessionScheduler({
 
       if (response.ok) {
         const data = await response.json();
+        const newSession = data.scheduledSession;
         setSessions((prev) =>
-          [...prev, data.scheduledSession].sort(
+          [...prev, newSession].sort(
             (a, b) =>
               new Date(a.scheduledAt).getTime() -
               new Date(b.scheduledAt).getTime()
@@ -123,6 +124,8 @@ export default function SessionScheduler({
         });
         setSelectedTemplate(null);
         setShowForm(false);
+        // Auto-open Google Calendar with the new session
+        openGoogleCalendar(newSession);
       }
     } catch (error) {
       console.error("Error scheduling session:", error);
