@@ -728,8 +728,70 @@ export function isDiscordConfigured(): boolean {
   return configured;
 }
 
+// Discord role IDs for automatic assignment
+export const DISCORD_MENTOR_ROLE_ID = "1422193153397493893";
+export const DISCORD_MENTEE_ROLE_ID = "1445734846730338386";
+
 // The #find-a-mentor channel ID for completion announcements
 const FIND_A_MENTOR_CHANNEL_ID = "1419645845258768385";
+
+/**
+ * Assign a Discord role to a user
+ * This is a fire-and-forget operation - failures are logged but do not throw
+ *
+ * @param discordUsername - The user's Discord username
+ * @param roleId - The role ID to assign
+ * @returns true if role was assigned successfully, false otherwise
+ */
+export async function assignDiscordRole(
+  discordUsername: string,
+  roleId: string
+): Promise<boolean> {
+  log.debug(`Assigning role ${roleId} to user ${discordUsername}`);
+
+  try {
+    // Look up the member by username
+    const member = await lookupMemberByUsername(discordUsername);
+    if (!member) {
+      log.warn(
+        `[Discord] Cannot assign role - user not found: ${discordUsername}`
+      );
+      return false;
+    }
+
+    const guildId = getGuildId();
+
+    // Assign the role using Discord API
+    // PUT /guilds/{guild_id}/members/{user_id}/roles/{role_id}
+    // Returns 204 No Content on success
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/guilds/${guildId}/members/${member.id}/roles/${roleId}`,
+      {
+        method: "PUT",
+        headers: getHeaders(),
+      }
+    );
+
+    if (response.status === 204) {
+      log.debug(
+        `Successfully assigned role ${roleId} to ${discordUsername} (ID: ${member.id})`
+      );
+      return true;
+    } else {
+      const errorText = await response.text();
+      log.error(
+        `[Discord] Failed to assign role ${roleId} to ${discordUsername}: ${response.status} - ${errorText}`
+      );
+      return false;
+    }
+  } catch (error) {
+    log.error(
+      `[Discord] Error assigning role ${roleId} to ${discordUsername}:`,
+      error
+    );
+    return false;
+  }
+}
 
 /**
  * Send a completion announcement to the #find-a-mentor channel
