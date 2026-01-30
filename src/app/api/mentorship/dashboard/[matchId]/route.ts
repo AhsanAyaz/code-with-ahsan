@@ -347,6 +347,104 @@ export async function PUT(
         },
         { status: 200 }
       );
+    } else if (action === "end") {
+      // Mentees can end their active mentorships
+      if (isMentor) {
+        return NextResponse.json(
+          { error: "Mentors should use 'remove' or 'complete' instead" },
+          { status: 400 }
+        );
+      }
+
+      if (matchData.status !== "active") {
+        return NextResponse.json(
+          { error: "Can only end active mentorships" },
+          { status: 400 }
+        );
+      }
+
+      await db
+        .collection("mentorship_sessions")
+        .doc(resolvedParams.matchId)
+        .update({
+          status: "cancelled",
+          cancellationReason: removalReason || "ended_by_mentee",
+          cancelledAt: new Date(),
+          cancelledBy: uid,
+        });
+
+      // Fetch profiles for notifications
+      const [mentorProfile, menteeProfile] = await Promise.all([
+        db.collection("mentorship_profiles").doc(matchData.mentorId).get(),
+        db.collection("mentorship_profiles").doc(matchData.menteeId).get(),
+      ]);
+
+      const mentorData = mentorProfile.exists ? mentorProfile.data() : null;
+      const menteeData = menteeProfile.exists ? menteeProfile.data() : null;
+
+      const notificationTasks = [];
+
+      // Send message to channel before archiving
+      if (isDiscordConfigured() && matchData.discordChannelId) {
+        notificationTasks.push(
+          sendChannelMessage(
+            matchData.discordChannelId,
+            `📢 This mentorship has been ended by the mentee. The channel will be archived.`
+          ).catch((err) =>
+            console.error("Channel message before archive failed:", err)
+          )
+        );
+      }
+
+      // Archive Discord channel
+      if (isDiscordConfigured() && matchData.discordChannelId) {
+        notificationTasks.push(
+          archiveMentorshipChannel(matchData.discordChannelId).catch((err) =>
+            console.error("Discord channel archiving failed:", err)
+          )
+        );
+      }
+
+      // Notify mentor via DM
+      if (isDiscordConfigured() && mentorData?.discordUsername && menteeData) {
+        notificationTasks.push(
+          sendDirectMessage(
+            mentorData.discordUsername,
+            `📢 **${menteeData.displayName || "Your mentee"}** has ended the mentorship.\n\n` +
+              `You now have an open slot for a new mentee.`
+          ).catch((err) => console.error("Mentor end DM failed:", err))
+        );
+      }
+
+      // Send email to mentor
+      if (mentorData && menteeData) {
+        notificationTasks.push(
+          sendMentorshipRemovedEmail(
+            {
+              uid: matchData.mentorId,
+              displayName: mentorData.displayName || "",
+              email: mentorData.email || "",
+              role: "mentor",
+            },
+            {
+              uid: matchData.menteeId,
+              displayName: menteeData.displayName || "",
+              email: menteeData.email || "",
+              role: "mentee",
+            }
+          ).catch((err) => console.error("Failed to send end email:", err))
+        );
+      }
+
+      await Promise.allSettled(notificationTasks);
+
+      return NextResponse.json(
+        {
+          success: true,
+          message: "Mentorship ended successfully",
+        },
+        { status: 200 }
+      );
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });

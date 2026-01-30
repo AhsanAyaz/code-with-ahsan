@@ -501,6 +501,49 @@ export async function PUT(request: NextRequest) {
         { success: true, message: "Match declined" },
         { status: 200 }
       );
+    } else if (action === "withdraw") {
+      // Mentees can withdraw their own pending requests
+      const { menteeId } = body;
+
+      if (!menteeId || matchData?.menteeId !== menteeId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      }
+
+      if (matchData?.status !== "pending") {
+        return NextResponse.json(
+          { error: "Can only withdraw pending requests" },
+          { status: 400 }
+        );
+      }
+
+      await matchRef.update({
+        status: "cancelled",
+        cancellationReason: "withdrawn_by_mentee",
+        cancelledAt: FieldValue.serverTimestamp(),
+        cancelledBy: menteeId,
+      });
+
+      // Notify mentor via Discord DM (fire-and-forget)
+      const [mentorProfile, menteeProfile] = await Promise.all([
+        db.collection("mentorship_profiles").doc(matchData.mentorId).get(),
+        db.collection("mentorship_profiles").doc(menteeId).get(),
+      ]);
+      const mentorData = mentorProfile.exists ? mentorProfile.data() : null;
+      const menteeData = menteeProfile.exists ? menteeProfile.data() : null;
+
+      if (isDiscordConfigured() && mentorData?.discordUsername && menteeData) {
+        sendDirectMessage(
+          mentorData.discordUsername,
+          `📢 **${menteeData.displayName || "A mentee"}** has withdrawn their mentorship request.`
+        ).catch((err) =>
+          console.error("Failed to send withdrawal DM to mentor:", err)
+        );
+      }
+
+      return NextResponse.json(
+        { success: true, message: "Request withdrawn" },
+        { status: 200 }
+      );
     }
 
     // Note: 'complete' action is handled by /api/mentorship/dashboard/[matchId]
