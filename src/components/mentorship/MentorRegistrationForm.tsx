@@ -257,6 +257,11 @@ export default function MentorRegistrationForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!displayName.trim()) {
+      toast.error("Please enter your display name");
+      return;
+    }
+
     if (expertise.length === 0) {
       toast.error("Please select at least one area of expertise");
       return;
@@ -316,6 +321,7 @@ export default function MentorRegistrationForm({
       );
 
     await onSubmit({
+      displayName: displayName.trim(),
       expertise,
       currentRole,
       bio,
@@ -326,9 +332,6 @@ export default function MentorRegistrationForm({
       isPublic,
       discordUsername: finalDiscordUsername,
       ...(mode === "edit" && username ? { username: username.trim() } : {}),
-      ...(mode === "edit" && displayName
-        ? { displayName: displayName.trim() }
-        : {}),
       ...(mode === "edit" && photoURL ? { photoURL } : {}),
     });
   };
@@ -366,11 +369,11 @@ export default function MentorRegistrationForm({
         </div>
       )}
 
-      {/* Display Name and Profile Image - Only shown in edit mode */}
-      {mode === "edit" && (
-        <div className="form-control">
-          <div className="flex flex-row gap-6 items-start">
-            {/* Profile Image */}
+      {/* Display Name and Profile Image */}
+      <div className="form-control">
+        <div className="flex flex-row gap-6 items-start">
+          {/* Profile Image - Only shown in edit mode */}
+          {mode === "edit" && (
             <div className="flex flex-col items-center gap-2">
               <div className="relative">
                 <div className="avatar">
@@ -414,28 +417,29 @@ export default function MentorRegistrationForm({
                 Max 5MB
               </span>
             </div>
+          )}
 
-            {/* Display Name */}
-            <div className="flex-1">
-              <label className="label pt-0">
-                <span className="label-text font-semibold">Display Name</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Your display name"
-                className="input input-bordered w-full"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-              />
-              <label className="label">
-                <span className="label-text-alt text-base-content/60">
-                  This is how your name appears across the platform
-                </span>
-              </label>
-            </div>
+          {/* Display Name */}
+          <div className="flex-1">
+            <label className="label pt-0">
+              <span className="label-text font-semibold">Display Name *</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Your full name"
+              className="input input-bordered w-full"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              required
+            />
+            <label className="label">
+              <span className="label-text-alt text-base-content/60">
+                This is how your name appears across the platform
+              </span>
+            </label>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Current Role + Discord Username - Two column grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
