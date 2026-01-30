@@ -54,8 +54,8 @@ export async function POST(request: NextRequest) {
 
     // Create new Discord channel
     const channelResult = await createMentorshipChannel(
-      mentorProfile?.displayName || 'Unknown Mentor',
-      menteeProfile?.displayName || 'Unknown Mentee',
+      mentorProfile?.displayName || mentorProfile?.email?.split("@")[0] || 'Unknown Mentor',
+      menteeProfile?.displayName || menteeProfile?.email?.split("@")[0] || 'Unknown Mentee',
       sessionId,
       mentorProfile?.discordUsername,
       menteeProfile?.discordUsername

@@ -378,8 +378,8 @@ export async function PUT(request: NextRequest) {
       if (isDiscordConfigured() && mentorProfileData) {
         try {
           const result = await createMentorshipChannel(
-            mentorProfileData.displayName || "Mentor",
-            menteeData?.displayName || "Mentee",
+            mentorProfileData.displayName || mentorProfileData.email?.split("@")[0] || "Mentor",
+            menteeData?.displayName || menteeData?.email?.split("@")[0] || "Mentee",
             matchId,
             mentorProfileData.discordUsername,
             menteeData?.discordUsername
