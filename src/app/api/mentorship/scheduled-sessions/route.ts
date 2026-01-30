@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { sessionId, scheduledAt, duration, agenda, templateId } = body;
+    const { sessionId, scheduledAt, duration, agenda, templateId, mentorTimezone } = body;
 
     if (!sessionId || !scheduledAt) {
       return NextResponse.json(
@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
       duration: duration || 30,
       agenda: agenda || "",
       templateId: templateId || null,
+      mentorTimezone: mentorTimezone || null,
       notes: "",
       createdAt: FieldValue.serverTimestamp(),
     };
@@ -83,16 +84,23 @@ export async function POST(request: NextRequest) {
           month: "long",
           day: "numeric",
         });
-        const formattedTime = sessionDate.toLocaleTimeString("en-US", {
+        const timeFormatOptions: Intl.DateTimeFormatOptions = {
           hour: "2-digit",
           minute: "2-digit",
-        });
+          ...(mentorTimezone ? { timeZone: mentorTimezone } : {}),
+        };
+        const formattedTime = sessionDate.toLocaleTimeString("en-US", timeFormatOptions);
+
+        // Get timezone abbreviation for display
+        const tzLabel = mentorTimezone
+          ? sessionDate.toLocaleTimeString("en-US", { timeZone: mentorTimezone, timeZoneName: "short" }).split(" ").pop()
+          : "";
 
         await sendChannelMessage(
           mentorshipData.discordChannelId,
           `📅 **Session Scheduled!**\n\n` +
             `**Date:** ${formattedDate}\n` +
-            `**Time:** ${formattedTime}\n` +
+            `**Time:** ${formattedTime}${tzLabel ? ` (${tzLabel})` : ""}\n` +
             `**Duration:** ${duration || 30} minutes\n` +
             (agenda ? `**Agenda:** ${agenda}\n\n` : "\n") +
             `Mark your calendars! 🗓️`
