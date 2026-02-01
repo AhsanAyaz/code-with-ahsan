@@ -88,9 +88,10 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 001 | Fix Discord channel name fallback and timezone handling | 2026-01-30 | 43536a6 | [001-fix-discord-channel-name-and-timezone](./quick/001-fix-discord-channel-name-and-timezone/) |
 | 002 | Assign Discord roles on mentor/mentee signup | 2026-01-30 | f8e3b26 | [002-assign-discord-roles-on-signup](./quick/002-assign-discord-roles-on-signup/) |
+| 003 | Add profile preview buttons for admins and mentors | 2026-02-01 | 365c4fd | [003-add-profile-preview-buttons-1-add-a-prof](./quick/003-add-profile-preview-buttons-1-add-a-prof/) |
 
 ## Session Continuity
 
-Last activity: 2026-01-30 - Completed quick task 002: Assign Discord roles on mentor/mentee signup
+Last activity: 2026-02-01 - Completed quick task 003: Add profile preview buttons for admins and mentors
 Resume file: None
 Next action: Ready for v2 planning or PR creation
