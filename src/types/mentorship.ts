@@ -69,6 +69,7 @@ export interface PublicMentor {
 export interface MentorProfileDetails extends PublicMentor {
   majorProjects?: string;
   createdAt: string | null;
+  status?: string;
 }
 
 /**

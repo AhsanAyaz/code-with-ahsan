@@ -17,6 +17,22 @@ export async function GET(request: NextRequest, context: RouteContext) {
   }
 
   try {
+    // Check for admin token
+    const adminToken = request.headers.get("x-admin-token");
+    let isAdminRequest = false;
+
+    if (adminToken) {
+      // Validate admin token
+      const sessionDoc = await db.collection("admin_sessions").doc(adminToken).get();
+      if (sessionDoc.exists) {
+        const session = sessionDoc.data();
+        const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
+        if (expiresAt >= new Date()) {
+          isAdminRequest = true;
+        }
+      }
+    }
+
     // Fetch the mentor's profile by username
     const profilesSnapshot = await db
       .collection("mentorship_profiles")
@@ -33,15 +49,15 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const profileData = profileDoc.data();
     const uid = profileDoc.id;
 
-    // Verify this is a public, accepted mentor
-    if (profileData?.status !== "accepted") {
+    // Verify this is a public, accepted mentor (bypass for admin)
+    if (profileData?.status !== "accepted" && !isAdminRequest) {
       return NextResponse.json(
         { error: "Mentor profile is not available" },
         { status: 404 }
       );
     }
 
-    if (profileData?.isPublic === false) {
+    if (profileData?.isPublic === false && !isAdminRequest) {
       return NextResponse.json(
         { error: "Mentor profile is private" },
         { status: 404 }
@@ -96,6 +112,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       isAtCapacity:
         activeMenteeCount >= (profileData.maxMentees || DEFAULT_MAX_MENTEES),
       createdAt: profileData.createdAt?.toDate?.() || null,
+      status: profileData.status,
     };
 
     return NextResponse.json({ mentor }, { status: 200 });

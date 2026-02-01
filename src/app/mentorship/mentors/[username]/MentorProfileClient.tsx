@@ -22,11 +22,13 @@ type RequestStatus = "none" | "pending" | "declined" | "active" | "completed";
 interface MentorProfileClientProps {
   username: string;
   initialMentor?: MentorProfileDetails | null;
+  isAdminPreview?: boolean;
 }
 
 export default function MentorProfileClient({
   username,
   initialMentor,
+  isAdminPreview = false,
 }: MentorProfileClientProps) {
   const [mentor, setMentor] = useState<MentorProfileDetails | null>(
     initialMentor ?? null
@@ -61,7 +63,21 @@ export default function MentorProfileClient({
 
     const fetchMentor = async () => {
       try {
-        const response = await fetch(`/api/mentorship/mentors/${username}`);
+        // For admin preview, get token from localStorage
+        const headers: HeadersInit = {};
+        if (isAdminPreview) {
+          const adminToken = localStorage.getItem("mentorship_admin_token");
+          if (!adminToken) {
+            setError("Admin authentication required");
+            setLoading(false);
+            return;
+          }
+          headers["x-admin-token"] = adminToken;
+        }
+
+        const response = await fetch(`/api/mentorship/mentors/${username}`, {
+          headers,
+        });
         if (response.ok) {
           const data = await response.json();
           setMentor(data.mentor);
@@ -80,7 +96,7 @@ export default function MentorProfileClient({
     if (username) {
       fetchMentor();
     }
-  }, [username, initialMentor]);
+  }, [username, initialMentor, isAdminPreview]);
 
   // Fetch mentee's request status for this mentor
   useEffect(() => {
@@ -463,6 +479,26 @@ export default function MentorProfileClient({
 
   return (
     <div className="space-y-6">
+      {/* Admin Preview Banner */}
+      {isAdminPreview && mentor && mentor.status !== "accepted" && (
+        <div className="alert alert-warning">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <span>Admin Preview - This profile is not publicly visible</span>
+        </div>
+      )}
+
       {/* Breadcrumb */}
       <div className="breadcrumbs text-sm">
         <ul>

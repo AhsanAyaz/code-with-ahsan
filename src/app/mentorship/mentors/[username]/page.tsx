@@ -5,6 +5,7 @@ import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 
 interface PageProps {
   params: Promise<{ username: string }>;
+  searchParams: Promise<{ admin?: string }>;
 }
 
 // Fetch mentor data for both metadata and initial render
@@ -170,9 +171,16 @@ export async function generateMetadata({
   };
 }
 
-export default async function MentorProfilePage({ params }: PageProps) {
+export default async function MentorProfilePage({ params, searchParams }: PageProps) {
   const { username } = await params;
+  const resolvedSearchParams = await searchParams;
   const mentor = await getMentorData(username);
 
-  return <MentorProfileClient username={username} initialMentor={mentor} />;
+  return (
+    <MentorProfileClient
+      username={username}
+      initialMentor={mentor}
+      isAdminPreview={resolvedSearchParams.admin === "1"}
+    />
+  );
 }
