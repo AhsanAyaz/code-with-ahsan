@@ -313,6 +313,24 @@ export default function MentorshipDashboardPage() {
           </Link>
         )}
 
+        {profile.role === "mentor" && (
+          <Link
+            href={`/mentorship/mentors/${profile.username || user.uid}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer"
+          >
+            <div className="card-body">
+              <h3 className="card-title">
+                <span className="text-2xl">👤</span> View My Profile
+              </h3>
+              <p className="text-base-content/70 text-sm">
+                Preview your public mentor profile
+              </p>
+            </div>
+          </Link>
+        )}
+
         <Link
           href="/mentorship/my-matches"
           className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer relative"
