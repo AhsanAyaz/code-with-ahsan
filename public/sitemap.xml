@@ -49,6 +49,10 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/mentorship/browse</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/mentorship/dashboard</loc>
   </url>
 
@@ -57,15 +61,15 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/my-matches</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/mentorship/mentors</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/browse</loc>
+    <loc>https://codewithahsan.dev/mentorship/my-matches</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
   </url>
 
   <url>
@@ -74,10 +78,6 @@
 
   <url>
     <loc>https://codewithahsan.dev/mentorship/settings</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
   </url>
 
   <url>

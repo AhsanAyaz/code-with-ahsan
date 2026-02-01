@@ -63,6 +63,8 @@ Recent decisions affecting current work:
 | Toggle defaults to OFF for declined mentors | 03-01 | Hides declined mentors from default view for cleaner UI |
 | Reuse handleStatusChange for restore | 03-01 | Leverages existing status update infrastructure |
 | Show toggle only on All Mentors tab | 03-01 | Declined status only applies to mentors |
+| Use x-admin-token header for admin profile bypass | quick-004 | Reuses admin_sessions validation, consistent with existing admin auth |
+| Query param ?admin=1 triggers admin preview mode | quick-004 | Simple boolean flag for admin-authenticated viewing |
 
 ### Pending Todos
 
@@ -89,9 +91,10 @@ None yet.
 | 001 | Fix Discord channel name fallback and timezone handling | 2026-01-30 | 43536a6 | [001-fix-discord-channel-name-and-timezone](./quick/001-fix-discord-channel-name-and-timezone/) |
 | 002 | Assign Discord roles on mentor/mentee signup | 2026-01-30 | f8e3b26 | [002-assign-discord-roles-on-signup](./quick/002-assign-discord-roles-on-signup/) |
 | 003 | Add profile preview buttons for admins and mentors | 2026-02-01 | 365c4fd | [003-add-profile-preview-buttons-1-add-a-prof](./quick/003-add-profile-preview-buttons-1-add-a-prof/) |
+| 004 | Fix admin profile preview for declined mentors | 2026-02-01 | 6e6ffec | [004-fix-admin-profile-preview-for-declined-m](./quick/004-fix-admin-profile-preview-for-declined-m/) |
 
 ## Session Continuity
 
-Last activity: 2026-02-01 - Completed quick task 003: Add profile preview buttons for admins and mentors
+Last activity: 2026-02-01 - Completed quick task 004: Fix admin profile preview for declined mentors
 Resume file: None
 Next action: Ready for v2 planning or PR creation
