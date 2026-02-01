@@ -120,6 +120,7 @@ export default function AdminPage() {
   const [loadingMentorships, setLoadingMentorships] = useState(false);
   const [mentorshipSummary, setMentorshipSummary] = useState<MentorshipSummary | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchInputValue, setSearchInputValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 15;
 
@@ -1280,7 +1281,11 @@ export default function AdminPage() {
               type="text"
               placeholder="Search by name, email, or Discord..."
               className="input input-bordered w-full"
-              onChange={(e) => debouncedSearch(e.target.value)}
+              value={searchInputValue}
+              onChange={(e) => {
+                setSearchInputValue(e.target.value);
+                debouncedSearch(e.target.value);
+              }}
             />
           </div>
 
