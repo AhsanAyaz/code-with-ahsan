@@ -10,7 +10,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "test:rules": "firebase emulators:exec --only firestore 'npx vitest run src/__tests__/security-rules/'"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
