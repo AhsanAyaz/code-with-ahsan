@@ -11,18 +11,18 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 Milestone: v2.0
 Phase: 5 of 10 (Projects - Core Lifecycle)
-Plan: 1 of 3
+Plan: 2 of 3
 Status: In progress
-Last activity: 2026-02-02 — Completed 05-01-PLAN.md (Backend API and Discord integration)
+Last activity: 2026-02-02 — Completed 05-02-PLAN.md (Projects frontend UI)
 
-Progress: [█████████░] 91% (10/11 total plans complete across current phases)
+Progress: [█████████░] 92% (11/12 total plans complete across current phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10 (v1.0: 5, v2.0: 5)
-- Average duration: ~23 min
-- Total execution time: ~4 hours
+- Total plans completed: 11 (v1.0: 5, v2.0: 6)
+- Average duration: ~33 min
+- Total execution time: ~6 hours
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [█████████░] 91% (10/11 total plans complete acros
 | 02 | 2 | ~60 min | ~30 min |
 | 03 | 1 | 2 min | 2 min |
 | 04 | 4 | 10 min | 2.5 min |
-| 05 | 1 | 3 min | 3 min |
+| 05 | 2 | 132 min | 66 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (2min), 04-03 (3min), 04-04 (3min), 05-01 (3min)
-- Trend: Phases 4-5 maintaining consistent 2-3 minute execution with clear requirements and established patterns
+- Last 5 plans: 04-03 (3min), 04-04 (3min), 05-01 (3min), 05-02 (129min)
+- Trend: Phase 05-02 longer due to checkpoint with user-driven enhancements (6 commits during verification)
 
 *Updated after each plan completion*
 
@@ -71,6 +71,12 @@ Recent decisions affecting current work:
 | Non-blocking Discord failures | 05-01 | Project status transitions proceed even if Discord channel creation/archival fails |
 | Creator-only completion | 05-01 | Only project creator can complete projects (not admin) - ownership model |
 | Denormalized creator profile in projects | 05-01 | Project documents include {displayName, photoURL, username} subset |
+| Projects tab in admin dashboard | 05-02 | Follows existing tab pattern for consistency (overview, pending, all-mentors, all-mentees, projects) |
+| Decline reason required | 05-02 | Admin must provide reason when declining project proposals for documentation |
+| Declined projects deleted | 05-02 | Declined projects removed from database (not marked as declined) for cleaner admin view |
+| React 19 useActionState for forms | 05-02 | Modern form handling with pending states and error handling |
+| MentorshipProvider layout pattern | 05-02 | Feature-specific layouts wrap routes needing auth context to avoid prerender errors |
+| Project submission guidelines | 05-02 | Collapsible info section with best practices to improve proposal quality |
 
 ### Pending Todos
 
@@ -94,14 +100,19 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 - ✅ Permission system enforces all PERM requirements with 50 test cases
 - ✅ Comprehensive test coverage: 25 validation tests + 20 security rules tests + 50 permission tests
 
-**Phase 5 Plan 1 Complete:**
+**Phase 5 Plans 1-2 Complete:**
 - ✅ Discord project channel management following mentorship patterns (category batching, rate limiting)
 - ✅ POST /api/projects creates projects with validation and permission checks
 - ✅ GET /api/projects lists projects with status/creator filters
 - ✅ PUT /api/projects/[id] handles approve (Discord channel + pin), decline (reason), complete (archive)
+- ✅ Admin dashboard Projects tab with approve/decline workflow
+- ✅ Project creation form at /projects/new with React 19 useActionState
+- ✅ Create Project button in mentor dashboard for discoverability
+- ✅ Project submission guidelines for quality control
 - ✅ lastActivityAt tracking on all project mutations
 - Discord category limit monitoring system required before scale (currently tracking in concerns)
 - Rate limiting on Discord API handled by existing fetchWithRateLimit, but volume testing needed
+- Project discovery/browsing page needed for users to find active projects (separate from creation flow)
 
 **Phase 8 Readiness:**
 - Firebase Storage integration pattern for Markdown content needs architecture research (version conflicts with concurrent edits)
@@ -118,9 +129,9 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 
 ## Session Continuity
 
-Last session: 2026-02-02 09:03
-Stopped at: Completed 05-01-PLAN.md (Backend API and Discord integration)
-Resume file: None (ready to continue Phase 5)
+Last session: 2026-02-02 11:18
+Stopped at: Completed 05-02-PLAN.md (Projects frontend UI with checkpoint enhancements)
+Resume file: None (ready to continue Phase 5 Plan 3)
 
 ---
-*Updated: 2026-02-02 after completing 05-01-PLAN.md*
+*Updated: 2026-02-02 after completing 05-02-PLAN.md*
