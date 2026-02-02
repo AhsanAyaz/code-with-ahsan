@@ -331,6 +331,22 @@ export default function MentorshipDashboardPage() {
           </Link>
         )}
 
+        {profile.role === "mentor" && profile.status === "accepted" && (
+          <Link
+            href="/projects/new"
+            className="card bg-gradient-to-br from-primary/10 to-secondary/10 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer border border-primary/20"
+          >
+            <div className="card-body">
+              <h3 className="card-title">
+                <span className="text-2xl">✨</span> Create Project
+              </h3>
+              <p className="text-base-content/70 text-sm">
+                Start a new collaborative project
+              </p>
+            </div>
+          </Link>
+        )}
+
         <Link
           href="/mentorship/my-matches"
           className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer relative"
