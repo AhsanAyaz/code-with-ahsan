@@ -117,12 +117,12 @@ Plans:
   7. Team members automatically added to Discord channel with appropriate permissions
   8. Project detail page shows current team roster with roles (Creator, Member)
 
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 06-01: Public project discovery and detail pages
-- [ ] 06-02: Application workflow (apply, approve, decline)
-- [ ] 06-03: Invitation workflow and Discord team sync
+- [ ] 06-01-PLAN.md — Types, skill mismatch helper, Discord member functions, Firestore rules
+- [ ] 06-02-PLAN.md — Application and invitation API routes with member removal
+- [ ] 06-03-PLAN.md — Discovery page, project detail page, and team management UI
 
 ---
 
@@ -236,7 +236,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 3. Declined Mentors | v1.0 | 1/1 | Complete | 2026-01-23 |
 | 4. Foundation | v2.0 | 4/4 | Complete | 2026-02-02 |
 | 5. Projects Core | v2.0 | 2/2 | Complete | 2026-02-02 |
-| 6. Projects Team | v2.0 | 0/3 | Not started | - |
+| 6. Projects Team | v2.0 | 0/3 | Planned | - |
 | 7. Projects Demo | v2.0 | 0/2 | Not started | - |
 | 8. Roadmaps Create | v2.0 | 0/3 | Not started | - |
 | 9. Roadmaps Discover | v2.0 | 0/2 | Not started | - |
