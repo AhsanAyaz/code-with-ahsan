@@ -11,18 +11,18 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 Milestone: v2.0
 Phase: 6 of 10 (Projects - Team Formation)
-Plan: 1 of 3
+Plan: 2 of 3
 Status: In progress
-Last activity: 2026-02-02 — Completed 06-01-PLAN.md (Team Formation Foundation)
+Last activity: 2026-02-02 — Completed 06-02-PLAN.md (Team Formation API Routes)
 
-Progress: [███████████░░] 92% (12/13 total plans complete across current phases)
+Progress: [███████████░░] 93% (13/14 total plans complete across current phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12 (v1.0: 5, v2.0: 7)
-- Average duration: ~30 min
-- Total execution time: ~6 hours 6 minutes
+- Total plans completed: 13 (v1.0: 5, v2.0: 8)
+- Average duration: ~28 min
+- Total execution time: ~6 hours 9 minutes
 
 **By Phase:**
 
@@ -33,11 +33,11 @@ Progress: [███████████░░] 92% (12/13 total plans compl
 | 03 | 1 | 2 min | 2 min |
 | 04 | 4 | 10 min | 2.5 min |
 | 05 | 2 | 132 min | 66 min |
-| 06 | 1 | 6 min | 6 min |
+| 06 | 2 | 9 min | 4.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-04 (3min), 05-01 (3min), 05-02 (129min), 06-01 (6min)
-- Trend: Foundation plans remain fast (6min for types/utils/rules)
+- Last 5 plans: 05-01 (3min), 05-02 (129min), 06-01 (6min), 06-02 (3min)
+- Trend: API route plans very fast (3min for 7 endpoints with batch writes)
 
 *Updated after each plan completion*
 
@@ -81,6 +81,9 @@ Recent decisions affecting current work:
 | Composite application/invitation keys | 06-01 | IDs use {projectId}_{userId} pattern to prevent duplicates and enable efficient lookups |
 | Three-tier skill hierarchy | 06-01 | Beginner/intermediate/advanced mapped to 1/2/3 for numeric gap calculation in mismatch warnings |
 | Non-blocking Discord member operations | 06-01 | addMemberToChannel/removeMemberFromChannel return boolean, log errors but don't throw |
+| Batch writes for atomicity | 06-02 | Approval/acceptance uses Firestore batch for application+member+project updates |
+| Discord DM on invitation | 06-02 | Invitations send Discord DM with project link for proactive notification |
+| userId filter for applications | 06-02 | GET applications supports userId param to check if user already applied |
 
 ### Pending Todos
 
@@ -121,6 +124,20 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 - ✅ Discord member permission management (add/remove from channels)
 - ✅ Firestore security rules for applications and invitations
 - ✅ lodash.debounce installed for future search UI
+
+**Phase 6 Plan 2 Complete:**
+- ✅ GET /api/projects/[id] returns single project data
+- ✅ POST /api/projects/[id]/applications with canApplyToProject permission check
+- ✅ GET /api/projects/[id]/applications with userId filter for checking user's application status
+- ✅ PUT /api/projects/[id]/applications/[userId] approve/decline with batch writes
+- ✅ POST /api/projects/[id]/invitations with Discord DM notification to invited user
+- ✅ GET /api/projects/[id]/invitations lists pending invitations
+- ✅ PUT /api/projects/[id]/invitations/[userId] accept/decline with batch writes
+- ✅ GET /api/projects/[id]/members returns team roster sorted by join date
+- ✅ DELETE /api/projects/[id]/members/[memberId] with canManageProjectMembers permission
+- ✅ All endpoints use composite keys for duplicate prevention
+- ✅ Batch writes ensure atomicity for approval/acceptance flows
+- ✅ Discord operations are non-blocking (API succeeds even if Discord fails)
 - Discord category limit monitoring system required before scale (currently tracking in concerns)
 - Rate limiting on Discord API handled by existing fetchWithRateLimit, but volume testing needed
 - Project discovery/browsing page needed for users to find active projects (separate from creation flow)
@@ -140,9 +157,9 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 
 ## Session Continuity
 
-Last session: 2026-02-02 19:33
-Stopped at: Completed 06-01-PLAN.md (Team Formation Foundation)
-Resume file: None (ready to continue Phase 6 Plan 2)
+Last session: 2026-02-02 19:52
+Stopped at: Completed 06-02-PLAN.md (Team Formation API Routes)
+Resume file: None (ready to continue Phase 6 Plan 3)
 
 ---
-*Updated: 2026-02-02 after completing 06-01-PLAN.md*
+*Updated: 2026-02-02 after completing 06-02-PLAN.md*
