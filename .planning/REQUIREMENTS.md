@@ -9,15 +9,15 @@ Requirements for v2.0 milestone: Project Collaboration & Learning Roadmaps.
 
 ### Project Lifecycle
 
-- [ ] **PROJ-01**: Mentor can create new project proposal with title, description, and template selection
-- [ ] **PROJ-02**: Admin can view pending project proposals in admin dashboard
-- [ ] **PROJ-03**: Admin can approve project proposal to move it from Proposed to Active status
-- [ ] **PROJ-04**: Admin can decline project proposal with reason
-- [ ] **PROJ-05**: Discord channel automatically created when project moves to Active status
-- [ ] **PROJ-06**: Project creator can mark project as Completed
-- [ ] **PROJ-07**: Admin can archive completed projects
-- [ ] **PROJ-08**: Project data includes GitHub repo URL field
-- [ ] **PROJ-09**: Project stores tech stack tags for filtering
+- [x] **PROJ-01**: Mentor can create new project proposal with title, description, and template selection
+- [x] **PROJ-02**: Admin can view pending project proposals in admin dashboard
+- [x] **PROJ-03**: Admin can approve project proposal to move it from Proposed to Active status
+- [x] **PROJ-04**: Admin can decline project proposal with reason
+- [x] **PROJ-05**: Discord channel automatically created when project moves to Active status
+- [x] **PROJ-06**: Project creator can mark project as Completed
+- [x] **PROJ-07**: Admin can archive completed projects
+- [x] **PROJ-08**: Project data includes GitHub repo URL field
+- [x] **PROJ-09**: Project stores tech stack tags for filtering
 
 ### Project Templates
 
@@ -39,10 +39,10 @@ Requirements for v2.0 milestone: Project Collaboration & Learning Roadmaps.
 
 ### Discord Integration
 
-- [ ] **DISC-01**: Discord channel created with project name as channel name
-- [ ] **DISC-02**: All team members automatically added to Discord channel with appropriate permissions
-- [ ] **DISC-03**: Discord channel includes pinned message with project details and GitHub link
-- [ ] **DISC-04**: Discord channel archived when project marked as Completed
+- [x] **DISC-01**: Discord channel created with project name as channel name
+- [x] **DISC-02**: All team members automatically added to Discord channel with appropriate permissions
+- [x] **DISC-03**: Discord channel includes pinned message with project details and GitHub link
+- [x] **DISC-04**: Discord channel archived when project marked as Completed
 
 ### Demo & Showcase
 
@@ -159,19 +159,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PERM-06 | Phase 4 | Complete |
 | PERM-07 | Phase 4 | Complete |
 | PERM-08 | Phase 4 | Complete |
-| PROJ-01 | Phase 5 | Not started |
-| PROJ-02 | Phase 5 | Not started |
-| PROJ-03 | Phase 5 | Not started |
-| PROJ-04 | Phase 5 | Not started |
-| PROJ-05 | Phase 5 | Not started |
-| PROJ-06 | Phase 5 | Not started |
-| PROJ-07 | Phase 5 | Not started |
-| PROJ-08 | Phase 5 | Not started |
-| PROJ-09 | Phase 5 | Not started |
-| DISC-01 | Phase 5 | Not started |
-| DISC-02 | Phase 5 | Not started |
-| DISC-03 | Phase 5 | Not started |
-| DISC-04 | Phase 5 | Not started |
+| PROJ-01 | Phase 5 | Complete |
+| PROJ-02 | Phase 5 | Complete |
+| PROJ-03 | Phase 5 | Complete |
+| PROJ-04 | Phase 5 | Complete |
+| PROJ-05 | Phase 5 | Complete |
+| PROJ-06 | Phase 5 | Complete |
+| PROJ-07 | Phase 5 | Complete |
+| PROJ-08 | Phase 5 | Complete |
+| PROJ-09 | Phase 5 | Complete |
+| DISC-01 | Phase 5 | Complete |
+| DISC-02 | Phase 5 | Complete |
+| DISC-03 | Phase 5 | Complete |
+| DISC-04 | Phase 5 | Complete |
 | TEAM-01 | Phase 6 | Not started |
 | TEAM-02 | Phase 6 | Not started |
 | TEAM-03 | Phase 6 | Not started |
