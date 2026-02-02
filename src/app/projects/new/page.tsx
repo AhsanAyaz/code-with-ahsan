@@ -81,7 +81,7 @@ export default function CreateProjectPage() {
       }
 
       const data = await response.json();
-      return { success: true, projectId: data.project.id };
+      return { success: true, projectId: data.projectId };
     } catch (error) {
       console.error("Error creating project:", error);
       return { error: "An unexpected error occurred" };
@@ -212,6 +212,79 @@ export default function CreateProjectPage() {
         Submit a project proposal for admin review. Once approved, a Discord
         channel will be created for collaboration.
       </p>
+
+      {/* Project Guidelines */}
+      <div className="collapse collapse-arrow bg-info/10 border border-info/20 mb-6">
+        <input type="checkbox" />
+        <div className="collapse-title text-lg font-medium flex items-center gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 text-info"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          Project Submission Guidelines
+        </div>
+        <div className="collapse-content text-sm space-y-3">
+          <div>
+            <h3 className="font-semibold text-base mb-2">What Makes a Great Project:</h3>
+            <ul className="list-disc list-inside space-y-1 ml-2">
+              <li>Clear learning objectives and skill-building opportunities</li>
+              <li>Realistic scope for team size and timeline (2-8 weeks recommended)</li>
+              <li>Well-defined milestones and deliverables</li>
+              <li>Active mentor involvement and regular check-ins</li>
+              <li>Real-world applications that solve actual problems</li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-semibold text-base mb-2">What to Include:</h3>
+            <ul className="list-disc list-inside space-y-1 ml-2">
+              <li>Detailed description of the project goal and expected outcomes</li>
+              <li>Required skills and recommended experience level</li>
+              <li>Tech stack and tools to be used</li>
+              <li>GitHub repository with README and contribution guidelines</li>
+              <li>Clear expectations for team member contributions</li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-semibold text-base mb-2">What to Avoid:</h3>
+            <ul className="list-disc list-inside space-y-1 ml-2">
+              <li>Overly ambitious projects with unclear scope</li>
+              <li>Projects without active mentor guidance</li>
+              <li>Duplicate or very similar existing projects</li>
+              <li>Projects requiring expensive tools or paid services</li>
+              <li>Vague descriptions or missing technical details</li>
+            </ul>
+          </div>
+          <div className="alert alert-warning mt-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="stroke-current shrink-0 h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <span className="text-xs">
+              All team members must be on Discord. Projects are publicly visible,
+              but team member details are only shown to logged-in users.
+            </span>
+          </div>
+        </div>
+      </div>
 
       {state.error && (
         <div className="alert alert-error mb-6">
