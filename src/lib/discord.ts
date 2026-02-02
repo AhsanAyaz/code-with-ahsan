@@ -854,3 +854,320 @@ export async function sendMentorshipCompletionAnnouncement(
     return false;
   }
 }
+
+// ─── Project Channel Management ────────────────────────────────────
+
+/**
+ * Get or create a category for project channels
+ * Creates categories like "Projects", "Projects - Batch 2", etc.
+ * Automatically creates a new batch when the current one approaches 50 channels.
+ *
+ * @returns Category ID to use for new channels, or null if creation failed
+ */
+async function getOrCreateProjectsCategory(): Promise<string | null> {
+  const guildId = getGuildId();
+  const baseNamePrefix = "Projects";
+
+  log.debug(`Looking for category with prefix: ${baseNamePrefix}`);
+
+  try {
+    // Get all channels in the guild
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/guilds/${guildId}/channels`,
+      {
+        headers: getHeaders(),
+      }
+    );
+
+    if (!response.ok) {
+      log.error(
+        `Failed to fetch guild channels: ${response.status} - ${await response.text()}`
+      );
+      return null;
+    }
+
+    const channels = await response.json();
+
+    // Find all categories matching "Projects" or "Projects - Batch N"
+    const projectCategories = channels.filter(
+      (ch: { type: number; name: string }) =>
+        ch.type === 4 &&
+        (ch.name.toLowerCase() === baseNamePrefix.toLowerCase() ||
+          ch.name
+            .toLowerCase()
+            .startsWith(baseNamePrefix.toLowerCase() + " - batch"))
+    );
+
+    // Sort by batch number (base name = batch 1, then Batch 2, Batch 3, etc.)
+    projectCategories.sort((a: { name: string }, b: { name: string }) => {
+      const getBatchNum = (name: string): number => {
+        const match = name.match(/batch\s*(\d+)/i);
+        return match ? parseInt(match[1], 10) : 1;
+      };
+      return getBatchNum(a.name) - getBatchNum(b.name);
+    });
+
+    // Check the latest batch for available space
+    if (projectCategories.length > 0) {
+      const latestCategory = projectCategories[projectCategories.length - 1];
+
+      // Count channels in this category
+      const channelsInCategory = channels.filter(
+        (ch: { parent_id?: string }) => ch.parent_id === latestCategory.id
+      ).length;
+
+      log.debug(
+        `Latest category: ${latestCategory.name} has ${channelsInCategory}/${MAX_CHANNELS_PER_CATEGORY} channels`
+      );
+
+      if (channelsInCategory < MAX_CHANNELS_PER_CATEGORY) {
+        // Still has space, use this category
+        return latestCategory.id;
+      }
+
+      // Need a new batch
+      const currentBatch =
+        latestCategory.name.toLowerCase() === baseNamePrefix.toLowerCase()
+          ? 1
+          : parseInt(
+              latestCategory.name.match(/batch\s*(\d+)/i)?.[1] || "1",
+              10
+            );
+      const newBatchNum = currentBatch + 1;
+      const newCategoryName = `${baseNamePrefix} - Batch ${newBatchNum}`;
+
+      log.debug(`Creating new batch category: ${newCategoryName}`);
+      return await createCategory(guildId, newCategoryName);
+    }
+
+    // No category exists, create the first one (no batch suffix)
+    log.debug(`Creating new category: ${baseNamePrefix}`);
+    return await createCategory(guildId, baseNamePrefix);
+  } catch (error) {
+    log.error(`Error getting/creating projects category: ${error}`);
+    return null;
+  }
+}
+
+/**
+ * Create a private text channel for a project
+ *
+ * @param projectTitle - Title of the project
+ * @param creatorName - Display name of the project creator
+ * @param projectId - Unique ID of the project
+ * @param creatorDiscordUsername - Discord username of creator (optional)
+ * @returns Channel result with ID and URL, or null if creation failed
+ */
+export async function createProjectChannel(
+  projectTitle: string,
+  creatorName: string,
+  projectId: string,
+  creatorDiscordUsername?: string
+): Promise<ChannelResult | null> {
+  log.debug(`Creating project channel for ${projectTitle} by ${creatorName}`);
+  log.debug(
+    `Discord username - Creator: ${creatorDiscordUsername || "not set"}`
+  );
+
+  const guildId = getGuildId();
+
+  // Use dynamic projects category
+  const categoryId = await getOrCreateProjectsCategory();
+
+  // Create URL-safe channel name
+  const sanitize = (name: string) =>
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "-")
+      .slice(0, 50);
+
+  const channelName = `proj-${sanitize(projectTitle)}`;
+
+  // Permission overwrites for the channel
+  // Default: @everyone cannot view, bot can manage
+  const permissionOverwrites: Array<{
+    id: string;
+    type: number;
+    allow: string;
+    deny?: string;
+  }> = [
+    {
+      id: guildId, // @everyone role has same ID as guild
+      type: 0, // Role
+      allow: "0",
+      deny: "1024", // VIEW_CHANNEL denied
+    },
+  ];
+
+  // Look up creator by username and add permissions
+  let creatorMemberId: string | null = null;
+
+  if (creatorDiscordUsername) {
+    const creator = await lookupMemberByUsername(creatorDiscordUsername);
+    if (creator) {
+      creatorMemberId = creator.id;
+      permissionOverwrites.push({
+        id: creator.id,
+        type: 1, // Member
+        allow: "3072", // VIEW_CHANNEL + SEND_MESSAGES
+      });
+    }
+  }
+
+  try {
+    const channelPayload: Record<string, unknown> = {
+      name: channelName,
+      type: 0, // GUILD_TEXT
+      topic: `Project: ${projectTitle} | Creator: ${creatorName} | ID: ${projectId}`,
+      permission_overwrites: permissionOverwrites,
+    };
+
+    // If category ID is specified, create channel under that category
+    if (categoryId) {
+      channelPayload.parent_id = categoryId;
+    }
+
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/guilds/${guildId}/channels`,
+      {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify(channelPayload),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      log.error(
+        `[Discord] Channel creation failed: ${response.status} - ${errorText}`
+      );
+      return null;
+    }
+
+    const channel = await response.json();
+    log.debug(`Channel created: ${channel.name} (ID: ${channel.id})`);
+
+    // Build mention string for creator if found
+    const creatorMention = creatorMemberId
+      ? `<@${creatorMemberId}>`
+      : `**${creatorName}**`;
+
+    // Send welcome message
+    await sendChannelMessage(
+      channel.id,
+      `Welcome to the project channel!\n\n` +
+        `${creatorMention}, this is your project's private workspace.\n\n` +
+        `Use this channel to:\n` +
+        `• Collaborate with team members\n` +
+        `• Share progress updates\n` +
+        `• Coordinate tasks and goals\n\n` +
+        `Happy building!`
+    );
+
+    const result: ChannelResult = {
+      channelId: channel.id,
+      channelUrl: `https://discord.com/channels/${guildId}/${channel.id}`,
+    };
+
+    log.debug(` Channel ready: ${result.channelUrl}`);
+    return result;
+  } catch (error) {
+    log.error("[Discord] Error creating project channel:", error);
+    return null;
+  }
+}
+
+/**
+ * Send project details message to channel and pin it
+ *
+ * @param channelId - Discord channel ID
+ * @param project - Project details to display
+ * @returns true if message was sent and pinned successfully
+ */
+export async function sendProjectDetailsMessage(
+  channelId: string,
+  project: {
+    title: string;
+    description: string;
+    githubRepo?: string;
+    techStack: string[];
+    difficulty: string;
+  }
+): Promise<boolean> {
+  log.debug(` Sending project details to channel ${channelId}...`);
+  try {
+    // Format the details message
+    const techStackText =
+      project.techStack.length > 0
+        ? project.techStack.join(", ")
+        : "Not specified";
+    const githubText = project.githubRepo
+      ? `\n**GitHub:** ${project.githubRepo}`
+      : "";
+
+    const message =
+      `**${project.title}**\n\n` +
+      `**Description:**\n${project.description}\n\n` +
+      `**Tech Stack:** ${techStackText}\n` +
+      `**Difficulty:** ${project.difficulty}${githubText}`;
+
+    // Send the message
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/channels/${channelId}/messages`,
+      {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({ content: message }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      log.error(
+        `[Discord] Failed to send project details: ${response.status} - ${errorText}`
+      );
+      return false;
+    }
+
+    const messageData = await response.json();
+    const messageId = messageData.id;
+
+    // Pin the message
+    const pinResponse = await fetchWithRateLimit(
+      `${DISCORD_API}/channels/${channelId}/pins/${messageId}`,
+      {
+        method: "PUT",
+        headers: getHeaders(),
+      }
+    );
+
+    if (!pinResponse.ok) {
+      const errorText = await pinResponse.text();
+      log.error(
+        `[Discord] Failed to pin message: ${pinResponse.status} - ${errorText}`
+      );
+      return false;
+    }
+
+    log.debug(`Project details sent and pinned successfully`);
+    return true;
+  } catch (error) {
+    log.error("[Discord] Error sending project details:", error);
+    return false;
+  }
+}
+
+/**
+ * Archive a project channel (when project is completed)
+ *
+ * @param channelId - The Discord channel ID
+ * @param projectTitle - The project title for the archive message
+ * @returns true if archived successfully, false otherwise
+ */
+export async function archiveProjectChannel(
+  channelId: string,
+  projectTitle: string
+): Promise<boolean> {
+  const archiveMessage = `Project '${projectTitle}' has been completed! This channel is now archived.`;
+  return archiveMentorshipChannel(channelId, archiveMessage);
+}
