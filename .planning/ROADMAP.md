@@ -67,12 +67,13 @@ Plans:
   4. Unit tests cover all role combinations (admin, mentor, mentee) for all permission actions
   5. Firebase emulator validates security rules prevent unauthorized access
 
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 04-01: Define types and extend Discord service
-- [ ] 04-02: Create Firestore collections with security rules
-- [ ] 04-03: Build centralized permission system
+- [ ] 04-01-PLAN.md — Install dependencies, configure Vitest, define Project and Roadmap types
+- [ ] 04-02-PLAN.md — Create Firestore security rules and input validation utilities
+- [ ] 04-03-PLAN.md — Build centralized permission system (TDD)
+- [ ] 04-04-PLAN.md — Test validation utilities and Firestore security rules
 
 ---
 
@@ -234,7 +235,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. Mentorship Mapping | v1.0 | 2/2 | Complete | 2026-01-23 |
 | 2. Discord & Status | v1.0 | 2/2 | Complete | 2026-01-23 |
 | 3. Declined Mentors | v1.0 | 1/1 | Complete | 2026-01-23 |
-| 4. Foundation | v2.0 | 0/3 | Not started | - |
+| 4. Foundation | v2.0 | 0/4 | Planned | - |
 | 5. Projects Core | v2.0 | 0/3 | Not started | - |
 | 6. Projects Team | v2.0 | 0/3 | Not started | - |
 | 7. Projects Demo | v2.0 | 0/2 | Not started | - |
@@ -243,4 +244,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 10. Integration | v2.0 | 0/3 | Not started | - |
 
 ---
-*Last updated: 2026-02-02 after v2.0 roadmap creation*
+*Last updated: 2026-02-02 after Phase 4 planning*
