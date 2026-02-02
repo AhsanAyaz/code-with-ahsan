@@ -5,6 +5,9 @@ import { useMentorship } from "@/contexts/MentorshipContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+// Force dynamic rendering to prevent prerender errors with client-side context
+export const dynamic = 'force-dynamic';
+
 interface FormState {
   success?: boolean;
   error?: string;
