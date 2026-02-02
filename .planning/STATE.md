@@ -11,17 +11,17 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 Milestone: v2.0
 Phase: 4 of 10 (Foundation & Permissions)
-Plan: 2 of 3
-Status: In progress
-Last activity: 2026-02-02 — Completed 04-02-PLAN.md (Security rules and validation utilities)
+Plan: 3 of 3
+Status: Phase complete
+Last activity: 2026-02-02 — Completed 04-03-PLAN.md (Permission system with TDD)
 
-Progress: [███░░░░░░░] 37% (7/19 total plans complete across all milestones)
+Progress: [████░░░░░░] 42% (8/19 total plans complete across all milestones)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7 (v1.0: 5, v2.0: 2)
-- Average duration: ~33 min
+- Total plans completed: 8 (v1.0: 5, v2.0: 3)
+- Average duration: ~30 min
 - Total execution time: ~4 hours
 
 **By Phase:**
@@ -31,11 +31,11 @@ Progress: [███░░░░░░░] 37% (7/19 total plans complete across
 | 01 | 2 | 178 min | 89 min |
 | 02 | 2 | ~60 min | ~30 min |
 | 03 | 1 | 2 min | 2 min |
-| 04 | 2 | 4 min | 2 min |
+| 04 | 3 | 7 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (~55min), 03-01 (2min), 04-01 (2min), 04-02 (2min)
-- Trend: Foundation/infrastructure tasks execute very quickly when dependencies installed; straightforward security rules and validation utilities are fast
+- Last 5 plans: 03-01 (2min), 04-01 (2min), 04-02 (2min), 04-03 (3min)
+- Trend: Foundation/infrastructure tasks execute very quickly when dependencies installed; TDD permission system was fast due to clear requirements and test infrastructure
 
 *Updated after each plan completion*
 
@@ -60,6 +60,10 @@ Recent decisions affecting current work:
 | Two sanitization functions | 04-02 | sanitizeMarkdown (HTML) and sanitizeMarkdownRaw (Markdown storage) for flexibility |
 | Strict HTTPS for GitHub URLs | 04-02 | Require https:// protocol only, reject http:// for security |
 | Immutable version history | 04-02 | Roadmap versions subcollection has no update/delete for audit trail |
+| Synchronous permission functions | 04-03 | All context provided by caller, no async DB lookups - simpler and faster |
+| PermissionUser subset interface | 04-03 | Decouples permission logic from full MentorshipProfile structure |
+| Admin detection via boolean flag | 04-03 | Permission system accepts isAdmin input (maps to Firebase custom claim) |
+| Generic helper for owner-or-admin | 04-03 | canOwnerOrAdminAccess reduces duplication across edit/manage functions |
 
 ### Pending Todos
 
@@ -77,10 +81,11 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 
 ### Blockers/Concerns
 
-**Phase 4 Readiness:**
-- Need to verify existing Discord service rate limiting handles combined mentorship + project channel creation
+**Phase 4 Complete:**
 - ✅ Firestore security rules prevent permission escalation (PERM-01 through PERM-04 enforced)
 - ✅ Type definitions extended without breaking existing mentorship imports
+- ✅ Permission system enforces all PERM requirements with 50 test cases
+- Need to verify existing Discord service rate limiting handles combined mentorship + project channel creation
 
 **Phase 5 Readiness:**
 - Discord category strategy needs validation (separate "Projects - Active" vs "Mentorship YYYY-MM" categories)
@@ -101,9 +106,9 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 
 ## Session Continuity
 
-Last session: 2026-02-02 03:02
-Stopped at: Completed 04-02-PLAN.md (Security rules and validation utilities)
-Resume file: None (ready to continue Phase 4 with plan 04-03)
+Last session: 2026-02-02 03:08
+Stopped at: Completed 04-03-PLAN.md (Permission system with TDD) - Phase 4 complete
+Resume file: None (ready to begin Phase 5: Project Creation)
 
 ---
-*Updated: 2026-02-02 after completing 04-02-PLAN.md*
+*Updated: 2026-02-02 after completing 04-03-PLAN.md*
