@@ -108,3 +108,90 @@ export type RequestStatus =
   | "declined"
   | "active"
   | "completed";
+
+// ─── v2.0 Project Collaboration Types ───────────────────────
+
+export type ProjectStatus = "pending" | "approved" | "active" | "completed" | "archived";
+export type RoadmapStatus = "draft" | "pending" | "approved" | "active" | "archived";
+export type ProjectDifficulty = "beginner" | "intermediate" | "advanced";
+export type ProjectMemberRole = "owner" | "member";
+
+export interface Project {
+  id: string;
+  title: string;
+  description: string;
+  creatorId: string;
+  creatorProfile?: {
+    displayName: string;
+    photoURL: string;
+    username?: string;
+  };
+  status: ProjectStatus;
+  githubRepo?: string;
+  techStack: string[];
+  difficulty: ProjectDifficulty;
+  maxTeamSize: number;
+  discordChannelId?: string;
+  discordChannelUrl?: string;
+  lastActivityAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  approvedAt?: Date;
+  approvedBy?: string;
+}
+
+export interface ProjectMember {
+  id: string;
+  projectId: string;
+  userId: string;
+  userProfile?: {
+    displayName: string;
+    photoURL: string;
+    username?: string;
+  };
+  role: ProjectMemberRole;
+  joinedAt: Date;
+}
+
+export interface Roadmap {
+  id: string;
+  title: string;
+  description?: string;
+  creatorId: string;
+  creatorProfile?: {
+    displayName: string;
+    photoURL: string;
+    username?: string;
+  };
+  domain: RoadmapDomain;
+  difficulty: ProjectDifficulty;
+  estimatedHours?: number;
+  contentUrl?: string;
+  content?: string;
+  status: RoadmapStatus;
+  version: number;
+  createdAt: Date;
+  updatedAt: Date;
+  approvedAt?: Date;
+  approvedBy?: string;
+}
+
+export type RoadmapDomain =
+  | "web-dev"
+  | "frontend"
+  | "backend"
+  | "ml"
+  | "ai"
+  | "mcp"
+  | "agents"
+  | "prompt-engineering";
+
+export interface RoadmapVersion {
+  id: string;
+  roadmapId: string;
+  version: number;
+  content: string;
+  createdBy: string;
+  createdAt: Date;
+  changeDescription?: string;
+}
