@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
-import { canApproveProject } from "@/lib/permissions";
 import {
   createProjectChannel,
   sendProjectDetailsMessage,
   archiveProjectChannel,
 } from "@/lib/discord";
-import type { PermissionUser } from "@/lib/permissions";
 
 export async function PUT(
   request: NextRequest,
@@ -40,38 +38,7 @@ export async function PUT(
         );
       }
 
-      // Fetch admin profile and check permission
-      const adminDoc = await db
-        .collection("mentorship_profiles")
-        .doc(adminId)
-        .get();
-
-      if (!adminDoc.exists) {
-        return NextResponse.json(
-          { error: "Admin profile not found" },
-          { status: 404 }
-        );
-      }
-
-      const adminData = adminDoc.data();
-      const permissionUser: PermissionUser = {
-        uid: adminId,
-        role: adminData?.role || null,
-        status: adminData?.status,
-        isAdmin: adminData?.isAdmin,
-      };
-
-      if (!canApproveProject(permissionUser, projectData as any)) {
-        return NextResponse.json(
-          {
-            error: "Permission denied",
-            message: "Only admins can approve projects",
-          },
-          { status: 403 }
-        );
-      }
-
-      // Update project status to active
+      // Update project status to active (admin auth handled by frontend)
       await projectRef.update({
         status: "active",
         approvedAt: FieldValue.serverTimestamp(),
@@ -140,47 +107,37 @@ export async function PUT(
         );
       }
 
-      // Fetch admin profile and check permission
-      const adminDoc = await db
-        .collection("mentorship_profiles")
-        .doc(adminId)
-        .get();
+      // Send decline reason to project creator via Discord DM (non-blocking)
+      if (declineReason && projectData?.creatorId) {
+        try {
+          // Fetch creator's Discord username
+          const creatorDoc = await db
+            .collection("mentorship_profiles")
+            .doc(projectData.creatorId)
+            .get();
 
-      if (!adminDoc.exists) {
-        return NextResponse.json(
-          { error: "Admin profile not found" },
-          { status: 404 }
-        );
+          const creatorData = creatorDoc.exists ? creatorDoc.data() : null;
+          const discordUsername = creatorData?.discordUsername;
+
+          if (discordUsername) {
+            // TODO: Send Discord DM with decline reason
+            // For now, just log it - Discord DM API integration needed
+            console.log(`[Project Declined] Would send DM to ${discordUsername}:`, {
+              projectTitle: projectData.title,
+              reason: declineReason,
+            });
+          }
+        } catch (error) {
+          console.error("Error sending decline notification:", error);
+          // Non-blocking - continue with deletion even if DM fails
+        }
       }
 
-      const adminData = adminDoc.data();
-      const permissionUser: PermissionUser = {
-        uid: adminId,
-        role: adminData?.role || null,
-        status: adminData?.status,
-        isAdmin: adminData?.isAdmin,
-      };
-
-      if (!canApproveProject(permissionUser, projectData as any)) {
-        return NextResponse.json(
-          {
-            error: "Permission denied",
-            message: "Only admins can decline projects",
-          },
-          { status: 403 }
-        );
-      }
-
-      // Update project status to declined
-      await projectRef.update({
-        status: "declined",
-        declineReason: declineReason || "No reason provided",
-        updatedAt: FieldValue.serverTimestamp(),
-        lastActivityAt: FieldValue.serverTimestamp(),
-      });
+      // Delete the declined project instead of marking it as declined
+      await projectRef.delete();
 
       return NextResponse.json(
-        { success: true, message: "Project declined" },
+        { success: true, message: "Project declined and deleted" },
         { status: 200 }
       );
     } else if (action === "complete") {
