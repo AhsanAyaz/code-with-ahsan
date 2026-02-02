@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-23)
+See: .planning/PROJECT.md (updated 2026-02-02)
 
-**Core value:** Administrators can see the complete picture of who is mentoring whom, and take action on mentorships without direct database access.
-**Current milestone:** v1.0 Complete
+**Core value:** Community members can find mentors, collaborate on real projects with structured support, and follow clear learning roadmaps—all within a mentor-led, quality-focused environment.
+**Current milestone:** v2.0 Community Collaboration & Learning
 
 ## Current Position
 
-Milestone: v1.0
-Status: Complete
-Completed: 2026-01-23
-Archive: .planning/milestones/v1.0/
+Milestone: v2.0
+Phase: Not started (defining requirements)
+Status: Researching domain
+Last activity: 2026-02-02 — Milestone v2.0 started
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
