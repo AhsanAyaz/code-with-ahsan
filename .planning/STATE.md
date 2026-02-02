@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Milestone: v2.0
-Phase: 5 of 10 (Projects - Core Lifecycle)
-Plan: 2 of 2
-Status: Phase complete
-Last activity: 2026-02-02 — Completed Phase 5: Projects - Core Lifecycle (verified 6/6 success criteria)
+Phase: 6 of 10 (Projects - Team Formation)
+Plan: 1 of 3
+Status: In progress
+Last activity: 2026-02-02 — Completed 06-01-PLAN.md (Team Formation Foundation)
 
-Progress: [██████████] 100% (11/11 total plans complete across current phases)
+Progress: [███████████░░] 92% (12/13 total plans complete across current phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11 (v1.0: 5, v2.0: 6)
-- Average duration: ~33 min
-- Total execution time: ~6 hours
+- Total plans completed: 12 (v1.0: 5, v2.0: 7)
+- Average duration: ~30 min
+- Total execution time: ~6 hours 6 minutes
 
 **By Phase:**
 
@@ -33,10 +33,11 @@ Progress: [██████████] 100% (11/11 total plans complete acro
 | 03 | 1 | 2 min | 2 min |
 | 04 | 4 | 10 min | 2.5 min |
 | 05 | 2 | 132 min | 66 min |
+| 06 | 1 | 6 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-03 (3min), 04-04 (3min), 05-01 (3min), 05-02 (129min)
-- Trend: Phase 05-02 longer due to checkpoint with user-driven enhancements (6 commits during verification)
+- Last 5 plans: 04-04 (3min), 05-01 (3min), 05-02 (129min), 06-01 (6min)
+- Trend: Foundation plans remain fast (6min for types/utils/rules)
 
 *Updated after each plan completion*
 
@@ -77,6 +78,9 @@ Recent decisions affecting current work:
 | React 19 useActionState for forms | 05-02 | Modern form handling with pending states and error handling |
 | MentorshipProvider layout pattern | 05-02 | Feature-specific layouts wrap routes needing auth context to avoid prerender errors |
 | Project submission guidelines | 05-02 | Collapsible info section with best practices to improve proposal quality |
+| Composite application/invitation keys | 06-01 | IDs use {projectId}_{userId} pattern to prevent duplicates and enable efficient lookups |
+| Three-tier skill hierarchy | 06-01 | Beginner/intermediate/advanced mapped to 1/2/3 for numeric gap calculation in mismatch warnings |
+| Non-blocking Discord member operations | 06-01 | addMemberToChannel/removeMemberFromChannel return boolean, log errors but don't throw |
 
 ### Pending Todos
 
@@ -100,7 +104,7 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 - ✅ Permission system enforces all PERM requirements with 50 test cases
 - ✅ Comprehensive test coverage: 25 validation tests + 20 security rules tests + 50 permission tests
 
-**Phase 5 Plans 1-2 Complete:**
+**Phase 5 Complete:**
 - ✅ Discord project channel management following mentorship patterns (category batching, rate limiting)
 - ✅ POST /api/projects creates projects with validation and permission checks
 - ✅ GET /api/projects lists projects with status/creator filters
@@ -110,6 +114,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 - ✅ Create Project button in mentor dashboard for discoverability
 - ✅ Project submission guidelines for quality control
 - ✅ lastActivityAt tracking on all project mutations
+
+**Phase 6 Plan 1 Complete:**
+- ✅ ProjectApplication and ProjectInvitation types with composite keys
+- ✅ Skill mismatch detection with 3-tier hierarchy (beginner/intermediate/advanced)
+- ✅ Discord member permission management (add/remove from channels)
+- ✅ Firestore security rules for applications and invitations
+- ✅ lodash.debounce installed for future search UI
 - Discord category limit monitoring system required before scale (currently tracking in concerns)
 - Rate limiting on Discord API handled by existing fetchWithRateLimit, but volume testing needed
 - Project discovery/browsing page needed for users to find active projects (separate from creation flow)
@@ -129,9 +140,9 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 
 ## Session Continuity
 
-Last session: 2026-02-02 11:18
-Stopped at: Completed 05-02-PLAN.md (Projects frontend UI with checkpoint enhancements)
-Resume file: None (ready to continue Phase 5 Plan 3)
+Last session: 2026-02-02 19:33
+Stopped at: Completed 06-01-PLAN.md (Team Formation Foundation)
+Resume file: None (ready to continue Phase 6 Plan 2)
 
 ---
-*Updated: 2026-02-02 after completing 05-02-PLAN.md*
+*Updated: 2026-02-02 after completing 06-01-PLAN.md*
