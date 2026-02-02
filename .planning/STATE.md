@@ -10,16 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Milestone: v2.0
-Phase: Not started (defining requirements)
-Status: Researching domain
-Last activity: 2026-02-02 — Milestone v2.0 started
+Phase: 4 of 10 (Foundation & Permissions)
+Plan: Ready to plan first plan
+Status: Ready to plan
+Last activity: 2026-02-02 — v2.0 roadmap created with 7 phases (4-10), 60 requirements mapped to phases
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 26% (5/19 total plans complete across all milestones)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 5 (v1.0)
 - Average duration: ~48 min
 - Total execution time: ~4 hours
 
@@ -46,25 +47,12 @@ Recent decisions affecting current work:
 
 | Decision | Phase | Context |
 |----------|-------|---------|
-| Use batch fetching with 30-item chunks for Firestore 'in' queries | 01-01 | Avoids N+1 query problem when joining profiles |
-| Include all mentors/mentees even with zero matches | 01-01 | Ensures UI shows complete picture per CONTEXT.md |
-| Group matches by role parameter (mentor or mentee) | 01-01 | Enables separate All Mentors and All Mentees tab views |
-| Use use-debounce for search input to avoid excessive re-renders | 01-02 | Better performance during typing |
-| Client-side filtering by displayName, email, and discordUsername | 01-02 | Data set size supports client-side approach |
-| Expand Active Mentorships by default, collapse others | 01-02 | Immediate visibility of most important status |
-| Page size of 15 items per page | 01-02 | Balances screen space and scroll requirements |
-| Use mentorship_sessions collection (not mentorship_matches) | 01-02 | Discovered during bug fix - correct collection name |
-| Display all mentorship statuses in separate collapse sections | 01-02 | Active, Completed, Pending, Cancelled all visible |
-| Discord username regex: /^[a-z0-9_.]{2,32}$/ | 02-01 | Discord 2023+ format validation |
-| State machine for status transitions | 02-01 | Prevents invalid status changes with ALLOWED_TRANSITIONS map |
-| Add completedAt/revertedAt timestamps | 02-01 | Audit trail for status changes |
-| Composite keys for Discord edit state | 02-02 | Prevents multi-instance edit jumps when same user in multiple cards |
-| Badge shows active count only | 02-02 | Clearer at-a-glance view of ongoing mentorships |
-| Toggle defaults to OFF for declined mentors | 03-01 | Hides declined mentors from default view for cleaner UI |
-| Reuse handleStatusChange for restore | 03-01 | Leverages existing status update infrastructure |
-| Show toggle only on All Mentors tab | 03-01 | Declined status only applies to mentors |
-| Use x-admin-token header for admin profile bypass | quick-004 | Reuses admin_sessions validation, consistent with existing admin auth |
-| Query param ?admin=1 triggers admin preview mode | quick-004 | Simple boolean flag for admin-authenticated viewing |
+| Extend existing admin tabs vs new tab | v1.0 | Extended All Mentors/Mentees tabs - reuse layout, consistent UX |
+| Filter modal vs toggle for declined | v1.0 | Comprehensive filter modal - better UX, prevents pagination issues |
+| State machine for status transitions | v1.0 | ALLOWED_TRANSITIONS map prevents invalid status changes |
+| Composite keys for edit state | v1.0 | Prevents multi-instance edit jumps when same user in multiple cards |
+| Batch fetching (30-item chunks) | v1.0 | Firestore 'in' query limit workaround |
+| Phase structure follows research | v2.0 | Foundation → Projects (Core → Team → Demo) → Roadmaps (Create → Discover) → Integration |
 
 ### Pending Todos
 
@@ -82,7 +70,17 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 
 ### Blockers/Concerns
 
-None yet.
+**Phase 4 Readiness:**
+- Need to verify existing Discord service rate limiting handles combined mentorship + project channel creation
+- Firestore security rules must prevent permission escalation (mentee creating project marked as "approved")
+- Type definitions must not break existing mentorship imports (backward compatibility critical)
+
+**Phase 5 Readiness:**
+- Discord category strategy needs validation (separate "Projects - Active" vs "Mentorship YYYY-MM" categories)
+- Channel limit monitoring system required before enabling project channel creation at scale
+
+**Phase 8 Readiness:**
+- Firebase Storage integration pattern for Markdown content needs architecture research (version conflicts with concurrent edits)
 
 ### Quick Tasks Completed
 
@@ -96,6 +94,9 @@ None yet.
 
 ## Session Continuity
 
-Last activity: 2026-02-01 - Completed quick task 005: Fix search input state sync issue on admin dashboard
-Resume file: None
-Next action: Ready for v2 planning or PR creation
+Last session: 2026-02-02 14:45
+Stopped at: v2.0 roadmap created, STATE.md updated, REQUIREMENTS.md traceability ready for update
+Resume file: None (ready to start Phase 4 planning with `/gsd:plan-phase 4`)
+
+---
+*Updated: 2026-02-02 after v2.0 roadmap creation*

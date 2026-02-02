@@ -151,13 +151,87 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be populated by roadmapper) | | |
+| PERM-01 | Phase 4 | Not started |
+| PERM-02 | Phase 4 | Not started |
+| PERM-03 | Phase 4 | Not started |
+| PERM-04 | Phase 4 | Not started |
+| PERM-05 | Phase 4 | Not started |
+| PERM-06 | Phase 4 | Not started |
+| PERM-07 | Phase 4 | Not started |
+| PERM-08 | Phase 4 | Not started |
+| PROJ-01 | Phase 5 | Not started |
+| PROJ-02 | Phase 5 | Not started |
+| PROJ-03 | Phase 5 | Not started |
+| PROJ-04 | Phase 5 | Not started |
+| PROJ-05 | Phase 5 | Not started |
+| PROJ-06 | Phase 5 | Not started |
+| PROJ-07 | Phase 5 | Not started |
+| PROJ-08 | Phase 5 | Not started |
+| PROJ-09 | Phase 5 | Not started |
+| DISC-01 | Phase 5 | Not started |
+| DISC-02 | Phase 5 | Not started |
+| DISC-03 | Phase 5 | Not started |
+| DISC-04 | Phase 5 | Not started |
+| TEAM-01 | Phase 6 | Not started |
+| TEAM-02 | Phase 6 | Not started |
+| TEAM-03 | Phase 6 | Not started |
+| TEAM-04 | Phase 6 | Not started |
+| TEAM-05 | Phase 6 | Not started |
+| TEAM-06 | Phase 6 | Not started |
+| TEAM-07 | Phase 6 | Not started |
+| TEAM-08 | Phase 6 | Not started |
+| TEAM-09 | Phase 6 | Not started |
+| DISC-05 | Phase 6 | Not started |
+| DISC-06 | Phase 6 | Not started |
+| DISC-07 | Phase 6 | Not started |
+| DISC-08 | Phase 6 | Not started |
+| DISC-09 | Phase 6 | Not started |
+| TMPL-01 | Phase 7 | Not started |
+| TMPL-02 | Phase 7 | Not started |
+| TMPL-03 | Phase 7 | Not started |
+| DEMO-01 | Phase 7 | Not started |
+| DEMO-02 | Phase 7 | Not started |
+| DEMO-03 | Phase 7 | Not started |
+| DEMO-04 | Phase 7 | Not started |
+| ROAD-01 | Phase 8 | Not started |
+| ROAD-02 | Phase 8 | Not started |
+| ROAD-03 | Phase 8 | Not started |
+| ROAD-04 | Phase 8 | Not started |
+| ROAD-05 | Phase 8 | Not started |
+| ROAD-06 | Phase 8 | Not started |
+| ROAD-07 | Phase 8 | Not started |
+| ROAD-08 | Phase 8 | Not started |
+| ROAD-09 | Phase 8 | Not started |
+| ROAD-10 | Phase 8 | Not started |
+| ROAD-11 | Phase 8 | Not started |
+| ROAD-12 | Phase 8 | Not started |
+| ROAD-13 | Phase 8 | Not started |
+| ROAD-14 | Phase 8 | Not started |
+| ROAD-15 | Phase 9 | Not started |
+| ROAD-16 | Phase 9 | Not started |
+| ROAD-17 | Phase 9 | Not started |
+| ROAD-18 | Phase 9 | Not started |
+| ROAD-19 | Phase 9 | Not started |
+| ADMIN-01 | Phase 10 | Not started |
+| ADMIN-02 | Phase 10 | Not started |
+| ADMIN-03 | Phase 10 | Not started |
+| ADMIN-04 | Phase 10 | Not started |
+| ADMIN-05 | Phase 10 | Not started |
 
 **Coverage:**
 - v2.0 requirements: 60 total
-- Mapped to phases: (pending roadmap)
-- Unmapped: (pending roadmap)
+- Mapped to phases: 60/60 (100%)
+- Unmapped: 0
+
+**Distribution:**
+- Phase 4 (Foundation): 8 requirements
+- Phase 5 (Projects Core): 13 requirements
+- Phase 6 (Projects Team): 14 requirements
+- Phase 7 (Projects Demo): 7 requirements
+- Phase 8 (Roadmaps Create): 14 requirements
+- Phase 9 (Roadmaps Discover): 5 requirements
+- Phase 10 (Integration): 5 requirements
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after initial definition*
+*Last updated: 2026-02-02 after v2.0 roadmap creation with full traceability*
