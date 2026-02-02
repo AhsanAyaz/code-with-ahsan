@@ -7,6 +7,47 @@ import {
   archiveProjectChannel,
 } from "@/lib/discord";
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    // Fetch project document
+    const projectRef = db.collection("projects").doc(id);
+    const projectDoc = await projectRef.get();
+
+    if (!projectDoc.exists) {
+      return NextResponse.json(
+        { error: "Project not found" },
+        { status: 404 }
+      );
+    }
+
+    const projectData = projectDoc.data();
+
+    // Convert Firestore Timestamps to ISO strings for JSON serialization
+    const project = {
+      id: projectDoc.id,
+      ...projectData,
+      createdAt: projectData?.createdAt?.toDate?.()?.toISOString() || null,
+      updatedAt: projectData?.updatedAt?.toDate?.()?.toISOString() || null,
+      approvedAt: projectData?.approvedAt?.toDate?.()?.toISOString() || null,
+      lastActivityAt: projectData?.lastActivityAt?.toDate?.()?.toISOString() || null,
+      completedAt: projectData?.completedAt?.toDate?.()?.toISOString() || null,
+    };
+
+    return NextResponse.json({ project }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching project:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch project" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
