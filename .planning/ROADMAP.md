@@ -70,15 +70,15 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Install dependencies, configure Vitest, define Project and Roadmap types
-- [ ] 04-02-PLAN.md — Create Firestore security rules and input validation utilities
-- [ ] 04-03-PLAN.md — Build centralized permission system (TDD)
-- [ ] 04-04-PLAN.md — Test validation utilities and Firestore security rules
+- [x] 04-01-PLAN.md — Install dependencies, configure Vitest, define Project and Roadmap types
+- [x] 04-02-PLAN.md — Create Firestore security rules and input validation utilities
+- [x] 04-03-PLAN.md — Build centralized permission system (TDD)
+- [x] 04-04-PLAN.md — Test validation utilities and Firestore security rules
 
 ---
 
 ### Phase 5: Projects - Core Lifecycle
-**Goal**: Complete project workflow end-to-end (create → approve → Discord channel → complete → demo) with activity tracking from day one.
+**Goal**: Complete project workflow end-to-end (create -> approve -> Discord channel -> complete -> demo) with activity tracking from day one.
 
 **Depends on**: Phase 4
 
@@ -92,12 +92,11 @@ Plans:
   5. Project creator can mark project as Completed and Discord channel archives automatically
   6. Project tracks lastActivityAt timestamp for stale content detection
 
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: Project creation and admin approval workflow
-- [ ] 05-02: Discord integration for project channels
-- [ ] 05-03: Project completion and archival
+- [ ] 05-01-PLAN.md — Backend: Discord project channel functions + project API routes (create, list, approve, decline, complete)
+- [ ] 05-02-PLAN.md — Frontend: Admin dashboard Projects tab + project creation form
 
 ---
 
@@ -228,7 +227,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -236,7 +235,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. Discord & Status | v1.0 | 2/2 | Complete | 2026-01-23 |
 | 3. Declined Mentors | v1.0 | 1/1 | Complete | 2026-01-23 |
 | 4. Foundation | v2.0 | 4/4 | Complete | 2026-02-02 |
-| 5. Projects Core | v2.0 | 0/3 | Not started | - |
+| 5. Projects Core | v2.0 | 0/2 | Not started | - |
 | 6. Projects Team | v2.0 | 0/3 | Not started | - |
 | 7. Projects Demo | v2.0 | 0/2 | Not started | - |
 | 8. Roadmaps Create | v2.0 | 0/3 | Not started | - |
@@ -244,4 +243,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 10. Integration | v2.0 | 0/3 | Not started | - |
 
 ---
-*Last updated: 2026-02-02 after Phase 4 execution*
+*Last updated: 2026-02-02 after Phase 5 planning*
