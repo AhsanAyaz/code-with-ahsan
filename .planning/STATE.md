@@ -54,6 +54,8 @@ Recent decisions affecting current work:
 | Composite keys for edit state | v1.0 | Prevents multi-instance edit jumps when same user in multiple cards |
 | Batch fetching (30-item chunks) | v1.0 | Firestore 'in' query limit workaround |
 | Phase structure follows research | v2.0 | Foundation → Projects (Core → Team → Demo) → Roadmaps (Create → Discover) → Integration |
+| Denormalized profile subset pattern | 04-01 | creatorProfile contains {displayName, photoURL, username} for efficient list rendering |
+| Composite ProjectMember key | 04-01 | ProjectMember.id is {projectId}_{userId} composite key |
 | Security rules helper functions | 04-02 | isSignedIn(), isAdmin(), isAcceptedMentor() reduce duplication in Firestore rules |
 | Two sanitization functions | 04-02 | sanitizeMarkdown (HTML) and sanitizeMarkdownRaw (Markdown storage) for flexibility |
 | Strict HTTPS for GitHub URLs | 04-02 | Require https:// protocol only, reject http:// for security |
