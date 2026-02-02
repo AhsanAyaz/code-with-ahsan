@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Milestone: v2.0
-Phase: 4 of 10 (Foundation & Permissions)
-Plan: 4 of 4
-Status: Phase complete
-Last activity: 2026-02-02 — Completed 04-04-PLAN.md (Testing for security rules and validation)
+Phase: 5 of 10 (Projects - Core Lifecycle)
+Plan: 1 of 3
+Status: In progress
+Last activity: 2026-02-02 — Completed 05-01-PLAN.md (Backend API and Discord integration)
 
-Progress: [█████████░] 100% (9/9 total plans complete across current phases)
+Progress: [█████████░] 91% (10/11 total plans complete across current phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9 (v1.0: 5, v2.0: 4)
-- Average duration: ~26 min
+- Total plans completed: 10 (v1.0: 5, v2.0: 5)
+- Average duration: ~23 min
 - Total execution time: ~4 hours
 
 **By Phase:**
@@ -32,10 +32,11 @@ Progress: [█████████░] 100% (9/9 total plans complete across
 | 02 | 2 | ~60 min | ~30 min |
 | 03 | 1 | 2 min | 2 min |
 | 04 | 4 | 10 min | 2.5 min |
+| 05 | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (2min), 04-02 (2min), 04-03 (3min), 04-04 (3min)
-- Trend: Phase 4 completed in 10 total minutes - testing/types/validation/permissions infrastructure all very fast due to clear requirements and existing dependencies
+- Last 5 plans: 04-02 (2min), 04-03 (3min), 04-04 (3min), 05-01 (3min)
+- Trend: Phases 4-5 maintaining consistent 2-3 minute execution with clear requirements and established patterns
 
 *Updated after each plan completion*
 
@@ -66,6 +67,10 @@ Recent decisions affecting current work:
 | Generic helper for owner-or-admin | 04-03 | canOwnerOrAdminAccess reduces duplication across edit/manage functions |
 | Firebase emulator tests optional | 04-04 | Security rules tests skip gracefully when emulator unavailable for flexible CI |
 | Separated validation vs emulator tests | 04-04 | Validation tests (no deps) vs security tests (require emulator) for CI flexibility |
+| Discord project category batching | 05-01 | Projects use same batching pattern as mentorship (45 channels per category) |
+| Non-blocking Discord failures | 05-01 | Project status transitions proceed even if Discord channel creation/archival fails |
+| Creator-only completion | 05-01 | Only project creator can complete projects (not admin) - ownership model |
+| Denormalized creator profile in projects | 05-01 | Project documents include {displayName, photoURL, username} subset |
 
 ### Pending Todos
 
@@ -88,11 +93,15 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 - ✅ Type definitions extended without breaking existing mentorship imports
 - ✅ Permission system enforces all PERM requirements with 50 test cases
 - ✅ Comprehensive test coverage: 25 validation tests + 20 security rules tests + 50 permission tests
-- Need to verify existing Discord service rate limiting handles combined mentorship + project channel creation
 
-**Phase 5 Readiness:**
-- Discord category strategy needs validation (separate "Projects - Active" vs "Mentorship YYYY-MM" categories)
-- Channel limit monitoring system required before enabling project channel creation at scale
+**Phase 5 Plan 1 Complete:**
+- ✅ Discord project channel management following mentorship patterns (category batching, rate limiting)
+- ✅ POST /api/projects creates projects with validation and permission checks
+- ✅ GET /api/projects lists projects with status/creator filters
+- ✅ PUT /api/projects/[id] handles approve (Discord channel + pin), decline (reason), complete (archive)
+- ✅ lastActivityAt tracking on all project mutations
+- Discord category limit monitoring system required before scale (currently tracking in concerns)
+- Rate limiting on Discord API handled by existing fetchWithRateLimit, but volume testing needed
 
 **Phase 8 Readiness:**
 - Firebase Storage integration pattern for Markdown content needs architecture research (version conflicts with concurrent edits)
@@ -109,9 +118,9 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 
 ## Session Continuity
 
-Last session: 2026-02-02 03:08
-Stopped at: Completed 04-04-PLAN.md (Testing for security rules and validation) - Phase 4 complete
-Resume file: None (ready to begin Phase 5: Projects - Core Lifecycle)
+Last session: 2026-02-02 09:03
+Stopped at: Completed 05-01-PLAN.md (Backend API and Discord integration)
+Resume file: None (ready to continue Phase 5)
 
 ---
-*Updated: 2026-02-02 after completing 04-04-PLAN.md*
+*Updated: 2026-02-02 after completing 05-01-PLAN.md*
