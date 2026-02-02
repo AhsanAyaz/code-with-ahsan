@@ -153,6 +153,42 @@ export interface ProjectMember {
   joinedAt: Date;
 }
 
+export type ApplicationStatus = "pending" | "approved" | "declined";
+export type InvitationStatus = "pending" | "accepted" | "declined";
+
+export interface ProjectApplication {
+  id: string; // composite: {projectId}_{userId}
+  projectId: string;
+  userId: string;
+  userProfile?: {
+    displayName: string;
+    photoURL: string;
+    username?: string;
+  };
+  message: string;
+  status: ApplicationStatus;
+  feedback?: string; // Feedback from creator on decline
+  createdAt: Date;
+  approvedAt?: Date;
+  declinedAt?: Date;
+}
+
+export interface ProjectInvitation {
+  id: string; // composite: {projectId}_{userId}
+  projectId: string;
+  userId: string;
+  userProfile?: {
+    displayName: string;
+    photoURL: string;
+    username?: string;
+  };
+  invitedBy: string; // creator userId
+  status: InvitationStatus;
+  createdAt: Date;
+  acceptedAt?: Date;
+  declinedAt?: Date;
+}
+
 export interface Roadmap {
   id: string;
   title: string;
