@@ -1171,3 +1171,99 @@ export async function archiveProjectChannel(
   const archiveMessage = `Project '${projectTitle}' has been completed! This channel is now archived.`;
   return archiveMentorshipChannel(channelId, archiveMessage);
 }
+
+/**
+ * Add a member to a project channel by granting them VIEW_CHANNEL and SEND_MESSAGES permissions
+ *
+ * @param channelId - Discord channel ID
+ * @param discordUsername - Discord username to add
+ * @returns true if permissions granted successfully, false otherwise (non-blocking)
+ */
+export async function addMemberToChannel(
+  channelId: string,
+  discordUsername: string
+): Promise<boolean> {
+  log.debug(`Adding member ${discordUsername} to channel ${channelId}`);
+
+  try {
+    // Look up member by username
+    const member = await lookupMemberByUsername(discordUsername);
+    if (!member) {
+      log.error(`[Discord] Cannot add member - user not found: ${discordUsername}`);
+      return false;
+    }
+
+    // Grant VIEW_CHANNEL (1024) + SEND_MESSAGES (2048) = 3072
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/channels/${channelId}/permissions/${member.id}`,
+      {
+        method: "PUT",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          type: 1, // Member
+          allow: "3072", // VIEW_CHANNEL + SEND_MESSAGES
+        }),
+      }
+    );
+
+    if (response.status === 204) {
+      log.debug(`Successfully added ${discordUsername} to channel ${channelId}`);
+      return true;
+    } else {
+      const errorText = await response.text();
+      log.error(
+        `[Discord] Failed to add member to channel: ${response.status} - ${errorText}`
+      );
+      return false;
+    }
+  } catch (error) {
+    log.error(`[Discord] Error adding member to channel:`, error);
+    return false;
+  }
+}
+
+/**
+ * Remove a member from a project channel by deleting their permission overwrite
+ *
+ * @param channelId - Discord channel ID
+ * @param discordUsername - Discord username to remove
+ * @returns true if permissions removed successfully, false otherwise (non-blocking)
+ */
+export async function removeMemberFromChannel(
+  channelId: string,
+  discordUsername: string
+): Promise<boolean> {
+  log.debug(`Removing member ${discordUsername} from channel ${channelId}`);
+
+  try {
+    // Look up member by username
+    const member = await lookupMemberByUsername(discordUsername);
+    if (!member) {
+      log.error(`[Discord] Cannot remove member - user not found: ${discordUsername}`);
+      return false;
+    }
+
+    // Delete permission overwrite
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/channels/${channelId}/permissions/${member.id}`,
+      {
+        method: "DELETE",
+        headers: getHeaders(),
+      }
+    );
+
+    if (response.status === 204) {
+      log.debug(`Successfully removed ${discordUsername} from channel ${channelId}`);
+      return true;
+    } else {
+      const errorText = await response.text();
+      log.error(
+        `[Discord] Failed to remove member from channel: ${response.status} - ${errorText}`
+      );
+      return false;
+    }
+  } catch (error) {
+    log.error(`[Discord] Error removing member from channel:`, error);
+    return false;
+  }
+}

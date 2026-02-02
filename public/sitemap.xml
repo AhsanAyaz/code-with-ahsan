@@ -49,11 +49,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/browse</loc>
+    <loc>https://codewithahsan.dev/mentorship/mentors</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/dashboard</loc>
+    <loc>https://codewithahsan.dev/mentorship/browse</loc>
   </url>
 
   <url>
@@ -61,11 +61,15 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/mentors</loc>
+    <loc>https://codewithahsan.dev/mentorship/dashboard</loc>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/mentorship/my-matches</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/projects/new</loc>
   </url>
 
   <url>
