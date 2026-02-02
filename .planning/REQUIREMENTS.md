@@ -151,14 +151,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PERM-01 | Phase 4 | Not started |
-| PERM-02 | Phase 4 | Not started |
-| PERM-03 | Phase 4 | Not started |
-| PERM-04 | Phase 4 | Not started |
-| PERM-05 | Phase 4 | Not started |
-| PERM-06 | Phase 4 | Not started |
-| PERM-07 | Phase 4 | Not started |
-| PERM-08 | Phase 4 | Not started |
+| PERM-01 | Phase 4 | Complete |
+| PERM-02 | Phase 4 | Complete |
+| PERM-03 | Phase 4 | Complete |
+| PERM-04 | Phase 4 | Complete |
+| PERM-05 | Phase 4 | Complete |
+| PERM-06 | Phase 4 | Complete |
+| PERM-07 | Phase 4 | Complete |
+| PERM-08 | Phase 4 | Complete |
 | PROJ-01 | Phase 5 | Not started |
 | PROJ-02 | Phase 5 | Not started |
 | PROJ-03 | Phase 5 | Not started |
