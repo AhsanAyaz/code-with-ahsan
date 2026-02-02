@@ -80,6 +80,19 @@ function isOwner(
   return user.uid === resource.creatorId;
 }
 
+/**
+ * Generic permission check for owner or admin actions
+ * Used by edit/manage functions to reduce duplication
+ */
+function canOwnerOrAdminAccess(
+  user: PermissionUser | null,
+  resource: { creatorId: string }
+): boolean {
+  if (isAdminUser(user)) return true;
+  if (isAcceptedMentor(user) && isOwner(user, resource)) return true;
+  return false;
+}
+
 // ─── Project Permissions ────────────────────────────────────────
 
 /**
@@ -109,9 +122,7 @@ export function canEditProject(
   user: PermissionUser | null,
   project: Project
 ): boolean {
-  if (isAdminUser(user)) return true;
-  if (isAcceptedMentor(user) && isOwner(user, project)) return true;
-  return false;
+  return canOwnerOrAdminAccess(user, project);
 }
 
 /**
@@ -122,9 +133,7 @@ export function canManageProjectMembers(
   user: PermissionUser | null,
   project: Project
 ): boolean {
-  if (isAdminUser(user)) return true;
-  if (isAcceptedMentor(user) && isOwner(user, project)) return true;
-  return false;
+  return canOwnerOrAdminAccess(user, project);
 }
 
 /**
@@ -169,7 +178,5 @@ export function canEditRoadmap(
   user: PermissionUser | null,
   roadmap: Roadmap
 ): boolean {
-  if (isAdminUser(user)) return true;
-  if (isAcceptedMentor(user) && isOwner(user, roadmap)) return true;
-  return false;
+  return canOwnerOrAdminAccess(user, roadmap);
 }
