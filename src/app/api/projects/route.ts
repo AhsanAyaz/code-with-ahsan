@@ -200,10 +200,27 @@ export async function GET(request: NextRequest) {
 
     const snapshot = await query.get();
 
+    // Enrich with pending application counts when creatorId filter is present
+    let pendingCountMap = new Map<string, number>();
+    if (creatorId) {
+      const projectIds = snapshot.docs.map((doc) => doc.id);
+      const pendingCounts = await Promise.all(
+        projectIds.map(async (pid) => {
+          const countSnap = await db
+            .collection("project_applications")
+            .where("projectId", "==", pid)
+            .where("status", "==", "pending")
+            .get();
+          return { id: pid, count: countSnap.size };
+        })
+      );
+      pendingCountMap = new Map(pendingCounts.map((p) => [p.id, p.count]));
+    }
+
     // Convert Firestore Timestamps to ISO strings for JSON serialization
     const projects = snapshot.docs.map((doc) => {
       const data = doc.data();
-      return {
+      const baseProject = {
         id: doc.id,
         ...data,
         createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
@@ -211,6 +228,16 @@ export async function GET(request: NextRequest) {
         approvedAt: data.approvedAt?.toDate?.()?.toISOString() || null,
         lastActivityAt: data.lastActivityAt?.toDate?.()?.toISOString() || null,
       };
+
+      // Add pendingApplicationCount only when creatorId is present
+      if (creatorId) {
+        return {
+          ...baseProject,
+          pendingApplicationCount: pendingCountMap.get(doc.id) || 0,
+        };
+      }
+
+      return baseProject;
     });
 
     return NextResponse.json({ projects }, { status: 200 });

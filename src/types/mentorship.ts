@@ -132,6 +132,7 @@ export interface Project {
   difficulty: ProjectDifficulty;
   maxTeamSize: number;
   memberCount?: number;
+  pendingApplicationCount?: number;
   discordChannelId?: string;
   discordChannelUrl?: string;
   lastActivityAt?: Date;
