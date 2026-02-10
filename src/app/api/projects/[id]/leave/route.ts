@@ -105,7 +105,13 @@ export async function POST(
     // 1. Delete project_members document
     batch.delete(memberRef);
 
-    // 2. Update project lastActivityAt and decrement memberCount
+    // 2. Delete related project_applications document
+    const applicationRef = db
+      .collection("project_applications")
+      .doc(`${projectId}_${userId}`);
+    batch.delete(applicationRef);
+
+    // 3. Update project lastActivityAt and decrement memberCount
     const projectRef = db.collection("projects").doc(projectId);
     batch.update(projectRef, {
       lastActivityAt: FieldValue.serverTimestamp(),
