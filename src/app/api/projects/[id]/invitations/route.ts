@@ -107,6 +107,7 @@ export async function POST(
         displayName: userData?.displayName || "",
         photoURL: userData?.photoURL || "",
         username: userData?.username,
+        discordUsername: userData?.discordUsername,
       },
       invitedBy,
       status: "pending",

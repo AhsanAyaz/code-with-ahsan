@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
-import { addMemberToChannel } from "@/lib/discord";
+import { addMemberToChannel, sendChannelMessage, sendDirectMessage, lookupMemberByUsername } from "@/lib/discord";
 import { verifyAuth } from "@/lib/auth";
 
 export async function PUT(
@@ -91,6 +91,7 @@ export async function PUT(
           displayName: userData?.displayName || "",
           photoURL: userData?.photoURL || "",
           username: userData?.username,
+          discordUsername: userData?.discordUsername,
         },
         role: "member",
         joinedAt: FieldValue.serverTimestamp(),
@@ -106,8 +107,20 @@ export async function PUT(
       // Commit batch
       await batch.commit();
 
-      // Non-blocking: Add to Discord channel
+      // Non-blocking Discord operations
+      const projectTitle = projectData?.title || "Untitled Project";
+
       if (projectData?.discordChannelId && userData?.discordUsername) {
+        // Look up Discord member for tagging
+        let discordUserId: string | null = null;
+        try {
+          const member = await lookupMemberByUsername(userData.discordUsername);
+          discordUserId = member?.id || null;
+        } catch {
+          // Continue without tag
+        }
+
+        // Add to Discord channel first
         try {
           await addMemberToChannel(
             projectData.discordChannelId,
@@ -115,7 +128,34 @@ export async function PUT(
           );
         } catch (discordError) {
           console.error("Discord member add failed:", discordError);
-          // Continue - member added to Firestore even if Discord fails
+        }
+
+        // Send welcome message with tag to project channel
+        try {
+          const tag = discordUserId
+            ? `<@${discordUserId}>`
+            : `**${userData?.displayName || "A new member"}**`;
+          await sendChannelMessage(
+            projectData.discordChannelId,
+            `👋 ${tag} has joined the project! Welcome to the team!`
+          );
+        } catch (channelMsgError) {
+          console.error("Discord channel welcome message failed:", channelMsgError);
+        }
+
+        // Send DM to the member
+        try {
+          const siteUrl =
+            process.env.NEXT_PUBLIC_SITE_URL || "https://codewithahsan.dev";
+          const dmMessage =
+            `You've joined **"${projectTitle}"**! 🎉\n\n` +
+            (projectData?.discordChannelUrl
+              ? `Project channel: ${projectData.discordChannelUrl}\n\n`
+              : "") +
+            `View the project: ${siteUrl}/projects/${projectId}`;
+          await sendDirectMessage(userData.discordUsername, dmMessage);
+        } catch (dmError) {
+          console.error("Discord DM failed:", dmError);
         }
       }
 

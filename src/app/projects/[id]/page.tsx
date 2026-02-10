@@ -660,9 +660,9 @@ export default function ProjectDetailPage() {
                           <div className="font-medium">
                             {inv.userProfile?.displayName || "Invited User"}
                           </div>
-                          {inv.userProfile?.username && (
+                          {inv.userProfile?.discordUsername && (
                             <div className="text-sm text-base-content/60">
-                              @{inv.userProfile.username}
+                              @{inv.userProfile.discordUsername}
                             </div>
                           )}
                         </div>
