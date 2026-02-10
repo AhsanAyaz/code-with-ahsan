@@ -25,7 +25,14 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     <Link href={`/projects/${project.id}`}>
       <div className="card bg-base-200 shadow-md hover:shadow-lg transition-shadow h-full cursor-pointer">
         <div className="card-body">
-          <h2 className="card-title text-lg">{project.title}</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="card-title text-lg">{project.title}</h2>
+            {project.pendingApplicationCount != null && project.pendingApplicationCount > 0 && (
+              <span className="badge badge-primary badge-sm whitespace-nowrap">
+                {project.pendingApplicationCount} pending
+              </span>
+            )}
+          </div>
 
           <div className="flex items-center gap-2 mb-2">
             {project.creatorProfile?.photoURL && (
