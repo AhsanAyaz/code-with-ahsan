@@ -3,6 +3,7 @@
 import { useState, useActionState } from "react";
 import { Project, ProjectDifficulty } from "@/types/mentorship";
 import { detectSkillMismatch } from "@/lib/validation/skillMatch";
+import { authFetch } from "@/lib/apiClient";
 
 interface ApplicationFormProps {
   projectId: string;
@@ -46,9 +47,8 @@ export default function ApplicationForm({
       }
 
       // POST to API
-      const response = await fetch(`/api/projects/${projectId}/applications`, {
+      const response = await authFetch(`/api/projects/${projectId}/applications`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId,
           message: message.trim(),

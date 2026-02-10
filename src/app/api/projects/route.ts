@@ -111,6 +111,7 @@ export async function POST(request: NextRequest) {
         displayName: creatorData?.displayName || "",
         photoURL: creatorData?.photoURL || "",
         username: creatorData?.username,
+        discordUsername: creatorData?.discordUsername,
       },
       status: "pending",
       githubRepo: githubRepo || null,

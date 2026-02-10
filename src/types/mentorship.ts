@@ -125,6 +125,7 @@ export interface Project {
     displayName: string;
     photoURL: string;
     username?: string;
+    discordUsername?: string;
   };
   status: ProjectStatus;
   githubRepo?: string;
@@ -150,6 +151,7 @@ export interface ProjectMember {
     displayName: string;
     photoURL: string;
     username?: string;
+    discordUsername?: string;
   };
   role: ProjectMemberRole;
   joinedAt: Date;
@@ -166,6 +168,7 @@ export interface ProjectApplication {
     displayName: string;
     photoURL: string;
     username?: string;
+    discordUsername?: string;
   };
   message: string;
   status: ApplicationStatus;
@@ -183,6 +186,7 @@ export interface ProjectInvitation {
     displayName: string;
     photoURL: string;
     username?: string;
+    discordUsername?: string;
   };
   invitedBy: string; // creator userId
   status: InvitationStatus;

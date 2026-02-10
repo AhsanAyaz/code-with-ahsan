@@ -629,6 +629,55 @@ export default function ProjectDetailPage() {
               </button>
             </div>
           </div>
+
+          {/* Sent Invitations */}
+          {invitations.length > 0 && (
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Sent Invitations</h2>
+              <div className="space-y-3">
+                {invitations.map((inv) => {
+                  const statusBadge: Record<string, string> = {
+                    pending: "badge-warning",
+                    accepted: "badge-success",
+                    declined: "badge-error",
+                  };
+                  return (
+                    <div
+                      key={inv.id}
+                      className="flex items-center justify-between bg-base-200 rounded-lg p-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        {inv.userProfile?.photoURL && (
+                          <Image
+                            src={inv.userProfile.photoURL}
+                            alt={inv.userProfile.displayName}
+                            width={32}
+                            height={32}
+                            className="rounded-full"
+                          />
+                        )}
+                        <div>
+                          <div className="font-medium">
+                            {inv.userProfile?.displayName || "Invited User"}
+                          </div>
+                          {inv.userProfile?.username && (
+                            <div className="text-sm text-base-content/60">
+                              @{inv.userProfile.username}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <span
+                        className={`badge ${statusBadge[inv.status] || "badge-ghost"}`}
+                      >
+                        {inv.status}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

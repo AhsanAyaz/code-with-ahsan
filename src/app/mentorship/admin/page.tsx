@@ -7,6 +7,7 @@ import { useMentorship, MentorshipProfile } from "@/contexts/MentorshipContext";
 import { Project } from "@/types/mentorship";
 import Link from "next/link";
 import { useDebouncedCallback } from "use-debounce";
+import { authFetch } from "@/lib/apiClient";
 import { format } from "date-fns";
 import { useStreamerMode } from "@/hooks/useStreamerMode";
 import { getAnonymizedDisplayName, getAnonymizedEmail, getAnonymizedDiscord } from "@/utils/streamer-mode";
@@ -627,9 +628,8 @@ export default function AdminPage() {
     if (!user) return;
     setProjectActionLoading(projectId);
     try {
-      const response = await fetch(`/api/projects/${projectId}`, {
+      const response = await authFetch(`/api/projects/${projectId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "approve", adminId: user.uid })
       });
 
@@ -655,9 +655,8 @@ export default function AdminPage() {
     if (!declineProjectId || !user) return;
     setProjectActionLoading(declineProjectId);
     try {
-      const response = await fetch(`/api/projects/${declineProjectId}`, {
+      const response = await authFetch(`/api/projects/${declineProjectId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "decline",
           adminId: user.uid,

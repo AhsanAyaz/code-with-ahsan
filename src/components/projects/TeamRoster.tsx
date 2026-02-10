@@ -40,9 +40,9 @@ export default function TeamRoster({
             <div className="font-semibold">
               {project.creatorProfile?.displayName}
             </div>
-            {project.creatorProfile?.username && (
+            {project.creatorProfile?.discordUsername && (
               <div className="text-sm text-base-content/70">
-                @{project.creatorProfile.username}
+                @{project.creatorProfile.discordUsername}
               </div>
             )}
           </div>
@@ -68,9 +68,9 @@ export default function TeamRoster({
               <div className="font-semibold">
                 {member.userProfile?.displayName}
               </div>
-              {member.userProfile?.username && (
+              {member.userProfile?.discordUsername && (
                 <div className="text-sm text-base-content/70">
-                  @{member.userProfile.username}
+                  @{member.userProfile.discordUsername}
                 </div>
               )}
             </div>

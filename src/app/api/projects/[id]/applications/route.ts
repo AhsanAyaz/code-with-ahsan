@@ -118,6 +118,7 @@ export async function POST(
         displayName: userData?.displayName || "",
         photoURL: userData?.photoURL || "",
         username: userData?.username,
+        discordUsername: userData?.discordUsername,
       },
       message,
       status: "pending",
@@ -157,23 +158,39 @@ export async function GET(
     const status = searchParams.get("status");
     const userId = searchParams.get("userId");
 
-    // Build query
+    // Direct document lookup when userId is provided (composite key: {projectId}_{userId})
+    if (userId) {
+      const docRef = db
+        .collection("project_applications")
+        .doc(`${projectId}_${userId}`);
+      const docSnap = await docRef.get();
+
+      if (docSnap.exists) {
+        const data = docSnap.data()!;
+        const application = {
+          id: docSnap.id,
+          ...data,
+          createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+          approvedAt: data.approvedAt?.toDate?.()?.toISOString() || null,
+          declinedAt: data.declinedAt?.toDate?.()?.toISOString() || null,
+        };
+        return NextResponse.json({ applications: [application] }, { status: 200 });
+      }
+      return NextResponse.json({ applications: [] }, { status: 200 });
+    }
+
+    // Build query for listing all applications (creator view)
     let query = db
       .collection("project_applications")
-      .where("projectId", "==", projectId);
-
-    // If userId provided, filter by userId (for checking user's own application status)
-    if (userId) {
-      query = query.where("userId", "==", userId) as any;
-    }
+      .where("projectId", "==", projectId) as FirebaseFirestore.Query;
 
     // If status provided, filter by status
     if (status) {
-      query = query.where("status", "==", status) as any;
+      query = query.where("status", "==", status);
     }
 
     // Order by createdAt descending
-    query = query.orderBy("createdAt", "desc") as any;
+    query = query.orderBy("createdAt", "desc");
 
     const snapshot = await query.get();
 

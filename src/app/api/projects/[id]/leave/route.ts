@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
-import { removeMemberFromChannel } from "@/lib/discord";
+import { removeMemberFromChannel, sendChannelMessage } from "@/lib/discord";
 import { verifyAuth } from "@/lib/auth";
 
 export async function POST(
@@ -77,16 +77,30 @@ export async function POST(
     // Commit batch
     await batch.commit();
 
-    // Non-blocking: Remove from Discord channel
-    if (projectData?.discordChannelId && memberProfileData?.discordUsername) {
+    // Non-blocking Discord operations
+    if (projectData?.discordChannelId) {
+      const displayName = memberProfileData?.displayName || "A member";
+
+      // Remove from Discord channel
+      if (memberProfileData?.discordUsername) {
+        try {
+          await removeMemberFromChannel(
+            projectData.discordChannelId,
+            memberProfileData.discordUsername
+          );
+        } catch (discordError) {
+          console.error("Discord member removal failed:", discordError);
+        }
+      }
+
+      // Send departure message to project channel
       try {
-        await removeMemberFromChannel(
+        await sendChannelMessage(
           projectData.discordChannelId,
-          memberProfileData.discordUsername
+          `📤 **${displayName}** has left the project.`
         );
-      } catch (discordError) {
-        console.error("Discord member removal failed:", discordError);
-        // Continue - member removed from Firestore even if Discord fails
+      } catch (channelMsgError) {
+        console.error("Discord channel departure message failed:", channelMsgError);
       }
     }
 

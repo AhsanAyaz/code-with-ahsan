@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
-import { addMemberToChannel } from "@/lib/discord";
+import { addMemberToChannel, sendDirectMessage, sendChannelMessage } from "@/lib/discord";
 import { verifyAuth } from "@/lib/auth";
 
 export async function PUT(
@@ -91,6 +91,7 @@ export async function PUT(
           displayName: userData?.displayName || "",
           photoURL: userData?.photoURL || "",
           username: userData?.username,
+          discordUsername: userData?.discordUsername,
         },
         role: "member",
         joinedAt: FieldValue.serverTimestamp(),
@@ -106,16 +107,48 @@ export async function PUT(
       // Commit batch
       await batch.commit();
 
-      // Non-blocking: Add to Discord channel
-      if (projectData?.discordChannelId && userData?.discordUsername) {
+      // Non-blocking Discord operations
+      if (userData?.discordUsername) {
+        const siteUrl =
+          process.env.NEXT_PUBLIC_SITE_URL || "https://codewithahsan.dev";
+        const projectTitle = projectData?.title || "Untitled Project";
+
+        // Add to Discord channel
+        if (projectData?.discordChannelId) {
+          try {
+            await addMemberToChannel(
+              projectData.discordChannelId,
+              userData.discordUsername
+            );
+          } catch (discordError) {
+            console.error("Discord member add failed:", discordError);
+          }
+        }
+
+        // Send welcome message to project channel
+        if (projectData?.discordChannelId) {
+          try {
+            const displayName = applicationData?.userProfile?.displayName || userData?.displayName || "A new member";
+            await sendChannelMessage(
+              projectData.discordChannelId,
+              `👋 **${displayName}** has joined the project! Welcome to the team!`
+            );
+          } catch (channelMsgError) {
+            console.error("Discord channel welcome message failed:", channelMsgError);
+          }
+        }
+
+        // Send approval DM
         try {
-          await addMemberToChannel(
-            projectData.discordChannelId,
-            userData.discordUsername
-          );
-        } catch (discordError) {
-          console.error("Discord member add failed:", discordError);
-          // Continue - member added to Firestore even if Discord fails
+          const dmMessage =
+            `Your application to join **"${projectTitle}"** has been approved! 🎉\n\n` +
+            (projectData?.discordChannelUrl
+              ? `Join the project channel: ${projectData.discordChannelUrl}\n\n`
+              : "") +
+            `View the project: ${siteUrl}/projects/${projectId}`;
+          await sendDirectMessage(userData.discordUsername, dmMessage);
+        } catch (dmError) {
+          console.error("Discord approval DM failed:", dmError);
         }
       }
 
@@ -124,12 +157,34 @@ export async function PUT(
         { status: 200 }
       );
     } else if (action === "decline") {
+      // Fetch user profile for Discord DM
+      const userDoc = await db
+        .collection("mentorship_profiles")
+        .doc(userId)
+        .get();
+      const userData = userDoc.data();
+
       // Update application status to declined
       await applicationRef.update({
         status: "declined",
         declinedAt: FieldValue.serverTimestamp(),
         feedback: feedback || null,
       });
+
+      // Non-blocking: Send decline DM
+      if (userData?.discordUsername) {
+        try {
+          const projectDoc = await db.collection("projects").doc(projectId).get();
+          const projectTitle = projectDoc.data()?.title || "Untitled Project";
+          const dmMessage =
+            `Your application to join **"${projectTitle}"** was not approved.\n\n` +
+            (feedback ? `**Feedback:** ${feedback}\n\n` : "") +
+            `You can browse other projects at ${process.env.NEXT_PUBLIC_SITE_URL || "https://codewithahsan.dev"}/projects/discover`;
+          await sendDirectMessage(userData.discordUsername, dmMessage);
+        } catch (dmError) {
+          console.error("Discord decline DM failed:", dmError);
+        }
+      }
 
       return NextResponse.json(
         { success: true, message: "Application declined" },
