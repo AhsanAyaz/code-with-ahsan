@@ -114,6 +114,7 @@ export async function POST(request: NextRequest) {
       techStack: Array.isArray(techStack) ? techStack : [],
       difficulty: difficulty || "intermediate",
       maxTeamSize: maxTeamSize || 4,
+      memberCount: 0,
       lastActivityAt: FieldValue.serverTimestamp(),
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
@@ -139,6 +140,46 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const creatorId = searchParams.get("creatorId");
+    const member = searchParams.get("member");
+
+    // If member filter: look up project_members first, then batch-fetch projects
+    if (member) {
+      const membershipsSnapshot = await db
+        .collection("project_members")
+        .where("userId", "==", member)
+        .get();
+
+      if (membershipsSnapshot.empty) {
+        return NextResponse.json({ projects: [] }, { status: 200 });
+      }
+
+      const projectIds = membershipsSnapshot.docs.map(
+        (doc) => doc.data().projectId
+      );
+
+      // Batch-fetch projects by their IDs
+      const projectRefs = projectIds.map((id) =>
+        db.collection("projects").doc(id)
+      );
+      const projectDocs = await db.getAll(...projectRefs);
+
+      const projects = projectDocs
+        .filter((doc) => doc.exists)
+        .map((doc) => {
+          const data = doc.data()!;
+          return {
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+            updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+            approvedAt: data.approvedAt?.toDate?.()?.toISOString() || null,
+            lastActivityAt:
+              data.lastActivityAt?.toDate?.()?.toISOString() || null,
+          };
+        });
+
+      return NextResponse.json({ projects }, { status: 200 });
+    }
 
     // Build query
     let query = db.collection("projects");

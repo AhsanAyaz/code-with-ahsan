@@ -1,23 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
-import { canManageProjectMembers } from "@/lib/permissions";
 import { removeMemberFromChannel } from "@/lib/discord";
-import type { PermissionUser } from "@/lib/permissions";
 
-export async function DELETE(
+export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string; memberId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: projectId, memberId } = await params;
+    const { id: projectId } = await params;
     const body = await request.json();
-    const { requestorId } = body;
+    const { userId } = body;
 
-    // Validate requestorId
-    if (!requestorId || typeof requestorId !== "string") {
+    // Validate userId
+    if (!userId || typeof userId !== "string") {
       return NextResponse.json(
-        { error: "Requestor ID is required" },
+        { error: "User ID is required" },
         { status: 400 }
       );
     }
@@ -34,46 +32,18 @@ export async function DELETE(
 
     const projectData = projectDoc.data();
 
-    // Fetch requestor profile for permission check
-    const requestorDoc = await db
-      .collection("mentorship_profiles")
-      .doc(requestorId)
-      .get();
-
-    if (!requestorDoc.exists) {
-      return NextResponse.json(
-        { error: "Requestor profile not found" },
-        { status: 404 }
-      );
-    }
-
-    const requestorData = requestorDoc.data();
-
-    // Check permission: canManageProjectMembers
-    const permissionUser: PermissionUser = {
-      uid: requestorId,
-      role: requestorData?.role || null,
-      status: requestorData?.status,
-      isAdmin: requestorData?.isAdmin,
-    };
-
-    const project = {
-      id: projectId,
-      ...projectData,
-    };
-
-    if (!canManageProjectMembers(permissionUser, project as any)) {
+    // Prevent creator from leaving
+    if (projectData?.creatorId === userId) {
       return NextResponse.json(
         {
-          error: "Permission denied",
-          message: "Only project creator or admin can remove members",
+          error: "Project creator cannot leave. Transfer ownership first.",
         },
         { status: 403 }
       );
     }
 
     // Find member document by composite key
-    const memberDocId = `${projectId}_${memberId}`;
+    const memberDocId = `${projectId}_${userId}`;
     const memberRef = db.collection("project_members").doc(memberDocId);
     const memberDoc = await memberRef.get();
 
@@ -84,12 +54,10 @@ export async function DELETE(
       );
     }
 
-    const memberData = memberDoc.data();
-
     // Fetch member's profile for Discord username
     const memberProfileDoc = await db
       .collection("mentorship_profiles")
-      .doc(memberId)
+      .doc(userId)
       .get();
     const memberProfileData = memberProfileDoc.data();
 
@@ -123,13 +91,13 @@ export async function DELETE(
     }
 
     return NextResponse.json(
-      { success: true, message: "Member removed successfully" },
+      { success: true, message: "Successfully left the project" },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error removing member:", error);
+    console.error("Error leaving project:", error);
     return NextResponse.json(
-      { error: "Failed to remove member" },
+      { error: "Failed to leave project" },
       { status: 500 }
     );
   }

@@ -7,12 +7,15 @@ import TeamRoster from "@/components/projects/TeamRoster";
 import ApplicationForm from "@/components/projects/ApplicationForm";
 import Link from "next/link";
 import Image from "next/image";
+import ToastContainer, { ToastMessage, ToastType } from "@/components/ui/Toast";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import {
   Project,
   ProjectMember,
   ProjectApplication,
   ProjectInvitation,
   ProjectDifficulty,
+  MentorshipRole,
 } from "@/types/mentorship";
 
 export const dynamic = "force-dynamic";
@@ -34,14 +37,58 @@ export default function ProjectDetailPage() {
   const [inviteInput, setInviteInput] = useState("");
   const [inviteLoading, setInviteLoading] = useState(false);
   const [declineFeedback, setDeclineFeedback] = useState<Record<string, string>>({});
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmLabel: string;
+    confirmClass: string;
+    onConfirm: () => void;
+  } | null>(null);
 
   const isCreator = user && project?.creatorId === user.uid;
   const isMember = members.some((m) => m.userId === user?.uid);
+
+  const getSkillLevelFromRole = (role: MentorshipRole): ProjectDifficulty | undefined => {
+    if (role === "mentor") return "advanced";
+    if (role === "mentee") return "beginner";
+    return undefined;
+  };
 
   const difficultyColors: Record<ProjectDifficulty, string> = {
     beginner: "badge-success",
     intermediate: "badge-warning",
     advanced: "badge-error",
+  };
+
+  const showToast = (message: string, type: ToastType) => {
+    const id = Date.now().toString();
+    setToasts((prev) => [...prev, { id, message, type }]);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const showConfirm = (opts: {
+    title: string;
+    message: string;
+    confirmLabel?: string;
+    confirmClass?: string;
+    onConfirm: () => void;
+  }) => {
+    setConfirmModal({
+      isOpen: true,
+      title: opts.title,
+      message: opts.message,
+      confirmLabel: opts.confirmLabel || "Confirm",
+      confirmClass: opts.confirmClass || "btn-primary",
+      onConfirm: () => {
+        setConfirmModal(null);
+        opts.onConfirm();
+      },
+    });
   };
 
   // Fetch project data
@@ -134,15 +181,15 @@ export default function ProjectDetailPage() {
       );
 
       if (response.ok) {
-        // Refresh data
         fetchProjectData();
+        showToast("Application approved!", "success");
       } else {
         const data = await response.json();
-        alert(data.error || "Failed to approve application");
+        showToast(data.error || "Failed to approve application", "error");
       }
     } catch (error) {
       console.error("Error approving application:", error);
-      alert("An error occurred");
+      showToast("An error occurred", "error");
     }
   };
 
@@ -159,20 +206,20 @@ export default function ProjectDetailPage() {
       );
 
       if (response.ok) {
-        // Refresh data
         fetchProjectData();
         setDeclineFeedback((prev) => {
           const next = { ...prev };
           delete next[userId];
           return next;
         });
+        showToast("Application declined", "success");
       } else {
         const data = await response.json();
-        alert(data.error || "Failed to decline application");
+        showToast(data.error || "Failed to decline application", "error");
       }
     } catch (error) {
       console.error("Error declining application:", error);
-      alert("An error occurred");
+      showToast("An error occurred", "error");
     }
   };
 
@@ -181,26 +228,29 @@ export default function ProjectDetailPage() {
 
     setInviteLoading(true);
     try {
+      const input = inviteInput.trim();
+      const isEmail = input.includes("@");
+
       const response = await fetch(`/api/projects/${projectId}/invitations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           invitedBy: user?.uid,
-          emailOrDiscord: inviteInput.trim(),
+          ...(isEmail ? { email: input } : { discordUsername: input }),
         }),
       });
 
       if (response.ok) {
         setInviteInput("");
         fetchProjectData();
-        alert("Invitation sent successfully!");
+        showToast("Invitation sent successfully!", "success");
       } else {
         const data = await response.json();
-        alert(data.error || "Failed to send invitation");
+        showToast(data.error || "Failed to send invitation", "error");
       }
     } catch (error) {
       console.error("Error sending invitation:", error);
-      alert("An error occurred");
+      showToast("An error occurred", "error");
     } finally {
       setInviteLoading(false);
     }
@@ -221,13 +271,14 @@ export default function ProjectDetailPage() {
 
       if (response.ok) {
         fetchProjectData();
+        showToast("Invitation accepted!", "success");
       } else {
         const data = await response.json();
-        alert(data.error || "Failed to accept invitation");
+        showToast(data.error || "Failed to accept invitation", "error");
       }
     } catch (error) {
       console.error("Error accepting invitation:", error);
-      alert("An error occurred");
+      showToast("An error occurred", "error");
     }
   };
 
@@ -246,37 +297,73 @@ export default function ProjectDetailPage() {
 
       if (response.ok) {
         fetchProjectData();
+        showToast("Invitation declined", "success");
       } else {
         const data = await response.json();
-        alert(data.error || "Failed to decline invitation");
+        showToast(data.error || "Failed to decline invitation", "error");
       }
     } catch (error) {
       console.error("Error declining invitation:", error);
-      alert("An error occurred");
+      showToast("An error occurred", "error");
     }
   };
 
-  const handleRemoveMember = async (memberId: string) => {
-    if (!confirm("Are you sure you want to remove this member?")) return;
-
-    try {
-      const response = await fetch(
-        `/api/projects/${projectId}/members/${memberId}`,
-        {
-          method: "DELETE",
+  const handleLeaveProject = () => {
+    showConfirm({
+      title: "Leave Project",
+      message: "Are you sure you want to leave this project?",
+      confirmLabel: "Leave",
+      confirmClass: "btn-error",
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`/api/projects/${projectId}/leave`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: user?.uid }),
+          });
+          if (response.ok) {
+            fetchProjectData();
+            showToast("You have left the project", "success");
+          } else {
+            const data = await response.json();
+            showToast(data.error || "Failed to leave project", "error");
+          }
+        } catch (error) {
+          console.error("Error leaving project:", error);
+          showToast("An error occurred", "error");
         }
-      );
+      },
+    });
+  };
 
-      if (response.ok) {
-        fetchProjectData();
-      } else {
-        const data = await response.json();
-        alert(data.error || "Failed to remove member");
-      }
-    } catch (error) {
-      console.error("Error removing member:", error);
-      alert("An error occurred");
-    }
+  const handleRemoveMember = (memberId: string) => {
+    showConfirm({
+      title: "Remove Member",
+      message: "Are you sure you want to remove this member from the project?",
+      confirmLabel: "Remove",
+      confirmClass: "btn-error",
+      onConfirm: async () => {
+        try {
+          const response = await fetch(
+            `/api/projects/${projectId}/members/${memberId}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          if (response.ok) {
+            fetchProjectData();
+            showToast("Member removed successfully", "success");
+          } else {
+            const data = await response.json();
+            showToast(data.error || "Failed to remove member", "error");
+          }
+        } catch (error) {
+          console.error("Error removing member:", error);
+          showToast("An error occurred", "error");
+        }
+      },
+    });
   };
 
   if (loading || authLoading) {
@@ -402,6 +489,15 @@ export default function ProjectDetailPage() {
         onRemoveMember={isCreator ? handleRemoveMember : undefined}
       />
 
+      {/* Leave Project Button */}
+      {isMember && !isCreator && (
+        <div className="flex justify-end">
+          <button onClick={handleLeaveProject} className="btn btn-outline btn-error btn-sm">
+            Leave Project
+          </button>
+        </div>
+      )}
+
       {/* Creator Section: Applications and Invitations */}
       {isCreator && (
         <div className="space-y-6">
@@ -523,7 +619,7 @@ export default function ProjectDetailPage() {
             projectId={projectId}
             project={project}
             userId={user.uid}
-            userSkillLevel={profile?.role === "mentee" ? undefined : undefined}
+            userSkillLevel={getSkillLevelFromRole(profile?.role ?? null)}
             onSuccess={fetchProjectData}
           />
         </div>
@@ -612,6 +708,19 @@ export default function ProjectDetailPage() {
             </div>
           </div>
         </div>
+      )}
+
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
+      {confirmModal && (
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          title={confirmModal.title}
+          message={confirmModal.message}
+          confirmLabel={confirmModal.confirmLabel}
+          confirmClass={confirmModal.confirmClass}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
       )}
     </div>
   );

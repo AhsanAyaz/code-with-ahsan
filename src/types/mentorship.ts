@@ -111,7 +111,7 @@ export type RequestStatus =
 
 // ─── v2.0 Project Collaboration Types ───────────────────────
 
-export type ProjectStatus = "pending" | "approved" | "active" | "completed" | "archived";
+export type ProjectStatus = "pending" | "approved" | "active" | "completed" | "archived" | "declined";
 export type RoadmapStatus = "draft" | "pending" | "approved" | "active" | "archived";
 export type ProjectDifficulty = "beginner" | "intermediate" | "advanced";
 export type ProjectMemberRole = "owner" | "member";
@@ -131,6 +131,7 @@ export interface Project {
   techStack: string[];
   difficulty: ProjectDifficulty;
   maxTeamSize: number;
+  memberCount?: number;
   discordChannelId?: string;
   discordChannelUrl?: string;
   lastActivityAt?: Date;

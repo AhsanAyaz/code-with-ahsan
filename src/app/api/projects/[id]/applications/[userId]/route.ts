@@ -37,9 +37,24 @@ export async function PUT(
     const applicationData = applicationDoc.data();
 
     if (action === "approve") {
-      // Fetch project for Discord info
+      // Fetch project for Discord info and capacity check
       const projectDoc = await db.collection("projects").doc(projectId).get();
       const projectData = projectDoc.data();
+
+      // Enforce maxTeamSize: count current members
+      const membersSnapshot = await db
+        .collection("project_members")
+        .where("projectId", "==", projectId)
+        .count()
+        .get();
+      const currentMemberCount = membersSnapshot.data().count;
+
+      if (projectData?.maxTeamSize && currentMemberCount >= projectData.maxTeamSize) {
+        return NextResponse.json(
+          { error: "Team is full. Maximum team size reached." },
+          { status: 409 }
+        );
+      }
 
       // Fetch user profile for Discord username
       const userDoc = await db
@@ -72,10 +87,11 @@ export async function PUT(
         joinedAt: FieldValue.serverTimestamp(),
       });
 
-      // 3. Update project lastActivityAt
+      // 3. Update project lastActivityAt and increment memberCount
       const projectRef = db.collection("projects").doc(projectId);
       batch.update(projectRef, {
         lastActivityAt: FieldValue.serverTimestamp(),
+        memberCount: FieldValue.increment(1),
       });
 
       // Commit batch

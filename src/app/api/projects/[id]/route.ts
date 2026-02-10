@@ -5,6 +5,7 @@ import {
   createProjectChannel,
   sendProjectDetailsMessage,
   archiveProjectChannel,
+  sendDirectMessage,
 } from "@/lib/discord";
 
 export async function GET(
@@ -161,12 +162,13 @@ export async function PUT(
           const discordUsername = creatorData?.discordUsername;
 
           if (discordUsername) {
-            // TODO: Send Discord DM with decline reason
-            // For now, just log it - Discord DM API integration needed
-            console.log(`[Project Declined] Would send DM to ${discordUsername}:`, {
-              projectTitle: projectData.title,
-              reason: declineReason,
-            });
+            const siteUrl =
+              process.env.NEXT_PUBLIC_SITE_URL || "https://codewithahsan.dev";
+            const dmMessage =
+              `Your project "${projectData.title}" was not approved.\n\n` +
+              `**Reason:** ${declineReason}\n\n` +
+              `You can revise and resubmit at ${siteUrl}/projects/create`;
+            await sendDirectMessage(discordUsername, dmMessage);
           }
         } catch (error) {
           console.error("Error sending decline notification:", error);
@@ -174,11 +176,17 @@ export async function PUT(
         }
       }
 
-      // Delete the declined project instead of marking it as declined
-      await projectRef.delete();
+      // Soft-delete: mark as declined instead of permanent deletion
+      await projectRef.update({
+        status: "declined",
+        declinedAt: FieldValue.serverTimestamp(),
+        declinedBy: adminId,
+        declineReason: declineReason || null,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
 
       return NextResponse.json(
-        { success: true, message: "Project declined and deleted" },
+        { success: true, message: "Project declined" },
         { status: 200 }
       );
     } else if (action === "complete") {

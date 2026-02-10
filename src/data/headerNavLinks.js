@@ -6,6 +6,7 @@ export const LINKS = {
 // Community dropdown items
 export const COMMUNITY_LINKS = [
   { href: "/mentorship", title: "Mentorship", icon: "mentorship" },
+  { href: "/projects/discover", title: "Projects", icon: "projects" },
   { href: LINKS.DISCORD, title: "Discord", icon: "discord", external: true },
   { href: "/logic-buddy", title: "Logic Buddy", icon: "brain" },
 ];
