@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { canManageProjectMembers } from "@/lib/permissions";
-import { removeMemberFromChannel } from "@/lib/discord";
+import { removeMemberFromChannel, sendChannelMessage } from "@/lib/discord";
 import { verifyAuth } from "@/lib/auth";
 import type { PermissionUser } from "@/lib/permissions";
 
@@ -72,8 +72,10 @@ export async function DELETE(
       );
     }
 
-    // Find member document by composite key
-    const memberDocId = `${projectId}_${memberId}`;
+    // Find member document — memberId may be a userId or composite key ({projectId}_{userId})
+    const isCompositeKey = memberId.includes("_");
+    const memberDocId = isCompositeKey ? memberId : `${projectId}_${memberId}`;
+    const memberUserId = isCompositeKey ? memberId.split("_").slice(1).join("_") : memberId;
     const memberRef = db.collection("project_members").doc(memberDocId);
     const memberDoc = await memberRef.get();
 
@@ -89,9 +91,36 @@ export async function DELETE(
     // Fetch member's profile for Discord username
     const memberProfileDoc = await db
       .collection("mentorship_profiles")
-      .doc(memberId)
+      .doc(memberUserId)
       .get();
     const memberProfileData = memberProfileDoc.data();
+
+    // Non-blocking Discord operations: message first, then remove
+    if (projectData?.discordChannelId) {
+      const displayName = memberData?.userProfile?.displayName || memberProfileData?.displayName || "A member";
+
+      // Send departure message to project channel
+      try {
+        await sendChannelMessage(
+          projectData.discordChannelId,
+          `📤 **${displayName}** has been removed from the project.`
+        );
+      } catch (channelMsgError) {
+        console.error("Discord channel removal message failed:", channelMsgError);
+      }
+
+      // Remove from Discord channel
+      if (memberProfileData?.discordUsername) {
+        try {
+          await removeMemberFromChannel(
+            projectData.discordChannelId,
+            memberProfileData.discordUsername
+          );
+        } catch (discordError) {
+          console.error("Discord member removal failed:", discordError);
+        }
+      }
+    }
 
     // Use Firestore batch for atomicity
     const batch = db.batch();
@@ -108,19 +137,6 @@ export async function DELETE(
 
     // Commit batch
     await batch.commit();
-
-    // Non-blocking: Remove from Discord channel
-    if (projectData?.discordChannelId && memberProfileData?.discordUsername) {
-      try {
-        await removeMemberFromChannel(
-          projectData.discordChannelId,
-          memberProfileData.discordUsername
-        );
-      } catch (discordError) {
-        console.error("Discord member removal failed:", discordError);
-        // Continue - member removed from Firestore even if Discord fails
-      }
-    }
 
     return NextResponse.json(
       { success: true, message: "Member removed successfully" },

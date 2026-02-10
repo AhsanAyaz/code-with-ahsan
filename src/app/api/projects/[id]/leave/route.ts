@@ -61,6 +61,33 @@ export async function POST(
       .get();
     const memberProfileData = memberProfileDoc.data();
 
+    // Non-blocking Discord operations: message first, then remove
+    if (projectData?.discordChannelId) {
+      const displayName = memberProfileData?.displayName || "A member";
+
+      // Send departure message to project channel first
+      try {
+        await sendChannelMessage(
+          projectData.discordChannelId,
+          `📤 **${displayName}** has left the project.`
+        );
+      } catch (channelMsgError) {
+        console.error("Discord channel departure message failed:", channelMsgError);
+      }
+
+      // Then remove from Discord channel
+      if (memberProfileData?.discordUsername) {
+        try {
+          await removeMemberFromChannel(
+            projectData.discordChannelId,
+            memberProfileData.discordUsername
+          );
+        } catch (discordError) {
+          console.error("Discord member removal failed:", discordError);
+        }
+      }
+    }
+
     // Use Firestore batch for atomicity
     const batch = db.batch();
 
@@ -76,33 +103,6 @@ export async function POST(
 
     // Commit batch
     await batch.commit();
-
-    // Non-blocking Discord operations
-    if (projectData?.discordChannelId) {
-      const displayName = memberProfileData?.displayName || "A member";
-
-      // Remove from Discord channel
-      if (memberProfileData?.discordUsername) {
-        try {
-          await removeMemberFromChannel(
-            projectData.discordChannelId,
-            memberProfileData.discordUsername
-          );
-        } catch (discordError) {
-          console.error("Discord member removal failed:", discordError);
-        }
-      }
-
-      // Send departure message to project channel
-      try {
-        await sendChannelMessage(
-          projectData.discordChannelId,
-          `📤 **${displayName}** has left the project.`
-        );
-      } catch (channelMsgError) {
-        console.error("Discord channel departure message failed:", channelMsgError);
-      }
-    }
 
     return NextResponse.json(
       { success: true, message: "Successfully left the project" },
