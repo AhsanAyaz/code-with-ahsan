@@ -154,12 +154,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 003 | Add profile preview buttons for admins and mentors | 2026-02-01 | 365c4fd | [003-add-profile-preview-buttons-1-add-a-prof](./quick/003-add-profile-preview-buttons-1-add-a-prof/) |
 | 004 | Fix admin profile preview for declined mentors | 2026-02-01 | 6e6ffec | [004-fix-admin-profile-preview-for-declined-m](./quick/004-fix-admin-profile-preview-for-declined-m/) |
 | 005 | Fix search input state sync issue on admin dashboard | 2026-02-01 | 8e6b4b6 | [005-fix-search-input-state-sync-issue-on-adm](./quick/005-fix-search-input-state-sync-issue-on-adm/) |
+| 006 | Add pending application count badge to ProjectCard | 2026-02-10 | aa5165f | [006-add-pending-application-count-badge-to-p](./quick/6-add-pending-application-count-badge-to-p/) |
 
 ## Session Continuity
 
-Last session: 2026-02-02 19:52
-Stopped at: Completed 06-02-PLAN.md (Team Formation API Routes)
+Last session: 2026-02-10 22:00
+Stopped at: Completed quick-006 (Add pending application count badge)
 Resume file: None (ready to continue Phase 6 Plan 3)
 
 ---
-*Updated: 2026-02-02 after completing 06-02-PLAN.md*
+*Updated: 2026-02-10 after completing quick-006*
