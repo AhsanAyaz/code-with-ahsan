@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
-import { removeMemberFromChannel, sendChannelMessage } from "@/lib/discord";
+import { removeMemberFromChannel, sendChannelMessage, lookupMemberByUsername } from "@/lib/discord";
 import { verifyAuth } from "@/lib/auth";
 
 export async function POST(
@@ -63,13 +63,24 @@ export async function POST(
 
     // Non-blocking Discord operations: message first, then remove
     if (projectData?.discordChannelId) {
-      const displayName = memberProfileData?.displayName || "A member";
+      // Look up Discord member for tagging
+      let tag: string;
+      if (memberProfileData?.discordUsername) {
+        try {
+          const discordMember = await lookupMemberByUsername(memberProfileData.discordUsername);
+          tag = discordMember ? `<@${discordMember.id}>` : `**${memberProfileData?.displayName || "A member"}**`;
+        } catch {
+          tag = `**${memberProfileData?.displayName || "A member"}**`;
+        }
+      } else {
+        tag = `**${memberProfileData?.displayName || "A member"}**`;
+      }
 
       // Send departure message to project channel first
       try {
         await sendChannelMessage(
           projectData.discordChannelId,
-          `📤 **${displayName}** has left the project.`
+          `📤 ${tag} has left the project.`
         );
       } catch (channelMsgError) {
         console.error("Discord channel departure message failed:", channelMsgError);

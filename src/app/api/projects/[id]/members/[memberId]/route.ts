@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { canManageProjectMembers } from "@/lib/permissions";
-import { removeMemberFromChannel, sendChannelMessage } from "@/lib/discord";
+import { removeMemberFromChannel, sendChannelMessage, lookupMemberByUsername } from "@/lib/discord";
 import { verifyAuth } from "@/lib/auth";
 import type { PermissionUser } from "@/lib/permissions";
 
@@ -97,13 +97,24 @@ export async function DELETE(
 
     // Non-blocking Discord operations: message first, then remove
     if (projectData?.discordChannelId) {
-      const displayName = memberData?.userProfile?.displayName || memberProfileData?.displayName || "A member";
+      // Look up Discord member for tagging
+      let tag: string;
+      if (memberProfileData?.discordUsername) {
+        try {
+          const discordMember = await lookupMemberByUsername(memberProfileData.discordUsername);
+          tag = discordMember ? `<@${discordMember.id}>` : `**${memberData?.userProfile?.displayName || memberProfileData?.displayName || "A member"}**`;
+        } catch {
+          tag = `**${memberData?.userProfile?.displayName || memberProfileData?.displayName || "A member"}**`;
+        }
+      } else {
+        tag = `**${memberData?.userProfile?.displayName || memberProfileData?.displayName || "A member"}**`;
+      }
 
       // Send departure message to project channel
       try {
         await sendChannelMessage(
           projectData.discordChannelId,
-          `📤 **${displayName}** has been removed from the project.`
+          `📤 ${tag} has been removed from the project.`
         );
       } catch (channelMsgError) {
         console.error("Discord channel removal message failed:", channelMsgError);
