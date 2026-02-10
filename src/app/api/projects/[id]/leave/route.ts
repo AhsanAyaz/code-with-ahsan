@@ -2,23 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { removeMemberFromChannel } from "@/lib/discord";
+import { verifyAuth } from "@/lib/auth";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: projectId } = await params;
-    const body = await request.json();
-    const { userId } = body;
-
-    // Validate userId
-    if (!userId || typeof userId !== "string") {
+    const authResult = await verifyAuth(request);
+    if (!authResult) {
       return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
+        { error: "Authentication required" },
+        { status: 401 }
       );
     }
+
+    const { id: projectId } = await params;
+    const userId = authResult.uid;
 
     // Fetch project
     const projectDoc = await db.collection("projects").doc(projectId).get();

@@ -4,6 +4,7 @@ import { useState, useActionState } from "react";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { authFetch } from "@/lib/apiClient";
 
 // Force dynamic rendering to prevent prerender errors with client-side context
 export const dynamic = 'force-dynamic';
@@ -61,7 +62,7 @@ export default function CreateProjectPage() {
       const maxTeamSize = parseInt(maxTeamSizeRaw, 10) || 4;
 
       // POST to API
-      const response = await fetch("/api/projects", {
+      const response = await authFetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -3,10 +3,19 @@ import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { canCreateProject } from "@/lib/permissions";
 import { validateGitHubUrl } from "@/lib/validation/urls";
+import { verifyAuth } from "@/lib/auth";
 import type { PermissionUser } from "@/lib/permissions";
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await verifyAuth(request);
+    if (!authResult) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const {
       title,
@@ -15,8 +24,9 @@ export async function POST(request: NextRequest) {
       techStack,
       difficulty,
       maxTeamSize,
-      creatorId,
     } = body;
+
+    const creatorId = authResult.uid;
 
     // Validate required fields
     if (!title || typeof title !== "string") {
@@ -43,13 +53,6 @@ export async function POST(request: NextRequest) {
     if (description.length < 10 || description.length > 2000) {
       return NextResponse.json(
         { error: "Description must be between 10 and 2000 characters" },
-        { status: 400 }
-      );
-    }
-
-    if (!creatorId || typeof creatorId !== "string") {
-      return NextResponse.json(
-        { error: "Creator ID is required" },
         { status: 400 }
       );
     }

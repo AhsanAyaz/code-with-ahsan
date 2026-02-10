@@ -2,23 +2,25 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { sendDirectMessage } from "@/lib/discord";
+import { verifyAuth } from "@/lib/auth";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: projectId } = await params;
-    const body = await request.json();
-    const { invitedBy, email, discordUsername } = body;
-
-    // Validate required fields
-    if (!invitedBy || typeof invitedBy !== "string") {
+    const authResult = await verifyAuth(request);
+    if (!authResult) {
       return NextResponse.json(
-        { error: "invitedBy is required" },
-        { status: 400 }
+        { error: "Authentication required" },
+        { status: 401 }
       );
     }
+
+    const { id: projectId } = await params;
+    const body = await request.json();
+    const { email, discordUsername } = body;
+    const invitedBy = authResult.uid;
 
     // Must provide email OR discordUsername
     if (!email && !discordUsername) {

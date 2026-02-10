@@ -8,6 +8,7 @@ import ApplicationForm from "@/components/projects/ApplicationForm";
 import Link from "next/link";
 import Image from "next/image";
 import ToastContainer, { ToastMessage, ToastType } from "@/components/ui/Toast";
+import { authFetch } from "@/lib/apiClient";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import {
   Project,
@@ -37,6 +38,8 @@ export default function ProjectDetailPage() {
   const [inviteInput, setInviteInput] = useState("");
   const [inviteLoading, setInviteLoading] = useState(false);
   const [declineFeedback, setDeclineFeedback] = useState<Record<string, string>>({});
+  const [leaveLoading, setLeaveLoading] = useState(false);
+  const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -171,7 +174,7 @@ export default function ProjectDetailPage() {
 
   const handleApproveApplication = async (userId: string) => {
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `/api/projects/${projectId}/applications/${userId}`,
         {
           method: "PUT",
@@ -196,7 +199,7 @@ export default function ProjectDetailPage() {
   const handleDeclineApplication = async (userId: string) => {
     const feedback = declineFeedback[userId];
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `/api/projects/${projectId}/applications/${userId}`,
         {
           method: "PUT",
@@ -231,7 +234,7 @@ export default function ProjectDetailPage() {
       const input = inviteInput.trim();
       const isEmail = input.includes("@");
 
-      const response = await fetch(`/api/projects/${projectId}/invitations`, {
+      const response = await authFetch(`/api/projects/${projectId}/invitations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -260,7 +263,7 @@ export default function ProjectDetailPage() {
     if (!userInvitation) return;
 
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `/api/projects/${projectId}/invitations/${user?.uid}`,
         {
           method: "PUT",
@@ -286,7 +289,7 @@ export default function ProjectDetailPage() {
     if (!userInvitation) return;
 
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `/api/projects/${projectId}/invitations/${user?.uid}`,
         {
           method: "PUT",
@@ -315,8 +318,9 @@ export default function ProjectDetailPage() {
       confirmLabel: "Leave",
       confirmClass: "btn-error",
       onConfirm: async () => {
+        setLeaveLoading(true);
         try {
-          const response = await fetch(`/api/projects/${projectId}/leave`, {
+          const response = await authFetch(`/api/projects/${projectId}/leave`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId: user?.uid }),
@@ -331,6 +335,8 @@ export default function ProjectDetailPage() {
         } catch (error) {
           console.error("Error leaving project:", error);
           showToast("An error occurred", "error");
+        } finally {
+          setLeaveLoading(false);
         }
       },
     });
@@ -343,11 +349,13 @@ export default function ProjectDetailPage() {
       confirmLabel: "Remove",
       confirmClass: "btn-error",
       onConfirm: async () => {
+        setRemovingMemberId(memberId);
         try {
-          const response = await fetch(
+          const response = await authFetch(
             `/api/projects/${projectId}/members/${memberId}`,
             {
               method: "DELETE",
+              body: JSON.stringify({ requestorId: user?.uid }),
             }
           );
 
@@ -361,6 +369,8 @@ export default function ProjectDetailPage() {
         } catch (error) {
           console.error("Error removing member:", error);
           showToast("An error occurred", "error");
+        } finally {
+          setRemovingMemberId(null);
         }
       },
     });
@@ -492,8 +502,19 @@ export default function ProjectDetailPage() {
       {/* Leave Project Button */}
       {isMember && !isCreator && (
         <div className="flex justify-end">
-          <button onClick={handleLeaveProject} className="btn btn-outline btn-error btn-sm">
-            Leave Project
+          <button
+            onClick={handleLeaveProject}
+            className="btn btn-outline btn-error btn-sm"
+            disabled={leaveLoading}
+          >
+            {leaveLoading ? (
+              <>
+                <span className="loading loading-spinner loading-sm"></span>
+                Leaving...
+              </>
+            ) : (
+              "Leave Project"
+            )}
           </button>
         </div>
       )}

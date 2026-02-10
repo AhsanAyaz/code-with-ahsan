@@ -3,6 +3,7 @@ import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { canManageProjectMembers } from "@/lib/permissions";
 import { removeMemberFromChannel } from "@/lib/discord";
+import { verifyAuth } from "@/lib/auth";
 import type { PermissionUser } from "@/lib/permissions";
 
 export async function DELETE(
@@ -10,17 +11,16 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string; memberId: string }> }
 ) {
   try {
-    const { id: projectId, memberId } = await params;
-    const body = await request.json();
-    const { requestorId } = body;
-
-    // Validate requestorId
-    if (!requestorId || typeof requestorId !== "string") {
+    const authResult = await verifyAuth(request);
+    if (!authResult) {
       return NextResponse.json(
-        { error: "Requestor ID is required" },
-        { status: 400 }
+        { error: "Authentication required" },
+        { status: 401 }
       );
     }
+
+    const { id: projectId, memberId } = await params;
+    const requestorId = authResult.uid;
 
     // Fetch project
     const projectDoc = await db.collection("projects").doc(projectId).get();

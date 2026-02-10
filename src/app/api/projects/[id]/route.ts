@@ -7,6 +7,7 @@ import {
   archiveProjectChannel,
   sendDirectMessage,
 } from "@/lib/discord";
+import { verifyAuth } from "@/lib/auth";
 
 export async function GET(
   request: NextRequest,
@@ -54,9 +55,17 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await verifyAuth(request);
+    if (!authResult) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
     const body = await request.json();
-    const { action, adminId, creatorId, declineReason } = body;
+    const { action, declineReason } = body;
 
     // Fetch project document
     const projectRef = db.collection("projects").doc(id);
@@ -73,18 +82,11 @@ export async function PUT(
 
     // Handle different actions
     if (action === "approve") {
-      if (!adminId) {
-        return NextResponse.json(
-          { error: "Admin ID is required for approval" },
-          { status: 400 }
-        );
-      }
-
-      // Update project status to active (admin auth handled by frontend)
+      // Update project status to active
       await projectRef.update({
         status: "active",
         approvedAt: FieldValue.serverTimestamp(),
-        approvedBy: adminId,
+        approvedBy: authResult.uid,
         updatedAt: FieldValue.serverTimestamp(),
         lastActivityAt: FieldValue.serverTimestamp(),
       });
@@ -142,13 +144,6 @@ export async function PUT(
         { status: 200 }
       );
     } else if (action === "decline") {
-      if (!adminId) {
-        return NextResponse.json(
-          { error: "Admin ID is required for declining" },
-          { status: 400 }
-        );
-      }
-
       // Send decline reason to project creator via Discord DM (non-blocking)
       if (declineReason && projectData?.creatorId) {
         try {
@@ -180,7 +175,7 @@ export async function PUT(
       await projectRef.update({
         status: "declined",
         declinedAt: FieldValue.serverTimestamp(),
-        declinedBy: adminId,
+        declinedBy: authResult.uid,
         declineReason: declineReason || null,
         updatedAt: FieldValue.serverTimestamp(),
       });
@@ -190,15 +185,8 @@ export async function PUT(
         { status: 200 }
       );
     } else if (action === "complete") {
-      if (!creatorId) {
-        return NextResponse.json(
-          { error: "Creator ID is required for completion" },
-          { status: 400 }
-        );
-      }
-
       // Verify creator owns the project
-      if (projectData?.creatorId !== creatorId) {
+      if (projectData?.creatorId !== authResult.uid) {
         return NextResponse.json(
           {
             error: "Permission denied",

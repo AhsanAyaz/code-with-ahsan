@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { canApplyToProject } from "@/lib/permissions";
+import { verifyAuth } from "@/lib/auth";
 import type { PermissionUser } from "@/lib/permissions";
 
 export async function POST(
@@ -9,17 +10,18 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: projectId } = await params;
-    const body = await request.json();
-    const { userId, message } = body;
-
-    // Validate required fields
-    if (!userId || typeof userId !== "string") {
+    const authResult = await verifyAuth(request);
+    if (!authResult) {
       return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
+        { error: "Authentication required" },
+        { status: 401 }
       );
     }
+
+    const { id: projectId } = await params;
+    const body = await request.json();
+    const { message } = body;
+    const userId = authResult.uid;
 
     if (!message || typeof message !== "string") {
       return NextResponse.json(
