@@ -183,22 +183,67 @@ optimized_classifier = optimizer.compile(
 )
 ```
 
-## Tools & Platforms
+## Learning Resources
 
-### Development
-- **Jupyter/Colab** - Prompt experimentation
-- **LangSmith** - Debugging and tracing
-- **Weights & Biases** - Experiment tracking
+### 🎓 Free Courses
 
-### Evaluation
-- **LLM-as-a-judge** - GPT-4/Claude for evaluation
-- **RAGAS** - RAG evaluation metrics
-- **Custom metrics** - Domain-specific scoring
+**Beginner-Friendly**
+- **[Prompt Engineering for Everyone](https://www.ibm.com/training/course/prompt-engineering-for-everyone)** - IBM's free course (Start Here)
+- **[Google Prompting Essentials Specialization](https://www.coursera.org/specializations/google-prompting-essentials)** - Coursera (Recommended)
+- **[DeepLearning.AI Prompt Engineering](https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/)** - Short course with Andrew Ng
 
-### Production
-- **PromptLayer** - Version control
-- **Helicone** - Observability
-- **LangFuse** - Open-source LLMOps
+**Advanced**
+- **[Prompt Engineering with watsonx.ai](https://www.ibm.com/training/watsonx)** - Hands-on IBM workshop
+- **[OpenAI Prompt Engineering Guide](https://platform.openai.com/docs/guides/prompt-engineering)** - Official best practices
+
+### 🔬 DSPy Resources
+
+**Official Documentation**
+- **[DSPy Docs](https://dspy-docs.vercel.app/)** - "Programming—not prompting—LMs"
+- **[DSPy GitHub](https://github.com/stanfordnlp/dspy)** - Source code and examples
+
+**Tutorials**
+- **DSPy Reflective Prompt Evolution** - Within DSPy docs
+- **DSPy for RAG** - RAG optimization tutorial
+- **Finetuning Agents with DSPy** - Advanced agent tuning
+
+### 📚 Comprehensive Guides
+
+- **[The 2026 Guide to Prompt Engineering](https://www.ibm.com/think/topics/prompt-engineering)** - IBM's comprehensive resource
+- **[Anthropic Prompt Engineering Guide](https://docs.anthropic.com/claude/docs/prompt-engineering)** - Claude-specific techniques
+- **[OpenAI Cookbook](https://cookbook.openai.com/)** - Practical examples
+
+### 🛠️ Evaluation & Management Tools
+
+**Prompt Management Platforms**
+- **[Maxim AI](https://www.getmaxim.ai/)** - Prompt experimentation and evaluation
+- **[PromptLayer](https://promptlayer.com/)** - Prompt versioning and registry
+- **[LangSmith](https://www.langchain.com/langsmith)** - LangChain observability
+- **[Braintrust](https://www.braintrust.dev/)** - Evaluation platform
+
+**Open Source Tools**
+- **[LangFuse](https://langfuse.com/)** - Open-source LLMOps
+- **[Helicone](https://www.helicone.ai/)** - LLM observability
+- **[RAGAS](https://docs.ragas.io/)** - RAG evaluation framework
+
+### 📺 Video Resources
+
+- **[AI Jason](https://www.youtube.com/@AIJason)** - Prompt engineering tutorials
+- **[Sam Witteveen](https://www.youtube.com/@samwitteveenai)** - LangChain and prompting
+- **[Matt Wolfe](https://www.youtube.com/@mreflow)** - AI tools and prompting
+
+### 🧪 Hands-On Practice
+
+- **[Jupyter Notebooks](https://jupyter.org/)** / **[Google Colab](https://colab.research.google.com/)** - Experimentation environment
+- **[Weights & Biases](https://wandb.ai/)** - Experiment tracking
+- **[ChatGPT Playground](https://platform.openai.com/playground)** - Test prompts
+- **[Claude Workbench](https://console.anthropic.com/workbench)** - Claude prompt testing
+
+### 📰 Stay Updated
+
+- **[AI Tidbits](https://aitidbits.substack.com/)** - Weekly AI newsletter
+- **[The Batch](https://www.deeplearning.ai/the-batch/)** - DeepLearning.AI newsletter
+- **[Import AI](https://importai.substack.com/)** - Jack Clark's AI news
 
 ## Best Practices
 

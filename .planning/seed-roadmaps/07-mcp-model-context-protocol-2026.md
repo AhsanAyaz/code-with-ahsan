@@ -240,22 +240,73 @@ async def call_tool(name: str, arguments: dict):
 | Enterprise Ready | ✅ | ⚠️ Limited | ❌ |
 | Ecosystem | 🚀 Growing | ✅ Mature | ✅ Mature |
 
-## Tools & Platforms
+## Learning Resources
 
-### Development
-- **MCP Inspector** - Debug MCP servers
-- **Claude Desktop** - Primary client
-- **Cursor** - IDE with MCP support
+### 📚 Official Documentation
 
-### Security
-- **OAuth 2.1 libraries** - authlib (Python), node-oauth2-server (Node)
-- **Vault** - Secret management
-- **Caddy** - Reverse proxy with auth
+**Core Resources**
+- **[Model Context Protocol Specification](https://modelcontextprotocol.io/)** - Official spec site (Start Here)
+- **[MCP Documentation](https://modelcontextprotocol.io/docs)** - Complete docs
+- **[MCP GitHub](https://github.com/modelcontextprotocol)** - Official repositories
 
-### Monitoring
-- **Prometheus** - Metrics
-- **Grafana** - Dashboards
-- **Sentry** - Error tracking
+### 🎓 Tutorials & Guides
+
+**Getting Started**
+- **[Creating Your First MCP Server: A Hello World Guide](https://medium.com/)** - Medium tutorial
+- **[MCP Architecture: Components, Lifecycle & Client-Server Tutorial](https://obot.ai/mcp-guide)** - Obot AI guide
+- **[2026 Guide to Securing MCP](https://operant.ai/mcp-security)** - Operant AI whitepaper
+
+**Official Courses**
+- **[MCP: Build Rich-Context AI Apps with Anthropic](https://www.deeplearning.ai/short-courses/)** - DeepLearning.AI course (Highly Recommended)
+
+### 🔧 SDKs & Tools
+
+**Official SDKs**
+- **[MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk)** - `pip install mcp`
+- **[MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)** - `@modelcontextprotocol/sdk`
+
+**Development Tools**
+- **[MCP Inspector](https://github.com/modelcontextprotocol/inspector)** - Debug MCP servers
+- **[Claude Desktop](https://claude.ai/download)** - Primary MCP client
+- **[Cursor](https://cursor.sh/)** - IDE with MCP support
+
+### 🔐 Security Resources
+
+**OAuth & Authentication**
+- **[OAuth 2.1 Specification](https://oauth.net/2.1/)** - Official spec
+- **[authlib (Python)](https://docs.authlib.org/)** - OAuth library
+- **[node-oauth2-server](https://oauth2-server.readthedocs.io/)** - Node.js OAuth
+
+**Security Best Practices**
+- **[OWASP API Security](https://owasp.org/www-project-api-security/)** - Security guidelines
+- **[HashiCorp Vault](https://www.vaultproject.io/)** - Secret management
+- **[Caddy Server](https://caddyserver.com/)** - Reverse proxy with automatic HTTPS
+
+### 🧩 Ecosystem & Integration
+
+**LangChain Integration**
+- **[langchain-mcp-adapters](https://github.com/langchain-ai/langchain-mcp-adapters)** - Connect LangChain agents to MCP
+
+**Community**
+- **[Agentic AI Foundation (AAIF)](https://aaif.dev/)** - Linux Foundation project hosting MCP
+- **[MCP Discord](https://discord.gg/mcp)** - Community support
+
+### 📺 Video Resources
+
+- **[MCP Introduction Video](https://www.youtube.com/anthropic)** - Anthropic official
+- **[Building MCP Servers Tutorial](https://www.youtube.com/)** - Step-by-step guides
+
+### 🛠️ Monitoring & Observability
+
+- **[Prometheus](https://prometheus.io/)** - Metrics collection
+- **[Grafana](https://grafana.com/)** - Visualization dashboards
+- **[Sentry](https://sentry.io/)** - Error tracking
+
+### 📰 Stay Updated
+
+- **[MCP Blog](https://modelcontextprotocol.io/blog)** - Official announcements
+- **[Anthropic Blog](https://www.anthropic.com/news)** - MCP updates
+- **[MCP GitHub Discussions](https://github.com/modelcontextprotocol/specification/discussions)** - Community Q&A
 
 ## Best Practices
 

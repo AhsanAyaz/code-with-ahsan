@@ -131,22 +131,57 @@ Build a production-grade application with:
 **Total Estimated Hours**: 400-600 hours
 **Timeline**: 6-12 months (part-time), 3-6 months (full-time)
 
-## Tools & Resources
+## Learning Resources
 
-### Development Environment
-- **Editor**: VS Code with AI extensions
-- **Browser**: Chrome DevTools / Firefox Dev Edition
-- **Version Control**: Git + GitHub
+### 🎓 Free Courses & Tutorials
 
-### Testing & Validation
-- Lighthouse for performance
-- axe DevTools for accessibility
-- WebPageTest for real-world testing
+**Comprehensive Courses**
+- **[Full Stack Open](https://fullstackopen.com/)** - University of Helsinki's free full-stack course (Highly Recommended)
+- **[freeCodeCamp](https://www.freecodecamp.org/)** - Responsive Web Design Certification
+- **[The Odin Project](https://www.theodinproject.com/)** - Full curriculum with projects
+- **[MDN Web Docs](https://developer.mozilla.org/)** - Mozilla's comprehensive reference
 
-### Learning Platforms
-- MDN Web Docs (reference)
-- web.dev (best practices)
-- Can I Use (browser support)
+**Specific Skills**
+- **[KodeKloud Labs](https://kodekloud.com/)** - Linux essentials, Git & GitHub, Containers 101
+- **[web.dev](https://web.dev/learn)** - Google's learn section for modern web development
+
+### 🤖 AI-Powered Development Tools
+
+**Vibe Coding Platforms** (mentioned in roadmap)
+- **[Bolt.new](https://bolt.new/)** - StackBlitz's AI web development environment
+- **[Lovable](https://lovable.ai/)** - Build full-stack apps using natural language
+- **[v0](https://v0.dev/)** - Vercel's AI UI generator
+
+### 📺 Video Resources
+
+- **[3Blue1Brown](https://www.youtube.com/@3blue1brown)** - Visual mathematics (useful for understanding algorithms)
+- **[Kevin Powell](https://www.youtube.com/@KevinPowell)** - CSS tutorials and best practices
+- **[Web Dev Simplified](https://www.youtube.com/@WebDevSimplified)** - Clear web dev explanations
+- **[Fireship](https://www.youtube.com/@Fireship)** - Quick tech overviews and tutorials
+
+### 📚 Documentation & References
+
+- **[MDN Web Docs](https://developer.mozilla.org/)** - The authoritative web reference
+- **[Can I Use](https://caniuse.com/)** - Browser compatibility tables
+- **[web.dev](https://web.dev/)** - Google's web development best practices
+
+### 📰 Stay Updated
+
+- **[The Replay](https://blog.logrocket.com/tag/the-replay/)** - LogRocket's weekly frontend newsletter
+- **[JavaScript Weekly](https://javascriptweekly.com/)** - Weekly JS news
+- **[Frontend Focus](https://frontendfoc.us/)** - Frontend news and links
+
+### 🛠️ Essential Tools
+
+**Development Environment**
+- **[VS Code](https://code.visualstudio.com/)** - Editor with AI extensions
+- **[Chrome DevTools](https://developer.chrome.com/docs/devtools/)** - Browser debugging
+- **[Git](https://git-scm.com/)** + **[GitHub](https://github.com/)** - Version control
+
+**Testing & Validation**
+- **[Lighthouse](https://developers.google.com/web/tools/lighthouse)** - Performance auditing
+- **[axe DevTools](https://www.deque.com/axe/devtools/)** - Accessibility testing
+- **[WebPageTest](https://www.webpagetest.org/)** - Real-world performance testing
 
 ## 2026 Success Criteria
 

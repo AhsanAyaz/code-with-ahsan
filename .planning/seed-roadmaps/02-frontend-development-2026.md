@@ -158,23 +158,68 @@ Build a production SaaS application with:
 - Intermediate: 200 hours
 - Advanced: 100 hours
 
-## Tools & Resources
+## Learning Resources
 
-### Development Environment
-- **Editor**: VS Code with TypeScript extensions
-- **Browser**: React DevTools, Redux DevTools
-- **AI Tools**: v0, Cursor, GitHub Copilot
+### 🎓 Free Courses & Tutorials
 
-### Testing
-- **Vitest** - Fast unit tests
-- **Testing Library** - Component tests
-- **Playwright** - E2E tests
+**React Fundamentals**
+- **[React Official Tutorial](https://react.dev/learn)** - Start here (official docs)
+- **[Full Stack Open](https://fullstackopen.com/)** - Part 1-2 covers React deeply
+- **[freeCodeCamp React Course](https://www.freecodecamp.org/learn/front-end-development-libraries/)** - Comprehensive
+- **[Scrimba React Course](https://scrimba.com/learn/learnreact)** - Interactive learning
 
-### Learning Resources
-- React docs (react.dev)
-- TanStack docs
-- Next.js Learn
-- Patterns.dev
+**Next.js**
+- **[Next.js Learn](https://nextjs.org/learn)** - Official interactive course (Highly Recommended)
+- **[Next.js Documentation](https://nextjs.org/docs)** - Comprehensive docs
+
+**TanStack Ecosystem**
+- **[TanStack Query Docs](https://tanstack.com/query/latest)** - Data fetching patterns
+- **[TanStack Table Docs](https://tanstack.com/table/latest)** - Complex data tables
+- **[TanStack Router Docs](https://tanstack.com/router/latest)** - Type-safe routing
+
+### 🎨 Component Libraries & Design
+
+- **[shadcn/ui](https://ui.shadcn.com/)** - Copy-paste component library
+- **[Radix UI](https://www.radix-ui.com/)** - Headless UI primitives
+- **[Tailwind CSS Docs](https://tailwindcss.com/docs)** - Utility-first CSS
+- **[Storybook](https://storybook.js.org/)** - Component development and documentation
+
+### 🤖 AI UI Generators
+
+- **[v0](https://v0.dev/)** - Vercel's AI component generator (mentioned in roadmap)
+- **[Lovable](https://lovable.ai/)** - Full-stack MVP builder
+- **[Bolt.new](https://bolt.new/)** - StackBlitz AI environment
+
+### 📺 Video Resources
+
+- **[Jack Herrington](https://www.youtube.com/@jherr)** - React patterns and performance
+- **[Theo - t3.gg](https://www.youtube.com/@t3dotgg)** - Modern full-stack development
+- **[Web Dev Simplified](https://www.youtube.com/@WebDevSimplified)** - Clear React tutorials
+- **[Fireship](https://www.youtube.com/@Fireship)** - Quick tech summaries
+
+### 📚 Advanced Resources
+
+- **[Patterns.dev](https://www.patterns.dev/)** - Design patterns for modern web
+- **[React Server Components](https://react.dev/reference/rsc/server-components)** - Official RSC docs
+- **[Qwik Docs](https://qwik.dev/)** - Resumability framework
+- **[Astro Docs](https://docs.astro.build/)** - Content-focused framework
+
+### 🛠️ Development Tools
+
+**Editor & Extensions**
+- **[VS Code](https://code.visualstudio.com/)** - With TypeScript, ES7+ snippets
+- **[React DevTools](https://react.dev/learn/react-developer-tools)** - Browser extension
+- **[Redux DevTools](https://github.com/reduxjs/redux-devtools)** - State inspection
+
+**Testing**
+- **[Vitest](https://vitest.dev/)** - Fast unit testing
+- **[React Testing Library](https://testing-library.com/react)** - Component testing
+- **[Playwright](https://playwright.dev/)** - E2E testing
+
+**AI Coding Assistants**
+- **[GitHub Copilot](https://github.com/features/copilot)** - AI pair programmer
+- **[Cursor](https://cursor.sh/)** - AI-first code editor
+- **[v0](https://v0.dev/)** - Generate React components
 
 ## Framework Decision Tree
 

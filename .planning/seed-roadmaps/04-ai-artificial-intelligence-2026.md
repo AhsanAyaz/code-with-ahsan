@@ -216,27 +216,70 @@ Response + Sources
 - Cost optimization
 - Cost: $ (cheap)
 
-## Tools & Platforms
+## Learning Resources
 
-### Development
-- **LangChain** - Quickest to prototype
-- **LlamaIndex** - Best for RAG
-- **Haystack** - Production-grade pipelines
+### 🎓 Free Courses
 
-### Vector DBs
-- **Pinecone** - Managed, easy to start
-- **Weaviate** - Open-source, full-featured
-- **Qdrant** - Rust-based, fast
+**LLM Fundamentals**
+- **[LangChain for LLM Application Development](https://www.deeplearning.ai/short-courses/langchain-for-llm-application-development/)** - DeepLearning.AI (Start Here)
+- **[IBM AI Foundations for Everyone Specialization](https://www.coursera.org/specializations/ibm-ai-foundations-for-everyone)** - Coursera
+- **[Google AI Essentials](https://www.coursera.org/learn/google-ai-essentials)** - Coursera
 
-### Evaluation
-- **LangSmith** - LangChain observability
-- **Arize Phoenix** - Open-source ML observability
-- **W&B** - Experiment tracking
+**RAG (Retrieval-Augmented Generation)**
+- **[Retrieval Augmented Generation (RAG)](https://www.deeplearning.ai/short-courses/building-applications-vector-databases/)** - DeepLearning.AI course
+- **[Building Multimodal Search and RAG](https://www.deeplearning.ai/short-courses/)** - DeepLearning.AI
+- **[RAG Core Lab](https://kodekloud.com/courses/rag-core/)** - KodeKloud hands-on lab
 
-### Hosting
-- **AWS Bedrock** - Managed enterprise AI
-- **Azure OpenAI** - Microsoft ecosystem
-- **Hugging Face** - Open-source models
+### 📚 Cookbooks & Guides
+
+- **[OpenAI Cookbook](https://cookbook.openai.com/)** - Practical LLM examples
+- **[Claude Cookbooks](https://github.com/anthropics/anthropic-cookbook)** - Anthropic's Claude recipes
+- **[LangChain Tutorials](https://python.langchain.com/docs/tutorials/)** - Official tutorials
+
+### 🗄️ Vector Database Resources
+
+**Learn Locally**
+- **[Chroma](https://docs.trychroma.com/)** - Best for learning vector DBs locally (Recommended)
+- **[Pinecone Tutorials](https://docs.pinecone.io/guides)** - Production vector DB
+- **[Weaviate Academy](https://weaviate.io/developers/academy)** - Free courses
+
+### 🛠️ Development Frameworks
+
+**Orchestration**
+- **[LangChain Docs](https://python.langchain.com/)** - Quickest to prototype
+- **[LlamaIndex Docs](https://docs.llamaindex.ai/)** - Best for RAG
+- **[Haystack Docs](https://haystack.deepset.ai/)** - Production-grade pipelines
+
+### 📺 Video Resources
+
+- **[AI Jason](https://www.youtube.com/@AIJason)** - LangChain tutorials
+- **[Sam Witteveen](https://www.youtube.com/@samwitteveenai)** - RAG deep dives
+- **[Matt Bornstein (a16z)](https://www.youtube.com/watch?v=jkrNMKz9pWU)** - AI engineering
+
+### 🧪 Hands-On Labs
+
+- **[KodeKloud RAG Core](https://kodekloud.com/)** - Hands-on RAG lab
+- **[LangSmith 101 for AI Observability](https://www.langchain.com/langsmith)** - James Briggs guide
+- **[DeepLearning.AI LLMOps](https://www.deeplearning.ai/short-courses/llmops/)** - Production LLM ops
+
+### 🚀 Deployment Platforms
+
+**Cloud AI Services**
+- **[AWS Bedrock](https://aws.amazon.com/bedrock/)** - Managed enterprise AI
+- **[Azure OpenAI](https://azure.microsoft.com/en-us/products/ai-services/openai-service)** - Microsoft ecosystem
+- **[Google Vertex AI](https://cloud.google.com/vertex-ai)** - GCP AI platform
+
+**Model Hosting**
+- **[Hugging Face](https://huggingface.co/)** - Open-source model hub
+- **[Replicate](https://replicate.com/)** - Easy model deployment
+- **[Modal](https://modal.com/)** - Serverless GPU compute
+
+### 📊 Observability & Monitoring
+
+- **[LangSmith](https://www.langchain.com/langsmith)** - LangChain observability
+- **[Arize Phoenix](https://phoenix.arize.com/)** - Open-source ML observability
+- **[Weights & Biases](https://wandb.ai/)** - Experiment tracking
+- **[Helicone](https://www.helicone.ai/)** - LLM monitoring
 
 ## Best Practices
 

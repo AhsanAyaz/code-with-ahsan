@@ -168,22 +168,78 @@ Build production ML system:
 
 ## Learning Resources
 
-### Mathematics
-- **3Blue1Brown** - Visual intuition
-- **Khan Academy** - Structured courses
-- **Gilbert Strang** - MIT Linear Algebra
-- **Coursera** - Mathematics for ML Specialization
+### 📐 Mathematics Foundation
 
-### Machine Learning
-- **Fast.ai** - Practical deep learning
-- **Andrew Ng** - ML Coursera course
-- **Stanford CS229** - ML theory
-- **DeepLearning.AI** - Specializations
+**Linear Algebra (Essential)**
+- **[MIT 18.06 Linear Algebra](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/)** - Prof. Gilbert Strang (Legendary)
+- **[3Blue1Brown: Essence of Linear Algebra](https://www.youtube.com/@3blue1brown)** - Visual intuition (Start Here)
+- **[Khan Academy Linear Algebra](https://www.khanacademy.org/math/linear-algebra)** - Structured practice
+- **[Mathematics for Machine Learning Book](https://mml-book.github.io/)** - Free textbook + GitHub repo
 
-### MLOps
-- **Made With ML** - Production ML
-- **Chip Huyen** - ML Systems Design
-- **Full Stack Deep Learning** - Production ML
+**Calculus & Statistics**
+- **[Khan Academy Calculus](https://www.khanacademy.org/math/calculus-1)** - Derivatives and gradients
+- **[3Blue1Brown: Essence of Calculus](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr)** - Visual understanding
+
+**Comprehensive Math Courses**
+- **[Mathematics for Machine Learning Specialization](https://www.coursera.org/specializations/mathematics-machine-learning)** - DeepLearning.AI (Beginner-Friendly, Highly Recommended)
+- **[Math for ML](https://www.coursera.org/specializations/mathematics-for-machine-learning-and-data-science)** - Imperial College (University Rigor)
+- **[Coursera Math Resources](https://www.coursera.org/)** - Multiple specializations
+- **[dair-ai/Mathematics-for-ML](https://github.com/dair-ai/ML-YouTube-Courses)** - Curated GitHub list
+
+### 🎓 Machine Learning Courses
+
+**Beginner**
+- **[Andrew Ng's Machine Learning](https://www.coursera.org/specializations/machine-learning-introduction)** - Coursera (Classic, Start Here)
+- **[Fast.ai Practical Deep Learning](https://course.fast.ai/)** - Top-down approach
+- **[Google Machine Learning Crash Course](https://developers.google.com/machine-learning/crash-course)** - Free, practical
+
+**Deep Learning**
+- **[Deep Learning Specialization](https://www.coursera.org/specializations/deep-learning)** - DeepLearning.AI with Andrew Ng
+- **[Stanford CS229](https://cs229.stanford.edu/)** - Machine Learning theory
+- **[Stanford CS231n](http://cs231n.stanford.edu/)** - Convolutional Neural Networks
+
+### 🔧 MLOps & Production ML
+
+**Courses**
+- **[LLMOps](https://www.deeplearning.ai/short-courses/llmops/)** - DeepLearning.AI
+- **[Full Stack Deep Learning](https://fullstackdeeplearning.com/)** - Production ML
+- **[Made With ML](https://madewithml.com/)** - End-to-end ML
+
+**Resources**
+- **[Chip Huyen: ML Systems Design](https://huyenchip.com/machine-learning-systems-design/toc.html)** - Free book
+- **[MLOps Zoomcamp](https://github.com/DataTalksClub/mlops-zoomcamp)** - Free course
+
+### 📺 Video Channels
+
+- **[3Blue1Brown](https://www.youtube.com/@3blue1brown)** - Mathematics visualization (Essential)
+- **[StatQuest](https://www.youtube.com/@statquest)** - Statistics and ML explained simply
+- **[Two Minute Papers](https://www.youtube.com/@TwoMinutePapers)** - Latest ML research
+- **[Yannic Kilcher](https://www.youtube.com/@YannicKilcher)** - Paper reviews
+
+### 🛠️ Tools & Platforms
+
+**Development**
+- **[Google Colab](https://colab.research.google.com/)** - Free GPU notebooks
+- **[Jupyter](https://jupyter.org/)** - Interactive notebooks
+- **[Kaggle](https://www.kaggle.com/)** - Datasets and competitions
+
+**MLOps Platforms**
+- **[MLflow](https://mlflow.org/)** - Experiment tracking
+- **[Weights & Biases](https://wandb.ai/)** - Collaboration and tracking
+- **[DVC](https://dvc.org/)** - Data version control
+- **[Arize Phoenix](https://phoenix.arize.com/)** - Model monitoring
+
+**Cloud ML**
+- **[AWS SageMaker](https://aws.amazon.com/sagemaker/)** - End-to-end ML
+- **[Google Vertex AI](https://cloud.google.com/vertex-ai)** - GCP ML platform
+- **[Azure ML](https://azure.microsoft.com/en-us/products/machine-learning)** - Microsoft ML cloud
+
+### 📚 Books & Papers
+
+- **[Mathematics for Machine Learning](https://mml-book.github.io/)** - Free textbook
+- **[Deep Learning Book](https://www.deeplearningbook.org/)** - Ian Goodfellow (Free online)
+- **[Hands-On Machine Learning](https://www.oreilly.com/library/view/hands-on-machine-learning/9781492032632/)** - Aurélien Géron
+- **[Papers with Code](https://paperswithcode.com/)** - Latest research + code
 
 ## Model Architecture Evolution
 

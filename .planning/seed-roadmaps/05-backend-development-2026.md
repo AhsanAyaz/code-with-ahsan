@@ -250,23 +250,88 @@ query {
 }
 ```
 
-## Tools & Platforms
+## Learning Resources
 
-### Development
-- **Postman/Insomnia** - API testing
-- **Datadog/New Relic** - APM
-- **Sentry** - Error tracking
+### 🎓 Free Courses
 
-### Databases
-- **Supabase** - Postgres + Auth + Storage
-- **PlanetScale** - MySQL at scale
-- **MongoDB Atlas** - Managed MongoDB
+**Python Backend**
+- **[FastAPI Tutorial](https://fastapi.tiangolo.com/tutorial/)** - Official docs (Highly Recommended)
+- **[Python for Everybody](https://www.coursera.org/specializations/python)** - University of Michigan
+- **[Automate the Boring Stuff with Python](https://automatetheboringstuff.com/)** - Al Sweigart (Free book + course)
+- **[CS50's Introduction to Programming with Python](https://cs50.harvard.edu/python/)** - Harvard
 
-### Deployment
-- **Fly.io** - Easy deployment
-- **Railway** - Simple infra
-- **AWS/GCP** - Enterprise scale
-- **Vercel** - Serverless functions
+**Database & SQL**
+- **[SQL for Data Analysis](https://www.thoughtspot.com/data-trends/best-practices/sql-tutorial)** - ThoughtSpot free tutorial
+- **[PostgreSQL Tutorial](https://www.postgresqltutorial.com/)** - Comprehensive guide
+- **[MongoDB University](https://learn.mongodb.com/)** - Free official courses
+
+**Docker & Containers**
+- **[Docker Tutorial for Beginners](https://docker-curriculum.com/)** - Essential for containerization
+- **[KodeKloud Docker Labs](https://kodekloud.com/courses/docker-for-the-absolute-beginner/)** - Hands-on practice
+- **[Containers 101](https://kodekloud.com/)** - KodeKloud lab
+
+### 📚 Framework Documentation
+
+**Python**
+- **[FastAPI](https://fastapi.tiangolo.com/)** - Modern API framework
+- **[Django](https://docs.djangoproject.com/)** - Full-featured web framework
+- **[Flask](https://flask.palletsprojects.com/)** - Micro-framework
+
+**Go**
+- **[Go by Example](https://gobyexample.com/)** - Hands-on Go introduction
+- **[Fiber](https://gofiber.io/)** - Fast HTTP framework
+- **[Echo](https://echo.labstack.com/)** - High-performance framework
+
+**Rust**
+- **[The Rust Book](https://doc.rust-lang.org/book/)** - Official guide
+- **[Axum](https://docs.rs/axum/latest/axum/)** - Type-safe web framework
+- **[Actix Web](https://actix.rs/)** - Powerful, pragmatic framework
+
+### 🗄️ Database Resources
+
+**Managed Services**
+- **[Supabase](https://supabase.com/)** - Postgres + Auth + Storage (Recommended for beginners)
+- **[PlanetScale](https://planetscale.com/)** - MySQL at scale
+- **[MongoDB Atlas](https://www.mongodb.com/cloud/atlas)** - Managed MongoDB
+- **[Neon](https://neon.tech/)** - Serverless Postgres
+
+### 📺 Video Resources
+
+- **[Hussein Nasser](https://www.youtube.com/@hnasr)** - Backend engineering deep dives
+- **[TechWorld with Nana](https://www.youtube.com/@TechWorldwithNana)** - DevOps and backend
+- **[ByteByteGo](https://www.youtube.com/@ByteByteGo)** - System design
+
+### 🛠️ Development & Testing Tools
+
+**API Development**
+- **[Postman](https://www.postman.com/)** - API testing
+- **[Insomnia](https://insomnia.rest/)** - API client
+- **[Bruno](https://www.usebruno.com/)** - Open-source API client
+
+**Monitoring & Observability**
+- **[Datadog](https://www.datadoghq.com/)** - APM
+- **[New Relic](https://newrelic.com/)** - Full-stack observability
+- **[Sentry](https://sentry.io/)** - Error tracking
+- **[Grafana](https://grafana.com/)** - Metrics visualization
+
+### 🚀 Deployment Platforms
+
+**Easy Deployment**
+- **[Fly.io](https://fly.io/)** - Deploy anywhere (Recommended)
+- **[Railway](https://railway.app/)** - Simple infrastructure
+- **[Render](https://render.com/)** - Unified platform
+- **[Vercel](https://vercel.com/)** - Serverless functions
+
+**Enterprise Scale**
+- **[AWS](https://aws.amazon.com/)** - Full cloud suite
+- **[Google Cloud](https://cloud.google.com/)** - GCP services
+- **[Azure](https://azure.microsoft.com/)** - Microsoft cloud
+
+### 🔧 Essential Labs
+
+- **[KodeKloud Labs](https://kodekloud.com/)** - Linux, Git, Docker, Kubernetes hands-on
+- **[LeetCode](https://leetcode.com/)** - Algorithm practice
+- **[System Design Primer](https://github.com/donnemartin/system-design-primer)** - GitHub repo
 
 ## Best Practices
 
