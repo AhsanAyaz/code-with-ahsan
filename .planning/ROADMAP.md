@@ -205,11 +205,11 @@ Plans:
   6. Roadmap shows last updated timestamp and version history viewer
   7. Roadmap detail page shows related mentors who teach that domain
 
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 09-01: Roadmap catalog with filters and search
-- [ ] 09-02: Roadmap viewer with Markdown rendering
+- [ ] 09-01-PLAN.md — Roadmap catalog with filters and search (RoadmapCard, RoadmapFilters, catalog page)
+- [ ] 09-02-PLAN.md — Roadmap detail page with Markdown rendering and related mentors
 
 ---
 
@@ -266,4 +266,4 @@ Plans:
 - [ ] TBD (run /gsd:plan-phase 11 to break down)
 
 ---
-*Last updated: 2026-02-11 after Phase 8 execution complete*
+*Last updated: 2026-02-11 after Phase 9 planning complete*
