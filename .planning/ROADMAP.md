@@ -150,11 +150,15 @@ Plans:
   4. Public showcase page displays completed projects with demos
   5. Showcase page filterable by tech stack and completion date
 
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 07-01: Project templates system
-- [ ] 07-02: Demo submission and showcase page
+- [x] 07-01-PLAN.md — Server-side auth verification (auth infrastructure)
+- [x] 07-02-PLAN.md — Frontend auth headers (auth infrastructure)
+- [x] 07-03-PLAN.md — Nav link + loading states + remove member fix (UI polish)
+- [ ] 07-04-PLAN.md — Project templates system (types, data, creation form selector)
+- [ ] 07-05-PLAN.md — Demo submission (type fields, completion modal, display)
+- [ ] 07-06-PLAN.md — Showcase page (API, page, cards, filters)
 
 ---
 
@@ -247,7 +251,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 4. Foundation | v2.0 | 4/4 | Complete | 2026-02-02 |
 | 5. Projects Core | v2.0 | 2/2 | Complete | 2026-02-02 |
 | 6. Projects Team | v2.0 | 3/3 | Complete | 2026-02-11 |
-| 7. Projects Demo | v2.0 | 0/2 | Not started | - |
+| 7. Projects Demo | v2.0 | 3/6 | In progress | - |
 | 8. Roadmaps Create | v2.0 | 0/3 | Not started | - |
 | 9. Roadmaps Discover | v2.0 | 0/2 | Not started | - |
 | 10. Integration | v2.0 | 0/3 | Not started | - |
@@ -262,4 +266,4 @@ Plans:
 - [ ] TBD (run /gsd:plan-phase 11 to break down)
 
 ---
-*Last updated: 2026-02-02 after Phase 5 execution*
+*Last updated: 2026-02-11 after Phase 7 gap closure planning*

@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useActionState } from "react";
+import { useState, useActionState, useEffect } from "react";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authFetch } from "@/lib/apiClient";
+import { PROJECT_TEMPLATES, getTemplateById } from "@/lib/projectTemplates";
+import type { ProjectTemplateId } from "@/types/mentorship";
 
 // Force dynamic rendering to prevent prerender errors with client-side context
 export const dynamic = 'force-dynamic';
@@ -20,30 +22,39 @@ export default function CreateProjectPage() {
   const { user, profile, loading } = useMentorship();
   const router = useRouter();
 
+  // Controlled form state
+  const [selectedTemplate, setSelectedTemplate] = useState<ProjectTemplateId | "blank">("blank");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [githubRepo, setGithubRepo] = useState("");
+  const [techStack, setTechStack] = useState("");
+  const [difficulty, setDifficulty] = useState("intermediate");
+  const [maxTeamSize, setMaxTeamSize] = useState(4);
+
   const createProjectAction = async (
     prevState: FormState,
     formData: FormData
   ): Promise<FormState> => {
     try {
-      // Extract form fields
-      const title = formData.get("title") as string;
-      const description = formData.get("description") as string;
-      const githubRepo = formData.get("githubRepo") as string;
-      const techStackRaw = formData.get("techStack") as string;
-      const difficulty = formData.get("difficulty") as string;
-      const maxTeamSizeRaw = formData.get("maxTeamSize") as string;
+      // Use controlled state values instead of FormData
+      const titleValue = title;
+      const descriptionValue = description;
+      const githubRepoValue = githubRepo;
+      const techStackValue = techStack;
+      const difficultyValue = difficulty;
+      const maxTeamSizeValue = maxTeamSize;
 
       // Client-side validation
       const fieldErrors: Record<string, string> = {};
 
-      if (!title || title.trim().length < 3 || title.trim().length > 100) {
+      if (!titleValue || titleValue.trim().length < 3 || titleValue.trim().length > 100) {
         fieldErrors.title = "Title must be between 3 and 100 characters";
       }
 
       if (
-        !description ||
-        description.trim().length < 10 ||
-        description.trim().length > 2000
+        !descriptionValue ||
+        descriptionValue.trim().length < 10 ||
+        descriptionValue.trim().length > 2000
       ) {
         fieldErrors.description =
           "Description must be between 10 and 2000 characters";
@@ -54,24 +65,23 @@ export default function CreateProjectPage() {
       }
 
       // Parse tech stack
-      const techStack = techStackRaw
+      const techStackArray = techStackValue
         .split(",")
         .map((t) => t.trim())
         .filter((t) => t.length > 0);
-
-      const maxTeamSize = parseInt(maxTeamSizeRaw, 10) || 4;
 
       // POST to API
       const response = await authFetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: title.trim(),
-          description: description.trim(),
-          githubRepo: githubRepo.trim() || undefined,
-          techStack,
-          difficulty,
-          maxTeamSize,
+          title: titleValue.trim(),
+          description: descriptionValue.trim(),
+          githubRepo: githubRepoValue.trim() || undefined,
+          techStack: techStackArray,
+          difficulty: difficultyValue,
+          maxTeamSize: maxTeamSizeValue,
+          templateId: selectedTemplate !== "blank" ? selectedTemplate : undefined,
           creatorId: user?.uid,
         }),
       });
@@ -90,6 +100,30 @@ export default function CreateProjectPage() {
   };
 
   const [state, formAction, isPending] = useActionState(createProjectAction, {});
+
+  // Handle template selection
+  const handleTemplateSelect = (id: ProjectTemplateId | "blank") => {
+    setSelectedTemplate(id);
+
+    if (id === "blank") {
+      // Clear all fields to defaults
+      setTitle("");
+      setDescription("");
+      setTechStack("");
+      setDifficulty("intermediate");
+      setMaxTeamSize(4);
+    } else {
+      // Populate from template
+      const template = getTemplateById(id);
+      if (template) {
+        setTitle(""); // Keep title empty to let user type their own
+        setDescription(template.defaultDescription);
+        setTechStack(template.suggestedTechStack.join(", "));
+        setDifficulty(template.suggestedDifficulty);
+        setMaxTeamSize(template.suggestedMaxTeamSize);
+      }
+    }
+  };
 
   // Check authentication and role
   if (loading) {
@@ -287,6 +321,72 @@ export default function CreateProjectPage() {
       )}
 
       <form action={formAction} className="space-y-6">
+        {/* Template Selector */}
+        <div className="form-control mb-6">
+          <label className="label">
+            <span className="label-text font-semibold">Start from a Template</span>
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* Blank Project option */}
+            <div
+              onClick={() => handleTemplateSelect("blank")}
+              className={`card cursor-pointer border-2 p-4 transition-all ${
+                selectedTemplate === "blank"
+                  ? "border-primary bg-primary/5"
+                  : "border-base-300 hover:border-base-400"
+              }`}
+            >
+              <h3 className="font-semibold">Blank Project</h3>
+              <p className="text-sm text-base-content/70">
+                Start from scratch with empty fields
+              </p>
+            </div>
+            {/* Template cards */}
+            {PROJECT_TEMPLATES.map((t) => (
+              <div
+                key={t.id}
+                onClick={() => handleTemplateSelect(t.id)}
+                className={`card cursor-pointer border-2 p-4 transition-all ${
+                  selectedTemplate === t.id
+                    ? "border-primary bg-primary/5"
+                    : "border-base-300 hover:border-base-400"
+                }`}
+              >
+                <h3 className="font-semibold">{t.name}</h3>
+                <p className="text-sm text-base-content/70">{t.description}</p>
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {t.suggestedTechStack.slice(0, 3).map((tech) => (
+                    <span key={tech} className="badge badge-xs badge-outline">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Template info box */}
+        {selectedTemplate !== "blank" && (() => {
+          const template = getTemplateById(selectedTemplate);
+          return template ? (
+            <div className="alert alert-info mb-4">
+              <div className="w-full">
+                <p className="text-sm">
+                  <strong>Suggested timeline:</strong> {template.suggestedTimeline}
+                </p>
+                <p className="text-sm">
+                  <strong>Recommended skills:</strong>{" "}
+                  {template.recommendedSkills.join(", ")}
+                </p>
+                <p className="text-xs mt-1">
+                  All fields are customizable - adjust to fit your project needs.
+                </p>
+              </div>
+            </div>
+          ) : null;
+        })()}
+
         {/* Title */}
         <div className="form-control">
           <label className="label">
@@ -297,6 +397,8 @@ export default function CreateProjectPage() {
           <input
             type="text"
             name="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             placeholder="My Awesome Project"
             className="input input-bordered w-full"
             required
@@ -322,6 +424,8 @@ export default function CreateProjectPage() {
           </label>
           <textarea
             name="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             placeholder="Describe your project, its goals, and what you hope to achieve..."
             className="textarea textarea-bordered w-full h-32"
             required
@@ -348,6 +452,8 @@ export default function CreateProjectPage() {
           <input
             type="url"
             name="githubRepo"
+            value={githubRepo}
+            onChange={(e) => setGithubRepo(e.target.value)}
             placeholder="https://github.com/username/repo"
             className="input input-bordered w-full"
             disabled={isPending}
@@ -365,6 +471,8 @@ export default function CreateProjectPage() {
           <input
             type="text"
             name="techStack"
+            value={techStack}
+            onChange={(e) => setTechStack(e.target.value)}
             placeholder="React, Node.js, PostgreSQL"
             className="input input-bordered w-full"
             disabled={isPending}
@@ -385,10 +493,11 @@ export default function CreateProjectPage() {
           </label>
           <select
             name="difficulty"
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
             className="select select-bordered w-full"
             required
             disabled={isPending}
-            defaultValue="intermediate"
           >
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
@@ -406,9 +515,10 @@ export default function CreateProjectPage() {
           <input
             type="number"
             name="maxTeamSize"
+            value={maxTeamSize}
+            onChange={(e) => setMaxTeamSize(parseInt(e.target.value, 10) || 4)}
             min="1"
             max="10"
-            defaultValue="4"
             className="input input-bordered w-full"
             required
             disabled={isPending}

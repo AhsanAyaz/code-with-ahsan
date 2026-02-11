@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Milestone: v2.0
-Phase: 6.1 of 10 (Fix Project Creation Permissions)
-Plan: 2 of 2
+Phase: 07 of 10 (Projects - Demos & Templates)
+Plan: 6 of 6
 Status: Complete
-Last activity: 2026-02-11 — Completed quick task 017: Fix Discord channel access removal logging and error handling
+Last activity: 2026-02-11 — Completed Phase 07: Projects - Demos & Templates (6 plans, 14 min)
 
-Progress: [████████████░] 100% (15/15 total plans complete across current phases)
+Progress: [██████████████] 95% (21/22 total plans complete across current phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15 (v1.0: 5, v2.0: 10)
-- Average duration: ~24 min
-- Total execution time: ~6 hours 14 minutes
+- Total plans completed: 21 (v1.0: 5, v2.0: 16)
+- Average duration: ~18 min
+- Total execution time: ~6 hours 28 minutes
 
 **By Phase:**
 
@@ -35,12 +35,15 @@ Progress: [████████████░] 100% (15/15 total plans comp
 | 05 | 2 | 132 min | 66 min |
 | 06 | 2 | 9 min | 4.5 min |
 | 06.1 | 2 | 5 min | 2.5 min |
+| 07 | 6 | 14 min | 2.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-01 (6min), 06-02 (3min), 06.1-01 (2min), 06.1-02 (3min)
-- Trend: Permission/rule fixes extremely fast (2-3min with comprehensive tests)
+- Last 5 plans: 07-03 (1min), 07-04 (4min), 07-05 (4min), 07-06 (2min)
+- Trend: Templates and demos phase complete - consistent 2-4 min execution
 
 *Updated after each plan completion*
+| Phase 07 P06 | 2 | 2 tasks | 5 files |
+| Phase 07 P05 | 4 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -92,6 +95,13 @@ Recent decisions affecting current work:
 - [Phase 06.1-02]: TeamRoster always shows creator separately, never as part of members list
 - [Phase 06.1-02]: Dual-role badge uses middot separator: 'Creator · Member' vs outline 'Creator'
 - [Phase 06.1-02]: Create Project button shown to all authenticated users (removed mentor-only restriction)
+- [Phase 07-01]: Auth verification at route level (not middleware) for flexibility with public endpoints
+- [Phase 07-01]: Auth verification at route level (not middleware) for flexibility with public endpoints
+- [Phase 07-05]: Demo fields optional on project completion (demoUrl and demoDescription)
+- [Phase 07-05]: HTTPS-only validation for demo URLs (any HTTPS platform accepted)
+- [Phase 07-05]: 1000 character limit on demo descriptions
+- [Phase 07-06]: No URL param syncing for showcase filters - browse experience vs search destination
+- [Phase 07-06]: Sort by completion date instead of difficulty - all completed projects are proven
 
 ### Roadmap Evolution
 
@@ -196,9 +206,9 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 
 ## Session Continuity
 
-Last session: 2026-02-11 17:27
-Stopped at: Completed quick task 017 (Fix Discord Channel Access Removal Logging and Error Handling)
+Last session: 2026-02-11 18:33
+Stopped at: Completed Phase 07: Projects - Demos & Templates (all 6 plans executed)
 Resume file: None
 
 ---
-*Updated: 2026-02-11 after completing quick task 017*
+*Updated: 2026-02-11 after completing Phase 07*

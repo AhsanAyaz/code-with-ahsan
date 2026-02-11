@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
       techStack,
       difficulty,
       maxTeamSize,
+      templateId,
     } = body;
 
     const creatorId = authResult.uid;
@@ -103,6 +104,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate templateId if provided
+    if (templateId) {
+      const validTemplateIds = ["fullstack-app", "ai-tool", "open-source-library"];
+      if (!validTemplateIds.includes(templateId)) {
+        return NextResponse.json(
+          { error: "Invalid templateId" },
+          { status: 400 }
+        );
+      }
+    }
+
     // Create project document
     const projectData = {
       title,
@@ -120,6 +132,7 @@ export async function POST(request: NextRequest) {
       difficulty: difficulty || "intermediate",
       maxTeamSize: maxTeamSize || 4,
       memberCount: 0,
+      ...(templateId && { templateId }),
       lastActivityAt: FieldValue.serverTimestamp(),
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),

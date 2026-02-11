@@ -138,11 +138,16 @@ export interface Project {
   pendingApplicationCount?: number;
   discordChannelId?: string;
   discordChannelUrl?: string;
+  templateId?: ProjectTemplateId;  // Which template was used (if any)
   lastActivityAt?: Date;
   createdAt: Date;
   updatedAt: Date;
   approvedAt?: Date;
   approvedBy?: string;
+  // Demo fields (populated when project is completed)
+  demoUrl?: string;           // URL to demo video/presentation (YouTube, Loom, Vimeo, Google Drive)
+  demoDescription?: string;   // Description of what the demo shows
+  completedAt?: Date;         // When project was completed
 }
 
 export interface ProjectMember {
@@ -239,4 +244,21 @@ export interface RoadmapVersion {
   createdBy: string;
   createdAt: Date;
   changeDescription?: string;
+}
+
+// ─── Project Templates ───────────────────────
+
+export type ProjectTemplateId = "fullstack-app" | "ai-tool" | "open-source-library";
+
+export interface ProjectTemplate {
+  id: ProjectTemplateId;
+  name: string;
+  description: string;           // Template description shown in selector
+  defaultTitle: string;           // Suggested title placeholder
+  defaultDescription: string;     // Pre-filled description scaffold
+  suggestedTechStack: string[];   // Pre-filled tech stack
+  suggestedDifficulty: ProjectDifficulty;
+  suggestedMaxTeamSize: number;
+  suggestedTimeline: string;      // e.g., "4-6 weeks" - display only, informational
+  recommendedSkills: string[];    // Display only, helps creators think about requirements
 }
