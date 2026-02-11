@@ -180,12 +180,12 @@ Plans:
   8. Roadmap stores version history with timestamps and changelog
   9. Markdown content sanitized with rehype-sanitize to prevent XSS attacks
 
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 08-01: Roadmap creation with Markdown editor and Storage integration
-- [ ] 08-02: Admin review workflow and version history
-- [ ] 08-03: Markdown sanitization and security
+- [ ] 08-01-PLAN.md — Backend: Roadmap API routes (create, list, get, submit, approve, decline, edit) + Firebase Storage upload + version history
+- [ ] 08-02-PLAN.md — Frontend: Roadmap creation page with @uiw/react-md-editor, dual save/submit buttons, MentorshipProvider layout
+- [ ] 08-03-PLAN.md — Frontend: Admin dashboard Roadmaps tab (approve/request-changes) + roadmap edit page with version tracking
 
 ---
 
@@ -252,7 +252,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 5. Projects Core | v2.0 | 2/2 | Complete | 2026-02-02 |
 | 6. Projects Team | v2.0 | 3/3 | Complete | 2026-02-11 |
 | 7. Projects Demo | v2.0 | 3/6 | In progress | - |
-| 8. Roadmaps Create | v2.0 | 0/3 | Not started | - |
+| 8. Roadmaps Create | v2.0 | 0/3 | Planned | - |
 | 9. Roadmaps Discover | v2.0 | 0/2 | Not started | - |
 | 10. Integration | v2.0 | 0/3 | Not started | - |
 
