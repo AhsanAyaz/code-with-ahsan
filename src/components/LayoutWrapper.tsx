@@ -130,7 +130,6 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                         {item.icon === "discord" && <DiscordIcon />}
                         {item.icon === "mentorship" && <span>🤝</span>}
                         {item.icon === "projects" && <span>🚀</span>}
-                        {item.icon === "my-projects" && <span>📂</span>}
                         {item.icon === "brain" && <span>🧠</span>}
                         {item.title}
                         {item.external && (
