@@ -2,7 +2,7 @@
 import React, { useContext } from "react";
 import { getAuth, User } from "firebase/auth";
 import { getApp } from "firebase/app";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { AuthContext } from "@/contexts/AuthContext";
 
@@ -12,6 +12,7 @@ const ProfileMenu = () => {
     "loading"
   );
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Lazy init auth on client
@@ -23,6 +24,17 @@ const ProfileMenu = () => {
     return () => {
       unsub();
     };
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   if (currentUser === "loading") {
@@ -72,59 +84,77 @@ const ProfileMenu = () => {
   }
 
   return (
-    <div className={`dropdown dropdown-end ${isOpen ? "dropdown-open" : ""}`}>
-      <div
-        tabIndex={0}
-        role="button"
-        className="btn btn-ghost btn-circle avatar"
+    <div className="relative" ref={dropdownRef}>
+      <button
+        className="flex items-center gap-1 btn btn-ghost btn-circle"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="w-10 rounded-full">
-          <img
-            src={currentUser?.photoURL || ""}
-            alt={currentUser?.displayName || "User"}
-          />
+        <div className="avatar">
+          <div className="w-10 rounded-full">
+            <img
+              src={currentUser?.photoURL || ""}
+              alt={currentUser?.displayName || "User"}
+            />
+          </div>
         </div>
-      </div>
-      <ul
-        tabIndex={0}
-        className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
-      >
-        <li>
-          <Link href="/profile" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-            <svg className="w-5 h-5 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-            </svg>
-            Profile
-          </Link>
-        </li>
-        <li>
-          <button
-            onClick={() => {
-              const auth = getAuth(getApp());
-              auth.signOut();
-              setIsOpen(false);
-            }}
-            className="flex items-center gap-2"
-          >
-            <svg
-              className="w-5 h-5 text-current"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+        <svg
+          className="w-4 h-4 opacity-60"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+      {isOpen && (
+        <ul className="absolute top-full right-0 z-[100] menu p-2 shadow-lg bg-base-100 rounded-box w-52 mt-2">
+          <li>
+            <Link href="/profile" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
+              <svg className="w-5 h-5 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              Profile
+            </Link>
+          </li>
+          <li>
+            <Link href="/projects/my" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
+              <span>📂</span>
+              My Projects
+            </Link>
+          </li>
+          <li>
+            <button
+              onClick={() => {
+                const auth = getAuth(getApp());
+                auth.signOut();
+                setIsOpen(false);
+              }}
+              className="flex items-center gap-2"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-              ></path>
-            </svg>
-            Logout
-          </button>
-        </li>
-      </ul>
+              <svg
+                className="w-5 h-5 text-current"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                ></path>
+              </svg>
+              Logout
+            </button>
+          </li>
+        </ul>
+      )}
     </div>
   );
 };
