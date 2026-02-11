@@ -184,12 +184,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 007 | Fix two UI issues: (1) Discovery page should always show Create Project button (not just in empty state), add it to header next to title. (2) Team roster should display discordUsername instead of username for members. | 2026-02-11 | 180b857 | [007-fix-two-ui-issues-1-discovery-page-shoul](./quick/7-fix-two-ui-issues-1-discovery-page-shoul/) |
 | 008 | Improve project detail page UX: separate creator section, add share button, show X/Y team capacity | 2026-02-11 | 5bcfe62 | [008-improve-project-detail-page-ux-1-separat](./quick/8-improve-project-detail-page-ux-1-separat/) |
 | 009 | Show project invitations in My Projects page | 2026-02-11 | 850e962 | [009-show-project-invitations-in-my-projects-](./quick/9-show-project-invitations-in-my-projects-/) |
+| 010 | Auto-close Community dropdown when clicking menu items, add emojis to Projects/My Projects | 2026-02-11 | 41f7c94 | [010-auto-close-community-dropdown-when-click](./quick/10-auto-close-community-dropdown-when-click/) |
 
 ## Session Continuity
 
-Last session: 2026-02-11 11:28
-Stopped at: Completed quick task 009 (Show project invitations in My Projects page)
+Last session: 2026-02-11 11:32
+Stopped at: Completed quick task 010 (Auto-close Community dropdown when click)
 Resume file: None
 
 ---
-*Updated: 2026-02-11 after completing quick task 009*
+*Updated: 2026-02-11 after completing quick task 010*
