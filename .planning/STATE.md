@@ -13,7 +13,7 @@ Milestone: v2.0
 Phase: 6.1 of 10 (Fix Project Creation Permissions)
 Plan: 2 of 2
 Status: Complete
-Last activity: 2026-02-11 — Completed quick task 014: Send Discord notification to moderators when new project is submitted
+Last activity: 2026-02-11 — Completed quick task 015: Show creator in team roster when joined as member
 
 Progress: [████████████░] 100% (15/15 total plans complete across current phases)
 
@@ -190,11 +190,12 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 012 | Improve ProfileMenu: move My Projects from Community dropdown, add chevron indicator, upgrade styling | 2026-02-11 | ea07ebb | [012-improve-profilemenu-add-my-projects-link](./quick/12-improve-profilemenu-add-my-projects-link/) |
 | 013 | Add visible chevron to profile avatar and darken dropdown backgrounds | 2026-02-11 | 6bdfe93 | [013-add-visible-chevron-to-profile-avatar-an](./quick/13-add-visible-chevron-to-profile-avatar-an/) |
 | 014 | Send Discord notification to moderators when new project is submitted | 2026-02-11 | a366056 | [014-when-a-new-project-is-submitted-for-revi](./quick/14-when-a-new-project-is-submitted-for-revi/) |
+| 015 | Show creator in team roster when joined as member | 2026-02-11 | b2a564f | [015-when-the-creator-joins-the-team-as-a-mem](./quick/15-when-the-creator-joins-the-team-as-a-mem/) |
 
 ## Session Continuity
 
-Last session: 2026-02-11 16:52
-Stopped at: Completed quick task 014 (Discord Notification for New Project Submissions)
+Last session: 2026-02-11 16:56
+Stopped at: Completed quick task 015 (Show Creator in Team Roster When Joined as Member)
 Resume file: None
 
 ---
