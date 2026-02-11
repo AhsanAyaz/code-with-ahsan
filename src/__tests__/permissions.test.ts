@@ -92,12 +92,12 @@ describe("Permission System", () => {
       expect(canCreateProject(acceptedMentor)).toBe(true);
     });
 
-    it("returns false for pending mentor", () => {
-      expect(canCreateProject(pendingMentor)).toBe(false);
+    it("returns true for pending mentor", () => {
+      expect(canCreateProject(pendingMentor)).toBe(true);
     });
 
-    it("returns false for mentee", () => {
-      expect(canCreateProject(mentee)).toBe(false);
+    it("returns true for mentee", () => {
+      expect(canCreateProject(mentee)).toBe(true);
     });
 
     it("returns false for null user", () => {
@@ -197,12 +197,17 @@ describe("Permission System", () => {
       expect(canEditProject(acceptedMentor, testProject)).toBe(false);
     });
 
-    it("returns false for pending mentor (owner)", () => {
+    it("returns true for pending mentor (owner)", () => {
       const pendingOwned = { ...testProject, creatorId: pendingMentor.uid };
-      expect(canEditProject(pendingMentor, pendingOwned)).toBe(false);
+      expect(canEditProject(pendingMentor, pendingOwned)).toBe(true);
     });
 
-    it("returns false for mentee", () => {
+    it("returns true for mentee (owner)", () => {
+      const menteeOwned = { ...testProject, creatorId: mentee.uid };
+      expect(canEditProject(mentee, menteeOwned)).toBe(true);
+    });
+
+    it("returns false for mentee (non-owner)", () => {
       expect(canEditProject(mentee, testProject)).toBe(false);
     });
 
@@ -231,12 +236,17 @@ describe("Permission System", () => {
       expect(canManageProjectMembers(acceptedMentor, testProject)).toBe(false);
     });
 
-    it("returns false for pending mentor (owner)", () => {
+    it("returns true for pending mentor (owner)", () => {
       const pendingOwned = { ...testProject, creatorId: pendingMentor.uid };
-      expect(canManageProjectMembers(pendingMentor, pendingOwned)).toBe(false);
+      expect(canManageProjectMembers(pendingMentor, pendingOwned)).toBe(true);
     });
 
-    it("returns false for mentee", () => {
+    it("returns true for mentee (owner)", () => {
+      const menteeOwned = { ...testProject, creatorId: mentee.uid };
+      expect(canManageProjectMembers(mentee, menteeOwned)).toBe(true);
+    });
+
+    it("returns false for mentee (non-owner)", () => {
       expect(canManageProjectMembers(mentee, testProject)).toBe(false);
     });
 
@@ -294,12 +304,17 @@ describe("Permission System", () => {
       expect(canEditRoadmap(acceptedMentor, testRoadmap)).toBe(false);
     });
 
-    it("returns false for pending mentor (owner)", () => {
+    it("returns true for pending mentor (owner)", () => {
       const pendingOwned = { ...testRoadmap, creatorId: pendingMentor.uid };
-      expect(canEditRoadmap(pendingMentor, pendingOwned)).toBe(false);
+      expect(canEditRoadmap(pendingMentor, pendingOwned)).toBe(true);
     });
 
-    it("returns false for mentee", () => {
+    it("returns true for mentee (owner)", () => {
+      const menteeOwned = { ...testRoadmap, creatorId: mentee.uid };
+      expect(canEditRoadmap(mentee, menteeOwned)).toBe(true);
+    });
+
+    it("returns false for mentee (non-owner)", () => {
       expect(canEditRoadmap(mentee, testRoadmap)).toBe(false);
     });
 
