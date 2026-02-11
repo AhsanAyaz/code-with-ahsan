@@ -5,6 +5,9 @@ import { canManageProjectMembers } from "@/lib/permissions";
 import { removeMemberFromChannel, sendChannelMessage, lookupMemberByUsername } from "@/lib/discord";
 import { verifyAuth } from "@/lib/auth";
 import type { PermissionUser } from "@/lib/permissions";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("projects");
 
 export async function DELETE(
   request: NextRequest,
@@ -100,6 +103,13 @@ export async function DELETE(
       // Resolve Discord username with fallback
       const discordUsername = memberProfileData?.discordUsername || memberData?.userProfile?.discordUsername;
 
+      // Warn if Discord username is missing
+      if (!discordUsername) {
+        log.warn(
+          `No Discord username found for member ${memberUserId} in project ${projectId} - cannot revoke channel access`
+        );
+      }
+
       // Look up Discord member for tagging
       let tag: string;
       if (discordUsername) {
@@ -120,18 +130,27 @@ export async function DELETE(
           `📤 ${tag} has been removed from the project.`
         );
       } catch (channelMsgError) {
-        console.error("Discord channel removal message failed:", channelMsgError);
+        log.error("Discord channel departure message failed", { error: channelMsgError });
       }
 
       // Remove from Discord channel (skip if member is the creator)
       if (discordUsername && memberUserId !== projectData?.creatorId) {
         try {
-          await removeMemberFromChannel(
+          const removed = await removeMemberFromChannel(
             projectData.discordChannelId,
             discordUsername
           );
+          if (!removed) {
+            log.warn(
+              `Discord permission removal failed for ${discordUsername} in channel ${projectData.discordChannelId} (project: ${projectId})`
+            );
+          } else {
+            log.info(
+              `Discord permission removed for ${discordUsername} in channel ${projectData.discordChannelId} (project: ${projectId})`
+            );
+          }
         } catch (discordError) {
-          console.error("Discord member removal failed:", discordError);
+          log.error("Discord member removal failed", { error: discordError });
         }
       }
     }
@@ -163,7 +182,7 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error removing member:", error);
+    log.error("Error removing member", { error });
     return NextResponse.json(
       { error: "Failed to remove member" },
       { status: 500 }

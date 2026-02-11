@@ -3,6 +3,9 @@ import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { removeMemberFromChannel, sendChannelMessage, lookupMemberByUsername } from "@/lib/discord";
 import { verifyAuth } from "@/lib/auth";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("projects");
 
 export async function POST(
   request: NextRequest,
@@ -58,6 +61,13 @@ export async function POST(
       // Resolve Discord username with fallback
       const discordUsername = memberProfileData?.discordUsername || memberData?.userProfile?.discordUsername;
 
+      // Warn if Discord username is missing
+      if (!discordUsername) {
+        log.warn(
+          `No Discord username found for member ${userId} in project ${projectId} - cannot revoke channel access`
+        );
+      }
+
       // Look up Discord member for tagging
       let tag: string;
       if (discordUsername) {
@@ -78,18 +88,27 @@ export async function POST(
           `📤 ${tag} has left the project.`
         );
       } catch (channelMsgError) {
-        console.error("Discord channel departure message failed:", channelMsgError);
+        log.error("Discord channel departure message failed", { error: channelMsgError });
       }
 
       // Then remove from Discord channel (skip if user is the creator)
       if (discordUsername && userId !== projectData?.creatorId) {
         try {
-          await removeMemberFromChannel(
+          const removed = await removeMemberFromChannel(
             projectData.discordChannelId,
             discordUsername
           );
+          if (!removed) {
+            log.warn(
+              `Discord permission removal failed for ${discordUsername} in channel ${projectData.discordChannelId} (project: ${projectId})`
+            );
+          } else {
+            log.info(
+              `Discord permission removed for ${discordUsername} in channel ${projectData.discordChannelId} (project: ${projectId})`
+            );
+          }
         } catch (discordError) {
-          console.error("Discord member removal failed:", discordError);
+          log.error("Discord member removal failed", { error: discordError });
         }
       }
     }
@@ -121,7 +140,7 @@ export async function POST(
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error leaving project:", error);
+    log.error("Error leaving project", { error });
     return NextResponse.json(
       { error: "Failed to leave project" },
       { status: 500 }
