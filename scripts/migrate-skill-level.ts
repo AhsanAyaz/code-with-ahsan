@@ -1,28 +1,19 @@
 /**
  * Migration script to add skillLevel field to existing mentorship profiles
  *
- * Run with: npx ts-node scripts/migrate-skill-level.ts
+ * Run with: npx tsx scripts/migrate-skill-level.ts
  *
  * Sets all existing profiles to skillLevel: "beginner" (default)
  */
 
 import * as admin from "firebase-admin";
-import * as dotenv from "dotenv";
-import * as path from "path";
 
-// Load environment variables
-dotenv.config({ path: path.resolve(__dirname, "../.env.local") });
+// Load service account for local development
+const serviceAccount = require("../secure/code-with-ahsan-45496-firebase-adminsdk-7axo0-3127308aba.json");
 
-// Initialize Firebase Admin
-if (!admin.apps.length) {
-  const serviceAccount = JSON.parse(
-    process.env.FIREBASE_SERVICE_ACCOUNT_KEY || "{}"
-  );
-
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-}
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 const db = admin.firestore();
 
