@@ -32,16 +32,6 @@ export async function POST(
 
     const projectData = projectDoc.data();
 
-    // Prevent creator from leaving
-    if (projectData?.creatorId === userId) {
-      return NextResponse.json(
-        {
-          error: "Project creator cannot leave. Transfer ownership first.",
-        },
-        { status: 403 }
-      );
-    }
-
     // Find member document by composite key
     const memberDocId = `${projectId}_${userId}`;
     const memberRef = db.collection("project_members").doc(memberDocId);
