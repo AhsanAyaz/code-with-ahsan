@@ -192,11 +192,12 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 014 | Send Discord notification to moderators when new project is submitted | 2026-02-11 | a366056 | [014-when-a-new-project-is-submitted-for-revi](./quick/14-when-a-new-project-is-submitted-for-revi/) |
 | 015 | Show creator in team roster when joined as member | 2026-02-11 | b2a564f | [015-when-the-creator-joins-the-team-as-a-mem](./quick/15-when-the-creator-joins-the-team-as-a-mem/) |
 | 016 | Fix Discord access revocation for project members | 2026-02-11 | a96c872 | [016-when-the-creator-removed-a-member-the-me](./quick/16-when-the-creator-removed-a-member-the-me/) |
+| 017 | Fix Discord channel access removal logging and error handling | 2026-02-11 | 6f19dd5 | [017-fix-discord-channel-access-removal-when-](./quick/17-fix-discord-channel-access-removal-when-/) |
 
 ## Session Continuity
 
-Last session: 2026-02-11 17:01
-Stopped at: Completed quick task 016 (Fix Discord Access Revocation for Project Members)
+Last session: 2026-02-11 17:27
+Stopped at: Completed quick task 017 (Fix Discord Channel Access Removal Logging and Error Handling)
 Resume file: None
 
 ---
