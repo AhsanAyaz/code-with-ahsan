@@ -567,7 +567,7 @@ export default function ProjectDetailPage() {
                             className="rounded-full"
                           />
                         )}
-                        <div>
+                        <div className="flex-1">
                           <div className="font-semibold">
                             {app.userProfile?.displayName}
                           </div>
@@ -577,6 +577,11 @@ export default function ProjectDetailPage() {
                             </div>
                           )}
                         </div>
+                        {app.userProfile?.skillLevel && (
+                          <span className={`badge ${difficultyColors[app.userProfile.skillLevel as ProjectDifficulty]}`}>
+                            {app.userProfile.skillLevel}
+                          </span>
+                        )}
                       </div>
                       <p className="text-sm mb-3">{app.message}</p>
                       <div className="flex gap-2">
@@ -741,7 +746,7 @@ export default function ProjectDetailPage() {
 
       {/* User has already applied */}
       {userApplication && !isMember && (
-        <div className="alert alert-info">
+        <div className={`alert ${userApplication.status === "declined" ? "alert-error" : "alert-info"}`}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="stroke-current shrink-0 h-6 w-6"
