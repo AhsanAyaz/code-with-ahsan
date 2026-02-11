@@ -1,0 +1,95 @@
+"use client";
+
+import Image from "next/image";
+import { Project, ProjectMember } from "@/types/mentorship";
+import ContactInfo from "@/components/mentorship/ContactInfo";
+
+interface TeamRosterProps {
+  project: Project;
+  members: ProjectMember[];
+  isCreator: boolean;
+  onRemoveMember?: (memberId: string) => void;
+  removingMemberId?: string | null;
+}
+
+export default function TeamRoster({
+  project,
+  members,
+  isCreator,
+  onRemoveMember,
+  removingMemberId,
+}: TeamRosterProps) {
+  // Filter creator out of members array to prevent duplicate rendering
+  const nonCreatorMembers = members.filter(m => m.userId !== project.creatorId);
+
+  // Team members only (creator is shown separately in parent page)
+  const totalMembers = nonCreatorMembers.length;
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">
+        Team ({totalMembers} / {project.maxTeamSize} members)
+      </h2>
+
+      <div className="space-y-3">
+        {/* Members */}
+        {nonCreatorMembers.map((member) => (
+          <div
+            key={member.id}
+            className="flex items-center gap-3 p-3 bg-base-200 rounded-lg"
+          >
+            {member.userProfile?.photoURL && (
+              <Image
+                src={member.userProfile.photoURL}
+                alt={member.userProfile.displayName}
+                width={48}
+                height={48}
+                className="rounded-full"
+              />
+            )}
+            <div className="flex-1">
+              <div className="font-semibold">
+                {member.userProfile?.displayName}
+              </div>
+              <ContactInfo discordUsername={member.userProfile?.discordUsername} />
+            </div>
+            <span className="badge">Member</span>
+            {isCreator && onRemoveMember && (
+              <button
+                onClick={() => onRemoveMember(member.id)}
+                className="btn btn-ghost btn-sm btn-circle"
+                title="Remove member"
+                disabled={removingMemberId === member.id}
+              >
+                {removingMemberId === member.id ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                )}
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {nonCreatorMembers.length === 0 && (
+        <div className="text-sm text-base-content/60 text-center py-4">
+          No team members yet.
+        </div>
+      )}
+    </div>
+  );
+}

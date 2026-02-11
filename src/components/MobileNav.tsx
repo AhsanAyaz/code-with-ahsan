@@ -146,6 +146,8 @@ const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
                     >
                       {item.icon === "discord" && <DiscordIcon />}
                       {item.icon === "mentorship" && <span className="text-xl">🤝</span>}
+                      {item.icon === "projects" && <span className="text-xl">🚀</span>}
+                      {item.icon === "my-projects" && <span className="text-xl">📂</span>}
                       {item.icon === "brain" && <span className="text-xl">🧠</span>}
                       {item.title}
                       {item.external && (

@@ -7,7 +7,7 @@ import MobileNav from "./MobileNav";
 import ThemeSwitch from "./ThemeSwitch";
 import Image from "./Image";
 import ProfileMenu from "./ProfileMenu";
-import { ReactNode } from "react";
+import { ReactNode, useState, useRef, useEffect } from "react";
 
 interface LinkItem {
   href: string;
@@ -28,6 +28,20 @@ const DiscordIcon = () => (
 );
 
 const LayoutWrapper = ({ children }: { children: ReactNode }) => {
+  const [communityOpen, setCommunityOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setCommunityOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const getLinkClass = (link: LinkItem) => {
     if (link.href.includes("ng-book")) {
       return "btn btn-sm btn-primary";
@@ -81,8 +95,11 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
               </Link>
             ))}
             {/* Community Dropdown */}
-            <div className="dropdown dropdown-hover">
-              <div tabIndex={0} role="button" className="btn btn-ghost">
+            <div className="relative" ref={dropdownRef}>
+              <button
+                className="btn btn-ghost"
+                onClick={() => setCommunityOpen(!communityOpen)}
+              >
                 Community
                 <svg
                   className="w-4 h-4 ml-1"
@@ -97,43 +114,44 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                     d="M19 9l-7 7-7-7"
                   />
                 </svg>
-              </div>
-              <ul
-                tabIndex={0}
-                className="dropdown-content z-[100] menu p-2 shadow-lg bg-base-100 rounded-box w-52"
-              >
-                {COMMUNITY_LINKS.map((item) => (
-                  <li key={item.title}>
-                    <Link
-                      href={item.href}
-                      className="flex items-center gap-2"
-                      {...(item.external
-                        ? { target: "_blank", rel: "noopener noreferrer" }
-                        : {})}
-                    >
-                      {item.icon === "discord" && <DiscordIcon />}
-                      {item.icon === "mentorship" && <span>🤝</span>}
-                      {item.icon === "brain" && <span>🧠</span>}
-                      {item.title}
-                      {item.external && (
-                        <svg
-                          className="w-3 h-3 opacity-50"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                          />
-                        </svg>
-                      )}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              </button>
+              {communityOpen && (
+                <ul className="absolute top-full left-0 z-[100] menu p-2 shadow-lg bg-base-300 rounded-box w-52">
+                  {COMMUNITY_LINKS.map((item) => (
+                    <li key={item.title}>
+                      <Link
+                        href={item.href}
+                        className="flex items-center gap-2"
+                        onClick={() => setCommunityOpen(false)}
+                        {...(item.external
+                          ? { target: "_blank", rel: "noopener noreferrer" }
+                          : {})}
+                      >
+                        {item.icon === "discord" && <DiscordIcon />}
+                        {item.icon === "mentorship" && <span>🤝</span>}
+                        {item.icon === "projects" && <span>🚀</span>}
+                        {item.icon === "brain" && <span>🧠</span>}
+                        {item.title}
+                        {item.external && (
+                          <svg
+                            className="w-3 h-3 opacity-50"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            />
+                          </svg>
+                        )}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         </div>

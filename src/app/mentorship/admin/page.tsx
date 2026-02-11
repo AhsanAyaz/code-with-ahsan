@@ -4,8 +4,10 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useMentorship, MentorshipProfile } from "@/contexts/MentorshipContext";
+import { Project } from "@/types/mentorship";
 import Link from "next/link";
 import { useDebouncedCallback } from "use-debounce";
+import { authFetch } from "@/lib/apiClient";
 import { format } from "date-fns";
 import { useStreamerMode } from "@/hooks/useStreamerMode";
 import { getAnonymizedDisplayName, getAnonymizedEmail, getAnonymizedDiscord } from "@/utils/streamer-mode";
@@ -82,7 +84,7 @@ interface MentorshipSummary {
   completedMentorships: number;
 }
 
-type TabType = "overview" | "pending-mentors" | "all-mentors" | "all-mentees";
+type TabType = "overview" | "pending-mentors" | "all-mentors" | "all-mentees" | "projects";
 
 const ADMIN_TOKEN_KEY = "mentorship_admin_token";
 
@@ -145,6 +147,13 @@ export default function AdminPage() {
     discord: "all" as "all" | "with" | "without",
   });
   const activeFilterCount = Object.values(filters).filter(v => v !== "all").length;
+
+  // Projects state
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
+  const [projectActionLoading, setProjectActionLoading] = useState<string | null>(null);
+  const [declineProjectId, setDeclineProjectId] = useState<string | null>(null);
+  const [declineReason, setDeclineReason] = useState("");
 
   // Debounced search handler
   const debouncedSearch = useDebouncedCallback((value: string) => {
@@ -255,7 +264,7 @@ export default function AdminPage() {
   // Fetch profiles based on active tab
   useEffect(() => {
     const fetchProfiles = async () => {
-      if (activeTab === "overview") return;
+      if (activeTab === "overview" || activeTab === "projects") return;
 
       setLoadingProfiles(true);
       try {
@@ -282,6 +291,30 @@ export default function AdminPage() {
 
     if (isAdminAuthenticated) {
       fetchProfiles();
+    }
+  }, [isAdminAuthenticated, activeTab]);
+
+  // Fetch projects when projects tab is active
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (activeTab !== "projects") return;
+
+      setLoadingProjects(true);
+      try {
+        const response = await fetch("/api/projects?status=pending");
+        if (response.ok) {
+          const data = await response.json();
+          setProjects(data.projects || []);
+        }
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+
+    if (isAdminAuthenticated) {
+      fetchProjects();
     }
   }, [isAdminAuthenticated, activeTab]);
 
@@ -590,6 +623,63 @@ export default function AdminPage() {
     }
   };
 
+  // Project handlers
+  const handleApproveProject = async (projectId: string) => {
+    if (!user) return;
+    setProjectActionLoading(projectId);
+    try {
+      const response = await authFetch(`/api/projects/${projectId}`, {
+        method: "PUT",
+        body: JSON.stringify({ action: "approve", adminId: user.uid })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to approve project");
+      }
+
+      toast.success("Project approved! Discord channel created.");
+      setProjects(prev => prev.filter(p => p.id !== projectId));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to approve project");
+    } finally {
+      setProjectActionLoading(null);
+    }
+  };
+
+  const handleDeclineProject = (projectId: string) => {
+    setDeclineProjectId(projectId);
+  };
+
+  const confirmDeclineProject = async () => {
+    if (!declineProjectId || !user) return;
+    setProjectActionLoading(declineProjectId);
+    try {
+      const response = await authFetch(`/api/projects/${declineProjectId}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          action: "decline",
+          adminId: user.uid,
+          declineReason
+        })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to decline project");
+      }
+
+      toast.success("Project declined.");
+      setProjects(prev => prev.filter(p => p.id !== declineProjectId));
+      setDeclineProjectId(null);
+      setDeclineReason("");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to decline project");
+    } finally {
+      setProjectActionLoading(null);
+    }
+  };
+
   // Filter mentorship data by search query and filters
   const filteredMentorshipData = mentorshipData.filter((item) => {
     const profile = item.profile;
@@ -810,6 +900,13 @@ export default function AdminPage() {
           onClick={() => setActiveTab("all-mentees")}
         >
           🚀 All Mentees
+        </button>
+        <button
+          role="tab"
+          className={`tab ${activeTab === "projects" ? "tab-active" : ""}`}
+          onClick={() => setActiveTab("projects")}
+        >
+          📦 Projects
         </button>
       </div>
 
@@ -2212,6 +2309,105 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* Projects Tab */}
+      {activeTab === "projects" && (
+        <div className="space-y-4">
+          {loadingProjects ? (
+            <div className="flex justify-center items-center py-12">
+              <span className="loading loading-spinner loading-lg"></span>
+            </div>
+          ) : projects.length === 0 ? (
+            <div className="text-center py-12 text-base-content/60">
+              No pending project proposals
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {projects.map((project) => (
+                <div key={project.id} className="card bg-base-200 shadow-md">
+                  <div className="card-body">
+                    <h3 className="card-title">{project.title}</h3>
+                    <p className="text-sm text-base-content/80">
+                      {project.description.length > 200
+                        ? `${project.description.substring(0, 200)}...`
+                        : project.description}
+                    </p>
+                    <div className="mt-2 space-y-2 text-sm">
+                      <div>
+                        <span className="font-semibold">Creator:</span>{" "}
+                        {project.creatorProfile?.displayName || "Unknown"}
+                      </div>
+                      <div>
+                        <span className="font-semibold">Tech Stack:</span>{" "}
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {project.techStack.map((tech, idx) => (
+                            <span key={idx} className="badge badge-sm badge-outline">
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="font-semibold">Difficulty:</span>{" "}
+                        <span
+                          className={`badge badge-sm ${
+                            project.difficulty === "beginner"
+                              ? "badge-success"
+                              : project.difficulty === "intermediate"
+                              ? "badge-warning"
+                              : "badge-error"
+                          }`}
+                        >
+                          {project.difficulty}
+                        </span>
+                      </div>
+                      {project.githubRepo && (
+                        <div>
+                          <span className="font-semibold">GitHub:</span>{" "}
+                          <a
+                            href={project.githubRepo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="link link-primary"
+                          >
+                            {project.githubRepo}
+                          </a>
+                        </div>
+                      )}
+                      <div className="text-xs text-base-content/60">
+                        Created: {format(new Date(project.createdAt), "MMM d, yyyy")}
+                      </div>
+                    </div>
+                    <div className="card-actions justify-end mt-4">
+                      <button
+                        className="btn btn-success btn-sm"
+                        onClick={() => handleApproveProject(project.id)}
+                        disabled={projectActionLoading === project.id}
+                      >
+                        {projectActionLoading === project.id ? (
+                          <>
+                            <span className="loading loading-spinner loading-xs"></span>
+                            Approving...
+                          </>
+                        ) : (
+                          "Approve"
+                        )}
+                      </button>
+                      <button
+                        className="btn btn-error btn-sm"
+                        onClick={() => handleDeclineProject(project.id)}
+                        disabled={projectActionLoading === project.id}
+                      >
+                        Decline
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Alerts Modal */}
       <dialog id="alerts-modal" className="modal">
         <div className="modal-box">
@@ -2572,6 +2768,62 @@ export default function AdminPage() {
               onClick={() => {
                 setShowDeleteModal(false);
                 setSessionToDelete(null);
+              }}
+            >
+              close
+            </button>
+          </form>
+        </dialog>
+      )}
+
+      {/* Decline Project Modal */}
+      {declineProjectId && (
+        <dialog className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg text-error">Decline Project</h3>
+            <p className="py-4">
+              Please provide a reason for declining this project proposal:
+            </p>
+            <textarea
+              className="textarea textarea-bordered w-full h-32"
+              placeholder="Enter decline reason..."
+              value={declineReason}
+              onChange={(e) => setDeclineReason(e.target.value)}
+            />
+            <div className="modal-action">
+              <button
+                className="btn btn-ghost"
+                onClick={() => {
+                  setDeclineProjectId(null);
+                  setDeclineReason("");
+                }}
+                disabled={projectActionLoading === declineProjectId}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-error"
+                onClick={confirmDeclineProject}
+                disabled={
+                  projectActionLoading === declineProjectId || !declineReason.trim()
+                }
+              >
+                {projectActionLoading === declineProjectId ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Declining...
+                  </>
+                ) : (
+                  "Confirm Decline"
+                )}
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button
+              onClick={() => {
+                setDeclineProjectId(null);
+                setDeclineReason("");
               }}
             >
               close

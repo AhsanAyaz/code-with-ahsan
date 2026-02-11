@@ -33,6 +33,10 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/profile</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/projects</loc>
   </url>
 
@@ -77,7 +81,15 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/settings</loc>
+    <loc>https://codewithahsan.dev/projects/discover</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/projects/my</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/projects/new</loc>
   </url>
 
   <url>

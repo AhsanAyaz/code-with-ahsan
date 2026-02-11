@@ -172,8 +172,8 @@ export default function MentorRequestsPage() {
               <>
                 {" "}
                 — You're at capacity.{" "}
-                <Link href="/mentorship/settings" className="link">
-                  Update settings
+                <Link href="/profile" className="link">
+                  Update profile
                 </Link>{" "}
                 to accept more mentees.
               </>

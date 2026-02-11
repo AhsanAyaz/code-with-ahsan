@@ -164,7 +164,7 @@ async function sendSummaryToDiscord(
     }
   }
 
-  const footer = `\n---\n_Users should update their Discord username at https://codewithahsan.dev/mentorship/settings_`;
+  const footer = `\n---\n_Users should update their Discord username at https://codewithahsan.dev/profile_`;
 
   const fullMessage = header + stats + mentorSection + menteeSection + footer;
 

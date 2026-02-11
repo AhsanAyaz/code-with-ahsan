@@ -54,6 +54,7 @@ if (!admin.apps.length) {
 }
 
 export const db = admin.firestore();
+export const auth = admin.auth();
 
 // Storage bucket for file uploads
 export const storage = admin

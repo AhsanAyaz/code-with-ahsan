@@ -22,6 +22,8 @@ export interface MentorshipProfile {
   updatedAt: Date;
   // Approval status
   status?: "pending" | "accepted" | "declined" | "disabled";
+  // Skill level for project matching (defaults to "beginner")
+  skillLevel?: "beginner" | "intermediate" | "advanced";
   // Mentor-specific
   expertise?: string[];
   currentRole?: string;
@@ -108,3 +110,133 @@ export type RequestStatus =
   | "declined"
   | "active"
   | "completed";
+
+// ─── v2.0 Project Collaboration Types ───────────────────────
+
+export type ProjectStatus = "pending" | "approved" | "active" | "completed" | "archived" | "declined";
+export type RoadmapStatus = "draft" | "pending" | "approved" | "active" | "archived";
+export type ProjectDifficulty = "beginner" | "intermediate" | "advanced";
+export type ProjectMemberRole = "owner" | "member";
+
+export interface Project {
+  id: string;
+  title: string;
+  description: string;
+  creatorId: string;
+  creatorProfile?: {
+    displayName: string;
+    photoURL: string;
+    username?: string;
+    discordUsername?: string;
+  };
+  status: ProjectStatus;
+  githubRepo?: string;
+  techStack: string[];
+  difficulty: ProjectDifficulty;
+  maxTeamSize: number;
+  memberCount?: number;
+  pendingApplicationCount?: number;
+  discordChannelId?: string;
+  discordChannelUrl?: string;
+  lastActivityAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  approvedAt?: Date;
+  approvedBy?: string;
+}
+
+export interface ProjectMember {
+  id: string;
+  projectId: string;
+  userId: string;
+  userProfile?: {
+    displayName: string;
+    photoURL: string;
+    username?: string;
+    discordUsername?: string;
+  };
+  role: ProjectMemberRole;
+  joinedAt: Date;
+}
+
+export type ApplicationStatus = "pending" | "approved" | "declined";
+export type InvitationStatus = "pending" | "accepted" | "declined";
+
+export interface ProjectApplication {
+  id: string; // composite: {projectId}_{userId}
+  projectId: string;
+  userId: string;
+  userProfile?: {
+    displayName: string;
+    photoURL: string;
+    username?: string;
+    discordUsername?: string;
+    skillLevel?: "beginner" | "intermediate" | "advanced";
+  };
+  message: string;
+  status: ApplicationStatus;
+  feedback?: string; // Feedback from creator on decline
+  createdAt: Date;
+  approvedAt?: Date;
+  declinedAt?: Date;
+}
+
+export interface ProjectInvitation {
+  id: string; // composite: {projectId}_{userId}
+  projectId: string;
+  userId: string;
+  userProfile?: {
+    displayName: string;
+    photoURL: string;
+    username?: string;
+    discordUsername?: string;
+  };
+  invitedBy: string; // creator userId
+  status: InvitationStatus;
+  createdAt: Date;
+  acceptedAt?: Date;
+  declinedAt?: Date;
+}
+
+export interface Roadmap {
+  id: string;
+  title: string;
+  description?: string;
+  creatorId: string;
+  creatorProfile?: {
+    displayName: string;
+    photoURL: string;
+    username?: string;
+  };
+  domain: RoadmapDomain;
+  difficulty: ProjectDifficulty;
+  estimatedHours?: number;
+  contentUrl?: string;
+  content?: string;
+  status: RoadmapStatus;
+  version: number;
+  createdAt: Date;
+  updatedAt: Date;
+  approvedAt?: Date;
+  approvedBy?: string;
+}
+
+export type RoadmapDomain =
+  | "web-dev"
+  | "frontend"
+  | "backend"
+  | "ml"
+  | "ai"
+  | "mcp"
+  | "agents"
+  | "prompt-engineering";
+
+export interface RoadmapVersion {
+  id: string;
+  roadmapId: string;
+  version: number;
+  content: string;
+  createdBy: string;
+  createdAt: Date;
+  changeDescription?: string;
+}

@@ -47,8 +47,8 @@ export default function DiscordValidationBanner({
         >
           Join Discord
         </a>
-        <Link href="/mentorship/settings" className="btn btn-sm btn-primary">
-          Update Settings
+        <Link href="/profile" className="btn btn-sm btn-primary">
+          Update Profile
         </Link>
       </div>
     </div>

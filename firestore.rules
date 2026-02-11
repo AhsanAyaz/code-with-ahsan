@@ -1,0 +1,179 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    function isAcceptedMentor() {
+      return isSignedIn() &&
+             request.auth.token.role == "mentor" &&
+             request.auth.token.status == "accepted";
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ─── Projects ───────────────────────────────
+    match /projects/{projectId} {
+      // Anyone signed in can read approved/active/completed projects
+      // Owner and admin can read any status
+      allow read: if isSignedIn() && (
+        resource.data.status in ["approved", "active", "completed"] ||
+        resource.data.creatorId == request.auth.uid ||
+        isAdmin()
+      );
+
+      // Any authenticated user can create projects
+      // Must set own uid as creator, status must be "pending"
+      allow create: if isSignedIn() &&
+                       request.resource.data.creatorId == request.auth.uid &&
+                       request.resource.data.status == "pending";
+
+      // Owner can update non-status fields
+      allow update: if isSignedIn() &&
+                       resource.data.creatorId == request.auth.uid &&
+                       request.resource.data.status == resource.data.status &&
+                       request.resource.data.creatorId == resource.data.creatorId;
+
+      // PERM-03: Only admins can change project status (approve/reject)
+      allow update: if isAdmin();
+
+      // Only owner or admin can delete
+      allow delete: if isSignedIn() && (
+        resource.data.creatorId == request.auth.uid || isAdmin()
+      );
+    }
+
+    // ─── Project Members ────────────────────────
+    match /project_members/{memberId} {
+      // Any signed-in user can read members
+      allow read: if isSignedIn();
+
+      // PERM-04: Only project creator or admin can manage members
+      // Check project ownership via get()
+      allow create: if isSignedIn() && (
+        isAdmin() ||
+        get(/databases/$(database)/documents/projects/$(request.resource.data.projectId)).data.creatorId == request.auth.uid
+      );
+
+      allow update, delete: if isSignedIn() && (
+        isAdmin() ||
+        get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.creatorId == request.auth.uid
+      );
+    }
+
+    // ─── Project Applications ────────────────────
+    match /project_applications/{applicationId} {
+      // Any signed-in user can read applications for projects they own or applied to
+      allow read: if isSignedIn() && (
+        resource.data.userId == request.auth.uid ||
+        get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.creatorId == request.auth.uid ||
+        isAdmin()
+      );
+
+      // PERM-07: Authenticated users can create applications (not project owner - checked in API)
+      allow create: if isSignedIn() &&
+                       request.resource.data.userId == request.auth.uid &&
+                       request.resource.data.status == "pending";
+
+      // Only project creator or admin can update (approve/decline)
+      allow update: if isSignedIn() && (
+        isAdmin() ||
+        get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.creatorId == request.auth.uid
+      );
+
+      // Only applicant, project creator, or admin can delete
+      allow delete: if isSignedIn() && (
+        resource.data.userId == request.auth.uid ||
+        get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.creatorId == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    // ─── Project Invitations ─────────────────────
+    match /project_invitations/{invitationId} {
+      // Invited user, project creator, or admin can read
+      allow read: if isSignedIn() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.invitedBy == request.auth.uid ||
+        isAdmin()
+      );
+
+      // Only project creator or admin can create invitations
+      allow create: if isSignedIn() && (
+        isAdmin() ||
+        get(/databases/$(database)/documents/projects/$(request.resource.data.projectId)).data.creatorId == request.auth.uid
+      );
+
+      // Invited user can update (accept/decline), creator/admin can update too
+      allow update: if isSignedIn() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.invitedBy == request.auth.uid ||
+        isAdmin()
+      );
+
+      allow delete: if isSignedIn() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.invitedBy == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    // ─── Roadmaps ──────────────────────────────
+    match /roadmaps/{roadmapId} {
+      // Signed-in users can read approved roadmaps; creator and admin can read any
+      allow read: if isSignedIn() && (
+        resource.data.status in ["approved", "active"] ||
+        resource.data.creatorId == request.auth.uid ||
+        isAdmin()
+      );
+
+      // PERM-02: Only accepted mentors can create roadmaps
+      allow create: if isAcceptedMentor() &&
+                       request.resource.data.creatorId == request.auth.uid &&
+                       request.resource.data.status == "draft";
+
+      // Creator can update non-status fields on draft/pending roadmaps
+      allow update: if isSignedIn() &&
+                       resource.data.creatorId == request.auth.uid &&
+                       request.resource.data.status == resource.data.status &&
+                       resource.data.status in ["draft", "pending"];
+
+      // PERM-03: Only admins can change roadmap status
+      allow update: if isAdmin();
+
+      // Only creator or admin can delete
+      allow delete: if isSignedIn() && (
+        resource.data.creatorId == request.auth.uid || isAdmin()
+      );
+
+      // ─── Roadmap Versions (subcollection) ─────
+      match /versions/{versionId} {
+        // Anyone who can read the roadmap can read versions
+        allow read: if isSignedIn();
+
+        // Only roadmap creator can add versions
+        allow create: if isSignedIn() &&
+                         request.resource.data.createdBy == request.auth.uid;
+
+        // Versions are immutable (audit trail)
+        allow update, delete: if false;
+      }
+    }
+
+    // ─── Existing collections (passthrough) ─────
+    // Existing mentorship collections use Admin SDK (server-side),
+    // so client-side rules can be restrictive.
+    // If existing rules are needed, they should be added here.
+    // For now, deny client access to mentorship collections
+    // (all mentorship operations go through API routes using Admin SDK).
+  }
+}
