@@ -9,11 +9,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/community</loc>
+    <loc>https://codewithahsan.dev/books</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/books</loc>
+    <loc>https://codewithahsan.dev/community</loc>
   </url>
 
   <url>
@@ -33,11 +33,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/projects</loc>
+    <loc>https://codewithahsan.dev/profile</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/profile</loc>
+    <loc>https://codewithahsan.dev/projects</loc>
   </url>
 
   <url>
@@ -57,19 +57,19 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/goals</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/mentorship/dashboard</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/my-matches</loc>
+    <loc>https://codewithahsan.dev/mentorship/goals</loc>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/mentorship/mentors</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/my-matches</loc>
   </url>
 
   <url>
@@ -94,6 +94,10 @@
 
   <url>
     <loc>https://codewithahsan.dev/projects/showcase</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/roadmaps/new</loc>
   </url>
 
   <url>
