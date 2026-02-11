@@ -99,6 +99,7 @@ Recent decisions affecting current work:
   - Planning complete: 2026-02-11 (2 plans in 2 waves)
   - Verification: PASSED after 1 revision iteration
   - Ready for execution
+- Phase 11 added: Admin Project Management: View all projects and delete with cascade cleanup
 
 ### Pending Todos
 
