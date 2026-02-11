@@ -11,18 +11,18 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 Milestone: v2.0
 Phase: 6.1 of 10 (Fix Project Creation Permissions)
-Plan: 1 of 2
-Status: In progress
-Last activity: 2026-02-11 — Completed 06.1-01-PLAN.md (Fix Project Creation Permissions)
+Plan: 2 of 2
+Status: Complete
+Last activity: 2026-02-11 — Completed 06.1-02-PLAN.md (Creator Join/Leave and UI Updates)
 
-Progress: [███████████░░] 93% (14/15 total plans complete across current phases)
+Progress: [████████████░] 100% (15/15 total plans complete across current phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14 (v1.0: 5, v2.0: 9)
-- Average duration: ~25 min
-- Total execution time: ~6 hours 11 minutes
+- Total plans completed: 15 (v1.0: 5, v2.0: 10)
+- Average duration: ~24 min
+- Total execution time: ~6 hours 14 minutes
 
 **By Phase:**
 
@@ -34,11 +34,11 @@ Progress: [███████████░░] 93% (14/15 total plans compl
 | 04 | 4 | 10 min | 2.5 min |
 | 05 | 2 | 132 min | 66 min |
 | 06 | 2 | 9 min | 4.5 min |
-| 06.1 | 1 | 2 min | 2 min |
+| 06.1 | 2 | 5 min | 2.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-02 (129min), 06-01 (6min), 06-02 (3min), 06.1-01 (2min)
-- Trend: Permission/rule fixes extremely fast (2min with comprehensive tests)
+- Last 5 plans: 06-01 (6min), 06-02 (3min), 06.1-01 (2min), 06.1-02 (3min)
+- Trend: Permission/rule fixes extremely fast (2-3min with comprehensive tests)
 
 *Updated after each plan completion*
 
@@ -87,6 +87,11 @@ Recent decisions affecting current work:
 | userId filter for applications | 06-02 | GET applications supports userId param to check if user already applied |
 - [Phase 06.1]: canOwnerOrAdminAccess now checks isAuthenticated(user) && isOwner instead of isAcceptedMentor && isOwner
 - [Phase 06.1]: Project creation permission changed from mentor-only to any authenticated user
+- [Phase 06.1-02]: Creator join endpoint is creator-only (not for general member join via applications)
+- [Phase 06.1-02]: Creator-members can leave but retain ownership permissions (lose Discord access only)
+- [Phase 06.1-02]: TeamRoster always shows creator separately, never as part of members list
+- [Phase 06.1-02]: Dual-role badge uses middot separator: 'Creator · Member' vs outline 'Creator'
+- [Phase 06.1-02]: Create Project button shown to all authenticated users (removed mentor-only restriction)
 
 ### Roadmap Evolution
 
@@ -152,14 +157,16 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 - Rate limiting on Discord API handled by existing fetchWithRateLimit, but volume testing needed
 - Project discovery/browsing page needed for users to find active projects (separate from creation flow)
 
-**Phase 6.1 Planning Complete (2026-02-11):**
+**Phase 6.1 Complete (2026-02-11):**
 - ✅ Research identified root cause: canCreateProject checks isAcceptedMentor() instead of isAuthenticated()
 - ✅ Secondary bug found: canOwnerOrAdminAccess requires mentor role, would block non-mentor creators
-- ✅ 2 plans created in 2 waves (permissions fix + join/leave endpoints + UI)
-- ✅ Plan verification passed after 1 revision iteration
-- ✅ All 7 user requirements covered
+- ✅ 2 plans executed in 2 waves (permissions fix + join/leave endpoints + UI)
+- ✅ Plan 1: Updated permission system (2 min, 3 files, 14 tests)
+- ✅ Plan 2: Creator join/leave endpoints and UI updates (3 min, 6 files, 2 endpoints)
+- ✅ All 7 user requirements satisfied
 - ✅ Public discovery filtering verified (ProjectCard shows creator only, not team members)
-- 🔜 Ready for execution: /gsd:execute-phase 06.1
+- ✅ Creator can join/leave while retaining ownership permissions
+- ✅ Any authenticated user can create projects (removed mentor-only restriction)
 
 **Phase 8 Readiness:**
 - Firebase Storage integration pattern for Markdown content needs architecture research (version conflicts with concurrent edits)
@@ -177,9 +184,9 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 
 ## Session Continuity
 
-Last session: 2026-02-11 11:28
-Stopped at: Completed 06.1-01-PLAN.md (Fix Project Creation Permissions)
-Resume file: None (ready to continue Phase 06.1 Plan 2)
+Last session: 2026-02-11 11:34
+Stopped at: Completed 06.1-02-PLAN.md (Creator Join/Leave and UI Updates) - Phase 06.1 Complete
+Resume file: None (Phase 06.1 complete, ready for next phase)
 
 ---
-*Updated: 2026-02-11 after completing 06.1-01-PLAN.md*
+*Updated: 2026-02-11 after completing 06.1-02-PLAN.md*
