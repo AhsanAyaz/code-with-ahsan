@@ -171,6 +171,7 @@ export interface ProjectApplication {
     photoURL: string;
     username?: string;
     discordUsername?: string;
+    skillLevel?: "beginner" | "intermediate" | "advanced";
   };
   message: string;
   status: ApplicationStatus;

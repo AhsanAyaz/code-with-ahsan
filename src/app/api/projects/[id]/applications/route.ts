@@ -119,6 +119,7 @@ export async function POST(
         photoURL: userData?.photoURL || "",
         username: userData?.username,
         discordUsername: userData?.discordUsername,
+        skillLevel: userData?.skillLevel || "beginner",
       },
       message,
       status: "pending",

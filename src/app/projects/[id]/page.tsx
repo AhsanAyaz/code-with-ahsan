@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import TeamRoster from "@/components/projects/TeamRoster";
 import ApplicationForm from "@/components/projects/ApplicationForm";
+import ContactInfo from "@/components/mentorship/ContactInfo";
 import Link from "next/link";
 import Image from "next/image";
 import ToastContainer, { ToastMessage, ToastType } from "@/components/ui/Toast";
@@ -622,11 +623,7 @@ export default function ProjectDetailPage() {
                           <div className="font-semibold">
                             {app.userProfile?.displayName}
                           </div>
-                          {app.userProfile?.discordUsername && (
-                            <div className="text-sm text-base-content/70">
-                              @{app.userProfile.discordUsername}
-                            </div>
-                          )}
+                          <ContactInfo discordUsername={app.userProfile?.discordUsername} />
                         </div>
                         {app.userProfile?.skillLevel && (
                           <span className={`badge ${difficultyColors[app.userProfile.skillLevel as ProjectDifficulty]}`}>
@@ -760,11 +757,7 @@ export default function ProjectDetailPage() {
                           <div className="font-medium">
                             {inv.userProfile?.displayName || "Invited User"}
                           </div>
-                          {inv.userProfile?.discordUsername && (
-                            <div className="text-sm text-base-content/60">
-                              @{inv.userProfile.discordUsername}
-                            </div>
-                          )}
+                          <ContactInfo discordUsername={inv.userProfile?.discordUsername} />
                         </div>
                       </div>
                       <span

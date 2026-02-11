@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Project, ProjectMember } from "@/types/mentorship";
+import ContactInfo from "@/components/mentorship/ContactInfo";
 
 interface TeamRosterProps {
   project: Project;
@@ -48,11 +49,7 @@ export default function TeamRoster({
             <div className="font-semibold">
               {project.creatorProfile?.displayName}
             </div>
-            {project.creatorProfile?.discordUsername && (
-              <div className="text-sm text-base-content/70">
-                @{project.creatorProfile.discordUsername}
-              </div>
-            )}
+            <ContactInfo discordUsername={project.creatorProfile?.discordUsername} />
           </div>
           {isCreatorAlsoMember ? (
             <span className="badge badge-primary">Creator &middot; Member</span>
@@ -80,11 +77,7 @@ export default function TeamRoster({
               <div className="font-semibold">
                 {member.userProfile?.displayName}
               </div>
-              {member.userProfile?.discordUsername && (
-                <div className="text-sm text-base-content/70">
-                  @{member.userProfile.discordUsername}
-                </div>
-              )}
+              <ContactInfo discordUsername={member.userProfile?.discordUsername} />
             </div>
             <span className="badge">Member</span>
             {isCreator && onRemoveMember && (

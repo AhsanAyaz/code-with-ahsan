@@ -179,6 +179,15 @@ export default function CreateProjectPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-8">
+      <Link
+        href="/projects/my"
+        className="btn btn-ghost btn-sm mb-4"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to Projects
+      </Link>
       <h1 className="text-3xl font-bold mb-2">Create New Project</h1>
       <p className="text-base-content/70 mb-6">
         Submit a project proposal for admin review. Once approved, a Discord
