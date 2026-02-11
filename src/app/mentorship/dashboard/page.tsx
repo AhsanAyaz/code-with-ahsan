@@ -388,7 +388,7 @@ export default function MentorshipDashboardPage() {
         </Link>
 
         <Link
-          href="/mentorship/settings"
+          href="/profile"
           className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer"
         >
           <div className="card-body">

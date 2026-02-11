@@ -9,11 +9,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/books</loc>
+    <loc>https://codewithahsan.dev/community</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/community</loc>
+    <loc>https://codewithahsan.dev/gear</loc>
   </url>
 
   <url>
@@ -21,7 +21,7 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/gear</loc>
+    <loc>https://codewithahsan.dev/books</loc>
   </url>
 
   <url>
@@ -33,11 +33,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/projects</loc>
+    <loc>https://codewithahsan.dev/rates</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/rates</loc>
+    <loc>https://codewithahsan.dev/projects</loc>
   </url>
 
   <url>
@@ -45,19 +45,7 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/admin</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/mentorship/goals</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/mentorship/dashboard</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/mentorship/mentors</loc>
   </url>
 
   <url>
@@ -65,7 +53,15 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
+    <loc>https://codewithahsan.dev/mentorship/goals</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/mentors</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/admin</loc>
   </url>
 
   <url>
@@ -73,19 +69,15 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/mentorship/requests</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/settings</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/projects/discover</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/projects/my</loc>
   </url>
 
   <url>
@@ -94,6 +86,14 @@
 
   <url>
     <loc>https://codewithahsan.dev/events/hackstack/2023</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/projects/my</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/profile</loc>
   </url>
 
   <url>

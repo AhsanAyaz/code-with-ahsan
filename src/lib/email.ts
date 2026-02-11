@@ -512,18 +512,18 @@ export async function sendDiscordUsernameReminderEmail(
     
     <h3>How to update your profile:</h3>
     <ol>
-      <li>Go to your <a href="${getSiteUrl()}/mentorship/settings">Mentorship Settings</a></li>
+      <li>Go to your <a href="${getSiteUrl()}/profile">Profile Settings</a></li>
       <li>Find the "Discord Username" field</li>
       <li>Enter your Discord username</li>
       <li>Click "Save"</li>
     </ol>
-    
+
     <div class="info-box">
       <p><strong>Why is this important?</strong></p>
       <p>We create a private Discord channel for each mentorship pair to facilitate easy communication. Without your Discord username, we can't add you to this channel.</p>
     </div>
-    
-    <a href="${getSiteUrl()}/mentorship/settings" class="button">Update Your Profile Now</a>
+
+    <a href="${getSiteUrl()}/profile" class="button">Update Your Profile Now</a>
     
     <p style="margin-top: 20px; color: #6b7280; font-size: 14px;">
       If you don't have a Discord account yet, you can create one for free at <a href="https://discord.com">discord.com</a>. 

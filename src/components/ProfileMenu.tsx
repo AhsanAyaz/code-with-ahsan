@@ -3,6 +3,7 @@ import React, { useContext } from "react";
 import { getAuth, User } from "firebase/auth";
 import { getApp } from "firebase/app";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { AuthContext } from "@/contexts/AuthContext";
 
 const ProfileMenu = () => {
@@ -89,6 +90,14 @@ const ProfileMenu = () => {
         tabIndex={0}
         className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
       >
+        <li>
+          <Link href="/profile" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
+            <svg className="w-5 h-5 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+            Profile
+          </Link>
+        </li>
         <li>
           <button
             onClick={() => {

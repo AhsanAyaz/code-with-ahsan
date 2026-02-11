@@ -97,7 +97,7 @@ async function sendInvalidDiscordSummaryToDiscord(
     sections.push(menteeSection);
   }
 
-  const footer = `\n---\n_These users should update their Discord username at https://codewithahsan.dev/mentorship/settings_\n_Discord invite: https://codewithahsan.dev/discord_`;
+  const footer = `\n---\n_These users should update their Discord username at https://codewithahsan.dev/profile_\n_Discord invite: https://codewithahsan.dev/discord_`;
 
   const fullMessage = header + sections.join("\n") + footer;
 
