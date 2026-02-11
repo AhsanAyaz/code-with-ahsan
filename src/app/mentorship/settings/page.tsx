@@ -18,6 +18,8 @@ export default function SettingsPage() {
   const { user, profile, loading, profileLoading, refreshProfile } =
     useMentorship();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [skillLevel, setSkillLevel] = useState<"beginner" | "intermediate" | "advanced">("beginner");
+  const [skillLevelLoading, setSkillLevelLoading] = useState(false);
 
 
   useEffect(() => {
@@ -31,6 +33,43 @@ export default function SettingsPage() {
       router.push("/mentorship/onboarding");
     }
   }, [loading, profileLoading, user, profile, router]);
+
+  // Initialize skill level from profile
+  useEffect(() => {
+    if (profile) {
+      setSkillLevel(profile.skillLevel || "beginner");
+    }
+  }, [profile]);
+
+  const handleSkillLevelChange = async (newSkillLevel: "beginner" | "intermediate" | "advanced") => {
+    if (!user) return;
+
+    setSkillLevelLoading(true);
+    try {
+      const response = await fetch("/api/mentorship/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: user.uid,
+          skillLevel: newSkillLevel,
+        }),
+      });
+
+      if (response.ok) {
+        setSkillLevel(newSkillLevel);
+        await refreshProfile();
+        toast.success("Skill level updated successfully!");
+      } else {
+        const error = await response.json();
+        toast.error("Failed to update skill level: " + error.error);
+      }
+    } catch (error) {
+      console.error("Error updating skill level:", error);
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setSkillLevelLoading(false);
+    }
+  };
 
   const handleSubmit = async (data: Record<string, unknown>) => {
     if (!user) return;
@@ -147,6 +186,46 @@ export default function SettingsPage() {
 
       {/* Success Message */}
 
+
+      {/* Skill Level Card */}
+      <div className="card bg-base-100 shadow-xl">
+        <div className="card-body">
+          <h3 className="card-title">💡 Skill Level</h3>
+          <p className="text-sm text-base-content/70">
+            Your skill level helps us match you with appropriate projects and learning opportunities.
+          </p>
+
+          <div className="divider"></div>
+
+          <div className="form-control max-w-xs">
+            <label className="label">
+              <span className="label-text font-semibold">Current Skill Level</span>
+            </label>
+            <div className="flex gap-2">
+              {(["beginner", "intermediate", "advanced"] as const).map((level) => (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() => handleSkillLevelChange(level)}
+                  disabled={skillLevelLoading}
+                  className={`btn ${
+                    skillLevel === level ? "btn-primary" : "btn-outline btn-ghost"
+                  } flex-1 capitalize`}
+                >
+                  {level}
+                </button>
+              ))}
+            </div>
+            <label className="label">
+              <span className="label-text-alt text-base-content/60">
+                {skillLevel === "beginner" && "Learning the fundamentals"}
+                {skillLevel === "intermediate" && "Building real-world projects"}
+                {skillLevel === "advanced" && "Expert-level experience"}
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
 
       {/* Form Card */}
       <div className="card bg-base-100 shadow-xl">

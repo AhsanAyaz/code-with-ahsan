@@ -8,10 +8,10 @@ updated: 2026-02-11T12:00:00Z
 
 ## Current Test
 
-number: 3
-name: Project Detail Page
+number: 6
+name: Skill Mismatch Warning
 expected: |
-  Click a project card. /projects/[id] loads showing: project title, status badge, difficulty badge, full description, tech stack badges, GitHub repo link (if set), and team roster section. Creator info displayed.
+  When a beginner-level user applies to an advanced project, a warning banner appears above the application form indicating the skill gap. It's advisory (non-blocking) — the user can still submit.
 awaiting: user response
 
 ## Tests
@@ -26,9 +26,16 @@ result: pass
 
 ### 3. Project Detail Page
 expected: Click a project card. /projects/[id] loads showing: project title, status badge, difficulty badge, full description, tech stack badges, GitHub repo link (if set), and team roster section. Creator info displayed.
-result: issue
-reported: "active badge should have a color (similar to other status badges). If there are no tech stack items, should show 'Tech stack not added' or similar message. Accepted invitations should be deleted from DB. Declined invitations should be kept to prevent spam re-invites."
-severity: major
+result: pass
+fixed: "Added status badge colors, empty tech stack message, and invitation deletion on accept (commit 951888b)"
+
+### 4. Team Roster with Discord Usernames
+expected: Team roster section shows creator first with "Creator" badge, then members with "Member" badge. Each person shows avatar, display name, and their Discord username (not the platform @username derived from email).
+result: pass
+
+### 5. Apply to Join Project
+expected: As a non-creator user on a project detail page, an "Apply to Join" section appears with a textarea for application message (required, 10-500 chars). Submit the application. On success, the form is replaced by the application status (e.g., "Your application is pending"). Submitting again returns 409 / "already applied".
+result: pass
 
 ### 4. Team Roster with Discord Usernames
 expected: Team roster section shows creator first with "Creator" badge, then members with "Member" badge. Each person shows avatar, display name, and their Discord username (not the platform @username derived from email).
@@ -40,7 +47,9 @@ result: [pending]
 
 ### 6. Skill Mismatch Warning
 expected: When a beginner-level user applies to an advanced project, a warning banner appears above the application form indicating the skill gap. It's advisory (non-blocking) — the user can still submit.
-result: [pending]
+result: issue
+reported: "Skill level is currently inferred from role (mentor=advanced, mentee=beginner) instead of being an explicit user profile field. Need to: 1) Add skillLevel field to MentorshipProfile with default 'beginner', 2) Add skill level selector to mentorship dashboard settings, 3) Update existing profiles to set default, 4) Use explicit skillLevel instead of role inference"
+severity: major
 
 ### 7. Creator Sees Pending Applications + Badge
 expected: As the project creator, visit /projects/my. Project cards show a badge like "N pending" for projects with pending applications. Click through to /projects/[id] — a "Pending Applications" section shows applicant info, their message, and Approve/Decline buttons.
@@ -73,18 +82,18 @@ result: [pending]
 ## Summary
 
 total: 13
-passed: 2
+passed: 5
 issues: 1
-pending: 10
+pending: 7
 skipped: 0
 
 ## Gaps
 
-- truth: "Project status badge (active/pending/complete/archived) should be color-coded like other badges in the system"
+- truth: "User skill level should be an explicit profile field (beginner/intermediate/advanced) selectable from dashboard settings, defaulting to beginner"
   status: failed
-  reason: "User reported: active badge should have a color (similar to other status badges). If there are no tech stack items, should show 'Tech stack not added' or similar message. Accepted invitations should be deleted from DB. Declined invitations should be kept to prevent spam re-invites."
+  reason: "User reported: Skill level is currently inferred from role (mentor=advanced, mentee=beginner) instead of being an explicit user profile field. Need to: 1) Add skillLevel field to MentorshipProfile with default 'beginner', 2) Add skill level selector to mentorship dashboard settings, 3) Update existing profiles to set default, 4) Use explicit skillLevel instead of role inference"
   severity: major
-  test: 3
+  test: 6
   artifacts: []
   missing: []
 

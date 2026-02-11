@@ -53,12 +53,6 @@ export default function ProjectDetailPage() {
   const isCreator = user && project?.creatorId === user.uid;
   const isMember = members.some((m) => m.userId === user?.uid);
 
-  const getSkillLevelFromRole = (role: MentorshipRole): ProjectDifficulty | undefined => {
-    if (role === "mentor") return "advanced";
-    if (role === "mentee") return "beginner";
-    return undefined;
-  };
-
   const difficultyColors: Record<ProjectDifficulty, string> = {
     beginner: "badge-success",
     intermediate: "badge-warning",
@@ -702,7 +696,7 @@ export default function ProjectDetailPage() {
             projectId={projectId}
             project={project}
             userId={user.uid}
-            userSkillLevel={getSkillLevelFromRole(profile?.role ?? null)}
+            userSkillLevel={profile?.skillLevel || "beginner"}
             onSuccess={fetchProjectData}
           />
         </div>

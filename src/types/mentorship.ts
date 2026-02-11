@@ -22,6 +22,8 @@ export interface MentorshipProfile {
   updatedAt: Date;
   // Approval status
   status?: "pending" | "accepted" | "declined" | "disabled";
+  // Skill level for project matching (defaults to "beginner")
+  skillLevel?: "beginner" | "intermediate" | "advanced";
   // Mentor-specific
   expertise?: string[];
   currentRole?: string;
