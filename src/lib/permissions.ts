@@ -3,7 +3,7 @@
  * Single source of truth for authorization logic across the application
  *
  * This module implements PERM-01 through PERM-08 requirements:
- * - PERM-01: Only accepted mentors can create projects
+ * - PERM-01: Any authenticated user can create projects
  * - PERM-02: Only accepted mentors can create roadmaps
  * - PERM-03: Only admins can approve projects and roadmaps
  * - PERM-04: Only project creator or admin can edit/manage projects
@@ -89,7 +89,7 @@ function canOwnerOrAdminAccess(
   resource: { creatorId: string }
 ): boolean {
   if (isAdminUser(user)) return true;
-  if (isAcceptedMentor(user) && isOwner(user, resource)) return true;
+  if (isAuthenticated(user) && isOwner(user, resource)) return true;
   return false;
 }
 
@@ -97,10 +97,10 @@ function canOwnerOrAdminAccess(
 
 /**
  * PERM-01: Can create projects
- * Only accepted mentors can create projects
+ * Any authenticated user can create projects
  */
 export function canCreateProject(user: PermissionUser | null): boolean {
-  return isAcceptedMentor(user);
+  return isAuthenticated(user);
 }
 
 /**
@@ -116,7 +116,7 @@ export function canApproveProject(
 
 /**
  * PERM-04: Can edit projects
- * Only project creator (if accepted mentor) or admin can edit
+ * Only project creator or admin can edit
  */
 export function canEditProject(
   user: PermissionUser | null,
@@ -127,7 +127,7 @@ export function canEditProject(
 
 /**
  * PERM-04: Can manage project members
- * Only project creator (if accepted mentor) or admin can manage members
+ * Only project creator or admin can manage members
  */
 export function canManageProjectMembers(
   user: PermissionUser | null,
@@ -172,7 +172,7 @@ export function canApproveRoadmap(
 
 /**
  * Can edit roadmaps
- * Only roadmap creator (if accepted mentor) or admin can edit
+ * Only roadmap creator or admin can edit
  */
 export function canEditRoadmap(
   user: PermissionUser | null,

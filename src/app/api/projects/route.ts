@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     const creatorData = creatorDoc.data();
 
-    // Check permission: only accepted mentors can create projects
+    // Check permission: only authenticated users can create projects
     const permissionUser: PermissionUser = {
       uid: creatorId,
       role: creatorData?.role || null,
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: "Permission denied",
-          message: "Only accepted mentors can create projects",
+          message: "Only authenticated users can create projects",
         },
         { status: 403 }
       );

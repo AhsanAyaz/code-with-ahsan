@@ -31,9 +31,9 @@ service cloud.firestore {
         isAdmin()
       );
 
-      // PERM-01: Only accepted mentors can create projects
+      // Any authenticated user can create projects
       // Must set own uid as creator, status must be "pending"
-      allow create: if isAcceptedMentor() &&
+      allow create: if isSignedIn() &&
                        request.resource.data.creatorId == request.auth.uid &&
                        request.resource.data.status == "pending";
 
