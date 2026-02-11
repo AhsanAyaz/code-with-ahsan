@@ -5,6 +5,7 @@ import { canCreateProject } from "@/lib/permissions";
 import { validateGitHubUrl } from "@/lib/validation/urls";
 import { verifyAuth } from "@/lib/auth";
 import type { PermissionUser } from "@/lib/permissions";
+import { sendProjectSubmissionNotification } from "@/lib/discord";
 
 export async function POST(request: NextRequest) {
   try {
@@ -125,6 +126,18 @@ export async function POST(request: NextRequest) {
     };
 
     const docRef = await db.collection("projects").add(projectData);
+
+    // Send Discord notification to moderators (non-blocking)
+    try {
+      await sendProjectSubmissionNotification(
+        title,
+        creatorData?.displayName || "Unknown",
+        docRef.id
+      );
+    } catch (error) {
+      console.error("Discord notification failed:", error);
+      // Non-blocking - project creation succeeds even if notification fails
+    }
 
     return NextResponse.json(
       { success: true, projectId: docRef.id },
