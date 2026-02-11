@@ -735,6 +735,10 @@ export const DISCORD_MENTEE_ROLE_ID = "1445734846730338386";
 // The #find-a-mentor channel ID for completion announcements
 const FIND_A_MENTOR_CHANNEL_ID = "1419645845258768385";
 
+// Project review notification channel and moderator role
+const PROJECT_REVIEW_CHANNEL_ID = "874565618458824715";
+const MODERATOR_ROLE_ID = "874774318779887656";
+
 /**
  * Assign a Discord role to a user
  * This is a fire-and-forget operation - failures are logged but do not throw
@@ -1264,6 +1268,61 @@ export async function removeMemberFromChannel(
     }
   } catch (error) {
     log.error(`[Discord] Error removing member from channel:`, error);
+    return false;
+  }
+}
+
+/**
+ * Send a notification to the project review channel when a new project is submitted
+ * Tags moderators so they can review and approve/decline the project
+ *
+ * @param projectTitle - Title of the submitted project
+ * @param creatorName - Display name of the project creator
+ * @param projectId - Unique ID of the project
+ * @returns true if notification sent successfully, false otherwise
+ */
+export async function sendProjectSubmissionNotification(
+  projectTitle: string,
+  creatorName: string,
+  projectId: string
+): Promise<boolean> {
+  log.debug(
+    `Sending project submission notification for "${projectTitle}" by ${creatorName}`
+  );
+
+  try {
+    const message =
+      `**New Project Submitted for Review**\n\n` +
+      `**Title:** ${projectTitle}\n` +
+      `**Submitted by:** ${creatorName}\n\n` +
+      `<@&${MODERATOR_ROLE_ID}> — Please review this project submission.`;
+
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/channels/${PROJECT_REVIEW_CHANNEL_ID}/messages`,
+      {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          content: message,
+          allowed_mentions: {
+            roles: [MODERATOR_ROLE_ID],
+          },
+        }),
+      }
+    );
+
+    if (response.ok) {
+      log.debug(`Project submission notification sent successfully`);
+      return true;
+    } else {
+      const errorText = await response.text();
+      log.error(
+        `[Discord] Failed to send project submission notification: ${response.status} - ${errorText}`
+      );
+      return false;
+    }
+  } catch (error) {
+    log.error("[Discord] Error sending project submission notification:", error);
     return false;
   }
 }
