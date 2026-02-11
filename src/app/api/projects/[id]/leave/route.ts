@@ -44,6 +44,8 @@ export async function POST(
       );
     }
 
+    const memberData = memberDoc.data();
+
     // Fetch member's profile for Discord username
     const memberProfileDoc = await db
       .collection("mentorship_profiles")
@@ -53,11 +55,14 @@ export async function POST(
 
     // Non-blocking Discord operations: message first, then remove
     if (projectData?.discordChannelId) {
+      // Resolve Discord username with fallback
+      const discordUsername = memberProfileData?.discordUsername || memberData?.userProfile?.discordUsername;
+
       // Look up Discord member for tagging
       let tag: string;
-      if (memberProfileData?.discordUsername) {
+      if (discordUsername) {
         try {
-          const discordMember = await lookupMemberByUsername(memberProfileData.discordUsername);
+          const discordMember = await lookupMemberByUsername(discordUsername);
           tag = discordMember ? `<@${discordMember.id}>` : `**${memberProfileData?.displayName || "A member"}**`;
         } catch {
           tag = `**${memberProfileData?.displayName || "A member"}**`;
@@ -76,12 +81,12 @@ export async function POST(
         console.error("Discord channel departure message failed:", channelMsgError);
       }
 
-      // Then remove from Discord channel
-      if (memberProfileData?.discordUsername) {
+      // Then remove from Discord channel (skip if user is the creator)
+      if (discordUsername && userId !== projectData?.creatorId) {
         try {
           await removeMemberFromChannel(
             projectData.discordChannelId,
-            memberProfileData.discordUsername
+            discordUsername
           );
         } catch (discordError) {
           console.error("Discord member removal failed:", discordError);

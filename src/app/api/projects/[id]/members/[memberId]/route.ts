@@ -97,11 +97,14 @@ export async function DELETE(
 
     // Non-blocking Discord operations: message first, then remove
     if (projectData?.discordChannelId) {
+      // Resolve Discord username with fallback
+      const discordUsername = memberProfileData?.discordUsername || memberData?.userProfile?.discordUsername;
+
       // Look up Discord member for tagging
       let tag: string;
-      if (memberProfileData?.discordUsername) {
+      if (discordUsername) {
         try {
-          const discordMember = await lookupMemberByUsername(memberProfileData.discordUsername);
+          const discordMember = await lookupMemberByUsername(discordUsername);
           tag = discordMember ? `<@${discordMember.id}>` : `**${memberData?.userProfile?.displayName || memberProfileData?.displayName || "A member"}**`;
         } catch {
           tag = `**${memberData?.userProfile?.displayName || memberProfileData?.displayName || "A member"}**`;
@@ -120,12 +123,12 @@ export async function DELETE(
         console.error("Discord channel removal message failed:", channelMsgError);
       }
 
-      // Remove from Discord channel
-      if (memberProfileData?.discordUsername) {
+      // Remove from Discord channel (skip if member is the creator)
+      if (discordUsername && memberUserId !== projectData?.creatorId) {
         try {
           await removeMemberFromChannel(
             projectData.discordChannelId,
-            memberProfileData.discordUsername
+            discordUsername
           );
         } catch (discordError) {
           console.error("Discord member removal failed:", discordError);
