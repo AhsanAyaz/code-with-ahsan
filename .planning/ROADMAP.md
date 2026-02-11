@@ -126,6 +126,16 @@ Plans:
 
 ---
 
+### Phase 06.1: Fix project creation permissions - allow any user to create, separate creator from team membership (INSERTED)
+
+**Goal:** Fix critical permission flaw: allow any authenticated user to create projects (not just mentors), separate creator ownership from team membership, and enable creator to optionally join/leave as a team member while retaining owner permissions.
+**Depends on:** Phase 6
+**Plans:** 2 plans
+
+Plans:
+- [ ] 06.1-01-PLAN.md — Fix permission logic, Firestore rules, and tests for any-user project creation
+- [ ] 06.1-02-PLAN.md — Creator join/leave endpoints and UI updates (dual-role badge, Join button)
+
 ### Phase 7: Projects - Demos & Templates
 **Goal**: Enable project showcase with demo submissions and provide reusable templates to accelerate project creation.
 
