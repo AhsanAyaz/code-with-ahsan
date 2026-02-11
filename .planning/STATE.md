@@ -181,12 +181,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 004 | Fix admin profile preview for declined mentors | 2026-02-01 | 6e6ffec | [004-fix-admin-profile-preview-for-declined-m](./quick/004-fix-admin-profile-preview-for-declined-m/) |
 | 005 | Fix search input state sync issue on admin dashboard | 2026-02-01 | 8e6b4b6 | [005-fix-search-input-state-sync-issue-on-adm](./quick/005-fix-search-input-state-sync-issue-on-adm/) |
 | 006 | Add pending application count badge to ProjectCard | 2026-02-10 | aa5165f | [006-add-pending-application-count-badge-to-p](./quick/6-add-pending-application-count-badge-to-p/) |
+| 007 | Fix two UI issues: (1) Discovery page should always show Create Project button (not just in empty state), add it to header next to title. (2) Team roster should display discordUsername instead of username for members. | 2026-02-11 | 180b857 | [007-fix-two-ui-issues-1-discovery-page-shoul](./quick/7-fix-two-ui-issues-1-discovery-page-shoul/) |
 
 ## Session Continuity
 
-Last session: 2026-02-11 11:34
-Stopped at: Completed 06.1-02-PLAN.md (Creator Join/Leave and UI Updates) - Phase 06.1 Complete
-Resume file: None (Phase 06.1 complete, ready for next phase)
+Last session: 2026-02-11 12:00
+Stopped at: Completed quick task 007 (Fix UI issues: Create Project button + discordUsername display)
+Resume file: None (Phase 06.1 verification pending)
 
 ---
 *Updated: 2026-02-11 after completing 06.1-02-PLAN.md*
