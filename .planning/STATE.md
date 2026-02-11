@@ -11,18 +11,18 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 Milestone: v2.0
 Phase: 07 of 10 (Projects - Demos & Templates)
-Plan: 3 of 3
-Status: Complete
-Last activity: 2026-02-11 — Completed 07-03-PLAN.md (Nav Link + Loading States + Remove Member Fix - 1 new task, 2 pre-completed)
+Plan: 4 of 6
+Status: In Progress
+Last activity: 2026-02-11 — Completed 07-04-PLAN.md (Project Templates - template-based scaffolding)
 
-Progress: [█████████████] 100% (18/18 total plans complete across current phases)
+Progress: [█████████████] 86% (19/22 total plans complete across current phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18 (v1.0: 5, v2.0: 13)
-- Average duration: ~21 min
-- Total execution time: ~6 hours 18 minutes
+- Total plans completed: 19 (v1.0: 5, v2.0: 14)
+- Average duration: ~20 min
+- Total execution time: ~6 hours 22 minutes
 
 **By Phase:**
 
@@ -35,13 +35,15 @@ Progress: [█████████████] 100% (18/18 total plans comp
 | 05 | 2 | 132 min | 66 min |
 | 06 | 2 | 9 min | 4.5 min |
 | 06.1 | 2 | 5 min | 2.5 min |
-| 07 | 3 | 4 min | 1.3 min |
+| 07 | 4 | 8 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 06.1-02 (3min), 07-01 (1min), 07-02 (2min), 07-03 (1min)
-- Trend: Pre-completed work from PR #141, minimal new implementation
+- Last 5 plans: 07-01 (1min), 07-02 (2min), 07-03 (1min), 07-04 (4min)
+- Trend: Mix of pre-completed work and new feature implementation
 
 *Updated after each plan completion*
+| Phase 07 P05 | 4 | 2 tasks | 3 files |
+| Phase 07 P04 | 4 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -95,6 +97,9 @@ Recent decisions affecting current work:
 - [Phase 06.1-02]: Create Project button shown to all authenticated users (removed mentor-only restriction)
 - [Phase 07-01]: Auth verification at route level (not middleware) for flexibility with public endpoints
 - [Phase 07-01]: Auth verification at route level (not middleware) for flexibility with public endpoints
+- [Phase 07-05]: Demo fields optional on project completion (demoUrl and demoDescription)
+- [Phase 07-05]: HTTPS-only validation for demo URLs (any HTTPS platform accepted)
+- [Phase 07-05]: 1000 character limit on demo descriptions
 
 ### Roadmap Evolution
 
@@ -198,9 +203,9 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 
 ## Session Continuity
 
-Last session: 2026-02-11 17:15
-Stopped at: Completed 07-03-PLAN.md (Nav Link + Loading States + Remove Member Fix)
+Last session: 2026-02-11 18:28
+Stopped at: Completed 07-04-PLAN.md (Project Templates)
 Resume file: None
 
 ---
-*Updated: 2026-02-11 after completing Phase 07 Plan 03*
+*Updated: 2026-02-11 after completing Phase 07 Plan 04*
