@@ -185,12 +185,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 008 | Improve project detail page UX: separate creator section, add share button, show X/Y team capacity | 2026-02-11 | 5bcfe62 | [008-improve-project-detail-page-ux-1-separat](./quick/8-improve-project-detail-page-ux-1-separat/) |
 | 009 | Show project invitations in My Projects page | 2026-02-11 | 850e962 | [009-show-project-invitations-in-my-projects-](./quick/9-show-project-invitations-in-my-projects-/) |
 | 010 | Auto-close Community dropdown when clicking menu items, add emojis to Projects/My Projects | 2026-02-11 | 41f7c94 | [010-auto-close-community-dropdown-when-click](./quick/10-auto-close-community-dropdown-when-click/) |
+| 011 | Move settings page from /mentorship/settings to /profile and add Profile link to ProfileMenu | 2026-02-11 | 803ac06 | [011-move-settings-to-profile-route-and-add-p](./quick/11-move-settings-to-profile-route-and-add-p/) |
 
 ## Session Continuity
 
-Last session: 2026-02-11 11:32
-Stopped at: Completed quick task 010 (Auto-close Community dropdown when click)
+Last session: 2026-02-11 13:10
+Stopped at: Completed quick task 011 (Move settings to /profile route)
 Resume file: None
 
 ---
-*Updated: 2026-02-11 after completing quick task 010*
+*Updated: 2026-02-11 after completing quick task 011*
