@@ -4,7 +4,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useMentorship, MentorshipProfile } from "@/contexts/MentorshipContext";
-import { Project } from "@/types/mentorship";
+import { Project, Roadmap } from "@/types/mentorship";
 import Link from "next/link";
 import { useDebouncedCallback } from "use-debounce";
 import { authFetch } from "@/lib/apiClient";
@@ -84,7 +84,7 @@ interface MentorshipSummary {
   completedMentorships: number;
 }
 
-type TabType = "overview" | "pending-mentors" | "all-mentors" | "all-mentees" | "projects";
+type TabType = "overview" | "pending-mentors" | "all-mentors" | "all-mentees" | "projects" | "roadmaps";
 
 const ADMIN_TOKEN_KEY = "mentorship_admin_token";
 
@@ -154,6 +154,13 @@ export default function AdminPage() {
   const [projectActionLoading, setProjectActionLoading] = useState<string | null>(null);
   const [declineProjectId, setDeclineProjectId] = useState<string | null>(null);
   const [declineReason, setDeclineReason] = useState("");
+
+  // Roadmap state (follows projects pattern)
+  const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
+  const [loadingRoadmaps, setLoadingRoadmaps] = useState(false);
+  const [roadmapActionLoading, setRoadmapActionLoading] = useState<string | null>(null);
+  const [feedbackRoadmapId, setFeedbackRoadmapId] = useState<string | null>(null);
+  const [feedbackText, setFeedbackText] = useState("");
 
   // Debounced search handler
   const debouncedSearch = useDebouncedCallback((value: string) => {
@@ -264,7 +271,7 @@ export default function AdminPage() {
   // Fetch profiles based on active tab
   useEffect(() => {
     const fetchProfiles = async () => {
-      if (activeTab === "overview" || activeTab === "projects") return;
+      if (activeTab === "overview" || activeTab === "projects" || activeTab === "roadmaps") return;
 
       setLoadingProfiles(true);
       try {
@@ -315,6 +322,30 @@ export default function AdminPage() {
 
     if (isAdminAuthenticated) {
       fetchProjects();
+    }
+  }, [isAdminAuthenticated, activeTab]);
+
+  // Fetch roadmaps when roadmaps tab is active
+  useEffect(() => {
+    const fetchRoadmaps = async () => {
+      if (activeTab !== "roadmaps") return;
+
+      setLoadingRoadmaps(true);
+      try {
+        const response = await fetch("/api/roadmaps?status=pending");
+        if (response.ok) {
+          const data = await response.json();
+          setRoadmaps(data.roadmaps || []);
+        }
+      } catch (error) {
+        console.error("Error fetching roadmaps:", error);
+      } finally {
+        setLoadingRoadmaps(false);
+      }
+    };
+
+    if (isAdminAuthenticated) {
+      fetchRoadmaps();
     }
   }, [isAdminAuthenticated, activeTab]);
 
@@ -680,6 +711,67 @@ export default function AdminPage() {
     }
   };
 
+  // Roadmap handlers
+  const handleApproveRoadmap = async (roadmapId: string) => {
+    if (!user) return;
+    setRoadmapActionLoading(roadmapId);
+    try {
+      const response = await authFetch(`/api/roadmaps/${roadmapId}`, {
+        method: "PUT",
+        body: JSON.stringify({ action: "approve" })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to approve roadmap");
+      }
+
+      toast.success("Roadmap approved and published!");
+      setRoadmaps(prev => prev.filter(r => r.id !== roadmapId));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to approve roadmap");
+    } finally {
+      setRoadmapActionLoading(null);
+    }
+  };
+
+  const handleRequestChangesRoadmap = (roadmapId: string) => {
+    setFeedbackRoadmapId(roadmapId);
+    setFeedbackText("");
+  };
+
+  const confirmRequestChanges = async () => {
+    if (!feedbackRoadmapId || !user) return;
+    if (feedbackText.trim().length < 10) {
+      toast.error("Feedback must be at least 10 characters");
+      return;
+    }
+    setRoadmapActionLoading(feedbackRoadmapId);
+    try {
+      const response = await authFetch(`/api/roadmaps/${feedbackRoadmapId}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          action: "request-changes",
+          feedback: feedbackText.trim()
+        })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to request changes");
+      }
+
+      toast.success("Changes requested. Mentor will be notified.");
+      setRoadmaps(prev => prev.filter(r => r.id !== feedbackRoadmapId));
+      setFeedbackRoadmapId(null);
+      setFeedbackText("");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to request changes");
+    } finally {
+      setRoadmapActionLoading(null);
+    }
+  };
+
   // Filter mentorship data by search query and filters
   const filteredMentorshipData = mentorshipData.filter((item) => {
     const profile = item.profile;
@@ -907,6 +999,13 @@ export default function AdminPage() {
           onClick={() => setActiveTab("projects")}
         >
           📦 Projects
+        </button>
+        <button
+          role="tab"
+          className={`tab ${activeTab === "roadmaps" ? "tab-active" : ""}`}
+          onClick={() => setActiveTab("roadmaps")}
+        >
+          🗺️ Roadmaps
         </button>
       </div>
 
@@ -2408,6 +2507,97 @@ export default function AdminPage() {
         </div>
       )}
 
+      {activeTab === "roadmaps" && (
+        <div className="space-y-4">
+          {loadingRoadmaps ? (
+            <div className="flex justify-center items-center py-12">
+              <span className="loading loading-spinner loading-lg"></span>
+            </div>
+          ) : roadmaps.length === 0 ? (
+            <div className="text-center py-12 text-base-content/60">
+              No pending roadmap submissions
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {roadmaps.map((roadmap) => (
+                <div key={roadmap.id} className="card bg-base-200 shadow-md">
+                  <div className="card-body">
+                    <h3 className="card-title">{roadmap.title}</h3>
+                    {roadmap.description && (
+                      <p className="text-sm text-base-content/80">
+                        {roadmap.description.length > 200
+                          ? `${roadmap.description.substring(0, 200)}...`
+                          : roadmap.description}
+                      </p>
+                    )}
+                    <div className="mt-2 space-y-2 text-sm">
+                      <div>
+                        <span className="font-semibold">Author:</span>{" "}
+                        {roadmap.creatorProfile?.displayName || "Unknown"}
+                      </div>
+                      <div>
+                        <span className="font-semibold">Domain:</span>{" "}
+                        <span className="badge badge-sm badge-outline">
+                          {roadmap.domain}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="font-semibold">Difficulty:</span>{" "}
+                        <span className={`badge badge-sm ${
+                          roadmap.difficulty === "beginner"
+                            ? "badge-success"
+                            : roadmap.difficulty === "intermediate"
+                            ? "badge-warning"
+                            : "badge-error"
+                        }`}>
+                          {roadmap.difficulty}
+                        </span>
+                      </div>
+                      {roadmap.estimatedHours && (
+                        <div>
+                          <span className="font-semibold">Estimated:</span>{" "}
+                          {roadmap.estimatedHours} hours
+                        </div>
+                      )}
+                      <div>
+                        <span className="font-semibold">Version:</span>{" "}
+                        {roadmap.version}
+                      </div>
+                      <div className="text-xs text-base-content/60">
+                        Submitted: {roadmap.createdAt ? format(new Date(roadmap.createdAt as unknown as string), "MMM d, yyyy") : "Unknown"}
+                      </div>
+                    </div>
+                    <div className="card-actions justify-end mt-4">
+                      <button
+                        className="btn btn-success btn-sm"
+                        onClick={() => handleApproveRoadmap(roadmap.id)}
+                        disabled={roadmapActionLoading === roadmap.id}
+                      >
+                        {roadmapActionLoading === roadmap.id ? (
+                          <>
+                            <span className="loading loading-spinner loading-xs"></span>
+                            Approving...
+                          </>
+                        ) : (
+                          "Approve"
+                        )}
+                      </button>
+                      <button
+                        className="btn btn-warning btn-sm"
+                        onClick={() => handleRequestChangesRoadmap(roadmap.id)}
+                        disabled={roadmapActionLoading === roadmap.id}
+                      >
+                        Request Changes
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Alerts Modal */}
       <dialog id="alerts-modal" className="modal">
         <div className="modal-box">
@@ -2831,6 +3021,53 @@ export default function AdminPage() {
           </form>
         </dialog>
       )}
+
+      {/* Roadmap Feedback Modal */}
+      <dialog className={`modal ${feedbackRoadmapId ? "modal-open" : ""}`}>
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Request Changes</h3>
+          <p className="py-2 text-sm text-base-content/70">
+            Provide feedback explaining what changes are needed before this roadmap can be approved.
+          </p>
+          <div className="form-control">
+            <textarea
+              className="textarea textarea-bordered w-full"
+              placeholder="Explain what changes are needed (minimum 10 characters)..."
+              value={feedbackText}
+              onChange={(e) => setFeedbackText(e.target.value)}
+              rows={4}
+            />
+            <label className="label">
+              <span className="label-text-alt">{feedbackText.length} characters (min 10)</span>
+            </label>
+          </div>
+          <div className="modal-action">
+            <button
+              className="btn btn-ghost"
+              onClick={() => { setFeedbackRoadmapId(null); setFeedbackText(""); }}
+            >
+              Cancel
+            </button>
+            <button
+              className="btn btn-warning"
+              onClick={confirmRequestChanges}
+              disabled={feedbackText.trim().length < 10 || roadmapActionLoading === feedbackRoadmapId}
+            >
+              {roadmapActionLoading === feedbackRoadmapId ? (
+                <>
+                  <span className="loading loading-spinner loading-xs"></span>
+                  Sending...
+                </>
+              ) : (
+                "Send Feedback"
+              )}
+            </button>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button onClick={() => { setFeedbackRoadmapId(null); setFeedbackText(""); }}>close</button>
+        </form>
+      </dialog>
     </div>
   );
 }
