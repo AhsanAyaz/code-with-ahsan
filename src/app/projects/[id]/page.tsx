@@ -46,6 +46,7 @@ export default function ProjectDetailPage() {
   const [decliningUserId, setDecliningUserId] = useState<string | null>(null);
   const [invitationLoading, setInvitationLoading] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [copied, setCopied] = useState(false);
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -79,6 +80,13 @@ export default function ProjectDetailPage() {
 
   const removeToast = (id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    showToast("Project URL copied to clipboard!", "success");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const showConfirm = (opts: {
@@ -469,21 +477,30 @@ export default function ProjectDetailPage() {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h1 className="text-3xl font-bold mb-2">{project.title}</h1>
-            <div className="flex items-center gap-2 mb-3">
-              {project.creatorProfile?.photoURL && (
-                <Image
-                  src={project.creatorProfile.photoURL}
-                  alt={project.creatorProfile.displayName}
-                  width={32}
-                  height={32}
-                  className="rounded-full"
-                />
-              )}
-              <span className="text-base-content/70">
-                Created by {project.creatorProfile?.displayName}
-              </span>
-            </div>
           </div>
+          <button onClick={handleShare} className="btn btn-ghost btn-sm gap-1">
+            {copied ? (
+              "Copied!"
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                  />
+                </svg>
+                Share
+              </>
+            )}
+          </button>
         </div>
 
         <div className="flex gap-2">
@@ -493,6 +510,30 @@ export default function ProjectDetailPage() {
           <span className={`badge badge-lg ${difficultyColors[project.difficulty]}`}>
             Difficulty: {project.difficulty}
           </span>
+        </div>
+      </div>
+
+      {/* Creator Section */}
+      <div>
+        <h2 className="text-xl font-semibold mb-2">Creator</h2>
+        <div className="bg-base-200 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            {project.creatorProfile?.photoURL && (
+              <Image
+                src={project.creatorProfile.photoURL}
+                alt={project.creatorProfile.displayName}
+                width={48}
+                height={48}
+                className="rounded-full"
+              />
+            )}
+            <div className="flex-1">
+              <div className="font-semibold">
+                {project.creatorProfile?.displayName}
+              </div>
+              <ContactInfo discordUsername={project.creatorProfile?.discordUsername} />
+            </div>
+          </div>
         </div>
       </div>
 
