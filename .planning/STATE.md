@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Milestone: v2.0
-Phase: 6 of 10 (Projects - Team Formation)
-Plan: 2 of 3
+Phase: 6.1 of 10 (Fix Project Creation Permissions)
+Plan: 1 of 2
 Status: In progress
-Last activity: 2026-02-02 — Completed 06-02-PLAN.md (Team Formation API Routes)
+Last activity: 2026-02-11 — Completed 06.1-01-PLAN.md (Fix Project Creation Permissions)
 
-Progress: [███████████░░] 93% (13/14 total plans complete across current phases)
+Progress: [███████████░░] 93% (14/15 total plans complete across current phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13 (v1.0: 5, v2.0: 8)
-- Average duration: ~28 min
-- Total execution time: ~6 hours 9 minutes
+- Total plans completed: 14 (v1.0: 5, v2.0: 9)
+- Average duration: ~25 min
+- Total execution time: ~6 hours 11 minutes
 
 **By Phase:**
 
@@ -34,10 +34,11 @@ Progress: [███████████░░] 93% (13/14 total plans compl
 | 04 | 4 | 10 min | 2.5 min |
 | 05 | 2 | 132 min | 66 min |
 | 06 | 2 | 9 min | 4.5 min |
+| 06.1 | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (3min), 05-02 (129min), 06-01 (6min), 06-02 (3min)
-- Trend: API route plans very fast (3min for 7 endpoints with batch writes)
+- Last 5 plans: 05-02 (129min), 06-01 (6min), 06-02 (3min), 06.1-01 (2min)
+- Trend: Permission/rule fixes extremely fast (2min with comprehensive tests)
 
 *Updated after each plan completion*
 
@@ -84,6 +85,15 @@ Recent decisions affecting current work:
 | Batch writes for atomicity | 06-02 | Approval/acceptance uses Firestore batch for application+member+project updates |
 | Discord DM on invitation | 06-02 | Invitations send Discord DM with project link for proactive notification |
 | userId filter for applications | 06-02 | GET applications supports userId param to check if user already applied |
+- [Phase 06.1]: canOwnerOrAdminAccess now checks isAuthenticated(user) && isOwner instead of isAcceptedMentor && isOwner
+- [Phase 06.1]: Project creation permission changed from mentor-only to any authenticated user
+
+### Roadmap Evolution
+
+- Phase 6.1 inserted after Phase 6: Fix project creation permissions - allow any user to create, separate creator from team membership (URGENT)
+  - Planning complete: 2026-02-11 (2 plans in 2 waves)
+  - Verification: PASSED after 1 revision iteration
+  - Ready for execution
 
 ### Pending Todos
 
@@ -142,6 +152,15 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 - Rate limiting on Discord API handled by existing fetchWithRateLimit, but volume testing needed
 - Project discovery/browsing page needed for users to find active projects (separate from creation flow)
 
+**Phase 6.1 Planning Complete (2026-02-11):**
+- ✅ Research identified root cause: canCreateProject checks isAcceptedMentor() instead of isAuthenticated()
+- ✅ Secondary bug found: canOwnerOrAdminAccess requires mentor role, would block non-mentor creators
+- ✅ 2 plans created in 2 waves (permissions fix + join/leave endpoints + UI)
+- ✅ Plan verification passed after 1 revision iteration
+- ✅ All 7 user requirements covered
+- ✅ Public discovery filtering verified (ProjectCard shows creator only, not team members)
+- 🔜 Ready for execution: /gsd:execute-phase 06.1
+
 **Phase 8 Readiness:**
 - Firebase Storage integration pattern for Markdown content needs architecture research (version conflicts with concurrent edits)
 
@@ -158,9 +177,9 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 
 ## Session Continuity
 
-Last session: 2026-02-10 22:00
-Stopped at: Completed quick-006 (Add pending application count badge)
-Resume file: None (ready to continue Phase 6 Plan 3)
+Last session: 2026-02-11 11:28
+Stopped at: Completed 06.1-01-PLAN.md (Fix Project Creation Permissions)
+Resume file: None (ready to continue Phase 06.1 Plan 2)
 
 ---
-*Updated: 2026-02-10 after completing quick-006*
+*Updated: 2026-02-11 after completing 06.1-01-PLAN.md*
