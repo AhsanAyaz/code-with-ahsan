@@ -4,19 +4,59 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import ProjectCard from "@/components/projects/ProjectCard";
-import { Project } from "@/types/mentorship";
+import { Project, ProjectInvitation, ProjectDifficulty } from "@/types/mentorship";
 import Link from "next/link";
+import { authFetch } from "@/lib/apiClient";
+import ToastContainer, { ToastMessage, ToastType } from "@/components/ui/Toast";
+import Image from "next/image";
 
 export const dynamic = "force-dynamic";
+
+interface InvitationWithProject extends ProjectInvitation {
+  project?: {
+    id: string;
+    title: string;
+    status: string;
+    difficulty: ProjectDifficulty;
+    techStack: string[];
+    creatorProfile?: {
+      displayName: string;
+      photoURL: string;
+      username?: string;
+    };
+    maxTeamSize: number;
+    memberCount: number;
+  } | null;
+}
 
 export default function MyProjectsPage() {
   const { user, loading: authLoading } = useMentorship();
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<"created" | "joined">("created");
+  const [activeTab, setActiveTab] = useState<"created" | "joined" | "invitations">("created");
   const [projects, setProjects] = useState<Project[]>([]);
+  const [invitations, setInvitations] = useState<InvitationWithProject[]>([]);
+  const [invitationCount, setInvitationCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [invitationsLoading, setInvitationsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  const difficultyColors: Record<ProjectDifficulty, string> = {
+    beginner: "badge-success",
+    intermediate: "badge-warning",
+    advanced: "badge-error",
+  };
+
+  const showToast = (message: string, type: ToastType) => {
+    const id = Date.now().toString();
+    setToasts((prev) => [...prev, { id, message, type }]);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -25,9 +65,35 @@ export default function MyProjectsPage() {
     }
   }, [authLoading, user, router]);
 
+  // Fetch invitation count on mount
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchInvitationCount = async () => {
+      try {
+        const response = await authFetch("/api/projects/invitations/my");
+        if (response.ok) {
+          const data = await response.json();
+          setInvitationCount(data.invitations?.length || 0);
+          setInvitations(data.invitations || []);
+        }
+      } catch (err) {
+        console.error("Error fetching invitation count:", err);
+      }
+    };
+
+    fetchInvitationCount();
+  }, [user]);
+
   // Fetch projects when tab changes or user loads
   useEffect(() => {
     if (!user) return;
+
+    if (activeTab === "invitations") {
+      // Use already-fetched invitations data
+      setInvitationsLoading(false);
+      return;
+    }
 
     const fetchProjects = async () => {
       try {
@@ -55,6 +121,68 @@ export default function MyProjectsPage() {
 
     fetchProjects();
   }, [user, activeTab]);
+
+  const handleAcceptInvitation = async (projectId: string, userId: string, invId: string) => {
+    setActionLoadingId(invId);
+    try {
+      const response = await authFetch(
+        `/api/projects/${projectId}/invitations/${userId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ action: "accept" }),
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to accept invitation");
+      }
+
+      // Remove invitation from local state
+      setInvitations((prev) => prev.filter((inv) => inv.id !== invId));
+      setInvitationCount((prev) => Math.max(0, prev - 1));
+      showToast("Invitation accepted! You've joined the project.", "success");
+    } catch (err) {
+      console.error("Error accepting invitation:", err);
+      showToast(
+        err instanceof Error ? err.message : "Failed to accept invitation",
+        "error"
+      );
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleDeclineInvitation = async (projectId: string, userId: string, invId: string) => {
+    setActionLoadingId(invId);
+    try {
+      const response = await authFetch(
+        `/api/projects/${projectId}/invitations/${userId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({ action: "decline" }),
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to decline invitation");
+      }
+
+      // Remove invitation from local state
+      setInvitations((prev) => prev.filter((inv) => inv.id !== invId));
+      setInvitationCount((prev) => Math.max(0, prev - 1));
+      showToast("Invitation declined.", "success");
+    } catch (err) {
+      console.error("Error declining invitation:", err);
+      showToast(
+        err instanceof Error ? err.message : "Failed to decline invitation",
+        "error"
+      );
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
 
   if (authLoading || !user) {
     return (
@@ -94,10 +222,127 @@ export default function MyProjectsPage() {
         >
           Joined
         </button>
+        <button
+          className={`tab ${activeTab === "invitations" ? "tab-active" : ""}`}
+          onClick={() => setActiveTab("invitations")}
+        >
+          Invitations
+          {invitationCount > 0 && (
+            <span className="badge badge-primary badge-sm ml-2">{invitationCount}</span>
+          )}
+        </button>
       </div>
 
       {/* Content */}
-      {loading ? (
+      {activeTab === "invitations" ? (
+        invitationsLoading ? (
+          <div className="flex justify-center py-12">
+            <span className="loading loading-spinner loading-lg"></span>
+          </div>
+        ) : invitations.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-lg text-base-content/70 mb-4">
+              No pending invitations
+            </p>
+            <Link href="/projects/discover" className="btn btn-primary">
+              Discover Projects
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {invitations.map((inv) => {
+              if (!inv.project) return null;
+              const project = inv.project;
+              return (
+                <div key={inv.id} className="card bg-base-100 shadow-xl">
+                  <div className="card-body">
+                    <h2 className="card-title">
+                      <Link
+                        href={`/projects/${inv.projectId}`}
+                        className="hover:text-primary"
+                      >
+                        {project.title}
+                      </Link>
+                    </h2>
+
+                    <div className="flex gap-2 flex-wrap mt-2">
+                      <span className={`badge ${difficultyColors[project.difficulty]}`}>
+                        {project.difficulty}
+                      </span>
+                    </div>
+
+                    {/* Tech Stack */}
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {project.techStack.slice(0, 4).map((tech) => (
+                        <span key={tech} className="badge badge-outline badge-sm">
+                          {tech}
+                        </span>
+                      ))}
+                      {project.techStack.length > 4 && (
+                        <span className="badge badge-outline badge-sm">
+                          +{project.techStack.length - 4}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Creator */}
+                    {project.creatorProfile && (
+                      <div className="flex items-center gap-2 mt-3">
+                        {project.creatorProfile.photoURL && (
+                          <div className="avatar">
+                            <div className="w-6 h-6 rounded-full">
+                              <Image
+                                src={project.creatorProfile.photoURL}
+                                alt={project.creatorProfile.displayName}
+                                width={24}
+                                height={24}
+                              />
+                            </div>
+                          </div>
+                        )}
+                        <span className="text-sm text-base-content/70">
+                          by {project.creatorProfile.displayName}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Team Capacity */}
+                    <div className="text-sm text-base-content/70 mt-2">
+                      Team: {project.memberCount || 0} / {project.maxTeamSize} members
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="card-actions justify-end mt-4">
+                      <button
+                        onClick={() => handleDeclineInvitation(inv.projectId, inv.userId, inv.id)}
+                        className="btn btn-ghost btn-sm"
+                        disabled={actionLoadingId === inv.id}
+                      >
+                        {actionLoadingId === inv.id ? (
+                          <span className="loading loading-spinner loading-xs"></span>
+                        ) : (
+                          "Decline"
+                        )}
+                      </button>
+                      <button
+                        onClick={() => handleAcceptInvitation(inv.projectId, inv.userId, inv.id)}
+                        className="btn btn-success btn-sm"
+                        disabled={actionLoadingId === inv.id}
+                      >
+                        {actionLoadingId === inv.id ? (
+                          <span className="loading loading-spinner loading-xs"></span>
+                        ) : (
+                          "Accept"
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )
+      ) : loading ? (
         <div className="flex justify-center py-12">
           <span className="loading loading-spinner loading-lg"></span>
         </div>
@@ -136,6 +381,8 @@ export default function MyProjectsPage() {
           ))}
         </div>
       )}
+
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }
