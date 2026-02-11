@@ -183,12 +183,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 006 | Add pending application count badge to ProjectCard | 2026-02-10 | aa5165f | [006-add-pending-application-count-badge-to-p](./quick/6-add-pending-application-count-badge-to-p/) |
 | 007 | Fix two UI issues: (1) Discovery page should always show Create Project button (not just in empty state), add it to header next to title. (2) Team roster should display discordUsername instead of username for members. | 2026-02-11 | 180b857 | [007-fix-two-ui-issues-1-discovery-page-shoul](./quick/7-fix-two-ui-issues-1-discovery-page-shoul/) |
 | 008 | Improve project detail page UX: separate creator section, add share button, show X/Y team capacity | 2026-02-11 | 5bcfe62 | [008-improve-project-detail-page-ux-1-separat](./quick/8-improve-project-detail-page-ux-1-separat/) |
+| 009 | Show project invitations in My Projects page | 2026-02-11 | 850e962 | [009-show-project-invitations-in-my-projects-](./quick/9-show-project-invitations-in-my-projects-/) |
 
 ## Session Continuity
 
-Last session: 2026-02-11 11:21
-Stopped at: Completed quick task 008 (Improve project detail page UX: separate creator section, add share button, show X/Y team capacity)
+Last session: 2026-02-11 11:28
+Stopped at: Completed quick task 009 (Show project invitations in My Projects page)
 Resume file: None
 
 ---
-*Updated: 2026-02-11 after completing 06.1-02-PLAN.md*
+*Updated: 2026-02-11 after completing quick task 009*
