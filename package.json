@@ -20,6 +20,7 @@
     "@google/genai": "^1.33.0",
     "@mailchimp/mailchimp_marketing": "^3.0.80",
     "@ngneat/falso": "^8.0.2",
+    "@uiw/react-md-editor": "^4.0.11",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "body-scroll-lock": "^4.0.0-beta.0",
