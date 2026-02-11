@@ -19,21 +19,15 @@ export default function TeamRoster({
   onRemoveMember,
   removingMemberId,
 }: TeamRosterProps) {
-  // Filter creator out of members array to prevent duplicate rendering
-  const nonCreatorMembers = members.filter(m => m.userId !== project.creatorId);
-
-  // Team members only (creator is shown separately in parent page)
-  const totalMembers = nonCreatorMembers.length;
-
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">
-        Team ({totalMembers} / {project.maxTeamSize} members)
+        Team ({members.length} / {project.maxTeamSize} members)
       </h2>
 
       <div className="space-y-3">
         {/* Members */}
-        {nonCreatorMembers.map((member) => (
+        {members.map((member) => (
           <div
             key={member.id}
             className="flex items-center gap-3 p-3 bg-base-200 rounded-lg"
@@ -53,8 +47,12 @@ export default function TeamRoster({
               </div>
               <ContactInfo discordUsername={member.userProfile?.discordUsername} />
             </div>
-            <span className="badge">Member</span>
-            {isCreator && onRemoveMember && (
+            {member.userId === project.creatorId ? (
+              <span className="badge badge-primary">Creator</span>
+            ) : (
+              <span className="badge">Member</span>
+            )}
+            {isCreator && onRemoveMember && member.userId !== project.creatorId && (
               <button
                 onClick={() => onRemoveMember(member.id)}
                 className="btn btn-ghost btn-sm btn-circle"
@@ -85,7 +83,7 @@ export default function TeamRoster({
         ))}
       </div>
 
-      {nonCreatorMembers.length === 0 && (
+      {members.length === 0 && (
         <div className="text-sm text-base-content/60 text-center py-4">
           No team members yet.
         </div>
