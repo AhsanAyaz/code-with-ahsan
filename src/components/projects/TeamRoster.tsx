@@ -25,7 +25,8 @@ export default function TeamRoster({
   // Filter creator out of members array to prevent duplicate rendering
   const nonCreatorMembers = members.filter(m => m.userId !== project.creatorId);
 
-  const totalMembers = nonCreatorMembers.length + 1; // +1 for creator (always shown)
+  // Only count creator if they're also a member (matches backend memberCount)
+  const totalMembers = isCreatorAlsoMember ? nonCreatorMembers.length + 1 : nonCreatorMembers.length;
 
   return (
     <div className="space-y-4">
