@@ -75,11 +75,8 @@ export async function PUT(
       // Use Firestore batch for atomicity
       const batch = db.batch();
 
-      // 1. Update invitation status to accepted
-      batch.update(invitationRef, {
-        status: "accepted",
-        acceptedAt: FieldValue.serverTimestamp(),
-      });
+      // 1. Delete invitation (accepted invitations are removed)
+      batch.delete(invitationRef);
 
       // 2. Create project_members document
       const memberId = `${projectId}_${userId}`;

@@ -65,6 +65,13 @@ export default function ProjectDetailPage() {
     advanced: "badge-error",
   };
 
+  const statusColors: Record<string, string> = {
+    pending: "badge-warning",
+    active: "badge-success",
+    complete: "badge-info",
+    archived: "badge-ghost",
+  };
+
   const showToast = (message: string, type: ToastType) => {
     const id = Date.now().toString();
     setToasts((prev) => [...prev, { id, message, type }]);
@@ -435,7 +442,9 @@ export default function ProjectDetailPage() {
         </div>
 
         <div className="flex gap-2">
-          <span className="badge badge-lg">{project.status}</span>
+          <span className={`badge badge-lg ${statusColors[project.status] || "badge-ghost"}`}>
+            {project.status}
+          </span>
           <span className={`badge badge-lg ${difficultyColors[project.difficulty]}`}>
             {project.difficulty}
           </span>
@@ -452,11 +461,15 @@ export default function ProjectDetailPage() {
       <div>
         <h2 className="text-xl font-semibold mb-2">Tech Stack</h2>
         <div className="flex flex-wrap gap-2">
-          {project.techStack.map((tech, index) => (
-            <span key={index} className="badge badge-lg badge-outline">
-              {tech}
-            </span>
-          ))}
+          {project.techStack && project.techStack.length > 0 ? (
+            project.techStack.map((tech, index) => (
+              <span key={index} className="badge badge-lg badge-outline">
+                {tech}
+              </span>
+            ))
+          ) : (
+            <span className="text-base-content/60 text-sm italic">Tech stack not added</span>
+          )}
         </div>
       </div>
 
