@@ -528,6 +528,7 @@ export default function ProjectDetailPage() {
         members={members}
         isCreator={!!isCreator}
         onRemoveMember={isCreator ? handleRemoveMember : undefined}
+        removingMemberId={removingMemberId}
       />
 
       {/* Leave Project Button */}

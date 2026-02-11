@@ -8,6 +8,7 @@ interface TeamRosterProps {
   members: ProjectMember[];
   isCreator: boolean;
   onRemoveMember?: (memberId: string) => void;
+  removingMemberId?: string | null;
 }
 
 export default function TeamRoster({
@@ -15,6 +16,7 @@ export default function TeamRoster({
   members,
   isCreator,
   onRemoveMember,
+  removingMemberId,
 }: TeamRosterProps) {
   const totalMembers = members.length + 1; // +1 for creator
 
@@ -80,21 +82,26 @@ export default function TeamRoster({
                 onClick={() => onRemoveMember(member.id)}
                 className="btn btn-ghost btn-sm btn-circle"
                 title="Remove member"
+                disabled={removingMemberId === member.id}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                {removingMemberId === member.id ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                )}
               </button>
             )}
           </div>
