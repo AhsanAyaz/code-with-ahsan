@@ -13,7 +13,7 @@ Milestone: v2.0
 Phase: 6.1 of 10 (Fix Project Creation Permissions)
 Plan: 2 of 2
 Status: Complete
-Last activity: 2026-02-11 — Completed quick task 015: Show creator in team roster when joined as member
+Last activity: 2026-02-11 — Completed quick task 016: Fix Discord access revocation for project members
 
 Progress: [████████████░] 100% (15/15 total plans complete across current phases)
 
@@ -191,12 +191,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 013 | Add visible chevron to profile avatar and darken dropdown backgrounds | 2026-02-11 | 6bdfe93 | [013-add-visible-chevron-to-profile-avatar-an](./quick/13-add-visible-chevron-to-profile-avatar-an/) |
 | 014 | Send Discord notification to moderators when new project is submitted | 2026-02-11 | a366056 | [014-when-a-new-project-is-submitted-for-revi](./quick/14-when-a-new-project-is-submitted-for-revi/) |
 | 015 | Show creator in team roster when joined as member | 2026-02-11 | b2a564f | [015-when-the-creator-joins-the-team-as-a-mem](./quick/15-when-the-creator-joins-the-team-as-a-mem/) |
+| 016 | Fix Discord access revocation for project members | 2026-02-11 | a96c872 | [016-when-the-creator-removed-a-member-the-me](./quick/16-when-the-creator-removed-a-member-the-me/) |
 
 ## Session Continuity
 
-Last session: 2026-02-11 16:56
-Stopped at: Completed quick task 015 (Show Creator in Team Roster When Joined as Member)
+Last session: 2026-02-11 17:01
+Stopped at: Completed quick task 016 (Fix Discord Access Revocation for Project Members)
 Resume file: None
 
 ---
-*Updated: 2026-02-11 after completing quick task 015*
+*Updated: 2026-02-11 after completing quick task 016*
