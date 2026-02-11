@@ -19,46 +19,19 @@ export default function TeamRoster({
   onRemoveMember,
   removingMemberId,
 }: TeamRosterProps) {
-  // Check if creator is also in the members array
-  const isCreatorAlsoMember = members.some(m => m.userId === project.creatorId);
-
   // Filter creator out of members array to prevent duplicate rendering
   const nonCreatorMembers = members.filter(m => m.userId !== project.creatorId);
 
-  // Only count creator if they're also a member (matches backend memberCount)
-  const totalMembers = isCreatorAlsoMember ? nonCreatorMembers.length + 1 : nonCreatorMembers.length;
+  // Team members only (creator is shown separately in parent page)
+  const totalMembers = nonCreatorMembers.length;
 
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">
-        Team ({totalMembers} member{totalMembers !== 1 ? "s" : ""})
+        Team ({totalMembers} / {project.maxTeamSize} members)
       </h2>
 
       <div className="space-y-3">
-        {/* Creator */}
-        <div className="flex items-center gap-3 p-3 bg-base-200 rounded-lg">
-          {project.creatorProfile?.photoURL && (
-            <Image
-              src={project.creatorProfile.photoURL}
-              alt={project.creatorProfile.displayName}
-              width={48}
-              height={48}
-              className="rounded-full"
-            />
-          )}
-          <div className="flex-1">
-            <div className="font-semibold">
-              {project.creatorProfile?.displayName}
-            </div>
-            <ContactInfo discordUsername={project.creatorProfile?.discordUsername} />
-          </div>
-          {isCreatorAlsoMember ? (
-            <span className="badge badge-primary">Creator &middot; Member</span>
-          ) : (
-            <span className="badge badge-primary badge-outline">Creator</span>
-          )}
-        </div>
-
         {/* Members */}
         {nonCreatorMembers.map((member) => (
           <div
@@ -114,7 +87,7 @@ export default function TeamRoster({
 
       {nonCreatorMembers.length === 0 && (
         <div className="text-sm text-base-content/60 text-center py-4">
-          No team members yet. Applications will appear here once approved.
+          No team members yet.
         </div>
       )}
     </div>
