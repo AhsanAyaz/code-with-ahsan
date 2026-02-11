@@ -186,12 +186,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 009 | Show project invitations in My Projects page | 2026-02-11 | 850e962 | [009-show-project-invitations-in-my-projects-](./quick/9-show-project-invitations-in-my-projects-/) |
 | 010 | Auto-close Community dropdown when clicking menu items, add emojis to Projects/My Projects | 2026-02-11 | 41f7c94 | [010-auto-close-community-dropdown-when-click](./quick/10-auto-close-community-dropdown-when-click/) |
 | 011 | Move settings page from /mentorship/settings to /profile and add Profile link to ProfileMenu | 2026-02-11 | 803ac06 | [011-move-settings-to-profile-route-and-add-p](./quick/11-move-settings-to-profile-route-and-add-p/) |
+| 012 | Improve ProfileMenu: move My Projects from Community dropdown, add chevron indicator, upgrade styling | 2026-02-11 | ea07ebb | [012-improve-profilemenu-add-my-projects-link](./quick/12-improve-profilemenu-add-my-projects-link/) |
 
 ## Session Continuity
 
-Last session: 2026-02-11 13:10
-Stopped at: Completed quick task 011 (Move settings to /profile route)
+Last session: 2026-02-11 13:27
+Stopped at: Completed quick task 012 (Improve ProfileMenu)
 Resume file: None
 
 ---
-*Updated: 2026-02-11 after completing quick task 011*
+*Updated: 2026-02-11 after completing quick task 012*
