@@ -55,6 +55,10 @@ export default function ProjectDetailPage() {
     confirmClass: string;
     onConfirm: () => void;
   } | null>(null);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [demoUrl, setDemoUrl] = useState("");
+  const [demoDescription, setDemoDescription] = useState("");
+  const [completeLoading, setCompleteLoading] = useState(false);
 
   const isCreator = user && project?.creatorId === user.uid;
   const isMember = members.some((m) => m.userId === user?.uid);
@@ -431,6 +435,41 @@ export default function ProjectDetailPage() {
     });
   };
 
+  const handleCompleteProject = () => {
+    setShowCompleteModal(true);
+  };
+
+  const submitCompletion = async () => {
+    setCompleteLoading(true);
+    try {
+      const response = await authFetch(`/api/projects/${projectId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "complete",
+          ...(demoUrl.trim() && { demoUrl: demoUrl.trim() }),
+          ...(demoDescription.trim() && { demoDescription: demoDescription.trim() }),
+        }),
+      });
+
+      if (response.ok) {
+        showToast("Project completed!", "success");
+        setShowCompleteModal(false);
+        setDemoUrl("");
+        setDemoDescription("");
+        fetchProjectData();
+      } else {
+        const data = await response.json();
+        showToast(data.error || data.message || "Failed to complete project", "error");
+      }
+    } catch (error) {
+      console.error("Error completing project:", error);
+      showToast("An error occurred", "error");
+    } finally {
+      setCompleteLoading(false);
+    }
+  };
+
   if (loading || authLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -590,6 +629,32 @@ export default function ProjectDetailPage() {
         </div>
       )}
 
+      {/* Project Demo */}
+      {project.status === "completed" && (project.demoUrl || project.demoDescription) && (
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Project Demo</h2>
+          <div className="card bg-base-200 shadow-md">
+            <div className="card-body">
+              {project.demoUrl && (
+                <div className="mb-2">
+                  <a
+                    href={project.demoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link link-primary font-medium"
+                  >
+                    View Demo
+                  </a>
+                </div>
+              )}
+              {project.demoDescription && (
+                <p className="text-base-content/80 whitespace-pre-wrap">{project.demoDescription}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Team Roster */}
       <TeamRoster
         project={project}
@@ -615,6 +680,18 @@ export default function ProjectDetailPage() {
             ) : (
               "Join Project"
             )}
+          </button>
+        </div>
+      )}
+
+      {/* Creator Actions: Complete Project Button */}
+      {isCreator && project.status === "active" && (
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={handleCompleteProject}
+            className="btn btn-success btn-sm"
+          >
+            Complete Project
           </button>
         </div>
       )}
@@ -934,6 +1011,74 @@ export default function ProjectDetailPage() {
           onConfirm={confirmModal.onConfirm}
           onCancel={() => setConfirmModal(null)}
         />
+      )}
+
+      {/* Complete Project Modal */}
+      {showCompleteModal && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Complete Project</h3>
+            <p className="py-2 text-base-content/70">
+              Mark this project as completed. You can optionally add a demo to showcase your work.
+            </p>
+
+            <div className="form-control mt-4">
+              <label className="label">
+                <span className="label-text font-semibold">Demo URL (optional)</span>
+              </label>
+              <input
+                type="url"
+                placeholder="https://youtube.com/watch?v=... or https://loom.com/share/..."
+                className="input input-bordered w-full"
+                value={demoUrl}
+                onChange={(e) => setDemoUrl(e.target.value)}
+                disabled={completeLoading}
+              />
+              <label className="label">
+                <span className="label-text-alt">YouTube, Loom, Vimeo, Google Drive, or any HTTPS URL</span>
+              </label>
+            </div>
+
+            <div className="form-control mt-2">
+              <label className="label">
+                <span className="label-text font-semibold">Demo Description (optional)</span>
+              </label>
+              <textarea
+                placeholder="Describe what your demo shows, key features, and outcomes..."
+                className="textarea textarea-bordered w-full h-24"
+                value={demoDescription}
+                onChange={(e) => setDemoDescription(e.target.value)}
+                disabled={completeLoading}
+                maxLength={1000}
+              />
+              <label className="label">
+                <span className="label-text-alt">{demoDescription.length}/1000 characters</span>
+              </label>
+            </div>
+
+            <div className="modal-action">
+              <button
+                onClick={() => setShowCompleteModal(false)}
+                className="btn btn-ghost"
+                disabled={completeLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitCompletion}
+                className="btn btn-success"
+                disabled={completeLoading}
+              >
+                {completeLoading ? (
+                  <><span className="loading loading-spinner loading-sm"></span> Completing...</>
+                ) : (
+                  "Complete Project"
+                )}
+              </button>
+            </div>
+          </div>
+          <div className="modal-backdrop" onClick={() => !completeLoading && setShowCompleteModal(false)}></div>
+        </div>
       )}
     </div>
   );
