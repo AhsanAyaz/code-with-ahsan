@@ -1243,7 +1243,10 @@ export async function removeMemberFromChannel(
     // Look up member by username
     const member = await lookupMemberByUsername(discordUsername);
     if (!member) {
-      log.error(`[Discord] Cannot remove member - user not found: ${discordUsername}`);
+      log.warn(
+        `[Discord] Cannot remove member - user not found in guild`,
+        { channelId, discordUsername }
+      );
       return false;
     }
 
@@ -1259,15 +1262,26 @@ export async function removeMemberFromChannel(
     if (response.status === 204) {
       log.debug(`Successfully removed ${discordUsername} from channel ${channelId}`);
       return true;
+    } else if (response.status === 404) {
+      // Permission overwrite didn't exist - desired state is achieved
+      log.warn(
+        `[Discord] Permission overwrite not found (404) - user may not have had channel access`,
+        { channelId, discordUsername }
+      );
+      return true;
     } else {
       const errorText = await response.text();
       log.error(
-        `[Discord] Failed to remove member from channel: ${response.status} - ${errorText}`
+        `[Discord] Failed to remove member from channel: ${response.status} - ${errorText}`,
+        { channelId, discordUsername }
       );
       return false;
     }
   } catch (error) {
-    log.error(`[Discord] Error removing member from channel:`, error);
+    log.error(
+      `[Discord] Error removing member from channel`,
+      { channelId, discordUsername, error }
+    );
     return false;
   }
 }
