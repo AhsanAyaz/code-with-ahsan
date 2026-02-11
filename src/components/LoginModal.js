@@ -21,7 +21,7 @@ export default function LoginModal({ show }) {
 
   return (
     <div
-      className="fixed top-0 bottom-0 left-0 right-0 mx-auto sm:px-6 lg:px-8 w-full bg-slate-900/50 z-10"
+      className="fixed top-0 bottom-0 left-0 right-0 mx-auto sm:px-6 lg:px-8 w-full bg-slate-900/50 z-[9999]"
       role="article"
       onClick={() => {
         setShowLoginPopup(false)
