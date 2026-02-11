@@ -116,7 +116,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                 </svg>
               </button>
               {communityOpen && (
-                <ul className="absolute top-full left-0 z-[100] menu p-2 shadow-lg bg-base-100 rounded-box w-52">
+                <ul className="absolute top-full left-0 z-[100] menu p-2 shadow-lg bg-base-300 rounded-box w-52">
                   {COMMUNITY_LINKS.map((item) => (
                     <li key={item.title}>
                       <Link

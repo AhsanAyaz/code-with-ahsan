@@ -86,7 +86,7 @@ const ProfileMenu = () => {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        className="flex items-center gap-1 btn btn-ghost btn-circle"
+        className="flex items-center gap-1.5 btn btn-ghost rounded-full px-2"
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="avatar">
@@ -98,7 +98,7 @@ const ProfileMenu = () => {
           </div>
         </div>
         <svg
-          className="w-4 h-4 opacity-60"
+          className="w-3.5 h-3.5 opacity-70"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -112,7 +112,7 @@ const ProfileMenu = () => {
         </svg>
       </button>
       {isOpen && (
-        <ul className="absolute top-full right-0 z-[100] menu p-2 shadow-lg bg-base-100 rounded-box w-52 mt-2">
+        <ul className="absolute top-full right-0 z-[100] menu p-2 shadow-lg bg-base-300 rounded-box w-52 mt-2">
           <li>
             <Link href="/profile" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
               <svg className="w-5 h-5 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
