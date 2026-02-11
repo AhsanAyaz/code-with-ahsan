@@ -8,10 +8,10 @@ updated: 2026-02-11T12:00:00Z
 
 ## Current Test
 
-number: 6
-name: Skill Mismatch Warning
+number: 7
+name: Creator Sees Pending Applications + Badge
 expected: |
-  When a beginner-level user applies to an advanced project, a warning banner appears above the application form indicating the skill gap. It's advisory (non-blocking) — the user can still submit.
+  As the project creator, visit /projects/my. Project cards show a badge like "N pending" for projects with pending applications. Click through to /projects/[id] — a "Pending Applications" section shows applicant info, their message, and Approve/Decline buttons.
 awaiting: user response
 
 ## Tests
@@ -47,9 +47,8 @@ result: [pending]
 
 ### 6. Skill Mismatch Warning
 expected: When a beginner-level user applies to an advanced project, a warning banner appears above the application form indicating the skill gap. It's advisory (non-blocking) — the user can still submit.
-result: issue
-reported: "Skill level is currently inferred from role (mentor=advanced, mentee=beginner) instead of being an explicit user profile field. Need to: 1) Add skillLevel field to MentorshipProfile with default 'beginner', 2) Add skill level selector to mentorship dashboard settings, 3) Update existing profiles to set default, 4) Use explicit skillLevel instead of role inference"
-severity: major
+result: pass
+fixed: "Added explicit skillLevel field, settings UI, and migrated to use explicit level instead of role inference (commit 07c2cfa). Migration script created to update existing profiles."
 
 ### 7. Creator Sees Pending Applications + Badge
 expected: As the project creator, visit /projects/my. Project cards show a badge like "N pending" for projects with pending applications. Click through to /projects/[id] — a "Pending Applications" section shows applicant info, their message, and Approve/Decline buttons.
@@ -82,20 +81,14 @@ result: [pending]
 ## Summary
 
 total: 13
-passed: 5
-issues: 1
+passed: 6
+issues: 0
 pending: 7
 skipped: 0
 
 ## Gaps
 
-- truth: "User skill level should be an explicit profile field (beginner/intermediate/advanced) selectable from dashboard settings, defaulting to beginner"
-  status: failed
-  reason: "User reported: Skill level is currently inferred from role (mentor=advanced, mentee=beginner) instead of being an explicit user profile field. Need to: 1) Add skillLevel field to MentorshipProfile with default 'beginner', 2) Add skill level selector to mentorship dashboard settings, 3) Update existing profiles to set default, 4) Use explicit skillLevel instead of role inference"
-  severity: major
-  test: 6
-  artifacts: []
-  missing: []
+[all issues fixed during testing]
 
 ## Future Enhancements
 

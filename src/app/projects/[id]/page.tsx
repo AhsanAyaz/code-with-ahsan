@@ -40,6 +40,9 @@ export default function ProjectDetailPage() {
   const [declineFeedback, setDeclineFeedback] = useState<Record<string, string>>({});
   const [leaveLoading, setLeaveLoading] = useState(false);
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
+  const [approvingUserId, setApprovingUserId] = useState<string | null>(null);
+  const [decliningUserId, setDecliningUserId] = useState<string | null>(null);
+  const [invitationLoading, setInvitationLoading] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -174,6 +177,7 @@ export default function ProjectDetailPage() {
   }, [projectId, user, authLoading]);
 
   const handleApproveApplication = async (userId: string) => {
+    setApprovingUserId(userId);
     try {
       const response = await authFetch(
         `/api/projects/${projectId}/applications/${userId}`,
@@ -194,11 +198,14 @@ export default function ProjectDetailPage() {
     } catch (error) {
       console.error("Error approving application:", error);
       showToast("An error occurred", "error");
+    } finally {
+      setApprovingUserId(null);
     }
   };
 
   const handleDeclineApplication = async (userId: string) => {
     const feedback = declineFeedback[userId];
+    setDecliningUserId(userId);
     try {
       const response = await authFetch(
         `/api/projects/${projectId}/applications/${userId}`,
@@ -224,6 +231,8 @@ export default function ProjectDetailPage() {
     } catch (error) {
       console.error("Error declining application:", error);
       showToast("An error occurred", "error");
+    } finally {
+      setDecliningUserId(null);
     }
   };
 
@@ -263,6 +272,7 @@ export default function ProjectDetailPage() {
   const handleAcceptInvitation = async () => {
     if (!userInvitation) return;
 
+    setInvitationLoading(true);
     try {
       const response = await authFetch(
         `/api/projects/${projectId}/invitations/${user?.uid}`,
@@ -283,12 +293,15 @@ export default function ProjectDetailPage() {
     } catch (error) {
       console.error("Error accepting invitation:", error);
       showToast("An error occurred", "error");
+    } finally {
+      setInvitationLoading(false);
     }
   };
 
   const handleDeclineInvitation = async () => {
     if (!userInvitation) return;
 
+    setInvitationLoading(true);
     try {
       const response = await authFetch(
         `/api/projects/${projectId}/invitations/${user?.uid}`,
@@ -309,6 +322,8 @@ export default function ProjectDetailPage() {
     } catch (error) {
       console.error("Error declining invitation:", error);
       showToast("An error occurred", "error");
+    } finally {
+      setInvitationLoading(false);
     }
   };
 
@@ -413,6 +428,11 @@ export default function ProjectDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-8 space-y-8">
+      {/* Back button */}
+      <Link href="/projects/discover" className="btn btn-ghost btn-sm mb-4">
+        ← Back to Projects
+      </Link>
+
       {/* Header */}
       <div className="space-y-4">
         <div className="flex items-start justify-between">
@@ -563,8 +583,16 @@ export default function ProjectDetailPage() {
                         <button
                           onClick={() => handleApproveApplication(app.userId)}
                           className="btn btn-success btn-sm"
+                          disabled={approvingUserId === app.userId || decliningUserId === app.userId}
                         >
-                          Approve
+                          {approvingUserId === app.userId ? (
+                            <>
+                              <span className="loading loading-spinner loading-xs"></span>
+                              Approving...
+                            </>
+                          ) : (
+                            "Approve"
+                          )}
                         </button>
                         <button
                           onClick={() => {
@@ -576,6 +604,7 @@ export default function ProjectDetailPage() {
                             }
                           }}
                           className="btn btn-error btn-sm"
+                          disabled={approvingUserId === app.userId || decliningUserId === app.userId}
                         >
                           Decline
                         </button>
@@ -596,8 +625,16 @@ export default function ProjectDetailPage() {
                           <button
                             onClick={() => handleDeclineApplication(app.userId)}
                             className="btn btn-error btn-sm"
+                            disabled={decliningUserId === app.userId}
                           >
-                            Confirm Decline
+                            {decliningUserId === app.userId ? (
+                              <>
+                                <span className="loading loading-spinner loading-xs"></span>
+                                Declining...
+                              </>
+                            ) : (
+                              "Confirm Decline"
+                            )}
                           </button>
                         </div>
                       )}
@@ -745,12 +782,21 @@ export default function ProjectDetailPage() {
               <button
                 onClick={handleAcceptInvitation}
                 className="btn btn-success"
+                disabled={invitationLoading}
               >
-                Accept Invitation
+                {invitationLoading ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Processing...
+                  </>
+                ) : (
+                  "Accept Invitation"
+                )}
               </button>
               <button
                 onClick={handleDeclineInvitation}
                 className="btn btn-ghost"
+                disabled={invitationLoading}
               >
                 Decline
               </button>
