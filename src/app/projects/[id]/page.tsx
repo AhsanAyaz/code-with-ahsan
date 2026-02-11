@@ -622,9 +622,9 @@ export default function ProjectDetailPage() {
                           <div className="font-semibold">
                             {app.userProfile?.displayName}
                           </div>
-                          {app.userProfile?.username && (
+                          {app.userProfile?.discordUsername && (
                             <div className="text-sm text-base-content/70">
-                              @{app.userProfile.username}
+                              @{app.userProfile.discordUsername}
                             </div>
                           )}
                         </div>
