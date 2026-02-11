@@ -65,7 +65,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { action, declineReason } = body;
+    const { action, declineReason, demoUrl, demoDescription } = body;
 
     // Fetch project document
     const projectRef = db.collection("projects").doc(id);
@@ -196,12 +196,51 @@ export async function PUT(
         );
       }
 
+      // Validate demo URL if provided
+      if (demoUrl) {
+        try {
+          const url = new URL(demoUrl);
+          if (url.protocol !== "https:") {
+            return NextResponse.json(
+              {
+                error: "Invalid demo URL",
+                message: "Demo URL must use HTTPS protocol",
+              },
+              { status: 400 }
+            );
+          }
+        } catch (error) {
+          return NextResponse.json(
+            {
+              error: "Invalid demo URL",
+              message: "Please provide a valid URL",
+            },
+            { status: 400 }
+          );
+        }
+      }
+
+      // Validate demo description if provided
+      if (demoDescription && typeof demoDescription === "string") {
+        if (demoDescription.length > 1000) {
+          return NextResponse.json(
+            {
+              error: "Invalid demo description",
+              message: "Demo description must be 1000 characters or less",
+            },
+            { status: 400 }
+          );
+        }
+      }
+
       // Update project status to completed
       await projectRef.update({
         status: "completed",
         completedAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
         lastActivityAt: FieldValue.serverTimestamp(),
+        ...(demoUrl && { demoUrl }),
+        ...(demoDescription && { demoDescription }),
       });
 
       // Archive Discord channel if it exists
