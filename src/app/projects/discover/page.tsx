@@ -140,11 +140,18 @@ function DiscoverProjectsContent() {
 
   return (
     <div className="max-w-6xl mx-auto p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Discover Projects</h1>
-        <p className="text-base-content/70">
-          Find active projects to join and collaborate with mentors and peers
-        </p>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Discover Projects</h1>
+          <p className="text-base-content/70">
+            Find active projects to join and collaborate with mentors and peers
+          </p>
+        </div>
+        {profile && (
+          <Link href="/projects/new" className="btn btn-primary">
+            Create a Project
+          </Link>
+        )}
       </div>
 
       <ProjectFilters
@@ -159,14 +166,9 @@ function DiscoverProjectsContent() {
 
       {filteredProjects.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-lg text-base-content/70 mb-4">
+          <p className="text-lg text-base-content/70">
             No active projects found
           </p>
-          {profile && (
-            <Link href="/projects/new" className="btn btn-primary">
-              Create a Project
-            </Link>
-          )}
         </div>
       ) : (
         <>
