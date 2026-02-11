@@ -66,11 +66,18 @@ export default function MyProjectsPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">My Projects</h1>
-        <p className="text-base-content/70">
-          View projects you&apos;ve created or joined
-        </p>
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">My Projects</h1>
+          <p className="text-base-content/70">
+            View projects you&apos;ve created or joined
+          </p>
+        </div>
+        {activeTab === "created" && (
+          <Link href="/projects/new" className="btn btn-primary">
+            Create Project
+          </Link>
+        )}
       </div>
 
       {/* Tabs */}

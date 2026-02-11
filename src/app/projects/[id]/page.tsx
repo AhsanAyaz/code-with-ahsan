@@ -39,6 +39,7 @@ export default function ProjectDetailPage() {
   const [inviteLoading, setInviteLoading] = useState(false);
   const [declineFeedback, setDeclineFeedback] = useState<Record<string, string>>({});
   const [leaveLoading, setLeaveLoading] = useState(false);
+  const [joinLoading, setJoinLoading] = useState(false);
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
   const [approvingUserId, setApprovingUserId] = useState<string | null>(null);
   const [decliningUserId, setDecliningUserId] = useState<string | null>(null);
@@ -55,6 +56,7 @@ export default function ProjectDetailPage() {
 
   const isCreator = user && project?.creatorId === user.uid;
   const isMember = members.some((m) => m.userId === user?.uid);
+  const isCreatorMember = isCreator && isMember;
 
   const difficultyColors: Record<ProjectDifficulty, string> = {
     beginner: "badge-success",
@@ -331,10 +333,34 @@ export default function ProjectDetailPage() {
     }
   };
 
+  const handleJoinProject = async () => {
+    setJoinLoading(true);
+    try {
+      const response = await authFetch(`/api/projects/${projectId}/join`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        fetchProjectData();
+        showToast("You've joined the project as a team member!", "success");
+      } else {
+        const data = await response.json();
+        showToast(data.error || "Failed to join project", "error");
+      }
+    } catch (error) {
+      console.error("Error joining project:", error);
+      showToast("An error occurred", "error");
+    } finally {
+      setJoinLoading(false);
+    }
+  };
+
   const handleLeaveProject = () => {
     showConfirm({
       title: "Leave Project",
-      message: "Are you sure you want to leave this project?",
+      message: isCreator
+        ? "Are you sure you want to leave as a team member? You'll retain creator permissions but lose Discord channel access."
+        : "Are you sure you want to leave this project?",
       confirmLabel: "Leave",
       confirmClass: "btn-error",
       onConfirm: async () => {
@@ -531,8 +557,28 @@ export default function ProjectDetailPage() {
         removingMemberId={removingMemberId}
       />
 
+      {/* Join Project Button — for creator who hasn't joined */}
+      {isCreator && !isMember && project.status === "active" && (
+        <div className="flex justify-end">
+          <button
+            onClick={handleJoinProject}
+            className="btn btn-primary btn-sm"
+            disabled={joinLoading}
+          >
+            {joinLoading ? (
+              <>
+                <span className="loading loading-spinner loading-sm"></span>
+                Joining...
+              </>
+            ) : (
+              "Join Project"
+            )}
+          </button>
+        </div>
+      )}
+
       {/* Leave Project Button */}
-      {isMember && !isCreator && (
+      {isMember && (
         <div className="flex justify-end">
           <button
             onClick={handleLeaveProject}

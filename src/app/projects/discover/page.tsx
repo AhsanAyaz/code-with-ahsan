@@ -162,7 +162,7 @@ function DiscoverProjectsContent() {
           <p className="text-lg text-base-content/70 mb-4">
             No active projects found
           </p>
-          {profile?.role === "mentor" && profile?.status === "accepted" && (
+          {profile && (
             <Link href="/projects/new" className="btn btn-primary">
               Create a Project
             </Link>

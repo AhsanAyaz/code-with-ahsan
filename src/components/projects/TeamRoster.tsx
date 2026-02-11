@@ -18,7 +18,13 @@ export default function TeamRoster({
   onRemoveMember,
   removingMemberId,
 }: TeamRosterProps) {
-  const totalMembers = members.length + 1; // +1 for creator
+  // Check if creator is also in the members array
+  const isCreatorAlsoMember = members.some(m => m.userId === project.creatorId);
+
+  // Filter creator out of members array to prevent duplicate rendering
+  const nonCreatorMembers = members.filter(m => m.userId !== project.creatorId);
+
+  const totalMembers = nonCreatorMembers.length + 1; // +1 for creator (always shown)
 
   return (
     <div className="space-y-4">
@@ -48,11 +54,15 @@ export default function TeamRoster({
               </div>
             )}
           </div>
-          <span className="badge badge-primary">Creator</span>
+          {isCreatorAlsoMember ? (
+            <span className="badge badge-primary">Creator &middot; Member</span>
+          ) : (
+            <span className="badge badge-primary badge-outline">Creator</span>
+          )}
         </div>
 
         {/* Members */}
-        {members.map((member) => (
+        {nonCreatorMembers.map((member) => (
           <div
             key={member.id}
             className="flex items-center gap-3 p-3 bg-base-200 rounded-lg"
@@ -108,7 +118,7 @@ export default function TeamRoster({
         ))}
       </div>
 
-      {members.length === 0 && (
+      {nonCreatorMembers.length === 0 && (
         <div className="text-sm text-base-content/60 text-center py-4">
           No team members yet. Applications will appear here once approved.
         </div>
