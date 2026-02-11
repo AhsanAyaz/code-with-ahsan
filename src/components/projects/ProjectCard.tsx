@@ -55,7 +55,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
           <div className="flex items-center gap-2 mb-3">
             <span className={`badge badge-sm ${difficultyColors[project.difficulty]}`}>
-              {project.difficulty}
+              Difficulty: {project.difficulty}
             </span>
           </div>
 

@@ -461,10 +461,10 @@ export default function ProjectDetailPage() {
 
         <div className="flex gap-2">
           <span className={`badge badge-lg ${statusColors[project.status] || "badge-ghost"}`}>
-            {project.status}
+            Status: {project.status}
           </span>
           <span className={`badge badge-lg ${difficultyColors[project.difficulty]}`}>
-            {project.difficulty}
+            Difficulty: {project.difficulty}
           </span>
         </div>
       </div>
@@ -584,7 +584,7 @@ export default function ProjectDetailPage() {
                         </div>
                         {app.userProfile?.skillLevel && (
                           <span className={`badge ${difficultyColors[app.userProfile.skillLevel as ProjectDifficulty]}`}>
-                            {app.userProfile.skillLevel}
+                            Skill level: {app.userProfile.skillLevel}
                           </span>
                         )}
                       </div>
