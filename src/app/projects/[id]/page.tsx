@@ -128,6 +128,8 @@ export default function ProjectDetailPage() {
           const appData = await appRes.json();
           if (appData.applications?.length > 0) {
             setUserApplication(appData.applications[0]);
+          } else {
+            setUserApplication(null);
           }
         }
 
@@ -140,6 +142,8 @@ export default function ProjectDetailPage() {
           );
           if (userInv) {
             setUserInvitation(userInv);
+          } else {
+            setUserInvitation(null);
           }
         }
       }
