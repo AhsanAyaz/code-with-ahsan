@@ -13,7 +13,7 @@ Milestone: v2.0
 Phase: 09 of 10 (Roadmaps - Discovery & Rendering)
 Plan: 2 of 2
 Status: Complete - Phase 09 finished
-Last activity: 2026-02-12 - Completed quick task 20: Fix invitation bugs (Discord notification + Invitations tab visibility)
+Last activity: 2026-02-12 - Completed quick task 23: Clean up stale invitations/applications on team join
 
 Progress: [████████████████████] 100% (26/26 total plans complete across current phases)
 
@@ -237,11 +237,12 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 020 | Fix invitation bugs: Discord channel notification and Invitations tab visibility | 2026-02-12 | 1fd7b89 | [020-when-an-invitation-is-sent-to-other-peop](./quick/20-when-an-invitation-is-sent-to-other-peop/) |
 | 021 | Clean up stale invitations/applications when user joins via alternate path | 2026-02-12 | c724927 | [021-clean-up-stale-invitations-applications-](./quick/21-clean-up-stale-invitations-applications-/) |
 | 022 | Allow creator to transfer project ownership to team members | 2026-02-12 | c2b87f2 | [022-allow-creator-to-transfer-project-owners](./quick/22-allow-creator-to-transfer-project-owners/) |
+| 023 | Clean up stale invitations/applications on team join (both paths) | 2026-02-12 | 5a9ac4c | [023-on-invitation-acceptance-or-application-](./quick/23-on-invitation-acceptance-or-application-/) |
 
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed quick task 22: Allow creator to transfer project ownership
+Stopped at: Completed quick task 23: Clean up stale invitations/applications on team join
 Resume file: None
 
 ---
