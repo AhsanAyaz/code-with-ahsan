@@ -504,7 +504,7 @@ export default function MentorshipDashboardPage() {
 
         {profile.role === "mentor" && stats.myRoadmaps > 0 && (
           <Link
-            href={`/roadmaps?creator=${user.uid}`}
+            href="/roadmaps/my"
             className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer relative"
           >
             <div className="card-body">
