@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useActionState } from "react";
+import { useState, useActionState, useEffect } from "react";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useRouter } from "next/navigation";
@@ -171,15 +171,16 @@ Where to go after completing this roadmap.
 
   const [state, formAction, isPending] = useActionState(createRoadmapAction, {});
 
-  // Handle success: show toast and redirect
-  if (state.success && !isPending) {
-    const message = (state as any).wasSubmitted
-      ? "Roadmap submitted for review!"
-      : "Roadmap saved as draft!";
-    showSuccessToast(message);
-    router.push("/roadmaps/my");
-    return null;
-  }
+  // Handle success: show toast and redirect (in useEffect to avoid setState during render)
+  useEffect(() => {
+    if (state.success && !isPending) {
+      const message = state.wasSubmitted
+        ? "Roadmap submitted for review!"
+        : "Roadmap saved as draft!";
+      showSuccessToast(message);
+      router.push("/roadmaps/my");
+    }
+  }, [state.success, state.wasSubmitted, isPending, showSuccessToast, router]);
 
   // Check authentication and role
   if (loading) {
