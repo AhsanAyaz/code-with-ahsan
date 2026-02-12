@@ -79,13 +79,15 @@ export async function PUT(
       // Use Firestore batch for atomicity
       const batch = db.batch();
 
-      // 1. Update application status to approved
-      batch.update(applicationRef, {
-        status: "approved",
-        approvedAt: FieldValue.serverTimestamp(),
-      });
+      // 1. Delete application (approved applications are removed - user is now a member)
+      batch.delete(applicationRef);
 
-      // 2. Create project_members document
+      // 2. Delete any stale invitation for this user+project (e.g., previously declined)
+      if (staleInvitationDoc.exists) {
+        batch.delete(staleInvitationRef);
+      }
+
+      // 3. Create project_members document
       const memberId = `${projectId}_${userId}`;
       const memberRef = db.collection("project_members").doc(memberId);
       batch.set(memberRef, {
@@ -101,17 +103,12 @@ export async function PUT(
         joinedAt: FieldValue.serverTimestamp(),
       });
 
-      // 3. Update project lastActivityAt and increment memberCount
+      // 4. Update project lastActivityAt and increment memberCount
       const projectRef = db.collection("projects").doc(projectId);
       batch.update(projectRef, {
         lastActivityAt: FieldValue.serverTimestamp(),
         memberCount: FieldValue.increment(1),
       });
-
-      // 4. Delete any stale invitation for this user+project (e.g., previously declined)
-      if (staleInvitationDoc.exists) {
-        batch.delete(staleInvitationRef);
-      }
 
       // Commit batch
       await batch.commit();
