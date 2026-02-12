@@ -253,7 +253,7 @@ export default function RoadmapDetailPage() {
             {relatedMentors.map((mentor: MentorshipProfile) => (
               <Link
                 key={mentor.uid}
-                href={`/mentorship/profile/${mentor.username || mentor.uid}`}
+                href={`/mentorship/mentors/${mentor.username || mentor.uid}`}
                 className="card bg-base-200 hover:shadow-lg transition-shadow"
               >
                 <div className="card-body p-4">
