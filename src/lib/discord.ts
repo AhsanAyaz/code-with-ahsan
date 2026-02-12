@@ -1340,3 +1340,119 @@ export async function sendProjectSubmissionNotification(
     return false;
   }
 }
+
+/**
+ * Send a notification to the project review channel when a new roadmap is submitted
+ * Tags moderators so they can review and approve/request-changes the roadmap
+ *
+ * @param title - Title of the submitted roadmap
+ * @param creatorName - Display name of the roadmap creator
+ * @param roadmapId - Unique ID of the roadmap
+ * @param isNewVersion - Whether this is a new version of an already approved roadmap
+ * @returns true if notification sent successfully, false otherwise
+ */
+export async function sendRoadmapSubmissionNotification(
+  title: string,
+  creatorName: string,
+  roadmapId: string,
+  isNewVersion = false
+): Promise<boolean> {
+  log.debug(
+    `Sending roadmap submission notification for "${title}" by ${creatorName} (isNewVersion: ${isNewVersion})`
+  );
+
+  try {
+    const message = isNewVersion
+      ? `**New Roadmap Version Submitted for Review**\n\n` +
+        `**Title:** ${title}\n` +
+        `**Submitted by:** ${creatorName}\n\n` +
+        `<@&${MODERATOR_ROLE_ID}> — Please review this updated roadmap.`
+      : `**New Roadmap Submitted for Review**\n\n` +
+        `**Title:** ${title}\n` +
+        `**Submitted by:** ${creatorName}\n\n` +
+        `<@&${MODERATOR_ROLE_ID}> — Please review this roadmap submission.`;
+
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/channels/${PROJECT_REVIEW_CHANNEL_ID}/messages`,
+      {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          content: message,
+          allowed_mentions: {
+            roles: [MODERATOR_ROLE_ID],
+          },
+        }),
+      }
+    );
+
+    if (response.ok) {
+      log.debug(`Roadmap submission notification sent successfully`);
+      return true;
+    } else {
+      const errorText = await response.text();
+      log.error(
+        `[Discord] Failed to send roadmap submission notification: ${response.status} - ${errorText}`
+      );
+      return false;
+    }
+  } catch (error) {
+    log.error("[Discord] Error sending roadmap submission notification:", error);
+    return false;
+  }
+}
+
+/**
+ * Send a DM to roadmap creator when admin takes action (approve or request changes)
+ *
+ * @param discordUsername - Discord username of the roadmap creator
+ * @param title - Title of the roadmap
+ * @param status - The status change: "approved", "changes-requested", "draft-approved", or "draft-changes-requested"
+ * @param feedback - Admin feedback (required for changes-requested statuses)
+ * @returns true if DM sent successfully, false otherwise
+ */
+export async function sendRoadmapStatusNotification(
+  discordUsername: string,
+  title: string,
+  status: "approved" | "changes-requested" | "draft-approved" | "draft-changes-requested",
+  feedback?: string
+): Promise<boolean> {
+  log.debug(
+    `Sending roadmap status notification to ${discordUsername} for "${title}" (status: ${status})`
+  );
+
+  if (!discordUsername) {
+    log.warn("[Discord] Cannot send roadmap status notification - discordUsername is empty");
+    return false;
+  }
+
+  try {
+    let message: string;
+
+    switch (status) {
+      case "approved":
+        message = `Your roadmap **${title}** has been approved and is now published! View it at https://codewithahsan.dev/roadmaps`;
+        break;
+      case "changes-requested":
+        message =
+          `Changes have been requested on your roadmap **${title}**.\n\n` +
+          `Feedback: ${feedback}\n\n` +
+          `Please update and resubmit at https://codewithahsan.dev/mentorship/roadmaps`;
+        break;
+      case "draft-approved":
+        message = `Your updated version of **${title}** has been approved and is now published! View it at https://codewithahsan.dev/roadmaps`;
+        break;
+      case "draft-changes-requested":
+        message =
+          `Changes have been requested on your updated version of **${title}**.\n\n` +
+          `Feedback: ${feedback}\n\n` +
+          `Please revise and resubmit at https://codewithahsan.dev/mentorship/roadmaps`;
+        break;
+    }
+
+    return await sendDirectMessage(discordUsername, message);
+  } catch (error) {
+    log.error("[Discord] Error sending roadmap status notification:", error);
+    return false;
+  }
+}
