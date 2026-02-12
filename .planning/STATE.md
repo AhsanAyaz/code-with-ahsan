@@ -13,7 +13,7 @@ Milestone: v2.0
 Phase: 09 of 10 (Roadmaps - Discovery & Rendering)
 Plan: 2 of 2
 Status: Complete - Phase 09 finished
-Last activity: 2026-02-12 - Completed quick task 19: Fix roadmap notifications and admin delete functionality
+Last activity: 2026-02-12 - Completed quick task 20: Fix invitation bugs (Discord notification + Invitations tab visibility)
 
 Progress: [████████████████████] 100% (26/26 total plans complete across current phases)
 
@@ -234,11 +234,12 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 017 | Fix Discord channel access removal logging and error handling | 2026-02-11 | 6f19dd5 | [017-fix-discord-channel-access-removal-when-](./quick/17-fix-discord-channel-access-removal-when-/) |
 | 018 | Implement Discord notifications for roadmap events | 2026-02-12 | d4f9428 | [018-implement-discord-notifications-for-road](./quick/18-implement-discord-notifications-for-road/) |
 | 019 | Fix roadmap notifications: add direct link to moderator messages, add admin delete functionality, and verify creator DM notifications work | 2026-02-12 | 994f554 | [019-fix-roadmap-notifications-add-direct-lin](./quick/19-fix-roadmap-notifications-add-direct-lin/) |
+| 020 | Fix invitation bugs: Discord channel notification and Invitations tab visibility | 2026-02-12 | 1fd7b89 | [020-when-an-invitation-is-sent-to-other-peop](./quick/20-when-an-invitation-is-sent-to-other-peop/) |
 
 ## Session Continuity
 
-Last session: 2026-02-11
-Stopped at: Completed Phase 09 Plan 02: Roadmap detail page with Markdown rendering and related mentors (Phase 09 Complete)
+Last session: 2026-02-12
+Stopped at: Completed quick task 20: Fix invitation bugs (Discord notification + Invitations tab visibility)
 Resume file: None
 
 ---
