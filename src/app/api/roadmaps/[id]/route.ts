@@ -5,6 +5,7 @@ import { canApproveRoadmap, canEditRoadmap } from "@/lib/permissions";
 import { sanitizeMarkdownRaw } from "@/lib/validation/sanitize";
 import { verifyAuth } from "@/lib/auth";
 import type { PermissionUser } from "@/lib/permissions";
+import { sendRoadmapSubmissionNotification, sendRoadmapStatusNotification } from "@/lib/discord";
 
 export async function GET(
   request: NextRequest,
@@ -30,14 +31,15 @@ export async function GET(
     let contentUrl = roadmapData?.contentUrl;
 
     // If preview=draft, fetch the draft version and overlay its data
-    if (previewDraft && roadmapData?.hasPendingDraft && roadmapData?.draftVersionNumber) {
+    // This includes both pending drafts and rejected drafts (with feedback)
+    if (previewDraft && roadmapData?.draftVersionNumber && (roadmapData?.hasPendingDraft || roadmapData?.feedback)) {
       try {
         const versionsSnapshot = await db
           .collection("roadmaps")
           .doc(id)
           .collection("versions")
           .where("version", "==", roadmapData.draftVersionNumber)
-          .where("status", "==", "draft")
+          .where("status", "in", ["draft", "rejected"])
           .limit(1)
           .get();
 
@@ -179,6 +181,17 @@ export async function PUT(
         updatedAt: FieldValue.serverTimestamp(),
       });
 
+      // Send Discord notification to moderators (non-blocking)
+      try {
+        await sendRoadmapSubmissionNotification(
+          roadmapData.title,
+          roadmapData.creatorProfile?.displayName || "Unknown",
+          id
+        );
+      } catch (error) {
+        console.error("[Discord] Failed to send roadmap submission notification:", error);
+      }
+
       return NextResponse.json(
         { success: true, message: "Roadmap submitted for review" },
         { status: 200 }
@@ -210,6 +223,19 @@ export async function PUT(
         approvedBy: authResult.uid,
         updatedAt: FieldValue.serverTimestamp(),
       });
+
+      // Send Discord DM to creator (non-blocking)
+      if (roadmapData?.creatorProfile?.discordUsername) {
+        try {
+          await sendRoadmapStatusNotification(
+            roadmapData.creatorProfile.discordUsername,
+            roadmapData.title,
+            "approved"
+          );
+        } catch (error) {
+          console.error("[Discord] Failed to send roadmap approval notification:", error);
+        }
+      }
 
       return NextResponse.json(
         { success: true, message: "Roadmap approved" },
@@ -288,6 +314,20 @@ export async function PUT(
           updatedAt: FieldValue.serverTimestamp(),
         });
 
+        // Send Discord DM to creator (non-blocking)
+        if (roadmapData?.creatorProfile?.discordUsername) {
+          try {
+            await sendRoadmapStatusNotification(
+              roadmapData.creatorProfile.discordUsername,
+              roadmapData.title,
+              "draft-changes-requested",
+              feedback
+            );
+          } catch (error) {
+            console.error("[Discord] Failed to send draft changes notification:", error);
+          }
+        }
+
         return NextResponse.json(
           { success: true, message: "Changes requested on draft version" },
           { status: 200 }
@@ -301,6 +341,20 @@ export async function PUT(
           feedbackBy: authResult.uid,
           updatedAt: FieldValue.serverTimestamp(),
         });
+
+        // Send Discord DM to creator (non-blocking)
+        if (roadmapData?.creatorProfile?.discordUsername) {
+          try {
+            await sendRoadmapStatusNotification(
+              roadmapData.creatorProfile.discordUsername,
+              roadmapData.title,
+              "changes-requested",
+              feedback
+            );
+          } catch (error) {
+            console.error("[Discord] Failed to send changes notification:", error);
+          }
+        }
 
         return NextResponse.json(
           { success: true, message: "Changes requested" },
@@ -376,6 +430,19 @@ export async function PUT(
         approvedBy: authResult.uid,
       });
 
+      // Send Discord DM to creator (non-blocking)
+      if (roadmapData?.creatorProfile?.discordUsername) {
+        try {
+          await sendRoadmapStatusNotification(
+            roadmapData.creatorProfile.discordUsername,
+            roadmapData.title,
+            "draft-approved"
+          );
+        } catch (error) {
+          console.error("[Discord] Failed to send draft approval notification:", error);
+        }
+      }
+
       return NextResponse.json(
         { success: true, message: "Draft version approved and published" },
         { status: 200 }
@@ -420,7 +487,15 @@ export async function PUT(
 
       const isApproved = roadmapData?.status === "approved";
       const currentVersion = roadmapData?.version || 1;
-      const newVersion = currentVersion + 1;
+
+      // Check if we're editing a rejected draft (has draftVersionNumber + feedback)
+      const hasRejectedDraft = roadmapData?.draftVersionNumber && roadmapData?.feedback;
+
+      // Determine version number:
+      // - If editing approved roadmap: increment to create new draft
+      // - If editing rejected draft: keep the draft version (don't increment)
+      // - Otherwise: keep current version (initial draft)
+      const newVersion = isApproved ? currentVersion + 1 : (hasRejectedDraft ? roadmapData.draftVersionNumber : currentVersion);
 
       // Sanitize content
       const sanitizedContent = sanitizeMarkdownRaw(content);
@@ -481,6 +556,18 @@ export async function PUT(
             changeDescription: changeDescription || `Version ${newVersion}`,
           });
 
+        // Send Discord notification to moderators for new version (non-blocking)
+        try {
+          await sendRoadmapSubmissionNotification(
+            title !== undefined ? title : roadmapData.title,
+            roadmapData.creatorProfile?.displayName || "Unknown",
+            id,
+            true
+          );
+        } catch (error) {
+          console.error("[Discord] Failed to send roadmap version submission notification:", error);
+        }
+
         return NextResponse.json(
           {
             success: true,
@@ -490,10 +577,57 @@ export async function PUT(
           { status: 200 }
         );
       } else {
-        // If roadmap is draft or pending, update directly
+        // If roadmap is draft or pending
+        if (hasRejectedDraft) {
+          // Editing a rejected draft - update existing draft in subcollection
+          const versionsSnapshot = await db
+            .collection("roadmaps")
+            .doc(id)
+            .collection("versions")
+            .where("version", "==", newVersion)
+            .where("status", "in", ["draft", "rejected"])
+            .limit(1)
+            .get();
+
+          if (!versionsSnapshot.empty) {
+            // Update existing draft version
+            const draftDoc = versionsSnapshot.docs[0];
+            const draftUpdateData: any = {
+              contentUrl,
+              updatedAt: FieldValue.serverTimestamp(),
+              changeDescription: changeDescription || `Version ${newVersion} (revised)`,
+            };
+
+            if (title !== undefined) draftUpdateData.title = title;
+            if (description !== undefined) draftUpdateData.description = description;
+            if (domain !== undefined) draftUpdateData.domain = domain;
+            if (difficulty !== undefined) draftUpdateData.difficulty = difficulty;
+            if (estimatedHours !== undefined) draftUpdateData.estimatedHours = estimatedHours;
+
+            await draftDoc.ref.update(draftUpdateData);
+
+            // Clear feedback in main doc (feedback has been addressed)
+            await roadmapRef.update({
+              feedback: null,
+              feedbackAt: null,
+              feedbackBy: null,
+              updatedAt: FieldValue.serverTimestamp(),
+            });
+
+            return NextResponse.json(
+              {
+                success: true,
+                message: "Draft updated (addressing feedback)",
+                version: newVersion,
+              },
+              { status: 200 }
+            );
+          }
+        }
+
+        // Otherwise, update main document directly (initial draft, never approved)
         const updateData: any = {
           contentUrl,
-          version: newVersion,
           updatedAt: FieldValue.serverTimestamp(),
         };
 
@@ -503,7 +637,7 @@ export async function PUT(
         if (difficulty !== undefined) updateData.difficulty = difficulty;
         if (estimatedHours !== undefined) updateData.estimatedHours = estimatedHours;
 
-        // Clear feedback fields when submitting new version (feedback has been addressed)
+        // Clear feedback fields when updating (feedback has been addressed)
         if (hasFeedback) {
           updateData.feedback = null;
           updateData.feedbackAt = null;
@@ -512,20 +646,38 @@ export async function PUT(
 
         await roadmapRef.update(updateData);
 
-        // Create version in subcollection
-        await db
+        // Update or create version in subcollection
+        const versionsSnapshot = await db
           .collection("roadmaps")
           .doc(id)
           .collection("versions")
-          .add({
-            roadmapId: id,
-            version: newVersion,
+          .where("version", "==", newVersion)
+          .limit(1)
+          .get();
+
+        if (!versionsSnapshot.empty) {
+          // Update existing version
+          await versionsSnapshot.docs[0].ref.update({
             contentUrl,
-            status: roadmapData.status,
-            createdBy: authResult.uid,
-            createdAt: FieldValue.serverTimestamp(),
-            changeDescription: changeDescription || `Version ${newVersion}`,
+            updatedAt: FieldValue.serverTimestamp(),
+            changeDescription: changeDescription || `Version ${newVersion} (updated)`,
           });
+        } else {
+          // Create new version entry
+          await db
+            .collection("roadmaps")
+            .doc(id)
+            .collection("versions")
+            .add({
+              roadmapId: id,
+              version: newVersion,
+              contentUrl,
+              status: roadmapData?.status || "draft",
+              createdBy: authResult.uid,
+              createdAt: FieldValue.serverTimestamp(),
+              changeDescription: changeDescription || `Version ${newVersion}`,
+            });
+        }
 
         return NextResponse.json(
           {

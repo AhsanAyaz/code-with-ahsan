@@ -109,6 +109,40 @@ export default function RoadmapDetailPage() {
     );
   }
 
+  // Access control: Only show unpublished roadmaps to creator
+  // (Server-side will enforce admin access if needed)
+  const isCreator = user?.uid === roadmap.creatorId;
+  const isPublished = roadmap.status === "approved";
+
+  if (!isPublished && !isCreator) {
+    return (
+      <div className="max-w-4xl mx-auto p-8">
+        <div className="alert alert-warning">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <div>
+            <p className="font-semibold">Roadmap Not Available</p>
+            <p className="text-sm">This roadmap is not published yet.</p>
+          </div>
+        </div>
+        <Link href="/roadmaps" className="btn btn-ghost mt-4">
+          Back to Roadmaps
+        </Link>
+      </div>
+    );
+  }
+
   // Domain labels for display
   const domainLabels: Record<string, string> = {
     "web-dev": "Web Development",
@@ -164,8 +198,8 @@ export default function RoadmapDetailPage() {
       <div className="mb-8">
         <div className="flex items-start justify-between mb-4">
           <h1 className="text-4xl font-bold flex-1">{roadmap.title}</h1>
-          {(user?.uid === roadmap.creatorId || profile?.isAdmin) &&
-           !isPreviewingDraft &&
+          {user?.uid === roadmap.creatorId &&
+           roadmap.status !== "pending" &&
            !roadmap.hasPendingDraft && (
             <Link
               href={`/roadmaps/${roadmapId}/edit`}

@@ -474,7 +474,7 @@ export default function MentorshipDashboardPage() {
           <div className="card-body">
             <h3 className="card-title">
               <span className="text-2xl">🗺️</span> Browse Roadmaps
-              {stats.totalRoadmaps > 0 && (
+              {stats.totalRoadmaps && stats.totalRoadmaps > 0 && (
                 <span className="badge badge-info badge-sm">
                   {stats.totalRoadmaps}
                 </span>
@@ -502,7 +502,7 @@ export default function MentorshipDashboardPage() {
           </Link>
         )}
 
-        {profile.role === "mentor" && stats.myRoadmaps > 0 && (
+        {profile.role === "mentor" && stats.myRoadmaps && stats.myRoadmaps > 0 && (
           <Link
             href="/roadmaps/my"
             className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer relative"
