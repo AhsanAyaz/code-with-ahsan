@@ -79,17 +79,20 @@ export default function EditRoadmapPage() {
         const hasRejectedDraft = initialData.roadmap.feedback && initialData.roadmap.draftVersionNumber;
 
         // If there's a rejected draft, fetch it with preview=draft
-        let finalResponse = initialResponse;
+        let roadmapData;
         if (hasRejectedDraft) {
-          finalResponse = await fetch(`/api/roadmaps/${id}?preview=draft`);
-          if (!finalResponse.ok) {
+          const draftResponse = await fetch(`/api/roadmaps/${id}?preview=draft`);
+          if (draftResponse.ok) {
+            const draftData = await draftResponse.json();
+            roadmapData = draftData.roadmap;
+          } else {
             // Fall back to initial data if draft fetch fails
-            finalResponse = initialResponse;
+            roadmapData = initialData.roadmap;
           }
+        } else {
+          roadmapData = initialData.roadmap;
         }
 
-        const data = await finalResponse.json();
-        const roadmapData = data.roadmap;
         setRoadmap(roadmapData);
 
         // Populate form fields
