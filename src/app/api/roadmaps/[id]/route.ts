@@ -759,21 +759,33 @@ export async function DELETE(
       );
     }
 
-    // Only allow deletion of draft or pending roadmaps (not approved)
-    if (roadmapData?.status === "approved") {
+    // Non-admin users cannot delete approved roadmaps
+    if (roadmapData?.status === "approved" && !permissionUser.isAdmin) {
       return NextResponse.json(
         {
           error: "Cannot delete approved roadmap",
-          message: "Approved roadmaps cannot be deleted. Please contact an admin if you need to remove it.",
+          message: "Only admins can delete approved roadmaps.",
         },
-        { status: 400 }
+        { status: 403 }
       );
+    }
+
+    // Clean up versions subcollection
+    const versionsSnapshot = await db
+      .collection("roadmaps")
+      .doc(id)
+      .collection("versions")
+      .get();
+    const batch = db.batch();
+    versionsSnapshot.docs.forEach((doc) => batch.delete(doc.ref));
+    if (versionsSnapshot.docs.length > 0) {
+      await batch.commit();
     }
 
     // Delete the roadmap document
     await roadmapRef.delete();
 
-    // Note: We're not deleting Storage files or version history for audit trail
+    // Note: We're not deleting Storage files for audit trail
     // Storage files can be cleaned up separately if needed
 
     return NextResponse.json(

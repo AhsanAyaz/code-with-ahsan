@@ -797,6 +797,27 @@ export default function AdminPage() {
     }
   };
 
+  const handleDeleteRoadmap = async (roadmapId: string, title: string) => {
+    if (!confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) return;
+
+    setRoadmapActionLoading(roadmapId);
+    try {
+      const response = await authFetch(`/api/roadmaps/${roadmapId}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to delete roadmap");
+      }
+      toast.success("Roadmap deleted");
+      setRoadmaps(prev => prev.filter(r => r.id !== roadmapId));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to delete roadmap");
+    } finally {
+      setRoadmapActionLoading(null);
+    }
+  };
+
   // Filter mentorship data by search query and filters
   const filteredMentorshipData = mentorshipData.filter((item) => {
     const profile = item.profile;
@@ -2646,6 +2667,13 @@ export default function AdminPage() {
                         disabled={roadmapActionLoading === roadmap.id}
                       >
                         Request Changes
+                      </button>
+                      <button
+                        className="btn btn-error btn-sm"
+                        onClick={() => handleDeleteRoadmap(roadmap.id, roadmap.title)}
+                        disabled={roadmapActionLoading === roadmap.id}
+                      >
+                        Delete
                       </button>
                     </div>
                   </div>
