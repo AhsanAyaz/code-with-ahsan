@@ -236,11 +236,12 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 019 | Fix roadmap notifications: add direct link to moderator messages, add admin delete functionality, and verify creator DM notifications work | 2026-02-12 | 994f554 | [019-fix-roadmap-notifications-add-direct-lin](./quick/19-fix-roadmap-notifications-add-direct-lin/) |
 | 020 | Fix invitation bugs: Discord channel notification and Invitations tab visibility | 2026-02-12 | 1fd7b89 | [020-when-an-invitation-is-sent-to-other-peop](./quick/20-when-an-invitation-is-sent-to-other-peop/) |
 | 021 | Clean up stale invitations/applications when user joins via alternate path | 2026-02-12 | c724927 | [021-clean-up-stale-invitations-applications-](./quick/21-clean-up-stale-invitations-applications-/) |
+| 022 | Allow creator to transfer project ownership to team members | 2026-02-12 | c2b87f2 | [022-allow-creator-to-transfer-project-owners](./quick/22-allow-creator-to-transfer-project-owners/) |
 
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Completed quick task 21: Clean up stale invitations/applications
+Stopped at: Completed quick task 22: Allow creator to transfer project ownership
 Resume file: None
 
 ---
