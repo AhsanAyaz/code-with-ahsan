@@ -72,13 +72,22 @@ export async function PUT(
         .get();
       const userData = userDoc.data();
 
+      // Check for any existing application for this user+project
+      const applicationRef = db.collection("project_applications").doc(invitationId);
+      const applicationDoc = await applicationRef.get();
+
       // Use Firestore batch for atomicity
       const batch = db.batch();
 
       // 1. Delete invitation (accepted invitations are removed)
       batch.delete(invitationRef);
 
-      // 2. Create project_members document
+      // 2. Delete any existing application for this user+project (regardless of status)
+      if (applicationDoc.exists) {
+        batch.delete(applicationRef);
+      }
+
+      // 3. Create project_members document
       const memberId = `${projectId}_${userId}`;
       const memberRef = db.collection("project_members").doc(memberId);
       batch.set(memberRef, {
@@ -94,7 +103,7 @@ export async function PUT(
         joinedAt: FieldValue.serverTimestamp(),
       });
 
-      // 3. Update project lastActivityAt and increment memberCount
+      // 4. Update project lastActivityAt and increment memberCount
       const projectRef = db.collection("projects").doc(projectId);
       batch.update(projectRef, {
         lastActivityAt: FieldValue.serverTimestamp(),
