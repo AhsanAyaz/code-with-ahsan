@@ -99,6 +99,13 @@ export async function POST(
       );
     }
 
+    // Delete any stale declined application for this user+project
+    const staleApplicationRef = db.collection("project_applications").doc(invitationId);
+    const staleApplicationDoc = await staleApplicationRef.get();
+    if (staleApplicationDoc.exists && staleApplicationDoc.data()?.status === "declined") {
+      await staleApplicationRef.delete();
+    }
+
     // Create invitation document
     const invitationData = {
       projectId,
