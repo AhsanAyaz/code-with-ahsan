@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
-import { sendDirectMessage } from "@/lib/discord";
+import { sendDirectMessage, sendChannelMessage } from "@/lib/discord";
 import { verifyAuth } from "@/lib/auth";
 
 export async function POST(
@@ -134,6 +134,18 @@ export async function POST(
       } catch (discordError) {
         console.error("Discord DM failed:", discordError);
         // Continue - invitation created even if DM fails
+      }
+    }
+
+    // Send notification to project channel (non-blocking)
+    if (projectData?.discordChannelId) {
+      try {
+        const invitedUserName = userData?.displayName || "a user";
+        const channelMessage = `A new invitation has been sent to **${invitedUserName}** to join the project!`;
+        await sendChannelMessage(projectData.discordChannelId, channelMessage);
+      } catch (discordError) {
+        console.error("Discord channel notification failed:", discordError);
+        // Continue - invitation created even if channel notification fails
       }
     }
 
