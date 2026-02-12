@@ -72,6 +72,10 @@ export async function PUT(
         .get();
       const userData = userDoc.data();
 
+      // Check for stale invitation to delete (must happen before batch)
+      const staleInvitationRef = db.collection("project_invitations").doc(applicationId);
+      const staleInvitationDoc = await staleInvitationRef.get();
+
       // Use Firestore batch for atomicity
       const batch = db.batch();
 
@@ -103,6 +107,11 @@ export async function PUT(
         lastActivityAt: FieldValue.serverTimestamp(),
         memberCount: FieldValue.increment(1),
       });
+
+      // 4. Delete any stale invitation for this user+project (e.g., previously declined)
+      if (staleInvitationDoc.exists) {
+        batch.delete(staleInvitationRef);
+      }
 
       // Commit batch
       await batch.commit();
