@@ -48,7 +48,52 @@ export default function CreateRoadmapPage() {
   const [domain, setDomain] = useState<RoadmapDomain>("web-dev");
   const [difficulty, setDifficulty] = useState<ProjectDifficulty>("intermediate");
   const [estimatedHours, setEstimatedHours] = useState("");
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(`# Your Roadmap Title
+
+## Overview
+Brief introduction to what this roadmap covers and who it's for.
+
+## Prerequisites
+- Prerequisite 1
+- Prerequisite 2
+
+## Learning Path
+
+### Phase 1: Foundations
+**Duration:** X weeks
+
+Key concepts to learn:
+- Concept 1
+- Concept 2
+
+**Resources:**
+- [Resource Title](https://example.com) - Description
+- [Another Resource](https://example.com)
+
+### Phase 2: Intermediate Topics
+**Duration:** X weeks
+
+Building on foundations...
+
+### Phase 3: Advanced Topics
+**Duration:** X weeks
+
+Deep dive into...
+
+## Projects
+Build these projects to practice:
+1. **Beginner Project** - Description
+2. **Intermediate Project** - Description
+3. **Advanced Project** - Description
+
+## Resources
+- **Documentation:** [Link](https://example.com)
+- **Community:** [Link](https://example.com)
+- **Tools:** List of recommended tools
+
+## Next Steps
+Where to go after completing this roadmap.
+`);
   const [submitAction, setSubmitAction] = useState<"draft" | "submit">("draft");
 
   const createRoadmapAction = async (
@@ -408,20 +453,21 @@ export default function CreateRoadmapPage() {
         </div>
 
         {/* Markdown Editor */}
-        <div className="form-control">
+        <div className="form-control w-full">
           <label className="label">
             <span className="label-text font-semibold">Roadmap Content <span className="text-error">*</span></span>
           </label>
-          <div data-color-mode="light">
+          <div data-color-mode="light" className="w-full">
             <MDEditor
               value={content}
               onChange={(val) => setContent(val || "")}
               height={500}
               preview="live"
+              style={{ width: '100%' }}
             />
           </div>
           <label className="label">
-            <span className="label-text-alt">Supports GitHub Flavored Markdown</span>
+            <span className="label-text-alt">Supports GitHub Flavored Markdown - Replace template with your content</span>
             <span className="label-text-alt">{content.length} characters</span>
           </label>
           {state.fieldErrors?.content && (

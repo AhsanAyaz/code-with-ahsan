@@ -231,34 +231,116 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const creatorId = searchParams.get("creatorId");
+    const adminView = searchParams.get("admin") === "true";
 
-    // Build query
-    let query = db.collection("roadmaps");
+    let roadmaps: any[] = [];
 
-    if (status) {
-      query = query.where("status", "==", status) as any;
+    if (adminView) {
+      // For admin: fetch both pending roadmaps AND approved roadmaps with pending drafts
+      // We need two separate queries since Firestore doesn't support OR queries well
+
+      // Query 1: Pending roadmaps
+      let pendingQuery = db.collection("roadmaps").where("status", "==", "pending");
+      if (creatorId) {
+        pendingQuery = pendingQuery.where("creatorId", "==", creatorId) as any;
+      }
+      pendingQuery = pendingQuery.orderBy("createdAt", "desc").limit(25) as any;
+      const pendingSnapshot = await pendingQuery.get();
+
+      // Query 2: Approved roadmaps with pending drafts
+      let draftQuery = db.collection("roadmaps").where("hasPendingDraft", "==", true);
+      if (creatorId) {
+        draftQuery = draftQuery.where("creatorId", "==", creatorId) as any;
+      }
+      draftQuery = draftQuery.orderBy("createdAt", "desc").limit(25) as any;
+      const draftSnapshot = await draftQuery.get();
+
+      // Merge and deduplicate
+      const roadmapMap = new Map();
+
+      [...pendingSnapshot.docs, ...draftSnapshot.docs].forEach(doc => {
+        if (!roadmapMap.has(doc.id)) {
+          const data = doc.data();
+          roadmapMap.set(doc.id, {
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+            updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+            approvedAt: data.approvedAt?.toDate?.()?.toISOString() || null,
+          });
+        }
+      });
+
+      roadmaps = Array.from(roadmapMap.values())
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      // For roadmaps with pending drafts, fetch and overlay draft metadata
+      const roadmapsWithDraftMetadata = await Promise.all(
+        roadmaps.map(async (roadmap) => {
+          if (roadmap.hasPendingDraft && roadmap.draftVersionNumber) {
+            try {
+              // Fetch draft version from subcollection
+              const versionsSnapshot = await db
+                .collection("roadmaps")
+                .doc(roadmap.id)
+                .collection("versions")
+                .where("version", "==", roadmap.draftVersionNumber)
+                .where("status", "==", "draft")
+                .limit(1)
+                .get();
+
+              if (!versionsSnapshot.empty) {
+                const draftData = versionsSnapshot.docs[0].data();
+                // Overlay draft metadata onto roadmap
+                return {
+                  ...roadmap,
+                  title: draftData.title !== undefined ? draftData.title : roadmap.title,
+                  description: draftData.description !== undefined ? draftData.description : roadmap.description,
+                  domain: draftData.domain !== undefined ? draftData.domain : roadmap.domain,
+                  difficulty: draftData.difficulty !== undefined ? draftData.difficulty : roadmap.difficulty,
+                  estimatedHours: draftData.estimatedHours !== undefined ? draftData.estimatedHours : roadmap.estimatedHours,
+                };
+              }
+            } catch (error) {
+              console.error(`Error fetching draft version for roadmap ${roadmap.id}:`, error);
+              // Return roadmap as-is if draft fetch fails
+            }
+          }
+          return roadmap;
+        })
+      );
+
+      roadmaps = roadmapsWithDraftMetadata;
+
+    } else {
+      // Normal query
+      let query = db.collection("roadmaps");
+
+      if (status) {
+        query = query.where("status", "==", status) as any;
+      }
+
+      if (creatorId) {
+        query = query.where("creatorId", "==", creatorId) as any;
+      }
+
+      // Order by creation date descending
+      query = query.orderBy("createdAt", "desc").limit(50) as any;
+
+      const snapshot = await query.get();
+
+      // Convert Firestore Timestamps to ISO strings for JSON serialization
+      roadmaps = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+          updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+          approvedAt: data.approvedAt?.toDate?.()?.toISOString() || null,
+        };
+      });
     }
-
-    if (creatorId) {
-      query = query.where("creatorId", "==", creatorId) as any;
-    }
-
-    // Order by creation date descending
-    query = query.orderBy("createdAt", "desc").limit(50) as any;
-
-    const snapshot = await query.get();
-
-    // Convert Firestore Timestamps to ISO strings for JSON serialization
-    const roadmaps = snapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
-        updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
-        approvedAt: data.approvedAt?.toDate?.()?.toISOString() || null,
-      };
-    });
 
     return NextResponse.json({ roadmaps }, { status: 200 });
   } catch (error) {

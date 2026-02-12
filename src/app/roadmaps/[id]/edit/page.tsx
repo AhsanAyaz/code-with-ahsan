@@ -19,6 +19,7 @@ interface FormState {
   error?: string;
   fieldErrors?: Record<string, string>;
   version?: number;
+  message?: string;
 }
 
 const DOMAIN_OPTIONS: { value: RoadmapDomain; label: string }[] = [
@@ -146,7 +147,7 @@ export default function EditRoadmapPage() {
       }
 
       const data = await response.json();
-      return { success: true, version: data.version };
+      return { success: true, version: data.version, message: data.message };
     } catch (error) {
       console.error("Error editing roadmap:", error);
       return { error: "An unexpected error occurred" };
@@ -291,20 +292,17 @@ export default function EditRoadmapPage() {
           <div>
             <p className="font-semibold">Roadmap Updated!</p>
             <p className="text-sm">
-              Your roadmap has been updated to version {state.version}. It has been returned to draft status for re-review.
+              {state.message || `Your roadmap has been updated to version ${state.version}.`}
             </p>
           </div>
         </div>
         <div className="mt-6 flex gap-4">
-          <Link href="/roadmaps" className="btn btn-primary">
-            Back to Roadmaps
+          <Link href="/roadmaps/my" className="btn btn-primary">
+            Go to My Roadmaps
           </Link>
-          <button
-            onClick={() => router.refresh()}
-            className="btn btn-ghost"
-          >
-            Edit Again
-          </button>
+          <Link href="/roadmaps" className="btn btn-ghost">
+            Browse All Roadmaps
+          </Link>
         </div>
       </div>
     );
@@ -462,17 +460,18 @@ export default function EditRoadmapPage() {
         </div>
 
         {/* Content */}
-        <div className="form-control">
+        <div className="form-control w-full">
           <label className="label">
             <span className="label-text font-semibold">Roadmap Content *</span>
             <span className="label-text-alt">Markdown supported</span>
           </label>
-          <div data-color-mode="light">
+          <div data-color-mode="light" className="w-full">
             <MDEditor
               value={content}
               onChange={(val) => setContent(val || "")}
-              height={400}
-              preview="edit"
+              height={500}
+              preview="live"
+              style={{ width: '100%' }}
             />
           </div>
           {state.fieldErrors?.content && (

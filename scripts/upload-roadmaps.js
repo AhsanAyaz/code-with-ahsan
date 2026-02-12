@@ -165,7 +165,7 @@ async function uploadToStorage(roadmapId, content) {
 /**
  * Upload a single roadmap
  */
-async function uploadRoadmap(roadmap, userId, index, total) {
+async function uploadRoadmap(roadmap, userId, userProfile, index, total) {
   console.log(`\n[${index}/${total}] Uploading: ${roadmap.title}`);
   console.log(`  Domain: ${roadmap.domain}, Difficulty: ${roadmap.difficulty}, Hours: ${roadmap.estimatedHours}`);
 
@@ -201,9 +201,10 @@ async function uploadRoadmap(roadmap, userId, index, total) {
       updatedAt: now,
       creatorId: userId,
       creatorProfile: {
-        displayName: 'Ahsan Ayaz',
-        photoURL: null,
-        username: 'admin',
+        displayName: userProfile.displayName || 'Unknown',
+        photoURL: userProfile.photoURL || null,
+        username: userProfile.username || null,
+        discordUsername: userProfile.discordUsername || null,
       },
     });
 
@@ -217,16 +218,31 @@ async function uploadRoadmap(roadmap, userId, index, total) {
 }
 
 /**
- * Get or create admin user
+ * Get admin user and their profile
  */
-async function getAdminUserId() {
+async function getAdminUserAndProfile() {
   // Try to find admin user by email
-  const adminEmail = process.env.ADMIN_EMAIL || 'ahsan.ayaz@codewithahsan.dev';
+  const adminEmail = process.env.ADMIN_EMAIL || 'ahsan.ubitian@gmail.com';
 
   try {
     const user = await admin.auth().getUserByEmail(adminEmail);
     console.log(`✓ Found admin user: ${user.uid}`);
-    return user.uid;
+
+    // Fetch mentorship profile
+    const profileDoc = await db.collection('mentorship_profiles').doc(user.uid).get();
+    if (!profileDoc.exists) {
+      console.error('✗ User profile not found');
+      console.error('  User must have a mentorship profile');
+      process.exit(1);
+    }
+
+    const profile = profileDoc.data();
+    console.log(`✓ Found profile: ${profile.displayName}`);
+    if (profile.discordUsername) {
+      console.log(`  Discord: ${profile.discordUsername}`);
+    }
+
+    return { userId: user.uid, profile };
   } catch (error) {
     console.error('✗ Could not find admin user');
     console.error('  Please set ADMIN_EMAIL env variable to your admin email');
@@ -241,8 +257,8 @@ async function main() {
   console.log('🚀 Roadmap Upload Script');
   console.log('========================\n');
 
-  // Get admin user ID
-  const userId = await getAdminUserId();
+  // Get admin user ID and profile
+  const { userId, profile } = await getAdminUserAndProfile();
 
   console.log(`\nFound ${ROADMAPS.length} roadmaps to upload\n`);
 
@@ -250,7 +266,7 @@ async function main() {
 
   // Upload each roadmap
   for (let i = 0; i < ROADMAPS.length; i++) {
-    const result = await uploadRoadmap(ROADMAPS[i], userId, i + 1, ROADMAPS.length);
+    const result = await uploadRoadmap(ROADMAPS[i], userId, profile, i + 1, ROADMAPS.length);
     results.push({ ...ROADMAPS[i], ...result });
 
     // Small delay

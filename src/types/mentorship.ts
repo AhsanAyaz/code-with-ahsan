@@ -212,6 +212,7 @@ export interface Roadmap {
     displayName: string;
     photoURL: string;
     username?: string;
+    discordUsername?: string;
   };
   domain: RoadmapDomain;
   difficulty: ProjectDifficulty;
@@ -220,6 +221,8 @@ export interface Roadmap {
   content?: string;
   status: RoadmapStatus;
   version: number;
+  hasPendingDraft?: boolean;
+  draftVersionNumber?: number;
   createdAt: Date;
   updatedAt: Date;
   approvedAt?: Date;
@@ -240,10 +243,20 @@ export interface RoadmapVersion {
   id: string;
   roadmapId: string;
   version: number;
-  content: string;
+  contentUrl: string;
+  content?: string;
+  status: "draft" | "approved" | "rejected";
+  title?: string;
+  description?: string;
+  domain?: RoadmapDomain;
+  difficulty?: ProjectDifficulty;
+  estimatedHours?: number;
   createdBy: string;
   createdAt: Date;
   changeDescription?: string;
+  feedback?: string;
+  feedbackAt?: Date;
+  feedbackBy?: string;
 }
 
 // ─── Project Templates ───────────────────────

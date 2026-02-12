@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
+import Link from "next/link";
+import { useMentorship } from "@/contexts/MentorshipContext";
 import RoadmapCard from "@/components/roadmaps/RoadmapCard";
 import RoadmapFilters from "@/components/roadmaps/RoadmapFilters";
 import { Roadmap, RoadmapDomain, ProjectDifficulty } from "@/types/mentorship";
@@ -8,6 +10,7 @@ import { Roadmap, RoadmapDomain, ProjectDifficulty } from "@/types/mentorship";
 export const dynamic = "force-dynamic";
 
 function RoadmapsCatalogContent() {
+  const { user, profile } = useMentorship();
   const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -97,7 +100,19 @@ function RoadmapsCatalogContent() {
   return (
     <div className="max-w-6xl mx-auto p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Learning Roadmaps</h1>
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-3xl font-bold">Learning Roadmaps</h1>
+          {profile?.role === "mentor" && (
+            <div className="flex gap-2">
+              <Link href="/roadmaps/my" className="btn btn-ghost">
+                My Roadmaps
+              </Link>
+              <Link href="/roadmaps/new" className="btn btn-primary">
+                + Create Roadmap
+              </Link>
+            </div>
+          )}
+        </div>
         <p className="text-base-content/70">
           Browse curated learning paths created by mentors to guide your journey
         </p>

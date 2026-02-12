@@ -12,6 +12,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const { searchParams } = new URL(request.url);
+    const previewDraft = searchParams.get('preview') === 'draft';
 
     // Fetch roadmap document
     const roadmapRef = db.collection("roadmaps").doc(id);
@@ -24,13 +26,46 @@ export async function GET(
       );
     }
 
-    const roadmapData = roadmapDoc.data();
+    let roadmapData = roadmapDoc.data();
+    let contentUrl = roadmapData?.contentUrl;
+
+    // If preview=draft, fetch the draft version and overlay its data
+    if (previewDraft && roadmapData?.hasPendingDraft && roadmapData?.draftVersionNumber) {
+      try {
+        const versionsSnapshot = await db
+          .collection("roadmaps")
+          .doc(id)
+          .collection("versions")
+          .where("version", "==", roadmapData.draftVersionNumber)
+          .where("status", "==", "draft")
+          .limit(1)
+          .get();
+
+        if (!versionsSnapshot.empty) {
+          const draftData = versionsSnapshot.docs[0].data();
+          // Overlay draft metadata and use draft contentUrl
+          roadmapData = {
+            ...roadmapData,
+            title: draftData.title !== undefined ? draftData.title : roadmapData.title,
+            description: draftData.description !== undefined ? draftData.description : roadmapData.description,
+            domain: draftData.domain !== undefined ? draftData.domain : roadmapData.domain,
+            difficulty: draftData.difficulty !== undefined ? draftData.difficulty : roadmapData.difficulty,
+            estimatedHours: draftData.estimatedHours !== undefined ? draftData.estimatedHours : roadmapData.estimatedHours,
+            version: draftData.version, // Show draft version number
+          };
+          contentUrl = draftData.contentUrl; // Use draft content
+        }
+      } catch (error) {
+        console.error("Error fetching draft version:", error);
+        // Fall back to published version if draft fetch fails
+      }
+    }
 
     // Fetch content from Storage if contentUrl exists
     let content: string | undefined;
-    if (roadmapData?.contentUrl) {
+    if (contentUrl) {
       try {
-        const response = await fetch(roadmapData.contentUrl);
+        const response = await fetch(contentUrl);
         if (response.ok) {
           content = await response.text();
         }
@@ -192,14 +227,6 @@ export async function PUT(
         );
       }
 
-      // Verify roadmap status is "pending"
-      if (roadmapData?.status !== "pending") {
-        return NextResponse.json(
-          { error: "Only pending roadmaps can have changes requested" },
-          { status: 400 }
-        );
-      }
-
       // Require feedback
       if (!feedback || typeof feedback !== "string" || feedback.length < 10) {
         return NextResponse.json(
@@ -208,17 +235,148 @@ export async function PUT(
         );
       }
 
-      // Update status back to draft with feedback
-      await roadmapRef.update({
-        status: "draft",
-        feedback,
-        feedbackAt: FieldValue.serverTimestamp(),
-        feedbackBy: authResult.uid,
+      const isPendingDraft = roadmapData?.hasPendingDraft === true;
+      const isPendingInitial = roadmapData?.status === "pending";
+
+      // Must be either pending initial submission or pending draft
+      if (!isPendingInitial && !isPendingDraft) {
+        return NextResponse.json(
+          { error: "Only pending roadmaps or draft versions can have changes requested" },
+          { status: 400 }
+        );
+      }
+
+      if (isPendingDraft) {
+        // Handle draft version (v2, v3, etc.)
+        const draftVersion = roadmapData.draftVersionNumber;
+
+        // Fetch draft version from subcollection
+        const versionsSnapshot = await db
+          .collection("roadmaps")
+          .doc(id)
+          .collection("versions")
+          .where("version", "==", draftVersion)
+          .where("status", "==", "draft")
+          .limit(1)
+          .get();
+
+        if (versionsSnapshot.empty) {
+          return NextResponse.json(
+            { error: "Draft version not found in versions subcollection" },
+            { status: 404 }
+          );
+        }
+
+        const draftDoc = versionsSnapshot.docs[0];
+
+        // Update draft version with feedback and mark as rejected
+        await draftDoc.ref.update({
+          status: "rejected",
+          feedback,
+          feedbackAt: FieldValue.serverTimestamp(),
+          feedbackBy: authResult.uid,
+        });
+
+        // Clear pending draft flags and add feedback to main document
+        await roadmapRef.update({
+          hasPendingDraft: false,
+          draftVersionNumber: null,
+          feedback,
+          feedbackAt: FieldValue.serverTimestamp(),
+          feedbackBy: authResult.uid,
+          updatedAt: FieldValue.serverTimestamp(),
+        });
+
+        return NextResponse.json(
+          { success: true, message: "Changes requested on draft version" },
+          { status: 200 }
+        );
+      } else {
+        // Handle initial submission (existing logic)
+        await roadmapRef.update({
+          status: "draft",
+          feedback,
+          feedbackAt: FieldValue.serverTimestamp(),
+          feedbackBy: authResult.uid,
+          updatedAt: FieldValue.serverTimestamp(),
+        });
+
+        return NextResponse.json(
+          { success: true, message: "Changes requested" },
+          { status: 200 }
+        );
+      }
+    } else if (action === "approve-draft") {
+      // Check admin permission
+      if (!canApproveRoadmap(permissionUser, roadmapData as any)) {
+        return NextResponse.json(
+          {
+            error: "Permission denied",
+            message: "Only admins can approve draft versions",
+          },
+          { status: 403 }
+        );
+      }
+
+      // Verify there's a pending draft
+      if (!roadmapData?.hasPendingDraft) {
+        return NextResponse.json(
+          { error: "No pending draft version found" },
+          { status: 400 }
+        );
+      }
+
+      const draftVersion = roadmapData.draftVersionNumber;
+
+      // Fetch draft version from subcollection
+      const versionsSnapshot = await db
+        .collection("roadmaps")
+        .doc(id)
+        .collection("versions")
+        .where("version", "==", draftVersion)
+        .where("status", "==", "draft")
+        .limit(1)
+        .get();
+
+      if (versionsSnapshot.empty) {
+        return NextResponse.json(
+          { error: "Draft version not found in versions subcollection" },
+          { status: 404 }
+        );
+      }
+
+      const draftDoc = versionsSnapshot.docs[0];
+      const draftData = draftDoc.data();
+
+      // Update main document with draft content
+      const updateData: any = {
+        contentUrl: draftData.contentUrl,
+        version: draftVersion,
+        status: "approved",
+        hasPendingDraft: false,
+        draftVersionNumber: null,
+        approvedAt: FieldValue.serverTimestamp(),
+        approvedBy: authResult.uid,
         updatedAt: FieldValue.serverTimestamp(),
+      };
+
+      if (draftData.title !== undefined) updateData.title = draftData.title;
+      if (draftData.description !== undefined) updateData.description = draftData.description;
+      if (draftData.domain !== undefined) updateData.domain = draftData.domain;
+      if (draftData.difficulty !== undefined) updateData.difficulty = draftData.difficulty;
+      if (draftData.estimatedHours !== undefined) updateData.estimatedHours = draftData.estimatedHours;
+
+      await roadmapRef.update(updateData);
+
+      // Mark draft version as approved in subcollection
+      await draftDoc.ref.update({
+        status: "approved",
+        approvedAt: FieldValue.serverTimestamp(),
+        approvedBy: authResult.uid,
       });
 
       return NextResponse.json(
-        { success: true, message: "Changes requested" },
+        { success: true, message: "Draft version approved and published" },
         { status: 200 }
       );
     } else if (action === "edit") {
@@ -238,6 +396,19 @@ export async function PUT(
         );
       }
 
+      // Check if there's already a pending draft (prevent concurrent edits)
+      // Exception: If there's feedback, the draft was rejected and mentor can edit again
+      const hasFeedback = roadmapData?.feedback && roadmapData?.feedbackAt;
+      if (roadmapData?.hasPendingDraft && !hasFeedback) {
+        return NextResponse.json(
+          {
+            error: "Draft already exists",
+            message: "This roadmap already has pending changes. Please wait for them to be approved or rejected before making new edits.",
+          },
+          { status: 409 }
+        );
+      }
+
       // Require content
       if (!content || typeof content !== "string" || content.length < 50) {
         return NextResponse.json(
@@ -246,14 +417,15 @@ export async function PUT(
         );
       }
 
-      // Calculate new version
-      const newVersion = (roadmapData?.version || 1) + 1;
+      const isApproved = roadmapData?.status === "approved";
+      const currentVersion = roadmapData?.version || 1;
+      const newVersion = currentVersion + 1;
 
       // Sanitize content
       const sanitizedContent = sanitizeMarkdownRaw(content);
 
       // Upload to Storage
-      const storagePath = `roadmaps/${id}/v${newVersion}-${Date.now()}.md`;
+      const storagePath = `roadmaps/${id}/v${newVersion}-draft-${Date.now()}.md`;
       const file = storage.file(storagePath);
 
       await file.save(sanitizedContent, {
@@ -262,6 +434,7 @@ export async function PUT(
           metadata: {
             version: String(newVersion),
             roadmapId: id,
+            status: "draft",
           },
         },
       });
@@ -270,45 +443,98 @@ export async function PUT(
       await file.makePublic();
       const contentUrl = file.publicUrl();
 
-      // Build update object with optional fields
-      const updateData: any = {
-        contentUrl,
-        version: newVersion,
-        status: "draft", // Reset to draft for re-approval
-        updatedAt: FieldValue.serverTimestamp(),
-      };
+      if (isApproved) {
+        // If roadmap is approved, keep it published and mark as having pending draft
+        const updateData: any = {
+          hasPendingDraft: true,
+          draftVersionNumber: newVersion,
+          updatedAt: FieldValue.serverTimestamp(),
+        };
 
-      if (title !== undefined) updateData.title = title;
-      if (description !== undefined) updateData.description = description;
-      if (domain !== undefined) updateData.domain = domain;
-      if (difficulty !== undefined) updateData.difficulty = difficulty;
-      if (estimatedHours !== undefined) updateData.estimatedHours = estimatedHours;
+        // Clear feedback fields when starting new draft (feedback has been addressed)
+        if (hasFeedback) {
+          updateData.feedback = null;
+          updateData.feedbackAt = null;
+          updateData.feedbackBy = null;
+        }
 
-      // Update main document
-      await roadmapRef.update(updateData);
+        await roadmapRef.update(updateData);
 
-      // Create version in subcollection
-      await db
-        .collection("roadmaps")
-        .doc(id)
-        .collection("versions")
-        .add({
-          roadmapId: id,
-          version: newVersion,
+        // Create draft version in subcollection
+        await db
+          .collection("roadmaps")
+          .doc(id)
+          .collection("versions")
+          .add({
+            roadmapId: id,
+            version: newVersion,
+            contentUrl,
+            status: "draft",
+            title: title !== undefined ? title : roadmapData.title,
+            description: description !== undefined ? description : roadmapData.description,
+            domain: domain !== undefined ? domain : roadmapData.domain,
+            difficulty: difficulty !== undefined ? difficulty : roadmapData.difficulty,
+            estimatedHours: estimatedHours !== undefined ? estimatedHours : roadmapData.estimatedHours,
+            createdBy: authResult.uid,
+            createdAt: FieldValue.serverTimestamp(),
+            changeDescription: changeDescription || `Version ${newVersion}`,
+          });
+
+        return NextResponse.json(
+          {
+            success: true,
+            message: "Draft version created. Current version remains published until approved.",
+            version: newVersion,
+          },
+          { status: 200 }
+        );
+      } else {
+        // If roadmap is draft or pending, update directly
+        const updateData: any = {
           contentUrl,
-          createdBy: authResult.uid,
-          createdAt: FieldValue.serverTimestamp(),
-          changeDescription: changeDescription || `Version ${newVersion}`,
-        });
-
-      return NextResponse.json(
-        {
-          success: true,
-          message: "Roadmap updated",
           version: newVersion,
-        },
-        { status: 200 }
-      );
+          updatedAt: FieldValue.serverTimestamp(),
+        };
+
+        if (title !== undefined) updateData.title = title;
+        if (description !== undefined) updateData.description = description;
+        if (domain !== undefined) updateData.domain = domain;
+        if (difficulty !== undefined) updateData.difficulty = difficulty;
+        if (estimatedHours !== undefined) updateData.estimatedHours = estimatedHours;
+
+        // Clear feedback fields when submitting new version (feedback has been addressed)
+        if (hasFeedback) {
+          updateData.feedback = null;
+          updateData.feedbackAt = null;
+          updateData.feedbackBy = null;
+        }
+
+        await roadmapRef.update(updateData);
+
+        // Create version in subcollection
+        await db
+          .collection("roadmaps")
+          .doc(id)
+          .collection("versions")
+          .add({
+            roadmapId: id,
+            version: newVersion,
+            contentUrl,
+            status: roadmapData.status,
+            createdBy: authResult.uid,
+            createdAt: FieldValue.serverTimestamp(),
+            changeDescription: changeDescription || `Version ${newVersion}`,
+          });
+
+        return NextResponse.json(
+          {
+            success: true,
+            message: "Roadmap updated",
+            version: newVersion,
+          },
+          { status: 200 }
+        );
+      }
     } else {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }

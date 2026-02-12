@@ -9,11 +9,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/books</loc>
+    <loc>https://codewithahsan.dev/community</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/community</loc>
+    <loc>https://codewithahsan.dev/books</loc>
   </url>
 
   <url>
@@ -45,6 +45,10 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/roadmaps</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/books/mastering-angular-signals</loc>
   </url>
 
@@ -61,10 +65,6 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/goals</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/mentorship/mentors</loc>
   </url>
 
@@ -74,6 +74,10 @@
 
   <url>
     <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/goals</loc>
   </url>
 
   <url>
@@ -89,19 +93,19 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/projects/new</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/projects/showcase</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/roadmaps/new</loc>
+    <loc>https://codewithahsan.dev/projects/new</loc>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/events/hackstack/2023</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/roadmaps/new</loc>
   </url>
 
   <url>
