@@ -198,7 +198,7 @@ export default function MyRoadmapsPage() {
                       <span className="badge badge-outline">{roadmap.domain}</span>
                       <span className="badge badge-outline">{roadmap.difficulty}</span>
                       <span className="text-sm text-base-content/60">
-                        v{roadmap.version}
+                        v{roadmap.draftVersionNumber || roadmap.version}
                       </span>
                     </div>
                   </div>
@@ -235,7 +235,7 @@ export default function MyRoadmapsPage() {
                 )}
 
                 {/* Admin Feedback */}
-                {roadmap.status === "draft" && (roadmap as any).feedback && (
+                {(roadmap as any).feedback && (
                   <div className="alert alert-warning mb-4">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -258,7 +258,7 @@ export default function MyRoadmapsPage() {
                           const date = new Date((roadmap as any).feedbackAt);
                           if (!isNaN(date.getTime())) {
                             return (
-                              <p className="text-xs text-base-content/60 mt-1">
+                              <p className="text-xs text-warning-content/80 mt-1">
                                 {format(date, "MMM d, yyyy")}
                               </p>
                             );
