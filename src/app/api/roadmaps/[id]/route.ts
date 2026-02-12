@@ -277,10 +277,11 @@ export async function PUT(
           feedbackBy: authResult.uid,
         });
 
-        // Clear pending draft flags and add feedback to main document
+        // Clear pending flag but KEEP draftVersionNumber so mentor can edit rejected draft
+        // This allows mentor to continue working on v7 instead of starting over from v6
         await roadmapRef.update({
           hasPendingDraft: false,
-          draftVersionNumber: null,
+          // draftVersionNumber: KEEP IT (don't set to null!)
           feedback,
           feedbackAt: FieldValue.serverTimestamp(),
           feedbackBy: authResult.uid,

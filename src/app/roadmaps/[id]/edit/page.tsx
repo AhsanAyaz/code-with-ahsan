@@ -67,14 +67,28 @@ export default function EditRoadmapPage() {
       setLoadingRoadmap(true);
       setLoadError(null);
       try {
-        const response = await fetch(`/api/roadmaps/${id}`);
-        if (!response.ok) {
-          const data = await response.json();
+        // First fetch to check if there's a rejected draft
+        const initialResponse = await fetch(`/api/roadmaps/${id}`);
+        if (!initialResponse.ok) {
+          const data = await initialResponse.json();
           setLoadError(data.error || "Failed to load roadmap");
           return;
         }
 
-        const data = await response.json();
+        const initialData = await initialResponse.json();
+        const hasRejectedDraft = initialData.roadmap.feedback && initialData.roadmap.draftVersionNumber;
+
+        // If there's a rejected draft, fetch it with preview=draft
+        let finalResponse = initialResponse;
+        if (hasRejectedDraft) {
+          finalResponse = await fetch(`/api/roadmaps/${id}?preview=draft`);
+          if (!finalResponse.ok) {
+            // Fall back to initial data if draft fetch fails
+            finalResponse = initialResponse;
+          }
+        }
+
+        const data = await finalResponse.json();
         const roadmapData = data.roadmap;
         setRoadmap(roadmapData);
 
