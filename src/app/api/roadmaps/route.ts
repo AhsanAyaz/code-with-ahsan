@@ -168,6 +168,7 @@ export async function POST(request: NextRequest) {
         displayName: creatorData?.displayName || "",
         photoURL: creatorData?.photoURL || "",
         username: creatorData?.username,
+        discordUsername: creatorData?.discordUsername,
       },
       status: "draft",
       version: 1,
@@ -338,8 +339,49 @@ export async function GET(request: NextRequest) {
           createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
           updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
           approvedAt: data.approvedAt?.toDate?.()?.toISOString() || null,
+          feedbackAt: data.feedbackAt?.toDate?.()?.toISOString() || null,
         };
       });
+
+      // For creator viewing their own roadmaps, overlay rejected draft metadata
+      if (creatorId) {
+        roadmaps = await Promise.all(
+          roadmaps.map(async (roadmap) => {
+            // Check if there's a rejected draft (feedback + draftVersionNumber)
+            // OR a pending draft (hasPendingDraft + draftVersionNumber)
+            if (roadmap.draftVersionNumber && (roadmap.feedback || roadmap.hasPendingDraft)) {
+              try {
+                // Fetch draft version from subcollection
+                const versionsSnapshot = await db
+                  .collection("roadmaps")
+                  .doc(roadmap.id)
+                  .collection("versions")
+                  .where("version", "==", roadmap.draftVersionNumber)
+                  .where("status", "in", ["draft", "rejected"])
+                  .limit(1)
+                  .get();
+
+                if (!versionsSnapshot.empty) {
+                  const draftData = versionsSnapshot.docs[0].data();
+                  // Overlay draft metadata onto roadmap
+                  return {
+                    ...roadmap,
+                    title: draftData.title !== undefined ? draftData.title : roadmap.title,
+                    description: draftData.description !== undefined ? draftData.description : roadmap.description,
+                    domain: draftData.domain !== undefined ? draftData.domain : roadmap.domain,
+                    difficulty: draftData.difficulty !== undefined ? draftData.difficulty : roadmap.difficulty,
+                    estimatedHours: draftData.estimatedHours !== undefined ? draftData.estimatedHours : roadmap.estimatedHours,
+                  };
+                }
+              } catch (error) {
+                console.error(`Error fetching draft version for roadmap ${roadmap.id}:`, error);
+                // Return roadmap as-is if draft fetch fails
+              }
+            }
+            return roadmap;
+          })
+        );
+      }
     }
 
     return NextResponse.json({ roadmaps }, { status: 200 });

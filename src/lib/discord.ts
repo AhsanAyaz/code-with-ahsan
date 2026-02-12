@@ -1365,11 +1365,13 @@ export async function sendRoadmapSubmissionNotification(
     const message = isNewVersion
       ? `**New Roadmap Version Submitted for Review**\n\n` +
         `**Title:** ${title}\n` +
-        `**Submitted by:** ${creatorName}\n\n` +
+        `**Submitted by:** ${creatorName}\n` +
+        `**Review:** https://codewithahsan.dev/roadmaps/${roadmapId}?preview=draft\n\n` +
         `<@&${MODERATOR_ROLE_ID}> — Please review this updated roadmap.`
       : `**New Roadmap Submitted for Review**\n\n` +
         `**Title:** ${title}\n` +
-        `**Submitted by:** ${creatorName}\n\n` +
+        `**Submitted by:** ${creatorName}\n` +
+        `**Review:** https://codewithahsan.dev/roadmaps/${roadmapId}\n\n` +
         `<@&${MODERATOR_ROLE_ID}> — Please review this roadmap submission.`;
 
     const response = await fetchWithRateLimit(
