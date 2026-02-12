@@ -2,6 +2,7 @@
 
 import { useState, useActionState } from "react";
 import { useMentorship } from "@/contexts/MentorshipContext";
+import { useToast } from "@/contexts/ToastContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authFetch } from "@/lib/apiClient";
@@ -19,6 +20,7 @@ interface FormState {
   error?: string;
   fieldErrors?: Record<string, string>;
   roadmapId?: string;
+  wasSubmitted?: boolean;
 }
 
 const DOMAIN_OPTIONS: { value: RoadmapDomain; label: string }[] = [
@@ -40,6 +42,7 @@ const DIFFICULTY_OPTIONS: { value: ProjectDifficulty; label: string }[] = [
 
 export default function CreateRoadmapPage() {
   const { user, profile, loading } = useMentorship();
+  const { success: showSuccessToast } = useToast();
   const router = useRouter();
 
   // Controlled form state
@@ -159,7 +162,7 @@ Where to go after completing this roadmap.
         }
       }
 
-      return { success: true, roadmapId };
+      return { success: true, roadmapId, wasSubmitted: submitAction === "submit" };
     } catch (error) {
       console.error("Error creating roadmap:", error);
       return { error: "An unexpected error occurred" };
@@ -167,6 +170,16 @@ Where to go after completing this roadmap.
   };
 
   const [state, formAction, isPending] = useActionState(createRoadmapAction, {});
+
+  // Handle success: show toast and redirect
+  if (state.success && !isPending) {
+    const message = (state as any).wasSubmitted
+      ? "Roadmap submitted for review!"
+      : "Roadmap saved as draft!";
+    showSuccessToast(message);
+    router.push("/roadmaps/my");
+    return null;
+  }
 
   // Check authentication and role
   if (loading) {
@@ -232,64 +245,6 @@ Where to go after completing this roadmap.
               Only accepted mentors can create roadmaps. Please apply to become a mentor first.
             </div>
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show success state
-  if (state.success) {
-    const wasSubmitted = submitAction === "submit";
-    return (
-      <div className="max-w-4xl mx-auto p-4 sm:p-6">
-        <div className="alert alert-success">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <div>
-            <h3 className="font-bold">
-              {wasSubmitted ? "Roadmap Submitted!" : "Roadmap Created!"}
-            </h3>
-            <div className="text-sm">
-              {wasSubmitted
-                ? "Your roadmap has been submitted for admin review. You'll be notified once it's approved."
-                : "Your roadmap has been saved as a draft. You can edit it later or submit it for review."}
-            </div>
-          </div>
-        </div>
-        <div className="mt-6 flex gap-4">
-          <button
-            className="btn btn-primary"
-            onClick={() => router.push("/mentorship/dashboard")}
-          >
-            Go to Dashboard
-          </button>
-          <button
-            className="btn btn-ghost"
-            onClick={() => {
-              // Reset form state
-              setTitle("");
-              setDescription("");
-              setContent("");
-              setEstimatedHours("");
-              setDomain("web-dev");
-              setDifficulty("intermediate");
-              setSubmitAction("draft");
-              router.push("/roadmaps/new");
-            }}
-          >
-            Create Another Roadmap
-          </button>
         </div>
       </div>
     );
