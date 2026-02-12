@@ -546,3 +546,92 @@ export async function PUT(
     );
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const authResult = await verifyAuth(request);
+    if (!authResult) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
+    const { id } = await params;
+
+    // Fetch roadmap document
+    const roadmapRef = db.collection("roadmaps").doc(id);
+    const roadmapDoc = await roadmapRef.get();
+
+    if (!roadmapDoc.exists) {
+      return NextResponse.json(
+        { error: "Roadmap not found" },
+        { status: 404 }
+      );
+    }
+
+    const roadmapData = roadmapDoc.data();
+
+    // Fetch actor's mentorship_profiles doc for permission checks
+    const actorDoc = await db
+      .collection("mentorship_profiles")
+      .doc(authResult.uid)
+      .get();
+
+    const actorData = actorDoc.exists ? actorDoc.data() : null;
+
+    // Build PermissionUser from profile data
+    const permissionUser: PermissionUser = {
+      uid: authResult.uid,
+      role: actorData?.role || null,
+      status: actorData?.status,
+      isAdmin: actorData?.isAdmin,
+    };
+
+    // Check permission: only creator or admin can delete
+    const roadmapForPermission = {
+      creatorId: roadmapData?.creatorId,
+    };
+
+    if (!canEditRoadmap(permissionUser, roadmapForPermission as any)) {
+      return NextResponse.json(
+        {
+          error: "Permission denied",
+          message: "Only the creator or admin can delete roadmaps",
+        },
+        { status: 403 }
+      );
+    }
+
+    // Only allow deletion of draft or pending roadmaps (not approved)
+    if (roadmapData?.status === "approved") {
+      return NextResponse.json(
+        {
+          error: "Cannot delete approved roadmap",
+          message: "Approved roadmaps cannot be deleted. Please contact an admin if you need to remove it.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Delete the roadmap document
+    await roadmapRef.delete();
+
+    // Note: We're not deleting Storage files or version history for audit trail
+    // Storage files can be cleaned up separately if needed
+
+    return NextResponse.json(
+      { success: true, message: "Roadmap deleted" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting roadmap:", error);
+    return NextResponse.json(
+      { error: "Failed to delete roadmap" },
+      { status: 500 }
+    );
+  }
+}

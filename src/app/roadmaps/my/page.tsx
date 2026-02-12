@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { useMentorship } from "@/contexts/MentorshipContext";
+import { useToast } from "@/contexts/ToastContext";
 import { authFetch } from "@/lib/apiClient";
 import { Roadmap } from "@/types/mentorship";
 
@@ -11,9 +12,11 @@ export const dynamic = "force-dynamic";
 
 export default function MyRoadmapsPage() {
   const { user, profile, loading } = useMentorship();
+  const { success: showSuccessToast, error: showErrorToast } = useToast();
   const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
   const [loadingRoadmaps, setLoadingRoadmaps] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   // Fetch user's roadmaps
   useEffect(() => {
@@ -59,8 +62,33 @@ export default function MyRoadmapsPage() {
           r.id === roadmapId ? { ...r, status: "pending" as const } : r
         )
       );
+      showSuccessToast("Roadmap submitted for review!");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Failed to submit");
+      showErrorToast(error instanceof Error ? error.message : "Failed to submit");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // Delete roadmap
+  const handleDeleteRoadmap = async (roadmapId: string) => {
+    setActionLoading(roadmapId);
+    try {
+      const response = await authFetch(`/api/roadmaps/${roadmapId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete roadmap");
+      }
+
+      // Remove from local state
+      setRoadmaps((prev) => prev.filter((r) => r.id !== roadmapId));
+      showSuccessToast("Roadmap deleted successfully!");
+      setDeleteConfirmId(null);
+    } catch (error) {
+      showErrorToast(error instanceof Error ? error.message : "Failed to delete");
     } finally {
       setActionLoading(null);
     }
@@ -299,10 +327,57 @@ export default function MyRoadmapsPage() {
                       ⏳ Draft v{roadmap.draftVersionNumber} Under Review
                     </span>
                   )}
+
+                  {/* Delete button - for drafts and pending (not approved) */}
+                  {roadmap.status !== "approved" && (
+                    <button
+                      className="btn btn-error btn-sm btn-outline"
+                      onClick={() => setDeleteConfirmId(roadmap.id)}
+                      disabled={actionLoading === roadmap.id}
+                    >
+                      🗑️ Delete
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmId && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Delete Roadmap?</h3>
+            <p className="py-4">
+              Are you sure you want to delete this roadmap? This action cannot be undone.
+            </p>
+            <div className="modal-action">
+              <button
+                className="btn btn-ghost"
+                onClick={() => setDeleteConfirmId(null)}
+                disabled={actionLoading === deleteConfirmId}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-error"
+                onClick={() => handleDeleteRoadmap(deleteConfirmId)}
+                disabled={actionLoading === deleteConfirmId}
+              >
+                {actionLoading === deleteConfirmId ? (
+                  <>
+                    <span className="loading loading-spinner loading-xs"></span>
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete"
+                )}
+              </button>
+            </div>
+          </div>
+          <div className="modal-backdrop" onClick={() => setDeleteConfirmId(null)}></div>
         </div>
       )}
     </div>
