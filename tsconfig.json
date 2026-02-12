@@ -50,6 +50,7 @@
   ],
   "exclude": [
     "node_modules",
-    "codewithahsan-revamp"
+    "codewithahsan-revamp",
+    "functions"
   ]
 }

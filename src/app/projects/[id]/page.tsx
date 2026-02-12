@@ -59,6 +59,7 @@ export default function ProjectDetailPage() {
   const [demoUrl, setDemoUrl] = useState("");
   const [demoDescription, setDemoDescription] = useState("");
   const [completeLoading, setCompleteLoading] = useState(false);
+  const [transferLoading, setTransferLoading] = useState(false);
 
   const isCreator = user && project?.creatorId === user.uid;
   const isMember = members.some((m) => m.userId === user?.uid);
@@ -435,6 +436,38 @@ export default function ProjectDetailPage() {
     });
   };
 
+  const handleTransferOwnership = (newOwnerId: string, memberName: string) => {
+    showConfirm({
+      title: "Transfer Ownership",
+      message: `Are you sure you want to transfer project ownership to ${memberName}? ${isMember ? "You will remain as a team member." : "You will lose all access to this project."}`,
+      confirmLabel: "Transfer",
+      confirmClass: "btn-warning",
+      onConfirm: async () => {
+        setTransferLoading(true);
+        try {
+          const response = await authFetch(`/api/projects/${projectId}/transfer`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ newOwnerId }),
+          });
+
+          if (response.ok) {
+            showToast("Ownership transferred successfully", "success");
+            fetchProjectData();
+          } else {
+            const data = await response.json();
+            showToast(data.error || data.message || "Failed to transfer ownership", "error");
+          }
+        } catch (error) {
+          console.error("Error transferring ownership:", error);
+          showToast("An error occurred", "error");
+        } finally {
+          setTransferLoading(false);
+        }
+      },
+    });
+  };
+
   const handleCompleteProject = () => {
     setShowCompleteModal(true);
   };
@@ -662,6 +695,7 @@ export default function ProjectDetailPage() {
         isCreator={!!isCreator}
         onRemoveMember={isCreator ? handleRemoveMember : undefined}
         removingMemberId={removingMemberId}
+        onTransferOwnership={isCreator && project.status === "active" ? handleTransferOwnership : undefined}
       />
 
       {/* Join Project Button — for creator who hasn't joined */}
