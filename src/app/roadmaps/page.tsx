@@ -99,6 +99,16 @@ function RoadmapsCatalogContent() {
 
   return (
     <div className="max-w-6xl mx-auto p-8">
+      {/* Breadcrumbs */}
+      <div className="text-sm breadcrumbs mb-4">
+        <ul>
+          <li>
+            <Link href="/mentorship/dashboard">Dashboard</Link>
+          </li>
+          <li>Roadmaps</li>
+        </ul>
+      </div>
+
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-3xl font-bold">Learning Roadmaps</h1>

@@ -125,6 +125,19 @@ export default function RoadmapDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-8">
+      {/* Breadcrumbs */}
+      <div className="text-sm breadcrumbs mb-4">
+        <ul>
+          <li>
+            <Link href="/mentorship/dashboard">Dashboard</Link>
+          </li>
+          <li>
+            <Link href="/roadmaps">Roadmaps</Link>
+          </li>
+          <li>{roadmap.title}</li>
+        </ul>
+      </div>
+
       {/* Admin Preview Warning */}
       {roadmap.status === "pending" && (
         <div className="alert alert-warning mb-4">
@@ -146,11 +159,6 @@ export default function RoadmapDetailPage() {
           </span>
         </div>
       )}
-
-      {/* Back button */}
-      <Link href="/roadmaps" className="btn btn-ghost btn-sm mb-4">
-        ← Back to Roadmaps
-      </Link>
 
       {/* Header Section */}
       <div className="mb-8">

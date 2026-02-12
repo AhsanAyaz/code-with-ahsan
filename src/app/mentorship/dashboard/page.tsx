@@ -11,6 +11,8 @@ import DiscordValidationBanner from "@/components/mentorship/DiscordValidationBa
 interface DashboardStats {
   activeMatches: number;
   completedMentorships: number;
+  myRoadmaps?: number;
+  totalRoadmaps?: number;
 }
 
 // DEV_MODE: Set to true to bypass authentication for testing form layouts
@@ -55,6 +57,8 @@ export default function MentorshipDashboardPage() {
   const [stats, setStats] = useState<DashboardStats>({
     activeMatches: 0,
     completedMentorships: 0,
+    myRoadmaps: 0,
+    totalRoadmaps: 0,
   });
 
   useEffect(() => {
@@ -75,19 +79,45 @@ export default function MentorshipDashboardPage() {
     }
   }, [loading, profileLoading, user, profile, router]);
 
-  // Fetch dashboard stats (active and completed mentorships)
+  // Fetch dashboard stats (active and completed mentorships, roadmaps)
   useEffect(() => {
     const fetchStats = async () => {
       if (!user) return;
       try {
-        const response = await fetch(
+        // Fetch mentorship matches
+        const matchesResponse = await fetch(
           `/api/mentorship/my-matches?uid=${user.uid}&role=${profile?.role}`,
         );
-        if (response.ok) {
-          const data = await response.json();
+        if (matchesResponse.ok) {
+          const data = await matchesResponse.json();
           const activeMatches = (data.activeMatches || []).length;
           const completedMentorships = (data.completedMatches || []).length;
-          setStats({ activeMatches, completedMentorships });
+
+          // Fetch roadmaps stats
+          let myRoadmaps = 0;
+          let totalRoadmaps = 0;
+
+          try {
+            // Get total approved roadmaps
+            const totalResponse = await fetch(`/api/roadmaps?status=approved`);
+            if (totalResponse.ok) {
+              const { roadmaps } = await totalResponse.json();
+              totalRoadmaps = roadmaps.length;
+            }
+
+            // Get user's roadmaps (if mentor)
+            if (profile?.role === "mentor") {
+              const myResponse = await fetch(`/api/roadmaps?creatorId=${user.uid}`);
+              if (myResponse.ok) {
+                const { roadmaps } = await myResponse.json();
+                myRoadmaps = roadmaps.length;
+              }
+            }
+          } catch (error) {
+            console.error("Error fetching roadmap stats:", error);
+          }
+
+          setStats({ activeMatches, completedMentorships, myRoadmaps, totalRoadmaps });
         }
       } catch (error) {
         console.error("Error fetching stats:", error);
@@ -264,6 +294,28 @@ export default function MentorshipDashboardPage() {
           <div className="stat-title">Pending Requests</div>
           <div className="stat-value text-accent">{pendingRequests.length}</div>
         </div>
+
+        {profile.role === "mentor" && (
+          <div className="stat">
+            <div className="stat-figure text-info">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                className="inline-block w-8 h-8 stroke-current"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                ></path>
+              </svg>
+            </div>
+            <div className="stat-title">My Roadmaps</div>
+            <div className="stat-value text-info">{stats.myRoadmaps}</div>
+          </div>
+        )}
       </div>
 
       {/* Navigation Cards */}
@@ -414,6 +466,60 @@ export default function MentorshipDashboardPage() {
             </p>
           </div>
         </Link>
+
+        <Link
+          href="/roadmaps"
+          className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer"
+        >
+          <div className="card-body">
+            <h3 className="card-title">
+              <span className="text-2xl">🗺️</span> Browse Roadmaps
+              {stats.totalRoadmaps > 0 && (
+                <span className="badge badge-info badge-sm">
+                  {stats.totalRoadmaps}
+                </span>
+              )}
+            </h3>
+            <p className="text-base-content/70 text-sm">
+              Explore learning paths and guides
+            </p>
+          </div>
+        </Link>
+
+        {profile.role === "mentor" && profile.status === "accepted" && (
+          <Link
+            href="/roadmaps/new"
+            className="card bg-gradient-to-br from-info/10 to-primary/10 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer border border-info/20"
+          >
+            <div className="card-body">
+              <h3 className="card-title">
+                <span className="text-2xl">📝</span> Create Roadmap
+              </h3>
+              <p className="text-base-content/70 text-sm">
+                Share your expertise with a learning path
+              </p>
+            </div>
+          </Link>
+        )}
+
+        {profile.role === "mentor" && stats.myRoadmaps > 0 && (
+          <Link
+            href={`/roadmaps?creator=${user.uid}`}
+            className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer relative"
+          >
+            <div className="card-body">
+              <h3 className="card-title">
+                <span className="text-2xl">📚</span> My Roadmaps
+                <span className="badge badge-info badge-sm">
+                  {stats.myRoadmaps}
+                </span>
+              </h3>
+              <p className="text-base-content/70 text-sm">
+                Manage your published roadmaps
+              </p>
+            </div>
+          </Link>
+        )}
       </div>
 
       {/* Role-Specific Guidelines */}

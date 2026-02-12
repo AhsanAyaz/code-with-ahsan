@@ -116,6 +116,19 @@ export default function MyRoadmapsPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-8">
+      {/* Breadcrumbs */}
+      <div className="text-sm breadcrumbs mb-4">
+        <ul>
+          <li>
+            <Link href="/mentorship/dashboard">Dashboard</Link>
+          </li>
+          <li>
+            <Link href="/roadmaps">Roadmaps</Link>
+          </li>
+          <li>My Roadmaps</li>
+        </ul>
+      </div>
+
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
