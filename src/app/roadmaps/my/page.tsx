@@ -253,14 +253,21 @@ export default function MyRoadmapsPage() {
                     <div>
                       <h3 className="font-bold">Admin Requested Changes</h3>
                       <p className="text-sm mt-1">{(roadmap as any).feedback}</p>
-                      {(roadmap as any).feedbackAt && (
-                        <p className="text-xs text-base-content/60 mt-1">
-                          {format(
-                            new Date((roadmap as any).feedbackAt),
-                            "MMM d, yyyy"
-                          )}
-                        </p>
-                      )}
+                      {(roadmap as any).feedbackAt && (() => {
+                        try {
+                          const date = new Date((roadmap as any).feedbackAt);
+                          if (!isNaN(date.getTime())) {
+                            return (
+                              <p className="text-xs text-base-content/60 mt-1">
+                                {format(date, "MMM d, yyyy")}
+                              </p>
+                            );
+                          }
+                        } catch (e) {
+                          console.error("Invalid feedbackAt date:", (roadmap as any).feedbackAt);
+                        }
+                        return null;
+                      })()}
                     </div>
                   </div>
                 )}
