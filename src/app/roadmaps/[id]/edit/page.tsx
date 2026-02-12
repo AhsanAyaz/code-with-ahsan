@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useActionState } from "react";
 import { useMentorship } from "@/contexts/MentorshipContext";
+import { useToast } from "@/contexts/ToastContext";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { authFetch } from "@/lib/apiClient";
@@ -41,6 +42,7 @@ const DIFFICULTY_OPTIONS: { value: ProjectDifficulty; label: string }[] = [
 
 export default function EditRoadmapPage() {
   const { user, profile, loading } = useMentorship();
+  const { success: showSuccessToast } = useToast();
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
@@ -156,6 +158,15 @@ export default function EditRoadmapPage() {
 
   const [state, formAction, isPending] = useActionState(editRoadmapAction, {});
 
+  // Handle success: show toast and redirect
+  useEffect(() => {
+    if (state.success && !isPending) {
+      const message = state.message || "Roadmap updated successfully!";
+      showSuccessToast(message);
+      router.push("/roadmaps/my");
+    }
+  }, [state.success, state.message, isPending, showSuccessToast, router]);
+
   // Check authentication
   if (loading || loadingRoadmap) {
     return (
@@ -265,43 +276,6 @@ export default function EditRoadmapPage() {
         <div className="mt-4">
           <Link href="/roadmaps" className="btn btn-ghost">
             Back to Roadmaps
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  // Success state
-  if (state.success) {
-    return (
-      <div className="max-w-4xl mx-auto p-4 sm:p-6">
-        <div className="alert alert-success">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <div>
-            <p className="font-semibold">Roadmap Updated!</p>
-            <p className="text-sm">
-              {state.message || `Your roadmap has been updated to version ${state.version}.`}
-            </p>
-          </div>
-        </div>
-        <div className="mt-6 flex gap-4">
-          <Link href="/roadmaps/my" className="btn btn-primary">
-            Go to My Roadmaps
-          </Link>
-          <Link href="/roadmaps" className="btn btn-ghost">
-            Browse All Roadmaps
           </Link>
         </div>
       </div>
