@@ -17,7 +17,7 @@ const DAYS_OF_WEEK = [
   "sunday",
 ];
 
-type RequestStatus = "none" | "pending" | "declined" | "active" | "completed";
+type RequestStatus = "none" | "pending" | "declined" | "active" | "completed" | "cancelled";
 
 interface MentorProfileClientProps {
   username: string;
@@ -343,6 +343,26 @@ export default function MentorProfileClient({
               />
             </svg>
             Request Declined
+          </button>
+        );
+      case "cancelled":
+        return (
+          <button className="btn btn-ghost btn-outline" disabled>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+              />
+            </svg>
+            Mentorship Cancelled
           </button>
         );
       case "active":
@@ -761,7 +781,9 @@ export default function MentorProfileClient({
                 ? `You're matched with ${mentor.displayName}!`
                 : requestStatus === "completed"
                   ? `You completed mentorship with ${mentor.displayName}!`
-                  : `Want ${mentor.displayName} as your mentor?`
+                  : requestStatus === "cancelled"
+                    ? `Mentorship with ${mentor.displayName} was cancelled`
+                    : `Want ${mentor.displayName} as your mentor?`
               : "Interested in getting mentored?"}
           </h3>
           <p className="opacity-90 mb-4">
@@ -779,7 +801,9 @@ export default function MentorProfileClient({
                         : "Don't forget to rate your mentorship experience."
                       : requestStatus === "declined"
                         ? "Your request was declined. You can explore other mentors."
-                        : mentor.isAtCapacity
+                        : requestStatus === "cancelled"
+                          ? "This mentorship was cancelled. You can explore other mentors."
+                          : mentor.isAtCapacity
                           ? "This mentor is at capacity, but you can explore other amazing mentors."
                           : "Click below to send a mentorship request."}
           </p>
