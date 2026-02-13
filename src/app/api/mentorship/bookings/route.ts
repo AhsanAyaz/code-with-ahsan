@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const menteeData = menteeDoc.data();
+    const menteeData = menteeDoc.data() as Record<string, string> | undefined;
     if (!menteeData) {
       return NextResponse.json(
         { error: "Mentee profile data not found" },
@@ -204,10 +204,10 @@ export async function POST(request: NextRequest) {
     };
 
     const menteeProfile = {
-      displayName: menteeData.displayName || "Unknown Mentee",
-      photoURL: menteeData.photoURL || "",
-      username: menteeData.username || "",
-      discordUsername: menteeData.discordUsername || "",
+      displayName: (menteeData as Record<string, string>).displayName || "Unknown Mentee",
+      photoURL: (menteeData as Record<string, string>).photoURL || "",
+      username: (menteeData as Record<string, string>).username || "",
+      discordUsername: (menteeData as Record<string, string>).discordUsername || "",
     };
 
     // Use Firestore transaction for atomic booking

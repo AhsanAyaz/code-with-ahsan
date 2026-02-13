@@ -209,7 +209,8 @@ export async function createCalendarEvent(
       },
     };
 
-    const response = await calendar.events.insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response = await (calendar.events.insert as any)({
       calendarId: "primary",
       conferenceDataVersion: 1,
       requestBody: event,
@@ -219,10 +220,10 @@ export async function createCalendarEvent(
     logger.info("Created calendar event", {
       mentorId,
       bookingId: booking.id,
-      eventId: response.data.id,
+      eventId: response.data?.id,
     });
 
-    return response.data.id || null;
+    return response.data?.id || null;
   } catch (error) {
     logger.error("Failed to create calendar event", {
       mentorId,
