@@ -52,7 +52,6 @@ const COMMON_TIMEZONES = [
 ];
 
 export default function AvailabilityManager({
-  userId,
   initialAvailability,
   initialUnavailableDates = [],
 }: AvailabilityManagerProps) {
