@@ -272,7 +272,7 @@ export default function EditProjectPage() {
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="input input-bordered"
+                  className="input input-bordered w-full"
                   required
                   minLength={3}
                   maxLength={100}
@@ -291,7 +291,7 @@ export default function EditProjectPage() {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="textarea textarea-bordered h-32"
+                  className="textarea textarea-bordered w-full h-32"
                   required
                   minLength={10}
                   maxLength={2000}
@@ -311,7 +311,7 @@ export default function EditProjectPage() {
                   type="url"
                   value={githubRepo}
                   onChange={(e) => setGithubRepo(e.target.value)}
-                  className="input input-bordered"
+                  className="input input-bordered w-full"
                   placeholder="https://github.com/username/repo"
                   disabled={saving}
                 />
@@ -326,69 +326,62 @@ export default function EditProjectPage() {
                   type="text"
                   value={techStack}
                   onChange={(e) => setTechStack(e.target.value)}
-                  className="input input-bordered"
+                  className="input input-bordered w-full"
                   placeholder="React, TypeScript, Node.js"
                   disabled={saving}
                 />
               </div>
 
-              {/* Difficulty */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Difficulty</span>
-                </label>
-                <select
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value as any)}
-                  className="select select-bordered"
-                  disabled={saving}
-                >
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                </select>
-              </div>
+              {/* Difficulty & Max Team Size - side by side */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Difficulty</span>
+                  </label>
+                  <select
+                    value={difficulty}
+                    onChange={(e) => setDifficulty(e.target.value as any)}
+                    className="select select-bordered w-full"
+                    disabled={saving}
+                  >
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                  </select>
+                </div>
 
-              {/* Max Team Size */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Max Team Size</span>
-                </label>
-                <input
-                  type="number"
-                  value={maxTeamSize}
-                  onChange={(e) => setMaxTeamSize(parseInt(e.target.value))}
-                  className="input input-bordered"
-                  min={1}
-                  max={20}
-                  required
-                  disabled={saving}
-                />
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Max Team Size</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={maxTeamSize}
+                    onChange={(e) => setMaxTeamSize(parseInt(e.target.value))}
+                    className="input input-bordered w-full"
+                    min={1}
+                    max={20}
+                    required
+                    disabled={saving}
+                  />
+                </div>
               </div>
 
               {/* Action buttons */}
-              <div className="flex gap-3 justify-end">
-                <Link
-                  href={`/projects/${projectId}`}
-                  className="btn btn-ghost"
-                >
-                  Cancel
-                </Link>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={saving}
-                >
-                  {saving ? (
-                    <>
-                      <span className="loading loading-spinner loading-sm"></span>
-                      Saving...
-                    </>
-                  ) : (
-                    "Save Changes"
-                  )}
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="btn btn-primary w-full"
+                disabled={saving}
+              >
+                {saving ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Saving...
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
+              </button>
             </form>
           </div>
         </div>
