@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Milestone: v2.0
-Phase: 09 of 10 (Roadmaps - Discovery & Rendering)
-Plan: 2 of 2
-Status: Complete - Phase 09 finished
-Last activity: 2026-02-12 - Completed quick task 23: Clean up stale invitations/applications on team join
+Phase: 11 (Admin Project Management - View & Delete)
+Plan: 3 of 3
+Status: Complete
+Last activity: 2026-02-13 - Completed quick task 34: Add edit action to My Projects
 
-Progress: [████████████████████] 100% (26/26 total plans complete across current phases)
+Progress: [█████████████████████] 100% (29/29 total plans complete across current phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 26 (v1.0: 5, v2.0: 21)
-- Average duration: ~15 min
-- Total execution time: ~6 hours 47 minutes
+- Total plans completed: 29 (v1.0: 5, v2.0: 24)
+- Average duration: ~14 min
+- Total execution time: ~7 hours 1 minute
 
 **By Phase:**
 
@@ -38,10 +38,11 @@ Progress: [████████████████████] 100% (2
 | 07 | 6 | 14 min | 2.3 min |
 | 08 | 3 | 14 min | 4.7 min |
 | 09 | 2 | 5 min | 2.5 min |
+| 11 | 3 | 14.3 min | 4.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 08-02 (3min), 08-03 (9min), 09-01 (2min), 09-02 (3min)
-- Trend: Phase 09 complete - Roadmap discovery (catalog + detail page) with Markdown rendering
+- Last 5 plans: 09-01 (2min), 09-02 (3min), 11-01 (6min), 11-02 (3.5min), 11-03 (4.8min)
+- Trend: Phase 11 complete - Admin project management fully implemented
 
 *Updated after each plan completion*
 | Phase 08 P01 | 2 | 2 tasks | 3 files |
@@ -49,6 +50,13 @@ Progress: [████████████████████] 100% (2
 | Phase 08 P03 | 9 | 2 tasks | 2 files |
 | Phase 09 P01 | 115 | 2 tasks | 3 files |
 | Phase 09-roadmaps-discovery-rendering P02 | 3 | 2 tasks | 2 files |
+| Phase 11 P01 | 6 | 2 tasks | 11 files |
+| Phase 11 P02 | 210 | 2 tasks | 3 files |
+| Phase 11 P03 | 290 | 2 tasks | 4 files |
+| Phase quick-29 P1 | 5 | 4 tasks | 5 files |
+| Phase quick-32 P32 | 1 | 1 tasks | 1 files |
+| Phase quick-33 P1 | 5 | 4 tasks | 4 files |
+| Phase quick-34 P1 | 64 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -116,6 +124,12 @@ Recent decisions affecting current work:
 - [Phase 09-02]: Fuzzy case-insensitive domain matching for related mentors (maps domain values to readable labels)
 - [Phase 09-02]: Limited related mentors to top 3 for focused recommendations
 - [Phase 09-01]: No URL param syncing for filters - browse experience vs search destination (per Phase 07-06 pattern)
+- [Phase 11-01]: Admin token read from localStorage directly (not via React Context) for simpler pattern
+- [Phase 11-01]: Simplified admin pages preserve core functionality (approve/decline/delete) without full monolith complexity (filters, modals, pagination, inline editing can be added incrementally)
+- [Phase quick-29]: Public discovery defaults to active OR completed projects when no filters provided
+- [Phase quick-29]: PERM-09: Admin can delete any project, creators can only delete own declined projects
+- [Phase quick-32]: Inline helper function instead of shared utility for single-use case
+- [Phase quick-32]: Status badge positioned next to title for immediate visibility
 
 ### Roadmap Evolution
 
@@ -215,6 +229,9 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 032 | Add status badges to My Projects page | 2026-02-13 | 0ce450e | [032-add-status-badges-to-my-projects-page](./quick/32-add-status-badges-to-my-projects-page/) |
+| 033 | Replace edit modal with dedicated page | 2026-02-13 | 657a2d3 | [033-replace-edit-modal-with-dedicated-page](./quick/33-replace-edit-modal-with-dedicated-page/) |
+| 034 | Add edit action to My Projects for pending/declined projects | 2026-02-13 | 9ded86e | [034-add-edit-action-to-my-projects](./quick/34-add-edit-action-to-my-projects/) |
 | 001 | Fix Discord channel name fallback and timezone handling | 2026-01-30 | 43536a6 | [001-fix-discord-channel-name-and-timezone](./quick/001-fix-discord-channel-name-and-timezone/) |
 | 002 | Assign Discord roles on mentor/mentee signup | 2026-01-30 | f8e3b26 | [002-assign-discord-roles-on-signup](./quick/002-assign-discord-roles-on-signup/) |
 | 003 | Add profile preview buttons for admins and mentors | 2026-02-01 | 365c4fd | [003-add-profile-preview-buttons-1-add-a-prof](./quick/003-add-profile-preview-buttons-1-add-a-prof/) |
@@ -238,12 +255,20 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 021 | Clean up stale invitations/applications when user joins via alternate path | 2026-02-12 | c724927 | [021-clean-up-stale-invitations-applications-](./quick/21-clean-up-stale-invitations-applications-/) |
 | 022 | Allow creator to transfer project ownership to team members | 2026-02-12 | c2b87f2 | [022-allow-creator-to-transfer-project-owners](./quick/22-allow-creator-to-transfer-project-owners/) |
 | 023 | Clean up stale invitations/applications on team join (both paths) | 2026-02-12 | 5a9ac4c | [023-on-invitation-acceptance-or-application-](./quick/23-on-invitation-acceptance-or-application-/) |
+| 024 | Restore original admin dashboard functionality (Pending Mentors, All Mentors, All Mentees pages) | 2026-02-13 | 8973f2f | [024-restore-original-admin-dashboard-functio](./quick/24-restore-original-admin-dashboard-functio/) |
+| 025 | Fix two admin dashboard issues: (1) Projects page 401 auth loop - use x-admin-token session verification (2) Mentees page wrong labels - header and stats | 2026-02-13 | 43dcb09 | [025-fix-two-admin-dashboard-issues-1-project](./quick/25-fix-two-admin-dashboard-issues-1-project/) |
+| 026 | Add approve and decline actions to admin projects page | 2026-02-13 | 02e3e58 | [026-add-approve-and-decline-actions-to-admin](./quick/26-add-approve-and-decline-actions-to-admin/) |
+| 027 | Fix thick dividers in admin projects Actions dropdown menu | 2026-02-13 | 9f09fa9 | [027-fix-thick-dividers-in-admin-projects-act](./quick/27-fix-thick-dividers-in-admin-projects-act/) |
+| 028 | Hide invite input and apply button on declined/pending projects | 2026-02-13 | 7efe450 | [028-hide-invite-input-on-declined-pending-pr](./quick/28-hide-invite-input-on-declined-pending-pr/) |
+| 029 | Fix project visibility and declined project workflow | 2026-02-13 | a1a1946 | [029-fix-project-visibility-and-declined-proj](./quick/29-fix-project-visibility-and-declined-proj/) |
+| 030 | Add access control to project detail page for pending/declined projects | 2026-02-13 | 16d6890 | [030-add-access-control-to-project-detail-pag](./quick/30-add-access-control-to-project-detail-pag/) |
+| 031 | Add admin project management features (Discord contact, Edit action, permissions) | 2026-02-13 | 58cb21f | [031-add-admin-project-management-features-1-](./quick/31-add-admin-project-management-features-1-/) |
 
 ## Session Continuity
 
-Last session: 2026-02-12
-Stopped at: Completed quick task 23: Clean up stale invitations/applications on team join
+Last session: 2026-02-13
+Stopped at: Completed Quick Task 034: Add edit action to My Projects
 Resume file: None
 
 ---
-*Updated: 2026-02-11 after completing Phase 09 Plan 02*
+*Updated: 2026-02-13 after completing Quick Task 034*

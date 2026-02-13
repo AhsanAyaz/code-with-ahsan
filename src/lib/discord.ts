@@ -1458,3 +1458,47 @@ export async function sendRoadmapStatusNotification(
     return false;
   }
 }
+
+/**
+ * Delete a Discord channel
+ *
+ * @param channelId - The Discord channel ID to delete
+ * @param reason - Reason for deletion (added to audit log)
+ * @returns true if deleted successfully (200) or already gone (404), false on other errors
+ */
+export async function deleteDiscordChannel(
+  channelId: string,
+  reason: string
+): Promise<boolean> {
+  log.debug(`Deleting Discord channel: ${channelId} (reason: ${reason})`);
+
+  try {
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/channels/${channelId}`,
+      {
+        method: "DELETE",
+        headers: {
+          ...getHeaders(),
+          "X-Audit-Log-Reason": reason,
+        },
+      }
+    );
+
+    if (response.ok) {
+      log.debug(`Channel ${channelId} deleted successfully`);
+      return true;
+    } else if (response.status === 404) {
+      log.debug(`Channel ${channelId} already deleted (404)`);
+      return true;
+    } else {
+      const errorText = await response.text();
+      log.error(
+        `[Discord] Failed to delete channel ${channelId}: ${response.status} - ${errorText}`
+      );
+      return false;
+    }
+  } catch (error) {
+    log.error(`[Discord] Error deleting channel ${channelId}:`, error);
+    return false;
+  }
+}

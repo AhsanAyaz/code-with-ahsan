@@ -2,13 +2,14 @@
  * Centralized Permission System
  * Single source of truth for authorization logic across the application
  *
- * This module implements PERM-01 through PERM-08 requirements:
+ * This module implements PERM-01 through PERM-09 requirements:
  * - PERM-01: Any authenticated user can create projects
  * - PERM-02: Only accepted mentors can create roadmaps
  * - PERM-03: Only admins can approve projects and roadmaps
  * - PERM-04: Only project creator or admin can edit/manage projects
  * - PERM-07: Any authenticated user can apply to projects
  * - PERM-08: Users cannot apply to their own projects
+ * - PERM-09: Admins can delete any project, creators can delete their own declined projects
  */
 
 import { MentorshipRole, Project, Roadmap } from "@/types/mentorship";
@@ -116,13 +117,21 @@ export function canApproveProject(
 
 /**
  * PERM-04: Can edit projects
- * Only project creator or admin can edit
+ * Admin can edit any project status, creators can only edit pending/declined projects
  */
 export function canEditProject(
   user: PermissionUser | null,
   project: Project
 ): boolean {
-  return canOwnerOrAdminAccess(user, project);
+  // Admin can always edit any project
+  if (isAdminUser(user)) return true;
+
+  // Creator can only edit pending or declined projects
+  if (isOwner(user, project)) {
+    return project.status === "pending" || project.status === "declined";
+  }
+
+  return false;
 }
 
 /**
@@ -147,6 +156,23 @@ export function canApplyToProject(
   if (!isAuthenticated(user)) return false;
   if (isOwner(user, project)) return false; // PERM-08: Cannot apply to own project
   return true;
+}
+
+/**
+ * PERM-09: Can delete projects
+ * Admin can delete any project, creators can delete their own declined projects
+ */
+export function canDeleteProject(
+  user: PermissionUser | null,
+  project: Project
+): boolean {
+  // Admin can delete any project
+  if (isAdminUser(user)) return true;
+
+  // Creator can only delete their own declined projects
+  if (isOwner(user, project) && project.status === "declined") return true;
+
+  return false;
 }
 
 // ─── Roadmap Permissions ────────────────────────────────────────

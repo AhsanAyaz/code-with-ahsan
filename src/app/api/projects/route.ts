@@ -172,6 +172,9 @@ export async function GET(request: NextRequest) {
     const creatorId = searchParams.get("creatorId");
     const member = searchParams.get("member");
 
+    // For public discovery (no creator/member filter), default to approved projects only
+    const isPublicListing = !creatorId && !member;
+
     // If member filter: look up project_members first, then batch-fetch projects
     if (member) {
       const membershipsSnapshot = await db
@@ -216,6 +219,9 @@ export async function GET(request: NextRequest) {
 
     if (status) {
       query = query.where("status", "==", status) as any;
+    } else if (isPublicListing) {
+      // Public listings: only show approved projects (active or completed)
+      query = query.where("status", "in", ["active", "completed"]) as any;
     }
 
     if (creatorId) {

@@ -9,15 +9,19 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/admin</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/books</loc>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/community</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses</loc>
   </url>
 
   <url>
@@ -49,6 +53,26 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/admin/mentees</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/admin/mentors</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/admin/pending</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/admin/projects</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/admin/roadmaps</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/books/mastering-angular-signals</loc>
   </url>
 
@@ -57,23 +81,15 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/dashboard</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/mentorship/browse</loc>
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/mentorship/dashboard</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/mentorship/goals</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/mentorship/requests</loc>
   </url>
 
   <url>
@@ -85,11 +101,19 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/projects/my</loc>
+    <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/mentorship/requests</loc>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/projects/discover</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/projects/my</loc>
   </url>
 
   <url>
@@ -105,11 +129,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/events/hackstack/2023</loc>
+    <loc>https://codewithahsan.dev/roadmaps/new</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/roadmaps/new</loc>
+    <loc>https://codewithahsan.dev/events/hackstack/2023</loc>
   </url>
 
   <url>

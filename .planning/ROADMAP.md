@@ -258,12 +258,14 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 ### Phase 11: Admin Project Management: View all projects and delete with cascade cleanup
 
-**Goal:** [To be planned]
+**Goal:** Admin interface for viewing all projects with comprehensive management capabilities, cascade delete with Discord cleanup and member notifications, and admin dashboard refactor from client-side tabs to nested routes for proper URL navigation.
 **Depends on:** Phase 10
-**Plans:** 0 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 11 to break down)
+- [ ] 11-01-PLAN.md — Admin dashboard route refactor: layout, auth gate, navigation, and migrate existing tabs to /admin/* routes
+- [ ] 11-02-PLAN.md — Admin projects API: enriched listing endpoint with filters and atomic cascade delete endpoint
+- [ ] 11-03-PLAN.md — Projects management page: filter UI, project cards, two-step delete confirmation, and post-deletion summary
 
 ---
-*Last updated: 2026-02-11 after Phase 9 planning complete*
+*Last updated: 2026-02-12 after Phase 11 planning complete*

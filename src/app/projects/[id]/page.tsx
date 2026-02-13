@@ -537,6 +537,36 @@ export default function ProjectDetailPage() {
     );
   }
 
+  // Access control: Only show pending/declined projects to creator
+  // (Admin access is handled via admin dashboard with token authentication)
+  const isNonPublicProject = project.status === "pending" || project.status === "declined";
+
+  if (isNonPublicProject && !isCreator) {
+    return (
+      <div className="max-w-4xl mx-auto p-8">
+        <div className="alert alert-error">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>Project not found</span>
+        </div>
+        <Link href="/projects/discover" className="btn btn-ghost mt-4">
+          Back to Discovery
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-8 space-y-8">
       {/* Back button */}
@@ -851,33 +881,35 @@ export default function ProjectDetailPage() {
           )}
 
           {/* Invitation Form */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Invite Team Members</h2>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Email or Discord username"
-                className="input input-bordered flex-1"
-                value={inviteInput}
-                onChange={(e) => setInviteInput(e.target.value)}
-                disabled={inviteLoading}
-              />
-              <button
-                onClick={handleInvite}
-                className="btn btn-primary"
-                disabled={inviteLoading || !inviteInput.trim()}
-              >
-                {inviteLoading ? (
-                  <>
-                    <span className="loading loading-spinner loading-sm"></span>
-                    Inviting...
-                  </>
-                ) : (
-                  "Invite"
-                )}
-              </button>
+          {project.status === 'active' && (
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Invite Team Members</h2>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Email or Discord username"
+                  className="input input-bordered flex-1"
+                  value={inviteInput}
+                  onChange={(e) => setInviteInput(e.target.value)}
+                  disabled={inviteLoading}
+                />
+                <button
+                  onClick={handleInvite}
+                  className="btn btn-primary"
+                  disabled={inviteLoading || !inviteInput.trim()}
+                >
+                  {inviteLoading ? (
+                    <>
+                      <span className="loading loading-spinner loading-sm"></span>
+                      Inviting...
+                    </>
+                  ) : (
+                    "Invite"
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Sent Invitations */}
           {invitations.length > 0 && (
@@ -927,7 +959,7 @@ export default function ProjectDetailPage() {
       )}
 
       {/* Non-creator, Non-member: Application Form */}
-      {user && !isCreator && !isMember && !userApplication && !userInvitation && (
+      {user && !isCreator && !isMember && !userApplication && !userInvitation && project.status === 'active' && (
         <div>
           <h2 className="text-xl font-semibold mb-4">Apply to Join</h2>
           <ApplicationForm
@@ -1007,7 +1039,7 @@ export default function ProjectDetailPage() {
       )}
 
       {/* Unauthenticated users */}
-      {!user && (
+      {!user && project.status === 'active' && (
         <div className="alert alert-warning">
           <svg
             xmlns="http://www.w3.org/2000/svg"

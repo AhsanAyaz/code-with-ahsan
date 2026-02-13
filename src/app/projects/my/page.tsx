@@ -42,6 +42,8 @@ export default function MyProjectsPage() {
   const [error, setError] = useState<string | null>(null);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const difficultyColors: Record<ProjectDifficulty, string> = {
     beginner: "badge-success",
@@ -181,6 +183,33 @@ export default function MyProjectsPage() {
       );
     } finally {
       setActionLoadingId(null);
+    }
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    setDeletingProjectId(projectId);
+    try {
+      const response = await authFetch(`/api/projects/${projectId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete project");
+      }
+
+      // Remove project from local state
+      setProjects((prev) => prev.filter((p) => p.id !== projectId));
+      setConfirmDeleteId(null);
+      showToast("Project deleted successfully", "success");
+    } catch (err) {
+      console.error("Error deleting project:", err);
+      showToast(
+        err instanceof Error ? err.message : "Failed to delete project",
+        "error"
+      );
+    } finally {
+      setDeletingProjectId(null);
     }
   };
 
@@ -377,7 +406,61 @@ export default function MyProjectsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
+            <div key={project.id} className="relative">
+              <ProjectCard project={project} />
+              {activeTab === "created" && (project.status === "pending" || project.status === "declined") && (
+                <div className="absolute top-2 right-2 flex gap-2">
+                  {/* Edit button - shown for both pending and declined */}
+                  <Link
+                    href={`/projects/${project.id}/edit`}
+                    className="btn btn-primary btn-xs"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Edit
+                  </Link>
+
+                  {/* Delete button - only for declined projects */}
+                  {project.status === "declined" && (
+                    <>
+                      {confirmDeleteId === project.id ? (
+                        <div className="flex gap-2 bg-base-100 rounded-lg p-2 shadow-lg">
+                          <button
+                            onClick={() => handleDeleteProject(project.id)}
+                            className="btn btn-error btn-xs"
+                            disabled={deletingProjectId === project.id}
+                          >
+                            {deletingProjectId === project.id ? (
+                              <span className="loading loading-spinner loading-xs"></span>
+                            ) : (
+                              "Confirm Delete"
+                            )}
+                          </button>
+                          <button
+                            onClick={() => setConfirmDeleteId(null)}
+                            className="btn btn-ghost btn-xs"
+                            disabled={deletingProjectId === project.id}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setConfirmDeleteId(project.id);
+                          }}
+                          className="btn btn-error btn-xs"
+                          title="Delete declined project"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           ))}
         </div>
       )}
