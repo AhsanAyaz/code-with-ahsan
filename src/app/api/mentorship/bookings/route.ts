@@ -1,11 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { verifyAuth } from "@/lib/auth";
-import { sendDirectMessage, isDiscordConfigured } from "@/lib/discord";
+import { sendChannelMessage, isDiscordConfigured } from "@/lib/discord";
 import { createCalendarEvent, deleteCalendarEvent, isCalendarConfigured } from "@/lib/google-calendar";
 import { FieldValue } from "firebase-admin/firestore";
 import { format } from "date-fns";
 import type { MentorBooking } from "@/types/mentorship";
+
+/**
+ * Find the Discord channel ID for a mentor-mentee pair from their active mentorship session.
+ */
+async function findMentorshipChannelId(mentorId: string, menteeId: string): Promise<string | null> {
+  try {
+    const sessionsSnapshot = await db.collection("mentorship_sessions")
+      .where("mentorId", "==", mentorId)
+      .where("menteeId", "==", menteeId)
+      .where("status", "==", "active")
+      .limit(1)
+      .get();
+
+    if (sessionsSnapshot.empty) return null;
+    return sessionsSnapshot.docs[0].data()?.discordChannelId || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Find the mentorship session ID for a mentor-mentee pair.
+ */
+async function findMentorshipSessionId(mentorId: string, menteeId: string): Promise<string | null> {
+  try {
+    const sessionsSnapshot = await db.collection("mentorship_sessions")
+      .where("mentorId", "==", mentorId)
+      .where("menteeId", "==", menteeId)
+      .where("status", "==", "active")
+      .limit(1)
+      .get();
+
+    if (sessionsSnapshot.empty) return null;
+    return sessionsSnapshot.docs[0].id;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * GET /api/mentorship/bookings?userId={uid}&role={mentor|mentee}&status={confirmed|cancelled|all}
@@ -281,6 +319,44 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Create a scheduled session in the dashboard (non-blocking)
+    const sessionId = await findMentorshipSessionId(mentorId, auth.uid);
+    if (sessionId) {
+      try {
+        await db.collection("mentorship_scheduled_sessions").add({
+          sessionId,
+          bookingId,
+          scheduledAt: startTimeDate,
+          duration: 30,
+          agenda: `Mentorship session booked by ${menteeProfile.displayName}`,
+          mentorTimezone: timezone,
+          notes: "",
+          createdAt: FieldValue.serverTimestamp(),
+        });
+      } catch (sessionError) {
+        console.error("Failed to create scheduled session (non-blocking):", sessionError);
+      }
+    }
+
+    // Send Discord channel notification (non-blocking)
+    if (isDiscordConfigured()) {
+      const channelId = await findMentorshipChannelId(mentorId, auth.uid);
+      if (channelId) {
+        const formattedDate = format(startTimeDate, "EEEE, MMMM d, yyyy");
+        const formattedTime = format(startTimeDate, "h:mm a");
+
+        sendChannelMessage(
+          channelId,
+          `📅 **New Session Booked!**\n\n` +
+            `**Booked by:** ${menteeProfile.displayName}\n` +
+            `**Date:** ${formattedDate}\n` +
+            `**Time:** ${formattedTime} (${timezone})\n` +
+            `**Duration:** 30 minutes\n\n` +
+            `See you there! 🎉`
+        ).catch((err) => console.error("Failed to send booking Discord notification:", err));
+      }
+    }
+
     return NextResponse.json(
       {
         success: true,
@@ -379,66 +455,63 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Update booking status
-    await bookingRef.update({
-      status: "cancelled",
-      cancelledBy: auth.uid,
-      cancelledAt: new Date(),
-      cancellationReason: reason || null,
-      updatedAt: FieldValue.serverTimestamp(),
-    });
+    // Delete the booking document (clean up, don't keep cancelled bookings)
+    await bookingRef.delete();
 
-    // Send Discord DM notification (non-blocking)
+    // Delete associated scheduled session (non-blocking)
+    try {
+      const scheduledSessions = await db.collection("mentorship_scheduled_sessions")
+        .where("bookingId", "==", bookingId)
+        .get();
+
+      const batch = db.batch();
+      scheduledSessions.docs.forEach((doc) => batch.delete(doc.ref));
+      if (!scheduledSessions.empty) {
+        await batch.commit();
+      }
+    } catch (sessionError) {
+      console.error("Failed to delete scheduled session (non-blocking):", sessionError);
+    }
+
+    // Send Discord channel notification (non-blocking)
     const isMentorCancel = auth.uid === bookingData.mentorId;
-    const recipientDiscordUsername = isMentorCancel
-      ? bookingData.menteeProfile?.discordUsername
-      : bookingData.mentorProfile?.discordUsername;
-
     const cancellerName = isMentorCancel
-      ? bookingData.mentorProfile?.displayName || "Your mentor"
-      : bookingData.menteeProfile?.displayName || "Your mentee";
+      ? bookingData.mentorProfile?.displayName || "The mentor"
+      : bookingData.menteeProfile?.displayName || "The mentee";
 
-    if (recipientDiscordUsername && isDiscordConfigured()) {
-      try {
-        // Format date and time for the notification
-        const startDate = bookingData.startTime instanceof Date
-          ? bookingData.startTime
-          : new Date(bookingData.startTime);
-        const formattedDate = format(startDate, "MMMM d, yyyy");
-        const formattedTime = format(startDate, "h:mm a");
+    if (isDiscordConfigured()) {
+      const channelId = await findMentorshipChannelId(bookingData.mentorId, bookingData.menteeId);
+      if (channelId) {
+        try {
+          const startDate = bookingData.startTime instanceof Date
+            ? bookingData.startTime
+            : new Date(bookingData.startTime);
+          const formattedDate = format(startDate, "EEEE, MMMM d, yyyy");
+          const formattedTime = format(startDate, "h:mm a");
 
-        // Check if this is a reschedule request (mentor cancels with "reschedule" in reason)
-        const isRescheduleRequest = isMentorCancel && reason && reason.toLowerCase().includes("reschedule");
+          const isRescheduleRequest = isMentorCancel && reason && reason.toLowerCase().includes("reschedule");
 
-        const message = isRescheduleRequest
-          ? `**Reschedule Requested**\n\nYour mentor ${cancellerName} has requested to reschedule your mentorship session on ${formattedDate} at ${formattedTime} (${bookingData.timezone}).\n${reason ? `Reason: ${reason}\n` : ""}\nPlease visit the platform to book a new time: https://codewithahsan.dev/mentorship/book/${bookingData.mentorId}`
-          : `**Session Cancelled**\n\nYour mentorship session on ${formattedDate} at ${formattedTime} (${bookingData.timezone}) has been cancelled by ${cancellerName}.\n${reason ? `Reason: ${reason}\n` : ""}\nPlease visit the platform to manage your bookings: https://codewithahsan.dev/mentorship/dashboard`;
+          const message = isRescheduleRequest
+            ? `🔄 **Session Reschedule Requested**\n\n${cancellerName} has cancelled the session on **${formattedDate}** at **${formattedTime}** (${bookingData.timezone}) and requests to reschedule.\n${reason ? `**Reason:** ${reason}\n` : ""}\nPlease book a new time at your convenience.`
+            : `❌ **Session Cancelled**\n\nThe mentorship session on **${formattedDate}** at **${formattedTime}** (${bookingData.timezone}) has been cancelled by ${cancellerName}.\n${reason ? `**Reason:** ${reason}` : ""}`;
 
-        await sendDirectMessage(recipientDiscordUsername, message);
-      } catch (discordError) {
-        // Log but don't fail the API response
-        console.error("Failed to send Discord DM for booking cancellation:", discordError);
+          await sendChannelMessage(channelId, message);
+        } catch (discordError) {
+          console.error("Failed to send cancellation Discord notification:", discordError);
+        }
       }
     }
 
-    // After booking cancelled, attempt calendar event deletion (non-blocking)
+    // Attempt calendar event deletion (non-blocking)
     if (isCalendarConfigured() && bookingData.calendarEventId) {
       try {
         await deleteCalendarEvent(bookingData.mentorId, bookingData.calendarEventId);
-        // Update booking to clear calendar reference
-        await db.collection("mentorship_bookings").doc(bookingId).update({
-          calendarSyncStatus: "cancelled",
-        });
       } catch (calendarError) {
         console.error("Calendar event deletion failed (non-blocking):", calendarError);
-        // Don't fail the cancel operation
       }
     }
 
-    return NextResponse.json({
-      success: true,
-      calendarEventId: bookingData.calendarEventId || null,
-    });
+    return NextResponse.json({ success: true });
 
   } catch (error) {
     console.error("Error cancelling booking:", error);
