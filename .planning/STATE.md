@@ -13,7 +13,7 @@ Milestone: v2.0
 Phase: 11 (Admin Project Management - View & Delete)
 Plan: 3 of 3
 Status: Complete
-Last activity: 2026-02-13 - Completed quick task 34: Add edit action to My Projects
+Last activity: 2026-02-13 - Completed quick task 035: Fix edit project page layout
 
 Progress: [█████████████████████] 100% (29/29 total plans complete across current phases)
 
@@ -130,6 +130,8 @@ Recent decisions affecting current work:
 - [Phase quick-29]: PERM-09: Admin can delete any project, creators can only delete own declined projects
 - [Phase quick-32]: Inline helper function instead of shared utility for single-use case
 - [Phase quick-32]: Status badge positioned next to title for immediate visibility
+- [Phase quick-035]: Edit page provides its own bg-base-200 background (projects layout.tsx only provides MentorshipProvider)
+- [Phase quick-035]: Card-based layout pattern for settings/edit pages (bg-base-200 background with card bg-base-100 shadow-xl containers)
 
 ### Roadmap Evolution
 
@@ -232,6 +234,7 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 032 | Add status badges to My Projects page | 2026-02-13 | 0ce450e | [032-add-status-badges-to-my-projects-page](./quick/32-add-status-badges-to-my-projects-page/) |
 | 033 | Replace edit modal with dedicated page | 2026-02-13 | 657a2d3 | [033-replace-edit-modal-with-dedicated-page](./quick/33-replace-edit-modal-with-dedicated-page/) |
 | 034 | Add edit action to My Projects for pending/declined projects | 2026-02-13 | 9ded86e | [034-add-edit-action-to-my-projects](./quick/34-add-edit-action-to-my-projects/) |
+| 035 | Fix edit project page layout to match /profile card-based styling | 2026-02-13 | ba4ef12 | [035-fix-edit-project-page-layout](./quick/035-fix-edit-project-page-layout/) |
 | 001 | Fix Discord channel name fallback and timezone handling | 2026-01-30 | 43536a6 | [001-fix-discord-channel-name-and-timezone](./quick/001-fix-discord-channel-name-and-timezone/) |
 | 002 | Assign Discord roles on mentor/mentee signup | 2026-01-30 | f8e3b26 | [002-assign-discord-roles-on-signup](./quick/002-assign-discord-roles-on-signup/) |
 | 003 | Add profile preview buttons for admins and mentors | 2026-02-01 | 365c4fd | [003-add-profile-preview-buttons-1-add-a-prof](./quick/003-add-profile-preview-buttons-1-add-a-prof/) |
@@ -267,8 +270,8 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed Quick Task 034: Add edit action to My Projects
+Stopped at: Completed Quick Task 035: Fix edit project page layout
 Resume file: None
 
 ---
-*Updated: 2026-02-13 after completing Quick Task 034*
+*Updated: 2026-02-13 after completing Quick Task 035*
