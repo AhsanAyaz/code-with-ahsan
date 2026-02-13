@@ -11,6 +11,7 @@ import Link from "next/link";
 import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 import MentorAnnouncementCard from "@/components/mentorship/MentorAnnouncementCard";
 import AvailabilityManager from "@/components/mentorship/AvailabilityManager";
+import BookingsList from "@/components/mentorship/BookingsList";
 import { authFetch } from "@/lib/apiClient";
 import { TimeSlotAvailability, UnavailableDate } from "@/types/mentorship";
 
@@ -372,6 +373,11 @@ export default function SettingsPage() {
             initialUnavailableDates={unavailableDates}
             isCalendarConnected={isCalendarConnected}
           />
+
+          {/* Upcoming Bookings */}
+          <div className="mt-6">
+            <BookingsList userId={profile.uid} role="mentor" />
+          </div>
         </>
       )}
     </div>

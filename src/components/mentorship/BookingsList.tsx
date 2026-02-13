@@ -146,6 +146,12 @@ export default function BookingsList({ userId, role }: BookingsListProps) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    {booking.calendarSyncStatus === "synced" && (
+                      <span className="badge badge-success badge-xs" title="Google Calendar event created">Cal</span>
+                    )}
+                    {booking.calendarSyncStatus === "failed" && (
+                      <span className="badge badge-warning badge-xs" title="Calendar sync failed">!</span>
+                    )}
                     {isCancelled ? (
                       <span className="badge badge-error badge-sm">
                         Cancelled

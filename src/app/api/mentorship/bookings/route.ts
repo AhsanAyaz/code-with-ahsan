@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { verifyAuth } from "@/lib/auth";
 import { sendDirectMessage, isDiscordConfigured } from "@/lib/discord";
+import { createCalendarEvent, deleteCalendarEvent, isCalendarConfigured } from "@/lib/google-calendar";
 import { FieldValue } from "firebase-admin/firestore";
 import { format } from "date-fns";
 import type { MentorBooking } from "@/types/mentorship";
@@ -249,6 +250,37 @@ export async function POST(request: NextRequest) {
     const createdBooking = await db.collection("mentorship_bookings").doc(bookingId).get();
     const bookingData = createdBooking.data();
 
+    // After booking created successfully, attempt calendar event creation (non-blocking)
+    if (isCalendarConfigured()) {
+      try {
+        const eventId = await createCalendarEvent(mentorId, {
+          id: bookingId,
+          startTime: startTimeDate,
+          endTime: endTimeDate,
+          timezone,
+          menteeName: menteeProfile.displayName,
+          menteeEmail: (menteeData as Record<string, string>).email,
+        });
+
+        if (eventId) {
+          // Update booking with calendar event ID
+          await db.collection("mentorship_bookings").doc(bookingId).update({
+            calendarEventId: eventId,
+            calendarSyncStatus: "synced",
+          });
+        } else {
+          await db.collection("mentorship_bookings").doc(bookingId).update({
+            calendarSyncStatus: "not_connected",
+          });
+        }
+      } catch (calendarError) {
+        console.error("Calendar event creation failed (non-blocking):", calendarError);
+        await db.collection("mentorship_bookings").doc(bookingId).update({
+          calendarSyncStatus: "failed",
+        }).catch(() => {}); // Double catch: don't fail if update fails too
+      }
+    }
+
     return NextResponse.json(
       {
         success: true,
@@ -386,6 +418,20 @@ export async function PUT(request: NextRequest) {
       } catch (discordError) {
         // Log but don't fail the API response
         console.error("Failed to send Discord DM for booking cancellation:", discordError);
+      }
+    }
+
+    // After booking cancelled, attempt calendar event deletion (non-blocking)
+    if (isCalendarConfigured() && bookingData.calendarEventId) {
+      try {
+        await deleteCalendarEvent(bookingData.mentorId, bookingData.calendarEventId);
+        // Update booking to clear calendar reference
+        await db.collection("mentorship_bookings").doc(bookingId).update({
+          calendarSyncStatus: "cancelled",
+        });
+      } catch (calendarError) {
+        console.error("Calendar event deletion failed (non-blocking):", calendarError);
+        // Don't fail the cancel operation
       }
     }
 
