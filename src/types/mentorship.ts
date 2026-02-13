@@ -275,3 +275,65 @@ export interface ProjectTemplate {
   suggestedTimeline: string;      // e.g., "4-6 weeks" - display only, informational
   recommendedSkills: string[];    // Display only, helps creators think about requirements
 }
+
+// --- Phase 12: Mentor Time Slots ---
+
+export interface TimeRange {
+  start: string; // "HH:mm" format e.g. "09:00"
+  end: string;   // "HH:mm" format e.g. "12:00"
+}
+
+export type DayOfWeek = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
+
+export interface TimeSlotAvailability {
+  /** Weekly recurring availability: day -> array of time ranges */
+  weekly: Partial<Record<DayOfWeek, TimeRange[]>>;
+  /** Mentor's timezone (IANA format, e.g. "America/New_York") */
+  timezone: string;
+  /** Slot duration in minutes (fixed at 30 for now) */
+  slotDurationMinutes: number;
+}
+
+export interface UnavailableDate {
+  date: string;    // "YYYY-MM-DD" format
+  reason?: string; // Optional reason
+}
+
+export type BookingStatus = "confirmed" | "cancelled";
+
+export interface MentorBooking {
+  id: string;
+  mentorId: string;
+  menteeId: string;
+  mentorProfile?: {
+    displayName: string;
+    photoURL: string;
+    username?: string;
+    discordUsername?: string;
+  };
+  menteeProfile?: {
+    displayName: string;
+    photoURL: string;
+    username?: string;
+    discordUsername?: string;
+  };
+  startTime: Date;   // UTC
+  endTime: Date;     // UTC
+  timezone: string;  // Mentor's timezone at time of booking
+  status: BookingStatus;
+  calendarEventId?: string;       // Google Calendar event ID
+  calendarSyncStatus?: "pending" | "synced" | "failed" | "not_connected";
+  cancelledBy?: string;           // uid of who cancelled
+  cancelledAt?: Date;
+  cancellationReason?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/** A computed available slot for display/booking */
+export interface AvailableSlot {
+  start: Date;  // UTC
+  end: Date;    // UTC
+  /** Display time in mentor's timezone, e.g. "09:00 AM" */
+  displayTime: string;
+}
