@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Milestone: v2.0
-Phase: 11 (Admin Project Management - View & Delete)
-Plan: 3 of 3
-Status: Complete
-Last activity: 2026-02-13 - Completed quick task 035: Fix edit project page layout
+Phase: 12 (Mentor Time Slots - Weekly Availability, Booking, Google Calendar Integration)
+Plan: 1 of 5
+Status: In progress
+Last activity: 2026-02-13 - Completed 12-01-PLAN.md
 
-Progress: [█████████████████████] 100% (29/29 total plans complete across current phases)
+Progress: [█████████████████████░] 97% (30/31 total plans complete across current phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 29 (v1.0: 5, v2.0: 24)
-- Average duration: ~14 min
-- Total execution time: ~7 hours 1 minute
+- Total plans completed: 30 (v1.0: 5, v2.0: 25)
+- Average duration: ~13.8 min
+- Total execution time: ~7 hours 6 minutes
 
 **By Phase:**
 
@@ -39,15 +39,17 @@ Progress: [█████████████████████] 100%
 | 08 | 3 | 14 min | 4.7 min |
 | 09 | 2 | 5 min | 2.5 min |
 | 11 | 3 | 14.3 min | 4.8 min |
+| 12 | 1 | 4.8 min | 4.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 09-01 (2min), 09-02 (3min), 11-01 (6min), 11-02 (3.5min), 11-03 (4.8min)
-- Trend: Phase 11 complete - Admin project management fully implemented
+- Last 5 plans: 09-02 (3min), 11-01 (6min), 11-02 (3.5min), 11-03 (4.8min), 12-01 (4.8min)
+- Trend: Phase 12 started - Mentor time slots foundation with types, availability calculation, and API
 
 *Updated after each plan completion*
 | Phase 08 P01 | 2 | 2 tasks | 3 files |
 | Phase 08 P02 | 3 | 2 tasks | 4 files |
 | Phase 08 P03 | 9 | 2 tasks | 2 files |
+| Phase 12 P01 | 290 | 2 tasks | 5 files |
 | Phase 09 P01 | 115 | 2 tasks | 3 files |
 | Phase 09-roadmaps-discovery-rendering P02 | 3 | 2 tasks | 2 files |
 | Phase 11 P01 | 6 | 2 tasks | 11 files |
@@ -132,6 +134,11 @@ Recent decisions affecting current work:
 - [Phase quick-32]: Status badge positioned next to title for immediate visibility
 - [Phase quick-035]: Edit page provides its own bg-base-200 background (projects layout.tsx only provides MentorshipProvider)
 - [Phase quick-035]: Card-based layout pattern for settings/edit pages (bg-base-200 background with card bg-base-100 shadow-xl containers)
+- [Phase 12-01]: Store availability as timeSlotAvailability field to avoid conflict with legacy availability Record<string, string[]> field
+- [Phase 12-01]: Public GET /api/mentorship/availability endpoint for unauthenticated mentee access to mentor schedules
+- [Phase 12-01]: 30-minute fixed slot duration with 2-hour minimum advance booking and 60-day future window
+- [Phase 12-01]: Weekly recurring availability using Partial<Record<DayOfWeek, TimeRange[]>> for flexible multi-range per day
+- [Phase 12-01]: TimeRange with HH:mm string format for storage efficiency and validation simplicity
 
 ### Roadmap Evolution
 
@@ -140,6 +147,7 @@ Recent decisions affecting current work:
   - Verification: PASSED after 1 revision iteration
   - Ready for execution
 - Phase 11 added: Admin Project Management: View all projects and delete with cascade cleanup
+- Phase 12 added: Mentor Time Slots — weekly availability management, mentee booking, rescheduling, Google Calendar integration (from GitHub #139)
 
 ### Pending Todos
 
@@ -270,8 +278,8 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed Quick Task 035: Fix edit project page layout
+Stopped at: Completed 12-01-PLAN.md
 Resume file: None
 
 ---
-*Updated: 2026-02-13 after completing Quick Task 035*
+*Updated: 2026-02-13 after completing Phase 12 Plan 01*
