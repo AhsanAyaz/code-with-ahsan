@@ -179,206 +179,220 @@ export default function EditProjectPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="max-w-4xl mx-auto p-8">
-        <div className="skeleton h-8 w-48 mb-8"></div>
-        <div className="skeleton h-12 w-full mb-4"></div>
-        <div className="skeleton h-32 w-full mb-4"></div>
-        <div className="skeleton h-12 w-full mb-4"></div>
-        <div className="skeleton h-12 w-full mb-4"></div>
+      <div className="min-h-screen bg-base-200">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="skeleton h-8 w-48 mb-8"></div>
+          <div className="skeleton h-12 w-full mb-4"></div>
+          <div className="skeleton h-32 w-full mb-4"></div>
+          <div className="skeleton h-12 w-full mb-4"></div>
+          <div className="skeleton h-12 w-full mb-4"></div>
+        </div>
       </div>
     );
   }
 
   if (error && !project) {
     return (
-      <div className="max-w-4xl mx-auto p-8">
-        <div className="alert alert-error mb-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>{error}</span>
+      <div className="min-h-screen bg-base-200">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="alert alert-error mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="stroke-current shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>{error}</span>
+          </div>
+          <Link href={`/projects/${projectId}`} className="btn btn-ghost">
+            Back to Project
+          </Link>
         </div>
-        <Link href={`/projects/${projectId}`} className="btn btn-ghost">
-          Back to Project
-        </Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-8 space-y-8">
-      {/* Back button */}
-      <Link href={`/projects/${projectId}`} className="btn btn-ghost btn-sm mb-4">
-        ← Back to Project
-      </Link>
-
-      {/* Page title */}
-      <div>
-        <h1 className="text-3xl font-bold">Edit Project</h1>
-        <p className="text-base-content/60 mt-1">
-          Update project details and settings
-        </p>
-      </div>
-
-      {/* Error alert */}
-      {error && (
-        <div className="alert alert-error">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>{error}</span>
-        </div>
-      )}
-
-      {/* Edit form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Title */}
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text font-semibold">Title</span>
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="input input-bordered"
-            required
-            minLength={3}
-            maxLength={100}
-            disabled={saving}
-          />
-          <label className="label">
-            <span className="label-text-alt">{title.length}/100 characters</span>
-          </label>
-        </div>
-
-        {/* Description */}
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text font-semibold">Description</span>
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="textarea textarea-bordered h-32"
-            required
-            minLength={10}
-            maxLength={2000}
-            disabled={saving}
-          />
-          <label className="label">
-            <span className="label-text-alt">{description.length}/2000 characters</span>
-          </label>
-        </div>
-
-        {/* GitHub Repo */}
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text font-semibold">GitHub Repository (optional)</span>
-          </label>
-          <input
-            type="url"
-            value={githubRepo}
-            onChange={(e) => setGithubRepo(e.target.value)}
-            className="input input-bordered"
-            placeholder="https://github.com/username/repo"
-            disabled={saving}
-          />
-        </div>
-
-        {/* Tech Stack */}
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text font-semibold">Tech Stack (comma-separated)</span>
-          </label>
-          <input
-            type="text"
-            value={techStack}
-            onChange={(e) => setTechStack(e.target.value)}
-            className="input input-bordered"
-            placeholder="React, TypeScript, Node.js"
-            disabled={saving}
-          />
-        </div>
-
-        {/* Difficulty */}
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text font-semibold">Difficulty</span>
-          </label>
-          <select
-            value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value as any)}
-            className="select select-bordered"
-            disabled={saving}
-          >
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </select>
-        </div>
-
-        {/* Max Team Size */}
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text font-semibold">Max Team Size</span>
-          </label>
-          <input
-            type="number"
-            value={maxTeamSize}
-            onChange={(e) => setMaxTeamSize(parseInt(e.target.value))}
-            className="input input-bordered"
-            min={1}
-            max={20}
-            required
-            disabled={saving}
-          />
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex gap-3 justify-end">
-          <Link
-            href={`/projects/${projectId}`}
-            className="btn btn-ghost"
-          >
-            Cancel
+    <div className="min-h-screen bg-base-200">
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold">Edit Project</h2>
+            <p className="text-base-content/70">
+              Update project details and settings
+            </p>
+          </div>
+          <Link href={`/projects/${projectId}`} className="btn btn-ghost btn-sm">
+            ← Back to Project
           </Link>
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={saving}
-          >
-            {saving ? (
-              <>
-                <span className="loading loading-spinner loading-sm"></span>
-                Saving...
-              </>
-            ) : (
-              "Save Changes"
-            )}
-          </button>
         </div>
-      </form>
+
+        {/* Form Card */}
+        <div className="card bg-base-100 shadow-xl">
+          <div className="card-body">
+            <h3 className="card-title">Project Details</h3>
+            <div className="divider"></div>
+
+            {/* Error alert */}
+            {error && (
+              <div className="alert alert-error mb-6">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="stroke-current shrink-0 h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <span>{error}</span>
+              </div>
+            )}
+
+            {/* Edit form */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Title */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Title</span>
+                </label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="input input-bordered"
+                  required
+                  minLength={3}
+                  maxLength={100}
+                  disabled={saving}
+                />
+                <label className="label">
+                  <span className="label-text-alt">{title.length}/100 characters</span>
+                </label>
+              </div>
+
+              {/* Description */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Description</span>
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="textarea textarea-bordered h-32"
+                  required
+                  minLength={10}
+                  maxLength={2000}
+                  disabled={saving}
+                />
+                <label className="label">
+                  <span className="label-text-alt">{description.length}/2000 characters</span>
+                </label>
+              </div>
+
+              {/* GitHub Repo */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">GitHub Repository (optional)</span>
+                </label>
+                <input
+                  type="url"
+                  value={githubRepo}
+                  onChange={(e) => setGithubRepo(e.target.value)}
+                  className="input input-bordered"
+                  placeholder="https://github.com/username/repo"
+                  disabled={saving}
+                />
+              </div>
+
+              {/* Tech Stack */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Tech Stack (comma-separated)</span>
+                </label>
+                <input
+                  type="text"
+                  value={techStack}
+                  onChange={(e) => setTechStack(e.target.value)}
+                  className="input input-bordered"
+                  placeholder="React, TypeScript, Node.js"
+                  disabled={saving}
+                />
+              </div>
+
+              {/* Difficulty */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Difficulty</span>
+                </label>
+                <select
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value as any)}
+                  className="select select-bordered"
+                  disabled={saving}
+                >
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+              </div>
+
+              {/* Max Team Size */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Max Team Size</span>
+                </label>
+                <input
+                  type="number"
+                  value={maxTeamSize}
+                  onChange={(e) => setMaxTeamSize(parseInt(e.target.value))}
+                  className="input input-bordered"
+                  min={1}
+                  max={20}
+                  required
+                  disabled={saving}
+                />
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-3 justify-end">
+                <Link
+                  href={`/projects/${projectId}`}
+                  className="btn btn-ghost"
+                >
+                  Cancel
+                </Link>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <span className="loading loading-spinner loading-sm"></span>
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
