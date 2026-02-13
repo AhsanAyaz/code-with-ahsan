@@ -11,18 +11,18 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 Milestone: v2.0
 Phase: 12 (Mentor Time Slots - Weekly Availability, Booking, Google Calendar Integration)
-Plan: 1 of 5
+Plan: 3 of 5
 Status: In progress
-Last activity: 2026-02-13 - Completed 12-01-PLAN.md
+Last activity: 2026-02-13 - Completed 12-03-PLAN.md
 
-Progress: [█████████████████████░] 97% (30/31 total plans complete across current phases)
+Progress: [█████████████████████░] 100% (31/31 total plans complete across current phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 30 (v1.0: 5, v2.0: 25)
-- Average duration: ~13.8 min
-- Total execution time: ~7 hours 6 minutes
+- Total plans completed: 31 (v1.0: 5, v2.0: 26)
+- Average duration: ~13.6 min
+- Total execution time: ~7 hours 13 minutes
 
 **By Phase:**
 
@@ -39,11 +39,11 @@ Progress: [█████████████████████░] 9
 | 08 | 3 | 14 min | 4.7 min |
 | 09 | 2 | 5 min | 2.5 min |
 | 11 | 3 | 14.3 min | 4.8 min |
-| 12 | 1 | 4.8 min | 4.8 min |
+| 12 | 2 | 11.5 min | 5.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 09-02 (3min), 11-01 (6min), 11-02 (3.5min), 11-03 (4.8min), 12-01 (4.8min)
-- Trend: Phase 12 started - Mentor time slots foundation with types, availability calculation, and API
+- Last 5 plans: 11-01 (6min), 11-02 (3.5min), 11-03 (4.8min), 12-01 (4.8min), 12-03 (6.7min)
+- Trend: Phase 12 Google Calendar integration - OAuth flow with encrypted token storage
 
 *Updated after each plan completion*
 | Phase 08 P01 | 2 | 2 tasks | 3 files |
@@ -139,6 +139,11 @@ Recent decisions affecting current work:
 - [Phase 12-01]: 30-minute fixed slot duration with 2-hour minimum advance booking and 60-day future window
 - [Phase 12-01]: Weekly recurring availability using Partial<Record<DayOfWeek, TimeRange[]>> for flexible multi-range per day
 - [Phase 12-01]: TimeRange with HH:mm string format for storage efficiency and validation simplicity
+- [Phase 12-03]: AES-256-GCM encryption for Google Calendar refresh tokens (requires GOOGLE_CALENDAR_ENCRYPTION_KEY env var)
+- [Phase 12-03]: Store only refresh tokens (access tokens auto-refreshed by googleapis client)
+- [Phase 12-03]: Non-blocking calendar operations - booking succeeds even if calendar not connected
+- [Phase 12-03]: Pass mentorId via OAuth state parameter for stateless callback handling
+- [Phase 12-03]: OAuth with access_type=offline and prompt=consent to always get refresh token
 
 ### Roadmap Evolution
 
@@ -278,8 +283,8 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 12-01-PLAN.md
+Stopped at: Completed 12-03-PLAN.md
 Resume file: None
 
 ---
-*Updated: 2026-02-13 after completing Phase 12 Plan 01*
+*Updated: 2026-02-13 after completing Phase 12 Plan 03*
