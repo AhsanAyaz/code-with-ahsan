@@ -10,6 +10,9 @@ import MenteeRegistrationForm from "@/components/mentorship/MenteeRegistrationFo
 import Link from "next/link";
 import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 import MentorAnnouncementCard from "@/components/mentorship/MentorAnnouncementCard";
+import AvailabilityManager from "@/components/mentorship/AvailabilityManager";
+import { authFetch } from "@/lib/apiClient";
+import { TimeSlotAvailability, UnavailableDate } from "@/types/mentorship";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -20,6 +23,12 @@ export default function SettingsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [skillLevel, setSkillLevel] = useState<"beginner" | "intermediate" | "advanced">("beginner");
   const [skillLevelLoading, setSkillLevelLoading] = useState(false);
+
+  // Availability management state
+  const [availability, setAvailability] = useState<TimeSlotAvailability | null>(null);
+  const [unavailableDates, setUnavailableDates] = useState<UnavailableDate[]>([]);
+  const [isCalendarConnected, setIsCalendarConnected] = useState(false);
+  const [calendarConnecting, setCalendarConnecting] = useState(false);
 
 
   useEffect(() => {
@@ -40,6 +49,35 @@ export default function SettingsPage() {
       setSkillLevel(profile.skillLevel || "beginner");
     }
   }, [profile]);
+
+  // Load availability data for mentors
+  useEffect(() => {
+    if (profile?.uid && profile.role === "mentor") {
+      fetch(`/api/mentorship/availability?mentorId=${profile.uid}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.availability) setAvailability(data.availability);
+          if (data.unavailableDates) setUnavailableDates(data.unavailableDates);
+          setIsCalendarConnected(!!data.googleCalendarConnected);
+        })
+        .catch((err) => console.error("Failed to load availability:", err));
+    }
+  }, [profile?.uid, profile?.role]);
+
+  // Check for calendar connection status from URL params (after OAuth redirect)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const calendarStatus = params.get("calendar");
+    if (calendarStatus === "connected") {
+      toast.success("Google Calendar connected successfully!");
+      setIsCalendarConnected(true);
+      // Clean URL
+      window.history.replaceState({}, "", "/profile");
+    } else if (calendarStatus === "error") {
+      toast.error("Failed to connect Google Calendar. Please try again.");
+      window.history.replaceState({}, "", "/profile");
+    }
+  }, [toast]);
 
   const handleSkillLevelChange = async (newSkillLevel: "beginner" | "intermediate" | "advanced") => {
     if (!user) return;
@@ -68,6 +106,23 @@ export default function SettingsPage() {
       toast.error("An error occurred. Please try again.");
     } finally {
       setSkillLevelLoading(false);
+    }
+  };
+
+  const handleCalendarConnect = async () => {
+    setCalendarConnecting(true);
+    try {
+      const res = await authFetch("/api/mentorship/calendar/auth");
+      const data = await res.json();
+      if (data.authUrl) {
+        window.location.href = data.authUrl;
+      } else {
+        toast.error("Calendar integration not available");
+      }
+    } catch {
+      toast.error("Failed to initiate calendar connection");
+    } finally {
+      setCalendarConnecting(false);
     }
   };
 
@@ -271,6 +326,54 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
+
+      {/* Availability Management Section - Mentors Only */}
+      {profile?.role === "mentor" && (
+        <>
+          {/* Section Divider */}
+          <div className="divider text-lg font-semibold mt-8">Time Slot Availability</div>
+
+          {/* Google Calendar Connection */}
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h3 className="card-title text-lg">Google Calendar Integration</h3>
+              <p className="text-sm opacity-70">
+                Connect your Google Calendar to automatically create events with Google Meet links when mentees book sessions.
+              </p>
+              <div className="mt-2">
+                {isCalendarConnected ? (
+                  <div className="flex items-center gap-2 text-success">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>Google Calendar connected</span>
+                  </div>
+                ) : (
+                  <button
+                    className="btn btn-outline btn-sm"
+                    onClick={handleCalendarConnect}
+                    disabled={calendarConnecting}
+                  >
+                    {calendarConnecting ? (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    ) : (
+                      "Connect Google Calendar"
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Weekly Availability and Override Dates */}
+          <AvailabilityManager
+            userId={profile.uid}
+            initialAvailability={availability || undefined}
+            initialUnavailableDates={unavailableDates}
+            isCalendarConnected={isCalendarConnected}
+          />
+        </>
+      )}
     </div>
   );
 }
