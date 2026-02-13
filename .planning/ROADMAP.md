@@ -267,5 +267,19 @@ Plans:
 - [ ] 11-02-PLAN.md — Admin projects API: enriched listing endpoint with filters and atomic cascade delete endpoint
 - [ ] 11-03-PLAN.md — Projects management page: filter UI, project cards, two-step delete confirmation, and post-deletion summary
 
+### Phase 12: Mentor Time Slots: Weekly availability management, mentee booking, rescheduling, Google Calendar integration
+
+**Goal:** Mentors can define weekly time slot availability with timezone support, mentees can browse and book 30-minute sessions with atomic double-booking prevention, bookings auto-create Google Calendar events with Google Meet links, and cancellations trigger Discord DM notifications and calendar event cleanup.
+**Depends on:** Phase 11
+**Plans:** 6 plans
+
+Plans:
+- [ ] 12-01-PLAN.md — Types, availability calculation library, and mentor availability API
+- [ ] 12-02-PLAN.md — Time slots query API and bookings API with Firestore transaction double-booking prevention and Discord DMs
+- [ ] 12-03-PLAN.md — Google Calendar OAuth library, token encryption, event create/delete, and auth callback routes
+- [ ] 12-04-PLAN.md — Mentor availability UI (weekly schedule editor, override dates, calendar connect) on profile page
+- [ ] 12-05-PLAN.md — Mentee booking UI (time slot picker, bookings list) and booking page route
+- [ ] 12-06-PLAN.md — Calendar integration wiring into booking flows and end-to-end verification
+
 ---
-*Last updated: 2026-02-12 after Phase 11 planning complete*
+*Last updated: 2026-02-13 after Phase 12 planning complete*
