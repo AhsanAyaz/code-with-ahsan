@@ -768,6 +768,66 @@ export default function MentorProfileClient({
               Days marked in color indicate general availability for mentorship
               sessions.
             </p>
+            {mentor.hasTimeSlots && (
+              <div className="mt-4">
+                <Link
+                  href={`/mentorship/book/${mentor.uid}`}
+                  className="btn btn-primary btn-sm"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  Book a Session
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Book a Session Card - shown when mentor has time slots */}
+      {mentor.hasTimeSlots && !availableDays.length && (
+        <div className="card bg-base-100 shadow-xl">
+          <div className="card-body">
+            <h2 className="card-title">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-primary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              Book a Session
+            </h2>
+            <p className="text-base-content/70">
+              This mentor offers 30-minute mentoring sessions. Browse available time slots and book a session.
+            </p>
+            <div className="card-actions mt-2">
+              <Link
+                href={`/mentorship/book/${mentor.uid}`}
+                className="btn btn-primary btn-sm"
+              >
+                View Available Slots
+              </Link>
+            </div>
           </div>
         </div>
       )}

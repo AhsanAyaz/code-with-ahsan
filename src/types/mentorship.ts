@@ -70,6 +70,7 @@ export interface PublicMentor {
  */
 export interface MentorProfileDetails extends PublicMentor {
   majorProjects?: string;
+  hasTimeSlots?: boolean;
   createdAt: string | null;
   status?: string;
 }

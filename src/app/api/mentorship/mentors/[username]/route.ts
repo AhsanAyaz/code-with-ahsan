@@ -111,6 +111,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       ratingCount,
       isAtCapacity:
         activeMenteeCount >= (profileData.maxMentees || DEFAULT_MAX_MENTEES),
+      hasTimeSlots: !!(profileData.timeSlotAvailability?.timezone),
       createdAt: profileData.createdAt?.toDate?.() || null,
       status: profileData.status,
     };
