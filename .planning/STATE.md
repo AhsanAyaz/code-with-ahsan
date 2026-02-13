@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 Milestone: v2.0
 Phase: 12 (Mentor Time Slots - Weekly Availability, Booking, Google Calendar Integration)
-Plan: 5 of 5
+Plan: 6 of 6
 Status: Phase complete
-Last activity: 2026-02-13 - Completed 12-05-PLAN.md
+Last activity: 2026-02-13 - Completed 12-06-PLAN.md
 
-Progress: [████████████████████████] 100% (33/33 total plans complete across current phases)
+Progress: [████████████████████████] 100% (34/34 total plans complete across current phases)
 
 ## Performance Metrics
 
@@ -39,11 +39,11 @@ Progress: [███████████████████████
 | 08 | 3 | 14 min | 4.7 min |
 | 09 | 2 | 5 min | 2.5 min |
 | 11 | 3 | 14.3 min | 4.8 min |
-| 12 | 5 | 29.7 min | 5.9 min |
+| 12 | 6 | 36.2 min | 6.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 12-01 (4.8min), 12-02 (8.5min), 12-03 (6.7min), 12-04 (4.7min), 12-05 (5.0min)
-- Trend: Phase 12 complete - mentor time slots booking system with UI, APIs, and Google Calendar integration
+- Last 5 plans: 12-02 (8.5min), 12-03 (6.7min), 12-04 (4.7min), 12-05 (5.0min), 12-06 (6.5min)
+- Trend: Phase 12 complete - full end-to-end mentor time slots booking system with Google Calendar integration
 
 *Updated after each plan completion*
 | Phase 08 P01 | 2 | 2 tasks | 3 files |
@@ -59,6 +59,7 @@ Progress: [███████████████████████
 | Phase quick-32 P32 | 1 | 1 tasks | 1 files |
 | Phase quick-33 P1 | 5 | 4 tasks | 4 files |
 | Phase quick-34 P1 | 64 | 1 tasks | 1 files |
+| Phase 12 P06 | 391 | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -153,6 +154,9 @@ Recent decisions affecting current work:
 - [Phase 12-05]: Inline confirmation panel instead of modal for faster booking flow
 - [Phase 12-05]: prompt() for cancellation reason to support reschedule-aware messaging
 - [Phase 12-05]: BookingsList shows all statuses (upcoming, past, cancelled) in one list for transparency
+- [Phase 12-06]: Non-blocking calendar sync - booking succeeds even if calendar not connected or sync fails
+- [Phase 12-06]: Calendar sync status tracked in booking document (synced/not_connected/failed/cancelled)
+- [Phase 12-06]: BookingsList rendered on mentor profile page below AvailabilityManager for consolidated view
 
 ### Roadmap Evolution
 
@@ -292,8 +296,8 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 12-05-PLAN.md
+Stopped at: Completed 12-06-PLAN.md
 Resume file: None
 
 ---
-*Updated: 2026-02-13 after completing Phase 12 Plan 05*
+*Updated: 2026-02-13 after completing Phase 12 Plan 06*
