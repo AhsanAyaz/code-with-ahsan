@@ -13,7 +13,7 @@ Milestone: v2.0
 Phase: 12 (Mentor Time Slots - Weekly Availability, Booking, Google Calendar Integration)
 Plan: 6 of 6
 Status: Phase complete
-Last activity: 2026-02-13 - Completed 12-06-PLAN.md
+Last activity: 2026-02-14 - Completed quick task 036: Booking approval flow, Monday-start DatePicker, Discord URL buttons, session templates
 
 Progress: [████████████████████████] 100% (34/34 total plans complete across current phases)
 
@@ -292,12 +292,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 029 | Fix project visibility and declined project workflow | 2026-02-13 | a1a1946 | [029-fix-project-visibility-and-declined-proj](./quick/29-fix-project-visibility-and-declined-proj/) |
 | 030 | Add access control to project detail page for pending/declined projects | 2026-02-13 | 16d6890 | [030-add-access-control-to-project-detail-pag](./quick/30-add-access-control-to-project-detail-pag/) |
 | 031 | Add admin project management features (Discord contact, Edit action, permissions) | 2026-02-13 | 58cb21f | [031-add-admin-project-management-features-1-](./quick/31-add-admin-project-management-features-1-/) |
+| 036 | Booking approval flow, Monday-start DatePicker, Discord URL buttons, session templates | 2026-02-14 | pending | [036-document-booking-approval-flow-monday-st](./quick/36-document-booking-approval-flow-monday-st/) |
 
 ## Session Continuity
 
-Last session: 2026-02-13
-Stopped at: Completed 12-06-PLAN.md
+Last session: 2026-02-14
+Stopped at: Completed quick task 036
 Resume file: None
 
 ---
-*Updated: 2026-02-13 after completing Phase 12 Plan 06*
+*Updated: 2026-02-14 after completing quick task 036*
