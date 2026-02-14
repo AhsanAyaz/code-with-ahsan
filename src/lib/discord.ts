@@ -480,6 +480,43 @@ export async function sendChannelMessage(
 }
 
 /**
+ * Send a message with components (e.g. URL buttons) to a Discord channel
+ * Uses Discord's component system with Link-style buttons (style: 5)
+ * which open a URL — no interactions webhook needed.
+ */
+export async function sendChannelMessageWithComponents(
+  channelId: string,
+  content: string,
+  components: object[]
+): Promise<boolean> {
+  log.debug(` Sending message with components to channel ${channelId}...`);
+  try {
+    const response = await fetch(
+      `${DISCORD_API}/channels/${channelId}/messages`,
+      {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({ content, components }),
+      }
+    );
+
+    if (response.ok) {
+      log.debug(`Message with components sent successfully to channel ${channelId}`);
+      return true;
+    } else {
+      const errorText = await response.text();
+      log.error(
+        `[Discord] Failed to send message with components to channel ${channelId}: ${response.status} - ${errorText}`
+      );
+      return false;
+    }
+  } catch (error) {
+    log.error("[Discord] Error sending channel message with components:", error);
+    return false;
+  }
+}
+
+/**
  * Send a direct message to a Discord user by their username
  *
  * @param discordUsername - The recipient's Discord username

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
+import { useRouter } from "next/navigation";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import TimeSlotPicker from "@/components/mentorship/TimeSlotPicker";
-import BookingsList from "@/components/mentorship/BookingsList";
 import Link from "next/link";
 
 export default function BookMentorPage({
@@ -12,6 +12,7 @@ export default function BookMentorPage({
   params: Promise<{ mentorId: string }>;
 }) {
   const { mentorId } = use(params);
+  const router = useRouter();
   const { user, loading } = useMentorship();
   const [mentor, setMentor] = useState<any>(null);
   const [mentorLoading, setMentorLoading] = useState(true);
@@ -77,28 +78,38 @@ export default function BookMentorPage({
     <div className="space-y-6">
       {/* Mentor Info Header */}
       <div className="card bg-base-100 shadow-xl">
-        <div className="card-body flex-row items-center gap-4">
-          {mentor.photoURL && (
-            <img
-              src={mentor.photoURL}
-              alt={mentor.displayName}
-              className="w-16 h-16 rounded-full"
-            />
-          )}
-          <div>
-            <h2 className="card-title">{mentor.displayName}</h2>
-            {mentor.currentRole && (
-              <p className="text-sm opacity-70">{mentor.currentRole}</p>
-            )}
-            {mentor.expertise?.length > 0 && (
-              <div className="flex gap-1 mt-1 flex-wrap">
-                {mentor.expertise.map((skill: string) => (
-                  <span key={skill} className="badge badge-sm badge-outline">
-                    {skill}
-                  </span>
-                ))}
+        <div className="card-body">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {mentor.photoURL && (
+                <img
+                  src={mentor.photoURL}
+                  alt={mentor.displayName}
+                  className="w-16 h-16 rounded-full"
+                />
+              )}
+              <div>
+                <h2 className="card-title">{mentor.displayName}</h2>
+                {mentor.currentRole && (
+                  <p className="text-sm opacity-70">{mentor.currentRole}</p>
+                )}
+                {mentor.expertise?.length > 0 && (
+                  <div className="flex gap-1 mt-1 flex-wrap">
+                    {mentor.expertise.map((skill: string) => (
+                      <span key={skill} className="badge badge-sm badge-outline">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+            <button
+              onClick={() => router.back()}
+              className="btn btn-ghost btn-sm"
+            >
+              ← Back
+            </button>
           </div>
         </div>
       </div>
@@ -106,7 +117,7 @@ export default function BookMentorPage({
       {/* Booking Success Message */}
       {bookingComplete && (
         <div className="alert alert-success">
-          <span>Session booked! Check your bookings below.</span>
+          <span>Session booked! You can view your bookings from the mentorship dashboard.</span>
         </div>
       )}
 
@@ -117,8 +128,6 @@ export default function BookMentorPage({
         onBookingComplete={() => setBookingComplete(true)}
       />
 
-      {/* My Bookings with this mentor */}
-      <BookingsList userId={user.uid} role="mentee" />
     </div>
   );
 }

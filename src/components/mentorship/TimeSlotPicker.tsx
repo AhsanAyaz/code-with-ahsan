@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { format, addDays, startOfDay, isSameDay } from "date-fns";
+import { format, addDays, startOfDay, startOfWeek, isSameDay } from "date-fns";
 import { authFetch } from "@/lib/apiClient";
 import { useToast } from "@/contexts/ToastContext";
+import { SESSION_TEMPLATES } from "@/lib/mentorship-templates";
 import type { AvailableSlot } from "@/types/mentorship";
 
 interface TimeSlotPickerProps {
@@ -24,7 +25,8 @@ export default function TimeSlotPicker({
   const [selectedSlot, setSelectedSlot] = useState<AvailableSlot | null>(null);
   const [booking, setBooking] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [startDate, setStartDate] = useState<Date>(startOfDay(new Date()));
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<Date>(startOfWeek(new Date(), { weekStartsOn: 1 }));
 
   const fetchSlots = async () => {
     setLoading(true);
@@ -81,14 +83,15 @@ export default function TimeSlotPicker({
           startTime: selectedSlot.start,
           endTime: selectedSlot.end,
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          templateId: selectedTemplate || undefined,
         }),
       });
 
       if (res.status === 409) {
-        setError(
-          "This slot was just booked by someone else. Please choose another."
-        );
-        // Refresh slots
+        const data = await res.json();
+        const msg = data.error || "This slot was just booked by someone else. Please choose another.";
+        setError(msg);
+        toast.error(msg);
         fetchSlots();
         setSelectedSlot(null);
       } else if (!res.ok) {
@@ -97,9 +100,14 @@ export default function TimeSlotPicker({
       } else {
         const data = await res.json();
         onBookingComplete?.(data.booking?.id);
-        toast.success("Session booked successfully!");
+        if (data.booking?.status === "pending_approval") {
+          toast.success("Booking request submitted! Your mentor will review it.");
+        } else {
+          toast.success("Session booked successfully!");
+        }
         setSelectedSlot(null);
         setSelectedDate(null);
+        setSelectedTemplate(null);
         fetchSlots(); // Refresh to remove booked slot
       }
     } catch (err) {
@@ -122,7 +130,7 @@ export default function TimeSlotPicker({
         <p className="text-sm opacity-70">30-minute mentorship sessions</p>
 
         {/* Date Navigator - show 7 days at a time */}
-        <div className="flex items-center gap-2 my-4">
+        <div className="flex items-center justify-center gap-2 my-4">
           <button
             className="btn btn-sm btn-ghost"
             onClick={prevWeek}
@@ -201,6 +209,30 @@ export default function TimeSlotPicker({
               {format(selectedDate, "EEEE, MMMM d, yyyy")} at{" "}
               {selectedSlot.displayTime} (30 minutes)
             </p>
+
+            {/* Session Template Picker */}
+            <div className="mt-3">
+              <p className="text-sm font-medium mb-2">Session Type (optional)</p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  className={`btn btn-xs ${selectedTemplate === null ? "btn-primary" : "btn-ghost"}`}
+                  onClick={() => setSelectedTemplate(null)}
+                >
+                  General
+                </button>
+                {SESSION_TEMPLATES.map((t) => (
+                  <button
+                    key={t.id}
+                    className={`btn btn-xs ${selectedTemplate === t.id ? "btn-primary" : "btn-ghost"}`}
+                    onClick={() => setSelectedTemplate(t.id)}
+                    title={t.description}
+                  >
+                    {t.icon} {t.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="mt-3 flex gap-2">
               <button
                 className="btn btn-primary btn-sm"

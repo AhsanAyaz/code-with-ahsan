@@ -300,7 +300,7 @@ export interface UnavailableDate {
   reason?: string; // Optional reason
 }
 
-export type BookingStatus = "confirmed" | "cancelled";
+export type BookingStatus = "confirmed" | "cancelled" | "pending_approval";
 
 export interface MentorBooking {
   id: string;
@@ -322,6 +322,7 @@ export interface MentorBooking {
   endTime: Date;     // UTC
   timezone: string;  // Mentor's timezone at time of booking
   status: BookingStatus;
+  templateId?: string;            // Session template ID (e.g. "cv-review", "mock-interview")
   calendarEventId?: string;       // Google Calendar event ID
   calendarSyncStatus?: "pending" | "synced" | "failed" | "not_connected";
   cancelledBy?: string;           // uid of who cancelled
