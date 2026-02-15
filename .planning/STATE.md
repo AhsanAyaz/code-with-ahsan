@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 Milestone: v2.0
 Phase: 13 (UX Review)
-Plan: 1 of 1
+Plan: 1 of 1 (COMPLETE)
 Status: All phases complete (v2.0 feature development done)
-Last activity: 2026-02-15 - Quick tasks 038-046 (dashboard widget refinements and polish)
+Last activity: 2026-02-15 - Phase 13-01 (smart navigation routing and UX improvements)
 
 Progress: [████████████████████████] 100% (38/38 total plans complete across current phases)
 
@@ -41,7 +41,7 @@ Progress: [███████████████████████
 | 10 | 3 | 30 min | 10 min |
 | 11 | 3 | 14.3 min | 4.8 min |
 | 12 | 6 | 36.2 min | 6.0 min |
-| 13 | 1 | 15 min | 15 min |
+| 13 | 1 | 2 min | 2 min |
 
 **Recent Trend:**
 - Last 5 phases: Phase 9 (2 plans), Phase 10 (3 plans), Phase 11 (3 plans), Phase 12 (6 plans), Phase 13 (1 plan)
@@ -143,6 +143,9 @@ Recent decisions affecting current work:
 - [Phase 12-06]: Non-blocking calendar sync - booking succeeds even if calendar not connected or sync fails
 - [Phase 12-06]: Calendar sync status tracked in booking document (synced/not_connected/failed/cancelled)
 - [Phase 12-06]: BookingsList rendered on mentor profile page below AvailabilityManager for consolidated view
+- [Phase 13-01]: Context-aware Mentorship routing using MentorshipContext (logged-in users → dashboard, others → marketing page)
+- [Phase 13-01]: Roadmap icon changed from projects (🚀) to roadmap-specific (🗺️) for better visual distinction
+- [Phase 13-01]: Smart routing applied to both desktop and mobile navigation for consistent UX
 
 ### Roadmap Evolution
 
@@ -240,6 +243,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 - ✅ Client Component pattern for data fetching from roadmap APIs
 - ✅ All TypeScript compilation and builds successful
 
+**Phase 13 Complete (2026-02-15):**
+- ✅ Dashboard UX review found Phase 10-03 already completed "Command Center" redesign
+- ✅ Smart navigation routing: Mentorship link context-aware (logged-in → dashboard, not logged-in → marketing)
+- ✅ Roadmap icon updated from projects emoji to roadmap-specific icon (🗺️)
+- ✅ Changes applied to both desktop (LayoutWrapper) and mobile (MobileNav) navigation
+- ✅ Leverages existing MentorshipContext for routing decisions (no new API calls)
+
 ### Quick Tasks Completed
 
 | # | Description | Date | Commit | Directory |
@@ -295,8 +305,8 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed quick task 047 (planning file synchronization)
+Stopped at: Completed Phase 13-01 (smart navigation routing and UX improvements)
 Resume file: None
 
 ---
-*Updated: 2026-02-15 after completing quick task 047*
+*Updated: 2026-02-15 after completing Phase 13-01*
