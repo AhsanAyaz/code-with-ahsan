@@ -31,14 +31,19 @@ export default function MyProjectsWidget({
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold flex items-center gap-2">
-            <span className="text-2xl">🏗️</span> My Projects
-            {projects.length > 0 && (
-              <span className="badge badge-primary badge-sm">
-                {projects.length}
-              </span>
-            )}
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-xl font-bold flex items-center gap-2">
+              <span className="text-2xl">🏗️</span> My Projects
+              {projects.length > 0 && (
+                <span className="badge badge-primary badge-sm">
+                  {projects.length}
+                </span>
+              )}
+            </h3>
+            <Link href="/projects/new" className="btn btn-ghost btn-xs text-primary">
+              + New
+            </Link>
+          </div>
           <Link href="/projects/my" className="btn btn-ghost btn-xs text-primary">
             Browse All
           </Link>
