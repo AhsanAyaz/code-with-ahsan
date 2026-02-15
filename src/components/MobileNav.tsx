@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Link from "./Link";
 import headerNavLinks, { COMMUNITY_LINKS } from "@/data/headerNavLinks";
-import { useMentorship } from "@/contexts/MentorshipContext";
+import { useMentorshipSafe } from "@/contexts/MentorshipContext";
 
 interface LinkItem {
   href: string;
@@ -22,7 +22,9 @@ const DiscordIcon = () => (
 const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
   const [navShow, setNavShow] = useState(false);
   const [communityOpen, setCommunityOpen] = useState(false);
-  const { profile, loading: profileLoading } = useMentorship();
+  const mentorshipContext = useMentorshipSafe();
+  const profile = mentorshipContext?.profile || null;
+  const profileLoading = mentorshipContext?.loading || false;
 
   const onToggleNav = () => {
     setNavShow((status) => {

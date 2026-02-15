@@ -8,7 +8,7 @@ import ThemeSwitch from "./ThemeSwitch";
 import Image from "./Image";
 import ProfileMenu from "./ProfileMenu";
 import { ReactNode, useState, useRef, useEffect } from "react";
-import { useMentorship } from "@/contexts/MentorshipContext";
+import { useMentorshipSafe } from "@/contexts/MentorshipContext";
 
 interface LinkItem {
   href: string;
@@ -31,7 +31,9 @@ const DiscordIcon = () => (
 const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   const [communityOpen, setCommunityOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { profile, loading: profileLoading } = useMentorship();
+  const mentorshipContext = useMentorshipSafe();
+  const profile = mentorshipContext?.profile || null;
+  const profileLoading = mentorshipContext?.loading || false;
 
   // Close dropdown when clicking outside
   useEffect(() => {

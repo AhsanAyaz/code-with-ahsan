@@ -41,6 +41,12 @@ export function useMentorship() {
   return context;
 }
 
+// Safe version that returns null if outside provider (for optional usage in layouts)
+export function useMentorshipSafe() {
+  const context = useContext(MentorshipContext);
+  return context || null;
+}
+
 interface MentorshipProviderProps {
   children: ReactNode;
 }
