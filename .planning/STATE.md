@@ -303,6 +303,7 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 041 | Unify roadmap actions with dropdown and improve dashboard widgets | 2026-02-15 | 8f9eb47 | [041-unify-roadmap-actions-and-improve-widgets](./quick/041-unify-roadmap-actions-and-improve-widgets/) |
 | 042 | Fine-tune roadmap UI and actions position | 2026-02-15 | 905efed | [042-fine-tune-roadmap-ui-and-actions-position](./quick/042-fine-tune-roadmap-ui-and-actions-position/) |
 | 043 | Improve roadmap actions dropdown UI and logic | 2026-02-15 | 6c8f68c | [043-improve-roadmap-actions-dropdown-ui-and-logic](./quick/043-improve-roadmap-actions-dropdown-ui-and-logic/) |
+| 044 | Fix nested links hydration error in projects widget | 2026-02-15 | 8a0c095 | [044-fix-nested-links-hydration-error](./quick/044-fix-nested-links-hydration-error/) |
 
 ## Session Continuity
 
