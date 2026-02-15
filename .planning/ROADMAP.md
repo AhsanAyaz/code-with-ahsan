@@ -281,5 +281,14 @@ Plans:
 - [ ] 12-05-PLAN.md — Mentee booking UI (time slot picker, bookings list) and booking page route
 - [ ] 12-06-PLAN.md — Calendar integration wiring into booking flows and end-to-end verification
 
+### Phase 13: Mentor & Mentee Dashboard UX Review
+
+**Goal:** Review the UI/UX of the mentor & mentee dashboard, analyze current state, suggest navigation/experience improvements, and evaluate against 2026 UX standards.
+**Depends on:** Phase 12
+**Plans:** TBD
+
+Plans:
+- [x] 13-01-PLAN.md — UX analysis, screenshots, improvement proposal, and dashboard redesign implementation
+
 ---
-*Last updated: 2026-02-13 after Phase 12 planning complete*
+*Last updated: 2026-02-15 after Phase 13 completion*
