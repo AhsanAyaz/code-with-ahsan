@@ -58,9 +58,9 @@ export default function MyProjectsWidget({
             {projects.slice(0, 3).map((project) => (
               <div
                 key={project.id}
-                className="p-6 bg-base-200/50 rounded-box hover:bg-base-200 transition-colors border border-transparent hover:border-primary/20 relative"
+                className="bg-base-200/50 rounded-box hover:bg-base-200 transition-colors border border-transparent hover:border-primary/20 relative"
               >
-                <Link href={`/projects/${project.id}`} className="block">
+                <Link href={`/projects/${project.id}`} className="block p-6">
                   <div className="flex justify-between items-start mb-2 gap-2">
                     <span className="font-bold truncate flex-1">
                       {project.title}
@@ -92,21 +92,20 @@ export default function MyProjectsWidget({
                             {project.pendingApplicationCount} apps
                           </span>
                         )}
-                      
-                      {/* Edit Button - Always visible for owners */}
-                      {project.creatorId === userId && (
-                        <Link
-                          href={`/projects/${project.id}/edit`}
-                          className="btn btn-xs btn-circle btn-ghost bg-base-100 hover:bg-primary hover:text-primary-content tooltip tooltip-left"
-                          data-tip="Edit Project"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          ✎
-                        </Link>
-                      )}
                     </div>
                   </div>
                 </Link>
+
+                {/* Edit Button - Outside main link to avoid nested <a> tags */}
+                {project.creatorId === userId && (
+                  <Link
+                    href={`/projects/${project.id}/edit`}
+                    className="btn btn-xs btn-circle btn-ghost bg-base-100 hover:bg-primary hover:text-primary-content tooltip tooltip-left absolute bottom-5 right-5 z-10"
+                    data-tip="Edit Project"
+                  >
+                    ✎
+                  </Link>
+                )}
               </div>
             ))}
           </div>
