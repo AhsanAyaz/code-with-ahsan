@@ -58,15 +58,15 @@ export default function MyProjectsWidget({
             {projects.map((project) => (
               <div
                 key={project.id}
-                className="p-4 bg-base-200/50 rounded-box hover:bg-base-200 transition-colors border border-transparent hover:border-primary/20 relative group"
+                className="p-6 bg-base-200/50 rounded-box hover:bg-base-200 transition-colors border border-transparent hover:border-primary/20 relative"
               >
                 <Link href={`/projects/${project.id}`} className="block">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold truncate mr-2 flex-1">
+                  <div className="flex justify-between items-start mb-2 gap-2">
+                    <span className="font-bold truncate flex-1">
                       {project.title}
                     </span>
                     <span
-                      className={`badge badge-xs ${
+                      className={`badge badge-xs shrink-0 ${
                         project.status === "active"
                           ? "badge-success"
                           : project.status === "completed"
@@ -77,7 +77,7 @@ export default function MyProjectsWidget({
                       {project.status}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center mt-4">
                     <span className="text-xs text-base-content/60">
                       {project.creatorId === userId ? (
                         <span className="text-primary font-medium">Owner</span>
@@ -85,28 +85,28 @@ export default function MyProjectsWidget({
                         "Member"
                       )}
                     </span>
-                    {project.pendingApplicationCount !== undefined &&
-                      project.pendingApplicationCount > 0 && (
-                        <span className="badge badge-error badge-xs">
-                          {project.pendingApplicationCount} apps
-                        </span>
+                    <div className="flex items-center gap-2">
+                      {project.pendingApplicationCount !== undefined &&
+                        project.pendingApplicationCount > 0 && (
+                          <span className="badge badge-error badge-xs">
+                            {project.pendingApplicationCount} apps
+                          </span>
+                        )}
+                      
+                      {/* Edit Button - Always visible for owners */}
+                      {project.creatorId === userId && (
+                        <Link
+                          href={`/projects/${project.id}/edit`}
+                          className="btn btn-xs btn-circle btn-ghost bg-base-100 hover:bg-primary hover:text-primary-content tooltip tooltip-left"
+                          data-tip="Edit Project"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          ✎
+                        </Link>
                       )}
+                    </div>
                   </div>
                 </Link>
-                
-                {/* Actions */}
-                {project.creatorId === userId && (
-                  <div className="absolute top-2 right-2 hidden group-hover:flex gap-1">
-                    <Link
-                      href={`/projects/${project.id}/edit`}
-                      className="btn btn-xs btn-circle btn-ghost bg-base-100/80 hover:bg-primary hover:text-primary-content tooltip tooltip-left"
-                      data-tip="Edit Project"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      ✎
-                    </Link>
-                  </div>
-                )}
               </div>
             ))}
           </div>

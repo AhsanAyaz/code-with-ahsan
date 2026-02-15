@@ -51,22 +51,21 @@ export default function MyRoadmapsWidget({ roadmaps, loading = false }: MyRoadma
         ) : (
           <div className="space-y-3">
             {roadmaps.map((roadmap) => (
-              <Link
-                href={`/roadmaps/${roadmap.id}`}
+              <div
                 key={roadmap.id}
                 className="flex items-center justify-between p-3 bg-base-200/50 rounded-box hover:bg-base-200 transition-colors border border-transparent hover:border-info/20"
               >
-                <div className="flex flex-col">
-                  <span className="font-bold text-sm truncate max-w-[200px]">
+                <Link href={`/roadmaps/${roadmap.id}`} className="flex-1 flex flex-col min-w-0 mr-4">
+                  <span className="font-bold text-sm truncate">
                     {roadmap.title}
                   </span>
                   <span className="text-xs text-base-content/60 capitalize">
                     {roadmap.domain.replace("-", " ")}
                   </span>
-                </div>
-                <div className="flex items-center gap-2">
+                </Link>
+                <div className="flex items-center gap-3">
                   <span
-                    className={`badge badge-sm ${
+                    className={`badge badge-sm shrink-0 ${
                       roadmap.status === "approved" || roadmap.status === "active"
                         ? "badge-success"
                         : roadmap.status === "pending"
@@ -76,8 +75,17 @@ export default function MyRoadmapsWidget({ roadmaps, loading = false }: MyRoadma
                   >
                     {roadmap.status}
                   </span>
+                  
+                  {/* Edit Action - Always visible */}
+                  <Link
+                    href={`/roadmaps/${roadmap.id}/edit`}
+                    className="btn btn-xs btn-circle btn-ghost bg-base-100 hover:bg-info hover:text-info-content tooltip tooltip-left"
+                    data-tip="Edit Roadmap"
+                  >
+                    ✎
+                  </Link>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}

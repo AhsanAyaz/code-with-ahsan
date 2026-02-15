@@ -298,6 +298,7 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 036 | Booking approval flow, Monday-start DatePicker, Discord URL buttons, session templates | 2026-02-14 | 2cfffce | [036-document-booking-approval-flow-monday-st](./quick/36-document-booking-approval-flow-monday-st/) |
 | 037 | Split mentorship dashboard tabs into nested routes | 2026-02-14 | e720187 | [037-split-mentorship-dashboard-tabs-into-nes](./quick/37-split-mentorship-dashboard-tabs-into-nes/) |
 | 038 | Improve dashboard UI - quick links and discord channel buttons | 2026-02-15 | 5d236f6 | [038-improve-dashboard-ui-quick-links-and-discord-buttons](./quick/038-improve-dashboard-ui-quick-links-and-discord-buttons/) |
+| 039 | Fix Browse All link and add actions to projects widget | 2026-02-15 | b0ed9a4 | [039-fix-browse-all-link-and-add-actions](./quick/039-fix-browse-all-link-and-add-actions/) |
 
 ## Session Continuity
 
