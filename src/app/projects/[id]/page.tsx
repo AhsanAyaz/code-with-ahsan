@@ -19,6 +19,7 @@ import {
   ProjectDifficulty,
   MentorshipRole,
 } from "@/types/mentorship";
+import RecommendedRoadmapsWidget from "@/components/projects/RecommendedRoadmapsWidget";
 
 export const dynamic = "force-dynamic";
 
@@ -1064,6 +1065,11 @@ export default function ProjectDetailPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Recommended Roadmaps */}
+      {project.techStack && project.techStack.length > 0 && (
+        <RecommendedRoadmapsWidget techStack={project.techStack} />
       )}
 
       <ToastContainer toasts={toasts} removeToast={removeToast} />

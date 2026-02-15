@@ -233,6 +233,8 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status");
     const creatorId = searchParams.get("creatorId");
     const adminView = searchParams.get("admin") === "true";
+    const domain = searchParams.get("domain");
+    const difficulty = searchParams.get("difficulty");
 
     let roadmaps: any[] = [];
 
@@ -323,6 +325,19 @@ export async function GET(request: NextRequest) {
 
       if (creatorId) {
         query = query.where("creatorId", "==", creatorId) as any;
+      }
+
+      if (domain) {
+        if (domain.includes(",")) {
+          const domains = domain.split(",").map((d) => d.trim());
+          query = query.where("domain", "in", domains) as any;
+        } else {
+          query = query.where("domain", "==", domain) as any;
+        }
+      }
+
+      if (difficulty) {
+        query = query.where("difficulty", "==", difficulty) as any;
       }
 
       // Order by creation date descending

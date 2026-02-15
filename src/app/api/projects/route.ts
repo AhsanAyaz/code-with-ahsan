@@ -171,6 +171,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status");
     const creatorId = searchParams.get("creatorId");
     const member = searchParams.get("member");
+    const techStack = searchParams.get("techStack");
 
     // For public discovery (no creator/member filter), default to approved projects only
     const isPublicListing = !creatorId && !member;
@@ -226,6 +227,13 @@ export async function GET(request: NextRequest) {
 
     if (creatorId) {
       query = query.where("creatorId", "==", creatorId) as any;
+    }
+
+    if (techStack) {
+      const techList = techStack.split(",").map((t) => t.trim()).slice(0, 10); // limit to 10 for array-contains-any
+      if (techList.length > 0) {
+        query = query.where("techStack", "array-contains-any", techList) as any;
+      }
     }
 
     // Order by creation date descending

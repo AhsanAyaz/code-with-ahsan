@@ -232,9 +232,9 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 10-01: Dashboard integration (My Projects, My Roadmaps)
-- [ ] 10-02: Cross-feature links and recommendations
-- [ ] 10-03: Regression testing and polish
+- [x] 10-01: Dashboard integration (My Projects, My Roadmaps)
+- [x] 10-02: Cross-feature links and recommendations
+- [x] 10-03: Regression testing and polish
 
 ---
 

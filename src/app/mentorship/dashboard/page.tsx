@@ -15,6 +15,8 @@ import ActionRequiredWidget from "@/components/mentorship/dashboard/ActionRequir
 import ActiveMatchesWidget from "@/components/mentorship/dashboard/ActiveMatchesWidget";
 import QuickLinksWidget from "@/components/mentorship/dashboard/QuickLinksWidget";
 import GuidelinesWidget from "@/components/mentorship/dashboard/GuidelinesWidget";
+import MyProjectsWidget from "@/components/mentorship/dashboard/MyProjectsWidget";
+import MyRoadmapsWidget from "@/components/mentorship/dashboard/MyRoadmapsWidget";
 
 interface DashboardStats {
   activeMatches: number;
@@ -29,7 +31,6 @@ const DEV_MODE = false;
 export default function MentorshipDashboardPage() {
   const router = useRouter();
   const { setShowLoginPopup } = useContext(AuthContext);
-  const toast = useToast();
   const {
     user,
     profile,
@@ -120,40 +121,6 @@ export default function MentorshipDashboardPage() {
     }
   }, [user, profile]);
 
-  const handleAction = async (
-    type: "request" | "invitation",
-    id: string,
-    action: "approve" | "decline" | "accept",
-  ) => {
-    if (type === "request") {
-      try {
-        const response = await fetch("/api/mentorship/match", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            matchId: id,
-            action,
-            mentorId: user?.uid,
-          }),
-        });
-
-        if (response.ok) {
-          toast.success(`Request ${action}d successfully`);
-          await refreshMatches();
-        } else {
-          const error = await response.json();
-          toast.error("Failed: " + error.error);
-        }
-      } catch (error) {
-        console.error("Error processing request:", error);
-        toast.error("An error occurred. Please try again.");
-      }
-    } else {
-      // TODO: Implement invitation acceptance/decline
-      toast.info("Invitation actions not yet implemented in dashboard");
-    }
-  };
-
   if (!DEV_MODE && (loading || profileLoading)) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
@@ -212,29 +179,12 @@ export default function MentorshipDashboardPage() {
     );
   }
 
-  // Active matches for widget (need partner profile)
-  // The `matches` from context are `MentorshipMatch`.
-  // We need `MatchWithProfile`.
-  // `useMentorship` hook's `matches` type is `MentorshipMatch[]` but in `my-matches` page it fetches enriched data.
-  // The context `matches` might NOT have `partnerProfile`.
-  // Let's check `MentorshipContext`. It fetches from `/api/mentorship/match`.
-  // `/api/mentorship/match` usually returns enriched data.
-  // We can cast it or use `any` safely if we know it's there, or fetch again if needed.
-  // For now, let's assume `matches` from context has what we need or minimal data.
-  // Actually, `activeMatches` in `stats` effect fetches from `/api/mentorship/my-matches` which DEFINITELY returns enriched data.
-  // But `activeMatches` state in `useEffect` is local to the effect and only used for counting.
-  // I should expose that data or fetch it for the widget.
-  // I'll create a state for `activeMatchesWithProfile`.
-
   return (
     <DashboardContent
       user={user}
       profile={profile}
       stats={stats}
       pendingRequests={pendingRequests}
-      // Matches from context might lack profile data, but let's try passing them.
-      // If `ActiveMatchesWidget` fails to show avatars, we know why.
-      // Better: Fetch enriched matches here like in `useEffect` and store them.
     />
   );
 }
@@ -252,9 +202,14 @@ function DashboardContent({
   pendingRequests: any[];
 }) {
   const [activeMatches, setActiveMatches] = useState<MatchWithProfile[]>([]);
+  const [myProjects, setMyProjects] = useState<any[]>([]);
+  const [myRoadmaps, setMyRoadmaps] = useState<any[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [loadingRoadmaps, setLoadingRoadmaps] = useState(true);
   const { refreshMatches } = useMentorship();
   const toast = useToast();
 
+  // Fetch enriched matches
   useEffect(() => {
     const fetchMatches = async () => {
       try {
@@ -270,6 +225,66 @@ function DashboardContent({
       }
     };
     fetchMatches();
+  }, [user.uid, profile.role]);
+
+  // Fetch Projects (Owned + Member)
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoadingProjects(true);
+        // Fetch projects where I am the creator
+        const ownedRes = await fetch(`/api/projects?creatorId=${user.uid}`);
+        const ownedData = ownedRes.ok ? await ownedRes.json() : { projects: [] };
+
+        // Fetch projects where I am a member
+        const memberRes = await fetch(`/api/projects?member=${user.uid}`);
+        const memberData = memberRes.ok ? await memberRes.json() : { projects: [] };
+
+        // Merge and deduplicate by ID
+        const allProjects = [...ownedData.projects, ...memberData.projects];
+        const uniqueProjects = Array.from(
+          new Map(allProjects.map((p) => [p.id, p])).values()
+        );
+
+        // Sort by last activity
+        uniqueProjects.sort(
+          (a: any, b: any) =>
+            new Date(b.lastActivityAt || b.createdAt).getTime() -
+            new Date(a.lastActivityAt || a.createdAt).getTime()
+        );
+
+        setMyProjects(uniqueProjects);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+    fetchProjects();
+  }, [user.uid]);
+
+  // Fetch Roadmaps (Mentor only)
+  useEffect(() => {
+    if (profile.role !== "mentor") {
+      setLoadingRoadmaps(false);
+      return;
+    }
+
+    const fetchRoadmaps = async () => {
+      try {
+        setLoadingRoadmaps(true);
+        const response = await fetch(`/api/roadmaps?creatorId=${user.uid}`);
+        if (response.ok) {
+          const data = await response.json();
+          setMyRoadmaps(data.roadmaps || []);
+        }
+      } catch (error) {
+        console.error("Error fetching roadmaps:", error);
+      } finally {
+        setLoadingRoadmaps(false);
+      }
+    };
+    fetchRoadmaps();
   }, [user.uid, profile.role]);
 
   const handleAction = async (
@@ -355,6 +370,18 @@ function DashboardContent({
             role={profile.role!}
           />
           
+          {/* My Projects */}
+          <MyProjectsWidget 
+            projects={myProjects} 
+            userId={user.uid}
+            loading={loadingProjects}
+          />
+
+          {/* My Roadmaps (Mentor Only) */}
+          {profile.role === "mentor" && (
+            <MyRoadmapsWidget roadmaps={myRoadmaps} loading={loadingRoadmaps} />
+          )}
+
           {/* Guidelines Accordion */}
            <GuidelinesWidget role={profile.role!} />
         </div>

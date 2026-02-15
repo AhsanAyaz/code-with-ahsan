@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import MarkdownRenderer from "@/components/roadmaps/MarkdownRenderer";
 import { Roadmap, MentorshipProfile } from "@/types/mentorship";
+import RelatedProjectsWidget from "@/components/roadmaps/RelatedProjectsWidget";
 
 export const dynamic = "force-dynamic";
 
@@ -335,6 +336,9 @@ export default function RoadmapDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Related Projects */}
+      <RelatedProjectsWidget domain={roadmap.domain} />
     </div>
   );
 }
