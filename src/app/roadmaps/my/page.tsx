@@ -7,6 +7,7 @@ import { useMentorship } from "@/contexts/MentorshipContext";
 import { useToast } from "@/contexts/ToastContext";
 import { authFetch } from "@/lib/apiClient";
 import { Roadmap } from "@/types/mentorship";
+import RoadmapActionsDropdown from "@/components/roadmaps/RoadmapActionsDropdown";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +16,6 @@ export default function MyRoadmapsPage() {
   const { success: showSuccessToast, error: showErrorToast } = useToast();
   const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
   const [loadingRoadmaps, setLoadingRoadmaps] = useState(true);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   // Fetch user's roadmaps
   useEffect(() => {
@@ -42,55 +41,16 @@ export default function MyRoadmapsPage() {
     }
   }, [user]);
 
-  // Submit draft for review
-  const handleSubmitForReview = async (roadmapId: string) => {
-    setActionLoading(roadmapId);
-    try {
-      const response = await authFetch(`/api/roadmaps/${roadmapId}`, {
-        method: "PUT",
-        body: JSON.stringify({ action: "submit" }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to submit roadmap");
-      }
-
-      // Update local state
+  // Callback for dropdown actions to update local state
+  const handleAction = (action: string, roadmapId: string) => {
+    if (action === "submit") {
       setRoadmaps((prev) =>
         prev.map((r) =>
           r.id === roadmapId ? { ...r, status: "pending" as const } : r
         )
       );
-      showSuccessToast("Roadmap submitted for review!");
-    } catch (error) {
-      showErrorToast(error instanceof Error ? error.message : "Failed to submit");
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  // Delete roadmap
-  const handleDeleteRoadmap = async (roadmapId: string) => {
-    setActionLoading(roadmapId);
-    try {
-      const response = await authFetch(`/api/roadmaps/${roadmapId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to delete roadmap");
-      }
-
-      // Remove from local state
+    } else if (action === "delete") {
       setRoadmaps((prev) => prev.filter((r) => r.id !== roadmapId));
-      showSuccessToast("Roadmap deleted successfully!");
-      setDeleteConfirmId(null);
-    } catch (error) {
-      showErrorToast(error instanceof Error ? error.message : "Failed to delete");
-    } finally {
-      setActionLoading(null);
     }
   };
 
@@ -283,108 +243,11 @@ export default function MyRoadmapsPage() {
 
                 {/* Actions */}
                 <div className="card-actions justify-end">
-                  {/* Preview button - always visible */}
-                  <Link
-                    href={`/roadmaps/${roadmap.id}`}
-                    target="_blank"
-                    className="btn btn-ghost btn-sm"
-                  >
-                    👁️ Preview
-                  </Link>
-
-                  {/* Edit button - for drafts or approved without pending draft */}
-                  {(roadmap.status === "draft" ||
-                    (roadmap.status === "approved" && !roadmap.hasPendingDraft)) && (
-                    <Link
-                      href={`/roadmaps/${roadmap.id}/edit`}
-                      className="btn btn-primary btn-sm"
-                    >
-                      ✏️ Edit
-                    </Link>
-                  )}
-
-                  {/* Submit button - only for drafts */}
-                  {roadmap.status === "draft" && (
-                    <button
-                      className="btn btn-success btn-sm"
-                      onClick={() => handleSubmitForReview(roadmap.id)}
-                      disabled={actionLoading === roadmap.id}
-                    >
-                      {actionLoading === roadmap.id ? (
-                        <>
-                          <span className="loading loading-spinner loading-xs"></span>
-                          Submitting...
-                        </>
-                      ) : (
-                        "Submit for Review"
-                      )}
-                    </button>
-                  )}
-
-                  {/* Pending status - no actions needed */}
-                  {roadmap.status === "pending" && (
-                    <span className="btn btn-sm btn-disabled">
-                      ⏳ Awaiting Admin Review
-                    </span>
-                  )}
-
-                  {/* Draft under review - no edit until approved/rejected */}
-                  {roadmap.hasPendingDraft && (
-                    <span className="btn btn-sm btn-disabled">
-                      ⏳ Draft v{roadmap.draftVersionNumber} Under Review
-                    </span>
-                  )}
-
-                  {/* Delete button - for drafts and pending (not approved) */}
-                  {roadmap.status !== "approved" && (
-                    <button
-                      className="btn btn-error btn-sm btn-outline"
-                      onClick={() => setDeleteConfirmId(roadmap.id)}
-                      disabled={actionLoading === roadmap.id}
-                    >
-                      🗑️ Delete
-                    </button>
-                  )}
+                  <RoadmapActionsDropdown roadmap={roadmap} onAction={handleAction} />
                 </div>
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {deleteConfirmId && (
-        <div className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg">Delete Roadmap?</h3>
-            <p className="py-4">
-              Are you sure you want to delete this roadmap? This action cannot be undone.
-            </p>
-            <div className="modal-action">
-              <button
-                className="btn btn-ghost"
-                onClick={() => setDeleteConfirmId(null)}
-                disabled={actionLoading === deleteConfirmId}
-              >
-                Cancel
-              </button>
-              <button
-                className="btn btn-error"
-                onClick={() => handleDeleteRoadmap(deleteConfirmId)}
-                disabled={actionLoading === deleteConfirmId}
-              >
-                {actionLoading === deleteConfirmId ? (
-                  <>
-                    <span className="loading loading-spinner loading-xs"></span>
-                    Deleting...
-                  </>
-                ) : (
-                  "Delete"
-                )}
-              </button>
-            </div>
-          </div>
-          <div className="modal-backdrop" onClick={() => setDeleteConfirmId(null)}></div>
         </div>
       )}
     </div>

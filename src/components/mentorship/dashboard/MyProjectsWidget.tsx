@@ -55,7 +55,7 @@ export default function MyProjectsWidget({
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-4">
-            {projects.map((project) => (
+            {projects.slice(0, 3).map((project) => (
               <div
                 key={project.id}
                 className="p-6 bg-base-200/50 rounded-box hover:bg-base-200 transition-colors border border-transparent hover:border-primary/20 relative"

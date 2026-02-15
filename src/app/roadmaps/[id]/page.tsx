@@ -8,11 +8,14 @@ import { useMentorship } from "@/contexts/MentorshipContext";
 import MarkdownRenderer from "@/components/roadmaps/MarkdownRenderer";
 import { Roadmap, MentorshipProfile } from "@/types/mentorship";
 import RelatedProjectsWidget from "@/components/roadmaps/RelatedProjectsWidget";
+import RoadmapActionsDropdown from "@/components/roadmaps/RoadmapActionsDropdown";
+import { useRouter } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default function RoadmapDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const roadmapId = params.id as string;
   const { user, profile } = useMentorship();
 
@@ -88,6 +91,14 @@ export default function RoadmapDetailPage() {
       fetchData();
     }
   }, [roadmapId]);
+
+  const handleAction = (action: string, id: string) => {
+    if (action === "delete") {
+      router.push("/roadmaps/my");
+    } else if (action === "submit") {
+      setRoadmap((prev) => prev ? { ...prev, status: "pending" } : null);
+    }
+  };
 
   if (loading) {
     return (
@@ -195,24 +206,22 @@ export default function RoadmapDetailPage() {
         </div>
       )}
 
-      {/* Header Section */}
-      <div className="mb-8">
-        <div className="flex items-start justify-between mb-4">
-          <h1 className="text-4xl font-bold flex-1">{roadmap.title}</h1>
-          {user?.uid === roadmap.creatorId &&
-           roadmap.status !== "pending" &&
-           !roadmap.hasPendingDraft && (
-            <Link
-              href={`/roadmaps/${roadmapId}/edit`}
-              className="btn btn-outline btn-sm"
-            >
-              ✏️ Edit
-            </Link>
-          )}
-        </div>
-
-        {/* Metadata badges */}
-        <div className="flex items-center gap-4 text-sm text-base-content/70 mb-4">
+              {/* Header Section */}
+            <div className="mb-8">
+              <div className="flex items-start justify-between mb-4">
+                <h1 className="text-4xl font-bold flex-1">{roadmap.title}</h1>
+                <div className="flex items-center gap-2">
+                  {user?.uid === roadmap.creatorId && (
+                    <RoadmapActionsDropdown 
+                      roadmap={roadmap} 
+                      onAction={handleAction} 
+                      className="dropdown-end"
+                    />
+                  )}
+                </div>
+              </div>
+      
+              {/* Metadata badges */}        <div className="flex items-center gap-4 text-sm text-base-content/70 mb-4">
           <span className="badge badge-primary">{domainLabel}</span>
           <span className="badge badge-secondary">{roadmap.difficulty}</span>
           {roadmap.estimatedHours && (
