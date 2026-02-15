@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "./Link";
 import headerNavLinks, { COMMUNITY_LINKS } from "@/data/headerNavLinks";
-import { useMentorshipSafe } from "@/contexts/MentorshipContext";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { getApp } from "firebase/app";
 
 interface LinkItem {
   href: string;
@@ -22,9 +23,19 @@ const DiscordIcon = () => (
 const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
   const [navShow, setNavShow] = useState(false);
   const [communityOpen, setCommunityOpen] = useState(false);
-  const mentorshipContext = useMentorshipSafe();
-  const profile = mentorshipContext?.profile || null;
-  const profileLoading = mentorshipContext?.loading || false;
+  const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  // Listen to Firebase auth state for smart routing
+  useEffect(() => {
+    const app = getApp();
+    const auth = getAuth(app);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const onToggleNav = () => {
     setNavShow((status) => {
@@ -142,7 +153,7 @@ const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
               <div className="mt-4 ml-4 space-y-4">
                 {COMMUNITY_LINKS.map((item) => {
                   // Smart routing for Mentorship: dashboard if logged in, mentorship page if not
-                  const href = item.title === "Mentorship" && profile && !profileLoading
+                  const href = item.title === "Mentorship" && user && !authLoading
                     ? "/mentorship/dashboard"
                     : item.href;
 

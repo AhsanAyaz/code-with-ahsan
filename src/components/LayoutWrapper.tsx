@@ -8,7 +8,8 @@ import ThemeSwitch from "./ThemeSwitch";
 import Image from "./Image";
 import ProfileMenu from "./ProfileMenu";
 import { ReactNode, useState, useRef, useEffect } from "react";
-import { useMentorshipSafe } from "@/contexts/MentorshipContext";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { getApp } from "firebase/app";
 
 interface LinkItem {
   href: string;
@@ -31,9 +32,19 @@ const DiscordIcon = () => (
 const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   const [communityOpen, setCommunityOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const mentorshipContext = useMentorshipSafe();
-  const profile = mentorshipContext?.profile || null;
-  const profileLoading = mentorshipContext?.loading || false;
+  const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  // Listen to Firebase auth state for smart routing
+  useEffect(() => {
+    const app = getApp();
+    const auth = getAuth(app);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -123,7 +134,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                 <ul className="absolute top-full left-0 z-[100] menu p-2 shadow-lg bg-base-300 rounded-box w-52">
                   {COMMUNITY_LINKS.map((item) => {
                     // Smart routing for Mentorship: dashboard if logged in, mentorship page if not
-                    const href = item.title === "Mentorship" && profile && !profileLoading
+                    const href = item.title === "Mentorship" && user && !authLoading
                       ? "/mentorship/dashboard"
                       : item.href;
 
