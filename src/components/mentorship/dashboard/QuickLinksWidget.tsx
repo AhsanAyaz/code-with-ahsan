@@ -22,7 +22,7 @@ export default function QuickLinksWidget({
         <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
           <span className="text-2xl">🔗</span> Quick Links
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {profile.role === "mentee" && (
             <Link
               href="/mentorship/browse"
