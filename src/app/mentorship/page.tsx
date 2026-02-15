@@ -6,6 +6,7 @@ import { AuthContext } from "@/contexts/AuthContext";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import Link from "next/link";
 import type { PublicMentor } from "@/types/mentorship";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 import DiscordValidationBanner from "@/components/mentorship/DiscordValidationBanner";
 
@@ -198,20 +199,7 @@ export default function MentorshipPage() {
                 <div className="card-body">
                   {/* Header with Avatar */}
                   <div className="flex items-start gap-4">
-                    <div className="avatar">
-                      <div className="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                        {mentor.photoURL ? (
-                          <img
-                            src={mentor.photoURL}
-                            alt={mentor.displayName || "Mentor"}
-                          />
-                        ) : (
-                          <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold w-full h-full">
-                            {mentor.displayName?.charAt(0) || "?"}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <ProfileAvatar photoURL={mentor.photoURL} displayName={mentor.displayName} size="xl" ring />
                     <div className="flex-1 min-w-0">
                       <h3 className="card-title text-lg">
                         {mentor.displayName}

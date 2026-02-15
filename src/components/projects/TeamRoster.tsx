@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { Project, ProjectMember } from "@/types/mentorship";
 import ContactInfo from "@/components/mentorship/ContactInfo";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 interface TeamRosterProps {
   project: Project;
@@ -34,15 +34,7 @@ export default function TeamRoster({
             key={member.id}
             className="flex items-center gap-3 p-3 bg-base-200 rounded-lg"
           >
-            {member.userProfile?.photoURL && (
-              <Image
-                src={member.userProfile.photoURL}
-                alt={member.userProfile.displayName}
-                width={48}
-                height={48}
-                className="rounded-full"
-              />
-            )}
+            <ProfileAvatar photoURL={member.userProfile?.photoURL} displayName={member.userProfile?.displayName} size="lg" />
             <div className="flex-1">
               <div className="font-semibold">
                 {member.userProfile?.displayName}

@@ -1,37 +1,17 @@
 import Link from "next/link";
-import Image from "next/image";
 import { MatchWithProfile } from "@/types/mentorship";
-import { useState } from "react";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 interface ActiveMatchesWidgetProps {
   matches: MatchWithProfile[];
   role: "mentor" | "mentee";
 }
 
-// Component to handle individual match card with image error handling
+// Component to handle individual match card
 function MatchCard({ match }: { match: MatchWithProfile }) {
-  const [imageError, setImageError] = useState(false);
-  const hasValidPhoto = match.partnerProfile?.photoURL && !imageError;
-
   return (
     <div className="flex items-center gap-4 p-4 bg-base-200/50 rounded-box hover:bg-base-200 transition-colors">
-      <div className="avatar">
-        <div className="w-12 h-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-1 relative overflow-hidden">
-          {hasValidPhoto ? (
-            <Image
-              src={match.partnerProfile.photoURL}
-              alt={match.partnerProfile.displayName || "User"}
-              fill
-              className="object-cover"
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <div className="bg-primary text-primary-content flex items-center justify-center font-bold text-lg w-full h-full">
-              {match.partnerProfile?.displayName?.charAt(0) || "?"}
-            </div>
-          )}
-        </div>
-      </div>
+      <ProfileAvatar photoURL={match.partnerProfile?.photoURL} displayName={match.partnerProfile?.displayName} size="lg" ring />
       <div className="flex-1 min-w-0">
         <div className="font-bold truncate">
           {match.partnerProfile?.displayName}

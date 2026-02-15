@@ -1,5 +1,6 @@
 import { MentorshipMatch, ProjectInvitation } from "@/types/mentorship";
 import { useState } from "react";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 interface ActionRequiredWidgetProps {
   requests: MentorshipMatch[];
@@ -51,20 +52,7 @@ export default function ActionRequiredWidget({
               key={req.id}
               className="alert bg-base-200/50 flex flex-col sm:flex-row items-start sm:items-center gap-4"
             >
-              <div className="avatar">
-                <div className="w-10 h-10 rounded-full">
-                  {(req as any).menteeProfile?.photoURL ? (
-                    <img
-                      src={(req as any).menteeProfile.photoURL}
-                      alt={(req as any).menteeProfile.displayName}
-                    />
-                  ) : (
-                    <div className="bg-neutral text-neutral-content w-full h-full flex items-center justify-center font-bold">
-                      ?
-                    </div>
-                  )}
-                </div>
-              </div>
+              <ProfileAvatar photoURL={(req as any).menteeProfile?.photoURL} displayName={(req as any).menteeProfile?.displayName} size="md" />
               <div className="flex-1">
                 <div className="font-bold">
                   {(req as any).menteeProfile?.displayName || "Unknown Mentee"}

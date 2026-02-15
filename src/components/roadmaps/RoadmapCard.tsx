@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Roadmap } from "@/types/mentorship";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 interface RoadmapCardProps {
   roadmap: Roadmap;
@@ -34,15 +34,7 @@ export default function RoadmapCard({ roadmap }: RoadmapCardProps) {
           <h2 className="card-title text-lg">{roadmap.title}</h2>
 
           <div className="flex items-center gap-2 mb-2">
-            {roadmap.creatorProfile?.photoURL && (
-              <Image
-                src={roadmap.creatorProfile.photoURL}
-                alt={roadmap.creatorProfile.displayName}
-                width={24}
-                height={24}
-                className="rounded-full"
-              />
-            )}
+            <ProfileAvatar photoURL={roadmap.creatorProfile?.photoURL} displayName={roadmap.creatorProfile?.displayName} size="xs" />
             <span className="text-sm text-base-content/70">
               {roadmap.creatorProfile?.displayName}
             </span>

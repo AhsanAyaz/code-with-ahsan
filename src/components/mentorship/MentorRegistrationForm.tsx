@@ -5,6 +5,7 @@ import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 import { useToast } from "@/contexts/ToastContext";
 import { getApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 const DISCORD_INVITE_URL = "https://codewithahsan.dev/discord";
 
@@ -381,22 +382,7 @@ export default function MentorRegistrationForm({
           {mode === "edit" && (
             <div className="flex flex-col items-center gap-2">
               <div className="relative">
-                <div className="avatar">
-                  <div className="w-20 h-20 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden bg-base-200">
-                    {photoURL ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={photoURL}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-2xl text-base-content/30">
-                        👤
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <ProfileAvatar photoURL={photoURL} displayName={displayName} size={80} ring />
                 {isUploadingImage && (
                   <div className="absolute inset-0 flex items-center justify-center bg-base-100/50 rounded-full">
                     <span className="loading loading-spinner loading-sm text-primary"></span>

@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Project, ProjectDifficulty } from "@/types/mentorship";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 interface ProjectCardProps {
   project: Project;
@@ -53,15 +53,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           </div>
 
           <div className="flex items-center gap-2 mb-2">
-            {project.creatorProfile?.photoURL && (
-              <Image
-                src={project.creatorProfile.photoURL}
-                alt={project.creatorProfile.displayName}
-                width={24}
-                height={24}
-                className="rounded-full"
-              />
-            )}
+            <ProfileAvatar photoURL={project.creatorProfile?.photoURL} displayName={project.creatorProfile?.displayName} size="xs" />
             <span className="text-sm text-base-content/70">
               {project.creatorProfile?.displayName}
             </span>

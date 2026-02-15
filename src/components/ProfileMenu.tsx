@@ -4,8 +4,8 @@ import { getAuth, User } from "firebase/auth";
 import { getApp } from "firebase/app";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { AuthContext } from "@/contexts/AuthContext";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 const ProfileMenu = () => {
   const { setShowLoginPopup } = useContext(AuthContext);
@@ -13,7 +13,6 @@ const ProfileMenu = () => {
     "loading"
   );
   const [isOpen, setIsOpen] = useState(false);
-  const [imageError, setImageError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -91,23 +90,7 @@ const ProfileMenu = () => {
         className="flex items-center gap-1.5 btn btn-ghost rounded-full px-2"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="avatar">
-          <div className="w-10 h-10 rounded-full relative overflow-hidden bg-primary">
-            {currentUser?.photoURL && !imageError ? (
-              <Image
-                src={currentUser.photoURL}
-                alt={currentUser?.displayName || "User"}
-                fill
-                className="object-cover"
-                onError={() => setImageError(true)}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-primary-content font-bold text-lg">
-                {currentUser?.displayName?.charAt(0) || currentUser?.email?.charAt(0) || "?"}
-              </div>
-            )}
-          </div>
-        </div>
+        <ProfileAvatar photoURL={currentUser?.photoURL} displayName={currentUser?.displayName} email={currentUser?.email} size="md" />
         <svg
           className="w-3.5 h-3.5 opacity-70"
           fill="none"

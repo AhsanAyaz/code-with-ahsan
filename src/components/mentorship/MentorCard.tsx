@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { MentorshipProfile } from "@/contexts/MentorshipContext";
 import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 type RequestStatus = "none" | "pending" | "declined" | "active" | "completed";
 
@@ -229,20 +230,7 @@ export default function MentorCard({
       <div className="card-body">
         {/* Header */}
         <div className="flex items-start gap-4">
-          <div className="avatar">
-            <div className="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-              {mentor.photoURL ? (
-                <img
-                  src={mentor.photoURL}
-                  alt={mentor.displayName || "Mentor"}
-                />
-              ) : (
-                <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold">
-                  {mentor.displayName?.charAt(0) || "?"}
-                </div>
-              )}
-            </div>
-          </div>
+          <ProfileAvatar photoURL={mentor.photoURL} displayName={mentor.displayName} size="xl" ring />
           <div className="flex-1 min-w-0">
             <h3 className="card-title text-lg truncate">
               {mentor.displayName}

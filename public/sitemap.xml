@@ -13,15 +13,15 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/books</loc>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/community</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses</loc>
   </url>
 
   <url>
@@ -53,11 +53,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/admin/mentees</loc>
+    <loc>https://codewithahsan.dev/admin/mentors</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/admin/mentors</loc>
+    <loc>https://codewithahsan.dev/admin/mentees</loc>
   </url>
 
   <url>

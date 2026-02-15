@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Project, ProjectDifficulty } from "@/types/mentorship";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 interface ShowcaseCardProps {
   project: Project;
@@ -43,15 +43,7 @@ export default function ShowcaseCard({ project }: ShowcaseCardProps) {
 
         {/* Creator */}
         <div className="flex items-center gap-2 mb-1">
-          {project.creatorProfile?.photoURL && (
-            <Image
-              src={project.creatorProfile.photoURL}
-              alt={project.creatorProfile.displayName}
-              width={20}
-              height={20}
-              className="rounded-full"
-            />
-          )}
+          <ProfileAvatar photoURL={project.creatorProfile?.photoURL} displayName={project.creatorProfile?.displayName} size={20} />
           <span className="text-sm text-base-content/70">
             {project.creatorProfile?.displayName}
           </span>

@@ -6,6 +6,7 @@ import { authFetch } from "@/lib/apiClient";
 import { useToast } from "@/contexts/ToastContext";
 import { SESSION_TEMPLATES } from "@/lib/mentorship-templates";
 import type { MentorBooking } from "@/types/mentorship";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 interface BookingsListProps {
   userId: string;
@@ -185,13 +186,7 @@ export default function BookingsList({ userId, role, filterPartnerId, embedded }
                 className={`flex items-center justify-between p-3 rounded-lg ${isPast ? "bg-base-200 opacity-60" : "bg-base-200"}`}
               >
                 <div className="flex items-center gap-3">
-                  {partner?.photoURL && (
-                    <img
-                      src={partner.photoURL}
-                      alt={partner.displayName}
-                      className="w-8 h-8 rounded-full"
-                    />
-                  )}
+                  <ProfileAvatar photoURL={partner?.photoURL} displayName={partner?.displayName} size="sm" />
                   <div>
                     <p className="font-medium">
                       {partner?.displayName || "Unknown"}
