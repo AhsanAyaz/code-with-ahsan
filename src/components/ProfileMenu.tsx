@@ -4,6 +4,7 @@ import { getAuth, User } from "firebase/auth";
 import { getApp } from "firebase/app";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { AuthContext } from "@/contexts/AuthContext";
 
 const ProfileMenu = () => {
@@ -12,6 +13,7 @@ const ProfileMenu = () => {
     "loading"
   );
   const [isOpen, setIsOpen] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -90,11 +92,20 @@ const ProfileMenu = () => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="avatar">
-          <div className="w-10 rounded-full">
-            <img
-              src={currentUser?.photoURL || ""}
-              alt={currentUser?.displayName || "User"}
-            />
+          <div className="w-10 h-10 rounded-full relative overflow-hidden bg-primary">
+            {currentUser?.photoURL && !imageError ? (
+              <Image
+                src={currentUser.photoURL}
+                alt={currentUser?.displayName || "User"}
+                fill
+                className="object-cover"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-primary-content font-bold text-lg">
+                {currentUser?.displayName?.charAt(0) || currentUser?.email?.charAt(0) || "?"}
+              </div>
+            )}
           </div>
         </div>
         <svg
