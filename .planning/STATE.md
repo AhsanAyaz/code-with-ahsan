@@ -301,6 +301,7 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 039 | Fix Browse All link and add actions to projects widget | 2026-02-15 | b0ed9a4 | [039-fix-browse-all-link-and-add-actions](./quick/039-fix-browse-all-link-and-add-actions/) |
 | 040 | Improve widget UI and add roadmap edit actions | 2026-02-15 | 04a36cd | [040-fix-widget-ui-and-add-roadmap-actions](./quick/040-fix-widget-ui-and-add-roadmap-actions/) |
 | 041 | Unify roadmap actions with dropdown and improve dashboard widgets | 2026-02-15 | 8f9eb47 | [041-unify-roadmap-actions-and-improve-widgets](./quick/041-unify-roadmap-actions-and-improve-widgets/) |
+| 042 | Fine-tune roadmap UI and actions position | 2026-02-15 | 905efed | [042-fine-tune-roadmap-ui-and-actions-position](./quick/042-fine-tune-roadmap-ui-and-actions-position/) |
 
 ## Session Continuity
 

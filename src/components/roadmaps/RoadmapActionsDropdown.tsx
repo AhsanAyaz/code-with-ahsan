@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Roadmap } from "@/types/mentorship";
 import { authFetch } from "@/lib/apiClient";
 import { useToast } from "@/contexts/ToastContext";
@@ -17,6 +18,9 @@ export default function RoadmapActionsDropdown({
 }: RoadmapActionsDropdownProps) {
   const { success: showSuccessToast, error: showErrorToast } = useToast();
   const [loading, setLoading] = useState(false);
+  const pathname = usePathname();
+
+  const isDetailPage = pathname === `/roadmaps/${roadmap.id}`;
 
   const handleSubmitForReview = async () => {
     setLoading(true);
@@ -84,26 +88,44 @@ export default function RoadmapActionsDropdown({
         tabIndex={0}
         className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
       >
-        {/* Preview - Always visible */}
-        <li>
-          <Link href={`/roadmaps/${roadmap.id}`} target="_blank">
-            👁️ Preview
-          </Link>
-        </li>
+        {/* Preview - Hide if already on detail page */}
+        {!isDetailPage && (
+          <li>
+            <Link
+              href={`/roadmaps/${roadmap.id}`}
+              target="_blank"
+              className="flex items-center gap-2"
+            >
+              <span>👁️</span>
+              <span>Preview</span>
+            </Link>
+          </li>
+        )}
 
         {/* Edit - Drafts or Approved without pending draft */}
         {(roadmap.status === "draft" ||
           (roadmap.status === "approved" && !roadmap.hasPendingDraft)) && (
           <li>
-            <Link href={`/roadmaps/${roadmap.id}/edit`}>✏️ Edit</Link>
+            <Link
+              href={`/roadmaps/${roadmap.id}/edit`}
+              className="flex items-center gap-2"
+            >
+              <span>✏️</span>
+              <span>Edit</span>
+            </Link>
           </li>
         )}
 
         {/* Submit - Only drafts */}
         {roadmap.status === "draft" && (
           <li>
-            <button onClick={handleSubmitForReview} disabled={loading}>
-              {loading ? "Submitting..." : "🚀 Submit for Review"}
+            <button
+              onClick={handleSubmitForReview}
+              disabled={loading}
+              className="flex items-center gap-2"
+            >
+              <span>🚀</span>
+              <span>{loading ? "Submitting..." : "Submit for Review"}</span>
             </button>
           </li>
         )}
@@ -114,9 +136,10 @@ export default function RoadmapActionsDropdown({
             <button
               onClick={handleDeleteRoadmap}
               disabled={loading}
-              className="text-error"
+              className="flex items-center gap-2 text-error"
             >
-              {loading ? "Deleting..." : "🗑️ Delete"}
+              <span>🗑️</span>
+              <span>{loading ? "Deleting..." : "Delete"}</span>
             </button>
           </li>
         )}
