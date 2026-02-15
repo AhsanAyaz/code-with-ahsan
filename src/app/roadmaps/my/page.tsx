@@ -162,6 +162,7 @@ export default function MyRoadmapsPage() {
                       </span>
                     </div>
                   </div>
+                  <RoadmapActionsDropdown roadmap={roadmap} onAction={handleAction} />
                 </div>
 
                 {/* Description */}
@@ -239,11 +240,6 @@ export default function MyRoadmapsPage() {
                   {roadmap.status === "approved" && roadmap.approvedAt && (
                     <div>Approved: {format(new Date(roadmap.approvedAt), "MMM d, yyyy")}</div>
                   )}
-                </div>
-
-                {/* Actions */}
-                <div className="card-actions justify-end">
-                  <RoadmapActionsDropdown roadmap={roadmap} onAction={handleAction} />
                 </div>
               </div>
             </div>
