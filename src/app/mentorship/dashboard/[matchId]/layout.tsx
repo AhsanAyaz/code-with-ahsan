@@ -8,6 +8,7 @@ import { useMentorship } from "@/contexts/MentorshipContext";
 import Link from "next/link";
 import ContactInfo from "@/components/mentorship/ContactInfo";
 import { DashboardContext, type MatchDetails } from "./DashboardContext";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 // DEV_MODE: Set to true to bypass authentication for testing form layouts
 const DEV_MODE = false;
@@ -355,21 +356,7 @@ export default function DashboardLayout({
           <div className="card-body">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="avatar">
-                  <div className="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                    {currentMatchDetails.partner.photoURL ? (
-                      <img
-                        src={currentMatchDetails.partner.photoURL}
-                        alt={currentMatchDetails.partner.displayName || "Partner"}
-                      />
-                    ) : (
-                      <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold">
-                        {currentMatchDetails.partner.displayName?.charAt(0) ||
-                          "?"}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <ProfileAvatar photoURL={currentMatchDetails.partner.photoURL} displayName={currentMatchDetails.partner.displayName} size="xl" ring />
                 <div>
                   <div className="text-sm text-base-content/60">
                     {currentIsMentor ? "Your Mentee" : "Your Mentor"}

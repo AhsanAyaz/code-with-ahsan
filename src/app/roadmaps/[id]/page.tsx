@@ -10,6 +10,7 @@ import { Roadmap, MentorshipProfile } from "@/types/mentorship";
 import RelatedProjectsWidget from "@/components/roadmaps/RelatedProjectsWidget";
 import RoadmapActionsDropdown from "@/components/roadmaps/RoadmapActionsDropdown";
 import { useRouter } from "next/navigation";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 export const dynamic = "force-dynamic";
 
@@ -234,15 +235,11 @@ export default function RoadmapDetailPage() {
         {roadmap.creatorProfile && (
           <div className="card bg-base-200 p-4 mb-4">
             <div className="flex items-center gap-3">
-              {roadmap.creatorProfile.photoURL && (
-                <Image
-                  src={roadmap.creatorProfile.photoURL}
-                  alt={roadmap.creatorProfile.displayName}
-                  width={48}
-                  height={48}
-                  className="rounded-full"
-                />
-              )}
+              <ProfileAvatar
+                photoURL={roadmap.creatorProfile.photoURL}
+                displayName={roadmap.creatorProfile.displayName}
+                size="lg"
+              />
               <div className="flex-1">
                 <p className="text-sm text-base-content/70">Created by</p>
                 <p className="font-semibold text-lg">
@@ -302,15 +299,11 @@ export default function RoadmapDetailPage() {
               >
                 <div className="card-body p-4">
                   <div className="flex items-center gap-3 mb-2">
-                    {mentor.photoURL && (
-                      <Image
-                        src={mentor.photoURL}
-                        alt={mentor.displayName}
-                        width={48}
-                        height={48}
-                        className="rounded-full"
-                      />
-                    )}
+                    <ProfileAvatar
+                      photoURL={mentor.photoURL}
+                      displayName={mentor.displayName}
+                      size="lg"
+                    />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-sm truncate">
                         {mentor.displayName}

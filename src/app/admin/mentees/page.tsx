@@ -18,6 +18,7 @@ import {
 } from "@/utils/streamer-mode";
 import Link from "next/link";
 import { useDebouncedCallback } from "use-debounce";
+import ProfileAvatar from "@/components/ProfileAvatar";
 import { format } from "date-fns";
 
 export default function AllMentorsPage() {
@@ -571,30 +572,16 @@ export default function AllMentorsPage() {
                   <div className="card-body">
                     {/* Profile Header */}
                     <div className="flex items-start gap-4">
-                      <div className="avatar">
-                        <div className="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                          {p.photoURL ? (
-                            <img
-                              src={p.photoURL}
-                              alt={
-                                getAnonymizedDisplayName(
-                                  p.displayName,
-                                  p.uid,
-                                  isStreamerMode
-                                ) || "Profile"
-                              }
-                            />
-                          ) : (
-                            <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold w-full h-full">
-                              {getAnonymizedDisplayName(
-                                p.displayName,
-                                p.uid,
-                                isStreamerMode
-                              )?.charAt(0) || "?"}
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                      <ProfileAvatar
+                        photoURL={p.photoURL}
+                        displayName={getAnonymizedDisplayName(
+                          p.displayName,
+                          p.uid,
+                          isStreamerMode
+                        )}
+                        size="xl"
+                        ring
+                      />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="text-lg font-bold">
@@ -856,32 +843,15 @@ export default function AllMentorsPage() {
                               <div key={mentorship.id} className="card bg-base-100">
                                 <div className="card-body p-4">
                                   <div className="flex items-start gap-3">
-                                    <div className="avatar">
-                                      <div className="w-12 h-12 rounded-full">
-                                        {mentorship.partnerProfile?.photoURL ? (
-                                          <img
-                                            src={mentorship.partnerProfile.photoURL}
-                                            alt={
-                                              getAnonymizedDisplayName(
-                                                mentorship.partnerProfile?.displayName,
-                                                mentorship.partnerProfile?.uid ||
-                                                  "partner",
-                                                isStreamerMode
-                                              ) || "Partner"
-                                            }
-                                          />
-                                        ) : (
-                                          <div className="bg-secondary text-secondary-content flex items-center justify-center text-lg font-bold w-full h-full">
-                                            {getAnonymizedDisplayName(
-                                              mentorship.partnerProfile?.displayName,
-                                              mentorship.partnerProfile?.uid ||
-                                                "partner",
-                                              isStreamerMode
-                                            )?.charAt(0) || "?"}
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
+                                    <ProfileAvatar
+                                      photoURL={mentorship.partnerProfile?.photoURL}
+                                      displayName={getAnonymizedDisplayName(
+                                        mentorship.partnerProfile?.displayName,
+                                        mentorship.partnerProfile?.uid || "partner",
+                                        isStreamerMode
+                                      )}
+                                      size="lg"
+                                    />
                                     <div className="flex-1 min-w-0">
                                       <div className="flex items-center gap-2 flex-wrap">
                                         <h4 className="font-semibold">
@@ -995,30 +965,16 @@ export default function AllMentorsPage() {
 
             {/* Modal Header */}
             <div className="flex items-center gap-4 mb-6">
-              <div className="avatar">
-                <div className="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                  {reviewMentor.photoURL ? (
-                    <img
-                      src={reviewMentor.photoURL}
-                      alt={
-                        getAnonymizedDisplayName(
-                          reviewMentor.displayName,
-                          reviewMentor.uid,
-                          isStreamerMode
-                        ) || "Mentor"
-                      }
-                    />
-                  ) : (
-                    <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold w-full h-full">
-                      {getAnonymizedDisplayName(
-                        reviewMentor.displayName,
-                        reviewMentor.uid,
-                        isStreamerMode
-                      )?.charAt(0) || "?"}
-                    </div>
-                  )}
-                </div>
-              </div>
+              <ProfileAvatar
+                photoURL={reviewMentor.photoURL}
+                displayName={getAnonymizedDisplayName(
+                  reviewMentor.displayName,
+                  reviewMentor.uid,
+                  isStreamerMode
+                )}
+                size="xl"
+                ring
+              />
               <div>
                 <h3 className="text-xl font-bold">
                   {getAnonymizedDisplayName(
@@ -1072,30 +1028,11 @@ export default function AllMentorsPage() {
                     <div className="card-body p-4">
                       {/* Reviewer Info */}
                       <div className="flex items-start gap-3">
-                        <div className="avatar">
-                          <div className="w-10 h-10 rounded-full">
-                            {review.menteePhoto ? (
-                              <img
-                                src={review.menteePhoto}
-                                alt={
-                                  getAnonymizedDisplayName(
-                                    review.menteeName,
-                                    review.menteeId,
-                                    isStreamerMode
-                                  ) || "Mentee"
-                                }
-                              />
-                            ) : (
-                              <div className="bg-secondary text-secondary-content flex items-center justify-center text-sm font-bold w-full h-full">
-                                {getAnonymizedDisplayName(
-                                  review.menteeName,
-                                  review.menteeId,
-                                  isStreamerMode
-                                )?.charAt(0) || "?"}
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                        <ProfileAvatar
+                          photoURL={review.menteePhoto}
+                          displayName={review.menteeName}
+                          size="md"
+                        />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between flex-wrap gap-2">
                             <div>
@@ -1376,30 +1313,15 @@ function MentorshipCard({
     <div className="card bg-base-100">
       <div className="card-body p-4">
         <div className="flex items-start gap-3">
-          <div className="avatar">
-            <div className="w-12 h-12 rounded-full">
-              {mentorship.partnerProfile?.photoURL ? (
-                <img
-                  src={mentorship.partnerProfile.photoURL}
-                  alt={
-                    getAnonymizedDisplayName(
-                      mentorship.partnerProfile?.displayName,
-                      mentorship.partnerProfile?.uid || "partner",
-                      isStreamerMode
-                    ) || "Partner"
-                  }
-                />
-              ) : (
-                <div className="bg-secondary text-secondary-content flex items-center justify-center text-lg font-bold w-full h-full">
-                  {getAnonymizedDisplayName(
-                    mentorship.partnerProfile?.displayName,
-                    mentorship.partnerProfile?.uid || "partner",
-                    isStreamerMode
-                  )?.charAt(0) || "?"}
-                </div>
-              )}
-            </div>
-          </div>
+          <ProfileAvatar
+            photoURL={mentorship.partnerProfile?.photoURL}
+            displayName={getAnonymizedDisplayName(
+              mentorship.partnerProfile?.displayName,
+              mentorship.partnerProfile?.uid || "partner",
+              isStreamerMode
+            )}
+            size="lg"
+          />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h4 className="font-semibold">

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import TimeSlotPicker from "@/components/mentorship/TimeSlotPicker";
 import Link from "next/link";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 export default function BookMentorPage({
   params,
@@ -81,13 +82,7 @@ export default function BookMentorPage({
         <div className="card-body">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {mentor.photoURL && (
-                <img
-                  src={mentor.photoURL}
-                  alt={mentor.displayName}
-                  className="w-16 h-16 rounded-full"
-                />
-              )}
+              <ProfileAvatar photoURL={mentor.photoURL} displayName={mentor.displayName} size="xl" />
               <div>
                 <h2 className="card-title">{mentor.displayName}</h2>
                 {mentor.currentRole && (

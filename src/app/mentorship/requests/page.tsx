@@ -8,6 +8,7 @@ import { useMentorship, MentorshipMatch } from "@/contexts/MentorshipContext";
 import Link from "next/link";
 import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 import ContactInfo from "@/components/mentorship/ContactInfo";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 interface RequestWithProfile extends MentorshipMatch {
   menteeProfile?: {
@@ -211,20 +212,7 @@ export default function MentorRequestsPage() {
                 <div className="flex flex-col md:flex-row gap-6">
                   {/* Mentee Info */}
                   <div className="flex items-start gap-4 flex-1">
-                    <div className="avatar">
-                      <div className="w-16 h-16 rounded-full ring ring-secondary ring-offset-base-100 ring-offset-2">
-                        {request.menteeProfile?.photoURL ? (
-                          <img
-                            src={request.menteeProfile.photoURL}
-                            alt={request.menteeProfile.displayName || "Mentee"}
-                          />
-                        ) : (
-                          <div className="bg-secondary text-secondary-content flex items-center justify-center text-2xl font-bold">
-                            ?
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <ProfileAvatar photoURL={request.menteeProfile?.photoURL} displayName={request.menteeProfile?.displayName} size="xl" ring />
                     <div className="flex-1">
                       <h3 className="font-bold text-lg">
                         {request.menteeProfile?.displayName || "Anonymous"}

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { authFetch } from "@/lib/apiClient";
 import ToastContainer, { ToastMessage, ToastType } from "@/components/ui/Toast";
 import Image from "next/image";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 export const dynamic = "force-dynamic";
 
@@ -317,18 +318,11 @@ export default function MyProjectsPage() {
                     {/* Creator */}
                     {project.creatorProfile && (
                       <div className="flex items-center gap-2 mt-3">
-                        {project.creatorProfile.photoURL && (
-                          <div className="avatar">
-                            <div className="w-6 h-6 rounded-full">
-                              <Image
-                                src={project.creatorProfile.photoURL}
-                                alt={project.creatorProfile.displayName}
-                                width={24}
-                                height={24}
-                              />
-                            </div>
-                          </div>
-                        )}
+                        <ProfileAvatar
+                          photoURL={project.creatorProfile.photoURL}
+                          displayName={project.creatorProfile.displayName}
+                          size="xs"
+                        />
                         <span className="text-sm text-base-content/70">
                           by {project.creatorProfile.displayName}
                         </span>

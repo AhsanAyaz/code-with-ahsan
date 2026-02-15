@@ -6,6 +6,7 @@ import type { MentorProfileDetails } from "@/types/mentorship";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import { useToast } from "@/contexts/ToastContext";
 import { AuthContext } from "@/contexts/AuthContext";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 const DAYS_OF_WEEK = [
   "monday",
@@ -538,17 +539,7 @@ export default function MentorProfileClient({
           <div className="flex flex-col md:flex-row gap-6">
             {/* Avatar */}
             <div className="flex-shrink-0">
-              <div className="avatar">
-                <div className="w-32 h-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-4">
-                  {mentor.photoURL ? (
-                    <img src={mentor.photoURL} alt={mentor.displayName} />
-                  ) : (
-                    <div className="bg-primary text-primary-content flex items-center justify-center text-5xl font-bold w-full h-full">
-                      {mentor.displayName?.charAt(0) || "?"}
-                    </div>
-                  )}
-                </div>
-              </div>
+              <ProfileAvatar photoURL={mentor.photoURL} displayName={mentor.displayName} size={128} ring />
             </div>
 
             {/* Info */}

@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import ContactInfo from "@/components/mentorship/ContactInfo";
 import DiscordValidationBanner from "@/components/mentorship/DiscordValidationBanner";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 interface MatchWithProfile extends MentorshipMatch {
   partnerProfile?: MentorshipProfile;
@@ -149,20 +150,7 @@ export default function MyMatchesPage() {
               >
                 <div className="card-body p-4">
                   <div className="flex items-center gap-4">
-                    <div className="avatar">
-                      <div className="w-12 h-12 rounded-full">
-                        {match.partnerProfile?.photoURL ? (
-                          <img
-                            src={match.partnerProfile.photoURL}
-                            alt={match.partnerProfile.displayName || "User"}
-                          />
-                        ) : (
-                          <div className="bg-warning text-warning-content flex items-center justify-center font-bold">
-                            ?
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <ProfileAvatar photoURL={match.partnerProfile?.photoURL} displayName={match.partnerProfile?.displayName} size="lg" />
                     <div>
                       <div className="font-semibold">
                         {match.partnerProfile?.displayName || "Unknown"}
@@ -236,21 +224,7 @@ export default function MyMatchesPage() {
               <div key={match.id} className="card bg-base-100 shadow-xl">
                 <div className="card-body">
                   <div className="flex items-start gap-4">
-                    <div className="avatar">
-                      <div className="w-16 h-16 rounded-full ring ring-success ring-offset-base-100 ring-offset-2">
-                        {match.partnerProfile?.photoURL ? (
-                          <img
-                            src={match.partnerProfile.photoURL}
-                            alt={match.partnerProfile.displayName || "User"}
-                          />
-                        ) : (
-                          <div className="bg-success text-success-content flex items-center justify-center text-2xl font-bold">
-                            {match.partnerProfile?.displayName?.charAt(0) ||
-                              "?"}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <ProfileAvatar photoURL={match.partnerProfile?.photoURL} displayName={match.partnerProfile?.displayName} size="xl" ring />
                     <div className="flex-1">
                       <h4 className="font-bold text-lg">
                         {match.partnerProfile?.displayName}

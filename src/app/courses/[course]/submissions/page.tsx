@@ -18,6 +18,7 @@ import SubmissionWrapper from "@/components/SubmissionWrapper";
 // @ts-ignore
 import { getCoursesForStaticPaths } from "@/services/CourseService";
 import axios from "axios";
+import ProfileAvatar from "@/components/ProfileAvatar";
 import qs from "qs";
 // @ts-ignore
 import Course from "@/classes/Course.class";
@@ -207,11 +208,10 @@ export default function SubmissionsPage() {
 
                 <div className="p-5 border-t border-base-200">
                   <div className="flex items-center gap-4">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={sub.by.photoURL}
-                      alt={sub.by.name}
-                      className="rounded-full w-10 h-10"
+                    <ProfileAvatar
+                      photoURL={sub.by.photoURL}
+                      displayName={sub.by.name}
+                      size="md"
                     />
                     <a
                       href={sub.demoLink}

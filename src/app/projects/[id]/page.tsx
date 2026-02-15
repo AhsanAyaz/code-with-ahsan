@@ -9,6 +9,7 @@ import ContactInfo from "@/components/mentorship/ContactInfo";
 import Link from "next/link";
 import Image from "next/image";
 import ToastContainer, { ToastMessage, ToastType } from "@/components/ui/Toast";
+import ProfileAvatar from "@/components/ProfileAvatar";
 import { authFetch } from "@/lib/apiClient";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import {
@@ -621,15 +622,11 @@ export default function ProjectDetailPage() {
         <h2 className="text-xl font-semibold mb-2">Creator</h2>
         <div className="bg-base-200 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            {project.creatorProfile?.photoURL && (
-              <Image
-                src={project.creatorProfile.photoURL}
-                alt={project.creatorProfile.displayName}
-                width={48}
-                height={48}
-                className="rounded-full"
-              />
-            )}
+            <ProfileAvatar
+              photoURL={project.creatorProfile?.photoURL}
+              displayName={project.creatorProfile?.displayName}
+              size="lg"
+            />
             <div className="flex-1">
               <div className="font-semibold">
                 {project.creatorProfile?.displayName}
@@ -793,15 +790,11 @@ export default function ProjectDetailPage() {
                   <div key={app.id} className="card bg-base-200 shadow-md">
                     <div className="card-body">
                       <div className="flex items-center gap-3 mb-3">
-                        {app.userProfile?.photoURL && (
-                          <Image
-                            src={app.userProfile.photoURL}
-                            alt={app.userProfile.displayName}
-                            width={40}
-                            height={40}
-                            className="rounded-full"
-                          />
-                        )}
+                        <ProfileAvatar
+                          photoURL={app.userProfile?.photoURL}
+                          displayName={app.userProfile?.displayName}
+                          size="md"
+                        />
                         <div className="flex-1">
                           <div className="font-semibold">
                             {app.userProfile?.displayName}
@@ -929,15 +922,11 @@ export default function ProjectDetailPage() {
                       className="flex items-center justify-between bg-base-200 rounded-lg p-3"
                     >
                       <div className="flex items-center gap-3">
-                        {inv.userProfile?.photoURL && (
-                          <Image
-                            src={inv.userProfile.photoURL}
-                            alt={inv.userProfile.displayName}
-                            width={32}
-                            height={32}
-                            className="rounded-full"
-                          />
-                        )}
+                        <ProfileAvatar
+                          photoURL={inv.userProfile?.photoURL}
+                          displayName={inv.userProfile?.displayName}
+                          size="sm"
+                        />
                         <div>
                           <div className="font-medium">
                             {inv.userProfile?.displayName || "Invited User"}

@@ -11,6 +11,7 @@ import DeleteProjectDialog from "@/components/admin/DeleteProjectDialog";
 import DeclineProjectDialog from "@/components/admin/DeclineProjectDialog";
 import DeletionSummaryModal from "@/components/admin/DeletionSummaryModal";
 import ContactInfo from "@/components/mentorship/ContactInfo";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 interface EnrichedProject extends Project {
   memberCount: number;
@@ -299,14 +300,11 @@ export default function AdminProjectsPage() {
 
                 {/* Creator info */}
                 <div className="flex items-center gap-3 mt-2">
-                  <div className="avatar">
-                    <div className="w-10 h-10 rounded-full">
-                      <img
-                        src={project.creatorProfile?.photoURL || "/default-avatar.png"}
-                        alt={project.creatorProfile?.displayName || "Creator"}
-                      />
-                    </div>
-                  </div>
+                  <ProfileAvatar
+                    photoURL={project.creatorProfile?.photoURL}
+                    displayName={project.creatorProfile?.displayName}
+                    size="md"
+                  />
                   <div className="text-sm">
                     <div className="font-semibold">
                       {project.creatorProfile?.displayName || "Unknown"}

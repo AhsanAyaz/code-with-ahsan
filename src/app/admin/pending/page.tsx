@@ -10,6 +10,7 @@ import {
   getAnonymizedEmail,
   getAnonymizedDiscord,
 } from "@/utils/streamer-mode";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 export default function PendingMentorsPage() {
   const toast = useToast();
@@ -190,30 +191,16 @@ export default function PendingMentorsPage() {
                 <div className="flex flex-col md:flex-row md:items-start gap-4">
                   {/* Avatar and Basic Info */}
                   <div className="flex items-start gap-4 flex-1">
-                    <div className="avatar">
-                      <div className="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                        {p.photoURL ? (
-                          <img
-                            src={p.photoURL}
-                            alt={
-                              getAnonymizedDisplayName(
-                                p.displayName,
-                                p.uid,
-                                isStreamerMode
-                              ) || "Profile"
-                            }
-                          />
-                        ) : (
-                          <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold w-full h-full">
-                            {getAnonymizedDisplayName(
-                              p.displayName,
-                              p.uid,
-                              isStreamerMode
-                            )?.charAt(0) || "?"}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <ProfileAvatar
+                      photoURL={p.photoURL}
+                      displayName={getAnonymizedDisplayName(
+                        p.displayName,
+                        p.uid,
+                        isStreamerMode
+                      )}
+                      size="xl"
+                      ring
+                    />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="text-lg font-bold">
@@ -455,30 +442,16 @@ export default function PendingMentorsPage() {
 
             {/* Modal Header */}
             <div className="flex items-center gap-4 mb-6">
-              <div className="avatar">
-                <div className="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                  {reviewMentor.photoURL ? (
-                    <img
-                      src={reviewMentor.photoURL}
-                      alt={
-                        getAnonymizedDisplayName(
-                          reviewMentor.displayName,
-                          reviewMentor.uid,
-                          isStreamerMode
-                        ) || "Mentor"
-                      }
-                    />
-                  ) : (
-                    <div className="bg-primary text-primary-content flex items-center justify-center text-2xl font-bold w-full h-full">
-                      {getAnonymizedDisplayName(
-                        reviewMentor.displayName,
-                        reviewMentor.uid,
-                        isStreamerMode
-                      )?.charAt(0) || "?"}
-                    </div>
-                  )}
-                </div>
-              </div>
+              <ProfileAvatar
+                photoURL={reviewMentor.photoURL}
+                displayName={getAnonymizedDisplayName(
+                  reviewMentor.displayName,
+                  reviewMentor.uid,
+                  isStreamerMode
+                )}
+                size="xl"
+                ring
+              />
               <div>
                 <h3 className="text-xl font-bold">
                   {getAnonymizedDisplayName(
@@ -532,30 +505,11 @@ export default function PendingMentorsPage() {
                     <div className="card-body p-4">
                       {/* Reviewer Info */}
                       <div className="flex items-start gap-3">
-                        <div className="avatar">
-                          <div className="w-10 h-10 rounded-full">
-                            {review.menteePhoto ? (
-                              <img
-                                src={review.menteePhoto}
-                                alt={
-                                  getAnonymizedDisplayName(
-                                    review.menteeName,
-                                    review.menteeId,
-                                    isStreamerMode
-                                  ) || "Mentee"
-                                }
-                              />
-                            ) : (
-                              <div className="bg-secondary text-secondary-content flex items-center justify-center text-sm font-bold w-full h-full">
-                                {getAnonymizedDisplayName(
-                                  review.menteeName,
-                                  review.menteeId,
-                                  isStreamerMode
-                                )?.charAt(0) || "?"}
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                        <ProfileAvatar
+                          photoURL={review.menteePhoto}
+                          displayName={review.menteeName}
+                          size="md"
+                        />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between flex-wrap gap-2">
                             <div>
