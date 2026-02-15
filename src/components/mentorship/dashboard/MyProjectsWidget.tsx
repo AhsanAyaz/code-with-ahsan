@@ -39,7 +39,7 @@ export default function MyProjectsWidget({
               </span>
             )}
           </h3>
-          <Link href="/projects" className="btn btn-ghost btn-xs text-primary">
+          <Link href="/projects/my" className="btn btn-ghost btn-xs text-primary">
             Browse All
           </Link>
         </div>
@@ -49,50 +49,65 @@ export default function MyProjectsWidget({
             <p className="text-base-content/70 mb-4">
               You haven&apos;t joined any projects yet.
             </p>
-            <Link href="/projects" className="btn btn-outline btn-sm">
+            <Link href="/projects/discover" className="btn btn-outline btn-sm">
               Explore Projects
             </Link>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-4">
             {projects.map((project) => (
-              <Link
-                href={`/projects/${project.id}`}
+              <div
                 key={project.id}
-                className="p-4 bg-base-200/50 rounded-box hover:bg-base-200 transition-colors border border-transparent hover:border-primary/20"
+                className="p-4 bg-base-200/50 rounded-box hover:bg-base-200 transition-colors border border-transparent hover:border-primary/20 relative group"
               >
-                <div className="flex justify-between items-start mb-2">
-                  <span className="font-bold truncate mr-2">
-                    {project.title}
-                  </span>
-                  <span
-                    className={`badge badge-xs ${
-                      project.status === "active"
-                        ? "badge-success"
-                        : project.status === "completed"
-                        ? "badge-info"
-                        : "badge-ghost"
-                    }`}
-                  >
-                    {project.status}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-base-content/60">
-                    {project.creatorId === userId ? (
-                      <span className="text-primary font-medium">Owner</span>
-                    ) : (
-                      "Member"
-                    )}
-                  </span>
-                  {project.pendingApplicationCount !== undefined &&
-                    project.pendingApplicationCount > 0 && (
-                      <span className="badge badge-error badge-xs">
-                        {project.pendingApplicationCount} apps
-                      </span>
-                    )}
-                </div>
-              </Link>
+                <Link href={`/projects/${project.id}`} className="block">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold truncate mr-2 flex-1">
+                      {project.title}
+                    </span>
+                    <span
+                      className={`badge badge-xs ${
+                        project.status === "active"
+                          ? "badge-success"
+                          : project.status === "completed"
+                          ? "badge-info"
+                          : "badge-ghost"
+                      }`}
+                    >
+                      {project.status}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-base-content/60">
+                      {project.creatorId === userId ? (
+                        <span className="text-primary font-medium">Owner</span>
+                      ) : (
+                        "Member"
+                      )}
+                    </span>
+                    {project.pendingApplicationCount !== undefined &&
+                      project.pendingApplicationCount > 0 && (
+                        <span className="badge badge-error badge-xs">
+                          {project.pendingApplicationCount} apps
+                        </span>
+                      )}
+                  </div>
+                </Link>
+                
+                {/* Actions */}
+                {project.creatorId === userId && (
+                  <div className="absolute top-2 right-2 hidden group-hover:flex gap-1">
+                    <Link
+                      href={`/projects/${project.id}/edit`}
+                      className="btn btn-xs btn-circle btn-ghost bg-base-100/80 hover:bg-primary hover:text-primary-content tooltip tooltip-left"
+                      data-tip="Edit Project"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      ✎
+                    </Link>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}
