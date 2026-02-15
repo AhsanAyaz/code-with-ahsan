@@ -8,6 +8,7 @@ import ThemeSwitch from "./ThemeSwitch";
 import Image from "./Image";
 import ProfileMenu from "./ProfileMenu";
 import { ReactNode, useState, useRef, useEffect } from "react";
+import { useMentorship } from "@/contexts/MentorshipContext";
 
 interface LinkItem {
   href: string;
@@ -30,6 +31,7 @@ const DiscordIcon = () => (
 const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   const [communityOpen, setCommunityOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { profile, loading: profileLoading } = useMentorship();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -117,39 +119,47 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
               </button>
               {communityOpen && (
                 <ul className="absolute top-full left-0 z-[100] menu p-2 shadow-lg bg-base-300 rounded-box w-52">
-                  {COMMUNITY_LINKS.map((item) => (
-                    <li key={item.title}>
-                      <Link
-                        href={item.href}
-                        className="flex items-center gap-2"
-                        onClick={() => setCommunityOpen(false)}
-                        {...(item.external
-                          ? { target: "_blank", rel: "noopener noreferrer" }
-                          : {})}
-                      >
-                        {item.icon === "discord" && <DiscordIcon />}
-                        {item.icon === "mentorship" && <span>🤝</span>}
-                        {item.icon === "projects" && <span>🚀</span>}
-                        {item.icon === "brain" && <span>🧠</span>}
-                        {item.title}
-                        {item.external && (
-                          <svg
-                            className="w-3 h-3 opacity-50"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                            />
-                          </svg>
-                        )}
-                      </Link>
-                    </li>
-                  ))}
+                  {COMMUNITY_LINKS.map((item) => {
+                    // Smart routing for Mentorship: dashboard if logged in, mentorship page if not
+                    const href = item.title === "Mentorship" && profile && !profileLoading
+                      ? "/mentorship/dashboard"
+                      : item.href;
+
+                    return (
+                      <li key={item.title}>
+                        <Link
+                          href={href}
+                          className="flex items-center gap-2"
+                          onClick={() => setCommunityOpen(false)}
+                          {...(item.external
+                            ? { target: "_blank", rel: "noopener noreferrer" }
+                            : {})}
+                        >
+                          {item.icon === "discord" && <DiscordIcon />}
+                          {item.icon === "mentorship" && <span>🤝</span>}
+                          {item.icon === "projects" && <span>🚀</span>}
+                          {item.icon === "roadmap" && <span>🗺️</span>}
+                          {item.icon === "brain" && <span>🧠</span>}
+                          {item.title}
+                          {item.external && (
+                            <svg
+                              className="w-3 h-3 opacity-50"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                              />
+                            </svg>
+                          )}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>

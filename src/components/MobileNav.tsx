@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Link from "./Link";
 import headerNavLinks, { COMMUNITY_LINKS } from "@/data/headerNavLinks";
+import { useMentorship } from "@/contexts/MentorshipContext";
 
 interface LinkItem {
   href: string;
@@ -21,6 +22,7 @@ const DiscordIcon = () => (
 const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
   const [navShow, setNavShow] = useState(false);
   const [communityOpen, setCommunityOpen] = useState(false);
+  const { profile, loading: profileLoading } = useMentorship();
 
   const onToggleNav = () => {
     setNavShow((status) => {
@@ -136,28 +138,36 @@ const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
             
             {communityOpen && (
               <div className="mt-4 ml-4 space-y-4">
-                {COMMUNITY_LINKS.map((item) => (
-                  <div key={item.title}>
-                    <Link
-                      href={item.href}
-                      className="flex items-center gap-3 text-xl font-medium text-base-content/80 hover:text-primary"
-                      onClick={onToggleNav}
-                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                    >
-                      {item.icon === "discord" && <DiscordIcon />}
-                      {item.icon === "mentorship" && <span className="text-xl">🤝</span>}
-                      {item.icon === "projects" && <span className="text-xl">🚀</span>}
-                      {item.icon === "my-projects" && <span className="text-xl">📂</span>}
-                      {item.icon === "brain" && <span className="text-xl">🧠</span>}
-                      {item.title}
-                      {item.external && (
-                        <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      )}
-                    </Link>
-                  </div>
-                ))}
+                {COMMUNITY_LINKS.map((item) => {
+                  // Smart routing for Mentorship: dashboard if logged in, mentorship page if not
+                  const href = item.title === "Mentorship" && profile && !profileLoading
+                    ? "/mentorship/dashboard"
+                    : item.href;
+
+                  return (
+                    <div key={item.title}>
+                      <Link
+                        href={href}
+                        className="flex items-center gap-3 text-xl font-medium text-base-content/80 hover:text-primary"
+                        onClick={onToggleNav}
+                        {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      >
+                        {item.icon === "discord" && <DiscordIcon />}
+                        {item.icon === "mentorship" && <span className="text-xl">🤝</span>}
+                        {item.icon === "projects" && <span className="text-xl">🚀</span>}
+                        {item.icon === "roadmap" && <span className="text-xl">🗺️</span>}
+                        {item.icon === "my-projects" && <span className="text-xl">📂</span>}
+                        {item.icon === "brain" && <span className="text-xl">🧠</span>}
+                        {item.title}
+                        {item.external && (
+                          <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        )}
+                      </Link>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
