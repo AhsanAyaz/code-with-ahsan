@@ -13,7 +13,7 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses</loc>
+    <loc>https://codewithahsan.dev/admin</loc>
   </url>
 
   <url>
@@ -21,11 +21,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/gear</loc>
+    <loc>https://codewithahsan.dev/courses</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/admin</loc>
+    <loc>https://codewithahsan.dev/gear</loc>
   </url>
 
   <url>
@@ -61,11 +61,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/admin/pending</loc>
+    <loc>https://codewithahsan.dev/admin/mentors</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/admin/roadmaps</loc>
+    <loc>https://codewithahsan.dev/admin/pending</loc>
   </url>
 
   <url>
@@ -73,7 +73,7 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/admin/mentors</loc>
+    <loc>https://codewithahsan.dev/admin/roadmaps</loc>
   </url>
 
   <url>
@@ -93,6 +93,10 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/mentorship/goals</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/mentorship/my-matches</loc>
   </url>
 
@@ -109,11 +113,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/projects/new</loc>
+    <loc>https://codewithahsan.dev/projects/my</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/projects/my</loc>
+    <loc>https://codewithahsan.dev/projects/new</loc>
   </url>
 
   <url>
@@ -121,19 +125,15 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/goals</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/roadmaps/my</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/roadmaps/new</loc>
+    <loc>https://codewithahsan.dev/events/hackstack/2023</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/events/hackstack/2023</loc>
+    <loc>https://codewithahsan.dev/roadmaps/new</loc>
   </url>
 
   <url>

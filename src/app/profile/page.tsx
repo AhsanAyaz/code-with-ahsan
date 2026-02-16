@@ -30,6 +30,7 @@ export default function SettingsPage() {
   const [unavailableDates, setUnavailableDates] = useState<UnavailableDate[]>([]);
   const [isCalendarConnected, setIsCalendarConnected] = useState(false);
   const [calendarConnecting, setCalendarConnecting] = useState(false);
+  const [calendarError, setCalendarError] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -72,10 +73,13 @@ export default function SettingsPage() {
     if (calendarStatus === "connected") {
       toast.success("Google Calendar connected successfully!");
       setIsCalendarConnected(true);
+      setCalendarError(null); // Clear any previous errors
       // Clean URL
       window.history.replaceState({}, "", "/profile");
     } else if (calendarStatus === "error") {
-      toast.error("Failed to connect Google Calendar. Please try again.");
+      const errorMsg = "Failed to connect Google Calendar. Please try again.";
+      setCalendarError(errorMsg);
+      toast.error(errorMsg);
       window.history.replaceState({}, "", "/profile");
     }
   }, [toast]);
@@ -112,16 +116,28 @@ export default function SettingsPage() {
 
   const handleCalendarConnect = async () => {
     setCalendarConnecting(true);
+    setCalendarError(null); // Clear previous errors
     try {
       const res = await authFetch("/api/mentorship/calendar/auth");
       const data = await res.json();
+
       if (data.authUrl) {
         window.location.href = data.authUrl;
+      } else if (data.error) {
+        // Show specific error from API
+        const errorMsg = data.error === "Google Calendar integration not configured"
+          ? "Google Calendar integration is not available. Please contact the administrator to configure Google OAuth credentials."
+          : data.error;
+        setCalendarError(errorMsg);
+        toast.error(errorMsg);
       } else {
+        setCalendarError("Calendar integration not available");
         toast.error("Calendar integration not available");
       }
-    } catch {
-      toast.error("Failed to initiate calendar connection");
+    } catch (error) {
+      const errorMsg = "Failed to initiate calendar connection. Please try again later.";
+      setCalendarError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setCalendarConnecting(false);
     }
@@ -341,13 +357,28 @@ export default function SettingsPage() {
               <p className="text-sm opacity-70">
                 Connect your Google Calendar to automatically create events with Google Meet links when mentees book sessions.
               </p>
-              <div className="mt-2">
+              <div className="mt-2 space-y-3">
                 {isCalendarConnected ? (
-                  <div className="flex items-center gap-2 text-success">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Google Calendar connected</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 text-success">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span>Google Calendar connected</span>
+                      </div>
+                      <button
+                        className="btn btn-outline btn-sm"
+                        onClick={handleCalendarConnect}
+                        disabled={calendarConnecting}
+                      >
+                        {calendarConnecting ? (
+                          <span className="loading loading-spinner loading-sm"></span>
+                        ) : (
+                          "Reconnect"
+                        )}
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <button
@@ -361,6 +392,26 @@ export default function SettingsPage() {
                       "Connect Google Calendar"
                     )}
                   </button>
+                )}
+
+                {/* Display error message if calendar connection fails */}
+                {calendarError && (
+                  <div className="alert alert-warning">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="stroke-current shrink-0 h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                    <span>{calendarError}</span>
+                  </div>
                 )}
               </div>
             </div>
