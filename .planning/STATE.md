@@ -146,6 +146,41 @@ Recent decisions affecting current work:
 - [Phase 13-01]: Context-aware Mentorship routing using MentorshipContext (logged-in users → dashboard, others → marketing page)
 - [Phase 13-01]: Roadmap icon changed from projects (🚀) to roadmap-specific (🗺️) for better visual distinction
 - [Phase 13-01]: Smart routing applied to both desktop and mobile navigation for consistent UX
+- [Phase quick-054]: Timezone Display Pattern - Display times in viewer/recipient timezone, never hardcode. Platform: use browser timezone via Intl API. Discord: fetch recipient's profile timezone. Always include timezone label (e.g., "2:30 PM (CET)"). Prevents user confusion from ambiguous timestamps.
+
+### Timezone Handling Architecture
+
+**Context:** Bookings span multiple timezones (mentor in Sweden, mentee in Pakistan, etc.). Timestamps stored in Firestore as UTC Dates.
+
+**Decision (quick-054):** Display times in viewer/recipient timezone, NEVER hardcode to booking timezone.
+
+**Implementation Pattern:**
+
+1. **Storage:** Always store UTC (Date objects in Firestore)
+2. **Platform Display (UI):**
+   - Use viewer's browser timezone: `Intl.DateTimeFormat().resolvedOptions().timeZone`
+   - Format with timezone label: "Feb 18, 2026 at 2:30 PM (CET)"
+   - Rationale: User expects to see times in their local timezone
+
+3. **Discord Notifications:**
+   - Fetch recipient's timezone from their profile: `mentorshipProfile.timeSlotAvailability.timezone`
+   - Format with timezone label: "Time: 2:30 PM (CET)"
+   - Rationale: Each person should see times in their own timezone
+
+4. **Channel Messages (Both Parties):**
+   - Show both timezones if different: "2:30 PM (CET) / 1:30 PM (PKT)"
+   - Show single timezone if same: "2:30 PM (CET)"
+   - Rationale: Both parties see their local time without confusion
+
+**Fallback:** Default to 'UTC' if timezone not found in profile.
+
+**Testing:** When fixing timezone bugs, verify:
+- [ ] Platform shows time in viewer's browser timezone with label
+- [ ] Discord notifications use recipient's profile timezone with label
+- [ ] Times adjust correctly when timezone changes
+- [ ] Timezone labels are always visible (not hidden or missing)
+
+**Why This Matters:** Previous fixes didn't document the pattern, leading to regressions. This decision ensures consistent timezone handling across the codebase.
 
 ### Roadmap Evolution
 
