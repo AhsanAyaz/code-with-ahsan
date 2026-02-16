@@ -1,7 +1,7 @@
 const siteMetadata = {
-  title: 'CodeWithAhsan',
+  title: 'Code with Ahsan',
   author: 'Muhammad Ahsan Ayaz',
-  headerTitle: 'CodeWithAhsan',
+  headerTitle: 'Code with Ahsan',
   description: 'The one stop shop to have fun with amazing people, and to code of course.',
   language: 'en-us',
   siteUrl: 'https://codewithahsan.dev',
