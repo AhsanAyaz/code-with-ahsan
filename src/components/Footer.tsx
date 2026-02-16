@@ -20,6 +20,14 @@ export default function Footer() {
           <SocialIcon kind="twitter" href={siteMetadata.twitter} size="24" />
         </div>
       </nav>
+      <nav className="grid grid-flow-col gap-4">
+        <Link href="/privacy" className="link link-hover text-sm">
+          Privacy Policy
+        </Link>
+        <Link href="/terms" className="link link-hover text-sm">
+          Terms of Service
+        </Link>
+      </nav>
       <aside>
         <div className="flex flex-col sm:flex-row items-center gap-2 text-sm text-base-content/70">
           <div>{siteMetadata.author}</div>
