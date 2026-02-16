@@ -48,16 +48,20 @@ export async function GET(request: NextRequest) {
         .where("menteeId", "==", uid)
         .where("status", "==", "active");
 
-      pendingQuery = db
-        .collection("mentorship_sessions")
-        .where("menteeId", "==", uid)
-        .where("status", "==", "pending");
+      // Mentees don't need to see pending requests
+      // (their requests are pending on the mentor's side)
+      pendingQuery = null;
     }
 
-    const [matchesSnapshot, pendingSnapshot] = await Promise.all([
-      matchesQuery.get(),
-      pendingQuery.get(),
-    ]);
+    // Build promises array - only fetch pending if needed
+    const promises = [matchesQuery.get()];
+    if (pendingQuery) {
+      promises.push(pendingQuery.get());
+    }
+
+    const results = await Promise.all(promises);
+    const matchesSnapshot = results[0];
+    const pendingSnapshot = results[1] || { docs: [] }; // Empty if no query
 
     const matches = matchesSnapshot.docs.map((doc) => ({
       id: doc.id,
