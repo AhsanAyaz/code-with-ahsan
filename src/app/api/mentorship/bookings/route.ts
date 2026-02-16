@@ -365,8 +365,25 @@ export async function POST(request: NextRequest) {
     if (isDiscordConfigured()) {
       const { channelId, sessionId } = await findMentorshipSessionInfo(mentorId, auth.uid);
       if (channelId) {
+        // Extract timezones for recipient-aware formatting
+        const mentorTimezone = mentorData.timeSlotAvailability?.timezone || 'UTC';
+        const menteeTimezone = (menteeData as any).timeSlotAvailability?.timezone ||
+                               (menteeData as any).timezone || 'UTC';
+
         const formattedDate = format(startTimeDate, "EEEE, MMMM d, yyyy");
-        const formattedTime = format(startTimeDate, "h:mm a");
+
+        // Format time in mentor's timezone (notification recipient)
+        const formattedTime = startTimeDate.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          timeZone: mentorTimezone,
+          hour12: true
+        });
+        const tzAbbr = new Intl.DateTimeFormat('en-US', {
+          timeZone: mentorTimezone,
+          timeZoneName: 'short'
+        }).formatToParts(startTimeDate)
+          .find(part => part.type === 'timeZoneName')?.value || mentorTimezone;
 
         // Resolve mentor's Discord ID for tagging
         let mentorMention = mentorProfile.displayName;
@@ -388,7 +405,7 @@ export async function POST(request: NextRequest) {
             `📅 **New Session Booked!**\n\n` +
               `${mentorMention} — ${menteeProfile.displayName} has booked a session with you.\n\n` +
               `**Date:** ${formattedDate}\n` +
-              `**Time:** ${formattedTime} (${timezone})\n` +
+              `**Time:** ${formattedTime} (${tzAbbr})\n` +
               `**Duration:** 30 minutes\n` +
               templateLine +
               `\nSee you there! 🎉`
@@ -405,7 +422,7 @@ export async function POST(request: NextRequest) {
             `📋 **Booking Approval Requested**\n\n` +
               `${mentorMention} — ${menteeProfile.displayName} wants to book an additional session this week.\n\n` +
               `**Date:** ${formattedDate}\n` +
-              `**Time:** ${formattedTime} (${timezone})\n` +
+              `**Time:** ${formattedTime} (${tzAbbr})\n` +
               `**Duration:** 30 minutes\n` +
               templateLine +
               `\nPlease approve or decline from your dashboard.`,
@@ -591,17 +608,33 @@ export async function PUT(request: NextRequest) {
       if (isDiscordConfigured()) {
         const { channelId } = await findMentorshipSessionInfo(bookingData.mentorId, bookingData.menteeId);
         if (channelId) {
+          // Fetch mentee's timezone for notification
+          const menteeDoc = await db.collection("mentorship_profiles").doc(bookingData.menteeId).get();
+          const menteeTimezone = menteeDoc.data()?.timeSlotAvailability?.timezone ||
+                                 menteeDoc.data()?.timezone || 'UTC';
+
           let menteeMention = bookingData.menteeProfile?.displayName || "Mentee";
           if (bookingData.menteeProfile?.discordUsername) {
             const member = await lookupMemberByUsername(bookingData.menteeProfile.discordUsername).catch(() => null);
             if (member) menteeMention = `<@${member.id}>`;
           }
           const formattedDate = format(startDate, "EEEE, MMMM d, yyyy");
-          const formattedTime = format(startDate, "h:mm a");
+          const formattedTime = startDate.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            timeZone: menteeTimezone,
+            hour12: true
+          });
+          const tzAbbr = new Intl.DateTimeFormat('en-US', {
+            timeZone: menteeTimezone,
+            timeZoneName: 'short'
+          }).formatToParts(startDate)
+            .find(part => part.type === 'timeZoneName')?.value || menteeTimezone;
+
           sendChannelMessage(
             channelId,
             `✅ **Booking Approved!**\n\n` +
-              `${menteeMention} — Your session on **${formattedDate}** at **${formattedTime}** (${bookingData.timezone}) has been confirmed by your mentor.\n\n` +
+              `${menteeMention} — Your session on **${formattedDate}** at **${formattedTime}** (${tzAbbr}) has been confirmed by your mentor.\n\n` +
               `See you there! 🎉`
           ).catch((err) => console.error("Failed to send approve Discord notification:", err));
         }
@@ -632,6 +665,11 @@ export async function PUT(request: NextRequest) {
       if (isDiscordConfigured()) {
         const { channelId } = await findMentorshipSessionInfo(bookingData.mentorId, bookingData.menteeId);
         if (channelId) {
+          // Fetch mentee's timezone for notification
+          const menteeDoc = await db.collection("mentorship_profiles").doc(bookingData.menteeId).get();
+          const menteeTimezone = menteeDoc.data()?.timeSlotAvailability?.timezone ||
+                                 menteeDoc.data()?.timezone || 'UTC';
+
           const rawStart = bookingData.startTime as unknown as { toDate?: () => Date };
           const startDate = rawStart.toDate?.() ?? new Date(bookingData.startTime);
           let menteeMention = bookingData.menteeProfile?.displayName || "Mentee";
@@ -640,11 +678,22 @@ export async function PUT(request: NextRequest) {
             if (member) menteeMention = `<@${member.id}>`;
           }
           const formattedDate = format(startDate, "EEEE, MMMM d, yyyy");
-          const formattedTime = format(startDate, "h:mm a");
+          const formattedTime = startDate.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            timeZone: menteeTimezone,
+            hour12: true
+          });
+          const tzAbbr = new Intl.DateTimeFormat('en-US', {
+            timeZone: menteeTimezone,
+            timeZoneName: 'short'
+          }).formatToParts(startDate)
+            .find(part => part.type === 'timeZoneName')?.value || menteeTimezone;
+
           sendChannelMessage(
             channelId,
             `❌ **Booking Declined**\n\n` +
-              `${menteeMention} — Your booking request for **${formattedDate}** at **${formattedTime}** (${bookingData.timezone}) has been declined by your mentor.`
+              `${menteeMention} — Your booking request for **${formattedDate}** at **${formattedTime}** (${tzAbbr}) has been declined by your mentor.`
           ).catch((err) => console.error("Failed to send decline Discord notification:", err));
         }
       }
@@ -677,7 +726,33 @@ export async function PUT(request: NextRequest) {
           const rawStart = bookingData.startTime as unknown as { toDate?: () => Date };
           const startDate = rawStart.toDate?.() ?? new Date(bookingData.startTime);
           const formattedDate = format(startDate, "EEEE, MMMM d, yyyy");
-          const formattedTime = format(startDate, "h:mm a");
+
+          // Get both timezones for channel message (visible to both parties)
+          const mentorDoc = await db.collection("mentorship_profiles").doc(bookingData.mentorId).get();
+          const menteeDoc = await db.collection("mentorship_profiles").doc(bookingData.menteeId).get();
+          const mentorTimezone = mentorDoc.data()?.timeSlotAvailability?.timezone || 'UTC';
+          const menteeTimezone = menteeDoc.data()?.timeSlotAvailability?.timezone ||
+                                 menteeDoc.data()?.timezone || 'UTC';
+
+          // Format with both timezones if different
+          const formatTimeWithTz = (date: Date, tz: string) => {
+            const time = date.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+              timeZone: tz,
+              hour12: true
+            });
+            const abbr = new Intl.DateTimeFormat('en-US', {
+              timeZone: tz,
+              timeZoneName: 'short'
+            }).formatToParts(date)
+              .find(part => part.type === 'timeZoneName')?.value || tz;
+            return `${time} (${abbr})`;
+          };
+
+          const timeDisplay = mentorTimezone === menteeTimezone
+            ? formatTimeWithTz(startDate, mentorTimezone)
+            : `${formatTimeWithTz(startDate, mentorTimezone)} / ${formatTimeWithTz(startDate, menteeTimezone)}`;
 
           // Resolve Discord IDs for tagging both mentor and mentee
           let mentorMention = bookingData.mentorProfile?.displayName || "Mentor";
@@ -695,8 +770,8 @@ export async function PUT(request: NextRequest) {
           const isRescheduleRequest = isMentorCancel && reason && reason.toLowerCase().includes("reschedule");
 
           const message = isRescheduleRequest
-            ? `🔄 **Session Reschedule Requested**\n\n${mentions}\n\n${cancellerName} has cancelled the session on **${formattedDate}** at **${formattedTime}** (${bookingData.timezone}) and requests to reschedule.\n${reason ? `**Reason:** ${reason}\n` : ""}\nPlease book a new time at your convenience.`
-            : `❌ **Session Cancelled**\n\n${mentions}\n\nThe mentorship session on **${formattedDate}** at **${formattedTime}** (${bookingData.timezone}) has been cancelled by ${cancellerName}.\n${reason ? `**Reason:** ${reason}` : ""}`;
+            ? `🔄 **Session Reschedule Requested**\n\n${mentions}\n\n${cancellerName} has cancelled the session on **${formattedDate}** at **${timeDisplay}** and requests to reschedule.\n${reason ? `**Reason:** ${reason}\n` : ""}\nPlease book a new time at your convenience.`
+            : `❌ **Session Cancelled**\n\n${mentions}\n\nThe mentorship session on **${formattedDate}** at **${timeDisplay}** has been cancelled by ${cancellerName}.\n${reason ? `**Reason:** ${reason}` : ""}`;
 
           await sendChannelMessage(channelId, message);
         } catch (discordError) {
