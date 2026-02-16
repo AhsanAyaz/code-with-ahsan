@@ -135,12 +135,27 @@ export default function BookingsList({ userId, role, filterPartnerId, embedded }
     }
   };
 
-  const formatDate = (date: Date) => {
-    return format(new Date(date), "MMM d, yyyy");
-  };
+  const formatDateTime = (date: Date) => {
+    const viewerTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const dateObj = new Date(date);
 
-  const formatTime = (date: Date) => {
-    return format(new Date(date), "h:mm a");
+    // Format: "Feb 18, 2026 at 2:30 PM (CET)"
+    const dateStr = format(dateObj, "MMM d, yyyy");
+    const timeStr = dateObj.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZone: viewerTimezone,
+      hour12: true
+    });
+
+    // Extract timezone abbreviation (e.g., "CET", "PST")
+    const tzAbbr = new Intl.DateTimeFormat('en-US', {
+      timeZone: viewerTimezone,
+      timeZoneName: 'short'
+    }).formatToParts(dateObj)
+      .find(part => part.type === 'timeZoneName')?.value || viewerTimezone;
+
+    return `${dateStr} at ${timeStr} (${tzAbbr})`;
   };
 
   const title = role === "mentor" ? "Mentee Bookings" : "My Bookings";
@@ -192,8 +207,7 @@ export default function BookingsList({ userId, role, filterPartnerId, embedded }
                       {partner?.displayName || "Unknown"}
                     </p>
                     <p className="text-sm opacity-70">
-                      {formatDate(booking.startTime)} at{" "}
-                      {formatTime(booking.startTime)}
+                      {formatDateTime(booking.startTime)}
                       {booking.templateId && (() => {
                         const tmpl = SESSION_TEMPLATES.find(t => t.id === booking.templateId);
                         return tmpl ? ` · ${tmpl.icon} ${tmpl.title}` : "";
