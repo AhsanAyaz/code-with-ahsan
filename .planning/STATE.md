@@ -13,7 +13,7 @@ Milestone: v2.0
 Phase: 13 (UX Review)
 Plan: 1 of 1 (COMPLETE)
 Status: All phases complete (v2.0 feature development done)
-Last activity: 2026-02-16 - Quick task 050 (remove hard-coded New Year Sale banner)
+Last activity: 2026-02-16 - Quick task 051 (fix mentee dashboard showing mentorship requests)
 
 Progress: [████████████████████████] 100% (38/38 total plans complete across current phases)
 
@@ -304,12 +304,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 048 | Replace all profile image implementations with ProfileAvatar component | 2026-02-15 | 3adbb7f | [048-replace-all-profile-image-implementation](./quick/48-replace-all-profile-image-implementation/) |
 | 049 | Update book promotions: remove 75% discount from Mastering Angular Signals, link Zero to Website to z2website.com | 2026-02-16 | afae920 | [049-update-the-books-page-to-remove-the-75-d](./quick/49-update-the-books-page-to-remove-the-75-d/) |
 | 050 | Remove hard-coded New Year Sale banner from homepage | 2026-02-16 | bfe65b9 | [050-remove-the-hard-coded-banner-of-masterin](./quick/50-remove-the-hard-coded-banner-of-masterin/) |
+| 051 | Fix mentee dashboard showing incorrect mentorship requests | 2026-02-16 | 3b1dc90 | [051-fix-mentee-dashboard-showing-mentorship-](./quick/51-fix-mentee-dashboard-showing-mentorship-/) |
 
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed quick-050 (remove hard-coded New Year Sale banner)
+Stopped at: Completed quick-051 (fix mentee dashboard showing mentorship requests)
 Resume file: None
 
 ---
-*Updated: 2026-02-16 after completing quick-049*
+*Updated: 2026-02-16 after completing quick-051*
