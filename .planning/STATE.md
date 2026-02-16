@@ -13,7 +13,7 @@ Milestone: v2.0
 Phase: 13 (UX Review)
 Plan: 1 of 1 (COMPLETE)
 Status: All phases complete (v2.0 feature development done)
-Last activity: 2026-02-16 - Quick task 049 (update book promotions and links)
+Last activity: 2026-02-16 - Quick task 050 (remove hard-coded New Year Sale banner)
 
 Progress: [████████████████████████] 100% (38/38 total plans complete across current phases)
 
@@ -303,11 +303,12 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 047 | Synchronize ROADMAP.md and STATE.md tracking files | 2026-02-15 | cee8c91 | [047-integrate-manual-planning-files-and-quic](./quick/47-integrate-manual-planning-files-and-quic/) |
 | 048 | Replace all profile image implementations with ProfileAvatar component | 2026-02-15 | 3adbb7f | [048-replace-all-profile-image-implementation](./quick/48-replace-all-profile-image-implementation/) |
 | 049 | Update book promotions: remove 75% discount from Mastering Angular Signals, link Zero to Website to z2website.com | 2026-02-16 | afae920 | [049-update-the-books-page-to-remove-the-75-d](./quick/49-update-the-books-page-to-remove-the-75-d/) |
+| 050 | Remove hard-coded New Year Sale banner from homepage | 2026-02-16 | bfe65b9 | [050-remove-the-hard-coded-banner-of-masterin](./quick/50-remove-the-hard-coded-banner-of-masterin/) |
 
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed quick-049 (update book promotions and links)
+Stopped at: Completed quick-050 (remove hard-coded New Year Sale banner)
 Resume file: None
 
 ---
