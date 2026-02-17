@@ -85,7 +85,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
           <Link
             href="/"
             aria-label="Code with Ahsan"
-            className="btn btn-link normal-case text-xl h-auto min-h-0 py-2"
+            className="btn btn-link normal-case text-xl h-auto min-h-0 py-2 no-underline hover:no-underline"
           >
             <div className="flex items-center gap-2">
               <Image
@@ -95,7 +95,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                 height={50}
                 style={{ objectFit: "cover" }}
               />
-              <span className="hidden sm:inline font-bold">{siteMetadata.headerTitle}</span>
+              <span className="hidden sm:inline font-bold text-white no-underline">{siteMetadata.headerTitle}</span>
             </div>
           </Link>
         </div>
