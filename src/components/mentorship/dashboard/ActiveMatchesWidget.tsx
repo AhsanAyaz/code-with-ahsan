@@ -5,6 +5,7 @@ import ProfileAvatar from "@/components/ProfileAvatar";
 interface ActiveMatchesWidgetProps {
   matches: MatchWithProfile[];
   role: "mentor" | "mentee";
+  loading?: boolean;
 }
 
 // Component to handle individual match card
@@ -48,7 +49,23 @@ function MatchCard({ match }: { match: MatchWithProfile }) {
 export default function ActiveMatchesWidget({
   matches,
   role,
+  loading = false,
 }: ActiveMatchesWidgetProps) {
+  if (loading) {
+    return (
+      <div className="card bg-base-100 shadow-xl col-span-1 md:col-span-2">
+        <div className="card-body">
+          <div className="h-7 w-48 bg-base-200 rounded animate-pulse mb-4"></div>
+          <div className="grid md:grid-cols-2 gap-4">
+            {[1, 2].map((i) => (
+              <div key={i} className="h-24 bg-base-200 rounded-box animate-pulse"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="card bg-base-100 shadow-xl col-span-1 md:col-span-2">
       <div className="card-body">
