@@ -204,6 +204,7 @@ function DashboardContent({
   const [activeMatches, setActiveMatches] = useState<MatchWithProfile[]>([]);
   const [myProjects, setMyProjects] = useState<any[]>([]);
   const [myRoadmaps, setMyRoadmaps] = useState<any[]>([]);
+  const [loadingMatches, setLoadingMatches] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingRoadmaps, setLoadingRoadmaps] = useState(true);
   const { refreshMatches } = useMentorship();
@@ -222,6 +223,8 @@ function DashboardContent({
         }
       } catch (error) {
         console.error("Error fetching matches:", error);
+      } finally {
+        setLoadingMatches(false);
       }
     };
     fetchMatches();
@@ -368,6 +371,7 @@ function DashboardContent({
           <ActiveMatchesWidget
             matches={activeMatches}
             role={profile.role!}
+            loading={loadingMatches}
           />
           
           {/* My Projects */}
