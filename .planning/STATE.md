@@ -198,6 +198,12 @@ None yet.
 
 ### Workflow Notes
 
+**Cron jobs — always use GitHub Actions + scripts/:**
+Scheduled/recurring tasks use `.github/workflows/*.yml` (schedule trigger) running `npx tsx scripts/*.ts` standalone scripts. Scripts initialize Firebase Admin directly (not via Next.js API layer). Do NOT use Vercel cron jobs or Next.js API routes for scheduled work. See `mentor-pending-reminders.yml` and `mentorship-inactivity-checks.yml` as the canonical pattern.
+
+**Inactivity detection — use Discord channel message history:**
+For mentorship inactivity checks, query the Discord channel's actual message history via `getLastChannelActivityDate(channelId)` (in `src/lib/discord.ts`), which fetches the last 50 messages and returns the timestamp of the most recent non-bot message. Do NOT use `lastContactAt` from Firestore — it is only set once at approval time and never updated during an active mentorship.
+
 **Quick task + PR workflow:**
 For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 1. Checkout `main`, pull latest, create a `fix/<issue>-<slug>` branch

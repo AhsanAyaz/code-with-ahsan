@@ -1,0 +1,88 @@
+name: Mentorship Inactivity Checks
+
+on:
+  # Warning: daily at 09:00 UTC
+  # Cleanup: daily at 10:00 UTC (1 hour after warning to avoid overlap)
+  schedule:
+    - cron: '0 9 * * *'   # warning job
+    - cron: '0 10 * * *'  # cleanup job
+
+  # Allow manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Which job to run'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - warning
+          - cleanup
+          - both
+
+jobs:
+  inactivity-warning:
+    name: Send inactivity warnings (35-day threshold)
+    runs-on: ubuntu-latest
+    # Run on schedule (warning cron = first entry = github.event.schedule matches '0 9 * * *')
+    # or on manual dispatch when job is 'warning' or 'both'
+    if: |
+      (github.event_name == 'schedule' && github.event.schedule == '0 9 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'warning' || github.event.inputs.job == 'both'))
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Send inactivity warnings
+        env:
+          NODE_ENV: production
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
+          MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+        run: npx tsx scripts/mentorship-inactivity-warning.ts
+
+  inactivity-cleanup:
+    name: Archive inactive mentorships (7-day grace after warning)
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'schedule' && github.event.schedule == '0 10 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'cleanup' || github.event.inputs.job == 'both'))
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Archive inactive mentorship channels
+        env:
+          NODE_ENV: production
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
+          MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+        run: npx tsx scripts/mentorship-inactivity-cleanup.ts

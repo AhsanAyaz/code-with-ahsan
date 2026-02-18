@@ -753,6 +753,44 @@ export async function getChannel(channelId: string): Promise<any | null> {
 }
 
 /**
+ * Get the timestamp of the last human (non-bot) message in a Discord channel.
+ * Used by inactivity cron jobs to determine real channel activity.
+ * Returns null if the channel doesn't exist, has no messages, or all messages are from bots.
+ */
+export async function getLastChannelActivityDate(
+  channelId: string
+): Promise<Date | null> {
+  try {
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/channels/${channelId}/messages?limit=50`,
+      { headers: getHeaders() }
+    );
+
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      log.error(
+        `Failed to fetch messages for channel ${channelId}: ${response.status}`
+      );
+      return null;
+    }
+
+    const messages: Array<{
+      timestamp: string;
+      author: { bot?: boolean };
+    }> = await response.json();
+
+    // Find the most recent non-bot message (messages are newest-first)
+    const lastHumanMessage = messages.find((m) => !m.author.bot);
+    if (!lastHumanMessage) return null;
+
+    return new Date(lastHumanMessage.timestamp);
+  } catch (error) {
+    log.error(`Error fetching messages for channel ${channelId}:`, error);
+    return null;
+  }
+}
+
+/**
  * Check if Discord integration is properly configured
  */
 export function isDiscordConfigured(): boolean {
