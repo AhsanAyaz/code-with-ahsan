@@ -480,6 +480,29 @@ export async function sendMentorshipRemovedEmail(
 }
 
 /**
+ * Send inactivity warning email to both mentor and mentee when session has been inactive for 35 days
+ */
+export async function sendMentorshipInactivityWarningEmail(
+  mentor: MentorshipProfile,
+  mentee: MentorshipProfile,
+): Promise<boolean> {
+  const subject = `⚠️ Mentorship Inactivity Warning`;
+  const content = `
+    <h2>Mentorship Inactivity Notice</h2>
+    <div class="highlight">
+      <p>The mentorship between <strong>${mentor.displayName}</strong> (mentor) and <strong>${mentee.displayName}</strong> (mentee) has been inactive for 35 days.</p>
+    </div>
+    <p>If no activity occurs in the Discord channel within the next <strong>7 days</strong>, the channel will be archived and the mentorship will be marked as cancelled.</p>
+    <p>To keep this mentorship active, please send a message in your Discord channel.</p>
+    <a href="${getSiteUrl()}/mentorship/dashboard" class="button">Go to Mentorship Dashboard</a>
+  `;
+  // Send to both mentor and mentee
+  const mentorResult = await sendEmail(mentor.email, subject, wrapEmailHtml(content, subject));
+  const menteeResult = await sendEmail(mentee.email, subject, wrapEmailHtml(content, subject));
+  return mentorResult && menteeResult;
+}
+
+/**
  * Send email to mentor or mentee reminding them to set their Discord username
  */
 export async function sendDiscordUsernameReminderEmail(
