@@ -351,12 +351,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 055 | Create Privacy Policy and Terms of Service pages | 2026-02-16 | 8ebab95 | [055-create-privacy-policy-and-terms-of-servi](./quick/55-create-privacy-policy-and-terms-of-servi/) |
 | 056 | Add skeleton loaders to ActiveMatchesWidget to prevent premature empty state flash | 2026-02-17 | e430b6d | [056-add-skeleton-loaders-to-dashboard-widge](./quick/56-add-skeleton-loaders-to-dashboard-widge/) |
 | 057 | Implement mentorship inactivity auto-cleanup with two Vercel cron jobs (35-day warning + 7-day grace cleanup) | 2026-02-18 | 68a7564 | [057-implement-mentorship-inactivity-auto-cle](./quick/57-implement-mentorship-inactivity-auto-cle/) |
+| 058 | Show LinkedIn profile link on mentor public profile page | 2026-02-18 | 9aa8bff | [058-show-linkedin-profile-link-on-mentor-pro](./quick/58-show-linkedin-profile-link-on-mentor-pro/) |
 
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed quick-057 (implement mentorship inactivity auto-cleanup)
+Stopped at: Completed quick-058 (show LinkedIn profile link on mentor pro)
 Resume file: None
 
 ---
-*Updated: 2026-02-18 after completing quick-057*
+*Updated: 2026-02-18 after completing quick-058*
