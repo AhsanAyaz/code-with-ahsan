@@ -79,6 +79,7 @@ async function getMentorData(username: string) {
       isAtCapacity:
         activeMenteeCount >= (profileData.maxMentees || DEFAULT_MAX_MENTEES),
       createdAt: profileData.createdAt?.toDate?.()?.toISOString() || null,
+      linkedinUrl: profileData.linkedinUrl || null,
     };
   } catch (error) {
     console.error("Error fetching mentor for metadata:", error);

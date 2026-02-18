@@ -59,9 +59,6 @@ export default function MentorProfileClient({
   const [submittingRating, setSubmittingRating] = useState(false);
 
   useEffect(() => {
-    // If we already have initial data, don't refetch
-    if (initialMentor) return;
-
     const fetchMentor = async () => {
       try {
         // For admin preview, get token from localStorage
@@ -83,12 +80,16 @@ export default function MentorProfileClient({
           const data = await response.json();
           setMentor(data.mentor);
         } else {
-          const errorData = await response.json();
-          setError(errorData.error || "Failed to load mentor profile");
+          if (!initialMentor) {
+            const errorData = await response.json();
+            setError(errorData.error || "Failed to load mentor profile");
+          }
         }
       } catch (err) {
         console.error("Error fetching mentor:", err);
-        setError("Failed to load mentor profile");
+        if (!initialMentor) {
+          setError("Failed to load mentor profile");
+        }
       } finally {
         setLoading(false);
       }
@@ -556,7 +557,7 @@ export default function MentorProfileClient({
                   href={mentor.linkedinUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 mt-2 text-sm text-primary hover:underline"
+                  className="inline-flex items-center gap-1.5 mt-2 text-sm text-blue-400 hover:underline"
                 >
                   {/* LinkedIn icon */}
                   <svg

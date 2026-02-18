@@ -52,9 +52,9 @@ export default function ProfileAvatar({
   const hasValidPhoto = photoURL && !imageError;
 
   // Get size classes
-  const sizeClasses = typeof size === "number"
-    ? `w-[${size}px] h-[${size}px]`
-    : sizeMap[size];
+  const isNumericSize = typeof size === "number";
+  const sizeClasses = isNumericSize ? "" : sizeMap[size];
+  const sizeStyle = isNumericSize ? { width: size, height: size } : undefined;
 
   // Get initials
   const initials = (displayName?.charAt(0) || email?.charAt(0) || "?").toUpperCase();
@@ -69,7 +69,7 @@ export default function ProfileAvatar({
   ].filter(Boolean).join(" ");
 
   return (
-    <div className={containerClasses}>
+    <div className={containerClasses} style={sizeStyle}>
       {hasValidPhoto ? (
         <Image
           src={photoURL}
