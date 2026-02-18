@@ -30,6 +30,7 @@ export interface MentorshipProfile {
   bio?: string;
   resumeURL?: string;
   cvUrl?: string; // CV/Resume link for scrutiny
+  linkedinUrl?: string; // Public LinkedIn profile URL
   majorProjects?: string; // Description of major projects and role
   availability?: Record<string, string[]>;
   maxMentees?: number;
@@ -62,6 +63,7 @@ export interface PublicMentor {
   ratingCount?: number;
   availability?: Record<string, string[]>;
   isAtCapacity?: boolean;
+  linkedinUrl?: string;
 }
 
 /**

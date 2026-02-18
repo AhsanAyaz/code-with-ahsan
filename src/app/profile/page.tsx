@@ -223,6 +223,7 @@ export default function SettingsPage() {
             : {},
           isPublic: profile.isPublic ?? true,
           cvUrl: profile.cvUrl || "",
+          linkedinUrl: profile.linkedinUrl || "",
           majorProjects: profile.majorProjects || "",
         }
       : undefined;

@@ -114,6 +114,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       hasTimeSlots: !!(profileData.timeSlotAvailability?.timezone),
       createdAt: profileData.createdAt?.toDate?.() || null,
       status: profileData.status,
+      linkedinUrl: profileData.linkedinUrl,
     };
 
     return NextResponse.json({ mentor }, { status: 200 });
