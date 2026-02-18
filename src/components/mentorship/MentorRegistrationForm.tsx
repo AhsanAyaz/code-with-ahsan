@@ -22,6 +22,7 @@ interface MentorRegistrationFormProps {
     currentRole?: string;
     bio?: string;
     cvUrl?: string;
+    linkedinUrl?: string;
     majorProjects?: string;
     maxMentees?: number;
     availability?: Record<string, boolean>;
@@ -72,6 +73,7 @@ export default function MentorRegistrationForm({
   );
   const [bio, setBio] = useState(initialData?.bio || "");
   const [cvUrl, setCvUrl] = useState(initialData?.cvUrl || "");
+  const [linkedinUrl, setLinkedinUrl] = useState(initialData?.linkedinUrl || "");
   const [majorProjects, setMajorProjects] = useState(
     initialData?.majorProjects || ""
   );
@@ -332,6 +334,7 @@ export default function MentorRegistrationForm({
       currentRole,
       bio,
       cvUrl: cvUrl.trim(),
+      linkedinUrl: linkedinUrl.trim(),
       majorProjects: majorProjects.trim() || undefined,
       maxMentees,
       availability: availableDays,
@@ -753,6 +756,26 @@ export default function MentorRegistrationForm({
             <span>10</span>
           </div>
         </div>
+      </div>
+
+      {/* LinkedIn Profile URL */}
+      <div className="form-control">
+        <label className="label">
+          <span className="label-text font-semibold">LinkedIn Profile URL</span>
+          <span className="label-text-alt text-base-content/60">Optional</span>
+        </label>
+        <input
+          type="url"
+          placeholder="https://linkedin.com/in/your-profile"
+          className="input input-bordered w-full"
+          value={linkedinUrl}
+          onChange={(e) => setLinkedinUrl(e.target.value)}
+        />
+        <label className="label">
+          <span className="label-text-alt text-base-content/60">
+            Shown publicly on your mentor profile
+          </span>
+        </label>
       </div>
 
       {/* Availability */}
