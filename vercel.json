@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/mentorship-inactivity-warning",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/mentorship-inactivity-cleanup",
+      "schedule": "0 10 * * *"
+    }
+  ]
+}
