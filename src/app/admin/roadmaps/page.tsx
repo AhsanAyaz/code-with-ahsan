@@ -6,6 +6,8 @@ import { Roadmap } from "@/types/mentorship";
 import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import Link from "next/link";
 import { format } from "date-fns";
+import { getAuth } from "firebase/auth";
+import { getApp } from "firebase/app";
 
 export default function AdminRoadmapsPage() {
   const toast = useToast();
@@ -39,11 +41,16 @@ export default function AdminRoadmapsPage() {
   const handleApprove = async (id: string, hasPendingDraft?: boolean) => {
     setActionLoading(id);
     try {
+      const auth = getAuth(getApp());
+      const user = auth.currentUser;
+      const authToken = user ? await user.getIdToken() : null;
       const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+
       const response = await fetch(`/api/roadmaps/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
           ...(token ? { "x-admin-token": token } : {}),
         },
         body: JSON.stringify({
@@ -77,11 +84,16 @@ export default function AdminRoadmapsPage() {
 
     setActionLoading(id);
     try {
+      const auth = getAuth(getApp());
+      const user = auth.currentUser;
+      const authToken = user ? await user.getIdToken() : null;
       const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+
       const response = await fetch(`/api/roadmaps/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
           ...(token ? { "x-admin-token": token } : {}),
         },
         body: JSON.stringify({ action: "request-changes", feedback }),
@@ -113,10 +125,17 @@ export default function AdminRoadmapsPage() {
 
     setActionLoading(id);
     try {
+      const auth = getAuth(getApp());
+      const user = auth.currentUser;
+      const authToken = user ? await user.getIdToken() : null;
       const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+
       const response = await fetch(`/api/roadmaps/${id}`, {
         method: "DELETE",
-        headers: token ? { "x-admin-token": token } : {},
+        headers: {
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+          ...(token ? { "x-admin-token": token } : {}),
+        },
       });
 
       if (response.ok) {
