@@ -2,6 +2,7 @@ import siteMetadata from "@/data/siteMetadata";
 import qs from "qs";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
+import HomeFAQ from "@/components/HomeFAQ";
 import NewsletterForm from "@/components/NewsletterForm";
 import HomeBanners from "@/components/HomeBanners";
 
@@ -72,6 +73,8 @@ export default async function Home() {
       <Hero />
 
       <Features />
+
+      <HomeFAQ />
 
       {/* Newsletter Section */}
       <section className="py-16 page-padding border-t border-base-300 relative bg-base-100">
