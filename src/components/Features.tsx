@@ -38,7 +38,7 @@ const features = [
     icon: Users,
     color: "text-info",
     borderColor: "group-hover:border-info",
-    href: "https://discord.gg/KSPpuxD8SG",
+    href: "/community",
   },
 ];
 

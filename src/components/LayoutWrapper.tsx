@@ -154,6 +154,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                           {item.icon === "projects" && <span>🚀</span>}
                           {item.icon === "roadmap" && <span>🗺️</span>}
                           {item.icon === "brain" && <span>🧠</span>}
+                          {item.icon === "community" && <span>🏘️</span>}
                           {item.title}
                           {item.external && (
                             <svg
