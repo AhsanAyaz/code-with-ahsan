@@ -13,7 +13,7 @@ Milestone: v2.0
 Phase: 13 (UX Review)
 Plan: 1 of 1 (COMPLETE)
 Status: All phases complete (v2.0 feature development done)
-Last activity: 2026-02-16 - Quick task 055 (create Privacy Policy and Terms of Service pages)
+Last activity: 2026-02-20 - Completed quick task 059: Add community page with Discord channels overview and FAQ section on homepage (issue #142)
 
 Progress: [████████████████████████] 100% (38/38 total plans complete across current phases)
 
