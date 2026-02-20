@@ -10,13 +10,17 @@ import { format } from "date-fns";
 export default function AdminRoadmapsPage() {
   const toast = useToast();
   const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
+  const [filter, setFilter] = useState<"pending" | "all">("pending");
   const [loadingRoadmaps, setLoadingRoadmaps] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRoadmaps = async () => {
+      setLoadingRoadmaps(true);
       try {
-        const response = await fetch("/api/roadmaps?admin=true");
+        const response = await fetch(
+          `/api/roadmaps?admin=true&filter=${filter}`,
+        );
         if (response.ok) {
           const data = await response.json();
           setRoadmaps(data.roadmaps || []);
@@ -30,7 +34,7 @@ export default function AdminRoadmapsPage() {
     };
 
     fetchRoadmaps();
-  }, [toast]);
+  }, [toast, filter]);
 
   const handleApprove = async (id: string, hasPendingDraft?: boolean) => {
     setActionLoading(id);
@@ -43,13 +47,13 @@ export default function AdminRoadmapsPage() {
           ...(token ? { "x-admin-token": token } : {}),
         },
         body: JSON.stringify({
-          action: hasPendingDraft ? "approve-draft" : "approve"
+          action: hasPendingDraft ? "approve-draft" : "approve",
         }),
       });
 
       if (response.ok) {
         toast.success("Roadmap approved successfully");
-        setRoadmaps(roadmaps.filter(r => r.id !== id));
+        setRoadmaps(roadmaps.filter((r) => r.id !== id));
       } else {
         const data = await response.json();
         toast.error(data.error || "Failed to approve roadmap");
@@ -63,7 +67,9 @@ export default function AdminRoadmapsPage() {
   };
 
   const handleRequestChanges = async (id: string) => {
-    const feedback = prompt("Please provide feedback for the roadmap author (min 10 characters):");
+    const feedback = prompt(
+      "Please provide feedback for the roadmap author (min 10 characters):",
+    );
     if (!feedback || feedback.length < 10) {
       toast.error("Feedback must be at least 10 characters");
       return;
@@ -83,7 +89,7 @@ export default function AdminRoadmapsPage() {
 
       if (response.ok) {
         toast.success("Feedback sent to author");
-        setRoadmaps(roadmaps.filter(r => r.id !== id));
+        setRoadmaps(roadmaps.filter((r) => r.id !== id));
       } else {
         const data = await response.json();
         toast.error(data.error || "Failed to request changes");
@@ -97,7 +103,11 @@ export default function AdminRoadmapsPage() {
   };
 
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Are you sure you want to delete the roadmap "${title}"? This action cannot be undone.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to delete the roadmap "${title}"? This action cannot be undone.`,
+      )
+    ) {
       return;
     }
 
@@ -111,7 +121,7 @@ export default function AdminRoadmapsPage() {
 
       if (response.ok) {
         toast.success("Roadmap deleted");
-        setRoadmaps(roadmaps.filter(r => r.id !== id));
+        setRoadmaps(roadmaps.filter((r) => r.id !== id));
       } else {
         const data = await response.json();
         toast.error(data.error || "Failed to delete roadmap");
@@ -126,7 +136,23 @@ export default function AdminRoadmapsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Roadmaps - Admin Review</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-3xl font-bold">Roadmaps - Admin Review</h1>
+        <div className="tabs tabs-boxed w-fit">
+          <button
+            className={`tab ${filter === "pending" ? "tab-active" : ""}`}
+            onClick={() => setFilter("pending")}
+          >
+            Pending Review
+          </button>
+          <button
+            className={`tab ${filter === "all" ? "tab-active" : ""}`}
+            onClick={() => setFilter("all")}
+          >
+            All Roadmaps
+          </button>
+        </div>
+      </div>
 
       {loadingRoadmaps ? (
         <div className="flex justify-center py-12">
@@ -163,10 +189,15 @@ export default function AdminRoadmapsPage() {
                   </div>
                   <div>
                     <span className="font-semibold">Status:</span>{" "}
-                    <span className={`badge badge-sm ${
-                      roadmap.status === "approved" ? "badge-success" :
-                      roadmap.status === "pending" ? "badge-warning" : "badge-ghost"
-                    }`}>
+                    <span
+                      className={`badge badge-sm ${
+                        roadmap.status === "approved"
+                          ? "badge-success"
+                          : roadmap.status === "pending"
+                            ? "badge-warning"
+                            : "badge-ghost"
+                      }`}
+                    >
                       {roadmap.status}
                     </span>
                     {roadmap.hasPendingDraft && (
@@ -183,10 +214,15 @@ export default function AdminRoadmapsPage() {
                   </div>
                   <div>
                     <span className="font-semibold">Difficulty:</span>{" "}
-                    <span className={`badge badge-sm ${
-                      roadmap.difficulty === "beginner" ? "badge-success" :
-                      roadmap.difficulty === "intermediate" ? "badge-warning" : "badge-error"
-                    }`}>
+                    <span
+                      className={`badge badge-sm ${
+                        roadmap.difficulty === "beginner"
+                          ? "badge-success"
+                          : roadmap.difficulty === "intermediate"
+                            ? "badge-warning"
+                            : "badge-error"
+                      }`}
+                    >
                       {roadmap.difficulty}
                     </span>
                   </div>
@@ -197,43 +233,57 @@ export default function AdminRoadmapsPage() {
                     </div>
                   )}
                   <div>
-                    <span className="font-semibold">Current Version:</span> {roadmap.version}
+                    <span className="font-semibold">Current Version:</span>{" "}
+                    {roadmap.version}
                   </div>
                   <div className="text-xs text-base-content/60">
-                    Submitted: {roadmap.createdAt ? format(new Date(roadmap.createdAt as unknown as string), "MMM d, yyyy") : "Unknown"}
+                    Submitted:{" "}
+                    {roadmap.createdAt
+                      ? format(
+                          new Date(roadmap.createdAt as unknown as string),
+                          "MMM d, yyyy",
+                        )
+                      : "Unknown"}
                   </div>
                 </div>
                 <div className="card-actions justify-end mt-4">
                   <Link
-                    href={`/roadmaps/${roadmap.id}${roadmap.hasPendingDraft ? '?preview=draft' : ''}`}
+                    href={`/roadmaps/${roadmap.id}${roadmap.hasPendingDraft ? "?preview=draft" : ""}`}
                     target="_blank"
                     className="btn btn-primary btn-sm"
                   >
                     Preview
                   </Link>
-                  <button
-                    className="btn btn-success btn-sm"
-                    onClick={() => handleApprove(roadmap.id, roadmap.hasPendingDraft)}
-                    disabled={actionLoading === roadmap.id}
-                  >
-                    {actionLoading === roadmap.id ? (
-                      <>
-                        <span className="loading loading-spinner loading-xs"></span>
-                        Approving...
-                      </>
-                    ) : roadmap.hasPendingDraft ? (
-                      `Approve v${roadmap.draftVersionNumber}`
-                    ) : (
-                      "Approve"
-                    )}
-                  </button>
-                  <button
-                    className="btn btn-warning btn-sm"
-                    onClick={() => handleRequestChanges(roadmap.id)}
-                    disabled={actionLoading === roadmap.id}
-                  >
-                    Request Changes
-                  </button>
+                  {(roadmap.status === "pending" ||
+                    roadmap.hasPendingDraft) && (
+                    <>
+                      <button
+                        className="btn btn-success btn-sm"
+                        onClick={() =>
+                          handleApprove(roadmap.id, roadmap.hasPendingDraft)
+                        }
+                        disabled={actionLoading === roadmap.id}
+                      >
+                        {actionLoading === roadmap.id ? (
+                          <>
+                            <span className="loading loading-spinner loading-xs"></span>
+                            Approving...
+                          </>
+                        ) : roadmap.hasPendingDraft ? (
+                          `Approve v${roadmap.draftVersionNumber}`
+                        ) : (
+                          "Approve"
+                        )}
+                      </button>
+                      <button
+                        className="btn btn-warning btn-sm"
+                        onClick={() => handleRequestChanges(roadmap.id)}
+                        disabled={actionLoading === roadmap.id}
+                      >
+                        Request Changes
+                      </button>
+                    </>
+                  )}
                   <button
                     className="btn btn-error btn-sm"
                     onClick={() => handleDelete(roadmap.id, roadmap.title)}

@@ -13,39 +13,33 @@ export async function POST(request: NextRequest) {
     if (!authResult) {
       return NextResponse.json(
         { error: "Authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     const body = await request.json();
-    const {
-      title,
-      description,
-      domain,
-      difficulty,
-      estimatedHours,
-      content,
-    } = body;
+    const { title, description, domain, difficulty, estimatedHours, content } =
+      body;
 
     // Validate required fields
     if (!title || typeof title !== "string") {
       return NextResponse.json(
         { error: "Title is required and must be a string" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (title.length < 3 || title.length > 100) {
       return NextResponse.json(
         { error: "Title must be between 3 and 100 characters" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!domain || typeof domain !== "string") {
       return NextResponse.json(
         { error: "Domain is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -63,45 +57,53 @@ export async function POST(request: NextRequest) {
     if (!validDomains.includes(domain as RoadmapDomain)) {
       return NextResponse.json(
         { error: "Invalid domain. Must be one of: " + validDomains.join(", ") },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!difficulty || typeof difficulty !== "string") {
       return NextResponse.json(
         { error: "Difficulty is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const validDifficulties = ["beginner", "intermediate", "advanced"];
     if (!validDifficulties.includes(difficulty)) {
       return NextResponse.json(
-        { error: "Invalid difficulty. Must be one of: " + validDifficulties.join(", ") },
-        { status: 400 }
+        {
+          error:
+            "Invalid difficulty. Must be one of: " +
+            validDifficulties.join(", "),
+        },
+        { status: 400 },
       );
     }
 
     if (!content || typeof content !== "string") {
       return NextResponse.json(
         { error: "Content is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (content.length < 50) {
       return NextResponse.json(
         { error: "Content must be at least 50 characters" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Validate optional fields
     if (estimatedHours !== undefined && estimatedHours !== null) {
-      if (typeof estimatedHours !== "number" || estimatedHours <= 0 || estimatedHours > 1000) {
+      if (
+        typeof estimatedHours !== "number" ||
+        estimatedHours <= 0 ||
+        estimatedHours > 1000
+      ) {
         return NextResponse.json(
           { error: "Estimated hours must be a number between 1 and 1000" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -109,14 +111,14 @@ export async function POST(request: NextRequest) {
     if (description && typeof description !== "string") {
       return NextResponse.json(
         { error: "Description must be a string" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (description && description.length > 500) {
       return NextResponse.json(
         { error: "Description must be 500 characters or less" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -129,7 +131,7 @@ export async function POST(request: NextRequest) {
     if (!creatorDoc.exists) {
       return NextResponse.json(
         { error: "Creator profile not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -149,7 +151,7 @@ export async function POST(request: NextRequest) {
           error: "Permission denied",
           message: "Only accepted mentors can create roadmaps",
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -201,28 +203,21 @@ export async function POST(request: NextRequest) {
     await docRef.update({ contentUrl });
 
     // Create initial version in subcollection
-    await db
-      .collection("roadmaps")
-      .doc(docRef.id)
-      .collection("versions")
-      .add({
-        roadmapId: docRef.id,
-        version: 1,
-        contentUrl,
-        createdBy: authResult.uid,
-        createdAt: FieldValue.serverTimestamp(),
-        changeDescription: "Initial version",
-      });
+    await db.collection("roadmaps").doc(docRef.id).collection("versions").add({
+      roadmapId: docRef.id,
+      version: 1,
+      contentUrl,
+      createdBy: authResult.uid,
+      createdAt: FieldValue.serverTimestamp(),
+      changeDescription: "Initial version",
+    });
 
-    return NextResponse.json(
-      { success: true, id: docRef.id },
-      { status: 201 }
-    );
+    return NextResponse.json({ success: true, id: docRef.id }, { status: 201 });
   } catch (error) {
     console.error("Error creating roadmap:", error);
     return NextResponse.json(
       { error: "Failed to create roadmap" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -233,36 +228,23 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status");
     const creatorId = searchParams.get("creatorId");
     const adminView = searchParams.get("admin") === "true";
+    const filter = searchParams.get("filter") || "pending";
     const domain = searchParams.get("domain");
     const difficulty = searchParams.get("difficulty");
 
     let roadmaps: any[] = [];
 
     if (adminView) {
-      // For admin: fetch both pending roadmaps AND approved roadmaps with pending drafts
-      // We need two separate queries since Firestore doesn't support OR queries well
-
-      // Query 1: Pending roadmaps
-      let pendingQuery = db.collection("roadmaps").where("status", "==", "pending");
-      if (creatorId) {
-        pendingQuery = pendingQuery.where("creatorId", "==", creatorId) as any;
-      }
-      pendingQuery = pendingQuery.orderBy("createdAt", "desc").limit(25) as any;
-      const pendingSnapshot = await pendingQuery.get();
-
-      // Query 2: Approved roadmaps with pending drafts
-      let draftQuery = db.collection("roadmaps").where("hasPendingDraft", "==", true);
-      if (creatorId) {
-        draftQuery = draftQuery.where("creatorId", "==", creatorId) as any;
-      }
-      draftQuery = draftQuery.orderBy("createdAt", "desc").limit(25) as any;
-      const draftSnapshot = await draftQuery.get();
-
-      // Merge and deduplicate
       const roadmapMap = new Map();
 
-      [...pendingSnapshot.docs, ...draftSnapshot.docs].forEach(doc => {
-        if (!roadmapMap.has(doc.id)) {
+      if (filter === "all") {
+        const allQuery = db
+          .collection("roadmaps")
+          .orderBy("createdAt", "desc")
+          .limit(100) as any;
+        const allSnapshot = await allQuery.get();
+
+        allSnapshot.docs.forEach((doc: any) => {
           const data = doc.data();
           roadmapMap.set(doc.id, {
             id: doc.id,
@@ -271,11 +253,55 @@ export async function GET(request: NextRequest) {
             updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
             approvedAt: data.approvedAt?.toDate?.()?.toISOString() || null,
           });
-        }
-      });
+        });
+      } else {
+        // For admin: fetch both pending roadmaps AND approved roadmaps with pending drafts
+        // We need two separate queries since Firestore doesn't support OR queries well
 
-      roadmaps = Array.from(roadmapMap.values())
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        // Query 1: Pending roadmaps
+        let pendingQuery = db
+          .collection("roadmaps")
+          .where("status", "==", "pending");
+        if (creatorId) {
+          pendingQuery = pendingQuery.where(
+            "creatorId",
+            "==",
+            creatorId,
+          ) as any;
+        }
+        pendingQuery = pendingQuery
+          .orderBy("createdAt", "desc")
+          .limit(25) as any;
+        const pendingSnapshot = await pendingQuery.get();
+
+        // Query 2: Approved roadmaps with pending drafts
+        let draftQuery = db
+          .collection("roadmaps")
+          .where("hasPendingDraft", "==", true);
+        if (creatorId) {
+          draftQuery = draftQuery.where("creatorId", "==", creatorId) as any;
+        }
+        draftQuery = draftQuery.orderBy("createdAt", "desc").limit(25) as any;
+        const draftSnapshot = await draftQuery.get();
+
+        [...pendingSnapshot.docs, ...draftSnapshot.docs].forEach((doc: any) => {
+          if (!roadmapMap.has(doc.id)) {
+            const data = doc.data();
+            roadmapMap.set(doc.id, {
+              id: doc.id,
+              ...data,
+              createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+              updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+              approvedAt: data.approvedAt?.toDate?.()?.toISOString() || null,
+            });
+          }
+        });
+      }
+
+      roadmaps = Array.from(roadmapMap.values()).sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
 
       // For roadmaps with pending drafts, fetch and overlay draft metadata
       const roadmapsWithDraftMetadata = await Promise.all(
@@ -297,24 +323,41 @@ export async function GET(request: NextRequest) {
                 // Overlay draft metadata onto roadmap
                 return {
                   ...roadmap,
-                  title: draftData.title !== undefined ? draftData.title : roadmap.title,
-                  description: draftData.description !== undefined ? draftData.description : roadmap.description,
-                  domain: draftData.domain !== undefined ? draftData.domain : roadmap.domain,
-                  difficulty: draftData.difficulty !== undefined ? draftData.difficulty : roadmap.difficulty,
-                  estimatedHours: draftData.estimatedHours !== undefined ? draftData.estimatedHours : roadmap.estimatedHours,
+                  title:
+                    draftData.title !== undefined
+                      ? draftData.title
+                      : roadmap.title,
+                  description:
+                    draftData.description !== undefined
+                      ? draftData.description
+                      : roadmap.description,
+                  domain:
+                    draftData.domain !== undefined
+                      ? draftData.domain
+                      : roadmap.domain,
+                  difficulty:
+                    draftData.difficulty !== undefined
+                      ? draftData.difficulty
+                      : roadmap.difficulty,
+                  estimatedHours:
+                    draftData.estimatedHours !== undefined
+                      ? draftData.estimatedHours
+                      : roadmap.estimatedHours,
                 };
               }
             } catch (error) {
-              console.error(`Error fetching draft version for roadmap ${roadmap.id}:`, error);
+              console.error(
+                `Error fetching draft version for roadmap ${roadmap.id}:`,
+                error,
+              );
               // Return roadmap as-is if draft fetch fails
             }
           }
           return roadmap;
-        })
+        }),
       );
 
       roadmaps = roadmapsWithDraftMetadata;
-
     } else {
       // Normal query
       let query = db.collection("roadmaps");
@@ -364,7 +407,10 @@ export async function GET(request: NextRequest) {
           roadmaps.map(async (roadmap) => {
             // Check if there's a rejected draft (feedback + draftVersionNumber)
             // OR a pending draft (hasPendingDraft + draftVersionNumber)
-            if (roadmap.draftVersionNumber && (roadmap.feedback || roadmap.hasPendingDraft)) {
+            if (
+              roadmap.draftVersionNumber &&
+              (roadmap.feedback || roadmap.hasPendingDraft)
+            ) {
               try {
                 // Fetch draft version from subcollection
                 const versionsSnapshot = await db
@@ -381,20 +427,38 @@ export async function GET(request: NextRequest) {
                   // Overlay draft metadata onto roadmap
                   return {
                     ...roadmap,
-                    title: draftData.title !== undefined ? draftData.title : roadmap.title,
-                    description: draftData.description !== undefined ? draftData.description : roadmap.description,
-                    domain: draftData.domain !== undefined ? draftData.domain : roadmap.domain,
-                    difficulty: draftData.difficulty !== undefined ? draftData.difficulty : roadmap.difficulty,
-                    estimatedHours: draftData.estimatedHours !== undefined ? draftData.estimatedHours : roadmap.estimatedHours,
+                    title:
+                      draftData.title !== undefined
+                        ? draftData.title
+                        : roadmap.title,
+                    description:
+                      draftData.description !== undefined
+                        ? draftData.description
+                        : roadmap.description,
+                    domain:
+                      draftData.domain !== undefined
+                        ? draftData.domain
+                        : roadmap.domain,
+                    difficulty:
+                      draftData.difficulty !== undefined
+                        ? draftData.difficulty
+                        : roadmap.difficulty,
+                    estimatedHours:
+                      draftData.estimatedHours !== undefined
+                        ? draftData.estimatedHours
+                        : roadmap.estimatedHours,
                   };
                 }
               } catch (error) {
-                console.error(`Error fetching draft version for roadmap ${roadmap.id}:`, error);
+                console.error(
+                  `Error fetching draft version for roadmap ${roadmap.id}:`,
+                  error,
+                );
                 // Return roadmap as-is if draft fetch fails
               }
             }
             return roadmap;
-          })
+          }),
         );
       }
     }
@@ -404,7 +468,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching roadmaps:", error);
     return NextResponse.json(
       { error: "Failed to fetch roadmaps" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
