@@ -9,11 +9,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/books</loc>
+    <loc>https://codewithahsan.dev/admin</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/admin</loc>
+    <loc>https://codewithahsan.dev/books</loc>
   </url>
 
   <url>
@@ -37,6 +37,10 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/privacy</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/profile</loc>
   </url>
 
@@ -53,7 +57,7 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/books/mastering-angular-signals</loc>
+    <loc>https://codewithahsan.dev/terms</loc>
   </url>
 
   <url>
@@ -77,6 +81,10 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/books/mastering-angular-signals</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/mentorship/admin</loc>
   </url>
 
@@ -89,11 +97,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/mentors</loc>
+    <loc>https://codewithahsan.dev/mentorship/goals</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/goals</loc>
+    <loc>https://codewithahsan.dev/mentorship/mentors</loc>
   </url>
 
   <url>
@@ -101,11 +109,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
+    <loc>https://codewithahsan.dev/mentorship/requests</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/requests</loc>
+    <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
   </url>
 
   <url>
@@ -113,11 +121,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/projects/my</loc>
+    <loc>https://codewithahsan.dev/projects/new</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/projects/new</loc>
+    <loc>https://codewithahsan.dev/projects/my</loc>
   </url>
 
   <url>
@@ -129,11 +137,21 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/roadmaps/new</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/events/hackstack/2023</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/roadmaps/new</loc>
+    <loc>https://codewithahsan.dev/events/cwa-promptathon/2026</loc>
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/events/cwa-promptathon/2026/sponsorships</loc
+    >
   </url>
 
   <url>
