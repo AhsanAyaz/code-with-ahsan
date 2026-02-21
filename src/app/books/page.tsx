@@ -7,12 +7,22 @@ import BooksList from "@/components/books/BooksList";
 import NewsletterForm from "@/components/NewsletterForm";
 
 export const metadata: Metadata = {
-  title: `Books - ${siteMetadata.author}`,
-  description: siteMetadata.description,
+  title: `Books - ${siteMetadata.title}`,
+  description:
+    "Explore books to accelerate your programming journey, authored by Ahsan.",
   openGraph: {
     type: "website",
-    title: `Books - ${siteMetadata.author}`,
-    description: siteMetadata.description,
+    title: `Books - ${siteMetadata.title}`,
+    description:
+      "Explore books to accelerate your programming journey, authored by Ahsan.",
+    images: ["/images/books-og.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Books - ${siteMetadata.title}`,
+    description:
+      "Explore books to accelerate your programming journey, authored by Ahsan.",
+    images: ["/images/books-og.png"],
   },
 };
 

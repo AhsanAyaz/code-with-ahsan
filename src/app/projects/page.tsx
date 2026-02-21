@@ -7,8 +7,22 @@ import projectsData from "@/data/projectsData";
 import Card from "@/components/Card";
 
 export const metadata: Metadata = {
-  title: `Projects - ${siteMetadata.author}`,
-  description: siteMetadata.description,
+  title: `Projects - ${siteMetadata.title}`,
+  description:
+    "Explore the various coding projects, tutorials, and open-source contributions by the Code with Ahsan community.",
+  openGraph: {
+    title: `Projects - ${siteMetadata.title}`,
+    description:
+      "Explore the various coding projects, tutorials, and open-source contributions by the Code with Ahsan community.",
+    images: ["/images/projects-og.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Projects - ${siteMetadata.title}`,
+    description:
+      "Explore the various coding projects, tutorials, and open-source contributions by the Code with Ahsan community.",
+    images: ["/images/projects-og.png"],
+  },
 };
 
 export default function Projects() {

@@ -58,8 +58,22 @@ async function getCourses() {
 }
 
 export const metadata = {
-  title: `Courses - ${siteMetadata.author}`,
-  description: siteMetadata.description,
+  title: `Courses - ${siteMetadata.title}`,
+  description:
+    "Browse comprehensive courses and tutorials to master web development and programming.",
+  openGraph: {
+    title: `Courses - ${siteMetadata.title}`,
+    description:
+      "Browse comprehensive courses and tutorials to master web development and programming.",
+    images: ["/images/courses-og.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Courses - ${siteMetadata.title}`,
+    description:
+      "Browse comprehensive courses and tutorials to master web development and programming.",
+    images: ["/images/courses-og.png"],
+  },
 };
 
 export default async function CoursesPage() {

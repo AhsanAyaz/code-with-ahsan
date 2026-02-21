@@ -6,6 +6,19 @@ export const metadata: Metadata = {
   title: `Community Hub - ${siteMetadata.title}`,
   description:
     "Join 4,300+ developers in the CodeWithAhsan Discord community. Explore channels for mentorship, projects, Angular, AI/ML, and more.",
+  openGraph: {
+    title: `Community Hub - ${siteMetadata.title}`,
+    description:
+      "Join 4,300+ developers in the CodeWithAhsan Discord community. Explore channels for mentorship, projects, Angular, AI/ML, and more.",
+    images: ["/images/community-og.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Community Hub - ${siteMetadata.title}`,
+    description:
+      "Join 4,300+ developers in the CodeWithAhsan Discord community. Explore channels for mentorship, projects, Angular, AI/ML, and more.",
+    images: ["/images/community-og.png"],
+  },
 };
 
 const GUILD_ID = "814191682282717194";
@@ -180,8 +193,9 @@ export default function CommunityPage() {
             Join the CodeWithAhsan Community
           </h1>
           <p className="text-lg text-base-content/70 mb-10">
-            4,300+ developers learning, building, and growing together. Jump into our Discord to
-            connect, get help, and collaborate on real projects.
+            4,300+ developers learning, building, and growing together. Jump
+            into our Discord to connect, get help, and collaborate on real
+            projects.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
@@ -216,7 +230,9 @@ export default function CommunityPage() {
                     <span className="text-2xl">{category.emoji}</span>
                     {category.name}
                   </h3>
-                  <p className="text-base-content/70 text-sm">{category.description}</p>
+                  <p className="text-base-content/70 text-sm">
+                    {category.description}
+                  </p>
                   <ul className="mt-3 space-y-1">
                     {category.channels.map((channel) => (
                       <li key={channel.id}>

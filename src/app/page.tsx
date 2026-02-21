@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import siteMetadata from "@/data/siteMetadata";
 import qs from "qs";
 import Hero from "@/components/Hero";
@@ -5,6 +6,25 @@ import Features from "@/components/Features";
 import HomeFAQ from "@/components/HomeFAQ";
 import NewsletterForm from "@/components/NewsletterForm";
 import HomeBanners from "@/components/HomeBanners";
+
+export const metadata: Metadata = {
+  title: "Code with Ahsan | Developer Community & Tutorials",
+  description:
+    "Join the free developer community to learn web development, find mentorship, and build awesome projects.",
+  openGraph: {
+    title: "Code with Ahsan | Developer Community & Tutorials",
+    description:
+      "Join the free developer community to learn web development, find mentorship, and build awesome projects.",
+    images: ["/images/home-og.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Code with Ahsan | Developer Community & Tutorials",
+    description:
+      "Join the free developer community to learn web development, find mentorship, and build awesome projects.",
+    images: ["/images/home-og.png"],
+  },
+};
 
 // Mock fetch for banners - TODO: Implement actual data fetching via Server Action or API
 async function getBanners() {
@@ -24,7 +44,7 @@ async function getBanners() {
     },
     {
       encodeValuesOnly: true,
-    }
+    },
   );
 
   try {
