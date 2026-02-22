@@ -1,9 +1,9 @@
 const siteMetadata = {
-  title: "Code with Ahsan",
+  title: "Code with Ahsan | Developer Community & Tutorials",
   author: "Muhammad Ahsan Ayaz",
   headerTitle: "Code with Ahsan",
   description:
-    "The one stop shop to have fun with amazing people, and to code of course.",
+    "Join the free developer community to learn web development, find mentorship, and build awesome projects.",
   language: "en-us",
   siteUrl: "https://codewithahsan.dev",
   siteRepo: "https://github.com/code-with-ahsan/code-with-ahsan",
