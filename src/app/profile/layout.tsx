@@ -4,6 +4,10 @@ import { MentorshipProvider } from "@/contexts/MentorshipContext";
 export const metadata: Metadata = {
   title: "Profile | Code with Ahsan",
   description: "Manage your profile settings and preferences.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function ProfileLayout({

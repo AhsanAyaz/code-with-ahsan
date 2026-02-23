@@ -1,6 +1,32 @@
 sitemap: https://codewithahsan.dev/sitemap.xml
 
 user-agent: *
-allow: /*
+allow: /
 
-disallow: /api/*
+# Block API routes
+disallow: /api/
+
+# Block admin pages (require authentication)
+disallow: /admin/
+
+# Block authenticated mentorship pages
+disallow: /mentorship/dashboard/
+disallow: /mentorship/requests
+disallow: /mentorship/goals
+disallow: /mentorship/my-matches
+disallow: /mentorship/onboarding
+disallow: /mentorship/book/
+disallow: /mentorship/admin
+
+# Block authenticated project pages
+disallow: /projects/my
+disallow: /projects/new
+disallow: /projects/*/edit
+
+# Block authenticated roadmap pages
+disallow: /roadmaps/my
+disallow: /roadmaps/new
+disallow: /roadmaps/*/edit
+
+# Block authenticated profile page
+disallow: /profile

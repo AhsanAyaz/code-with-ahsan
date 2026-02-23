@@ -6,6 +6,10 @@ import AdminNavigation from "@/components/admin/AdminNavigation";
 export const metadata: Metadata = {
   title: "Admin Dashboard | Code with Ahsan",
   description: "Administrative dashboard for managing mentorship, projects, and roadmaps",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function AdminLayout({

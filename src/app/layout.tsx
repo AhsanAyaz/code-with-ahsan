@@ -24,8 +24,22 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://codewithahsan.dev"),
   title: siteMetadata.title,
   description: siteMetadata.description,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    siteName: "Code with Ahsan",
+    type: "website",
+    locale: "en_US",
+    url: "https://codewithahsan.dev",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   manifest: "/static/favicons/site.webmanifest",
   icons: {
     icon: [

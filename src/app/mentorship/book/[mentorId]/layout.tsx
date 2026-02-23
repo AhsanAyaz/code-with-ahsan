@@ -4,6 +4,10 @@ import { MentorshipProvider } from "@/contexts/MentorshipContext";
 export const metadata: Metadata = {
   title: "Book a Session | Code with Ahsan",
   description: "Book a mentorship session with a mentor.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function BookLayout({ children }: { children: React.ReactNode }) {
