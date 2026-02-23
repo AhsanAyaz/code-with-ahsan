@@ -1,1412 +1,1754 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Homepage -->
   <url>
     <loc>https://codewithahsan.dev</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
   </url>
 
+  <!-- Static pages -->
   <url>
     <loc>https://codewithahsan.dev/about</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/admin</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/books</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/community</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/events</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/gear</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/logic-buddy</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/mentorship</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/privacy</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/profile</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/projects</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/rates</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/roadmaps</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/terms</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
   </url>
 
-  <url>
-    <loc>https://codewithahsan.dev/admin/mentees</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/admin/mentors</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/admin/pending</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/admin/projects</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/admin/roadmaps</loc>
-  </url>
-
+  <!-- Books sub-pages -->
   <url>
     <loc>https://codewithahsan.dev/books/mastering-angular-signals</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 
-  <url>
-    <loc>https://codewithahsan.dev/mentorship/admin</loc>
-  </url>
-
+  <!-- Mentorship public pages -->
   <url>
     <loc>https://codewithahsan.dev/mentorship/browse</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/mentorship/dashboard</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/mentorship/goals</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/mentorship/mentors</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
   </url>
 
-  <url>
-    <loc>https://codewithahsan.dev/mentorship/my-matches</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/mentorship/requests</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
-  </url>
-
+  <!-- Projects public pages -->
   <url>
     <loc>https://codewithahsan.dev/projects/discover</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/projects/new</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/projects/my</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/projects/showcase</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
   </url>
 
-  <url>
-    <loc>https://codewithahsan.dev/roadmaps/my</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/roadmaps/new</loc>
-  </url>
-
+  <!-- Events -->
   <url>
     <loc>https://codewithahsan.dev/events/hackstack/2023</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/events/cwa-promptathon/2026</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/events/cwa-promptathon/2026/sponsorships</loc
-    >
+    <loc>https://codewithahsan.dev/events/cwa-promptathon/2026/sponsorships</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 
+  <!-- Courses -->
   <url>
     <loc>https://codewithahsan.dev/courses/practical-react-essentials</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/design-patterns-javascript</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/design-patterns-javascript/constructor-pattern-in-js</loc
-    >
+    <loc>https://codewithahsan.dev/courses/design-patterns-javascript/constructor-pattern-in-js</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/design-patterns-javascript/singleton-pattern-in-js</loc
-    >
+    <loc>https://codewithahsan.dev/courses/design-patterns-javascript/singleton-pattern-in-js</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/design-patterns-javascript/factory-pattern-in-js</loc
-    >
+    <loc>https://codewithahsan.dev/courses/design-patterns-javascript/factory-pattern-in-js</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/design-patterns-javascript/prototype-pattern-in-js</loc
-    >
+    <loc>https://codewithahsan.dev/courses/design-patterns-javascript/prototype-pattern-in-js</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/design-patterns-javascript/observer-pattern-in-js</loc
-    >
+    <loc>https://codewithahsan.dev/courses/design-patterns-javascript/observer-pattern-in-js</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/design-patterns-javascript/container-presentational-pattern-in-js</loc
-    >
+    <loc>https://codewithahsan.dev/courses/design-patterns-javascript/container-presentational-pattern-in-js</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/design-patterns-javascript/proxy-pattern-in-js</loc
-    >
+    <loc>https://codewithahsan.dev/courses/design-patterns-javascript/proxy-pattern-in-js</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/design-patterns-javascript/resources</loc
-    >
+    <loc>https://codewithahsan.dev/courses/design-patterns-javascript/resources</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/design-patterns-javascript/submissions</loc
-    >
+    <loc>https://codewithahsan.dev/courses/design-patterns-javascript/submissions</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/js-beginners-series</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/js-beginners-series/js-variables</loc
-    >
+    <loc>https://codewithahsan.dev/courses/js-beginners-series/js-variables</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/js-beginners-series/js-conditionals</loc
-    >
+    <loc>https://codewithahsan.dev/courses/js-beginners-series/js-conditionals</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/js-beginners-series/js-arrays</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/js-beginners-series/js-strings</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/js-beginners-series/js-objects</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/js-beginners-series/js-oop-basics</loc
-    >
+    <loc>https://codewithahsan.dev/courses/js-beginners-series/js-oop-basics</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/js-beginners-series/js-es6-part-1</loc
-    >
+    <loc>https://codewithahsan.dev/courses/js-beginners-series/js-es6-part-1</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/js-beginners-series/js-symbols</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/js-beginners-series/for-each-loop-javascript</loc
-    >
+    <loc>https://codewithahsan.dev/courses/js-beginners-series/for-each-loop-javascript</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/js-beginners-series/javascript-closures</loc
-    >
+    <loc>https://codewithahsan.dev/courses/js-beginners-series/javascript-closures</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/js-beginners-series/resources</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/js-beginners-series/submissions</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/796d60</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/e5bd8b</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/7e2e7c</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/6a5e1f</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/215880</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/73a1ec</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/a2da32</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/eabc02</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/cf9fa3</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/b3d205</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/eeb518</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/77556d</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/ddf358</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/a24361</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/463323</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/resources</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/submissions</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-bootcamp</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-bootcamp/web-development-bootcamp-day-1-5</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-bootcamp/web-development-bootcamp-day-1-5</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-bootcamp/web-development-bootcamp-day-2-5</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-bootcamp/web-development-bootcamp-day-2-5</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-bootcamp/web-development-bootcamp-day-3-5</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-bootcamp/web-development-bootcamp-day-3-5</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-bootcamp/web-development-bootcamp-day-4-5</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-bootcamp/web-development-bootcamp-day-4-5</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-bootcamp/web-development-bootcamp-day-5-5</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-bootcamp/web-development-bootcamp-day-5-5</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-bootcamp/web-development-bootcamp-day-bonus</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-bootcamp/web-development-bootcamp-day-bonus</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-bootcamp/resources</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-bootcamp/submissions</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/mern-stack-crash-course</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/intro-and-app-preview</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/intro-and-app-preview</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/creating-the-backend-nodejs-app</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/creating-the-backend-nodejs-app</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/creating-the-frontend-react-app</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/creating-the-frontend-react-app</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/creating-the-notes-ui</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/creating-the-notes-ui</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/updating-notes-ui</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/updating-notes-ui</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/making-notes-editable</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/making-notes-editable</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/saving-notes-to-localstorage</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/saving-notes-to-localstorage</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/deploying-react-app-to-ghpages</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/deploying-react-app-to-ghpages</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/setting-up-database-mongodb</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/setting-up-database-mongodb</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/implementing-backend-routes-expressjs</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/implementing-backend-routes-expressjs</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/connecting-the-backend-and-the-database</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/connecting-the-backend-and-the-database</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/creating-mongoose-models-crud</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/creating-mongoose-models-crud</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/implementing-crud-api-in-backend</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/implementing-crud-api-in-backend</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/integrating-frontend-and-backend</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/integrating-frontend-and-backend</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/outro</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/resources</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/resources</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/submissions</loc
-    >
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/submissions</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/course-introduction</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/course-introduction</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/what-is-web-development</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/what-is-web-development</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/set-up-pc-environment</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/set-up-pc-environment</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/how-to-ask-question</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/how-to-ask-question</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/resources</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/submissions</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/section-1-intro</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/your-first-web-app</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/your-first-web-app</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/structure-of-web-page</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/structure-of-web-page</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/html-headings</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/use-vscode-live-preview-extension</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/use-vscode-live-preview-extension</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/html-tags-vs-attributes</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/html-tags-vs-attributes</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/html-paragraphs</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/formatting-text-in-html</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/formatting-text-in-html</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/styles-in-html</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/colors-in-html</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/html-lists</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/html-images</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/html-forms-introduction</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/html-forms-introduction</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/using-starter-files</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/using-starter-files</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/form-elements</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/input-types</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/html-links</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/html-entities</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/html-tables</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/block-vs-inline-elements</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/block-vs-inline-elements</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/html-audio-video-tags</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/html-audio-video-tags</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/semantic-html</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/html-assignment</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses/web-dev-basics/resources</loc>
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/css3-section-intro</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses/web-dev-basics/submissions</loc>
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/different-ways-of-using-css</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/css3-section-intro</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/classes-vs-id-selectors</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/different-ways-of-using-css</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/combinator-and-grouping-selectors</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/classes-vs-id-selectors</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/css-pseudo-classes</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/combinator-and-grouping-selectors</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/css-pseudo-classes</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/css-pseudo-elements</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/css-pseudo-elements</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-colors</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-borders</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-margins</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-paddings</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-box-model</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-opacity</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-styling-text</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/css-display-visibility</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/css-display-visibility</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-fonts</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-icons</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/building-navbars</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-position</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-box-shadows</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-width-height</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-z-index</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-overflow</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-and-forms</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/css-important-styles</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/css-important-styles</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/activity-portfolio-site</loc
-    >
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/web-dev-basics/resources</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/web-dev-basics/submissions</loc>
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/activity-portfolio-site</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/section-3-intro</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/css-flex-container</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/css-flex-container</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-flex-items</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/flexbox-responsive-image-gallery</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/flexbox-responsive-image-gallery</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-grid-intro</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-variables</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-transforms</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/css-animations</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/css-media-queries</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/css-media-queries</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/activity-landing-page-from-figma-design</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/activity-landing-page-from-figma-design</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses/web-dev-basics/resources</loc>
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/section-4-intro-javascript</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses/web-dev-basics/submissions</loc>
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/introduction-to-javascript</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/section-4-intro-javascript</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/how-to-use-javascript</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/introduction-to-javascript</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-statements</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/how-to-use-javascript</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-syntax</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-statements</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-variables</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-syntax</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-comments</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-variables</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-arithmetic-operators</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-comments</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-assignment-operators</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-arithmetic-operators</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-comparison-operators</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-assignment-operators</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-data-types</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-comparison-operators</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-functions</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-data-types</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-objects</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-functions</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-boolean-truthy--falsy-values</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-objects</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-strings</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-boolean-truthy--falsy-values</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-numbers-</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-strings</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-dialog-boxes</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-numbers-</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-if-else-conditionals</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-dialog-boxes</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/activity-building-a-basic-addition-calculator-with-javascript</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-if-else-conditionals</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-switch-case-conditionals</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/activity-building-a-basic-addition-calculator-with-javascript</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-arrays</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-switch-case-conditionals</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-array-methods</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-arrays</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-arrays--sorting</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-array-methods</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-for-loop</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-arrays--sorting</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-while-loop</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-for-loop</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-do-while-loop</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-while-loop</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-for-in-loop</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-do-while-loop</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-for-of-loop</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-for-in-loop</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-regexes---part-1</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-for-of-loop</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-regexes---part-2</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-regexes---part-1</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-break-and-continue</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-regexes---part-2</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/activity---pugam-game-in-javascript</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-break-and-continue</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-hoisting</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/activity---pugam-game-in-javascript</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-hoisting</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-this-keyword</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-this-keyword</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-dates</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-dom</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-classes</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-classes</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/what-is-json</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-debugging</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-debugging</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses/web-dev-basics/resources</loc>
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/section-5-intro---javascript-advanced</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses/web-dev-basics/submissions</loc>
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-callbacks</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/section-5-intro---javascript-advanced</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-promises</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-callbacks</loc
-    >
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/javascript-async-await</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-promises</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/javascript-async-await</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/web-dev-basics/activity---random-users-list-app</loc
-    >
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/web-dev-basics/resources</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/web-dev-basics/submissions</loc>
+    <loc>https://codewithahsan.dev/courses/web-dev-basics/activity---random-users-list-app</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/web-dev-basics/wrap-up</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/web-dev-basics/resources</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/web-dev-basics/submissions</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/ad318c</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/ad318c</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/e1a7ad</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/e1a7ad</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/a7ad9a</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/a7ad9a</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/8899a4</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/8899a4</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/41698c</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/41698c</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/8e8d67</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/8e8d67</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/105f12</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/105f12</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/efa5da</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/efa5da</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/b1d81d</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/b1d81d</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/dc2bf7</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/dc2bf7</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/4cd559</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/4cd559</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/aa37e4</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/aa37e4</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/0e3429</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/0e3429</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/a4dcab</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/a4dcab</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/4270c9</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/4270c9</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/2fdad2</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/2fdad2</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/0464cf</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/0464cf</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/5dc1c1</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/5dc1c1</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/280fda</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/280fda</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/905425</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/905425</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/c04819</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/c04819</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/e2489b</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/e2489b</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/resources</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/resources</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/submissions</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/submissions</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-pipes</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-pipes</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-directives</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-directives</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/making-http-calls-in-angular-services</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/making-http-calls-in-angular-services</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-services</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-services</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-routes-in-angular</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-routes-in-angular</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-a-counter-component</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-a-counter-component</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/event-listeners-in-angular</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/event-listeners-in-angular</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/passing-data-from-parent-to-child-component</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/passing-data-from-parent-to-child-component</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/data-binding-in-angular</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/data-binding-in-angular</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-angular-components</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-angular-components</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-components</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-components</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-an-angular-application</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-an-angular-application</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/myths-about-angular</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/myths-about-angular</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-vs-react</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-vs-react</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/benefits-of-angular</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/benefits-of-angular</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-cookbook-latest-edition</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-cookbook-latest-edition</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/what-is-angular</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/what-is-angular</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/prerequisites</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/prerequisites</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/90ish-outro</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/90ish-outro</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/introduction</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/introduction</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/resources</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/resources</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
 
   <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/submissions</loc
-    >
+    <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes/submissions</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
+
 </urlset>
