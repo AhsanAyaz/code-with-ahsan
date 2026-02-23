@@ -353,12 +353,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 057 | Implement mentorship inactivity auto-cleanup with two Vercel cron jobs (35-day warning + 7-day grace cleanup) | 2026-02-18 | 68a7564 | [057-implement-mentorship-inactivity-auto-cle](./quick/57-implement-mentorship-inactivity-auto-cle/) |
 | 058 | Show LinkedIn profile link on mentor public profile page | 2026-02-18 | 9aa8bff | [058-show-linkedin-profile-link-on-mentor-pro](./quick/58-show-linkedin-profile-link-on-mentor-pro/) |
 | 059 | Add community hub page with Discord channels overview and FAQ | 2026-02-20 | 44bd2bc | [059-add-community-page-with-discord-channels](./quick/59-add-community-page-with-discord-channels/) |
+| 060 | Create events listing page at /events with CWA Prompt-a-thon 2026 and HackStack Pakistan 2023 | 2026-02-23 | 1327423 | [060-create-events-listing-page-at-events-wit](./quick/60-create-events-listing-page-at-events-wit/) |
 
 ## Session Continuity
 
-Last session: 2026-02-20
-Stopped at: Completed quick-059 (add community hub page with Discord channels)
+Last session: 2026-02-23
+Stopped at: Completed quick-060 (create events listing page at /events)
 Resume file: None
 
 ---
-*Updated: 2026-02-20 after completing quick-059*
+*Updated: 2026-02-23 after completing quick-060*
