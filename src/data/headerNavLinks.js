@@ -9,6 +9,7 @@ export const COMMUNITY_LINKS = [
   { href: "/projects/discover", title: "Projects", icon: "projects" },
   { href: "/roadmaps", title: "Roadmaps", icon: "roadmap" },
   { href: "/community", title: "Community Hub", icon: "community" },
+  { href: "/events", title: "Events", icon: "events" },
   { href: LINKS.DISCORD, title: "Discord", icon: "discord", external: true },
   { href: "/logic-buddy", title: "Logic Buddy", icon: "brain" },
 ];

@@ -172,6 +172,7 @@ const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
                         {item.icon === "my-projects" && <span className="text-xl">📂</span>}
                         {item.icon === "brain" && <span className="text-xl">🧠</span>}
                         {item.icon === "community" && <span className="text-xl">🏘️</span>}
+                        {item.icon === "events" && <span className="text-xl">🎉</span>}
                         {item.title}
                         {item.external && (
                           <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">

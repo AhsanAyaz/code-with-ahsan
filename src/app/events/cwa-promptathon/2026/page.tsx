@@ -37,7 +37,7 @@ const Promptathon2026Base = () => {
 
       {/* About Section */}
       <section className="flex flex-col gap-6 md:px-12">
-        <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-purple-600 border-b pb-4">
+        <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-400 via-purple-400 to-pink-400 border-b pb-4">
           What is Prompt-a-thon 2026?
         </h2>
         <div className="prose dark:prose-invert max-w-none text-lg">

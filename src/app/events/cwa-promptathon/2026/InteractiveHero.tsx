@@ -151,7 +151,7 @@ export default function InteractiveHero() {
         <div className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold tracking-wider uppercase bg-primary-50 text-primary-600 border border-primary-200 shadow-sm">
           Hackathon & Innovation Sprint
         </div>
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-purple-600 drop-shadow-sm">
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary-300 via-purple-400 to-pink-400 dark:from-primary-300 dark:via-purple-400 dark:to-pink-400 drop-shadow-sm">
           CWA Prompt-a-thon 2026
         </h1>
         <p className="text-xl md:text-2xl font-light text-gray-700 dark:text-gray-300">
