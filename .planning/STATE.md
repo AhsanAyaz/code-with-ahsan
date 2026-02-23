@@ -354,12 +354,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 058 | Show LinkedIn profile link on mentor public profile page | 2026-02-18 | 9aa8bff | [058-show-linkedin-profile-link-on-mentor-pro](./quick/58-show-linkedin-profile-link-on-mentor-pro/) |
 | 059 | Add community hub page with Discord channels overview and FAQ | 2026-02-20 | 44bd2bc | [059-add-community-page-with-discord-channels](./quick/59-add-community-page-with-discord-channels/) |
 | 060 | Create events listing page at /events with CWA Prompt-a-thon 2026 and HackStack Pakistan 2023 | 2026-02-23 | 1327423 | [060-create-events-listing-page-at-events-wit](./quick/60-create-events-listing-page-at-events-wit/) |
+| 061 | Fix SEO indexing issues: metadataBase, robots.txt, noindex on auth layouts, clean sitemap | 2026-02-23 | b8b8129 | [061-fix-seo-indexing-issues-identified-in-go](./quick/61-fix-seo-indexing-issues-identified-in-go/) |
 
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed quick-060 (create events listing page at /events)
+Stopped at: Completed quick-061 (fix SEO indexing issues - metadataBase, robots.txt, sitemap cleanup)
 Resume file: None
 
 ---
-*Updated: 2026-02-23 after completing quick-060*
+*Updated: 2026-02-23 after completing quick-061*
