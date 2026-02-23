@@ -10,8 +10,10 @@ import Dialog from './Dialog'
 import { getEnrollmentDoc } from '../services/EnrollmentService'
 import { AuthContext } from '@/contexts/AuthContext'
 
-const storage = getStorage(getApp())
-const firestore = getFirestore(getApp())
+function getFirebaseServices() {
+  const app = getApp()
+  return { storage: getStorage(app), firestore: getFirestore(app) }
+}
 
 export default function SubmissionWrapper({
   user,
@@ -85,6 +87,7 @@ export default function SubmissionWrapper({
   const deleteProjectFileIfExists = async (docRef) => {
     const existingDoc = await getDoc(docRef)
     if (existingDoc.exists()) {
+      const { storage } = getFirebaseServices()
       const existingFileUrl = existingDoc.data().screenshotUrl
       const filePath = getFireStorageFileName(existingFileUrl)
       await deleteObject(ref(storage, filePath))
@@ -98,6 +101,7 @@ export default function SubmissionWrapper({
       return alert('Invalid URL')
     }
     try {
+      const { firestore } = getFirebaseServices()
       const docRef = doc(firestore, submissionUrl)
       setIsSubmittingProject(true)
       deleteProjectFileIfExists(docRef)
@@ -128,6 +132,7 @@ export default function SubmissionWrapper({
     const metadata = {
       contentType: file.type,
     }
+    const { storage } = getFirebaseServices()
     const fileRef = ref(storage, `project-submissions/${file.name}`)
     await uploadBytes(fileRef, file, metadata)
     const url = await getDownloadURL(fileRef)
