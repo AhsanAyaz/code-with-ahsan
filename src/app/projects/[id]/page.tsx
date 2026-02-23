@@ -21,6 +21,7 @@ import {
   MentorshipRole,
 } from "@/types/mentorship";
 import RecommendedRoadmapsWidget from "@/components/projects/RecommendedRoadmapsWidget";
+import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +63,34 @@ export default function ProjectDetailPage() {
   const [demoDescription, setDemoDescription] = useState("");
   const [completeLoading, setCompleteLoading] = useState(false);
   const [transferLoading, setTransferLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminCheckDone, setAdminCheckDone] = useState(false);
+
+  // Check admin status by validating the token against the server
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+      if (!token) {
+        setAdminCheckDone(true);
+        return;
+      }
+      try {
+        const res = await fetch("/api/mentorship/admin/auth", {
+          method: "GET",
+          headers: { "x-admin-token": token },
+        });
+        const data = await res.json();
+        if (data.valid) {
+          setIsAdmin(true);
+        }
+      } catch {
+        // Not admin
+      } finally {
+        setAdminCheckDone(true);
+      }
+    };
+    checkAdmin();
+  }, []);
 
   const isCreator = user && project?.creatorId === user.uid;
   const isMember = members.some((m) => m.userId === user?.uid);
@@ -505,7 +534,7 @@ export default function ProjectDetailPage() {
     }
   };
 
-  if (loading || authLoading) {
+  if (loading || authLoading || !adminCheckDone) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <span className="loading loading-spinner loading-lg"></span>
@@ -539,11 +568,10 @@ export default function ProjectDetailPage() {
     );
   }
 
-  // Access control: Only show pending/declined projects to creator
-  // (Admin access is handled via admin dashboard with token authentication)
+  // Access control: Only show pending/declined projects to creator or admin
   const isNonPublicProject = project.status === "pending" || project.status === "declined";
 
-  if (isNonPublicProject && !isCreator) {
+  if (isNonPublicProject && !isCreator && !isAdmin) {
     return (
       <div className="max-w-4xl mx-auto p-8">
         <div className="alert alert-error">
