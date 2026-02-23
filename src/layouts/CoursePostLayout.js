@@ -14,8 +14,6 @@ import { CoursesList } from "../components/courses/CoursesList";
 import Button from "../components/Button";
 import { AuthContext } from "../contexts/AuthContext";
 
-const auth = getAuth(getApp());
-
 export default function CoursePostLayout({
   courseStr,
   postStr,
@@ -115,6 +113,7 @@ export default function CoursePostLayout({
   };
 
   useEffect(() => {
+    const auth = getAuth(getApp());
     const sub = auth.onAuthStateChanged((user) => {
       if (user) {
         getMarked(user);
