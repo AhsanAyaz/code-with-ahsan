@@ -24,7 +24,7 @@ const Promptathon2026Base = () => {
       <section className="flex justify-center">
         <Button
           onClick={() => {
-            window.open("https://forms.gle/spjYMMC58Si3RoP49", "_blank");
+            window.open("https://forms.gle/LXMhL7jZgddrNoxy8", "_blank");
           }}
           className="text-lg px-8 py-4 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
           color="hackstack"
@@ -37,7 +37,7 @@ const Promptathon2026Base = () => {
 
       {/* About Section */}
       <section className="flex flex-col gap-6 md:px-12">
-        <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-400 via-purple-400 to-pink-400 border-b pb-4">
+        <h2 className="text-4xl font-bold text-primary-400 border-b border-base-content/10 pb-4">
           What is Prompt-a-thon 2026?
         </h2>
         <div className="prose dark:prose-invert max-w-none text-lg">
@@ -96,22 +96,12 @@ const Promptathon2026Base = () => {
       >
         <h2 className="text-3xl font-bold">Event Structure</h2>
         <p className="text-lg max-w-2xl text-gray-700 dark:text-gray-300">
-          Want a detailed breakdown of the schedule, guidelines, and rules for
-          the hackathon? Please read our official structure document.
+          A detailed breakdown of the schedule, guidelines, and rules for
+          the hackathon will be shared soon. Stay tuned!
         </p>
-        <Button
-          onClick={() => {
-            window.open(
-              "https://docs.google.com/document/d/1bTcMa4r5XBHabCD-OiH2Bzn714hK-8NdnaUwJXrIf3M/edit?tab=t.0",
-              "_blank",
-            );
-          }}
-          color="primary"
-          title="View Event Structure"
-          href={undefined}
-        >
-          View Event Structure Doc
-        </Button>
+        <span className="btn btn-primary btn-disabled no-animation opacity-70">
+          Structure Doc — Coming Soon
+        </span>
       </section>
 
       {/* Contact Footnote */}
