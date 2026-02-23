@@ -33,8 +33,6 @@ import LegitMarkdown from "@/components/LegitMarkdown";
 import NewsletterForm from "@/components/NewsletterForm";
 import siteMetadata from "@/data/siteMetadata";
 
-const auth = getAuth(getApp());
-
 export default function PostDetail({
   course,
   post,
@@ -157,7 +155,8 @@ export default function PostDetail({
   };
 
   useEffect(() => {
-    const sub = auth.onAuthStateChanged((user) => {
+    const auth = getAuth(getApp());
+    const sub = auth.onAuthStateChanged((user: any) => {
       if (user) {
         getMarked(user);
       } else {

@@ -38,9 +38,14 @@ const strapiAPIKey =
   process.env.STRAPI_API_KEY ||
   "2d28dddc977ac98d7e4e55b2f5cd7e1302d22f3e9033f705cb918185d5d178fd95768ae1d7e8406714022bccddc7c91a394fee9e276eba87b0e047948b22e4be58f0e97bd6e5295f52dd24fd943ad67fb0f85e7bc2d1a6487753cc704a160761b29ef8dda04f04c31fac2c1b9620103afe7a0eba541108738a5fc46c4083485d";
 
-const auth = getAuth(getApp());
-const storage = getStorage(getApp());
-const firestore = getFirestore(getApp());
+function getFirebaseServices() {
+  const app = getApp();
+  return {
+    auth: getAuth(app),
+    storage: getStorage(app),
+    firestore: getFirestore(app),
+  };
+}
 
 export default function SubmissionsPage() {
   const params = useParams();
@@ -49,10 +54,12 @@ export default function SubmissionsPage() {
   const [course, setCourse] = useState<any>(null);
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(auth.currentUser);
+  const [user, setUser] = useState<any>(null);
   const [isDeletingSubmission, setIsDeletingSubmission] = useState(false);
 
   useEffect(() => {
+    const { auth } = getFirebaseServices();
+    setUser(auth.currentUser);
     const sub = auth.onAuthStateChanged((user) => {
       setUser(user);
     });
@@ -102,6 +109,7 @@ export default function SubmissionsPage() {
 
   const getSubmissions = useCallback(async () => {
     if (!courseSlug) return;
+    const { firestore } = getFirebaseServices();
     const querySnapshot = await getDocs(
       collection(firestore, `cwa-web/project-submissions/${courseSlug}`)
     );
@@ -120,6 +128,7 @@ export default function SubmissionsPage() {
   const deleteProjectFileIfExists = async (docRef: any) => {
     const existingDoc = await getDoc(docRef);
     if (existingDoc.exists()) {
+      const { storage } = getFirebaseServices();
       const existingFileUrl = (existingDoc.data() as any)?.screenshotUrl;
       const filePath = getFireStorageFileName(existingFileUrl);
       await deleteObject(ref(storage, filePath));
@@ -130,6 +139,7 @@ export default function SubmissionsPage() {
     if (!user) return;
     setIsDeletingSubmission(true);
     try {
+      const { firestore } = getFirebaseServices();
       const docRef = doc(
         firestore,
         `cwa-web/project-submissions/${courseSlug}/${user.uid}`
