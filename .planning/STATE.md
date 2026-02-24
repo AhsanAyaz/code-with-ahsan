@@ -355,12 +355,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 059 | Add community hub page with Discord channels overview and FAQ | 2026-02-20 | 44bd2bc | [059-add-community-page-with-discord-channels](./quick/59-add-community-page-with-discord-channels/) |
 | 060 | Create events listing page at /events with CWA Prompt-a-thon 2026 and HackStack Pakistan 2023 | 2026-02-23 | 1327423 | [060-create-events-listing-page-at-events-wit](./quick/60-create-events-listing-page-at-events-wit/) |
 | 061 | Fix SEO indexing issues: metadataBase, robots.txt, noindex on auth layouts, clean sitemap | 2026-02-23 | b8b8129 | [061-fix-seo-indexing-issues-identified-in-go](./quick/61-fix-seo-indexing-issues-identified-in-go/) |
+| 062 | Fix Core Web Vitals CLS issues: font stack mismatch, raw img tags, newsletter containment, cookie consent fixed positioning | 2026-02-24 | a8ae0b6 | [062-fix-core-web-vitals-cls-issues-on-deskto](./quick/62-fix-core-web-vitals-cls-issues-on-deskto/) |
 
 ## Session Continuity
 
-Last session: 2026-02-23
-Stopped at: Completed quick-061 (fix SEO indexing issues - metadataBase, robots.txt, sitemap cleanup)
+Last session: 2026-02-24
+Stopped at: Completed quick-062 (fix Core Web Vitals CLS issues - font stack, images, newsletter, cookie consent)
 Resume file: None
 
 ---
-*Updated: 2026-02-23 after completing quick-061*
+*Updated: 2026-02-24 after completing quick-062*
