@@ -10,10 +10,10 @@ const NewsletterForm = ({
   title = `Subscribe to Code with Ahsan's newsletter`,
 }: NewsletterFormProps) => {
   return (
-    <div style={{ height: "40vmin", minHeight: "360px", width: "100%" }}>
+    <div style={{ height: "40vmin", minHeight: "360px", maxHeight: "400px", width: "100%", contain: "layout style", position: "relative", overflow: "hidden" }}>
       <div
         id="newsletter-container"
-        style={{ maxHeight: "400px", overflow: "hidden", height: "100%" }}
+        style={{ maxHeight: "400px", overflow: "hidden", height: "100%", position: "relative" }}
       ></div>
       <Script
         src={`https://cdn.jsdelivr.net/ghost/signup-form@~0.2/umd/signup-form.min.js?ts=${Date.now()}`}

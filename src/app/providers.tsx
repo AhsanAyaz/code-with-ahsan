@@ -49,6 +49,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
               color: "white",
               borderRadius: "4px",
             }}
+            style={{
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 9999,
+            }}
+            overlay={false}
           >
             This website uses cookies to enhance the user experience.
           </CookieConsent>
