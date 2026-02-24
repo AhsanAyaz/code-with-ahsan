@@ -1,14 +1,6 @@
 "use client";
 import Script from "next/script";
-import { ReactNode } from "react";
-
-interface NewsletterFormProps {
-  title?: string;
-}
-
-const NewsletterForm = ({
-  title = `Subscribe to Code with Ahsan's newsletter`,
-}: NewsletterFormProps) => {
+const NewsletterForm = () => {
   return (
     <div style={{ height: "40vmin", minHeight: "360px", maxHeight: "400px", width: "100%", contain: "layout style", position: "relative", overflow: "hidden" }}>
       <div
@@ -74,15 +66,11 @@ const NewsletterForm = ({
 
 export default NewsletterForm;
 
-interface BlogNewsletterFormProps {
-  title: string;
-}
-
-export const BlogNewsletterForm = ({ title }: BlogNewsletterFormProps) => (
+export const BlogNewsletterForm = () => (
   <div className="flex items-center justify-center">
     <div className="card bg-base-200 w-full shadow-xl">
       <div className="card-body p-6 sm:px-14 sm:py-8">
-        <NewsletterForm title={title} />
+        <NewsletterForm />
       </div>
     </div>
   </div>
