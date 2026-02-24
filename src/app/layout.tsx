@@ -15,12 +15,16 @@ const rubik = Rubik({
   subsets: ["latin"],
   variable: "--font-rubik",
   display: "swap",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
+  adjustFontFallback: true,
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
+  fallback: ["ui-monospace", "SFMono-Regular", "monospace"],
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
