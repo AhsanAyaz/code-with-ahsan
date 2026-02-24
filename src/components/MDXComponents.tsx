@@ -43,7 +43,13 @@ export const MDXComponents: Record<string, React.FC<any> | string> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   input: (props: any) => <input {...props} />,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  img: (props: any) => <img {...props} />,
+  img: (props: any) => {
+    if (props.width && props.height) {
+      return <Image src={props.src} alt={props.alt || ""} width={Number(props.width)} height={Number(props.height)} className={props.className} />;
+    }
+    // For images without explicit dimensions (e.g., from markdown), contain layout shift
+    return <img {...props} style={{ ...props.style, maxWidth: "100%", height: "auto" }} loading="lazy" decoding="async" />;
+  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ul: (props: any) => <ul {...props} />,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

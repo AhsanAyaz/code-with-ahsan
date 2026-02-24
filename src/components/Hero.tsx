@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Terminal, Code, Cpu } from "lucide-react";
 
 export default function Hero() {
@@ -136,11 +137,12 @@ export default function Hero() {
               className="absolute -bottom-6 -right-6 bg-base-100 border border-primary p-4 rounded-lg shadow-lg flex items-center gap-3"
             >
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="static/images/gde_logo_brackets.png"
+                <Image
+                  src="/static/images/gde_logo_brackets.png"
                   alt="GDE"
-                  className="w-10 h-10 object-contain"
+                  width={40}
+                  height={40}
+                  className="object-contain"
                 />
               </div>
               <div>

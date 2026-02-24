@@ -5,7 +5,7 @@
 
 @theme inline {
   --font-mono: "JetBrains Mono", monospace;
-  --font-sans: "Inter", "Rubik", sans-serif;
+  --font-sans: var(--font-rubik), "Rubik", ui-sans-serif, system-ui, sans-serif;
 
   /* Neon Color Palette - for accents only */
   --color-neon-cyan: #00f0ff;
