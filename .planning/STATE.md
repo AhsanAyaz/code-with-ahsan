@@ -356,7 +356,7 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 060 | Create events listing page at /events with CWA Prompt-a-thon 2026 and HackStack Pakistan 2023 | 2026-02-23 | 1327423 | [060-create-events-listing-page-at-events-wit](./quick/60-create-events-listing-page-at-events-wit/) |
 | 061 | Fix SEO indexing issues: metadataBase, robots.txt, noindex on auth layouts, clean sitemap | 2026-02-23 | b8b8129 | [061-fix-seo-indexing-issues-identified-in-go](./quick/61-fix-seo-indexing-issues-identified-in-go/) |
 | 062 | Fix Core Web Vitals CLS issues: font stack mismatch, raw img tags, newsletter containment, cookie consent fixed positioning | 2026-02-24 | a8ae0b6 | [062-fix-core-web-vitals-cls-issues-on-deskto](./quick/62-fix-core-web-vitals-cls-issues-on-deskto/) |
-| 063 | Consolidate /projects route as discovery page, show Create Project button for all users, remove showcase route and orphaned components | 2026-02-25 | 52dafca | [063-show-create-project-button-on-discovery-](./quick/63-show-create-project-button-on-discovery-/) |
+| 063 | Consolidate /projects route as discovery page, show Create Project button for all users, remove showcase route and orphaned components | 2026-02-25 | c520c60 | [063-show-create-project-button-on-discovery-](./quick/63-show-create-project-button-on-discovery-/) |
 
 ## Session Continuity
 
