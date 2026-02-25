@@ -274,7 +274,7 @@ export default function MyProjectsPage() {
             <p className="text-lg text-base-content/70 mb-4">
               No pending invitations
             </p>
-            <Link href="/projects/discover" className="btn btn-primary">
+            <Link href="/projects" className="btn btn-primary">
               Discover Projects
             </Link>
           </div>
@@ -393,7 +393,7 @@ export default function MyProjectsPage() {
               ? "You haven't created any projects yet."
               : "You haven't joined any projects yet."}
           </p>
-          <Link href="/projects/discover" className="btn btn-primary">
+          <Link href="/projects" className="btn btn-primary">
             Discover Projects
           </Link>
         </div>

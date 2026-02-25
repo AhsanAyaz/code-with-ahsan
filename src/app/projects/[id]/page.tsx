@@ -561,7 +561,7 @@ export default function ProjectDetailPage() {
           </svg>
           <span>{error || "Project not found"}</span>
         </div>
-        <Link href="/projects/discover" className="btn btn-ghost mt-4">
+        <Link href="/projects" className="btn btn-ghost mt-4">
           Back to Discovery
         </Link>
       </div>
@@ -590,7 +590,7 @@ export default function ProjectDetailPage() {
           </svg>
           <span>Project not found</span>
         </div>
-        <Link href="/projects/discover" className="btn btn-ghost mt-4">
+        <Link href="/projects" className="btn btn-ghost mt-4">
           Back to Discovery
         </Link>
       </div>
@@ -600,7 +600,7 @@ export default function ProjectDetailPage() {
   return (
     <div className="max-w-4xl mx-auto p-8 space-y-8">
       {/* Back button */}
-      <Link href="/projects/discover" className="btn btn-ghost btn-sm mb-4">
+      <Link href="/projects" className="btn btn-ghost btn-sm mb-4">
         ← Back to Projects
       </Link>
 

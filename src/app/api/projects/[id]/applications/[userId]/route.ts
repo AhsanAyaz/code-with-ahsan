@@ -190,7 +190,7 @@ export async function PUT(
           const dmMessage =
             `Your application to join **"${projectTitle}"** was not approved.\n\n` +
             (feedback ? `**Feedback:** ${feedback}\n\n` : "") +
-            `You can browse other projects at ${process.env.NEXT_PUBLIC_SITE_URL || "https://codewithahsan.dev"}/projects/discover`;
+            `You can browse other projects at ${process.env.NEXT_PUBLIC_SITE_URL || "https://codewithahsan.dev"}/projects`;
           await sendDirectMessage(userData.discordUsername, dmMessage);
         } catch (dmError) {
           console.error("Discord decline DM failed:", dmError);

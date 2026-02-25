@@ -54,7 +54,7 @@ export default function MyProjectsWidget({
             <p className="text-base-content/70 mb-4">
               You haven&apos;t joined any projects yet.
             </p>
-            <Link href="/projects/discover" className="btn btn-outline btn-sm">
+            <Link href="/projects" className="btn btn-outline btn-sm">
               Explore Projects
             </Link>
           </div>
