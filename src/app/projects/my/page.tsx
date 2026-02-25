@@ -8,7 +8,6 @@ import { Project, ProjectInvitation, ProjectDifficulty } from "@/types/mentorshi
 import Link from "next/link";
 import { authFetch } from "@/lib/apiClient";
 import ToastContainer, { ToastMessage, ToastType } from "@/components/ui/Toast";
-import Image from "next/image";
 import ProfileAvatar from "@/components/ProfileAvatar";
 
 export const dynamic = "force-dynamic";
