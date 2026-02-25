@@ -1,56 +1,197 @@
-import { Metadata } from "next";
-// @ts-ignore
-import siteMetadata from "@/data/siteMetadata";
-// @ts-ignore
-import projectsData from "@/data/projectsData";
-// @ts-ignore
-import Card from "@/components/Card";
+"use client";
 
-export const metadata: Metadata = {
-  title: `Projects - ${siteMetadata.title}`,
-  description:
-    "Explore the various coding projects, tutorials, and open-source contributions by the Code with Ahsan community.",
-  openGraph: {
-    title: `Projects - ${siteMetadata.title}`,
-    description:
-      "Explore the various coding projects, tutorials, and open-source contributions by the Code with Ahsan community.",
-    images: ["/images/projects-og.png"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `Projects - ${siteMetadata.title}`,
-    description:
-      "Explore the various coding projects, tutorials, and open-source contributions by the Code with Ahsan community.",
-    images: ["/images/projects-og.png"],
-  },
-};
+import { useState, useEffect, useCallback, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import debounce from "lodash.debounce";
+import ProjectCard from "@/components/projects/ProjectCard";
+import ProjectFilters from "@/components/projects/ProjectFilters";
+import { Project, ProjectDifficulty } from "@/types/mentorship";
+import Link from "next/link";
 
-export default function Projects() {
-  return (
-    <div className="page-padding">
-      <div className="divide-y divide-gray-200 dark:divide-gray-700">
-        <div className="pt-6 pb-8 space-y-2 md:space-y-5">
-          <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-base-content sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
-            Projects
-          </h1>
-          <p className="text-lg leading-7 text-base-content/70">
-            Showcase your projects with a hero image (16 x 9)
-          </p>
-        </div>
-        <div className="container py-12">
-          <div className="flex flex-wrap -m-4">
-            {projectsData.map((d: any) => (
-              <Card
-                key={d.title}
-                title={d.title}
-                description={d.description}
-                imgSrc={d.imgSrc}
-                href={d.href}
-              />
-            ))}
-          </div>
+export const dynamic = "force-dynamic";
+
+function DiscoverProjectsContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Initialize filters from URL params
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("search") || ""
+  );
+  const [techFilter, setTechFilter] = useState<string[]>(
+    searchParams.get("tech")?.split(",").filter(Boolean) || []
+  );
+  const [difficultyFilter, setDifficultyFilter] = useState<
+    ProjectDifficulty | "all"
+  >((searchParams.get("difficulty") as ProjectDifficulty | "all") || "all");
+
+  // Fetch projects on mount
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/projects?status=active");
+        if (!response.ok) {
+          throw new Error("Failed to fetch projects");
+        }
+        const data = await response.json();
+        setProjects(data.projects || []);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+        setError("Failed to load projects. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  // Debounced URL update (500ms)
+  const updateURL = useCallback(
+    debounce((search: string, tech: string[], difficulty: string) => {
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (tech.length > 0) params.set("tech", tech.join(","));
+      if (difficulty !== "all") params.set("difficulty", difficulty);
+
+      const newURL = params.toString()
+        ? `/projects?${params.toString()}`
+        : "/projects";
+      router.push(newURL, { scroll: false });
+    }, 500),
+    [router]
+  );
+
+  // Update URL when filters change
+  useEffect(() => {
+    updateURL(searchTerm, techFilter, difficultyFilter);
+  }, [searchTerm, techFilter, difficultyFilter, updateURL]);
+
+  // Extract unique tech stacks
+  const availableTechs = Array.from(
+    new Set(projects.flatMap((p) => p.techStack))
+  ).sort();
+
+  // Client-side filtering
+  const filteredProjects = projects.filter((project) => {
+    // Search filter (case-insensitive, matches title and description)
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch =
+        project.title.toLowerCase().includes(searchLower) ||
+        project.description.toLowerCase().includes(searchLower);
+      if (!matchesSearch) return false;
+    }
+
+    // Difficulty filter
+    if (difficultyFilter !== "all" && project.difficulty !== difficultyFilter) {
+      return false;
+    }
+
+    // Tech stack filter (any match)
+    if (techFilter.length > 0) {
+      const hasMatchingTech = techFilter.some((tech) =>
+        project.techStack.includes(tech)
+      );
+      if (!hasMatchingTech) return false;
+    }
+
+    return true;
+  });
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-6xl mx-auto p-8">
+        <div className="alert alert-error">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>{error}</span>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto p-8">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Discover Projects</h1>
+          <p className="text-base-content/70">
+            Find active projects to join and collaborate with mentors and peers
+          </p>
+        </div>
+        <Link href="/projects/new" className="btn btn-primary">
+          Create a Project
+        </Link>
+      </div>
+
+      <ProjectFilters
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        techFilter={techFilter}
+        setTechFilter={setTechFilter}
+        difficultyFilter={difficultyFilter}
+        setDifficultyFilter={setDifficultyFilter}
+        availableTechs={availableTechs}
+      />
+
+      {filteredProjects.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-lg text-base-content/70">
+            No active projects found
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="mb-4 text-sm text-base-content/70">
+            Showing {filteredProjects.length} of {projects.length} projects
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProjects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        </>
+      )}
     </div>
+  );
+}
+
+export default function ProjectsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center min-h-screen">
+          <span className="loading loading-spinner loading-lg"></span>
+        </div>
+      }
+    >
+      <DiscoverProjectsContent />
+    </Suspense>
   );
 }
