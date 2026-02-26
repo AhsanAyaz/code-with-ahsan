@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-// @ts-ignore
 import siteMetadata from "@/data/siteMetadata";
 
 export const metadata: Metadata = {
