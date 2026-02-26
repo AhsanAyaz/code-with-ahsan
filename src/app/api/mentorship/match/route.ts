@@ -71,11 +71,38 @@ export async function GET(request: NextRequest) {
       lastContactAt: doc.data().lastContactAt?.toDate?.() || null,
     }));
 
-    const pendingRequests = pendingSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      requestedAt: doc.data().requestedAt?.toDate?.() || null,
-    }));
+    const pendingRequests = await Promise.all(
+      pendingSnapshot.docs.map(async (doc) => {
+        const matchData = doc.data();
+
+        // Fetch mentee profile
+        const menteeDoc = await db
+          .collection("mentorship_profiles")
+          .doc(matchData.menteeId)
+          .get();
+
+        const menteeProfile = menteeDoc.exists ? menteeDoc.data() : null;
+
+        return {
+          id: doc.id,
+          ...matchData,
+          requestedAt: matchData.requestedAt?.toDate?.() || null,
+          menteeProfile: menteeProfile
+            ? {
+                displayName: menteeProfile.displayName,
+                photoURL: menteeProfile.photoURL,
+                email: menteeProfile.email,
+                discordUsername: menteeProfile.discordUsername,
+                education: menteeProfile.education,
+                skillsSought: menteeProfile.skillsSought,
+                careerGoals: menteeProfile.careerGoals,
+                mentorshipGoals: menteeProfile.mentorshipGoals,
+                learningStyle: menteeProfile.learningStyle,
+              }
+            : null,
+        };
+      })
+    );
 
     return NextResponse.json({ matches, pendingRequests }, { status: 200 });
   } catch (error) {
