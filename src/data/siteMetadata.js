@@ -9,7 +9,7 @@ const siteMetadata = {
   siteRepo: "https://github.com/code-with-ahsan/code-with-ahsan",
   siteLogo: "/static/images/logo.png",
   image: "/static/images/avatar.jpeg",
-  socialBanner: "/images/banner-cwa.png",
+  socialBanner: "/images/home-og.png",
   email: "muhd.ahsanayaz@gmail.com",
   github: "https://github.com/ahsanayaz",
   twitter: "https://twitter.com/codewith_ahsan",
