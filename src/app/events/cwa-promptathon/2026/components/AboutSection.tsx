@@ -26,7 +26,7 @@ const AboutSection = () => {
             <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
               <Code2 className="w-5 h-5 text-primary" />
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-mono text-primary">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">
               What is Prompt-a-thon 2026?
             </h2>
           </motion.div>
