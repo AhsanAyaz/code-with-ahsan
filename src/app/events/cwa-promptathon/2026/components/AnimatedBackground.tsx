@@ -22,17 +22,18 @@ const AnimatedBackground = () => {
   const [particles, setParticles] = useState<{ id: number; x: string; y: string; delay: number; durationOffset: number; size: number }[]>([]);
 
   useEffect(() => {
-    // Generate particles only on the client to avoid hydration mismatch
-    setParticles(
-      Array.from({ length: 20 }, (_, i) => ({
+    // Generate particles only on the client if not already generated
+    setParticles(prev => {
+      if (prev.length > 0) return prev;
+      return Array.from({ length: 20 }, (_, i) => ({
         id: i,
         x: `${Math.random() * 100}%`,
         y: `${Math.random() * 100}%`,
         delay: Math.random() * 5,
         durationOffset: Math.random() * 3,
         size: 2 + Math.random() * 4,
-      }))
-    );
+      }));
+    });
 
     const styleSheet = document.styleSheets[0];
     const keyframes = `
