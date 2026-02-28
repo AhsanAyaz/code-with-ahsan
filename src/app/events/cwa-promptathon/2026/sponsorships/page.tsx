@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-// @ts-ignore
 import NoSSRWrapper from "@/components/NoSSRWrapper";
 import { useTheme } from "next-themes";
+
 
 const SPONSORS = [
   {
@@ -55,17 +55,14 @@ const SPONSORS = [
 ];
 
 const SponsorshipsBase = () => {
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col gap-16">
       {/* Hero Section */}
       <section className="text-center max-w-4xl mx-auto mt-12 mb-8">
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-primary-400 mb-6">
+        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-primary mb-6">
           Sponsor CWA Prompt-a-thon 2026
         </h1>
-        <p className="text-xl md:text-2xl font-light text-gray-700 dark:text-gray-300">
+        <p className="text-xl md:text-2xl font-light text-base-content/70">
           Reach 4,000+ global tech enthusiasts, access a powerful talent
           pipeline, and place your brand in a high-trust technical environment.
         </p>
@@ -77,7 +74,7 @@ const SponsorshipsBase = () => {
           {SPONSORS.map((sponsor) => (
             <div
               key={sponsor.tier}
-              className={`flex flex-col rounded-2xl overflow-hidden border ${isDark ? "bg-gray-800/50 border-gray-700" : "bg-white border-gray-200 shadow-sm"}`}
+              className="flex flex-col rounded-2xl overflow-hidden border bg-base-200 border-base-300 shadow-sm"
             >
               <div
                 className={`p-6 bg-gradient-to-br ${sponsor.color} text-gray-900`}
@@ -104,7 +101,7 @@ const SponsorshipsBase = () => {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                      <span className="text-sm text-base-content/80">
                         {feature}
                       </span>
                     </li>
@@ -117,20 +114,20 @@ const SponsorshipsBase = () => {
       </section>
 
       {/* Contact Footnote */}
-      <section className="text-center mt-8 pb-12 text-lg text-gray-600 dark:text-gray-400">
+      <section className="text-center mt-8 pb-12 text-lg text-base-content/60">
         <p>
           Interested in a custom sponsorship package? Contact us at{" "}
           <br className="sm:hidden" />
           <a
             href="mailto:maham.visionwiseab@gmail.com"
-            className="text-primary-600 hover:underline font-semibold mx-2"
+            className="text-primary hover:underline font-semibold mx-2"
           >
             maham.visionwiseab@gmail.com
           </a>
           or
           <a
             href="mailto:ahsan.ubitian@gmail.com"
-            className="text-primary-600 hover:underline font-semibold mx-2"
+            className="text-primary hover:underline font-semibold mx-2"
           >
             ahsan.ubitian@gmail.com
           </a>
