@@ -47,7 +47,7 @@ const FeatureCard = ({ feature, index }: { feature: typeof features[0]; index: n
         <feature.icon className={`w-7 h-7 ${isPrimary ? 'text-primary' : 'text-accent'}`} />
       </div>
 
-      <h3 className="text-lg sm:text-xl font-semibold font-mono text-base-content mb-3">
+      <h3 className="text-lg sm:text-xl font-semibold text-base-content mb-3">
         {feature.title}
       </h3>
       <p className="text-base-content/70 text-sm leading-relaxed">
@@ -74,7 +74,7 @@ const FeaturesSection = () => {
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
           variants={headingVariants}
-          className="text-2xl sm:text-3xl font-bold font-mono text-center text-primary mb-10 sm:mb-14"
+          className="text-2xl sm:text-3xl font-bold text-center text-primary mb-10 sm:mb-14"
         >
           Why Join the Sprint?
         </motion.h2>

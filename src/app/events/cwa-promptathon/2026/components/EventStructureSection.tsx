@@ -20,7 +20,7 @@ const EventStructureSection = () => {
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <FileText className="w-5 h-5 text-primary" />
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-mono text-primary">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">
               Event Structure
             </h2>
           </div>
@@ -62,7 +62,7 @@ const EventStructureSection = () => {
 
           <div className="flex items-center justify-center gap-2 mb-3 mt-2">
             <Mail className="w-5 h-5 text-primary" />
-            <h3 className="text-base sm:text-lg font-semibold font-mono text-base-content">
+            <h3 className="text-base sm:text-lg font-semibold text-base-content">
               Interested in Sponsoring?
             </h3>
           </div>
