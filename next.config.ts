@@ -27,6 +27,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/events/cwa-promptathon/2026/sponsorships",
+        destination: "/events/cwa-promptathon/2026/sponsorship",
+        permanent: true,
+      },
+      {
         source: "/youtube",
         destination: "https://youtube.com/codewithahsan",
         permanent: true,

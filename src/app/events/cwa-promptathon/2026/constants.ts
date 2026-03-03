@@ -11,6 +11,14 @@ export const COMMUNITY_STATS: StatItem[] = [
   { value: "GDE", label: "Founder: Google Developer Expert in AI & Angular" },
 ];
 
+export const SPONSOR_STATS: StatItem[] = [
+  { value: "4,300+", label: "Discord Members" },
+  { value: "130,000+", label: "Social Followers" },
+  { value: "50", label: "Participants" },
+  { value: "3", label: "Confirmed Judges" },
+  { value: "GDE", label: "Founder" },
+];
+
 export type EventMilestone = {
   title: string;
   dateTime: string;
@@ -94,74 +102,64 @@ export const SPONSOR_PLACEHOLDERS: SponsorLogoPlaceholder[] = [
 
 export type SponsorshipFeature = {
   name: string;
-  platinum: string;
+  community: string;
   gold: string;
-  silver: string;
-  bronze: string;
+  platinum: string;
 };
 
 export const SPONSORSHIP_FEATURES: SponsorshipFeature[] = [
   {
     name: "Social Media Mentions",
+    community: "2-3 posts",
+    gold: "All posts",
     platinum: "All posts",
-    gold: "Partial posts",
-    silver: "2-3 posts",
-    bronze: "1-2 posts",
   },
   {
     name: "Speaker Slot",
+    community: "No",
+    gold: "Yes",
     platinum: "1 slot",
-    gold: "1 slot",
-    silver: "-",
-    bronze: "-",
   },
   {
     name: "CV Access for Recruitment",
-    platinum: "Yes",
+    community: "No",
     gold: "No",
-    silver: "No",
-    bronze: "No",
+    platinum: "Yes",
   },
   {
     name: "Swag Distribution",
-    platinum: "Yes",
+    community: "Yes",
     gold: "Yes",
-    silver: "Yes",
-    bronze: "Yes",
+    platinum: "Yes",
   },
   {
     name: "Logo on Event Page",
-    platinum: "Yes",
+    community: "Yes",
     gold: "Yes",
-    silver: "Yes",
-    bronze: "No",
+    platinum: "Yes",
   },
   {
     name: "Logo on Stream Overlays",
-    platinum: "Yes",
+    community: "Yes",
     gold: "Yes",
-    silver: "No",
-    bronze: "No",
+    platinum: "Yes",
   },
   {
     name: "Product Used in Hackathon",
-    platinum: "Yes",
+    community: "Yes",
     gold: "Yes",
-    silver: "Yes",
-    bronze: "No",
+    platinum: "Yes",
   },
   {
     name: "Dedicated Discord Channel",
-    platinum: "Yes",
+    community: "Yes",
     gold: "Yes",
-    silver: "No",
-    bronze: "No",
+    platinum: "Yes",
   },
   {
     name: "Live Demo Room",
-    platinum: "Yes",
+    community: "Yes",
     gold: "Yes",
-    silver: "No",
-    bronze: "No",
+    platinum: "Yes",
   },
 ];

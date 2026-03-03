@@ -201,7 +201,7 @@ const HeroSection = () => {
             </span>
           </a>
           <a
-            href="#sponsorship-packages"
+            href="/events/cwa-promptathon/2026/sponsorship"
             className="btn btn-outline btn-primary btn-lg rounded-xl"
           >
             Become a Sponsor
