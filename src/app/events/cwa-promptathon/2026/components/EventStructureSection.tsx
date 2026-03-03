@@ -32,7 +32,7 @@ const EventStructureSection = () => {
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}> {/* Added hover animation */}
             <a
               href="#" // Placeholder link
-              className="btn btn-outline btn-primary btn-lg rounded-xl gap-2 mb-12 sm:mb-16"
+              className="btn btn-outline btn-primary btn-lg rounded-xl gap-2 mb-12 sm:mb-16 shadow-[0_0_18px_rgba(143,39,224,0.25)] hover:shadow-[0_0_28px_rgba(143,39,224,0.45)] transition-shadow duration-300"
             >
               <ExternalLink className="w-4 h-4" />
               View Event Structure Doc
@@ -47,14 +47,14 @@ const EventStructureSection = () => {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ delay: 0.2 }} // Added slight delay for staggered effect
           variants={itemVariants}
-          className="bg-base-200 rounded-2xl p-6 sm:p-8 relative shadow-lg border border-base-300"
+          className="bg-base-200 rounded-2xl p-6 sm:p-8 relative shadow-[0_0_25px_rgba(143,39,224,0.1)] border border-primary/15"
         >
           <motion.div
             className="absolute -top-3 left-1/2 -translate-x-1/2"
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full badge badge-primary badge-outline text-xs font-mono">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full badge badge-primary badge-outline text-xs font-mono shadow-[0_0_15px_rgba(143,39,224,0.3)]">
               <Sparkles className="w-3 h-3" />
               Sponsors Welcome
             </div>

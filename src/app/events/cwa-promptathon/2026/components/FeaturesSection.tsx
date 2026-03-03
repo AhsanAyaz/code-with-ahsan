@@ -34,7 +34,7 @@ const FeatureCard = ({ feature, index }: { feature: typeof features[0]; index: n
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.2, delay: index * 0.08, type: "spring" }}
       whileHover={{ y: -8 }} // Added hover effect
-      className="bg-base-200 rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden shadow-lg border border-base-300 transition-all duration-300 group hover:border-primary/40"
+      className="bg-base-200 rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden shadow-[0_0_20px_rgba(143,39,224,0.08)] border border-primary/10 transition-all duration-300 group hover:border-primary/30 hover:shadow-[0_0_30px_rgba(143,39,224,0.18)]"
     >
       {/* Top glow line - simplified without motion */}
       <div

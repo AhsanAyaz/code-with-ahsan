@@ -16,7 +16,7 @@ const AboutSection = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }} // Trigger when 30% of element is in view
-          className="bg-base-200 rounded-2xl p-6 sm:p-10 relative overflow-hidden shadow-lg border border-base-300"
+          className="bg-base-200 rounded-2xl p-6 sm:p-10 relative overflow-hidden shadow-[0_0_25px_rgba(143,39,224,0.1)] border border-primary/15"
         >
           {/* Corner decoration */}
           <div className="absolute top-0 right-0 w-20 h-20 border-t border-r border-primary/20 rounded-tr-2xl" />

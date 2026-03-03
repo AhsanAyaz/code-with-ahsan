@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 const CountdownUnit = ({ value, label }: { value: number; label: string }) => (
   <div className="flex flex-col items-center">
-    <div className="bg-base-200 rounded-xl px-3 py-2 sm:px-4 sm:py-3 min-w-[56px] sm:min-w-[72px] shadow-lg border border-base-300">
+    <div className="bg-base-200 rounded-xl px-3 py-2 sm:px-4 sm:py-3 min-w-[56px] sm:min-w-[72px] shadow-[0_0_12px_rgba(143,39,224,0.15)] border border-primary/20">
       <span className="text-xl sm:text-3xl font-bold font-mono text-primary">
         {String(value).padStart(2, "0")}
       </span>
@@ -80,7 +80,7 @@ const HeroSection = () => {
         className="relative z-10 container mx-auto px-4 sm:px-6 text-center"
       >
         <motion.div variants={itemVariants}>
-          <span className="badge badge-primary badge-outline inline-flex items-center gap-2 px-4 py-2 mb-6 sm:mb-8 text-xs font-medium tracking-[0.15em] uppercase rounded-full font-mono">
+          <span className="badge badge-primary badge-outline inline-flex items-center gap-2 px-4 py-2 mb-6 sm:mb-8 text-xs font-medium tracking-[0.15em] uppercase rounded-full font-mono shadow-[0_0_15px_rgba(143,39,224,0.3)]">
             <Zap className="w-3.5 h-3.5" />
             Hackathon & Innovation Sprint
           </span>
@@ -133,7 +133,7 @@ const HeroSection = () => {
         </motion.div>
 
         <motion.div variants={itemVariants} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <a href="https://forms.gle/BdJ5bPZEeZoiMfi59" className="btn btn-primary btn-lg font-semibold rounded-xl transition-all duration-300 hover:scale-105 group relative overflow-hidden">
+          <a href="https://forms.gle/BdJ5bPZEeZoiMfi59" className="btn btn-primary btn-lg font-semibold rounded-xl transition-all duration-300 hover:scale-105 group relative overflow-hidden shadow-[0_0_20px_rgba(143,39,224,0.4)] hover:shadow-[0_0_30px_rgba(143,39,224,0.5)]">
             <span className="relative z-10 flex items-center gap-2">
               <Zap className="w-4 h-4 group-hover:animate-pulse" />
               Register Now (10 Teams Maximum)
