@@ -18,7 +18,12 @@ const CountdownUnit = ({ value, label }: { value: number; label: string }) => (
 );
 
 const HeroSection = () => {
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
   useEffect(() => {
     const target = new Date("2026-03-28T10:00:00").getTime();
@@ -63,12 +68,22 @@ const HeroSection = () => {
         />
         <motion.div
           animate={{ scale: [1, 1.6], opacity: [0.015, 0] }} // Further reduced max scale and opacity
-          transition={{ duration: 8, repeat: Infinity, ease: "easeOut", delay: 2.5 }} // Increased duration
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeOut",
+            delay: 2.5,
+          }} // Increased duration
           className="absolute w-64 h-64 rounded-full border border-accent/10" // Reduced border opacity
         />
         <motion.div
           animate={{ scale: [1, 1.6], opacity: [0.01, 0] }} // Further reduced max scale and opacity
-          transition={{ duration: 8, repeat: Infinity, ease: "easeOut", delay: 5 }} // Increased duration
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeOut",
+            delay: 5,
+          }} // Increased duration
           className="absolute w-64 h-64 rounded-full border border-primary/5" // Reduced border opacity
         />
       </div>
@@ -80,8 +95,8 @@ const HeroSection = () => {
         className="relative z-10 container mx-auto px-4 sm:px-6 text-center"
       >
         <motion.div variants={itemVariants}>
-          <span className="badge badge-primary badge-outline inline-flex items-center gap-2 px-4 py-2 mb-6 sm:mb-8 text-xs font-medium tracking-[0.15em] uppercase rounded-full font-mono shadow-[0_0_15px_rgba(143,39,224,0.3)]">
-            <Zap className="w-3.5 h-3.5" />
+          <span className="badge badge-primary inline-flex items-center gap-3 px-6 py-3.5 sm:px-7 sm:py-4 mb-6 sm:mb-8 text-base sm:text-lg text-primary-content font-semibold tracking-[0.2em] uppercase rounded-full font-mono shadow-[0_0_18px_rgba(143,39,224,0.4)]">
+            <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
             Hackathon & Innovation Sprint
           </span>
         </motion.div>
@@ -91,16 +106,17 @@ const HeroSection = () => {
           className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 leading-tight"
         >
           <span className="text-primary">CWA Prompt-a-thon</span>{" "}
-          <span className="text-primary">
-            2026
-          </span>
+          <span className="text-primary">2026</span>
         </motion.h1>
 
         <motion.p
           variants={itemVariants}
           className="text-base sm:text-lg md:text-xl text-base-content/70 mb-6 sm:mb-8 max-w-xl mx-auto"
         >
-          Theme: <span className="text-base-content font-semibold">Generative AI, Build with AI</span>
+          Theme:{" "}
+          <span className="text-base-content font-semibold">
+            Generative AI, #BuildWithAI
+          </span>
         </motion.p>
 
         <motion.div
@@ -124,20 +140,71 @@ const HeroSection = () => {
           className="flex items-center justify-center gap-2 sm:gap-3 mb-10 sm:mb-12"
         >
           <CountdownUnit value={timeLeft.days} label="Days" />
-          <span className="text-primary/50 text-xl font-bold mt-[-20px]">:</span>
+          <span className="text-primary/50 text-xl font-bold mt-[-20px]">
+            :
+          </span>
           <CountdownUnit value={timeLeft.hours} label="Hours" />
-          <span className="text-primary/50 text-xl font-bold mt-[-20px]">:</span>
+          <span className="text-primary/50 text-xl font-bold mt-[-20px]">
+            :
+          </span>
           <CountdownUnit value={timeLeft.minutes} label="Min" />
-          <span className="text-primary/50 text-xl font-bold mt-[-20px]">:</span>
+          <span className="text-primary/50 text-xl font-bold mt-[-20px]">
+            :
+          </span>
           <CountdownUnit value={timeLeft.seconds} label="Sec" />
         </motion.div>
 
-        <motion.div variants={itemVariants} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <a href="https://forms.gle/BdJ5bPZEeZoiMfi59" className="btn btn-primary btn-lg font-semibold rounded-xl transition-all duration-300 hover:scale-105 group relative overflow-hidden shadow-[0_0_20px_rgba(143,39,224,0.4)] hover:shadow-[0_0_30px_rgba(143,39,224,0.5)]">
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <div className="bg-base-200/80 border border-primary/15 rounded-2xl px-4 py-4 sm:px-5 sm:py-5 mb-6 max-w-3xl mx-auto">
+            <div className="grid sm:grid-cols-3 gap-3 text-xs sm:text-sm text-base-content/80">
+              <div>
+                <p className="text-primary/80 uppercase tracking-wider text-[11px] mb-1">
+                  Event Type
+                </p>
+                <p className="font-medium">
+                  1-Day Online Hackathon & Innovation Sprint
+                </p>
+              </div>
+              <div>
+                <p className="text-primary/80 uppercase tracking-wider text-[11px] mb-1">
+                  Date & Time
+                </p>
+                <p className="font-medium">28 March 2026, 10:00 AM - 7:00 PM</p>
+              </div>
+              <div>
+                <p className="text-primary/80 uppercase tracking-wider text-[11px] mb-1">
+                  Format
+                </p>
+                <p className="font-medium">
+                  Generative AI | Open Stack | 50 Participants | 10 Teams
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col sm:flex-row items-center justify-center gap-3"
+        >
+          <a
+            href="https://forms.gle/BdJ5bPZEeZoiMfi59"
+            className="btn btn-primary btn-lg font-semibold rounded-xl transition-all duration-300 hover:scale-105 group relative overflow-hidden shadow-[0_0_20px_rgba(143,39,224,0.4)] hover:shadow-[0_0_30px_rgba(143,39,224,0.5)]"
+          >
             <span className="relative z-10 flex items-center gap-2">
               <Zap className="w-4 h-4 group-hover:animate-pulse" />
-              Register Now (10 Teams Maximum)
+              Register Now
             </span>
+          </a>
+          <a
+            href="#sponsorship-packages"
+            className="btn btn-outline btn-primary btn-lg rounded-xl"
+          >
+            Become a Sponsor
           </a>
         </motion.div>
       </motion.div>

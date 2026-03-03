@@ -1,147 +1,90 @@
 "use client";
 
-import React from "react";
-import NoSSRWrapper from "@/components/NoSSRWrapper";
-import { useTheme } from "next-themes";
-
-
-const SPONSORS = [
-  {
-    tier: "Platinum",
-    amount: "$5,000",
-    color: "from-gray-300 to-gray-400",
-    features: [
-      "Mention in Social Media Coverage (All posts)",
-      "1 Speaker Slot",
-      "CVs of participants",
-      "Swag Distribution",
-      "Logo on Conference Page",
-      "Logo on Stream Overlays",
-      "Product use in hackathon",
-      "Dedicated Discord channel",
-    ],
-  },
-  {
-    tier: "Gold",
-    amount: "$3,500",
-    color: "from-yellow-300 to-yellow-500",
-    features: [
-      "Partial Social Media Coverage",
-      "1 Speaker Slot",
-      "Swag Distribution",
-      "Logo on Conference Page",
-      "Logo on Stream Overlays",
-      "Product use in hackathon",
-      "Dedicated Discord channel",
-    ],
-  },
-  {
-    tier: "Silver",
-    amount: "$2,000",
-    color: "from-gray-300 to-gray-400",
-    features: [
-      "2-3 Social Media posts",
-      "Swag Distribution",
-      "Logo on Conference Page",
-      "Product use in hackathon",
-    ],
-  },
-  {
-    tier: "Bronze",
-    amount: "$1,000",
-    color: "from-orange-300 to-orange-500",
-    features: ["1-2 Social Media posts", "Swag Distribution"],
-  },
-];
-
-const SponsorshipsBase = () => {
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col gap-16">
-      {/* Hero Section */}
-      <section className="text-center max-w-4xl mx-auto mt-12 mb-8">
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-primary mb-6">
-          Sponsor CWA Prompt-a-thon 2026
-        </h1>
-        <p className="text-xl md:text-2xl font-light text-base-content/70">
-          Reach 4,000+ global tech enthusiasts, access a powerful talent
-          pipeline, and place your brand in a high-trust technical environment.
-        </p>
-      </section>
-
-      {/* Sponsorship Section */}
-      <section className="flex flex-col gap-8 md:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
-          {SPONSORS.map((sponsor) => (
-            <div
-              key={sponsor.tier}
-              className="flex flex-col rounded-2xl overflow-hidden border bg-base-200 border-base-300 shadow-sm"
-            >
-              <div
-                className={`p-6 bg-gradient-to-br ${sponsor.color} text-gray-900`}
-              >
-                <h3 className="text-2xl font-bold">{sponsor.tier}</h3>
-                <div className="text-3xl font-extrabold mt-2">
-                  {sponsor.amount}
-                </div>
-              </div>
-              <div className="p-6 flex-1">
-                <ul className="space-y-3">
-                  {sponsor.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <svg
-                        className="h-5 w-5 text-green-500 shrink-0 mt-0.5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      <span className="text-sm text-base-content/80">
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Contact Footnote */}
-      <section className="text-center mt-8 pb-12 text-lg text-base-content/60">
-        <p>
-          Interested in a custom sponsorship package? Contact us at{" "}
-          <br className="sm:hidden" />
-          <a
-            href="mailto:maham.visionwiseab@gmail.com"
-            className="text-primary hover:underline font-semibold mx-2"
-          >
-            maham.visionwiseab@gmail.com
-          </a>
-          or
-          <a
-            href="mailto:ahsan.ubitian@gmail.com"
-            className="text-primary hover:underline font-semibold mx-2"
-          >
-            ahsan.ubitian@gmail.com
-          </a>
-        </p>
-      </section>
-    </div>
-  );
-};
+import { SPONSORSHIP_FEATURES } from "../constants";
 
 const Sponsorships = () => {
   return (
-    <NoSSRWrapper>
-      <SponsorshipsBase />
-    </NoSSRWrapper>
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col gap-10">
+      <section className="text-center max-w-4xl mx-auto mt-8">
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-primary mb-4">
+          Sponsor CWA Prompt-a-thon 2026
+        </h1>
+        <p className="text-base md:text-lg text-base-content/70">
+          Hybrid model: Tool Partner first (credits/licenses), plus cash sponsorship options.
+        </p>
+      </section>
+
+      <section className="grid lg:grid-cols-2 gap-5 max-w-5xl mx-auto w-full">
+        <article className="rounded-2xl border border-primary/30 bg-base-200 p-6">
+          <h2 className="text-xl font-bold text-primary mb-2">Tool Partner (Primary)</h2>
+          <p className="text-sm text-base-content/70 mb-4">
+            Provide API credits or licenses for all participants instead of cash.
+          </p>
+          <ul className="space-y-2 text-sm text-base-content/80">
+            <li>Logo on event page</li>
+            <li>Mention in all major social posts</li>
+            <li>Dedicated Discord support channel</li>
+            <li>Live demo slot during the event</li>
+            <li>Product included in onboarding kit</li>
+          </ul>
+        </article>
+
+        <article className="rounded-2xl border border-primary/15 bg-base-200 p-6">
+          <h2 className="text-xl font-bold text-base-content mb-2">Community Partner ($750)</h2>
+          <p className="text-sm text-base-content/70 mb-4">
+            Lightweight paid option optimized for a 1-day online event.
+          </p>
+          <ul className="space-y-2 text-sm text-base-content/80">
+            <li>Logo on event page and social mentions</li>
+            <li>Swag inclusion support</li>
+            <li>Product featured in hackathon resources</li>
+            <li>Priority verbal mention during kickoff</li>
+          </ul>
+        </article>
+      </section>
+
+      <section className="overflow-x-auto rounded-2xl border border-primary/15 bg-base-200 p-4 sm:p-6">
+        <h3 className="text-lg sm:text-xl font-semibold text-primary mb-4">
+          Extended Cash Tiers (Optional)
+        </h3>
+        <table className="table table-zebra w-full text-sm">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Platinum ($2,000)</th>
+              <th>Gold ($1,500)</th>
+              <th>Silver ($1,000)</th>
+              <th>Bronze ($500)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {SPONSORSHIP_FEATURES.map((feature) => (
+              <tr key={feature.name}>
+                <td>{feature.name}</td>
+                <td>{feature.platinum}</td>
+                <td>{feature.gold}</td>
+                <td>{feature.silver}</td>
+                <td>{feature.bronze}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      <section className="text-center pb-6 text-sm sm:text-base text-base-content/70">
+        <p>
+          Custom packages available. Contact{" "}
+          <a href="mailto:maham.visionwiseab@gmail.com" className="text-primary hover:underline font-semibold">
+            maham.visionwiseab@gmail.com
+          </a>{" "}
+          or{" "}
+          <a href="mailto:ahsan.ubitian@gmail.com" className="text-primary hover:underline font-semibold">
+            ahsan.ubitian@gmail.com
+          </a>
+          .
+        </p>
+      </section>
+    </main>
   );
 };
 

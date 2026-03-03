@@ -63,14 +63,16 @@ Output: Server-rendered events listing page at /events with metadata.
 Create two files following the community page patterns (server component, DaisyUI classes):
 
 **src/app/events/layout.tsx** - Metadata layout:
+
 - Import Metadata from "next" and siteMetadata from "@/data/siteMetadata"
 - Export metadata with title "Events - {siteMetadata.title}", description about CWA community events
 - Simple layout that renders children
 
 **src/app/events/page.tsx** - Events listing page:
+
 - Server component (NO "use client")
 - Define an events array inline with two entries, each having: name, date (Date object), slug (href path), description, and a status label. Order the array by date descending.
-  1. CWA Prompt-a-thon 2026 — date: March 28, 2026 — href: /events/cwa-promptathon/2026 — status: "Upcoming" — description: "A Generative AI & Build with AI Hackathon. Collaborate, build, and showcase innovative solutions using Generative AI."
+  1. CWA Prompt-a-thon 2026 — date: March 28, 2026 — href: /events/cwa-promptathon/2026 — status: "Upcoming" — description: "A Generative AI & #BuildWithAI Hackathon. Collaborate, build, and showcase innovative solutions using Generative AI."
   2. HackStack Pakistan 2023 — date: October 2023 (use Oct 1) — href: /events/hackstack/2023 — status: "Completed" — description: "Pakistan's premier 2-week hybrid hackathon focused on Full Stack Development. Organized with GDG Kolachi."
 
 - Hero section: bg-base-200, page-padding, centered heading "Events" with subtitle about community events. Follow the community page hero pattern (max-w-3xl mx-auto text-center).
@@ -87,18 +89,12 @@ Create two files following the community page patterns (server component, DaisyU
 - All styling via DaisyUI semantic classes (bg-base-100, bg-base-200, text-base-content, etc.) for automatic dark/light theme support. Do NOT use useTheme or conditional dark: classes.
   </action>
   <verify>
-    <automated>cd /home/ahsan/projects/code-with-ahsan && npx next build 2>&1 | tail -20</automated>
-    <manual>Visit /events and confirm both events display as cards in descending order with correct links</manual>
+  <automated>cd /home/ahsan/projects/code-with-ahsan && npx next build 2>&1 | tail -20</automated>
+  <manual>Visit /events and confirm both events display as cards in descending order with correct links</manual>
   </verify>
-  <done>
-    - /events page renders with hero section and two event cards
-    - CWA Prompt-a-thon 2026 (Upcoming) appears first, HackStack Pakistan 2023 (Completed) appears second
-    - Each card shows event name, date, description, status badge, and "View Event" link
-    - Links navigate to /events/cwa-promptathon/2026 and /events/hackstack/2023 respectively
-    - Page works in both light and dark themes without conditional logic
-    - Build succeeds without errors
+  <done> - /events page renders with hero section and two event cards - CWA Prompt-a-thon 2026 (Upcoming) appears first, HackStack Pakistan 2023 (Completed) appears second - Each card shows event name, date, description, status badge, and "View Event" link - Links navigate to /events/cwa-promptathon/2026 and /events/hackstack/2023 respectively - Page works in both light and dark themes without conditional logic - Build succeeds without errors
   </done>
-</task>
+  </task>
 
 </tasks>
 
@@ -110,12 +106,13 @@ Create two files following the community page patterns (server component, DaisyU
 </verification>
 
 <success_criteria>
+
 - Events listing page exists at /events with proper metadata
 - Two event cards displayed in descending date order
 - Clean, aesthetic design using DaisyUI components matching site conventions
 - Dark/light theme support via semantic DaisyUI classes
 - Build passes
-</success_criteria>
+  </success_criteria>
 
 <output>
 After completion, create `.planning/quick/60-create-events-listing-page-at-events-wit/60-SUMMARY.md`

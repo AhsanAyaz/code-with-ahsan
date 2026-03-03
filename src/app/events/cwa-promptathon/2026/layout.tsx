@@ -5,7 +5,7 @@ import ForceDarkTheme from "./components/ForceDarkTheme";
 export const metadata: Metadata = {
   title: "CWA Prompt-a-thon 2026",
   description:
-    "Join the CWA Prompt-a-thon 2026 - A Generative AI & Build with AI Hackathon. Ignite your ideas, collaborate, and build the future of tech.",
+    "Join the CWA Prompt-a-thon 2026 - A Generative AI & #BuildWithAI Hackathon. Ignite your ideas, collaborate, and build the future of tech.",
   openGraph: {
     images: [`${siteMetadata.siteUrl}/static/images/og-default.png`], // Fallback, can update when we have an image
   },

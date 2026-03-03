@@ -1,90 +1,62 @@
 "use client";
 
-import { motion } from "framer-motion"; // Import motion
-import { ExternalLink, Mail, FileText, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+import { CalendarDays, FileText } from "lucide-react";
+import { EVENT_MILESTONES, HACKATHON_THEMES } from "../constants";
 
 const EventStructureSection = () => {
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.7 } },
-  };
-
   return (
     <section className="py-16 sm:py-24 relative overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 max-w-3xl text-center relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 max-w-6xl relative z-10">
         <motion.div
-          initial="hidden"
-          whileInView="visible"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          variants={itemVariants}
+          className="text-center mb-10"
         >
-          <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="flex items-center justify-center gap-2 mb-3">
             <FileText className="w-5 h-5 text-primary" />
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">
-              Event Structure
-            </h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">Event Structure</h2>
           </div>
-          <p className="text-base-content/70 mb-8 leading-relaxed text-sm sm:text-base max-w-lg mx-auto">
-            Want a detailed breakdown of the schedule, guidelines, and rules for
-            the hackathon? Please read our official structure document.
-          </p>
-
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-            {" "}
-            {/* Added hover animation */}
-            <a
-              href="#" // Placeholder link
-              className="btn btn-outline btn-primary btn-lg rounded-xl gap-2 mb-12 sm:mb-16 shadow-[0_0_18px_rgba(143,39,224,0.25)] hover:shadow-[0_0_28px_rgba(143,39,224,0.45)] transition-shadow duration-300"
-            >
-              <ExternalLink className="w-4 h-4" />
-              View Event Structure Doc
-            </a>
-          </motion.div>
-        </motion.div>
-
-        {/* Sponsor card */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ delay: 0.2 }} // Added slight delay for staggered effect
-          variants={itemVariants}
-          className="bg-base-200 rounded-2xl p-6 sm:p-8 relative shadow-[0_0_25px_rgba(143,39,224,0.1)] border border-primary/15"
-        >
-          <motion.div
-            className="absolute -top-3 left-1/2 -translate-x-1/2"
-            animate={{ y: [0, -4, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full badge badge-primary text-primary-content text-xs font-mono shadow-[0_0_15px_rgba(143,39,224,0.3)]">
-              <Sparkles className="w-3 h-3" />
-              Sponsors Welcome
-            </div>
-          </motion.div>
-
-          <div className="flex items-center justify-center gap-2 mb-3 mt-2">
-            <Mail className="w-5 h-5 text-primary" />
-            <h3 className="text-base sm:text-lg font-semibold text-base-content">
-              Interested in Sponsoring Swags/Cloud Credits?
-            </h3>
-          </div>
-          <p className="text-base-content/70 text-xs sm:text-sm">
-            Contact us at{" "}
-            <a
-              href="mailto:maham.visionwiseab@gmail.com"
-              className="text-primary hover:underline font-mono text-xs"
-            >
-              maham.visionwiseab@gmail.com
-            </a>{" "}
-            or{" "}
-            <a
-              href="mailto:ahsan.ubitian@gmail.com"
-              className="text-primary hover:underline font-mono text-xs"
-            >
-              ahsan.ubitian@gmail.com
-            </a>
+          <p className="text-base-content/70 max-w-2xl mx-auto text-sm sm:text-base">
+            Key timeline and themes for CWA Prompt-a-thon 2026.
           </p>
         </motion.div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          {EVENT_MILESTONES.map((item, index) => (
+            <motion.div
+              key={item.title}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+              className="bg-base-200 border border-primary/15 rounded-xl p-5 shadow-[0_0_16px_rgba(143,39,224,0.1)]"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <CalendarDays className="w-4 h-4 text-primary" />
+                <h3 className="text-sm font-semibold text-base-content">{item.title}</h3>
+              </div>
+              <p className="text-xs sm:text-sm text-base-content/70">{item.dateTime}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4">
+          {HACKATHON_THEMES.map((theme, index) => (
+            <motion.div
+              key={theme.title}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+              className="bg-base-200 border border-primary/10 rounded-xl p-5"
+            >
+              <h3 className="text-base font-semibold text-primary mb-2">{theme.title}</h3>
+              <p className="text-sm text-base-content/70 leading-relaxed">{theme.description}</p>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -15,7 +15,7 @@ const events: EventItem[] = [
     href: "/events/cwa-promptathon/2026",
     status: "Upcoming",
     description:
-      "A Generative AI & Build with AI Hackathon. Collaborate, build, and showcase innovative solutions using Generative AI.",
+      "A Generative AI & #BuildWithAI Hackathon. Collaborate, build, and showcase innovative solutions using Generative AI.",
   },
   {
     name: "HackStack Pakistan 2023",
@@ -80,10 +80,7 @@ export default function EventsPage() {
                     {event.description}
                   </p>
                   <div className="card-actions mt-4">
-                    <Link
-                      href={event.href}
-                      className="btn btn-primary btn-sm"
-                    >
+                    <Link href={event.href} className="btn btn-primary btn-sm">
                       View Event
                     </Link>
                   </div>
