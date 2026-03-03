@@ -95,8 +95,8 @@ const HeroSection = () => {
         className="relative z-10 container mx-auto px-4 sm:px-6 text-center"
       >
         <motion.div variants={itemVariants}>
-          <span className="badge badge-primary inline-flex items-center gap-3 px-6 py-3.5 sm:px-7 sm:py-4 mb-6 sm:mb-8 text-base sm:text-lg text-primary-content font-semibold tracking-[0.2em] uppercase rounded-full font-mono shadow-[0_0_18px_rgba(143,39,224,0.4)]">
-            <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
+          <span className="badge badge-primary inline-flex w-fit h-auto mx-auto items-center justify-center gap-2 px-4 py-2.5 sm:px-7 sm:py-4 mb-6 sm:mb-8 text-xs sm:text-lg text-primary-content font-semibold tracking-[0.05em] sm:tracking-[0.16em] uppercase rounded-full font-mono shadow-[0_0_18px_rgba(143,39,224,0.4)] max-w-[92vw] whitespace-normal text-center leading-tight">
+            <Zap className="w-4 h-4 sm:w-6 sm:h-6 shrink-0" />
             Hackathon & Innovation Sprint
           </span>
         </motion.div>
