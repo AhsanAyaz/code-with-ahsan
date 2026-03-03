@@ -95,7 +95,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                 height={50}
                 style={{ objectFit: "cover" }}
               />
-              <span className="hidden sm:inline font-bold text-white no-underline">{siteMetadata.headerTitle}</span>
+              <span className="hidden sm:inline font-bold text-base-content no-underline">{siteMetadata.headerTitle}</span>
             </div>
           </Link>
         </div>

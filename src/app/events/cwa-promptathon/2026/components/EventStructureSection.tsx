@@ -25,11 +25,13 @@ const EventStructureSection = () => {
             </h2>
           </div>
           <p className="text-base-content/70 mb-8 leading-relaxed text-sm sm:text-base max-w-lg mx-auto">
-            Want a detailed breakdown of the schedule, guidelines, and rules for the hackathon?
-            Please read our official structure document.
+            Want a detailed breakdown of the schedule, guidelines, and rules for
+            the hackathon? Please read our official structure document.
           </p>
 
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}> {/* Added hover animation */}
+          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+            {" "}
+            {/* Added hover animation */}
             <a
               href="#" // Placeholder link
               className="btn btn-outline btn-primary btn-lg rounded-xl gap-2 mb-12 sm:mb-16 shadow-[0_0_18px_rgba(143,39,224,0.25)] hover:shadow-[0_0_28px_rgba(143,39,224,0.45)] transition-shadow duration-300"
@@ -54,7 +56,7 @@ const EventStructureSection = () => {
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full badge badge-primary badge-outline text-xs font-mono shadow-[0_0_15px_rgba(143,39,224,0.3)]">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full badge badge-primary text-primary-content text-xs font-mono shadow-[0_0_15px_rgba(143,39,224,0.3)]">
               <Sparkles className="w-3 h-3" />
               Sponsors Welcome
             </div>
@@ -63,21 +65,26 @@ const EventStructureSection = () => {
           <div className="flex items-center justify-center gap-2 mb-3 mt-2">
             <Mail className="w-5 h-5 text-primary" />
             <h3 className="text-base sm:text-lg font-semibold text-base-content">
-              Interested in Sponsoring?
+              Interested in Sponsoring Swags/Cloud Credits?
             </h3>
           </div>
           <p className="text-base-content/70 text-xs sm:text-sm">
             Contact us at{" "}
-            <a href="mailto:maham.visionwiseab@gmail.com" className="text-primary hover:underline font-mono text-xs">
+            <a
+              href="mailto:maham.visionwiseab@gmail.com"
+              className="text-primary hover:underline font-mono text-xs"
+            >
               maham.visionwiseab@gmail.com
             </a>{" "}
             or{" "}
-            <a href="mailto:ahsan.ubitian@gmail.com" className="text-primary hover:underline font-mono text-xs">
+            <a
+              href="mailto:ahsan.ubitian@gmail.com"
+              className="text-primary hover:underline font-mono text-xs"
+            >
               ahsan.ubitian@gmail.com
             </a>
           </p>
         </motion.div>
-
       </div>
     </section>
   );

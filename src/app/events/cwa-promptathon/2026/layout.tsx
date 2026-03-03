@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import siteMetadata from "@/data/siteMetadata";
+import ForceDarkTheme from "./components/ForceDarkTheme";
 
 export const metadata: Metadata = {
   title: "CWA Prompt-a-thon 2026",
@@ -11,5 +12,10 @@ export const metadata: Metadata = {
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <ForceDarkTheme />
+      {children}
+    </>
+  );
 }
