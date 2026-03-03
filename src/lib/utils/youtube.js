@@ -42,7 +42,8 @@ export const getEmbedUrl = (originalUrl) => {
       ts,
     }
   } catch (e) {
-    console.log(e, this)
+    console.warn('Failed to parse YouTube URL:', originalUrl, e)
+    return { url: originalUrl || '', isYouTube: false, id: '', ts: 0 }
   }
 }
 

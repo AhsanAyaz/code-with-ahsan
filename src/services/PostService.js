@@ -2,6 +2,9 @@ export const getNextAndPreviousPosts = (course, post) => {
   const chapter = course.chapters.find((chapter) => {
     return chapter.id === post.chapterId
   })
+  if (!chapter) {
+    return { nextPost: null, previousPost: null }
+  }
   const postIndex = chapter.posts.findIndex((p) => p.slug === post.slug)
   if (postIndex < 0) {
     return {

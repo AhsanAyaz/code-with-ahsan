@@ -57,22 +57,32 @@ async function getCourseAndPost(courseSlug: string, postSlug: string) {
   const postUrl = `${strapiUrl}/api/posts?${postQuery}`;
 
   try {
-    const [courseResp, postResp] = await Promise.all([
-      fetch(courseUrl, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${strapiAPIKey}`,
-        },
-        next: { revalidate: 60 },
-      }),
-      fetch(postUrl, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${strapiAPIKey}`,
-        },
-        next: { revalidate: 60 },
-      }),
-    ]);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    let courseResp: Response, postResp: Response;
+    try {
+      [courseResp, postResp] = await Promise.all([
+        fetch(courseUrl, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${strapiAPIKey}`,
+          },
+          next: { revalidate: 60 },
+          signal: controller.signal,
+        }),
+        fetch(postUrl, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${strapiAPIKey}`,
+          },
+          next: { revalidate: 60 },
+          signal: controller.signal,
+        }),
+      ]);
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (!courseResp.ok || !postResp.ok) return null;
 
