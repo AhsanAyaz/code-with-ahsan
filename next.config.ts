@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "cdn.jsdelivr.net" },
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
       { protocol: "https", hostname: "firebasestorage.googleapis.com" },
+      { protocol: "https", hostname: "unavatar.io" },
+      { protocol: "https", hostname: "media.licdn.com" },
     ],
   },
   async rewrites() {

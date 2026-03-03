@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Handshake, Rocket, Sparkles } from "lucide-react";
+import { Handshake, Sparkles } from "lucide-react";
+import { SPONSORSHIP_FEATURES } from "../constants";
 
 const SponsorshipPackagesSection = () => {
   return (
@@ -52,14 +53,32 @@ const SponsorshipPackagesSection = () => {
         </div>
 
         <div className="max-w-5xl mx-auto rounded-2xl border border-primary/15 bg-base-200 p-5 sm:p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <p className="text-sm text-base-content/70">
-              Need the full Platinum/Gold/Silver/Bronze details?
-            </p>
-            <a href="/events/cwa-promptathon/2026/sponsorships" className="btn btn-sm btn-outline btn-primary">
-              <Rocket className="w-4 h-4" />
-              View Full Sponsorship Matrix
-            </a>
+          <h3 className="text-lg sm:text-xl font-semibold text-primary mb-4">
+            Full Sponsorship Tier Matrix
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="table table-zebra w-full text-sm">
+              <thead>
+                <tr>
+                  <th>Feature</th>
+                  <th>Platinum ($2,000)</th>
+                  <th>Gold ($1,500)</th>
+                  <th>Silver ($1,000)</th>
+                  <th>Bronze ($500)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {SPONSORSHIP_FEATURES.map((feature) => (
+                  <tr key={feature.name}>
+                    <td>{feature.name}</td>
+                    <td>{feature.platinum}</td>
+                    <td>{feature.gold}</td>
+                    <td>{feature.silver}</td>
+                    <td>{feature.bronze}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
           <p className="text-xs text-base-content/60 mt-4">
             Custom packages available. Contact:{" "}

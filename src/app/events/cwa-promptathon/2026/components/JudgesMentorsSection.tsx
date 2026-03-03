@@ -1,46 +1,68 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { BadgeCheck, UserRound } from "lucide-react";
-import { JUDGES_PLACEHOLDERS } from "../constants";
+import { ExternalLink } from "lucide-react";
+import { JUDGES } from "../constants";
 
 const JudgesMentorsSection = () => {
   return (
-    <section className="py-16 sm:py-24 relative overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+    <section className="py-12 sm:py-16 relative overflow-hidden">
+      <div className="container mx-auto px-4 sm:px-6 max-w-6xl relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          className="text-center mb-10"
+          className="text-center mb-8"
         >
           <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-3">Judges & Mentors</h2>
-          <p className="text-sm sm:text-base text-base-content/70 max-w-2xl mx-auto">
-            Meet the judges and mentors guiding participants through the sprint.
-            Announcements will be published here as confirmations are finalized.
+          <p className="text-sm sm:text-base text-base-content/70">
+            Confirmed judges for CWA Prompt-a-thon 2026.
           </p>
         </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 max-w-6xl mx-auto">
-          {JUDGES_PLACEHOLDERS.map((person, index) => (
-            <motion.div
-              key={`${person.role}-${index}`}
-              initial={{ opacity: 0, y: 24 }}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          {JUDGES.map((judge, index) => (
+            <motion.article
+              key={judge.name}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="rounded-2xl p-5 border border-primary/15 bg-base-200 shadow-[0_0_18px_rgba(143,39,224,0.08)]"
+              className="rounded-2xl border border-primary/15 bg-base-200 p-5 shadow-[0_0_16px_rgba(143,39,224,0.08)]"
             >
-              <div className="flex items-center justify-between mb-4">
-                <span className="badge badge-outline badge-primary text-[11px]">{person.role}</span>
-                <BadgeCheck className="w-4 h-4 text-primary/80" />
+              <div className="flex items-start gap-4">
+                <Image
+                  src={judge.avatarUrl}
+                  alt={judge.name}
+                  width={64}
+                  height={64}
+                  unoptimized
+                  className="w-16 h-16 rounded-full object-cover border border-primary/20"
+                />
+                <div className="min-w-0">
+                  <h3 className="text-base font-semibold text-base-content leading-tight">
+                    {judge.name}
+                  </h3>
+                  <p className="text-sm text-base-content/70 mt-1">{judge.title}</p>
+                </div>
               </div>
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <UserRound className="w-6 h-6 text-primary" />
+
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <span className="badge badge-outline badge-primary">
+                  Experience: {judge.experience}
+                </span>
+                <a
+                  href={judge.linkedinUrl}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-primary hover:underline text-sm inline-flex items-center gap-1"
+                >
+                  LinkedIn
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
               </div>
-              <h3 className="text-base font-semibold text-base-content">Announced Soon</h3>
-              <p className="text-sm text-base-content/70 mt-1">Name, title, and company will be updated.</p>
-            </motion.div>
+            </motion.article>
           ))}
         </div>
       </div>

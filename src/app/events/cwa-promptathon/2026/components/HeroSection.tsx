@@ -103,7 +103,7 @@ const HeroSection = () => {
 
         <motion.h1
           variants={itemVariants}
-          className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 leading-tight"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight md:whitespace-nowrap"
         >
           <span className="text-primary">CWA Prompt-a-thon</span>{" "}
           <span className="text-primary">2026</span>

@@ -38,26 +38,18 @@ const AboutSection = () => {
             variants={itemVariants}
             className="text-base-content/70 leading-relaxed text-base sm:text-lg mb-5"
           >
-            The{" "}
-            <span className="text-base-content font-semibold">
-              Code With Ahsan Prompt-a-thon 2026
-            </span>{" "}
-            is an exciting Hackathon & Innovation Sprint focused on the theme of{" "}
-            <span className="text-accent font-semibold">
-              Generative AI & #BuildWithAI
-            </span>
-            .
+            The <span className="text-base-content font-semibold">Code With Ahsan Prompt-a-thon 2026</span> is a
+            one-day online hackathon where teams build and demo practical AI apps under a fixed sprint timeline.
           </motion.p>
           <motion.p
             variants={itemVariants}
             className="text-base-content/70 leading-relaxed text-sm sm:text-base"
           >
-            This event brings together developers, AI enthusiasts, and
-            problem-solvers to collaborate, build, and showcase innovative
-            solutions using Generative AI. Whether you are a beginner or an
-            expert, this hackathon provides a platform to pair program, receive
-            mentorship from industry leaders, and build the future of tech
-            together.
+            It is focused on{" "}
+            <span className="text-accent font-semibold">
+              Generative AI & #BuildWithAI
+            </span>
+            , with 50 participants, 10 teams, mentor support, and a same-day judging cycle.
           </motion.p>
 
           {/* Terminal-style decoration */}

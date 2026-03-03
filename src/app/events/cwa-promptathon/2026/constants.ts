@@ -8,7 +8,7 @@ export const COMMUNITY_STATS: StatItem[] = [
   { value: "130,000+", label: "Social Followers" },
   { value: "60+", label: "Active Mentorships" },
   { value: "20+", label: "Weekly Meetups" },
-  { value: "GDE", label: "Founder in AI & Angular" },
+  { value: "GDE", label: "Founder: Google Developer Expert in AI & Angular" },
 ];
 
 export type EventMilestone = {
@@ -31,27 +31,54 @@ export type ThemeItem = {
 export const HACKATHON_THEMES: ThemeItem[] = [
   {
     title: "AI Brand Architect",
-    description: "Create AI tools for brand identity, content, media, or voice experiences.",
+    description:
+      "Create AI tools for brand identity, content, media, or voice experiences.",
   },
   {
     title: "AI Community Board",
-    description: "Build solutions that help developer communities collaborate and scale impact.",
+    description:
+      "Build solutions that help developer communities collaborate and scale impact.",
   },
   {
     title: "Personal AI Trainer",
-    description: "Design assistants that coach learning, productivity, and personal growth.",
+    description:
+      "Design assistants that coach learning, productivity, and personal growth.",
   },
 ];
 
-export type JudgePlaceholder = {
-  role: string;
+export type JudgeProfile = {
+  name: string;
+  title: string;
+  experience: string;
+  linkedinUrl: string;
+  avatarUrl: string;
 };
 
-export const JUDGES_PLACEHOLDERS: JudgePlaceholder[] = [
-  { role: "Judge" },
-  { role: "Mentor" },
-  { role: "Judge" },
-  { role: "Mentor" },
+export const JUDGES: JudgeProfile[] = [
+  {
+    name: "Imran Siddiqui",
+    title: "Principal Presales Architect at HP Enterprise",
+    experience: "18+ years",
+    linkedinUrl: "https://www.linkedin.com/in/mimrans",
+    avatarUrl:
+      "https://media.licdn.com/dms/image/v2/D4D03AQHSxewilpWE9w/profile-displayphoto-crop_800_800/B4DZxX59rOJ8AM-/0/1771001340116?e=1773878400&v=beta&t=L_O4YqFD79gvEnJbe9EVKmbcmIBTSMKbgU5aW5IIbOU",
+  },
+  {
+    name: "Muhammad Noman",
+    title: "Principal Software Consultant at 10 Pearls",
+    experience: "9+ years",
+    linkedinUrl: "https://www.linkedin.com/in/mnomanmemon",
+    avatarUrl:
+      "https://media.licdn.com/dms/image/v2/C4D03AQFqEykx6PGlaA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1663789669818?e=1773878400&v=beta&t=2uUBASpllh1HSJaiqInEb9C4aVQT5tazTaleq5aMpWw",
+  },
+  {
+    name: "Asad Ullah Khalid",
+    title: "Senior Frontend Engineer at Mercedes-Benz.io",
+    experience: "6+ years",
+    linkedinUrl: "https://www.linkedin.com/in/asadkhalid305/",
+    avatarUrl:
+      "https://media.licdn.com/dms/image/v2/D4E03AQGk0ry36qwAsA/profile-displayphoto-shrink_800_800/B4EZQnyeDxHEAk-/0/1735834329848?e=1773878400&v=beta&t=-V4-7FVIORu5avV-4rBvCwtvyiH4gIIsNzb4xDQfQhU",
+  },
 ];
 
 export type SponsorLogoPlaceholder = {
@@ -59,10 +86,10 @@ export type SponsorLogoPlaceholder = {
 };
 
 export const SPONSOR_PLACEHOLDERS: SponsorLogoPlaceholder[] = [
-  { tierHint: "Tool Partner" },
-  { tierHint: "Community Partner" },
-  { tierHint: "Platinum / Gold" },
-  { tierHint: "Silver / Bronze" },
+  { tierHint: "Spot Available" },
+  { tierHint: "Spot Available" },
+  { tierHint: "Spot Available" },
+  { tierHint: "Spot Available" },
 ];
 
 export type SponsorshipFeature = {

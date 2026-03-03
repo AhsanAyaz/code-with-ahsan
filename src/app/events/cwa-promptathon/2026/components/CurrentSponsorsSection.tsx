@@ -23,7 +23,7 @@ const CurrentSponsorsSection = () => {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
           {SPONSOR_PLACEHOLDERS.map((item, index) => (
             <motion.div
-              key={item.tierHint}
+              key={`${item.tierHint}-${index}`}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
@@ -31,7 +31,8 @@ const CurrentSponsorsSection = () => {
               className="h-28 rounded-xl border border-dashed border-primary/30 bg-base-200 flex flex-col items-center justify-center text-center px-3"
             >
               <Building2 className="w-5 h-5 text-primary/70 mb-2" />
-              <span className="text-xs text-base-content/70">{item.tierHint}</span>
+              <span className="text-xs font-semibold text-base-content/80">{item.tierHint}</span>
+              <span className="text-[11px] text-base-content/60">Your Logo Here</span>
             </motion.div>
           ))}
         </div>
