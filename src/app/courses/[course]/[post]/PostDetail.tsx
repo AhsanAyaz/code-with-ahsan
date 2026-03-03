@@ -212,7 +212,7 @@ export default function PostDetail({
         )}
         {course.resources?.length ? (
           <div className="my-6">
-            <h5 className="text-center md:text-left mb-4">Resources</h5>
+            <h5 className="text-left mb-4">Resources</h5>
             {/* @ts-ignore */}
             <Link
               href={`/courses/${course.slug}/resources`}
@@ -223,7 +223,7 @@ export default function PostDetail({
           </div>
         ) : null}
         <div className="my-6">
-          <h5 className="text-center md:text-left mb-4">Project Submissions</h5>
+          <h5 className="text-left mb-4">Project Submissions</h5>
           {/* @ts-ignore */}
           <Link
             href={`/courses/${course.slug}/submissions`}

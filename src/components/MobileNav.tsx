@@ -22,7 +22,6 @@ const DiscordIcon = () => (
 
 const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
   const [navShow, setNavShow] = useState(false);
-  const [communityOpen, setCommunityOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
@@ -90,23 +89,35 @@ const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
           )}
         </svg>
       </button>
+
+      {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-base-100/95 z-[100] transform ease-in-out duration-300 ${
+        className={`fixed inset-0 z-[100] bg-black/50 transition-opacity duration-300 ${
+          navShow ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        aria-hidden="true"
+        onClick={onToggleNav}
+      />
+
+      {/* Drawer */}
+      <div
+        className={`fixed top-0 right-0 bottom-0 z-[101] w-3/4 max-w-xs bg-base-100 shadow-xl transform transition-transform duration-300 ease-in-out ${
           navShow ? "translate-x-0" : "translate-x-full"
         }`}
       >
+        {/* Close button */}
         <div className="flex justify-end p-4">
           <button
             type="button"
-            className="btn btn-ghost btn-circle"
-            aria-label="toggle modal"
+            className="btn btn-ghost btn-sm btn-circle"
+            aria-label="Close menu"
             onClick={onToggleNav}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
               fill="currentColor"
-              className="text-base-content w-8 h-8"
+              className="text-base-content w-6 h-6"
             >
               <path
                 fillRule="evenodd"
@@ -117,12 +128,14 @@ const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
           </button>
         </div>
 
-        <nav className="h-full mt-8 overflow-y-auto">
+        {/* Scrollable nav content */}
+        <nav className="h-[calc(100%-4rem)] overflow-y-auto px-5 pb-8">
+          {/* Primary links */}
           {primaryLinks.map((link) => (
-            <div key={link.title} className="px-12 py-4">
+            <div key={link.title} className="py-2.5">
               <Link
                 href={link.href}
-                className={`text-2xl font-bold tracking-widest text-base-content hover:text-primary ${linkClassOverrides(
+                className={`text-lg font-semibold text-base-content hover:text-primary ${linkClassOverrides(
                   link
                 )}`}
                 onClick={onToggleNav}
@@ -131,60 +144,46 @@ const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
               </Link>
             </div>
           ))}
-          
-          {/* Community Collapsible Section */}
-          <div className="px-12 py-4">
-            <button
-              onClick={() => setCommunityOpen(!communityOpen)}
-              className="flex items-center gap-2 text-2xl font-bold tracking-widest text-base-content hover:text-primary w-full text-left"
-            >
-              Community
-              <svg 
-                className={`w-5 h-5 transition-transform ${communityOpen ? 'rotate-180' : ''}`} 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            
-            {communityOpen && (
-              <div className="mt-4 ml-4 space-y-4">
-                {COMMUNITY_LINKS.map((item) => {
-                  // Smart routing for Mentorship: dashboard if logged in, mentorship page if not
-                  const href = item.title === "Mentorship" && user && !authLoading
-                    ? "/mentorship/dashboard"
-                    : item.href;
 
-                  return (
-                    <div key={item.title}>
-                      <Link
-                        href={href}
-                        className="flex items-center gap-3 text-xl font-medium text-base-content/80 hover:text-primary"
-                        onClick={onToggleNav}
-                        {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                      >
-                        {item.icon === "discord" && <DiscordIcon />}
-                        {item.icon === "mentorship" && <span className="text-xl">🤝</span>}
-                        {item.icon === "projects" && <span className="text-xl">🚀</span>}
-                        {item.icon === "roadmap" && <span className="text-xl">🗺️</span>}
-                        {item.icon === "my-projects" && <span className="text-xl">📂</span>}
-                        {item.icon === "brain" && <span className="text-xl">🧠</span>}
-                        {item.icon === "community" && <span className="text-xl">🏘️</span>}
-                        {item.icon === "events" && <span className="text-xl">🎉</span>}
-                        {item.title}
-                        {item.external && (
-                          <svg className="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                          </svg>
-                        )}
-                      </Link>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+          {/* Community section divider */}
+          <div className="mt-4 mb-2 text-xs font-semibold uppercase tracking-wider text-base-content/50">
+            Community
+          </div>
+
+          {/* Community links — flat list */}
+          <div className="space-y-1">
+            {COMMUNITY_LINKS.map((item) => {
+              // Smart routing for Mentorship: dashboard if logged in, mentorship page if not
+              const href = item.title === "Mentorship" && user && !authLoading
+                ? "/mentorship/dashboard"
+                : item.href;
+
+              return (
+                <div key={item.title}>
+                  <Link
+                    href={href}
+                    className="flex items-center gap-2.5 px-1 py-2 text-base text-base-content/80 hover:text-primary rounded-lg"
+                    onClick={onToggleNav}
+                    {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  >
+                    {item.icon === "discord" && <DiscordIcon />}
+                    {item.icon === "mentorship" && <span className="text-base">🤝</span>}
+                    {item.icon === "projects" && <span className="text-base">🚀</span>}
+                    {item.icon === "roadmap" && <span className="text-base">🗺️</span>}
+                    {item.icon === "my-projects" && <span className="text-base">📂</span>}
+                    {item.icon === "brain" && <span className="text-base">🧠</span>}
+                    {item.icon === "community" && <span className="text-base">🏘️</span>}
+                    {item.icon === "events" && <span className="text-base">🎉</span>}
+                    {item.title}
+                    {item.external && (
+                      <svg className="w-3.5 h-3.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    )}
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         </nav>
       </div>
@@ -193,4 +192,3 @@ const MobileNav = ({ linkClassOverrides }: MobileNavProps) => {
 };
 
 export default MobileNav;
-

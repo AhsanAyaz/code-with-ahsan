@@ -17,7 +17,7 @@ const PostsList = ({
       <ul className="flex flex-col gap-2">
         <li
           key={1}
-          className="flex items-center gap-4 justify-between px-4 py-2 bg-gray-700 text-white backdrop-blur border border-gray-600 hover:border-primary/40 transition-colors rounded-lg shadow-lg"
+          className="flex items-center gap-4 justify-between px-4 py-2 text-left bg-gray-700 text-white backdrop-blur border border-gray-600 hover:border-primary/40 transition-colors rounded-lg shadow-lg"
         >
           -
         </li>
@@ -34,7 +34,7 @@ const PostsList = ({
             href={`/courses/${courseSlug}/${chapterPost.slug}`}
           >
             <li
-              className={`flex cursor-pointer items-center gap-4 justify-between px-4 py-2 backdrop-blur border border-gray-600 hover:border-primary transition-colors rounded-lg shadow-lg ${
+              className={`flex cursor-pointer items-center gap-4 justify-between px-4 py-2 text-left backdrop-blur border border-gray-600 hover:border-primary transition-colors rounded-lg shadow-lg ${
                 post?.id === chapterPost.id
                   ? "bg-primary text-white"
                   : "bg-gray-700 text-white hover:bg-gray-600"
@@ -72,7 +72,7 @@ const PostsList = ({
               alert("Please enroll to access the video");
               enrollUser();
             }}
-            className="flex items-center gap-4 justify-between px-4 py-2 bg-gray-700 text-white backdrop-blur border border-gray-600 hover:border-primary hover:bg-gray-600 transition-colors rounded-lg shadow-lg"
+            className="flex items-center gap-4 justify-between px-4 py-2 text-left bg-gray-700 text-white backdrop-blur border border-gray-600 hover:border-primary hover:bg-gray-600 transition-colors rounded-lg shadow-lg"
           >
             <span className="break-words">{chapterPost.title}</span>
             <FontAwesomeIcon icon={faLock} className="text-gray-400" />

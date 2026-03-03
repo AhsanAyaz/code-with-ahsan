@@ -47,7 +47,7 @@ export const CoursesList = ({ course, activePost, markedPosts = {}, enrolled, en
                     [chapter.id]: !chaptersExpansion[chapter.id],
                   })
                 }}
-                className="pb-4 w-full text-base font-bold flex items-center justify-between"
+                className="pb-4 w-full text-left text-base font-bold flex items-center justify-between"
               >
                 <h2 className="text-base flex gap-4 items-center">
                   <span>

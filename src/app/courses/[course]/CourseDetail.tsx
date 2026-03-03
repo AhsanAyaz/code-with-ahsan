@@ -184,7 +184,7 @@ const CourseDetail = ({ course }: { course: any }) => {
       ) : null}
       {enrolled && (
         <section>
-          <h4 className="my-6 text-center font-bold">Project Submissions</h4>
+          <h4 className="my-6 text-left font-bold">Project Submissions</h4>
           {/* @ts-ignore */}
           {/* @ts-ignore */}
           <Link
