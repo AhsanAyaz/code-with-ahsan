@@ -13,7 +13,7 @@ Milestone: v2.0
 Phase: 13 (UX Review)
 Plan: 1 of 1 (COMPLETE)
 Status: All phases complete (v2.0 feature development done)
-Last activity: 2026-02-26 - Completed quick task 064: Fix Unknown Mentee on mentor dashboard
+Last activity: 2026-03-03 - Completed quick task 065: Fix course post pages crashing with client-side exception errors
 
 Progress: [████████████████████████] 100% (38/38 total plans complete across current phases)
 
@@ -358,12 +358,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 062 | Fix Core Web Vitals CLS issues: font stack mismatch, raw img tags, newsletter containment, cookie consent fixed positioning | 2026-02-24 | a8ae0b6 | [062-fix-core-web-vitals-cls-issues-on-deskto](./quick/62-fix-core-web-vitals-cls-issues-on-deskto/) |
 | 063 | Consolidate /projects route as discovery page, show Create Project button for all users, remove showcase route and orphaned components | 2026-02-25 | c520c60 | [063-show-create-project-button-on-discovery-](./quick/63-show-create-project-button-on-discovery-/) |
 | 064 | Fix "Unknown Mentee" on mentor dashboard by enriching pendingRequests with menteeProfile in /api/mentorship/match GET endpoint | 2026-02-26 | 4d190a6 | [064-fix-unknown-mentee-on-mentor-dashboard](./quick/64-fix-unknown-mentee-on-mentor-dashboard/) |
+| 065 | Fix course post pages crashing: AbortController fetch timeouts, null-safe PostService chapter lookup, youtube.js fallback return, error.tsx boundary | 2026-03-03 | c165cc2 | [065-fix-course-post-pages-crashing-with-clie](./quick/65-fix-course-post-pages-crashing-with-clie/) |
 
 ## Session Continuity
 
-Last session: 2026-02-26
-Stopped at: Completed quick-064 (fix Unknown Mentee on mentor dashboard - enrich pendingRequests with menteeProfile)
+Last session: 2026-03-03
+Stopped at: Completed quick-065 (fix course post pages crashing - fetch timeouts, null-safe PostService, youtube fallback, error boundary)
 Resume file: None
 
 ---
-*Updated: 2026-02-26 after completing quick-064*
+*Updated: 2026-03-03 after completing quick-065*
