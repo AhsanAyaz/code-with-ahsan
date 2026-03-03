@@ -1,0 +1,21 @@
+{
+  "exportedAt": "2026-03-03T22:25:20.984Z",
+  "source": "strapi",
+  "count": 2,
+  "banners": [
+    {
+      "id": 5,
+      "content": "🧠 Check out the new [Logic Buddy](./logic-buddy) to practice building programming logic",
+      "isActive": true,
+      "dismissable": true,
+      "publishedAt": "2026-01-06T12:31:11.146Z"
+    },
+    {
+      "id": 8,
+      "content": "🚀 Learn Web Development with Socratic AI. [Zero to Website](https://z2website.com) is my latest technical book powered by Socratic AI that challenges you instead of answering your questions. Join the first [100 Founding Legends](https://blog.codewithahsan.dev/ahsync-bytes-weekly-digest-26th-jan-2026) for FREE ",
+      "isActive": true,
+      "dismissable": true,
+      "publishedAt": "2026-02-16T07:15:05.201Z"
+    }
+  ]
+}

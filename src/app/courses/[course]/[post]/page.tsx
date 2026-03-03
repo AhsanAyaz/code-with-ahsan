@@ -1,108 +1,39 @@
-import qs from "qs";
 import { notFound } from "next/navigation";
-// @ts-ignore
-import {
-  STRAPI_COURSE_POPULATE_OBJ,
-  STRAPI_POST_QUERY_OBJ,
-} from "@/lib/strapiQueryHelpers";
-// @ts-ignore
 import Course from "@/classes/Course.class";
-// @ts-ignore
 import Post from "@/classes/Post.class";
-// @ts-ignore
 import { getNextAndPreviousPosts } from "@/services/PostService";
 import PostDetail from "./PostDetail";
 import siteMetadata from "@/data/siteMetadata";
+import { getCourseBySlug, getPostBySlug } from "@/lib/content/contentProvider";
 
 async function getCourseAndPost(courseSlug: string, postSlug: string) {
-  const strapiUrl = process.env.STRAPI_URL;
-  const strapiAPIKey = process.env.STRAPI_API_KEY;
+  const [courseRaw, postRaw] = await Promise.all([
+    getCourseBySlug(courseSlug),
+    getPostBySlug(postSlug),
+  ]);
 
-  if (!strapiUrl || !strapiAPIKey) {
-    return null;
-  }
+  if (!courseRaw || !postRaw) return null;
 
-  // Course query
-  const courseQuery = qs.stringify(
-    {
-      fields: ["name", "slug", "description"],
-      populate: STRAPI_COURSE_POPULATE_OBJ,
-      filters: {
-        slug: {
-          $eq: courseSlug,
-        },
-      },
-    },
-    {
-      encodeValuesOnly: true,
-    }
+  const chapter = courseRaw.chapters.find((c) => c.id === postRaw.chapter?.id);
+  if (!chapter) return null;
+
+  const course = new Course(courseRaw);
+  course.chapters.sort(
+    (a: { order?: number | string }, b: { order?: number | string }) =>
+      (Number(a.order) || 0) - (Number(b.order) || 0)
   );
 
-  // Post query
-  const postQuery = qs.stringify(
-    {
-      ...STRAPI_POST_QUERY_OBJ,
-      filters: {
-        slug: {
-          $eq: postSlug,
-        },
-      },
+  const post = new Post({
+    ...postRaw,
+    chapter: {
+      id: chapter.id,
+      name: chapter.name,
     },
-    {
-      encodeValuesOnly: true,
-    }
-  );
+  });
 
-  const courseUrl = `${strapiUrl}/api/courses?${courseQuery}`;
-  const postUrl = `${strapiUrl}/api/posts?${postQuery}`;
+  const { nextPost, previousPost } = getNextAndPreviousPosts(course, post);
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    let courseResp: Response, postResp: Response;
-    try {
-      [courseResp, postResp] = await Promise.all([
-        fetch(courseUrl, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${strapiAPIKey}`,
-          },
-          next: { revalidate: 60 },
-          signal: controller.signal,
-        }),
-        fetch(postUrl, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${strapiAPIKey}`,
-          },
-          next: { revalidate: 60 },
-          signal: controller.signal,
-        }),
-      ]);
-    } finally {
-      clearTimeout(timeoutId);
-    }
-
-    if (!courseResp.ok || !postResp.ok) return null;
-
-    const courseData = await courseResp.json();
-    const postData = await postResp.json();
-
-    if (!courseData.data.length || !postData.data.length) {
-      return null;
-    }
-
-    const course = new Course(courseData.data[0]);
-    course.chapters.sort((a: any, b: any) => a.order - b.order);
-    const post = new Post(postData.data[0]);
-    const { nextPost, previousPost } = getNextAndPreviousPosts(course, post);
-
-    return { course, post, nextPost, previousPost };
-  } catch (error) {
-    console.warn(`Failed to fetch data for ${courseSlug}/${postSlug}:`, error);
-    return null;
-  }
+  return { course, post, nextPost, previousPost };
 }
 
 export async function generateMetadata({
@@ -150,7 +81,6 @@ export default async function Page({
 
   const { course, post, nextPost, previousPost } = data;
 
-  // Serialize objects for client component
   return (
     <div className="page-padding">
       <PostDetail

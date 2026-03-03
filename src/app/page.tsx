@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import siteMetadata from "@/data/siteMetadata";
-import qs from "qs";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import HomeFAQ from "@/components/HomeFAQ";
 import NewsletterForm from "@/components/NewsletterForm";
 import HomeBanners from "@/components/HomeBanners";
+import { getBanners } from "@/lib/content/contentProvider";
 
 export const metadata: Metadata = {
   title: "Code with Ahsan | Developer Community & Tutorials",
@@ -26,63 +26,13 @@ export const metadata: Metadata = {
   },
 };
 
-// Mock fetch for banners - TODO: Implement actual data fetching via Server Action or API
-async function getBanners() {
+async function getHomeBanners() {
   if (process.env.NEXT_PUBLIC_SHOW_BANNERS !== "true") return [];
-
-  const STRAPI_URL =
-    process.env.STRAPI_URL ||
-    process.env.NEXT_PUBLIC_STRAPI_API_URL ||
-    "https://strapi-production-7b84.up.railway.app";
-  const query = qs.stringify(
-    {
-      sort: ["id:ASC"],
-      pagination: {
-        page: 1,
-        pageSize: 10,
-      },
-    },
-    {
-      encodeValuesOnly: true,
-    },
-  );
-
-  try {
-    const res = await fetch(`${STRAPI_URL}/api/banners?${query}`, {
-      next: { revalidate: 60 },
-      headers: {
-        Authorization: `Bearer ${process.env.STRAPI_API_KEY ?? ""}`,
-      },
-    });
-
-    if (!res.ok) {
-      return [];
-    }
-
-    const json = await res.json();
-    const data = json.data;
-
-    // Handle Strapi v4 (attributes) vs v5 (flat) vs array
-    if (!Array.isArray(data)) return [];
-
-    return data
-      .map((item: any) => {
-        const attr = item.attributes || item;
-        return {
-          content: attr.content,
-          isActive: attr.isActive ?? true,
-          dismissable: attr.dismissable ?? false,
-        };
-      })
-      .filter((item: any) => item.isActive);
-  } catch (error) {
-    console.error("Error fetching banners:", error);
-    return [];
-  }
+  return getBanners();
 }
 
 export default async function Home() {
-  const banners = await getBanners();
+  const banners = await getHomeBanners();
 
   return (
     <>
@@ -96,7 +46,6 @@ export default async function Home() {
 
       <HomeFAQ />
 
-      {/* Newsletter Section */}
       <section className="py-16 page-padding border-t border-base-300 relative bg-base-100">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(143,39,224,0.05)_0%,transparent_70%)]"></div>
         <div className="relative z-10 text-center">

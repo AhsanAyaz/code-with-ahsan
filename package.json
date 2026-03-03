@@ -6,6 +6,7 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "postbuild": "node scripts/generate-sitemap.js",
+    "content:export:strapi": "node scripts/migrate/export-strapi-content.js",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",

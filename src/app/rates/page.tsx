@@ -1,50 +1,23 @@
-import axios from "axios";
-import qs from "qs";
-import Post from "@/classes/Post.class";
-import { STRAPI_POST_QUERY_OBJ } from "@/lib/strapiQueryHelpers";
 import { Metadata } from "next";
+import Post from "@/classes/Post.class";
 import RatesClient from "./RatesClient";
+import { getRateCard } from "@/lib/content/contentProvider";
 
-const strapiUrl = process.env.STRAPI_URL;
-const strapiAPIKey = process.env.STRAPI_API_KEY;
-const RATE_CARD_DOC_ID =
-  process.env.STRAPI_RATE_CARD_DOC_ID || "tyzwd2y813dr8sldugy0y51l";
+async function getRateCardPost() {
+  const data = await getRateCard();
+  if (!data) return null;
 
-async function getRateCard() {
-  const postQuery = qs.stringify(
-    {
-      ...STRAPI_POST_QUERY_OBJ,
-      filters: {
-        documentId: {
-          $eq: RATE_CARD_DOC_ID,
-        },
-      },
-    },
-    { encodeValuesOnly: true }
-  );
-
-  const url = `${strapiUrl}/api/posts?${postQuery}`;
-
-  try {
-    const postResp = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${strapiAPIKey}`,
-      },
-    });
-
-    if (!postResp.data?.data?.length) {
-      return null;
-    }
-
-    return new Post(postResp.data.data[0]);
-  } catch (error) {
-    console.error("Error fetching rate card:", error);
-    return null;
-  }
+  return new Post({
+    ...data,
+    type: "article",
+    hasAssignment: false,
+    videoUrl: "",
+    chapter: null,
+  });
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const post = await getRateCard();
+  const post = await getRateCardPost();
 
   return {
     title: post?.title || "Creator Rate Card",
@@ -54,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RatesPage() {
-  const post = await getRateCard();
+  const post = await getRateCardPost();
 
   if (!post) {
     return (
@@ -67,7 +40,5 @@ export default async function RatesPage() {
     );
   }
 
-  // Next.js handles serialization of the Post object (created via constructor)
-  // as it contains simpler data properties.
   return <RatesClient post={{ ...post }} />;
 }

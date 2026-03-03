@@ -2,62 +2,32 @@ const fs = require("fs");
 const globby = require("globby");
 const prettier = require("prettier");
 const siteMetadata = require("../src/data/siteMetadata");
-
-require("dotenv").config();
-const qs = require("qs");
-const axios = require("axios");
-const { STRAPI_COURSE_POPULATE_OBJ } = require("../src/lib/strapiQueryHelpers");
-
-// Headers config
-axios.defaults.headers.common["Authorization"] =
-  `Bearer ${process.env.STRAPI_API_KEY}`;
-
-const getCourses = async () => {
-  const strapiUrl = process.env.STRAPI_URL;
-  const strapiAPIKey = process.env.STRAPI_API_KEY;
-  const query = qs.stringify(
-    {
-      populate: STRAPI_COURSE_POPULATE_OBJ,
-      sort: ["publishedAt:desc"],
-    },
-    {
-      encodeValuesOnly: true,
-    }
-  );
-  const url = `${strapiUrl}/api/courses?${query}`;
-  const coursesResp = await axios.get(url, {
-    headers: {
-      "Content-Type": "application/json",
-      "X-Requested-With": "XMLHttpRequest",
-      Authorization: `Bearer ${strapiAPIKey}`,
-    },
-  });
-  const courses = coursesResp.data.data;
-  return courses;
-};
+const coursesData = require("../src/content/courses.json");
 
 (async () => {
   const prettierConfig = await prettier.resolveConfig("./.prettierrc.js");
   const pages = await globby([
     "src/app/**/page.{tsx,ts,jsx,js}",
-
-    "!src/app/**/[*/**", // Exclude dynamic routes
+    "!src/app/**/[*/**",
     "!src/app/api/**",
   ]);
+
   const paths = [];
-  const courses = await getCourses();
-  courses.map((course) => {
-    const { slug: courseSlug, chapters } = course;
+  const courses = coursesData?.courses || [];
+
+  courses.forEach((course) => {
+    const courseSlug = course.slug;
     paths.push(`/courses/${courseSlug}`);
-    chapters.map((chapter) => {
-      const { posts } = chapter;
-      posts.map((post) => {
-        const { slug: postSlug } = post;
-        paths.push(`/courses/${courseSlug}/${postSlug}`);
+
+    (course.chapters || []).forEach((chapter) => {
+      (chapter.posts || []).forEach((post) => {
+        if (!post?.slug) return;
+        paths.push(`/courses/${courseSlug}/${post.slug}`);
       });
-      paths.push(`/courses/${courseSlug}/resources`);
-      paths.push(`/courses/${courseSlug}/submissions`);
     });
+
+    paths.push(`/courses/${courseSlug}/resources`);
+    paths.push(`/courses/${courseSlug}/submissions`);
   });
 
   const sitemap = `
@@ -68,8 +38,8 @@ const getCourses = async () => {
                 let path = page
                   .replace("src/app", "")
                   .replace("public/", "/")
-                  .replace(/\/\([^)]+\)/g, "") // Remove route groups like (marketing)
-                  .replace(/\/page\.[a-z]+$/, ""); // Remove /page.tsx, /page.js
+                  .replace(/\/\([^)]+\)/g, "")
+                  .replace(/\/page\.[a-z]+$/, "");
 
                 const route = path === "/index" || path === "" ? "" : path;
                 if (page === `pages/404.js`) {
@@ -90,6 +60,5 @@ const getCourses = async () => {
     parser: "html",
   });
 
-  // eslint-disable-next-line no-sync
   fs.writeFileSync("public/sitemap.xml", formatted);
 })();

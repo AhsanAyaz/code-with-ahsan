@@ -1,0 +1,1704 @@
+{
+  "exportedAt": "2026-03-03T22:25:20.984Z",
+  "source": "strapi",
+  "count": 100,
+  "posts": [
+    {
+      "id": 4819,
+      "title": "Forms and CSS",
+      "slug": "css-and-forms",
+      "description": "In this video, you'll learn to build an HTML form with CSS. You'll learn how to style inputs, select elements and buttons, and how to construct a good-looking HTML form.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/8BC6OqQ6iMw",
+      "article": "",
+      "hasAssignment": false,
+      "order": "23",
+      "publishedAt": "2025-02-28T18:53:15.111Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4831,
+      "title": "CSS Box Model",
+      "slug": "css-box-model",
+      "description": "In this video, we'll discuss the CSS Box Model. We'll discuss what are the 4 different factors of the Box Model, how to understand the concepts around it, and how box-sizing: border-box; is a game changer to make things easier for developers.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/uzqNhrz0Er4",
+      "article": "",
+      "hasAssignment": false,
+      "order": "11",
+      "publishedAt": "2025-02-28T19:02:25.444Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4742,
+      "title": "4. JavaScript Strings",
+      "slug": "js-strings",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://youtube.com/watch?v=8gva38b_9rA&list=PL2sQdFoGnLIjERHiLVzcheUODYLPMiUx3&index=4",
+      "article": "",
+      "hasAssignment": false,
+      "order": "4",
+      "publishedAt": "2025-01-28T17:41:46.648Z",
+      "chapter": {
+        "id": 437,
+        "name": "JavaScript Beginners Series"
+      },
+      "resources": []
+    },
+    {
+      "id": 4743,
+      "title": "5. JavaScript Objects",
+      "slug": "js-objects",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://youtube.com/watch?v=k7F5mEvmkmw&list=PL2sQdFoGnLIjERHiLVzcheUODYLPMiUx3&index=5",
+      "article": "",
+      "hasAssignment": false,
+      "order": "5",
+      "publishedAt": "2025-01-28T17:41:51.696Z",
+      "chapter": {
+        "id": 437,
+        "name": "JavaScript Beginners Series"
+      },
+      "resources": []
+    },
+    {
+      "id": 4820,
+      "title": "Width & Height",
+      "slug": "css-width-height",
+      "description": "In this video, you'll learn what happens when we give an element width and a height. We'll see what to be cautious about when doing that. And what are some good use cases to use width and height in px vs in % etc.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/N-6wqOugcQM",
+      "article": "",
+      "hasAssignment": false,
+      "order": "20",
+      "publishedAt": "2025-02-28T18:53:57.101Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4832,
+      "title": "Paddings",
+      "slug": "css-paddings",
+      "description": "In this video, you'll learn about CSS paddings and how to use them. You'll learn both the short-hand syntax for CSS paddings and how to use different margin properties individually. You'll also learn how to use the chrome debugger to inspect the padding of an element.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/E5PePBIsGbU",
+      "article": "",
+      "hasAssignment": false,
+      "order": "10",
+      "publishedAt": "2025-02-28T19:03:03.484Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4837,
+      "title": "Pseudo Classes",
+      "slug": "css-pseudo-classes",
+      "description": "In this video, you will learn what are pseudo classes in CSS and how to target different pseudo states. We will discuss the most common pseudo-classes used in HTML and CSS for real-world use cases",
+      "type": "video",
+      "videoUrl": "https://youtu.be/_80Pyzx7kiE",
+      "article": "",
+      "hasAssignment": false,
+      "order": "5",
+      "publishedAt": "2025-02-28T19:06:25.648Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4825,
+      "title": "Activity: Building a Horizontal & a Vertical Nav Bar",
+      "slug": "building-navbars",
+      "description": "In this video, we're going to build two different navigation bars. We'll build one horizontal Navigation Bar (Navbar) using HTML and CSS and we'll do the same for the vertical navbar. You'll also see some basic usage of flex box to understand how we build the layout. Once you've followed it, try building and submitting your own version of navbars. Style it a bit differently.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/vCBxY02oP7M",
+      "article": "",
+      "hasAssignment": true,
+      "order": "17",
+      "publishedAt": "2025-02-28T18:57:41.777Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4833,
+      "title": "Margins",
+      "slug": "css-margins",
+      "description": "In this video, you'll learn about CSS margins and how to use them. You'll learn both the short-hand syntax for CSS margins and how to use different margin properties individually. You'll also learn how to use the chrome debugger to inspect margins of an element.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/NMrSBb_Tybg",
+      "article": "",
+      "hasAssignment": false,
+      "order": "9",
+      "publishedAt": "2025-02-28T19:03:42.687Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4602,
+      "title": "CSS Media Queries",
+      "slug": "css-media-queries",
+      "description": "In this video, you're going to briefly learn CSS Media queries and how to build responsive websites with media queries. In the video, we go through a grid layout that we want to work with for tablets and for mobile screens using CSS media queries.",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=9sOOxWDOSK8",
+      "article": "",
+      "hasAssignment": false,
+      "order": "9",
+      "publishedAt": "2025-01-22T10:33:47.993Z",
+      "chapter": {
+        "id": 442,
+        "name": "CSS Advanced"
+      },
+      "resources": []
+    },
+    {
+      "id": 4744,
+      "title": "6. OOP (Object Oriented Programming) in JavaScript",
+      "slug": "js-oop-basics",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://youtube.com/watch?v=_ZLm6b7EG7g&list=PL2sQdFoGnLIjERHiLVzcheUODYLPMiUx3&index=6",
+      "article": "",
+      "hasAssignment": false,
+      "order": "6",
+      "publishedAt": "2025-01-28T17:41:59.637Z",
+      "chapter": {
+        "id": 437,
+        "name": "JavaScript Beginners Series"
+      },
+      "resources": []
+    },
+    {
+      "id": 4821,
+      "title": "Z-Index",
+      "slug": "css-z-index",
+      "description": "In this video, you'll learn about the z-index style in CSS. You'll learn why we use Z Index and what to be cautious about. You'll also learn the default behavior of CSS when there's no z-index provided and how to overlap items using z-index.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/ROyI60VsW2o",
+      "article": "",
+      "hasAssignment": false,
+      "order": "21",
+      "publishedAt": "2025-02-28T18:54:38.640Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4826,
+      "title": "Icons",
+      "slug": "css-icons",
+      "description": "In this video, we're going to discuss CSS Icons. We'll look into how to use Material Icons and FontAwesome icons in your web applications.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/iZC1rm1B71c",
+      "article": "",
+      "hasAssignment": false,
+      "order": "16",
+      "publishedAt": "2025-02-28T18:58:17.850Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4779,
+      "title": "Architecture & UI of the app",
+      "slug": "0e3429",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=cAj6gzAMNfA&t=73",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-28T17:57:20.604Z",
+      "chapter": {
+        "id": 425,
+        "name": "Angular NestJS FullStack Course"
+      },
+      "resources": []
+    },
+    {
+      "id": 4834,
+      "title": "Borders",
+      "slug": "css-borders",
+      "description": "In this video, you'll learn about CSS borders and how to use them. You'll learn about both the short-hand syntax for CSS borders and how to use different border properties.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/V1umcz-f3cs",
+      "article": "",
+      "hasAssignment": false,
+      "order": "8",
+      "publishedAt": "2025-02-28T19:04:23.921Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4838,
+      "title": "Combinator Selectors & Grouping Selectors",
+      "slug": "combinator-and-grouping-selectors",
+      "description": "In this video, you will learn how to use universal selectors, combinator selectors, descendent selectors and a couple of more types of selectors. ",
+      "type": "video",
+      "videoUrl": "https://youtu.be/S1InOiheRz0",
+      "article": "",
+      "hasAssignment": false,
+      "order": "4",
+      "publishedAt": "2025-02-28T19:07:05.459Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4840,
+      "title": "Different ways of using CSS",
+      "slug": "different-ways-of-using-css",
+      "description": "In this video, you will learn how to use CSS using 3 different ways. You'll learn about the inline-styles, the style tag in HTML and using external style sheets. ",
+      "type": "video",
+      "videoUrl": "https://youtu.be/_nRyfDZyZlQ",
+      "article": "",
+      "hasAssignment": false,
+      "order": "2",
+      "publishedAt": "2025-02-28T19:08:46.374Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4842,
+      "title": "Activity: Building a Landing Page from Figma Design",
+      "slug": "activity-landing-page-from-figma-design",
+      "description": "In this video, we're going to build a landing page using a Figma Design. You'll learn how to work with Figma to extract images and export them. You'll also learn how to work with Figma to inspect elements to figure out CSS properties to implement the pixel-perfect design. You'll also learn how to find out gaps, margins, paddings, etc using Figma Design.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/FhIYo4V22CA",
+      "article": "",
+      "hasAssignment": true,
+      "order": "10",
+      "publishedAt": "2025-02-28T19:10:07.338Z",
+      "chapter": {
+        "id": 442,
+        "name": "CSS Advanced"
+      },
+      "resources": []
+    },
+    {
+      "id": 4845,
+      "title": "Grid",
+      "slug": "css-grid-intro",
+      "description": "In this video, you're going to learn what CSS Grids are, and how to work with them. We'll look at mainly the properties you can apply to CSS Grid containers, and how you could build different layouts.\n",
+      "type": "video",
+      "videoUrl": "https://youtu.be/ejVHwf_hEqs",
+      "article": "",
+      "hasAssignment": false,
+      "order": "5",
+      "publishedAt": "2025-02-28T19:11:58.611Z",
+      "chapter": {
+        "id": 442,
+        "name": "CSS Advanced"
+      },
+      "resources": []
+    },
+    {
+      "id": 4848,
+      "title": "Flexbox: Flex Items",
+      "slug": "css-flex-items",
+      "description": "In this video, you're going to learn Flexbox and specifically Flex Items. You'll learn how to use the flex styles on the items in a flexbox layout element to position, wrap, and align the items themselves using Flexbox. We're going to cover orders, self-alignment, etc.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/XiV0KoQUNhA",
+      "article": "",
+      "hasAssignment": false,
+      "order": "3",
+      "publishedAt": "2025-02-28T19:13:57.938Z",
+      "chapter": {
+        "id": 442,
+        "name": "CSS Advanced"
+      },
+      "resources": []
+    },
+    {
+      "id": 4851,
+      "title": "Styles",
+      "slug": "styles-in-html",
+      "description": "In this video, you'll learn about the different ways you can use CSS Styles in HTML. You'll learn about inline styles vs the style tag. You'll also see some examples of the styles we can use in HTML and how we can reuse the styles.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/QJQyPaxa6F4",
+      "article": "",
+      "hasAssignment": false,
+      "order": "9",
+      "publishedAt": "2025-02-28T19:15:50.976Z",
+      "chapter": {
+        "id": 440,
+        "name": "HTML5"
+      },
+      "resources": []
+    },
+    {
+      "id": 4854,
+      "title": "Images",
+      "slug": "html-images",
+      "description": "In this video, you'll learn about HTML images and how to use the img tag to work with images. You'll also learn how to style the images and how to use image links.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/4oo3J55Ohpc",
+      "article": "",
+      "hasAssignment": false,
+      "order": "12",
+      "publishedAt": "2025-02-28T19:18:45.610Z",
+      "chapter": {
+        "id": 440,
+        "name": "HTML5"
+      },
+      "resources": []
+    },
+    {
+      "id": 4856,
+      "title": "Input Types",
+      "slug": "input-types",
+      "description": "In this video, you'll learn about how to work with different form inputs. We'll talk about the most common type of input elements used including but not limited to Text, Password, Date, Month, Week, Color, and File.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/L9JEu7F2xBw",
+      "article": "",
+      "hasAssignment": false,
+      "order": "16",
+      "publishedAt": "2025-02-28T19:20:18.346Z",
+      "chapter": {
+        "id": 440,
+        "name": "HTML5"
+      },
+      "resources": []
+    },
+    {
+      "id": 4858,
+      "title": "Entities",
+      "slug": "html-entities",
+      "description": "In this video, you will learn how to work with HTML entities which are especial characters to use in an HTML file. You'll learn about the less than, greater than, copyright and other special entities.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/BCZhNFDyI48",
+      "article": "",
+      "hasAssignment": false,
+      "order": "18",
+      "publishedAt": "2025-02-28T19:21:25.701Z",
+      "chapter": {
+        "id": 440,
+        "name": "HTML5"
+      },
+      "resources": []
+    },
+    {
+      "id": 4859,
+      "title": "Tables",
+      "slug": "html-tables",
+      "description": "In this video, you will learn how to work with tables in an HTML file. You'll learn about table rows, table data, table headings and the related elements to create a table in HTML.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/260wNr2EnTo",
+      "article": "",
+      "hasAssignment": false,
+      "order": "19",
+      "publishedAt": "2025-02-28T19:22:00.353Z",
+      "chapter": {
+        "id": 440,
+        "name": "HTML5"
+      },
+      "resources": []
+    },
+    {
+      "id": 4860,
+      "title": "Block VS Inline Elements ",
+      "slug": "block-vs-inline-elements",
+      "description": "In this video, you will learn the differences between Block vs Inline elements in HTML. You'll learn about the different types of block elements and different types of inline elements. You'll also see how do we structure our HTML layout using these two.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/e9LnuguT0dI",
+      "article": "",
+      "hasAssignment": false,
+      "order": "20",
+      "publishedAt": "2025-02-28T19:23:01.656Z",
+      "chapter": {
+        "id": 440,
+        "name": "HTML5"
+      },
+      "resources": []
+    },
+    {
+      "id": 4861,
+      "title": "Audio & Video Tags",
+      "slug": "html-audio-video-tags",
+      "description": "In this video, you will learn how to work with the audio and video tags in an HTML file. You'll learn about how to show controls on an audio vs a video file. And how to autoplay an audio or a video file. You'll also learn how to mute them on page load.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/EF__Oq3Of_0",
+      "article": "",
+      "hasAssignment": false,
+      "order": "21",
+      "publishedAt": "2025-02-28T19:23:35.709Z",
+      "chapter": {
+        "id": 440,
+        "name": "HTML5"
+      },
+      "resources": []
+    },
+    {
+      "id": 4862,
+      "title": "Semantic HTML",
+      "slug": "semantic-html",
+      "description": "In this video, you will learn the what is Semantic HTML and why can't we just use div and span elements everywhere. You'll learn why it is important to know Semantic HTML tags and which tags to use when.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/fGxCFNOk6Es",
+      "article": "",
+      "hasAssignment": false,
+      "order": "22",
+      "publishedAt": "2025-02-28T19:24:12.357Z",
+      "chapter": {
+        "id": 440,
+        "name": "HTML5"
+      },
+      "resources": []
+    },
+    {
+      "id": 4863,
+      "title": "Introduction to JavaScript",
+      "slug": "introduction-to-javascript",
+      "description": "In this video, you'll learn what javascript is, why it is used, and what the background is in general for javascript. We'll see some basic examples of javascript and how to use it.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/pzfpNGc4XtU",
+      "article": "",
+      "hasAssignment": false,
+      "order": "2",
+      "publishedAt": "2025-03-03T09:04:12.499Z",
+      "chapter": {
+        "id": 443,
+        "name": "JavaScript"
+      },
+      "resources": []
+    },
+    {
+      "id": 4871,
+      "title": "Creator Rate Card (Code with Ahsan)",
+      "slug": "rate-card",
+      "description": "",
+      "type": "article",
+      "videoUrl": "",
+      "article": "All rates below include a **12-month license** for the client to use the content for organic resharing on their owned social media channels and website, with full attribution. See \"Usage Rights Add-Ons\" for extended or paid media rights.\n\n### **[YouTube ↗️](http://youtube.com/codewithahsan) (33k+ Subscribers)**\n\n*Your most valuable platform for in-depth, evergreen content.*\n\n- **Dedicated Long-Form Video (20-30 mins):** **Starting at $3,000**\nAs a 12-year software industry veteran, I create in-depth video content that resonates with my nearly 31,000 YouTube subscribers. My dedicated long-form videos are typically 20-30 minutes long, involving thorough research and production time to deliver high-quality content. This package includes a detailed product review, real-world application demonstrations, prominent mentions in the description, a pinned comment, and an end-screen card. We can discuss specific details and pricing for a dedicated long-form video collaboration.\n\n- **Dedicated Full-Length Video (5-10 mins):** **$2,200**\n    - *Details:* In-depth tutorial, product review, or real-world integration. Includes prominent links in the description, a pinned comment, and an end-screen card.\n- **YouTube Short (Up to 60s):** **$800**\nWith a 12-year software industry background, I create engaging YouTube Shorts, typically 60 seconds or less, reaching my nearly 31,000 YouTube subscribers. This package includes a quick feature highlight, developer tips, or a clear call to action, along with a branded tag and a link in the comments or description.\n- **YouTube Mention/Integration (60-90s segment):** **$1,100**\nLeveraging my 12 years in the software industry, I offer authentic integrations within my regularly scheduled long-form videos, reaching my engaged audience of over 30,000 YouTube subscribers. This package, typically 60-90 seconds, offers a dedicated segment within a longer video, providing an authentic endorsement to a relevant audience.\n\n### **YouTube Packages:**\n\n- **Starter Package:** 1 Full Video + 1 Short: **$2,800** *(Save $200)*\n- **Growth Package:** 2 Full Videos: **$4,000** *(Save $400)*\n- **Max Visibility Package:** 1 Full Video + 2 Shorts: **$3,400** *(Save $400)*\n\n\n\n### **[Instagram ↗️](https://www.instagram.com/code.with.ahsan/) (62k+ Followers)**\n\n*High-impact visuals and direct community engagement with your largest audience.*\n\n- **Reel (Up to 90s):** **$1,200**\n    - *Details:* Engaging, high-reach video content. Includes collaborator tag for co-branding, link in bio, and brand mention in the caption.\n- **Static Post / Carousel:** **$950**\n    - *Details:* High-quality visuals to explain a concept or announce a feature. Ideal for saving and sharing.\n- **Stories (Set of 3, with link sticker):** **$750**\n    - *Details:* Direct, authentic engagement with a clear call-to-action. Perfect for time-sensitive promotions or driving traffic.\n\n### **Instagram Packages:**\n\n- **IG Starter:** 1 Reel + 1 Story Set: **$1,850** *(Save $100)*\n- **IG Complete:** 1 Reel + 1 Post + 1 Story Set: **$2,600** *(Save $300)*\n\n\n\n### **[LinkedIn ↗️](https://linkedin.com/in/ahsanayaz) (22k+ Followers)**\n\n*Premium B2B audience for high-value tech products, services, and developer tools.*\n\n- **Post (Text + Image/Video Clip):** **$1,200**\n    - *Details:* Professional, value-driven post targeting a B2B audience. Includes company tag and relevant hashtags for maximum reach.\n- **Article/Long-Form Post:** **$1,500**\n    - *Details:* Establishes thought leadership for the brand by co-authoring an in-depth piece on a relevant technical topic.\n\n### **LinkedIn Packages:**\n\n- **LI Foundation:** 2 Posts: **$2,200** *(Save $200)*\n- **LI Thought Leader:** 1 Post + 1 Article: **$2,500** *(Save $200)*\n\n\n\n### **[Facebook ↗️](https://facebook.com/codewithahsan) (52k+ Followers)**\n\n*A versatile platform for reaching a broad demographic with video and link-based content.*\n\n- **Video Post (Up to 3 mins):** **$550**\n    - *Details:* Native video upload, optimized for feed viewing. Includes brand tag and a clear call-to-action with a link in the post text.\n- **Link or Image Post:** **$450**\n    - *Details:* A static post driving traffic to a specific URL or highlighting a key message with visuals.\n\n\n\n### **[TikTok ↗️](https://tiktok.com/codewithahsan) (9k+ Followers)**\n\n*Ideal for short, trend-driven, and highly engaging developer-focused content.*\n\n- **TikTok Video (Up to 60s):** **$400**\n    - *Details:* Creative, fast-paced video leveraging platform trends. Includes brand mention, relevant hashtags, and a link in the bio for the duration of the campaign.\n\n\n\n## **Usage Rights & Campaign Add-Ons**\n\nThe standard rates include a 12-month organic usage license. For campaigns requiring broader or longer-term rights, the following add-ons are available:\n\n- **Paid Media (Whitelisting) License:**\n    - **+30% of base rate** for a 3-month license to use the content in paid digital ads.\n    - **+50% of base rate** for a 6-month license.\n- **Perpetual (Lifetime) Organic Rights:**\n    - **+75% of base rate** for perpetual rights for organic use only (no paid ads).\n- **Full Buyout (Perpetual Paid & Organic Rights):**\n    - **+150% of base rate.** The client owns the rights to use the content in any medium, anywhere, forever.\n- **Exclusivity:**\n    - **+25% of base rate per month** for category exclusivity (e.g., agreeing not to work with a direct competitor for a set period).\n- **Raw Footage:**\n    - **+40% of base rate** for delivery of all raw, unedited video files.",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2026-02-09T11:35:16.879Z",
+      "chapter": null,
+      "resources": []
+    },
+    {
+      "id": 4643,
+      "title": "Assignment - Business Card",
+      "slug": "html-assignment",
+      "description": "Create a new project and create the following business card using HTML and CSS.  \nYou're supposed to have the following things as per mock:",
+      "type": "article",
+      "videoUrl": "",
+      "article": "Create a new project and create the following business card using HTML and CSS.  \nYou're supposed to have the following things as per mock:\n- Heading saying \"Business Card\"\n- Profile Image\n- Name & Email\n- Skills (put any random skills)\n- Interests (put any random interests)\n- Social links at the bottom with images\n  - Clicking on the image should navigate to the corresponding link in a new tab\n\n![Assignment](https://github.com/AhsanAyaz/slides/raw/main/talks/assets/images/web-dev-basics/assignments/basic-business-card.png)",
+      "hasAssignment": true,
+      "order": "23",
+      "publishedAt": "2025-01-22T10:33:47.999Z",
+      "chapter": {
+        "id": 440,
+        "name": "HTML5"
+      },
+      "resources": []
+    },
+    {
+      "id": 4822,
+      "title": "Overflow",
+      "slug": "css-overflow",
+      "description": "In this video, you'll learn about CSS overflow. You'll learn how to use it with max width or max height to create a scrolling effect. You'll also learn about overflow hidden vs overflow scroll vs overflow auto with some real examples.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/ucAw8QA3U6I",
+      "article": "",
+      "hasAssignment": false,
+      "order": "22",
+      "publishedAt": "2025-02-28T18:55:18.457Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4827,
+      "title": "Fonts",
+      "slug": "css-fonts",
+      "description": "In this video, we're going to discuss about CSS Fonts. We're going to talk about font-family, font-size, font-variant, font-weight, font-style and font-stretch",
+      "type": "video",
+      "videoUrl": "https://youtu.be/7Mx1JjdwGtw",
+      "article": "",
+      "hasAssignment": false,
+      "order": "15",
+      "publishedAt": "2025-02-28T18:58:52.465Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4828,
+      "title": "Display & Visibility",
+      "slug": "css-display-visibility",
+      "description": "In this video, you're going to learn what are the differences between CSS display and visibility features. You'll see some real-world examples to understand the differences between both of them.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/rLXGQhmgQX4",
+      "article": "",
+      "hasAssignment": false,
+      "order": "14",
+      "publishedAt": "2025-02-28T19:00:26.830Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4835,
+      "title": "Colors",
+      "slug": "css-colors",
+      "description": "In this video, we're going to discuss CSS colors and some color properties. We'll learn about text color, background color, border color, etc with some real-world examples.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/xyb1DOmQ8AE",
+      "article": "",
+      "hasAssignment": false,
+      "order": "7",
+      "publishedAt": "2025-02-28T19:05:01.412Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4691,
+      "title": "Setting up Tailwind CSS for Angular",
+      "slug": "dc2bf7",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=cAj6gzAMNfA&t=4358",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-23T08:41:57.040Z",
+      "chapter": {
+        "id": 425,
+        "name": "Angular NestJS FullStack Course"
+      },
+      "resources": []
+    },
+    {
+      "id": 4659,
+      "title": "Activity: Set up your PC for Web Development",
+      "slug": "set-up-pc-environment",
+      "description": "In this activity, you're going to set up your PC for web development as a beginner. You're going to install NodeJS, Git, VSCode, and Chrome. The video shows how you can install them and how to identify your PC configuration for web development set up.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/laIbRl3TfkM",
+      "article": "",
+      "hasAssignment": false,
+      "order": "3",
+      "publishedAt": "2025-01-22T10:33:48.000Z",
+      "chapter": {
+        "id": 439,
+        "name": "Introduction"
+      },
+      "resources": []
+    },
+    {
+      "id": 4843,
+      "title": "Animations",
+      "slug": "css-animations",
+      "description": "In this video, we're going to learn CSS Animations. We'll learn with some real world examples on how to work with CSS Animations and how to use CSS keyframes to do so. We'll discuss about the CSS Keyframes using from and to properties, and using different percentages as well. We'll discuss different properties to use with CSS Animations like animation-duration, animation-timing-function etc.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/yMr3aRctm1E",
+      "article": "",
+      "hasAssignment": false,
+      "order": "8",
+      "publishedAt": "2025-02-28T19:10:47.618Z",
+      "chapter": {
+        "id": 442,
+        "name": "CSS Advanced"
+      },
+      "resources": []
+    },
+    {
+      "id": 4846,
+      "title": "CSS Variables",
+      "slug": "css-variables",
+      "description": "In this video, we're going to learn CSS Variables and how to use CSS Variables. We'll look into global CSS Variables, how to override them within media queries, and how they become reusable.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/7NpYco4IXSg",
+      "article": "",
+      "hasAssignment": false,
+      "order": "6",
+      "publishedAt": "2025-02-28T19:12:36.392Z",
+      "chapter": {
+        "id": 442,
+        "name": "CSS Advanced"
+      },
+      "resources": []
+    },
+    {
+      "id": 4662,
+      "title": "Angular Pipes",
+      "slug": "angular-pipes",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=4831",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.081Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4663,
+      "title": "Angular Directives",
+      "slug": "angular-directives",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=4096",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.081Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4664,
+      "title": "Making HTTP calls in Angular Services",
+      "slug": "making-http-calls-in-angular-services",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=3680",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.082Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4665,
+      "title": "Angular Services",
+      "slug": "angular-services",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=3140",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.082Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4666,
+      "title": "Creating routes in Angular",
+      "slug": "creating-routes-in-angular",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=2644",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.082Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4667,
+      "title": "Creating a Counter Component",
+      "slug": "creating-a-counter-component",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=2340",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.082Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4668,
+      "title": "Event listeners in Angular",
+      "slug": "event-listeners-in-angular",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=2150",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.082Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4669,
+      "title": "Passing data from parent to child component",
+      "slug": "passing-data-from-parent-to-child-component",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=1787",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.082Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4670,
+      "title": "Data-Binding in Angular",
+      "slug": "data-binding-in-angular",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=1575",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.082Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4671,
+      "title": "Creating Angular Components",
+      "slug": "creating-angular-components",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=1232",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.083Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4849,
+      "title": "Flexbox: Flex Container",
+      "slug": "css-flex-container",
+      "description": "In this video, you're going to learn Flexbox and specifically Flex Container. You'll learn how to use the flex styles on the container element to position, wrap, and align the contents using Flexbox.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/69eglD21lNI",
+      "article": "",
+      "hasAssignment": false,
+      "order": "2",
+      "publishedAt": "2025-02-28T19:14:34.916Z",
+      "chapter": {
+        "id": 442,
+        "name": "CSS Advanced"
+      },
+      "resources": []
+    },
+    {
+      "id": 4672,
+      "title": "Angular Components",
+      "slug": "angular-components",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=918",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.083Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4673,
+      "title": "Creating an Angular application",
+      "slug": "creating-an-angular-application",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=628",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.083Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4674,
+      "title": "Myths about Angular",
+      "slug": "myths-about-angular",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=458",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.084Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4675,
+      "title": "Angular vs React",
+      "slug": "angular-vs-react",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=330",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.084Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4676,
+      "title": "Benefits of Angular",
+      "slug": "benefits-of-angular",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=245",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.084Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4677,
+      "title": "Angular Cookbook (latest edition)",
+      "slug": "angular-cookbook-latest-edition",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=178",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.084Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4678,
+      "title": "What is Angular",
+      "slug": "what-is-angular",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=110",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.084Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4679,
+      "title": "Prerequisites",
+      "slug": "prerequisites",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=69",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.085Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4680,
+      "title": "Outro",
+      "slug": "90ish-outro",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=5292",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.105Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4681,
+      "title": "Introduction",
+      "slug": "introduction",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=oUmVFHlwZsI&t=0",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-22T10:33:48.110Z",
+      "chapter": {
+        "id": 421,
+        "name": "Angular in 90ish minutes"
+      },
+      "resources": []
+    },
+    {
+      "id": 4682,
+      "title": "Replying to comments",
+      "slug": "ad318c",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=cAj6gzAMNfA&t=9480",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-23T08:41:57.039Z",
+      "chapter": {
+        "id": 425,
+        "name": "Angular NestJS FullStack Course"
+      },
+      "resources": []
+    },
+    {
+      "id": 4683,
+      "title": "Creating comments using API calls",
+      "slug": "e1a7ad",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=cAj6gzAMNfA&t=8340",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-23T08:41:57.039Z",
+      "chapter": {
+        "id": 425,
+        "name": "Angular NestJS FullStack Course"
+      },
+      "resources": []
+    },
+    {
+      "id": 4684,
+      "title": "Creating users on the fly for creating comments",
+      "slug": "a7ad9a",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=cAj6gzAMNfA&t=7810",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-23T08:41:57.039Z",
+      "chapter": {
+        "id": 425,
+        "name": "Angular NestJS FullStack Course"
+      },
+      "resources": []
+    },
+    {
+      "id": 4685,
+      "title": "Expanding & collapsing comments",
+      "slug": "8899a4",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=cAj6gzAMNfA&t=7330",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-23T08:41:57.040Z",
+      "chapter": {
+        "id": 425,
+        "name": "Angular NestJS FullStack Course"
+      },
+      "resources": []
+    },
+    {
+      "id": 4686,
+      "title": "Rendering top-level comments from the API call",
+      "slug": "41698c",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=cAj6gzAMNfA&t=6684",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-23T08:41:57.040Z",
+      "chapter": {
+        "id": 425,
+        "name": "Angular NestJS FullStack Course"
+      },
+      "resources": []
+    },
+    {
+      "id": 4687,
+      "title": "Setting up HttpClient in Angular",
+      "slug": "8e8d67",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=cAj6gzAMNfA&t=6522",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-23T08:41:57.040Z",
+      "chapter": {
+        "id": 425,
+        "name": "Angular NestJS FullStack Course"
+      },
+      "resources": []
+    },
+    {
+      "id": 4688,
+      "title": "Creating the comment-form component",
+      "slug": "105f12",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=cAj6gzAMNfA&t=6130",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-23T08:41:57.040Z",
+      "chapter": {
+        "id": 425,
+        "name": "Angular NestJS FullStack Course"
+      },
+      "resources": []
+    },
+    {
+      "id": 4689,
+      "title": "Creating the comment component",
+      "slug": "efa5da",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=cAj6gzAMNfA&t=5148",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-23T08:41:57.040Z",
+      "chapter": {
+        "id": 425,
+        "name": "Angular NestJS FullStack Course"
+      },
+      "resources": []
+    },
+    {
+      "id": 4690,
+      "title": "Creating the main layout (Angular)",
+      "slug": "b1d81d",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=cAj6gzAMNfA&t=4552",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-23T08:41:57.040Z",
+      "chapter": {
+        "id": 425,
+        "name": "Angular NestJS FullStack Course"
+      },
+      "resources": []
+    },
+    {
+      "id": 4823,
+      "title": "Box Shadows",
+      "slug": "css-box-shadows",
+      "description": "In this video, we're going to discuss CSS Positions. This topic is something even the senior web developers struggle with some times. We're going to talk about position relative, position fixed and position absolute in particular.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/TFknOdqSCIA",
+      "article": "",
+      "hasAssignment": false,
+      "order": "19",
+      "publishedAt": "2025-02-28T18:56:13.580Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4829,
+      "title": "Styling Text",
+      "slug": "css-styling-text",
+      "description": "In this video, you'll learn how to style the text in HTML using different techniques including alignment, shadows, and some other neat CSS tricks.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/yvcJq9nui14",
+      "article": "",
+      "hasAssignment": false,
+      "order": "13",
+      "publishedAt": "2025-02-28T19:01:08.475Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4836,
+      "title": "Pseudo Elements",
+      "slug": "css-pseudo-elements",
+      "description": "In this video, you will learn what are pseudo elements in CSS and how to target different pseudo-elements using CSS selectors. We will talk about ::first-letter, ::first-line, ::before, ::after, and ::marked elements etc.\n ",
+      "type": "video",
+      "videoUrl": "https://youtu.be/Eg9dSHEXD38",
+      "article": "",
+      "hasAssignment": false,
+      "order": "6",
+      "publishedAt": "2025-02-28T19:05:44.449Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4839,
+      "title": "Classes vs ID",
+      "slug": "classes-vs-id-selectors",
+      "description": "In this video, you will learn how to use the class and ID selectors in css. You'll learn why and when to use ID selectors in CSS and when to use the ID selectors. We also discuss when do we really put an ID or a class in HTML in the context of aiming to style the elements.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/hvBVrM34oYM",
+      "article": "",
+      "hasAssignment": false,
+      "order": "3",
+      "publishedAt": "2025-02-28T19:08:02.312Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4841,
+      "title": "Section Introduction - CSS3",
+      "slug": "css3-section-intro",
+      "description": "In this video, you will learn what we are going to learn in this section. We'll talk about CSS3, Flexbox, Grid, mobile responsiveness and some other interesting topics.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/CqZIxn81GbY",
+      "article": "",
+      "hasAssignment": false,
+      "order": "1",
+      "publishedAt": "2025-02-28T19:09:25.533Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4844,
+      "title": "Transforms",
+      "slug": "css-transforms",
+      "description": "In this video, we're going to learn CSS Transforms and how to use CSS Transforms in a Web Application. We'll look into translateX, translateY, translate, scaleX, scaleY, scale, rotateX, rotateY, rotate, skewX, skewY, skew, and the matrix transform with practical examples.\n",
+      "type": "video",
+      "videoUrl": "https://youtu.be/xg0gMdK6udQ",
+      "article": "",
+      "hasAssignment": false,
+      "order": "7",
+      "publishedAt": "2025-02-28T19:11:19.476Z",
+      "chapter": {
+        "id": 442,
+        "name": "CSS Advanced"
+      },
+      "resources": []
+    },
+    {
+      "id": 4847,
+      "title": "Activity: Responsive Gallery using Flexbox",
+      "slug": "flexbox-responsive-image-gallery",
+      "description": "In this activity, we'll build a responsive CSS image gallery using Flexbox. We'll use a 4-column layout on desktop, 2 column layout on Tablet, and 1 column layout for mobile devices.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/wxNyIZbZDGc",
+      "article": "",
+      "hasAssignment": false,
+      "order": "4",
+      "publishedAt": "2025-02-28T19:13:17.914Z",
+      "chapter": {
+        "id": 442,
+        "name": "CSS Advanced"
+      },
+      "resources": []
+    },
+    {
+      "id": 4850,
+      "title": "Section Introduction - CSS Advanced",
+      "slug": "section-3-intro",
+      "description": "In this video, you'll get to know what we're going to learn in the third section of this course. We've already discussed HTML, and CSS3 basics. This section will be about some advanced concepts in CSS.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/_04eGlJqqNg",
+      "article": "",
+      "hasAssignment": false,
+      "order": "1",
+      "publishedAt": "2025-02-28T19:15:07.461Z",
+      "chapter": {
+        "id": 442,
+        "name": "CSS Advanced"
+      },
+      "resources": []
+    },
+    {
+      "id": 4852,
+      "title": "Colors",
+      "slug": "colors-in-html",
+      "description": "In this lecture you'll learn about how to use Colors in HTML. You'll learn about the different ways we can define the colors to be used. We'll talk about rgb, rgba, and hex colors. I'll also show you https://www.materialpalette.com/ where you can get inspiration from some cool color combinations",
+      "type": "video",
+      "videoUrl": "https://youtu.be/VFVm4qIAkSY",
+      "article": "",
+      "hasAssignment": false,
+      "order": "10",
+      "publishedAt": "2025-02-28T19:17:10.909Z",
+      "chapter": {
+        "id": 440,
+        "name": "HTML5"
+      },
+      "resources": []
+    },
+    {
+      "id": 4855,
+      "title": "Form Elements",
+      "slug": "form-elements",
+      "description": "In this video, you'll learn about how to work with different Form Elements inside the form. We'll talk about certain types of inputs, how you register and name those inputs and a bit about what attributes can be used within those form elements.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/8QlLzr2wqzI",
+      "article": "",
+      "hasAssignment": false,
+      "order": "15",
+      "publishedAt": "2025-02-28T19:19:41.484Z",
+      "chapter": {
+        "id": 440,
+        "name": "HTML5"
+      },
+      "resources": []
+    },
+    {
+      "id": 4857,
+      "title": "Links",
+      "slug": "html-links",
+      "description": "In this video, you will learn how to work with links in an HTML file. You'll learn about what the href attribute does and how to open the link in a new tab. You'll also learn about the difference between absolute vs relative links",
+      "type": "video",
+      "videoUrl": "https://youtu.be/4OSNcOedckQ",
+      "article": "",
+      "hasAssignment": false,
+      "order": "17",
+      "publishedAt": "2025-02-28T19:20:51.345Z",
+      "chapter": {
+        "id": 440,
+        "name": "HTML5"
+      },
+      "resources": []
+    },
+    {
+      "id": 4824,
+      "title": "Positions",
+      "slug": "css-position",
+      "description": "In this video, we're going to discuss CSS Positions. This topic is something even the senior web developers struggle with some times. We're going to talk about position relative, position fixed and position absolute in particular.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/2DiEEoL6g0U",
+      "article": "",
+      "hasAssignment": false,
+      "order": "18",
+      "publishedAt": "2025-02-28T18:56:58.726Z",
+      "chapter": {
+        "id": 441,
+        "name": "CSS3"
+      },
+      "resources": []
+    },
+    {
+      "id": 4705,
+      "title": "JavaScript Debugging",
+      "slug": "javascript-debugging",
+      "description": "In this video, you'll how to debug JavaScript code in the browser. We'll be using Chrome for debugging but you can use other browsers for similar use cases as well. We'll go through the different debugging options like Step Into, Step Over, Step Out, Break Points, Log Points, Conditional Breakpoints and some other concepts as well.\n\n",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=Nhy42Apnob0",
+      "article": "",
+      "hasAssignment": false,
+      "order": "39",
+      "publishedAt": "2025-01-28T17:23:22.553Z",
+      "chapter": {
+        "id": 443,
+        "name": "JavaScript"
+      },
+      "resources": []
+    },
+    {
+      "id": 4716,
+      "title": "JavaScript For Of Loop",
+      "slug": "javascript-for-of-loop",
+      "description": "In this video, you'll learn the For Of loop in JavaScript. This loop is used mostly on Arrays and iterables when we're 100% sure about running the loop on the entire array instead of running a classic for loop.\n\n",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=OG3uNZOOL1A",
+      "article": "",
+      "hasAssignment": false,
+      "order": "28",
+      "publishedAt": "2025-01-28T17:29:25.458Z",
+      "chapter": {
+        "id": 443,
+        "name": "JavaScript"
+      },
+      "resources": []
+    },
+    {
+      "id": 4726,
+      "title": "JavaScript If-Else Conditionals",
+      "slug": "javascript-if-else-conditionals",
+      "description": "In this video, you'll learn the If-Else conditionals. These conditionals are used to write different business logics based on different conditions. These are probably your first statements to implement program control flow. Learn how to use if, else-if and else conditions to control the program's flow.\n\n",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=nlyBnK1bcaE",
+      "article": "",
+      "hasAssignment": false,
+      "order": "18",
+      "publishedAt": "2025-01-28T17:31:02.891Z",
+      "chapter": {
+        "id": 443,
+        "name": "JavaScript"
+      },
+      "resources": []
+    },
+    {
+      "id": 4736,
+      "title": "Javascript Arithmetic Operators",
+      "slug": "javascript-arithmetic-operators",
+      "description": "In this video, you'll learn how to perform arithmetic operations in JavaScript. You'll learn how to add, subtract, multiply etc. You'll also learn the javascript syntax to use arithmetic operators in JavaScript.\n\n",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=eoAU1zblOCg",
+      "article": "",
+      "hasAssignment": false,
+      "order": "8",
+      "publishedAt": "2025-01-28T17:33:08.553Z",
+      "chapter": {
+        "id": 443,
+        "name": "JavaScript"
+      },
+      "resources": []
+    },
+    {
+      "id": 4745,
+      "title": "7. JavaScript ES6 - Part 1",
+      "slug": "js-es6-part-1",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://youtube.com/watch?v=T7q2H_DrsRw&list=PL2sQdFoGnLIjERHiLVzcheUODYLPMiUx3&index=7",
+      "article": "",
+      "hasAssignment": false,
+      "order": "7",
+      "publishedAt": "2025-01-28T17:42:06.537Z",
+      "chapter": {
+        "id": 437,
+        "name": "JavaScript Beginners Series"
+      },
+      "resources": []
+    },
+    {
+      "id": 4747,
+      "title": "9. How does a forEach loop work in JavaScript",
+      "slug": "for-each-loop-javascript",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=_wGkb7fM-no&list=PL2sQdFoGnLIjERHiLVzcheUODYLPMiUx3&index=9",
+      "article": "",
+      "hasAssignment": false,
+      "order": "9",
+      "publishedAt": "2025-01-28T17:42:19.975Z",
+      "chapter": {
+        "id": 437,
+        "name": "JavaScript Beginners Series"
+      },
+      "resources": []
+    },
+    {
+      "id": 4748,
+      "title": "10. What is a Closure in JavaScript",
+      "slug": "javascript-closures",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=eKTBFxph928&list=PL2sQdFoGnLIjERHiLVzcheUODYLPMiUx3&index=11",
+      "article": "",
+      "hasAssignment": false,
+      "order": "10",
+      "publishedAt": "2025-01-28T17:42:26.593Z",
+      "chapter": {
+        "id": 437,
+        "name": "JavaScript Beginners Series"
+      },
+      "resources": []
+    },
+    {
+      "id": 4749,
+      "title": "1. Constructor Pattern in JavaScript",
+      "slug": "constructor-pattern-in-js",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://youtube.com/watch?v=uFyj0_n1uD8&list=PL2sQdFoGnLIizdb8a7O2H2PkSCWazP6F9&index=1",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-28T17:43:51.549Z",
+      "chapter": {
+        "id": 429,
+        "name": "Design Patterns in JavaScript"
+      },
+      "resources": []
+    },
+    {
+      "id": 4753,
+      "title": "5. Observer Pattern in JavaScript",
+      "slug": "observer-pattern-in-js",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://youtube.com/watch?v=AkCozUJdbAo&list=PL2sQdFoGnLIizdb8a7O2H2PkSCWazP6F9&index=5",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-28T17:44:22.827Z",
+      "chapter": {
+        "id": 429,
+        "name": "Design Patterns in JavaScript"
+      },
+      "resources": []
+    },
+    {
+      "id": 4757,
+      "title": "3. HTML Semantics, Figma Design and CSS basics",
+      "slug": "web-development-bootcamp-day-3-5",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=NqDEt2FbvCA&t=5588s&index=3",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-28T17:46:47.533Z",
+      "chapter": {
+        "id": 430,
+        "name": "Web Development Bootcamp (Figma Design to HTML and CSS)"
+      },
+      "resources": []
+    },
+    {
+      "id": 4764,
+      "title": "Creating the notes user interface (UI)",
+      "slug": "creating-the-notes-ui",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+      "article": "",
+      "hasAssignment": false,
+      "order": "4",
+      "publishedAt": "2025-01-28T17:52:15.992Z",
+      "chapter": {
+        "id": 431,
+        "name": "MERN Stack Crash Course Default Chapter"
+      },
+      "resources": []
+    },
+    {
+      "id": 4768,
+      "title": "Deploying react app to GitHub pages",
+      "slug": "deploying-react-app-to-ghpages",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+      "article": "",
+      "hasAssignment": false,
+      "order": "8",
+      "publishedAt": "2025-01-28T17:53:25.054Z",
+      "chapter": {
+        "id": 431,
+        "name": "MERN Stack Crash Course Default Chapter"
+      },
+      "resources": []
+    },
+    {
+      "id": 4773,
+      "title": "Implementing CRUD API in backend",
+      "slug": "implementing-crud-api-in-backend",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+      "article": "",
+      "hasAssignment": false,
+      "order": "13",
+      "publishedAt": "2025-01-28T17:54:28.546Z",
+      "chapter": {
+        "id": 431,
+        "name": "MERN Stack Crash Course Default Chapter"
+      },
+      "resources": []
+    },
+    {
+      "id": 4780,
+      "title": "Creating a NestJS app",
+      "slug": "a4dcab",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=cAj6gzAMNfA&t=215",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-28T17:57:28.825Z",
+      "chapter": {
+        "id": 425,
+        "name": "Angular NestJS FullStack Course"
+      },
+      "resources": []
+    },
+    {
+      "id": 4786,
+      "title": "Validating request bodies calls in NestJS",
+      "slug": "905425",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=cAj6gzAMNfA&t=1985",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-28T17:58:24.742Z",
+      "chapter": {
+        "id": 425,
+        "name": "Angular NestJS FullStack Course"
+      },
+      "resources": []
+    },
+    {
+      "id": 4792,
+      "title": "Running the application.",
+      "slug": "6a5e1f",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=73",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-28T18:00:35.828Z",
+      "chapter": {
+        "id": 432,
+        "name": "React Redux Toolkit tutorial for beginners"
+      },
+      "resources": []
+    },
+    {
+      "id": 4796,
+      "title": "Installing Redux Toolkit.",
+      "slug": "eabc02",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=340",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-28T18:01:05.003Z",
+      "chapter": {
+        "id": 432,
+        "name": "React Redux Toolkit tutorial for beginners"
+      },
+      "resources": []
+    },
+    {
+      "id": 4801,
+      "title": "Using a selector.",
+      "slug": "ddf358",
+      "description": "",
+      "type": "video",
+      "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=590",
+      "article": "",
+      "hasAssignment": false,
+      "order": 0,
+      "publishedAt": "2025-01-28T18:01:49.890Z",
+      "chapter": {
+        "id": 432,
+        "name": "React Redux Toolkit tutorial for beginners"
+      },
+      "resources": []
+    },
+    {
+      "id": 4809,
+      "title": "Section Introduction - HTML5",
+      "slug": "section-1-intro",
+      "description": "In this video you'll learn about what we'll learn in Section 1 of this course. Which is about HTML5. In this course of web development basics for beginners,  you'll learn JavaScript, HTML and CSS and a lot of cool tools and techniques to use as a Web Developer.",
+      "type": "video",
+      "videoUrl": "https://youtu.be/jBxtk2XLGlw",
+      "article": "",
+      "hasAssignment": false,
+      "order": "1",
+      "publishedAt": "2025-02-28T16:25:38.291Z",
+      "chapter": {
+        "id": 440,
+        "name": "HTML5"
+      },
+      "resources": []
+    }
+  ]
+}
