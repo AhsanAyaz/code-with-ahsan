@@ -8,7 +8,7 @@ import EventStructureSection from "./components/EventStructureSection";
 
 const CwaPromptathon2026Page = () => {
   return (
-    <main className="min-h-screen relative bg-gradient-to-b from-base-100 via-base-100/80 to-base-100">
+    <main className="min-h-screen relative bg-[#0c0a14]">
       <AnimatedBackground />
       <HeroSection />
       <AboutSection />
