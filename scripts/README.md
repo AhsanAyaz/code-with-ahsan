@@ -56,10 +56,9 @@ Generates XML sitemap for SEO (runs automatically in `npm run postbuild`).
 
 ### `migrate/export-strapi-content.js`
 
-One-time content export from Strapi into local repo files:
+Exports Strapi content into local intermediate files:
 
-- `src/content/courses.json`
-- `src/content/posts.json`
+- `src/content/_imports/courses.strapi.json`
 - `src/content/banners.json`
 - `src/content/rates.json`
 
@@ -67,4 +66,11 @@ Run with:
 
 ```bash
 npm run content:export:strapi
+```
+
+Then convert and build MDX-backed runtime index:
+
+```bash
+npm run content:mdx:from-json
+npm run content:build
 ```

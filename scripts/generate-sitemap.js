@@ -2,7 +2,7 @@ const fs = require("fs");
 const globby = require("globby");
 const prettier = require("prettier");
 const siteMetadata = require("../src/data/siteMetadata");
-const coursesData = require("../src/content/courses.json");
+const coursesData = require("../src/content/courses.generated.json");
 
 (async () => {
   const prettierConfig = await prettier.resolveConfig("./.prettierrc.js");

@@ -1,5 +1,4 @@
-import coursesData from "@/content/courses.json";
-import postsData from "@/content/posts.json";
+import coursesData from "@/content/courses.generated.json";
 import bannersData from "@/content/banners.json";
 import ratesData from "@/content/rates.json";
 import type {
@@ -11,9 +10,7 @@ import type {
 
 export function getLocalCourses(): CourseContent[] {
   const courses = (coursesData?.courses || []) as CourseContent[];
-  return courses
-    .filter((course) => !!course.publishedAt)
-    .sort((a, b) => (b.visibilityOrder || 0) - (a.visibilityOrder || 0));
+  return courses.filter((course) => !!course.publishedAt);
 }
 
 export function getLocalCourseBySlug(slug: string): CourseContent | null {
@@ -21,7 +18,15 @@ export function getLocalCourseBySlug(slug: string): CourseContent | null {
 }
 
 export function getLocalPosts(): PostContent[] {
-  return (postsData?.posts || []) as PostContent[];
+  const posts: PostContent[] = [];
+  getLocalCourses().forEach((course) => {
+    (course.chapters || []).forEach((chapter) => {
+      (chapter.posts || []).forEach((post) => {
+        posts.push(post);
+      });
+    });
+  });
+  return posts;
 }
 
 export function getLocalPostBySlug(slug: string): PostContent | null {

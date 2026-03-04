@@ -4,9 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
+    "content:mdx:from-json": "node scripts/migrate/convert-course-json-to-mdx.js",
+    "content:build": "node scripts/content/build-courses-index.js",
+    "prebuild": "npm run content:build",
     "build": "next build",
     "postbuild": "node scripts/generate-sitemap.js",
     "content:export:strapi": "node scripts/migrate/export-strapi-content.js",
+    "content:sync:strapi": "npm run content:export:strapi && npm run content:mdx:from-json && npm run content:build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
