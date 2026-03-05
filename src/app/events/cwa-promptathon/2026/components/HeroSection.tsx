@@ -58,7 +58,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center justify-center overflow-hidden pt-16 pb-8">
       {/* Radial pulse rings - Further adjusted for subtlety */}
       <div className="absolute inset-0 flex items-center justify-center">
         <motion.div
@@ -103,9 +103,10 @@ const HeroSection = () => {
 
         <motion.h1
           variants={itemVariants}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight md:whitespace-nowrap"
+          className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight md:whitespace-nowrap"
         >
-          <span className="text-primary">CWA Prompt-a-thon</span>{" "}
+          <span className="text-primary">CWA</span>{" "}
+          <span className="text-primary whitespace-nowrap">Prompt-a-thon</span>{" "}
           <span className="text-primary">2026</span>
         </motion.h1>
 
@@ -154,11 +155,7 @@ const HeroSection = () => {
           <CountdownUnit value={timeLeft.seconds} label="Sec" />
         </motion.div>
 
-        <motion.div
-          variants={itemVariants}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
+        <motion.div variants={itemVariants}>
           <div className="bg-base-200/80 border border-primary/15 rounded-2xl px-4 py-4 sm:px-5 sm:py-5 mb-6 max-w-3xl mx-auto">
             <div className="grid sm:grid-cols-3 gap-3 text-xs sm:text-sm text-base-content/80">
               <div>

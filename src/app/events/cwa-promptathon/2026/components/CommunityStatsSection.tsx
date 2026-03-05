@@ -5,7 +5,7 @@ import { COMMUNITY_STATS } from "../constants";
 
 const CommunityStatsSection = () => {
   return (
-    <section className="relative pb-8 sm:pb-12 -mt-10 sm:-mt-16 z-20">
+    <section className="relative py-8 sm:py-12">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
           {COMMUNITY_STATS.map((stat, index) => (
