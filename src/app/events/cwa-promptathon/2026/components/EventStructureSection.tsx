@@ -8,12 +8,7 @@ const EventStructureSection = () => {
   return (
     <section className="py-16 sm:py-24 relative overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 max-w-6xl relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          className="text-center mb-10"
-        >
+        <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-2 mb-3">
             <FileText className="w-5 h-5 text-primary" />
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">Event Structure</h2>
@@ -21,7 +16,7 @@ const EventStructureSection = () => {
           <p className="text-base-content/70 max-w-2xl mx-auto text-sm sm:text-base">
             Key timeline and themes for CWA Prompt-a-thon 2026.
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
           {EVENT_MILESTONES.map((item, index) => (
@@ -29,7 +24,7 @@ const EventStructureSection = () => {
               key={item.title}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
               className="bg-base-200 border border-primary/15 rounded-xl p-5 shadow-[0_0_16px_rgba(143,39,224,0.1)]"
             >
@@ -48,7 +43,7 @@ const EventStructureSection = () => {
               key={theme.title}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
               className="bg-base-200 border border-primary/10 rounded-xl p-5"
             >

@@ -11,7 +11,7 @@ import CurrentSponsorsSection from "./components/CurrentSponsorsSection";
 
 const CwaPromptathon2026Page = () => {
   return (
-    <main className="min-h-screen relative bg-[#0c0a14]">
+    <main className="min-h-screen relative bg-[#0c0a14]" data-theme="dark">
       <AnimatedBackground />
       <HeroSection />
       <CommunityStatsSection />

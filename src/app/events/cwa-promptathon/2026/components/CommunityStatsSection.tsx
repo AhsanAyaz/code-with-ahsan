@@ -13,7 +13,7 @@ const CommunityStatsSection = () => {
               key={stat.label}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{ delay: index * 0.06, duration: 0.35 }}
               className="bg-base-200 border border-primary/15 rounded-xl p-4 text-center shadow-[0_0_14px_rgba(143,39,224,0.1)]"
             >

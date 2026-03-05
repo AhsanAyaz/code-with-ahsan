@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Sparkles, Handshake, Crown } from "lucide-react";
 
 const SPONSORSHIP_PAGE = "/events/cwa-promptathon/2026/sponsorship";
@@ -9,18 +8,13 @@ const SponsorshipPackagesSection = () => {
   return (
     <section id="sponsorship-packages" className="py-16 sm:py-24 relative overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          className="text-center mb-10"
-        >
+        <div className="text-center mb-10">
           <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-3">Sponsorship Packages</h2>
           <p className="text-sm sm:text-base text-base-content/70 max-w-3xl mx-auto">
             We are prioritizing tool partners for this event and offering lightweight cash tiers.
             Full details on our sponsorship page.
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid md:grid-cols-3 gap-5 max-w-6xl mx-auto">
           <article className="rounded-2xl border border-success/40 bg-base-200 p-6 shadow-[0_0_20px_rgba(30,200,120,0.08)]">
