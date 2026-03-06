@@ -56,9 +56,9 @@ export default function DashboardLayout({
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [completionNotes, setCompletionNotes] = useState("");
   const [completing, setCompleting] = useState(false);
-  const [showRemoveModal, setShowRemoveModal] = useState(false);
-  const [removalReason, setRemovalReason] = useState("");
-  const [removing, setRemoving] = useState(false);
+  const [showMentorEndModal, setShowMentorEndModal] = useState(false);
+  const [mentorEndReason, setMentorEndReason] = useState("");
+  const [mentorEnding, setMentorEnding] = useState(false);
   const [showEndModal, setShowEndModal] = useState(false);
   const [endReason, setEndReason] = useState("");
   const [ending, setEnding] = useState(false);
@@ -144,9 +144,9 @@ export default function DashboardLayout({
     }
   };
 
-  const handleRemoveMentee = async () => {
+  const handleMentorEndMentorship = async () => {
     if (!matchDetails || !user) return;
-    setRemoving(true);
+    setMentorEnding(true);
     try {
       const response = await fetch(
         `/api/mentorship/dashboard/${matchId}`,
@@ -156,23 +156,23 @@ export default function DashboardLayout({
           body: JSON.stringify({
             uid: user.uid,
             action: "remove",
-            removalReason: removalReason.trim() || null,
+            removalReason: mentorEndReason.trim() || null,
           }),
         },
       );
       if (response.ok) {
-        toast.success("Mentee has been removed from your list.");
+        toast.success("Mentorship has been ended.");
         router.push("/mentorship/my-matches");
       } else {
         const data = await response.json();
-        toast.error(data.error || "Failed to remove mentee");
+        toast.error(data.error || "Failed to end mentorship");
       }
     } catch (error) {
-      console.error("Error removing mentee:", error);
-      toast.error("Failed to remove mentee. Please try again.");
+      console.error("Error ending mentorship:", error);
+      toast.error("Failed to end mentorship. Please try again.");
     } finally {
-      setRemoving(false);
-      setShowRemoveModal(false);
+      setMentorEnding(false);
+      setShowMentorEndModal(false);
     }
   };
 
@@ -406,9 +406,9 @@ export default function DashboardLayout({
               {currentIsMentor && (
                 <button
                   className="btn btn-sm btn-outline btn-error gap-2"
-                  onClick={() => setShowRemoveModal(true)}
+                  onClick={() => setShowMentorEndModal(true)}
                 >
-                  ❌ Remove Mentee
+                  ❌ End Mentorship
                 </button>
               )}
 
@@ -765,18 +765,17 @@ export default function DashboardLayout({
           </dialog>
         )}
 
-        {/* Remove Mentee Modal */}
-        {showRemoveModal && (
+        {/* End Mentorship Modal (Mentor) */}
+        {showMentorEndModal && (
           <dialog className="modal modal-open">
             <div className="modal-box">
               <h3 className="font-bold text-lg flex items-center gap-2 text-error">
-                ❌ Remove Mentee
+                ❌ End Mentorship
               </h3>
               <p className="py-4 text-base-content/70">
-                Are you sure you want to remove{" "}
-                <strong>{currentMatchDetails.partner.displayName}</strong> from
-                your mentee list? This will end the mentorship and archive the
-                Discord channel.
+                Are you sure you want to end your mentorship with{" "}
+                <strong>{currentMatchDetails.partner.displayName}</strong>? This
+                will archive the Discord channel and cannot be undone.
               </p>
 
               <div className="form-control">
@@ -788,8 +787,8 @@ export default function DashboardLayout({
                 <textarea
                   className="textarea textarea-bordered h-24"
                   placeholder="This is for internal records only and won't be shared with the mentee..."
-                  value={removalReason}
-                  onChange={(e) => setRemovalReason(e.target.value)}
+                  value={mentorEndReason}
+                  onChange={(e) => setMentorEndReason(e.target.value)}
                 />
               </div>
 
@@ -797,31 +796,31 @@ export default function DashboardLayout({
                 <button
                   className="btn btn-ghost"
                   onClick={() => {
-                    setShowRemoveModal(false);
-                    setRemovalReason("");
+                    setShowMentorEndModal(false);
+                    setMentorEndReason("");
                   }}
-                  disabled={removing}
+                  disabled={mentorEnding}
                 >
                   Cancel
                 </button>
                 <button
                   className="btn btn-error"
-                  onClick={handleRemoveMentee}
-                  disabled={removing}
+                  onClick={handleMentorEndMentorship}
+                  disabled={mentorEnding}
                 >
-                  {removing ? (
+                  {mentorEnding ? (
                     <>
                       <span className="loading loading-spinner loading-sm"></span>
-                      Removing...
+                      Ending...
                     </>
                   ) : (
-                    "Confirm Removal"
+                    "Confirm End"
                   )}
                 </button>
               </div>
             </div>
             <form method="dialog" className="modal-backdrop">
-              <button onClick={() => setShowRemoveModal(false)}>close</button>
+              <button onClick={() => setShowMentorEndModal(false)}>close</button>
             </form>
           </dialog>
         )}

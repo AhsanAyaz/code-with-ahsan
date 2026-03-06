@@ -211,7 +211,11 @@ export async function PUT(
       // Archive Discord channel
       if (isDiscordConfigured() && matchData.discordChannelId) {
         notificationTasks.push(
-          archiveMentorshipChannel(matchData.discordChannelId).catch((err) =>
+          archiveMentorshipChannel(
+            matchData.discordChannelId,
+            `📦 **This mentorship session has been completed.**\n\n` +
+              `This channel is now archived. Thank you for being part of the mentorship program!`
+          ).catch((err) =>
             console.error("Discord channel archiving failed:", err)
           )
         );
@@ -343,7 +347,7 @@ export async function PUT(
       return NextResponse.json(
         {
           success: true,
-          message: "Mentee removed from your list",
+          message: "Mentorship ended successfully",
         },
         { status: 200 }
       );
