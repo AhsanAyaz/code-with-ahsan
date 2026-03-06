@@ -34,7 +34,7 @@ const CurrentSponsorsSection = () => {
                 alt={`${sponsor.name} logo`}
                 width={80}
                 height={60}
-                className="object-contain mb-2"
+                className="object-contain mb-2 mask mask-squircle"
               />
               <span className="text-[11px] font-semibold text-primary/80">{sponsor.tier}</span>
             </motion.a>
