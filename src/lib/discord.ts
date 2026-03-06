@@ -617,8 +617,8 @@ export async function archiveMentorshipChannel(
     // Send archive message (use custom reason or default completion message)
     const archiveMessage =
       reason ||
-      `📦 **This mentorship session has been completed.**\n\n` +
-        `This channel is now archived. Thank you for being part of the mentorship program!`;
+      `📦 **This mentorship session has ended.**\n\n` +
+        `This channel is now archived.`;
 
     await sendChannelMessage(channelId, archiveMessage);
 
@@ -655,11 +655,11 @@ export async function unarchiveMentorshipChannel(
     }
 
     const channel = await channelResponse.json();
-    let newName = channel.name.replace(/^archived-/, "");
+    const newName = channel.name.replace(/^archived-/, "");
     // If it didn't have archived- prefix, maybe just ensure permissions? 
     // But let's assume we want to clean it up.
 
-    let newTopic = channel.topic?.replace(/^\[ARCHIVED\]\s*/, "") || "";
+    const newTopic = channel.topic?.replace(/^\[ARCHIVED\]\s*/, "") || "";
 
     // Prepare permission updates if IDs provided
     // We need to fetch existing overwrites first if we want to preserve others, 

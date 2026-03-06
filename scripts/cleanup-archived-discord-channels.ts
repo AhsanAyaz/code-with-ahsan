@@ -2,12 +2,13 @@
 /**
  * Cleanup Archived Discord Channels
  *
- * Finds Discord channels whose name starts with "archived-" and deletes them
- * if they have had no messages in the last 30 days.
+ * Two-step process:
+ *   --mode list    → List archived channels and their age (no destructive action)
+ *   --mode delete  → Actually delete archived channels older than 30 days
  *
  * Usage:
- *   npx tsx scripts/cleanup-archived-discord-channels.ts                          # Development
- *   NODE_ENV=production npx tsx scripts/cleanup-archived-discord-channels.ts      # Production
+ *   npx tsx scripts/cleanup-archived-discord-channels.ts --mode list
+ *   npx tsx scripts/cleanup-archived-discord-channels.ts --mode delete
  *
  * Requirements:
  * - DISCORD_BOT_TOKEN
@@ -45,16 +46,10 @@ function getGuildId(): string {
   return guildId;
 }
 
-/**
- * Sleep for rate limit handling
- */
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/**
- * Fetch with basic rate limit handling (retry on 429)
- */
 async function fetchWithRetry(
   url: string,
   options: RequestInit,
@@ -88,9 +83,6 @@ interface DiscordMessage {
   timestamp: string;
 }
 
-/**
- * Fetch all guild channels
- */
 async function getGuildChannels(): Promise<DiscordChannel[]> {
   const guildId = getGuildId();
   const response = await fetchWithRetry(
@@ -108,10 +100,6 @@ async function getGuildChannels(): Promise<DiscordChannel[]> {
   return response.json();
 }
 
-/**
- * Get the timestamp of the last message in a channel.
- * Returns null if no messages exist.
- */
 async function getLastMessageTimestamp(
   channelId: string
 ): Promise<Date | null> {
@@ -122,7 +110,6 @@ async function getLastMessageTimestamp(
 
   if (!response.ok) {
     if (response.status === 403 || response.status === 404) {
-      // Cannot access channel or it doesn't exist
       return null;
     }
     const errorText = await response.text();
@@ -140,9 +127,38 @@ async function getLastMessageTimestamp(
   return new Date(messages[0].timestamp);
 }
 
+function parseMode(): "list" | "delete" {
+  const modeArg = process.argv.find((arg) => arg.startsWith("--mode"));
+  if (!modeArg) {
+    // Check next arg after --mode
+    const idx = process.argv.indexOf("--mode");
+    if (idx !== -1 && process.argv[idx + 1]) {
+      const val = process.argv[idx + 1];
+      if (val === "list" || val === "delete") return val;
+    }
+    return "list"; // default to safe mode
+  }
+
+  if (modeArg.includes("=")) {
+    const val = modeArg.split("=")[1];
+    if (val === "list" || val === "delete") return val;
+  }
+
+  // Check the argument after --mode
+  const idx = process.argv.indexOf("--mode");
+  if (idx !== -1 && process.argv[idx + 1]) {
+    const val = process.argv[idx + 1];
+    if (val === "list" || val === "delete") return val;
+  }
+
+  return "list";
+}
+
 async function main() {
+  const mode = parseMode();
+
   console.log("=".repeat(60));
-  console.log("Cleanup Archived Discord Channels");
+  console.log(`Archived Discord Channel Cleanup — ${mode.toUpperCase()} mode`);
   console.log("=".repeat(60));
   console.log(`Timestamp: ${new Date().toISOString()}`);
   console.log(`Archive age threshold: ${ARCHIVE_AGE_DAYS} days`);
@@ -154,15 +170,13 @@ async function main() {
     );
     process.exit(1);
   }
-  console.log("Discord configured");
-  console.log("");
 
-  // Step 1: Fetch all guild channels
-  console.log("Step 1: Fetching guild channels...");
+  // Fetch all guild channels
+  console.log("Fetching guild channels...");
   const allChannels = await getGuildChannels();
   console.log(`  Found ${allChannels.length} total channels`);
 
-  // Step 2: Filter to archived channels (name starts with "archived-")
+  // Filter to archived channels
   const archivedChannels = allChannels.filter((ch) =>
     ch.name.startsWith("archived-")
   );
@@ -170,73 +184,122 @@ async function main() {
   console.log("");
 
   if (archivedChannels.length === 0) {
-    console.log("No archived channels found - nothing to do.");
+    console.log("No archived channels found — nothing to do.");
     console.log("=".repeat(60));
     process.exit(0);
   }
 
-  // Step 3: Check each archived channel's last message age
-  console.log("Step 2: Checking channel activity...");
+  // Check each channel's last message age
+  console.log("Checking channel activity...");
   console.log("");
 
   const cutoffDate = new Date(Date.now() - ARCHIVE_AGE_DAYS * MS_PER_DAY);
-  let deleted = 0;
-  let skipped = 0;
-  let failed = 0;
+  const eligible: { channel: DiscordChannel; ageStr: string }[] = [];
+  const recent: { channel: DiscordChannel; daysAgo: number }[] = [];
 
   for (const channel of archivedChannels) {
     try {
       const lastMessageDate = await getLastMessageTimestamp(channel.id);
 
       if (lastMessageDate === null || lastMessageDate <= cutoffDate) {
-        // No messages or last message is older than threshold - delete
         const ageStr = lastMessageDate
-          ? `${Math.floor((Date.now() - lastMessageDate.getTime()) / MS_PER_DAY)} days old`
+          ? `${Math.floor((Date.now() - lastMessageDate.getTime()) / MS_PER_DAY)} days since last message`
           : "no messages";
-        console.log(
-          `  ${channel.name} (${channel.id}): ${ageStr} - deleting...`
-        );
-
-        const success = await deleteDiscordChannel(
-          channel.id,
-          "Automated cleanup: archived channel older than 30 days"
-        );
-
-        if (success) {
-          deleted++;
-          console.log(`    Deleted`);
-        } else {
-          failed++;
-          console.log(`    Failed to delete`);
-        }
+        eligible.push({ channel, ageStr });
       } else {
         const daysAgo = Math.floor(
           (Date.now() - lastMessageDate.getTime()) / MS_PER_DAY
         );
-        console.log(
-          `  ${channel.name} (${channel.id}): last message ${daysAgo} days ago - skipping`
-        );
-        skipped++;
+        recent.push({ channel, daysAgo });
       }
 
-      // Small delay between API calls to be respectful of rate limits
       await sleep(500);
     } catch (err) {
       console.error(
-        `  Failed to process channel ${channel.name} (${channel.id}):`,
+        `  Error checking ${channel.name} (${channel.id}):`,
         err
       );
+    }
+  }
+
+  // Print report
+  console.log("─".repeat(60));
+  console.log(`ELIGIBLE FOR DELETION (inactive ${ARCHIVE_AGE_DAYS}+ days):`);
+  console.log("─".repeat(60));
+  if (eligible.length === 0) {
+    console.log("  (none)");
+  } else {
+    for (const { channel, ageStr } of eligible) {
+      console.log(`  ${channel.name}  (${channel.id})  — ${ageStr}`);
+    }
+  }
+
+  console.log("");
+  console.log("─".repeat(60));
+  console.log("SKIPPED (recent activity):");
+  console.log("─".repeat(60));
+  if (recent.length === 0) {
+    console.log("  (none)");
+  } else {
+    for (const { channel, daysAgo } of recent) {
+      console.log(
+        `  ${channel.name}  (${channel.id})  — last message ${daysAgo} days ago`
+      );
+    }
+  }
+  console.log("");
+
+  // In list mode, stop here
+  if (mode === "list") {
+    console.log("=".repeat(60));
+    console.log(
+      `LIST COMPLETE: ${eligible.length} channels eligible for deletion, ${recent.length} skipped`
+    );
+    console.log(
+      "Run with --mode delete to actually delete the eligible channels."
+    );
+    console.log("=".repeat(60));
+    process.exit(0);
+  }
+
+  // Delete mode — actually delete eligible channels
+  console.log("=".repeat(60));
+  console.log(`DELETING ${eligible.length} channels...`);
+  console.log("=".repeat(60));
+  console.log("");
+
+  let deleted = 0;
+  let failed = 0;
+
+  for (const { channel, ageStr } of eligible) {
+    try {
+      console.log(`  Deleting ${channel.name} (${ageStr})...`);
+      const success = await deleteDiscordChannel(
+        channel.id,
+        "Automated cleanup: archived channel older than 30 days"
+      );
+
+      if (success) {
+        deleted++;
+        console.log(`    ✓ Deleted`);
+      } else {
+        failed++;
+        console.log(`    ✗ Failed to delete`);
+      }
+
+      await sleep(500);
+    } catch (err) {
+      console.error(`    ✗ Error deleting ${channel.name}:`, err);
       failed++;
     }
   }
 
   console.log("");
   console.log("=".repeat(60));
-  console.log("Summary:");
-  console.log(`  Archived channels found: ${archivedChannels.length}`);
+  console.log("DELETE COMPLETE:");
   console.log(`  Deleted: ${deleted}`);
-  console.log(`  Skipped (recent activity): ${skipped}`);
-  console.log(`  Errors: ${failed}`);
+  console.log(`  Failed:  ${failed}`);
+  console.log(`  Skipped: ${recent.length}`);
   console.log("=".repeat(60));
 
   process.exit(failed > 0 && deleted === 0 ? 1 : 0);

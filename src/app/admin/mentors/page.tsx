@@ -242,12 +242,12 @@ export default function AllMentorsPage() {
         }))
       );
 
-      toast.success("Mentorship deleted successfully");
+      toast.success("Mentorship ended successfully");
       setShowDeleteModal(false);
       setSessionToDelete(null);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete mentorship"
+        error instanceof Error ? error.message : "Failed to end mentorship"
       );
     } finally {
       setDeletingSession(null);
@@ -1272,18 +1272,18 @@ export default function AllMentorsPage() {
         </dialog>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* End Mentorship Confirmation Modal */}
       {showDeleteModal && sessionToDelete && (
         <dialog className="modal modal-open">
           <div className="modal-box">
-            <h3 className="font-bold text-lg text-error">Delete Mentorship</h3>
+            <h3 className="font-bold text-lg text-error">End Mentorship</h3>
             <p className="py-4">
-              Are you sure you want to delete the mentorship with{" "}
+              Are you sure you want to end the mentorship with{" "}
               <span className="font-semibold">{sessionToDelete.partnerName}</span>?
             </p>
             <p className="text-sm text-base-content/70">
-              This action cannot be undone. The mentorship session will be
-              permanently removed.
+              This will archive the Discord channel and notify both participants.
+              This action cannot be undone.
             </p>
             <div className="modal-action">
               <button
@@ -1304,10 +1304,10 @@ export default function AllMentorsPage() {
                 {deletingSession === sessionToDelete.id ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
-                    Deleting...
+                    Ending...
                   </>
                 ) : (
-                  "Delete Mentorship"
+                  "End Mentorship"
                 )}
               </button>
             </div>
@@ -1590,7 +1590,7 @@ function MentorshipCard({
                   setShowDeleteModal(true);
                 }}
               >
-                Delete
+                End
               </button>
             </div>
           </div>

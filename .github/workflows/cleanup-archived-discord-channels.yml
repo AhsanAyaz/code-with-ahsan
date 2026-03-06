@@ -5,13 +5,26 @@ on:
   schedule:
     - cron: '0 6 * * 0'
 
-  # Allow manual trigger for testing
+  # Manual trigger — pick which step to run
   workflow_dispatch:
+    inputs:
+      job:
+        description: 'Which job to run'
+        required: true
+        default: 'list'
+        type: choice
+        options:
+          - list
+          - delete
 
 jobs:
-  cleanup:
-    name: Delete archived Discord channels older than 30 days
+  # Job 1: List archived channels (safe, read-only)
+  list:
+    name: List archived Discord channels
     runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.job == 'list')
 
     steps:
       - name: Checkout code
@@ -26,9 +39,36 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run cleanup script
+      - name: List archived channels
         env:
           NODE_ENV: production
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
-        run: npx tsx scripts/cleanup-archived-discord-channels.ts
+        run: npx tsx scripts/cleanup-archived-discord-channels.ts --mode list
+
+  # Job 2: Delete archived channels (manual trigger only)
+  delete:
+    name: Delete archived Discord channels (30+ days inactive)
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' && github.event.inputs.job == 'delete'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Delete archived channels
+        env:
+          NODE_ENV: production
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+        run: npx tsx scripts/cleanup-archived-discord-channels.ts --mode delete
