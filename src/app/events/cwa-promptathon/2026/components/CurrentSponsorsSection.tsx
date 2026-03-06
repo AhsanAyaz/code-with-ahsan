@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import { Building2 } from "lucide-react";
-import { SPONSOR_PLACEHOLDERS } from "../constants";
+import Image from "next/image";
+import { CONFIRMED_SPONSORS, SPONSOR_PLACEHOLDERS } from "../constants";
 
 const CurrentSponsorsSection = () => {
   return (
@@ -16,13 +17,35 @@ const CurrentSponsorsSection = () => {
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+          {CONFIRMED_SPONSORS.map((sponsor, index) => (
+            <motion.a
+              key={sponsor.name}
+              href={sponsor.websiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ delay: index * 0.04, duration: 0.3 }}
+              className="h-28 rounded-xl border border-primary/40 bg-base-200 flex flex-col items-center justify-center text-center px-3 hover:border-primary/70 transition-colors"
+            >
+              <Image
+                src={sponsor.logoUrl}
+                alt={`${sponsor.name} logo`}
+                width={80}
+                height={60}
+                className="object-contain mb-2"
+              />
+              <span className="text-[11px] font-semibold text-primary/80">{sponsor.tier}</span>
+            </motion.a>
+          ))}
           {SPONSOR_PLACEHOLDERS.map((item, index) => (
             <motion.div
               key={`${item.tierHint}-${index}`}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.1 }}
-              transition={{ delay: index * 0.04, duration: 0.3 }}
+              transition={{ delay: (CONFIRMED_SPONSORS.length + index) * 0.04, duration: 0.3 }}
               className="h-28 rounded-xl border border-dashed border-primary/30 bg-base-200 flex flex-col items-center justify-center text-center px-3"
             >
               <Building2 className="w-5 h-5 text-primary/70 mb-2" />

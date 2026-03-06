@@ -89,12 +89,27 @@ export const JUDGES: JudgeProfile[] = [
   },
 ];
 
+export type ConfirmedSponsor = {
+  name: string;
+  logoUrl: string;
+  websiteUrl: string;
+  tier: string;
+};
+
+export const CONFIRMED_SPONSORS: ConfirmedSponsor[] = [
+  {
+    name: "CommandCode",
+    logoUrl: "/static/images/events/cwa-promptathon-2026/sponsors/commandcode-logo.jpg",
+    websiteUrl: "https://commandcode.ai",
+    tier: "Tool Partner",
+  },
+];
+
 export type SponsorLogoPlaceholder = {
   tierHint: string;
 };
 
 export const SPONSOR_PLACEHOLDERS: SponsorLogoPlaceholder[] = [
-  { tierHint: "Spot Available" },
   { tierHint: "Spot Available" },
   { tierHint: "Spot Available" },
   { tierHint: "Spot Available" },
