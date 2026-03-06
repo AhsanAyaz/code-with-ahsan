@@ -13,7 +13,7 @@ Milestone: v2.0
 Phase: 13 (UX Review)
 Plan: 1 of 1 (COMPLETE)
 Status: All phases complete (v2.0 feature development done)
-Last activity: 2026-03-05 - Completed quick task 066: Fix spacing, overlapping, and visibility issues on promptathon page
+Last activity: 2026-03-06 - Completed quick task 067: Rename Remove Mentee to End Mentorship, add archived Discord channel cleanup
 
 Progress: [████████████████████████] 100% (38/38 total plans complete across current phases)
 
@@ -360,12 +360,13 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 064 | Fix "Unknown Mentee" on mentor dashboard by enriching pendingRequests with menteeProfile in /api/mentorship/match GET endpoint | 2026-02-26 | 4d190a6 | [064-fix-unknown-mentee-on-mentor-dashboard](./quick/64-fix-unknown-mentee-on-mentor-dashboard/) |
 | 065 | Fix course post pages crashing: AbortController fetch timeouts, null-safe PostService chapter lookup, youtube.js fallback return, error.tsx boundary | 2026-03-03 | c165cc2 | [065-fix-course-post-pages-crashing-with-clie](./quick/65-fix-course-post-pages-crashing-with-clie/) |
 | 066 | Fix spacing, overlapping, and visibility issues on CWA Prompt-a-thon 2026 page | 2026-03-05 | bd10d42 | [066-fix-spacing-and-overlapping-issues-on-cw](./quick/66-fix-spacing-and-overlapping-issues-on-cw/) |
+| 067 | Rename Remove Mentee to End Mentorship, add archived Discord channel cleanup cron | 2026-03-06 | 744d6de | [067-distinguish-mentorship-completed-vs-ende](./quick/67-distinguish-mentorship-completed-vs-ende/) |
 
 ## Session Continuity
 
-Last session: 2026-03-05
-Stopped at: Completed quick-066 (fix spacing, overlapping, visibility on promptathon page)
+Last session: 2026-03-06
+Stopped at: Completed quick-067 (rename Remove Mentee to End Mentorship, add archived channel cleanup)
 Resume file: None
 
 ---
-*Updated: 2026-03-05 after completing quick-066*
+*Updated: 2026-03-06 after completing quick-067*
