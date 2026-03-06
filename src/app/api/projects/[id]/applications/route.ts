@@ -4,6 +4,12 @@ import { FieldValue } from "firebase-admin/firestore";
 import { canApplyToProject } from "@/lib/permissions";
 import { verifyAuth } from "@/lib/auth";
 import type { PermissionUser } from "@/lib/permissions";
+import {
+  sendDirectMessage,
+  sendChannelMessage,
+  isDiscordConfigured,
+} from "@/lib/discord";
+import { sendProjectApplicationEmail } from "@/lib/email";
 
 export async function POST(
   request: NextRequest,
@@ -131,10 +137,71 @@ export async function POST(
       .doc(applicationId)
       .set(applicationData);
 
-    // Update project lastActivityAt
+    // Update project lastActivityAt and increment pending count
     await projectRef.update({
       lastActivityAt: FieldValue.serverTimestamp(),
     });
+
+    // Notify project creator (non-blocking)
+    const creatorId = projectData?.creatorId;
+    if (creatorId) {
+      const creatorDoc = await db
+        .collection("mentorship_profiles")
+        .doc(creatorId)
+        .get();
+      const creatorData = creatorDoc.exists ? creatorDoc.data() : null;
+      const applicantName = userData?.displayName || "Someone";
+      const projectTitle = projectData?.title || "your project";
+
+      const notificationTasks: Promise<unknown>[] = [];
+
+      // Discord DM to creator
+      if (isDiscordConfigured() && creatorData?.discordUsername) {
+        notificationTasks.push(
+          sendDirectMessage(
+            creatorData.discordUsername,
+            `📋 **New application for "${projectTitle}"**\n\n` +
+              `**${applicantName}** has applied to join your project.\n\n` +
+              `👉 Review: https://codewithahsan.dev/projects/${projectId}`
+          ).catch((err) =>
+            console.error("Creator application DM failed:", err)
+          )
+        );
+      }
+
+      // Message in the project's Discord channel
+      if (isDiscordConfigured() && projectData?.discordChannelId) {
+        notificationTasks.push(
+          sendChannelMessage(
+            projectData.discordChannelId,
+            `📋 **${applicantName}** has applied to join this project! The creator can review the application on the project page.`
+          ).catch((err) =>
+            console.error("Channel application message failed:", err)
+          )
+        );
+      }
+
+      // Email to creator
+      if (creatorData?.email) {
+        notificationTasks.push(
+          sendProjectApplicationEmail(
+            {
+              displayName: creatorData.displayName || "",
+              email: creatorData.email,
+            },
+            {
+              displayName: applicantName,
+              message,
+            },
+            { id: projectId, title: projectTitle }
+          ).catch((err) =>
+            console.error("Creator application email failed:", err)
+          )
+        );
+      }
+
+      await Promise.allSettled(notificationTasks);
+    }
 
     return NextResponse.json(
       { success: true, applicationId },

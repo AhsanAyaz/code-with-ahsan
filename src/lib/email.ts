@@ -556,3 +556,25 @@ export async function sendDiscordUsernameReminderEmail(
 
   return sendEmail(user.email, subject, wrapEmailHtml(content, subject), cc);
 }
+
+/**
+ * Send email to project creator when someone applies to their project
+ */
+export async function sendProjectApplicationEmail(
+  creator: { displayName: string; email: string },
+  applicant: { displayName: string; message: string },
+  project: { id: string; title: string },
+): Promise<boolean> {
+  const subject = `📋 New Application for "${project.title}"`;
+  const content = `
+    <h2>Hi ${creator.displayName}!</h2>
+    <p><strong>${applicant.displayName}</strong> has applied to join your project <strong>${project.title}</strong>.</p>
+    <div class="info-box">
+      <p><strong>Their message:</strong></p>
+      <p>${applicant.message}</p>
+    </div>
+    <p>Please review this application and approve or decline it.</p>
+    <a href="${getSiteUrl()}/projects/${project.id}" class="button">Review Application</a>
+  `;
+  return sendEmail(creator.email, subject, wrapEmailHtml(content, subject));
+}
