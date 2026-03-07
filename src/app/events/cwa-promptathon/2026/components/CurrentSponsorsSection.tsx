@@ -5,6 +5,16 @@ import { Building2 } from "lucide-react";
 import Image from "next/image";
 import { CONFIRMED_SPONSORS, SPONSOR_PLACEHOLDERS } from "../constants";
 
+const TIER_COLORS: Record<string, string> = {
+  "Tool Partner": "text-success",
+  "Gold Sponsor": "text-warning",
+  "Gold": "text-warning",
+  "Platinum Sponsor": "text-yellow-300",
+  "Platinum": "text-yellow-300",
+  "Community Partner": "text-primary",
+};
+const getTierColor = (tier: string) => TIER_COLORS[tier] ?? "text-primary";
+
 const CurrentSponsorsSection = () => {
   return (
     <section className="pb-16 sm:pb-24 relative overflow-hidden">
@@ -34,9 +44,10 @@ const CurrentSponsorsSection = () => {
                 alt={`${sponsor.name} logo`}
                 width={80}
                 height={60}
-                className="object-contain mb-2 mask mask-squircle"
+                className="object-contain mask mask-squircle"
               />
-              <span className="text-[11px] font-semibold text-primary/80">{sponsor.tier}</span>
+              <span className="text-[11px] font-bold text-white mt-1 leading-tight">{sponsor.name}</span>
+              <span className={`text-[10px] font-semibold ${getTierColor(sponsor.tier)}`}>{sponsor.tier}</span>
             </motion.a>
           ))}
           {SPONSOR_PLACEHOLDERS.map((item, index) => (
