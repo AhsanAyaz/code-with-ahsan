@@ -814,6 +814,10 @@ const FIND_A_MENTOR_CHANNEL_ID = "1419645845258768385";
 const PROJECT_REVIEW_CHANNEL_ID = "874565618458824715";
 const MODERATOR_ROLE_ID = "874774318779887656";
 
+// #project-collaboration channel and ProjectCollaborator role
+const PROJECT_COLLABORATION_CHANNEL_ID = "1419645803751805111";
+const PROJECT_COLLABORATOR_ROLE_ID = "1447918848203427840";
+
 /**
  * Assign a Discord role to a user
  * This is a fire-and-forget operation - failures are logged but do not throw
@@ -1412,6 +1416,62 @@ export async function sendProjectSubmissionNotification(
     }
   } catch (error) {
     log.error("[Discord] Error sending project submission notification:", error);
+    return false;
+  }
+}
+
+/**
+ * Send an announcement to the #project-collaboration channel when a project is approved
+ * Tags the ProjectCollaborator role so community members can discover and join the project
+ *
+ * @param projectTitle - Title of the approved project
+ * @param creatorName - Display name of the project creator
+ * @param projectId - Unique ID of the project
+ * @returns true if announcement sent successfully, false otherwise
+ */
+export async function sendNewProjectAnnouncementToCollaborators(
+  projectTitle: string,
+  creatorName: string,
+  projectId: string
+): Promise<boolean> {
+  log.debug(
+    `Sending project collaboration announcement for "${projectTitle}" by ${creatorName}`
+  );
+
+  try {
+    const message =
+      `🎉 **New Project is Now Open for Collaboration!**\n\n` +
+      `**${projectTitle}**\n` +
+      `Created by ${creatorName}\n\n` +
+      `<@&${PROJECT_COLLABORATOR_ROLE_ID}> — Check it out and apply to join the team!\n\n` +
+      `🔗 https://codewithahsan.com/projects/${projectId}`;
+
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/channels/${PROJECT_COLLABORATION_CHANNEL_ID}/messages`,
+      {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          content: message,
+          allowed_mentions: {
+            roles: [PROJECT_COLLABORATOR_ROLE_ID],
+          },
+        }),
+      }
+    );
+
+    if (response.ok) {
+      log.debug(`Project collaboration announcement sent successfully`);
+      return true;
+    } else {
+      const errorText = await response.text();
+      log.error(
+        `[Discord] Failed to send project collaboration announcement: ${response.status} - ${errorText}`
+      );
+      return false;
+    }
+  } catch (error) {
+    log.error("[Discord] Error sending project collaboration announcement:", error);
     return false;
   }
 }

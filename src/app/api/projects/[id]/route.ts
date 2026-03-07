@@ -6,6 +6,7 @@ import {
   sendProjectDetailsMessage,
   archiveProjectChannel,
   sendDirectMessage,
+  sendNewProjectAnnouncementToCollaborators,
 } from "@/lib/discord";
 import { verifyAuth } from "@/lib/auth";
 import { canDeleteProject } from "@/lib/permissions";
@@ -284,6 +285,17 @@ export async function PUT(
       } catch (discordError) {
         console.error("Discord channel creation failed:", discordError);
         // Continue - project is still approved even if Discord fails
+      }
+
+      // Notify #project-collaboration channel (non-blocking)
+      try {
+        await sendNewProjectAnnouncementToCollaborators(
+          projectData?.title || "Untitled Project",
+          projectData?.creatorProfile?.displayName || "Creator",
+          id
+        );
+      } catch (notifyError) {
+        console.error("Project collaboration notification failed:", notifyError);
       }
 
       return NextResponse.json(
