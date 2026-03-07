@@ -48,14 +48,6 @@ if (!admin.apps.length) {
   }
 }
 
-const db = admin.firestore();
-
-// --- Query open projects ---
-const snapshot = await db
-  .collection("projects")
-  .where("status", "==", "active")
-  .get();
-
 interface ProjectDoc {
   id: string;
   title: string;
@@ -64,48 +56,63 @@ interface ProjectDoc {
   creatorProfile: { displayName: string };
 }
 
-const openProjects: ProjectDoc[] = snapshot.docs
-  .map((doc) => ({ id: doc.id, ...(doc.data() as Omit<ProjectDoc, "id">) }))
-  .filter((p) => (p.memberCount ?? 0) < (p.maxTeamSize ?? 4));
+async function main() {
+  const db = admin.firestore();
 
-if (openProjects.length === 0) {
-  console.log("No open projects found (all at max capacity or none active).");
-  process.exit(0);
-}
+  // --- Query open projects ---
+  const snapshot = await db
+    .collection("projects")
+    .where("status", "==", "active")
+    .get();
 
-// --- List mode ---
-if (MODE === "list") {
-  console.log(`\nOpen projects with available spots (${openProjects.length} total):\n`);
+  const openProjects: ProjectDoc[] = snapshot.docs
+    .map((doc) => ({ id: doc.id, ...(doc.data() as Omit<ProjectDoc, "id">) }))
+    .filter((p) => (p.memberCount ?? 0) < (p.maxTeamSize ?? 4));
+
+  if (openProjects.length === 0) {
+    console.log("No open projects found (all at max capacity or none active).");
+    return;
+  }
+
+  // --- List mode ---
+  if (MODE === "list") {
+    console.log(`\nOpen projects with available spots (${openProjects.length} total):\n`);
+    for (const p of openProjects) {
+      const spots = (p.maxTeamSize ?? 4) - (p.memberCount ?? 0);
+      console.log(`  [${p.id}] ${p.title}`);
+      console.log(`    Creator : ${p.creatorProfile?.displayName || "Unknown"}`);
+      console.log(`    Members : ${p.memberCount ?? 0} / ${p.maxTeamSize ?? 4}  (${spots} spot${spots !== 1 ? "s" : ""} left)`);
+      console.log(`    URL     : https://codewithahsan.com/projects/${p.id}`);
+      console.log();
+    }
+    return;
+  }
+
+  // --- Notify mode ---
+  console.log(`\nSending Discord notifications for ${openProjects.length} open project(s)...\n`);
+
+  let successCount = 0;
+  let failCount = 0;
+
   for (const p of openProjects) {
-    const spots = (p.maxTeamSize ?? 4) - (p.memberCount ?? 0);
-    console.log(`  [${p.id}] ${p.title}`);
-    console.log(`    Creator : ${p.creatorProfile?.displayName || "Unknown"}`);
-    console.log(`    Members : ${p.memberCount ?? 0} / ${p.maxTeamSize ?? 4}  (${spots} spot${spots !== 1 ? "s" : ""} left)`);
-    console.log(`    URL     : https://codewithahsan.com/projects/${p.id}`);
-    console.log();
+    const title = p.title || "Untitled Project";
+    const creator = p.creatorProfile?.displayName || "Creator";
+    process.stdout.write(`  Notifying: "${title}" ... `);
+    const ok = await sendNewProjectAnnouncementToCollaborators(title, creator, p.id);
+    if (ok) {
+      console.log("sent");
+      successCount++;
+    } else {
+      console.log("FAILED");
+      failCount++;
+    }
   }
-  process.exit(0);
+
+  console.log(`\nDone: ${successCount} sent, ${failCount} failed.`);
+  if (failCount > 0) process.exit(1);
 }
 
-// --- Notify mode ---
-console.log(`\nSending Discord notifications for ${openProjects.length} open project(s)...\n`);
-
-let successCount = 0;
-let failCount = 0;
-
-for (const p of openProjects) {
-  const title = p.title || "Untitled Project";
-  const creator = p.creatorProfile?.displayName || "Creator";
-  process.stdout.write(`  Notifying: "${title}" ... `);
-  const ok = await sendNewProjectAnnouncementToCollaborators(title, creator, p.id);
-  if (ok) {
-    console.log("sent");
-    successCount++;
-  } else {
-    console.log("FAILED");
-    failCount++;
-  }
-}
-
-console.log(`\nDone: ${successCount} sent, ${failCount} failed.`);
-if (failCount > 0) process.exit(1);
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
