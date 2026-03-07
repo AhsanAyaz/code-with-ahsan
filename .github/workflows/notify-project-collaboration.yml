@@ -1,0 +1,44 @@
+name: Notify Project Collaboration Channel
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_id:
+        description: 'Project ID (Firestore document ID)'
+        required: true
+        type: string
+      project_title:
+        description: 'Project title'
+        required: true
+        type: string
+      creator_name:
+        description: 'Creator display name'
+        required: true
+        type: string
+
+jobs:
+  notify:
+    name: Send #project-collaboration announcement
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Send Discord notification
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+          PROJECT_ID: ${{ github.event.inputs.project_id }}
+          PROJECT_TITLE: ${{ github.event.inputs.project_title }}
+          CREATOR_NAME: ${{ github.event.inputs.creator_name }}
+        run: npx tsx scripts/notify-project-collaboration.ts
