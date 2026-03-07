@@ -1,3 +1,19 @@
+---
+gsd_state_version: 1.0
+milestone: v2.0
+milestone_name: Community Collaboration & Learning
+status: completed
+stopped_at: Completed quick-68-01-PLAN.md
+last_updated: "2026-03-07T10:20:03.064Z"
+last_activity: "2026-03-06 - Completed quick task 067: Rename Remove Mentee to End Mentorship, add archived Discord channel cleanup"
+progress:
+  total_phases: 14
+  completed_phases: 13
+  total_plans: 40
+  completed_plans: 39
+  percent: 100
+---
+
 # Project State
 
 ## Project Reference
@@ -361,12 +377,14 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 065 | Fix course post pages crashing: AbortController fetch timeouts, null-safe PostService chapter lookup, youtube.js fallback return, error.tsx boundary | 2026-03-03 | c165cc2 | [065-fix-course-post-pages-crashing-with-clie](./quick/65-fix-course-post-pages-crashing-with-clie/) |
 | 066 | Fix spacing, overlapping, and visibility issues on CWA Prompt-a-thon 2026 page | 2026-03-05 | bd10d42 | [066-fix-spacing-and-overlapping-issues-on-cw](./quick/66-fix-spacing-and-overlapping-issues-on-cw/) |
 | 067 | Rename Remove Mentee to End Mentorship, add archived Discord channel cleanup cron | 2026-03-06 | 744d6de | [067-distinguish-mentorship-completed-vs-ende](./quick/67-distinguish-mentorship-completed-vs-ende/) |
+| 068 | Notify #project-collaboration channel with @ProjectCollaborator role when a project is approved | 2026-03-07 | c9cc36b | [068-notify-the-channel-project-collaboration](./quick/68-notify-the-channel-project-collaboration/) |
+| 069 | Update promptathon page to show sponsor names and use tier colors for labels on sponsor cards | 2026-03-07 | 23f0fe4 | [069-update-promptathon-page-to-show-sponsor-](./quick/69-update-promptathon-page-to-show-sponsor-/) |
 
 ## Session Continuity
 
-Last session: 2026-03-06
-Stopped at: Completed quick-067 (rename Remove Mentee to End Mentorship, add archived channel cleanup)
+Last session: 2026-03-07T10:20:03.058Z
+Stopped at: Completed quick-069
 Resume file: None
 
 ---
-*Updated: 2026-03-06 after completing quick-067*
+*Updated: 2026-03-07 after completing quick-068, quick-069*
