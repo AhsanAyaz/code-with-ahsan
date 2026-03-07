@@ -1477,6 +1477,71 @@ export async function sendNewProjectAnnouncementToCollaborators(
 }
 
 /**
+ * Send a single consolidated reminder to #project-collaboration listing all open projects.
+ * Used by the manual GitHub Action so admins can remind the community in one message
+ * rather than flooding the channel with individual announcements.
+ *
+ * @param projects - Array of open projects (memberCount < maxTeamSize)
+ * @returns true if message sent successfully, false otherwise
+ */
+export async function sendOpenProjectsReminder(
+  projects: Array<{
+    id: string;
+    title: string;
+    creatorName: string;
+    memberCount: number;
+    maxTeamSize: number;
+  }>
+): Promise<boolean> {
+  log.debug(`Sending open projects reminder for ${projects.length} project(s)`);
+
+  try {
+    const projectLines = projects
+      .map((p) => {
+        const spots = p.maxTeamSize - p.memberCount;
+        return (
+          `• **${p.title}** by ${p.creatorName} — ${spots} spot${spots !== 1 ? "s" : ""} left\n` +
+          `  🔗 https://codewithahsan.com/projects/${p.id}`
+        );
+      })
+      .join("\n");
+
+    const message =
+      `👋 <@&${PROJECT_COLLABORATOR_ROLE_ID}> — Here's a roundup of projects currently open for collaboration!\n\n` +
+      `${projectLines}\n\n` +
+      `Check them out and apply to join a team. 🚀`;
+
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/channels/${PROJECT_COLLABORATION_CHANNEL_ID}/messages`,
+      {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          content: message,
+          allowed_mentions: {
+            roles: [PROJECT_COLLABORATOR_ROLE_ID],
+          },
+        }),
+      }
+    );
+
+    if (response.ok) {
+      log.debug(`Open projects reminder sent successfully`);
+      return true;
+    } else {
+      const errorText = await response.text();
+      log.error(
+        `[Discord] Failed to send open projects reminder: ${response.status} - ${errorText}`
+      );
+      return false;
+    }
+  } catch (error) {
+    log.error("[Discord] Error sending open projects reminder:", error);
+    return false;
+  }
+}
+
+/**
  * Send a notification to the project review channel when a new roadmap is submitted
  * Tags moderators so they can review and approve/request-changes the roadmap
  *

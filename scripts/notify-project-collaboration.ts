@@ -19,7 +19,7 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import * as admin from "firebase-admin";
-import { sendNewProjectAnnouncementToCollaborators } from "../src/lib/discord";
+import { sendOpenProjectsReminder } from "../src/lib/discord";
 
 const MODE = (process.env.MODE || "list").trim();
 
@@ -89,27 +89,24 @@ async function main() {
   }
 
   // --- Notify mode ---
-  console.log(`\nSending Discord notifications for ${openProjects.length} open project(s)...\n`);
+  console.log(`\nSending consolidated reminder for ${openProjects.length} open project(s)...`);
 
-  let successCount = 0;
-  let failCount = 0;
+  const ok = await sendOpenProjectsReminder(
+    openProjects.map((p) => ({
+      id: p.id,
+      title: p.title || "Untitled Project",
+      creatorName: p.creatorProfile?.displayName || "Creator",
+      memberCount: p.memberCount ?? 0,
+      maxTeamSize: p.maxTeamSize ?? 4,
+    }))
+  );
 
-  for (const p of openProjects) {
-    const title = p.title || "Untitled Project";
-    const creator = p.creatorProfile?.displayName || "Creator";
-    process.stdout.write(`  Notifying: "${title}" ... `);
-    const ok = await sendNewProjectAnnouncementToCollaborators(title, creator, p.id);
-    if (ok) {
-      console.log("sent");
-      successCount++;
-    } else {
-      console.log("FAILED");
-      failCount++;
-    }
+  if (ok) {
+    console.log("Reminder sent successfully.");
+  } else {
+    console.error("Failed to send reminder.");
+    process.exit(1);
   }
-
-  console.log(`\nDone: ${successCount} sent, ${failCount} failed.`);
-  if (failCount > 0) process.exit(1);
 }
 
 main().catch((err) => {
