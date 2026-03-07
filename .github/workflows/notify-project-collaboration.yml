@@ -3,23 +3,21 @@ name: Notify Project Collaboration Channel
 on:
   workflow_dispatch:
     inputs:
-      project_id:
-        description: 'Project ID (Firestore document ID)'
+      job:
+        description: 'Which job to run'
         required: true
-        type: string
-      project_title:
-        description: 'Project title'
-        required: true
-        type: string
-      creator_name:
-        description: 'Creator display name'
-        required: true
-        type: string
+        default: 'list'
+        type: choice
+        options:
+          - list
+          - notify
 
 jobs:
-  notify:
-    name: Send #project-collaboration announcement
+  # Job 1: List active projects with open spots (read-only, safe)
+  list:
+    name: List open projects
     runs-on: ubuntu-latest
+    if: github.event.inputs.job == 'list'
 
     steps:
       - name: Checkout code
@@ -34,11 +32,39 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Send Discord notification
+      - name: List open projects
         env:
+          NODE_ENV: production
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          MODE: list
+        run: npx tsx scripts/notify-project-collaboration.ts
+
+  # Job 2: Send Discord notifications for all open projects (manual trigger only)
+  notify:
+    name: Notify #project-collaboration for all open projects
+    runs-on: ubuntu-latest
+    if: github.event.inputs.job == 'notify'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Send Discord notifications
+        env:
+          NODE_ENV: production
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
-          PROJECT_ID: ${{ github.event.inputs.project_id }}
-          PROJECT_TITLE: ${{ github.event.inputs.project_title }}
-          CREATOR_NAME: ${{ github.event.inputs.creator_name }}
+          MODE: notify
         run: npx tsx scripts/notify-project-collaboration.ts
