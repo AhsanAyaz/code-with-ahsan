@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { ProfileWithDetails, Review } from "@/types/admin";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import { useStreamerMode } from "@/hooks/useStreamerMode";
 import {
   getAnonymizedDisplayName,
@@ -18,11 +17,6 @@ export default function PendingMentorsPage() {
   const [profiles, setProfiles] = useState<ProfileWithDetails[]>([]);
   const [loadingProfiles, setLoadingProfiles] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-
-  // Inline Discord edit state
-  const [editingDiscord, setEditingDiscord] = useState<string | null>(null);
-  const [editingDiscordValue, setEditingDiscordValue] = useState("");
-  const [savingDiscord, setSavingDiscord] = useState(false);
 
   // Reviews modal state
   const [showReviewsModal, setShowReviewsModal] = useState(false);
@@ -119,50 +113,6 @@ export default function PendingMentorsPage() {
       toast.error("Failed to request changes");
     } finally {
       setActionLoading(null);
-    }
-  };
-
-  const handleDiscordSave = async (uid: string, newUsername: string) => {
-    // Validate format client-side first
-    if (newUsername && !/^[a-z0-9_.]{2,32}$/.test(newUsername)) {
-      toast.error(
-        "Invalid Discord username format. Use 2-32 lowercase characters (letters, numbers, underscore, period)."
-      );
-      return;
-    }
-
-    setSavingDiscord(true);
-    try {
-      const response = await fetch("/api/mentorship/admin/profiles", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ uid, discordUsername: newUsername }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Update failed");
-      }
-
-      // Update local state
-      setProfiles((prev) =>
-        prev.map((p) =>
-          p.uid === uid
-            ? { ...p, discordUsername: newUsername || undefined }
-            : p
-        )
-      );
-
-      toast.success("Discord username updated");
-      setEditingDiscord(null);
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to update Discord username"
-      );
-    } finally {
-      setSavingDiscord(false);
     }
   };
 
