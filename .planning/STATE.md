@@ -380,7 +380,7 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 | 068 | Notify #project-collaboration channel with @ProjectCollaborator role when a project is approved | 2026-03-07 | c9cc36b | [068-notify-the-channel-project-collaboration](./quick/68-notify-the-channel-project-collaboration/) |
 | 069 | Update promptathon page to show sponsor names and use tier colors for labels on sponsor cards | 2026-03-07 | 23f0fe4 | [069-update-promptathon-page-to-show-sponsor-](./quick/69-update-promptathon-page-to-show-sponsor-/) |
 | 070 | Create manual GitHub Action to notify #project-collaboration channel for a given project | 2026-03-07 | c3d0f18 | [070-create-a-manual-github-action-to-notify-](./quick/70-create-a-manual-github-action-to-notify-/) |
-| 071 | Mentor review workflow: full profile details, Request Changes with Discord DM, resubmit flow | 2026-03-08 | 3bb13ce | [071-mentor-review-workflow-show-full-profile](./quick/71-mentor-review-workflow-show-full-profile/) |
+| 071 | Mentor review workflow: full profile details, Request Changes with Discord DM, resubmit flow | 2026-03-08 | ffda794 | [071-mentor-review-workflow-show-full-profile](./quick/71-mentor-review-workflow-show-full-profile/) |
 
 ## Session Continuity
 
