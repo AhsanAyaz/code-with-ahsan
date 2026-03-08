@@ -21,7 +21,7 @@ import { MentorshipRole, Project, Roadmap } from "@/types/mentorship";
 export interface PermissionUser {
   uid: string;
   role: MentorshipRole;
-  status?: "pending" | "accepted" | "declined" | "disabled";
+  status?: "pending" | "accepted" | "declined" | "disabled" | "changes_requested";
   isAdmin?: boolean;
 }
 

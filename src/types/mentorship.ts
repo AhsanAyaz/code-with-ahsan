@@ -21,7 +21,7 @@ export interface MentorshipProfile {
   createdAt: Date;
   updatedAt: Date;
   // Approval status
-  status?: "pending" | "accepted" | "declined" | "disabled";
+  status?: "pending" | "accepted" | "declined" | "disabled" | "changes_requested";
   // Skill level for project matching (defaults to "beginner")
   skillLevel?: "beginner" | "intermediate" | "advanced";
   // Mentor-specific
@@ -42,6 +42,9 @@ export interface MentorshipProfile {
   careerGoals?: string;
   mentorshipGoals?: string; // What the mentee is looking for in a mentorship
   learningStyle?: "self-study" | "guided" | "mixed";
+  // Changes requested fields
+  changesFeedback?: string;       // Admin feedback when requesting changes
+  changesFeedbackAt?: Date;       // When changes were requested
 }
 
 /**

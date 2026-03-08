@@ -234,10 +234,22 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    await profileRef.update({
+    const updatePayload: Record<string, unknown> = {
       ...updates,
       updatedAt: new Date(),
-    });
+    };
+
+    // Handle resubmit: reset status from changes_requested to pending
+    if (body.resubmit === true) {
+      const currentData = profileDoc.data();
+      if (currentData?.status === 'changes_requested') {
+        updatePayload.status = 'pending';
+        updatePayload.changesFeedback = null;
+        updatePayload.changesFeedbackAt = null;
+      }
+    }
+
+    await profileRef.update(updatePayload);
 
     return NextResponse.json(
       {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/firebaseAdmin'
 import { sendRegistrationStatusEmail, sendAccountStatusEmail } from '@/lib/email'
+import { sendMentorChangesRequestedNotification } from '@/lib/discord'
 
 
 // GET: Fetch all profiles with optional filters
@@ -83,7 +84,7 @@ const DISCORD_USERNAME_REGEX = /^[a-z0-9_.]{2,32}$/
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { uid, status, adminNotes, reactivateSessions, discordUsername } = body
+    const { uid, status, adminNotes, reactivateSessions, discordUsername, feedback } = body
 
     if (!uid) {
       return NextResponse.json({ error: 'Missing uid' }, { status: 400 })
@@ -99,7 +100,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // If status is provided, validate it
-    if (status !== undefined && !['pending', 'accepted', 'declined', 'disabled'].includes(status)) {
+    if (status !== undefined && !['pending', 'accepted', 'declined', 'disabled', 'changes_requested'].includes(status)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
     }
 
@@ -134,6 +135,15 @@ export async function PUT(request: NextRequest) {
 
     if (adminNotes !== undefined) {
       updateData.adminNotes = adminNotes
+    }
+
+    // Handle changes_requested: require feedback and store it
+    if (status === 'changes_requested') {
+      if (!feedback || typeof feedback !== 'string' || feedback.trim().length < 10) {
+        return NextResponse.json({ error: 'Feedback must be at least 10 characters' }, { status: 400 })
+      }
+      updateData.changesFeedback = feedback.trim()
+      updateData.changesFeedbackAt = new Date()
     }
 
     // Track when status changed to accepted
@@ -219,6 +229,15 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    // Send Discord DM for changes_requested
+    if (status === 'changes_requested' && profileData?.discordUsername) {
+      sendMentorChangesRequestedNotification(
+        profileData.discordUsername,
+        profileData.displayName || '',
+        feedback
+      ).catch(err => console.error('Failed to send changes requested Discord DM:', err))
+    }
+
     // Build response
     const response: Record<string, unknown> = {
       success: true,
@@ -226,7 +245,7 @@ export async function PUT(request: NextRequest) {
     }
 
     if (status !== undefined) {
-      response.message = `Profile ${status === 'accepted' ? 'approved' : status === 'declined' ? 'declined' : status === 'disabled' ? 'disabled' : 'updated'} successfully`
+      response.message = `Profile ${status === 'accepted' ? 'approved' : status === 'declined' ? 'declined' : status === 'disabled' ? 'disabled' : status === 'changes_requested' ? 'changes requested' : 'updated'} successfully`
       response.reactivatedSessions = reactivatedCount
     } else if (discordUsername !== undefined) {
       response.message = 'Discord username updated successfully'

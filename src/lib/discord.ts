@@ -1660,6 +1660,41 @@ export async function sendRoadmapStatusNotification(
 }
 
 /**
+ * Send a Discord DM to a mentor when an admin requests changes on their application.
+ *
+ * @param discordUsername - Discord username of the mentor
+ * @param mentorName - Display name of the mentor
+ * @param feedback - Admin feedback describing what changes are needed
+ * @returns true if DM sent successfully, false otherwise
+ */
+export async function sendMentorChangesRequestedNotification(
+  discordUsername: string,
+  mentorName: string,
+  feedback: string
+): Promise<boolean> {
+  log.debug(
+    `Sending mentor changes requested notification to ${discordUsername}`
+  );
+
+  if (!discordUsername) {
+    log.warn("[Discord] Cannot send mentor changes notification - discordUsername is empty");
+    return false;
+  }
+
+  try {
+    const message =
+      `Hi ${mentorName}, changes have been requested on your mentor application.\n\n` +
+      `**Feedback from admin:** ${feedback}\n\n` +
+      `Please update your profile and resubmit at https://codewithahsan.dev/profile`;
+
+    return await sendDirectMessage(discordUsername, message);
+  } catch (error) {
+    log.error("[Discord] Error sending mentor changes requested notification:", error);
+    return false;
+  }
+}
+
+/**
  * Delete a Discord channel
  *
  * @param channelId - The Discord channel ID to delete
