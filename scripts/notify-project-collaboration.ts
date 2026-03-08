@@ -82,7 +82,7 @@ async function main() {
       console.log(`  [${p.id}] ${p.title}`);
       console.log(`    Creator : ${p.creatorProfile?.displayName || "Unknown"}`);
       console.log(`    Members : ${p.memberCount ?? 0} / ${p.maxTeamSize ?? 4}  (${spots} spot${spots !== 1 ? "s" : ""} left)`);
-      console.log(`    URL     : https://codewithahsan.com/projects/${p.id}`);
+      console.log(`    URL     : https://codewithahsan.dev/projects/${p.id}`);
       console.log();
     }
     return;

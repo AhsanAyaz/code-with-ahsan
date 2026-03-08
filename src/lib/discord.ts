@@ -1444,7 +1444,7 @@ export async function sendNewProjectAnnouncementToCollaborators(
       `**${projectTitle}**\n` +
       `Created by ${creatorName}\n\n` +
       `<@&${PROJECT_COLLABORATOR_ROLE_ID}> — Check it out and apply to join the team!\n\n` +
-      `🔗 https://codewithahsan.com/projects/${projectId}`;
+      `🔗 https://codewithahsan.dev/projects/${projectId}`;
 
     const response = await fetchWithRateLimit(
       `${DISCORD_API}/channels/${PROJECT_COLLABORATION_CHANNEL_ID}/messages`,
@@ -1501,7 +1501,7 @@ export async function sendOpenProjectsReminder(
         const spots = p.maxTeamSize - p.memberCount;
         return (
           `• **${p.title}** by ${p.creatorName} — ${spots} spot${spots !== 1 ? "s" : ""} left\n` +
-          `  🔗 https://codewithahsan.com/projects/${p.id}`
+          `  🔗 https://codewithahsan.dev/projects/${p.id}`
         );
       })
       .join("\n");
