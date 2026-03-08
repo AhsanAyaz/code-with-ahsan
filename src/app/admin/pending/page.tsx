@@ -35,13 +35,16 @@ export default function PendingMentorsPage() {
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const response = await fetch(
-          "/api/mentorship/admin/profiles?role=mentor&status=pending"
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setProfiles(data.profiles || []);
-        }
+        // Fetch both pending and changes_requested profiles in parallel
+        const [pendingRes, changesRes] = await Promise.all([
+          fetch("/api/mentorship/admin/profiles?role=mentor&status=pending"),
+          fetch("/api/mentorship/admin/profiles?role=mentor&status=changes_requested"),
+        ]);
+
+        const pendingProfiles = pendingRes.ok ? (await pendingRes.json()).profiles || [] : [];
+        const changesProfiles = changesRes.ok ? (await changesRes.json()).profiles || [] : [];
+
+        setProfiles([...pendingProfiles, ...changesProfiles]);
       } catch (error) {
         console.error("Error fetching profiles:", error);
         toast.error("Failed to load pending mentors");
@@ -81,6 +84,39 @@ export default function PendingMentorsPage() {
       }
     } catch (error) {
       console.error("Error updating status:", error);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRequestChanges = async (uid: string) => {
+    const feedback = prompt(
+      "Please describe what changes are needed (min 10 characters):"
+    );
+    if (feedback === null) return; // User cancelled
+    if (feedback.length < 10) {
+      toast.error("Feedback must be at least 10 characters");
+      return;
+    }
+
+    setActionLoading(uid);
+    try {
+      const response = await fetch("/api/mentorship/admin/profiles", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, status: "changes_requested", feedback }),
+      });
+
+      if (response.ok) {
+        setProfiles((prev) => prev.filter((p) => p.uid !== uid));
+        toast.success("Changes requested - mentor notified via Discord");
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to request changes");
+      }
+    } catch (error) {
+      console.error("Error requesting changes:", error);
+      toast.error("Failed to request changes");
     } finally {
       setActionLoading(null);
     }
@@ -160,8 +196,23 @@ export default function PendingMentorsPage() {
         return <span className="badge badge-error">Declined</span>;
       case "disabled":
         return <span className="badge badge-neutral">Disabled</span>;
+      case "changes_requested":
+        return <span className="badge badge-warning">Changes Requested</span>;
       default:
         return <span className="badge badge-ghost">Unknown</span>;
+    }
+  };
+
+  const getSkillLevelBadge = (level: string | undefined) => {
+    switch (level) {
+      case "beginner":
+        return <span className="badge badge-info badge-sm">Beginner</span>;
+      case "intermediate":
+        return <span className="badge badge-warning badge-sm">Intermediate</span>;
+      case "advanced":
+        return <span className="badge badge-success badge-sm">Advanced</span>;
+      default:
+        return <span className="badge badge-ghost badge-sm">Not set</span>;
     }
   };
 
@@ -283,7 +334,7 @@ export default function PendingMentorsPage() {
 
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-2">
-                    {p.status === "pending" && (
+                    {(p.status === "pending" || p.status === "changes_requested") && (
                       <>
                         <button
                           className="btn btn-success btn-sm"
@@ -294,6 +345,17 @@ export default function PendingMentorsPage() {
                             <span className="loading loading-spinner loading-xs"></span>
                           ) : (
                             "✓ Accept"
+                          )}
+                        </button>
+                        <button
+                          className="btn btn-warning btn-sm"
+                          disabled={actionLoading === p.uid}
+                          onClick={() => handleRequestChanges(p.uid)}
+                        >
+                          {actionLoading === p.uid ? (
+                            <span className="loading loading-spinner loading-xs"></span>
+                          ) : (
+                            "Request Changes"
                           )}
                         </button>
                         <button
@@ -309,7 +371,7 @@ export default function PendingMentorsPage() {
                         </button>
                       </>
                     )}
-                    {p.status !== "disabled" && p.status !== "pending" && (
+                    {p.status !== "disabled" && p.status !== "pending" && p.status !== "changes_requested" && (
                       <button
                         className="btn btn-warning btn-sm"
                         disabled={actionLoading === p.uid}
@@ -362,42 +424,138 @@ export default function PendingMentorsPage() {
                   </div>
                   <div className="collapse-content">
                     <div className="grid md:grid-cols-2 gap-4 pt-2">
-                      {/* Bio */}
-                      {p.bio && (
-                        <div>
-                          <h4 className="font-semibold text-sm mb-1">Bio</h4>
-                          <p className="text-sm text-base-content/70">{p.bio}</p>
+                      {/* Discord Username */}
+                      <div>
+                        <h4 className="font-semibold text-sm mb-1">Discord Username</h4>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm text-base-content/70">
+                            {p.discordUsername
+                              ? getAnonymizedDiscord(p.discordUsername, p.uid, isStreamerMode)
+                              : <span className="italic">Not provided</span>}
+                          </p>
+                          {p.discordUsername && (
+                            p.discordUsernameValidated
+                              ? <span className="badge badge-success badge-xs">Verified</span>
+                              : <span className="badge badge-warning badge-xs">Unverified</span>
+                          )}
                         </div>
-                      )}
+                      </div>
+
+                      {/* LinkedIn */}
+                      <div>
+                        <h4 className="font-semibold text-sm mb-1">LinkedIn</h4>
+                        {p.linkedinUrl ? (
+                          <a
+                            href={p.linkedinUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="link link-primary text-sm"
+                          >
+                            View LinkedIn Profile
+                          </a>
+                        ) : (
+                          <p className="text-sm text-base-content/70 italic">Not provided</p>
+                        )}
+                      </div>
+
+                      {/* Bio */}
+                      <div className={p.bio && p.bio.length > 100 ? "md:col-span-2" : ""}>
+                        <h4 className="font-semibold text-sm mb-1">Bio</h4>
+                        <p className="text-sm text-base-content/70">
+                          {p.bio || <span className="italic">Not provided</span>}
+                        </p>
+                      </div>
+
+                      {/* Major Projects */}
+                      <div className="md:col-span-2">
+                        <h4 className="font-semibold text-sm mb-1">
+                          Major Projects & Experience
+                        </h4>
+                        {p.majorProjects ? (
+                          <p className="text-sm text-base-content/70 whitespace-pre-wrap">
+                            {p.majorProjects}
+                          </p>
+                        ) : (
+                          <p className="text-sm text-base-content/70 italic">Not provided</p>
+                        )}
+                      </div>
 
                       {/* CV Link */}
-                      {p.cvUrl && (
-                        <div>
-                          <h4 className="font-semibold text-sm mb-1">
-                            CV / Resume
-                          </h4>
+                      <div>
+                        <h4 className="font-semibold text-sm mb-1">
+                          CV / Resume
+                        </h4>
+                        {p.cvUrl ? (
                           <a
                             href={p.cvUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="link link-primary text-sm"
                           >
-                            View CV →
+                            View CV
                           </a>
-                        </div>
-                      )}
+                        ) : (
+                          <p className="text-sm text-base-content/70 italic">Not provided</p>
+                        )}
+                      </div>
 
-                      {/* Major Projects */}
-                      {p.majorProjects && (
-                        <div className="md:col-span-2">
-                          <h4 className="font-semibold text-sm mb-1">
-                            Major Projects & Experience
-                          </h4>
-                          <p className="text-sm text-base-content/70 whitespace-pre-wrap">
-                            {p.majorProjects}
-                          </p>
-                        </div>
-                      )}
+                      {/* Skill Level */}
+                      <div>
+                        <h4 className="font-semibold text-sm mb-1">Skill Level</h4>
+                        {getSkillLevelBadge(p.skillLevel)}
+                      </div>
+
+                      {/* Expertise (full list) */}
+                      <div>
+                        <h4 className="font-semibold text-sm mb-1">Expertise</h4>
+                        {p.expertise && p.expertise.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {p.expertise.map((skill) => (
+                              <span key={skill} className="badge badge-primary badge-sm">
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-base-content/70 italic">Not provided</p>
+                        )}
+                      </div>
+
+                      {/* Max Mentees */}
+                      <div>
+                        <h4 className="font-semibold text-sm mb-1">Max Mentees</h4>
+                        <p className="text-sm text-base-content/70">
+                          {p.maxMentees ?? <span className="italic">Not set</span>}
+                        </p>
+                      </div>
+
+                      {/* Availability */}
+                      <div>
+                        <h4 className="font-semibold text-sm mb-1">Availability</h4>
+                        <p className="text-sm text-base-content/70">
+                          {p.availability && Object.keys(p.availability).length > 0
+                            ? Object.keys(p.availability).map(day =>
+                                day.charAt(0).toUpperCase() + day.slice(1)
+                              ).join(", ")
+                            : <span className="italic">Not set</span>}
+                        </p>
+                      </div>
+
+                      {/* Public Profile */}
+                      <div>
+                        <h4 className="font-semibold text-sm mb-1">Public Profile</h4>
+                        <p className="text-sm text-base-content/70">
+                          {p.isPublic === undefined ? <span className="italic">Not set</span> : p.isPublic ? "Yes" : "No"}
+                        </p>
+                      </div>
+
+                      {/* Username */}
+                      <div>
+                        <h4 className="font-semibold text-sm mb-1">Username</h4>
+                        <p className="text-sm text-base-content/70">
+                          {p.username || <span className="italic">Not set</span>}
+                        </p>
+                      </div>
 
                       {/* Career Goals (for mentees) */}
                       {p.careerGoals && (
@@ -567,7 +725,7 @@ export default function PendingMentorsPage() {
                           {review.feedback && (
                             <div className="mt-3 p-3 bg-base-100 rounded-lg">
                               <p className="text-sm italic text-base-content/80">
-                                "{review.feedback}"
+                                &quot;{review.feedback}&quot;
                               </p>
                             </div>
                           )}
