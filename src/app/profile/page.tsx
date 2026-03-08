@@ -143,6 +143,30 @@ export default function SettingsPage() {
     }
   };
 
+  const handleResubmit = async () => {
+    if (!user) return;
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/mentorship/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: user.uid, resubmit: true }),
+      });
+      if (response.ok) {
+        await refreshProfile();
+        toast.success("Your application has been resubmitted for review!");
+      } else {
+        const error = await response.json();
+        toast.error("Failed to resubmit: " + error.error);
+      }
+    } catch (error) {
+      console.error("Error resubmitting:", error);
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleSubmit = async (data: Record<string, unknown>) => {
     if (!user) return;
 
@@ -257,8 +281,24 @@ export default function SettingsPage() {
         </Link>
       </div>
 
-      {/* Success Message */}
-
+      {/* Changes Requested Banner */}
+      {profile.status === "changes_requested" && (
+        <div className="alert alert-warning shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div>
+            <h3 className="font-bold">Changes Requested</h3>
+            <p className="text-sm">An admin has requested changes to your mentor application. Please review the feedback below, update your profile, and resubmit.</p>
+            {profile.changesFeedback && (
+              <div className="mt-2 p-3 bg-warning/20 rounded-lg">
+                <p className="text-sm font-semibold">Admin Feedback:</p>
+                <p className="text-sm mt-1">{profile.changesFeedback}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Skill Level Card */}
       <div className="card bg-base-100 shadow-xl">
@@ -328,6 +368,22 @@ export default function SettingsPage() {
               initialData={menteeInitialData}
               mode="edit"
             />
+          )}
+
+          {/* Resubmit Application Button */}
+          {profile.status === "changes_requested" && (
+            <div className="mt-6 pt-4 border-t border-base-300">
+              <button
+                className="btn btn-primary btn-block"
+                onClick={handleResubmit}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? <span className="loading loading-spinner loading-sm"></span> : "Resubmit Application for Review"}
+              </button>
+              <p className="text-xs text-base-content/60 text-center mt-2">
+                This will submit your updated profile for admin review
+              </p>
+            </div>
           )}
 
           {/* Mentor Announcement Section - Moved to Bottom */}
