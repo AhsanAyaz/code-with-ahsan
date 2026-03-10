@@ -316,7 +316,11 @@ Plans:
   4. Roadmap displays estimated completion time
   5. GET /api/roadmaps?admin=true requires admin authentication
 
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 14-01-PLAN.md — Active/Completed tabs on /projects page with CompletedProjectCard (DEMO-03, DEMO-04)
+- [ ] 14-02-PLAN.md — Roadmap version history UI + admin roadmap auth fix (ROAD-11, ROAD-12, security)
 
 ---
-*Last updated: 2026-03-10 after v2.0 gap closure phase creation*
+*Last updated: 2026-03-10 after Phase 14 planning*
