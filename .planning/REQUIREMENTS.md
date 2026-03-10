@@ -37,10 +37,10 @@ Requirements for Brand Identity & Site Restructure milestone.
 
 ### Mentorship Landing
 
-- [ ] **MENT-01**: Mentorship page hero focuses on "find a mentor" / "become a mentor" — not community entry
-- [ ] **MENT-02**: Mentorship page shows how the program works (steps/process)
-- [ ] **MENT-03**: Mentorship page shows mentor browsing with search and filters (existing, repositioned)
-- [ ] **MENT-04**: Mentorship page shows mentorship stats (mentors, active mentorships, completed, avg rating)
+- [x] **MENT-01**: Mentorship page hero focuses on "find a mentor" / "become a mentor" — not community entry
+- [x] **MENT-02**: Mentorship page shows how the program works (steps/process)
+- [x] **MENT-03**: Mentorship page shows mentor browsing with search and filters (existing, repositioned)
+- [x] **MENT-04**: Mentorship page shows mentorship stats (mentors, active mentorships, completed, avg rating)
 
 ### Community Page
 
@@ -100,10 +100,10 @@ Requirements for Brand Identity & Site Restructure milestone.
 | PORT-06 | Phase 17 | Complete |
 | PORT-07 | Phase 17 | Complete |
 | PORT-08 | Phase 17 | Complete |
-| MENT-01 | Phase 18 | Pending |
-| MENT-02 | Phase 18 | Pending |
-| MENT-03 | Phase 18 | Pending |
-| MENT-04 | Phase 18 | Pending |
+| MENT-01 | Phase 18 | Complete |
+| MENT-02 | Phase 18 | Complete |
+| MENT-03 | Phase 18 | Complete |
+| MENT-04 | Phase 18 | Complete |
 | COMM-01 | Phase 18 | Pending |
 | COMM-02 | Phase 18 | Pending |
 | COMM-03 | Phase 18 | Pending |

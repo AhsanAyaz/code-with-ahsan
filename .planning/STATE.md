@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Brand Identity & Site Restructure
 status: completed
-stopped_at: Completed 17-02-PLAN.md
-last_updated: "2026-03-10T15:10:19.666Z"
-last_activity: "2026-03-10 — Phase 17 Plan 02 complete: CoursesSection, OpenSourceSection, SocialLinksSection + /about page fully assembled"
+stopped_at: Completed 18-02-PLAN.md
+last_updated: "2026-03-10T15:21:57.355Z"
+last_activity: "2026-03-10 — Phase 18 Plan 02 complete: CommunityGetInvolved, CommunityStatsBar + /community page redesigned as Get Involved hub"
 progress:
   total_phases: 4
-  completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
+  completed_phases: 4
+  total_plans: 8
+  completed_plans: 8
   percent: 100
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-10)
 
 **Core value:** Community members can find mentors, collaborate on real projects with structured support, and follow clear learning roadmaps—all within a mentor-led, quality-focused environment.
-**Current focus:** Phase 17 — Portfolio Page
+**Current focus:** Phase 18 — Mentorship & Community Pages
 
 ## Current Position
 
-Phase: 17 of 18 (Portfolio Page) — COMPLETE
-Plan: 02 complete — Phase 17 complete
-Status: Phase 17 complete — all 6 plans done
-Last activity: 2026-03-10 — Phase 17 Plan 02 complete: CoursesSection, OpenSourceSection, SocialLinksSection + /about page fully assembled
+Phase: 18 of 18 (Mentorship & Community Pages) — COMPLETE
+Plan: 02 complete — Phase 18 complete
+Status: Phase 18 complete — all 8 plans done (v3.0 milestone complete)
+Last activity: 2026-03-10 — Phase 18 Plan 02 complete: CommunityGetInvolved, CommunityStatsBar + /community page redesigned as Get Involved hub
 
 Progress: [██████████] 100% (v3.0)
 
@@ -64,6 +64,9 @@ Recent decisions affecting v3.0:
 - [Phase 17-01]: All portfolio components are server components — no interactivity needed for static data display
 - [Phase 17-02]: CoursesSection receives courses as prop (not calling getCourses internally) — consistent with data-fetching at page level
 - [Phase 17-02]: SocialLinksSection returns null on error — same graceful degradation pattern as SocialReachBar
+- [Phase 18-mentorship-community-pages]: MentorshipStats fetches from /api/stats instead of computing from mentor array — centralizes stats logic
+- [Phase 18-mentorship-community-pages]: HowItWorks is a server component — no interactivity needed for static content
+- [Phase 18-mentorship-community-pages]: MentorshipStats returns null on error — consistent graceful degradation pattern
 
 ### Workflow Notes
 
@@ -79,8 +82,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T15:06:41.328Z
-Stopped at: Completed 17-02-PLAN.md
+Last session: 2026-03-10T15:21:57.353Z
+Stopped at: Completed 18-01-PLAN.md
 Resume file: None
 
 ---
