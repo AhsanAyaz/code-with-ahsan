@@ -9,7 +9,15 @@ export default function TestimonialsSection() {
             What Mentees Say
           </h2>
           <p className="text-base-content/60 mb-8">
-            Feedback from 1:1 mentorship sessions
+            Feedback from 1:1 mentorship sessions via{" "}
+            <a
+              href="https://topmate.io/ahsanayaz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link link-primary"
+            >
+              Topmate
+            </a>
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {testimonials.map((testimonial, index) => (
