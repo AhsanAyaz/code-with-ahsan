@@ -8,6 +8,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 
 - ✅ **v1.0 Mentorship Admin Dashboard** - Phases 1-3 (shipped 2026-01-23)
 - ✅ **v2.0 Community Collaboration & Learning** - Phases 4-13 (shipped 2026-02-15)
+- 🚧 **v2.0 Gap Closure** - Phase 14 (in progress)
 
 ## Phases
 
@@ -300,4 +301,22 @@ Plans:
 - [x] 13-01-PLAN.md — UX analysis, screenshots, improvement proposal, and dashboard redesign implementation
 
 ---
-*Last updated: 2026-02-15 after synchronizing all phase completion status*
+
+### Phase 14: Audit Gap Closure — Showcase, Version History & Security
+**Goal**: Close v2.0 audit gaps: add completed projects tab to /projects page with demo links (DEMO-03/04), surface roadmap version history UI (ROAD-11/12), and fix unauthenticated admin roadmap list endpoint (PERM-03 security).
+
+**Depends on**: Phase 13
+**Requirements**: DEMO-03, DEMO-04, ROAD-11, ROAD-12
+**Gap Closure**: Closes gaps from v2.0 audit
+
+**Success Criteria** (what must be TRUE):
+  1. /projects page has Active/Completed tabs — Completed tab shows projects with demo URLs
+  2. Completed projects filterable by tech stack and sortable by completion date
+  3. Roadmap detail or edit page shows version history list
+  4. Roadmap displays estimated completion time
+  5. GET /api/roadmaps?admin=true requires admin authentication
+
+**Plans**: TBD
+
+---
+*Last updated: 2026-03-10 after v2.0 gap closure phase creation*

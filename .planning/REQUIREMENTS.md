@@ -21,21 +21,21 @@ Requirements for v2.0 milestone: Project Collaboration & Learning Roadmaps.
 
 ### Project Templates
 
-- [ ] **TMPL-01**: System provides project templates (Fullstack App, AI Tool, Open Source Library)
-- [ ] **TMPL-02**: Template includes predefined fields (tech stack, estimated timeline, required skills)
-- [ ] **TMPL-03**: Mentor can customize template fields when creating project
+- [x] **TMPL-01**: System provides project templates (Fullstack App, AI Tool, Open Source Library)
+- [x] **TMPL-02**: Template includes predefined fields (tech stack, estimated timeline, required skills)
+- [x] **TMPL-03**: Mentor can customize template fields when creating project
 
 ### Team Formation
 
-- [ ] **TEAM-01**: Developer can browse public project discovery page showing Active projects
-- [ ] **TEAM-02**: Developer can apply to join an Active project with application message
-- [ ] **TEAM-03**: Project creator can view pending applications for their project
-- [ ] **TEAM-04**: Project creator can approve application to add developer to team
-- [ ] **TEAM-05**: Project creator can decline application with optional feedback
-- [ ] **TEAM-06**: Project creator can invite specific developer by Discord username or email
-- [ ] **TEAM-07**: Invited developer receives notification and can accept or decline
-- [ ] **TEAM-08**: Project detail page shows current team members with roles
-- [ ] **TEAM-09**: Project creator can remove team member from project
+- [x] **TEAM-01**: Developer can browse public project discovery page showing Active projects
+- [x] **TEAM-02**: Developer can apply to join an Active project with application message
+- [x] **TEAM-03**: Project creator can view pending applications for their project
+- [x] **TEAM-04**: Project creator can approve application to add developer to team
+- [x] **TEAM-05**: Project creator can decline application with optional feedback
+- [x] **TEAM-06**: Project creator can invite specific developer by Discord username or email
+- [x] **TEAM-07**: Invited developer receives notification and can accept or decline
+- [x] **TEAM-08**: Project detail page shows current team members with roles
+- [x] **TEAM-09**: Project creator can remove team member from project
 
 ### Discord Integration
 
@@ -46,65 +46,65 @@ Requirements for v2.0 milestone: Project Collaboration & Learning Roadmaps.
 
 ### Demo & Showcase
 
-- [ ] **DEMO-01**: Project creator can submit demo when marking project as Completed
-- [ ] **DEMO-02**: Demo submission includes video/presentation URL and description
+- [x] **DEMO-01**: Project creator can submit demo when marking project as Completed
+- [x] **DEMO-02**: Demo submission includes video/presentation URL and description
 - [ ] **DEMO-03**: Public showcase page displays completed projects with demos
 - [ ] **DEMO-04**: Showcase page filterable by tech stack and completion date
 
 ### Project Discovery
 
-- [ ] **DISC-05**: Public project discovery page shows all Active projects
-- [ ] **DISC-06**: Discovery page filterable by tech stack tags and skill level
-- [ ] **DISC-07**: Discovery page searchable by project name and description
-- [ ] **DISC-08**: Project detail page shows full project information and team roster
-- [ ] **DISC-09**: Project detail page shows application status for current user
+- [x] **DISC-05**: Public project discovery page shows all Active projects
+- [x] **DISC-06**: Discovery page filterable by tech stack tags and skill level
+- [x] **DISC-07**: Discovery page searchable by project name and description
+- [x] **DISC-08**: Project detail page shows full project information and team roster
+- [x] **DISC-09**: Project detail page shows application status for current user
 
 ### Roadmap Creation
 
-- [ ] **ROAD-01**: Mentor can create new roadmap with title, domain category, and Markdown content
-- [ ] **ROAD-02**: Roadmap creation uses Markdown editor with preview
-- [ ] **ROAD-03**: Mentor can save roadmap as draft (not published)
-- [ ] **ROAD-04**: Mentor can submit draft roadmap for admin review
-- [ ] **ROAD-05**: Admin can view pending roadmap submissions in admin dashboard
-- [ ] **ROAD-06**: Admin can approve roadmap to publish it
-- [ ] **ROAD-07**: Admin can request changes to roadmap with feedback
-- [ ] **ROAD-08**: Mentor can edit published roadmap (creates new draft version)
-- [ ] **ROAD-09**: Roadmap stores version history with timestamps
+- [x] **ROAD-01**: Mentor can create new roadmap with title, domain category, and Markdown content
+- [x] **ROAD-02**: Roadmap creation uses Markdown editor with preview
+- [x] **ROAD-03**: Mentor can save roadmap as draft (not published)
+- [x] **ROAD-04**: Mentor can submit draft roadmap for admin review
+- [x] **ROAD-05**: Admin can view pending roadmap submissions in admin dashboard
+- [x] **ROAD-06**: Admin can approve roadmap to publish it
+- [x] **ROAD-07**: Admin can request changes to roadmap with feedback
+- [x] **ROAD-08**: Mentor can edit published roadmap (creates new draft version)
+- [x] **ROAD-09**: Roadmap stores version history with timestamps
 
 ### Roadmap Organization
 
-- [ ] **ROAD-10**: Roadmap has domain category (Web Dev, Frontend, Backend, ML, AI, MCP Servers, AI Agents, Prompt Engineering)
+- [x] **ROAD-10**: Roadmap has domain category (Web Dev, Frontend, Backend, ML, AI, MCP Servers, AI Agents, Prompt Engineering)
 - [ ] **ROAD-11**: Roadmap has difficulty level indicator (Beginner, Intermediate, Advanced)
 - [ ] **ROAD-12**: Roadmap has estimated completion time
-- [ ] **ROAD-13**: Roadmap displays author attribution (mentor profile link)
-- [ ] **ROAD-14**: Roadmap shows last updated timestamp
+- [x] **ROAD-13**: Roadmap displays author attribution (mentor profile link)
+- [x] **ROAD-14**: Roadmap shows last updated timestamp
 
 ### Roadmap Discovery
 
-- [ ] **ROAD-15**: Public roadmap catalog page lists all published roadmaps
-- [ ] **ROAD-16**: Catalog filterable by domain category and difficulty level
-- [ ] **ROAD-17**: Catalog searchable by title and description
-- [ ] **ROAD-18**: Roadmap detail page renders Markdown content with syntax highlighting
-- [ ] **ROAD-19**: Roadmap detail page shows related mentors who teach that domain
+- [x] **ROAD-15**: Public roadmap catalog page lists all published roadmaps
+- [x] **ROAD-16**: Catalog filterable by domain category and difficulty level
+- [x] **ROAD-17**: Catalog searchable by title and description
+- [x] **ROAD-18**: Roadmap detail page renders Markdown content with syntax highlighting
+- [x] **ROAD-19**: Roadmap detail page shows related mentors who teach that domain
 
 ### Admin Dashboard Integration
 
-- [ ] **ADMIN-01**: Admin dashboard has new "Projects" tab showing all projects by status
-- [ ] **ADMIN-02**: Admin dashboard has new "Roadmaps" tab showing all roadmaps by status
+- [x] **ADMIN-01**: Admin dashboard has new "Projects" tab showing all projects by status
+- [x] **ADMIN-02**: Admin dashboard has new "Roadmaps" tab showing all roadmaps by status
 - [x] **ADMIN-03**: Admin dashboard shows pending approvals count for projects and roadmaps
 - [x] **ADMIN-04**: Admin can filter projects by status, tech stack, and mentor
 - [x] **ADMIN-05**: Admin can filter roadmaps by status, domain, and author
 
 ### Permissions & Security
 
-- [ ] **PERM-01**: Only accepted mentors can create projects
-- [ ] **PERM-02**: Only accepted mentors can create roadmaps
-- [ ] **PERM-03**: Only admins can approve projects and roadmaps
-- [ ] **PERM-04**: Only project creator and admins can manage team membership
-- [ ] **PERM-05**: Roadmap Markdown content sanitized to prevent XSS attacks
-- [ ] **PERM-06**: GitHub repo URLs validated before saving
-- [ ] **PERM-07**: Only authenticated users can apply to projects
-- [ ] **PERM-08**: Project creator cannot apply to their own project
+- [x] **PERM-01**: Only accepted mentors can create projects
+- [x] **PERM-02**: Only accepted mentors can create roadmaps
+- [x] **PERM-03**: Only admins can approve projects and roadmaps
+- [x] **PERM-04**: Only project creator and admins can manage team membership
+- [x] **PERM-05**: Roadmap Markdown content sanitized to prevent XSS attacks
+- [x] **PERM-06**: GitHub repo URLs validated before saving
+- [x] **PERM-07**: Only authenticated users can apply to projects
+- [x] **PERM-08**: Project creator cannot apply to their own project
 
 ## Future Requirements
 
@@ -172,51 +172,51 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DISC-02 | Phase 5 | Complete |
 | DISC-03 | Phase 5 | Complete |
 | DISC-04 | Phase 5 | Complete |
-| TEAM-01 | Phase 6 | Not started |
-| TEAM-02 | Phase 6 | Not started |
-| TEAM-03 | Phase 6 | Not started |
-| TEAM-04 | Phase 6 | Not started |
-| TEAM-05 | Phase 6 | Not started |
-| TEAM-06 | Phase 6 | Not started |
-| TEAM-07 | Phase 6 | Not started |
-| TEAM-08 | Phase 6 | Not started |
-| TEAM-09 | Phase 6 | Not started |
-| DISC-05 | Phase 6 | Not started |
-| DISC-06 | Phase 6 | Not started |
-| DISC-07 | Phase 6 | Not started |
-| DISC-08 | Phase 6 | Not started |
-| DISC-09 | Phase 6 | Not started |
-| TMPL-01 | Phase 7 | Not started |
-| TMPL-02 | Phase 7 | Not started |
-| TMPL-03 | Phase 7 | Not started |
-| DEMO-01 | Phase 7 | Not started |
-| DEMO-02 | Phase 7 | Not started |
-| DEMO-03 | Phase 7 | Not started |
-| DEMO-04 | Phase 7 | Not started |
-| ROAD-01 | Phase 8 | Not started |
-| ROAD-02 | Phase 8 | Not started |
-| ROAD-03 | Phase 8 | Not started |
-| ROAD-04 | Phase 8 | Not started |
-| ROAD-05 | Phase 8 | Not started |
-| ROAD-06 | Phase 8 | Not started |
-| ROAD-07 | Phase 8 | Not started |
-| ROAD-08 | Phase 8 | Not started |
-| ROAD-09 | Phase 8 | Not started |
-| ROAD-10 | Phase 8 | Not started |
-| ROAD-11 | Phase 8 | Not started |
-| ROAD-12 | Phase 8 | Not started |
-| ROAD-13 | Phase 8 | Not started |
-| ROAD-14 | Phase 8 | Not started |
-| ROAD-15 | Phase 9 | Not started |
-| ROAD-16 | Phase 9 | Not started |
-| ROAD-17 | Phase 9 | Not started |
-| ROAD-18 | Phase 9 | Not started |
-| ROAD-19 | Phase 9 | Not started |
-| ADMIN-01 | Phase 10 | Not started |
-| ADMIN-02 | Phase 10 | Not started |
-| ADMIN-03 | Phase 10 | Not started |
-| ADMIN-04 | Phase 10 | Not started |
-| ADMIN-05 | Phase 10 | Not started |
+| TEAM-01 | Phase 6 | Complete |
+| TEAM-02 | Phase 6 | Complete |
+| TEAM-03 | Phase 6 | Complete |
+| TEAM-04 | Phase 6 | Complete |
+| TEAM-05 | Phase 6 | Complete |
+| TEAM-06 | Phase 6 | Complete |
+| TEAM-07 | Phase 6 | Complete |
+| TEAM-08 | Phase 6 | Complete |
+| TEAM-09 | Phase 6 | Complete |
+| DISC-05 | Phase 6 | Complete |
+| DISC-06 | Phase 6 | Complete |
+| DISC-07 | Phase 6 | Complete |
+| DISC-08 | Phase 6 | Complete |
+| DISC-09 | Phase 6 | Complete |
+| TMPL-01 | Phase 7 | Complete |
+| TMPL-02 | Phase 7 | Complete |
+| TMPL-03 | Phase 7 | Complete |
+| DEMO-01 | Phase 7 | Complete |
+| DEMO-02 | Phase 7 | Complete |
+| DEMO-03 | Phase 14 | Pending |
+| DEMO-04 | Phase 14 | Pending |
+| ROAD-01 | Phase 8 | Complete |
+| ROAD-02 | Phase 8 | Complete |
+| ROAD-03 | Phase 8 | Complete |
+| ROAD-04 | Phase 8 | Complete |
+| ROAD-05 | Phase 8 | Complete |
+| ROAD-06 | Phase 8 | Complete |
+| ROAD-07 | Phase 8 | Complete |
+| ROAD-08 | Phase 8 | Complete |
+| ROAD-09 | Phase 8 | Complete |
+| ROAD-10 | Phase 8 | Complete |
+| ROAD-11 | Phase 14 | Pending |
+| ROAD-12 | Phase 14 | Pending |
+| ROAD-13 | Phase 8 | Complete |
+| ROAD-14 | Phase 8 | Complete |
+| ROAD-15 | Phase 9 | Complete |
+| ROAD-16 | Phase 9 | Complete |
+| ROAD-17 | Phase 9 | Complete |
+| ROAD-18 | Phase 9 | Complete |
+| ROAD-19 | Phase 9 | Complete |
+| ADMIN-01 | Phase 10 | Complete |
+| ADMIN-02 | Phase 10 | Complete |
+| ADMIN-03 | Phase 10 | Complete |
+| ADMIN-04 | Phase 10 | Complete |
+| ADMIN-05 | Phase 10 | Complete |
 
 **Coverage:**
 - v2.0 requirements: 60 total
