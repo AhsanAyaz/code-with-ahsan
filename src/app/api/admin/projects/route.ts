@@ -41,6 +41,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search");
     const fromDate = searchParams.get("fromDate");
     const toDate = searchParams.get("toDate");
+    const techStack = searchParams.get("techStack");
+    const creator = searchParams.get("creator");
 
     // Build Firestore query
     let query = db.collection("projects").orderBy("createdAt", "desc");
@@ -126,6 +128,22 @@ export async function GET(request: NextRequest) {
         if (!p.createdAt) return false;
         return new Date(p.createdAt).getTime() <= toDateTime;
       });
+    }
+
+    // Tech stack filter (client-side: check if any tech in array contains the search term)
+    if (techStack) {
+      const techLower = techStack.toLowerCase();
+      projects = projects.filter((p: any) =>
+        p.techStack?.some((t: string) => t.toLowerCase().includes(techLower))
+      );
+    }
+
+    // Creator filter (client-side: match against creator display name)
+    if (creator) {
+      const creatorLower = creator.toLowerCase();
+      projects = projects.filter((p: any) =>
+        p.creatorProfile?.displayName?.toLowerCase().includes(creatorLower)
+      );
     }
 
     return NextResponse.json(

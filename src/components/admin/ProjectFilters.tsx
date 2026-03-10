@@ -8,6 +8,8 @@ interface ProjectFiltersProps {
     search: string;
     fromDate: string;
     toDate: string;
+    techStack: string;
+    creator: string;
   };
   onFilterChange: (key: string, value: string) => void;
   onClearFilters: () => void;
@@ -25,12 +27,27 @@ export default function ProjectFilters({
     onFilterChange("search", value);
   }, 300);
 
+  // Debounced tech stack handler
+  const debouncedTechStackChange = useDebouncedCallback((value: string) => {
+    onFilterChange("techStack", value);
+  }, 300);
+
+  // Debounced creator handler
+  const debouncedCreatorChange = useDebouncedCallback((value: string) => {
+    onFilterChange("creator", value);
+  }, 300);
+
   const hasActiveFilters =
-    filters.status || filters.search || filters.fromDate || filters.toDate;
+    filters.status ||
+    filters.search ||
+    filters.fromDate ||
+    filters.toDate ||
+    filters.techStack ||
+    filters.creator;
 
   return (
     <div className="card bg-base-200 shadow-md p-4">
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-end">
+      <div className="flex flex-col md:flex-row gap-4 items-start md:items-end flex-wrap">
         {/* Status dropdown */}
         <div className="form-control flex-1 w-full md:w-auto">
           <label className="label">
@@ -47,6 +64,34 @@ export default function ProjectFilters({
             <option value="completed">Completed</option>
             <option value="declined">Declined</option>
           </select>
+        </div>
+
+        {/* Tech Stack input */}
+        <div className="form-control flex-1 w-full md:w-auto">
+          <label className="label">
+            <span className="label-text">Tech Stack</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Filter by tech (e.g., React)..."
+            className="input input-bordered w-full"
+            defaultValue={filters.techStack}
+            onChange={(e) => debouncedTechStackChange(e.target.value)}
+          />
+        </div>
+
+        {/* Creator input */}
+        <div className="form-control flex-1 w-full md:w-auto">
+          <label className="label">
+            <span className="label-text">Creator</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Filter by creator name..."
+            className="input input-bordered w-full"
+            defaultValue={filters.creator}
+            onChange={(e) => debouncedCreatorChange(e.target.value)}
+          />
         </div>
 
         {/* Search input */}

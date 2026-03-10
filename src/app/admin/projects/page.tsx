@@ -38,6 +38,8 @@ export default function AdminProjectsPage() {
     search: "",
     fromDate: "",
     toDate: "",
+    techStack: "",
+    creator: "",
   });
   const [deleteTarget, setDeleteTarget] = useState<EnrichedProject | null>(null);
   const [declineTarget, setDeclineTarget] = useState<EnrichedProject | null>(null);
@@ -54,6 +56,8 @@ export default function AdminProjectsPage() {
         if (filters.search) params.set("search", filters.search);
         if (filters.fromDate) params.set("fromDate", filters.fromDate);
         if (filters.toDate) params.set("toDate", filters.toDate);
+        if (filters.techStack) params.set("techStack", filters.techStack);
+        if (filters.creator) params.set("creator", filters.creator);
 
         const response = await fetch(`/api/admin/projects?${params.toString()}`, {
           headers: token ? { "x-admin-token": token } : {},
@@ -81,7 +85,7 @@ export default function AdminProjectsPage() {
   };
 
   const handleClearFilters = () => {
-    setFilters({ status: "", search: "", fromDate: "", toDate: "" });
+    setFilters({ status: "", search: "", fromDate: "", toDate: "", techStack: "", creator: "" });
   };
 
   const handleApprove = async (project: EnrichedProject) => {
