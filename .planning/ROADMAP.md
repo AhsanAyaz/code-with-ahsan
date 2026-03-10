@@ -79,8 +79,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 16-01-PLAN.md — Community hero, pillars grid, and live stats components
-- [ ] 16-02-PLAN.md — Social reach bar, founder credibility, and homepage assembly
+- [x] 16-01-PLAN.md — Community hero, pillars grid, and live stats components
+- [x] 16-02-PLAN.md — Social reach bar, founder credibility, and homepage assembly
 
 ### Phase 17: Portfolio Page
 **Goal**: Recruiters and collaborators can learn about Ahsan's professional background, output, and contact options all from `/about`
@@ -92,7 +92,11 @@ Plans:
   3. Visitor can see courses with descriptions and enrollment links
   4. Visitor can see open-source community projects Ahsan has authored
   5. Visitor can see professional work history, mentee/student testimonials, a contact/hire section, and social media links with follower counts
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 17-01-PLAN.md — Portfolio data files and static-data components (bio, books, work history, testimonials, contact)
+- [ ] 17-02-PLAN.md — Dynamic components (courses, open-source, social links) and page assembly
 
 ### Phase 18: Mentorship & Community Pages
 **Goal**: Mentorship page converts visitors who want a mentor or to become one; community page serves as a clear get-involved hub
@@ -126,9 +130,9 @@ Plans:
 | 13. UX Review | v2.0 | 1/1 | Complete | 2026-02-15 |
 | 14. Audit Gap Closure | v2.0 | 2/2 | Complete | 2026-03-10 |
 | 15. Stats API & Navigation | v3.0 | 2/2 | Complete | 2026-03-10 |
-| 16. Homepage Redesign | 2/2 | Complete    | 2026-03-10 | - |
-| 17. Portfolio Page | v3.0 | 0/TBD | Not started | - |
+| 16. Homepage Redesign | v3.0 | 2/2 | Complete | 2026-03-10 |
+| 17. Portfolio Page | v3.0 | 0/2 | Not started | - |
 | 18. Mentorship & Community Pages | v3.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-03-10 after Phase 16 planning*
+*Last updated: 2026-03-10 after Phase 17 planning*
