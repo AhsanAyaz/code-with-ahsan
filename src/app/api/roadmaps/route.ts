@@ -236,6 +236,22 @@ export async function GET(request: NextRequest) {
     let roadmaps: any[] = [];
 
     if (adminView) {
+      // Admin authentication required for admin view
+      const token = request.headers.get("x-admin-token");
+      if (!token) {
+        return NextResponse.json(
+          { error: "Admin authentication required" },
+          { status: 401 },
+        );
+      }
+      const sessionDoc = await db.collection("admin_sessions").doc(token).get();
+      if (!sessionDoc.exists) {
+        return NextResponse.json(
+          { error: "Invalid or expired admin session" },
+          { status: 401 },
+        );
+      }
+
       const roadmapMap = new Map();
 
       if (filter !== "pending") {
