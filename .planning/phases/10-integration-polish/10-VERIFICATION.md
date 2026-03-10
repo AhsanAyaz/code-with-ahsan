@@ -1,27 +1,27 @@
 ---
 phase: 10-integration-polish
-verified: 2026-02-12T06:30:00Z
-status: human_needed
-score: pending
-re_verification: false
-human_verification:
-  - test: "Complete end-to-end roadmap workflow (create → edit → submit → approve → edit draft → approve draft)"
-    expected: "All workflow states transition correctly without errors or stale data"
-    why_human: "Complex multi-step workflow requires manual testing with real Firebase data and user authentication"
-  - test: "Dashboard navigation and stats display correctly"
-    expected: "Roadmap stats show accurate counts, navigation cards work, breadcrumbs function"
-    why_human: "Visual verification of dashboard integration and navigation flow"
-  - test: "Cross-feature navigation between roadmaps, projects, mentors, and dashboard"
-    expected: "All navigation links work correctly, breadcrumbs provide clear context"
-    why_human: "End-to-end navigation flow testing across multiple features"
+verified: 2026-03-10T14:00:00Z
+status: passed
+score: 5/5 requirements satisfied
+re_verification:
+  previous_status: gaps_found
+  previous_score: 2/5
+  gaps_closed:
+    - "ADMIN-03: Admin overview now shows Pending Projects and Pending Roadmaps stat cards backed by real Firestore queries"
+    - "ADMIN-04: ProjectFilters now has Tech Stack and Creator inputs; API handles techStack and creator filter params end-to-end"
+    - "ADMIN-05: Admin roadmaps page replaced tab toggle with full filter bar (status dropdown, domain dropdown, author input); API handles domain and author in admin view"
+  gaps_remaining: []
+  regressions: []
 ---
 
 # Phase 10: Integration & Polish Verification Report
 
-**Phase Goal:** Integrate roadmaps into main dashboard, add cross-feature navigation, and verify complete workflow end-to-end.
-**Verified:** 2026-02-12T06:30:00Z
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Phase Goal:** Integrate projects and roadmaps into user dashboard, add cross-feature links, and run regression tests to ensure existing mentorship features remain intact.
+**Verified:** 2026-03-10T14:00:00Z
+**Status:** passed
+**Re-verification:** Yes — after gap closure via plans 10-04 and 10-05. Supersedes previous verification dated 2026-03-10T13:00:00Z which found 3 gaps (ADMIN-03, ADMIN-04, ADMIN-05).
+
+---
 
 ## Goal Achievement
 
@@ -29,265 +29,90 @@ human_verification:
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | Dashboard shows "My Roadmaps" stat for mentors | ✓ VERIFIED | DashboardStats interface includes myRoadmaps, stat displayed at lines 250-265 |
-| 2 | Dashboard fetches roadmap counts for stats | ✓ VERIFIED | fetchStats fetches total approved and user's roadmaps (lines 91-120) |
-| 3 | Dashboard has "Browse Roadmaps" navigation card for all users | ✓ VERIFIED | Card added at lines 426-440 with link to /roadmaps |
-| 4 | Dashboard has "Create Roadmap" card for accepted mentors | ✓ VERIFIED | Card with gradient styling at lines 442-456, gated by role and status |
-| 5 | Dashboard has "My Roadmaps" card for mentors with roadmaps | ✓ VERIFIED | Card at lines 458-472, only shown if myRoadmaps > 0 |
-| 6 | Breadcrumbs added to roadmap catalog page | ✓ VERIFIED | Breadcrumbs navigation at lines 103-111 |
-| 7 | Breadcrumbs added to "My Roadmaps" page | ✓ VERIFIED | Breadcrumbs navigation at lines 119-129 |
-| 8 | Breadcrumbs added to roadmap detail page | ✓ VERIFIED | Breadcrumbs navigation at lines 128-136 |
-| 9 | Edit button hidden when viewing draft preview | ✓ VERIFIED | Condition checks isPreviewingDraft at line 160 |
-| 10 | Preview link uses ?preview=draft for pending drafts | ✓ VERIFIED | Admin page preview link includes query param at line 2622 |
-| 11 | API GET endpoint handles preview=draft parameter | ✓ VERIFIED | GET handler fetches draft version when param present (lines 16-62) |
-| 12 | Admin dashboard shows draft metadata before approval | ✓ VERIFIED | Admin API overlays draft metadata onto roadmaps (lines 277-313) |
-| 13 | Mentor can edit after admin requests changes on draft | ✓ VERIFIED | Edit action checks hasFeedback to allow edits (lines 401-410) |
-| 14 | Feedback cleared when creating new draft version | ✓ VERIFIED | UpdateData clears feedback fields when hasFeedback (lines 455-459, 506-510) |
-| 15 | Approved draft removed from admin dashboard after approval | ✓ VERIFIED | handleApproveDraftRoadmap uses filter to remove (lines 753-755) |
+| 1 | Admin dashboard has a "Projects" tab showing all projects by status | VERIFIED | `AdminNavigation` links to `/admin/projects`; page (539 lines) renders all projects with status badges, approve/decline/delete actions — confirmed in previous verification, no regression detected |
+| 2 | Admin dashboard has a "Roadmaps" tab showing all roadmaps by status | VERIFIED | `AdminNavigation` links to `/admin/roadmaps`; page shows roadmaps with status badges and approve/request-changes/delete actions — confirmed in previous verification, no regression detected |
+| 3 | Admin dashboard shows pending approvals count for projects and roadmaps | VERIFIED | `AdminStats` interface has `pendingProjects` and `pendingRoadmaps` fields (lines 14-15 of `src/types/admin.ts`); stats API queries both collections with `Promise.all` and Set-based deduplication (lines 56-67 of `route.ts`); overview page renders 6 stat cards including "Pending Projects" (line 198) and "Pending Roadmaps" (line 224) with `text-warning` color |
+| 4 | Admin can filter projects by status, tech stack, and mentor | VERIFIED | `ProjectFilters` has `techStack` and `creator` inputs with 300ms debounce (lines 70-95); projects page passes `techStack` and `creator` to `URLSearchParams` (lines 59-60); API reads and applies both as client-side substring filters (lines 44-45, 133-147) |
+| 5 | Admin can filter roadmaps by status, domain, and author | VERIFIED | Roadmaps page has `filters: { status, domain, author }` state, status dropdown with 4 options, domain dropdown with all 8 `RoadmapDomain` values, author input with debounce; fetch passes all three as URL params (lines 46-50); API reads `author` alongside existing `domain` and applies both client-side after draft metadata overlay (lines 364-375) |
 
-**Score:** 15/15 truths verified
+**Score:** 5/5 truths verified
+
+---
 
 ### Required Artifacts
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `src/app/mentorship/dashboard/page.tsx` | Updated dashboard with roadmap stats and navigation | ✓ VERIFIED | 604 lines, includes roadmap stats, fetch logic, and navigation cards |
-| `src/app/roadmaps/page.tsx` | Roadmap catalog with breadcrumbs | ✓ VERIFIED | 165 lines, breadcrumbs added for navigation context |
-| `src/app/roadmaps/my/page.tsx` | My Roadmaps page with breadcrumbs | ✓ VERIFIED | 298 lines, breadcrumbs added for navigation context |
-| `src/app/roadmaps/[id]/page.tsx` | Detail page with breadcrumbs and preview logic | ✓ VERIFIED | 299 lines, breadcrumbs and isPreviewingDraft state added |
-| `src/app/api/roadmaps/[id]/route.ts` | API with preview and draft workflow fixes | ✓ VERIFIED | 549 lines, handles preview=draft, allows edits after feedback |
-| `src/app/api/roadmaps/route.ts` | API with admin draft metadata overlay | ✓ VERIFIED | 354 lines, fetches and overlays draft metadata for admin view |
+| `src/types/admin.ts` | AdminStats with pendingProjects and pendingRoadmaps | VERIFIED | Exists; lines 14-15 add `pendingProjects: number` and `pendingRoadmaps: number` to the interface |
+| `src/app/api/mentorship/admin/stats/route.ts` | Stats API querying projects and roadmaps for pending counts | VERIFIED | Exists (91 lines); `Promise.all` runs three Firestore queries; Set deduplication produces correct `pendingRoadmaps` count; both fields included in the returned `stats` object (lines 81-82) |
+| `src/app/admin/page.tsx` | Overview with 6 stat cards including pending counts | VERIFIED | Exists (237 lines); renders 6 stat cards — 4 original + "Pending Projects" (line 198) and "Pending Roadmaps" (line 224); both use `{stats.pendingProjects}` and `{stats.pendingRoadmaps}` |
+| `src/components/admin/ProjectFilters.tsx` | Filter with status, tech stack, and creator | VERIFIED | Exists (189 lines); `filters` interface includes `techStack: string` and `creator: string`; two new debounced inputs added; `hasActiveFilters` check updated |
+| `src/app/api/admin/projects/route.ts` | Projects API with techStack and creator filter handling | VERIFIED | Exists (164 lines); reads `techStack` (line 44) and `creator` (line 45); applies case-insensitive substring filters (lines 133-147) after existing search/date filters |
+| `src/app/admin/projects/page.tsx` | Projects page wiring techStack and creator to API | VERIFIED | Initial state has `techStack: ""` and `creator: ""`; `handleClearFilters` resets both; `URLSearchParams` sets both conditionally (lines 59-60) |
+| `src/app/admin/roadmaps/page.tsx` | Roadmaps page with domain and author filters | VERIFIED | Exists (430 lines); `filters` state object with `{ status, domain, author }`; status dropdown (4 options), domain dropdown (8 values from `DOMAIN_LABELS`), debounced author input; all three passed to API as URL params |
+| `src/app/api/roadmaps/route.ts` | Roadmaps API handling domain and author in admin view | VERIFIED | Exists (494 lines); reads `author` at line 234 alongside `domain` (line 232); admin branch applies domain filter (lines 364-366) and author filter (lines 370-375) after draft metadata overlay; specific-status filter applied last (lines 378-380) |
 
-**Artifact Verification:** All 6 artifacts updated and verified.
+---
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
-|------|----|----|--------|---------|
-| Dashboard | Roadmap catalog | Browse Roadmaps card | ✓ WIRED | Lines 426-440: Link to /roadmaps |
-| Dashboard | Create Roadmap | Create Roadmap card | ✓ WIRED | Lines 442-456: Link to /roadmaps/new (mentors only) |
-| Dashboard | My Roadmaps | My Roadmaps card | ✓ WIRED | Lines 458-472: Link to /roadmaps?creator={uid} |
-| Catalog | Detail | RoadmapCard link | ✓ WIRED | RoadmapCard component links to /roadmaps/[id] |
-| Detail | Catalog | Breadcrumbs | ✓ WIRED | Lines 128-136: Breadcrumbs link back to /roadmaps |
-| My Roadmaps | Catalog | Breadcrumbs | ✓ WIRED | Lines 119-129: Breadcrumbs link to /roadmaps |
-| All pages | Dashboard | Breadcrumbs | ✓ WIRED | All breadcrumbs start with Dashboard link |
-| Admin | Draft preview | Preview button | ✓ WIRED | Line 2622: Link includes ?preview=draft param |
+|------|-----|-----|--------|---------|
+| `src/app/admin/page.tsx` | `/api/mentorship/admin/stats` | fetch in useEffect | WIRED | Fetches stats and renders `stats.pendingProjects` and `stats.pendingRoadmaps` |
+| `/api/mentorship/admin/stats/route.ts` | Firestore `projects` + `roadmaps` collections | `db.collection('projects').where(...)` | WIRED | Three parallel queries with `Promise.all`; counts returned in response |
+| `src/components/admin/ProjectFilters.tsx` | `src/app/admin/projects/page.tsx` | `onFilterChange("techStack",...)` and `onFilterChange("creator",...)` | WIRED | Debounced inputs call `onFilterChange`; page state updates trigger useEffect fetch |
+| `src/app/admin/projects/page.tsx` | `/api/admin/projects` | `params.set("techStack",...)` and `params.set("creator",...)` | WIRED | Both new params appended to `URLSearchParams` when non-empty (lines 59-60) |
+| `src/app/admin/roadmaps/page.tsx` | `/api/roadmaps?admin=true` | `params.set("domain",...)` and `params.set("author",...)` | WIRED | `domain` and `author` appended when non-empty (lines 49-50); `filters` in useEffect dependency array triggers re-fetch |
+| Admin layout | Projects page | AdminNavigation "Projects" link | WIRED | Confirmed in previous verification; no regression |
+| Admin layout | Roadmaps page | AdminNavigation "Roadmaps" link | WIRED | Confirmed in previous verification; no regression |
 
-**Key Links:** All 8 critical navigation connections verified.
+---
 
 ### Requirements Coverage
 
-| Requirement | Status | Blocking Issue |
-|-------------|--------|----------------|
-| INT-01: Roadmaps integrated into main dashboard | ✓ SATISFIED | Stats and navigation cards added |
-| INT-02: Cross-feature navigation with breadcrumbs | ✓ SATISFIED | Breadcrumbs added to all roadmap pages |
-| INT-03: Complete workflow tested end-to-end | ⏳ PENDING | Requires human testing |
-| INT-04: Draft preview shows correct version | ✓ SATISFIED | Preview param and API handling implemented |
-| INT-05: Admin sees draft metadata before approval | ✓ SATISFIED | Admin API overlays draft metadata |
-| INT-06: Mentor can edit after admin feedback | ✓ SATISFIED | Edit action allows edits when feedback exists |
-| INT-07: Approved drafts removed from admin dashboard | ✓ SATISFIED | HandleApproveDraftRoadmap filters out roadmap |
+| Requirement | Phase Mapping | Description | Status | Evidence |
+|-------------|--------------|-------------|--------|---------|
+| ADMIN-01 | Phase 10 | Admin dashboard has new "Projects" tab showing all projects by status | SATISFIED | `/admin/projects` page exists with full project management and status filtering; confirmed in previous verification, no regression |
+| ADMIN-02 | Phase 10 | Admin dashboard has new "Roadmaps" tab showing all roadmaps by status | SATISFIED | `/admin/roadmaps` page exists with status display; confirmed in previous verification, no regression |
+| ADMIN-03 | Phase 10 | Admin dashboard shows pending approvals count for projects and roadmaps | SATISFIED | `AdminStats` extended; stats API queries both collections; overview page renders "Pending Projects" and "Pending Roadmaps" stat cards — commit `c6ee5c8` (type + API) and `5c95867` (UI) |
+| ADMIN-04 | Phase 10 | Admin can filter projects by status, tech stack, and mentor | SATISFIED | `ProjectFilters` has tech stack and creator inputs; API handles both filter dimensions — commit `9252cbf` |
+| ADMIN-05 | Phase 10 | Admin can filter roadmaps by status, domain, and author | SATISFIED | Admin roadmaps page has domain dropdown and author input; API applies both filters in admin branch — commit `9a809ef` |
 
-**Requirements:** 6/7 satisfied, 1 pending human testing
+**Coverage:** 5/5 requirements satisfied
 
-### Workflow Test Cases
+Note: REQUIREMENTS.md still shows ADMIN-01 and ADMIN-02 as `[ ]` (unchecked) while ADMIN-03/04/05 are marked `[x]`. The checkbox state in REQUIREMENTS.md is a documentation concern only — the implementation for ADMIN-01 and ADMIN-02 was verified substantively in previous verification rounds.
 
-#### 1. Initial Roadmap Creation & Submission
-**Steps:**
-1. As accepted mentor, navigate to Dashboard
-2. Click "Create Roadmap" card
-3. Fill in title, description, domain, difficulty, content
-4. Save as draft
-5. Preview roadmap
-6. Submit for review
-7. Verify status changes to "pending"
-
-**Expected:** Roadmap appears in admin queue with status "pending"
-
-#### 2. Admin Review & Approval (Initial)
-**Steps:**
-1. As admin, navigate to admin dashboard
-2. Find pending roadmap in queue
-3. Click "Preview" to view roadmap
-4. Click "Approve"
-5. Verify roadmap removed from admin queue
-6. Verify roadmap appears in public catalog
-
-**Expected:** Roadmap published (status: approved, version: 1)
-
-#### 3. Admin Request Changes (Initial)
-**Steps:**
-1. As admin, find pending roadmap
-2. Click "Request Changes"
-3. Enter feedback message
-4. Submit feedback
-5. As mentor, navigate to "My Roadmaps"
-6. Verify yellow feedback banner appears
-7. Click "Edit"
-8. Make changes and save
-9. Submit for review again
-
-**Expected:** Mentor can edit after feedback, roadmap returns to pending
-
-#### 4. Edit Approved Roadmap (Draft Version)
-**Steps:**
-1. As mentor, navigate to "My Roadmaps"
-2. Find approved roadmap
-3. Click "Edit"
-4. Change title, description, or content
-5. Save changes
-6. Verify blue "Draft under review" banner appears
-7. Verify "Edit" button disabled
-8. Verify original version still public
-
-**Expected:** Draft version created (v2), published version remains live
-
-#### 5. Admin Preview Draft Version
-**Steps:**
-1. As admin, navigate to admin dashboard
-2. Find roadmap with pending draft
-3. Verify card shows NEW title/metadata from draft
-4. Click "Preview"
-5. Verify preview shows draft content (not published)
-6. Verify "Edit" button hidden in preview
-
-**Expected:** Admin sees draft version, not published version
-
-#### 6. Admin Request Changes (Draft Version)
-**Steps:**
-1. As admin, view pending draft
-2. Click "Request Changes"
-3. Enter feedback
-4. Submit
-5. As mentor, navigate to "My Roadmaps"
-6. Verify feedback banner appears
-7. Verify "Draft under review" banner removed
-8. Click "Edit"
-9. Make changes and save
-
-**Expected:** Mentor can edit draft after feedback, creates new draft
-
-#### 7. Admin Approve Draft Version
-**Steps:**
-1. As admin, find roadmap with pending draft
-2. Click "Preview" to view draft
-3. Click "Approve Draft"
-4. Verify roadmap removed from admin queue
-5. Navigate to public catalog
-6. View roadmap and verify new version displayed
-
-**Expected:** Draft becomes published (v2), replaces previous version
-
-#### 8. Navigation Flow Testing
-**Steps:**
-1. Start at Dashboard
-2. Click "Browse Roadmaps"
-3. Use breadcrumbs to return to Dashboard
-4. Click "My Roadmaps" (mentor)
-5. Use breadcrumbs to navigate to Roadmaps, then Dashboard
-6. From catalog, click a roadmap card
-7. Use breadcrumbs to return through navigation hierarchy
-
-**Expected:** All navigation works, breadcrumbs show correct path
+---
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 |------|------|---------|----------|--------|
-| - | - | - | - | No anti-patterns detected |
+| `src/app/api/admin/projects/route.ts` | 52 | `query.where(...) as any` | Warning | Unsafe cast to bypass TypeScript for Firestore chaining; pre-existing from earlier plans; functional but bypasses type safety |
 
-**Anti-Pattern Scan Results:**
-- No TODO/FIXME/PLACEHOLDER comments found
-- No empty implementations
-- All state properly used
-- All navigation properly wired
-- All conditional logic correct
-
-### Human Verification Required
-
-#### 1. Complete End-to-End Workflow Test
-
-**Test:**
-Execute all 8 workflow test cases listed above in sequence with real Firebase data and authentication:
-1. Create roadmap as mentor
-2. Admin approve initial submission
-3. Admin request changes on initial submission
-4. Edit approved roadmap (draft version)
-5. Admin preview draft version
-6. Admin request changes on draft
-7. Admin approve draft version
-8. Test all navigation flows
-
-**Expected:**
-- All state transitions work correctly
-- No stale data shown at any step
-- Feedback workflow functions properly
-- Draft version system works end-to-end
-- Admin sees correct metadata at all times
-- Mentor edit restrictions work correctly
-
-**Why human:**
-Complex multi-step workflow with authentication, permissions, Firebase Firestore queries, and Storage operations requires manual testing with real data. Need to verify all edge cases and state transitions work correctly across user roles.
-
-#### 2. Dashboard Integration Verification
-
-**Test:**
-1. Login as mentor with published roadmaps
-2. View dashboard
-3. Verify "My Roadmaps" stat shows correct count
-4. Verify "Total Roadmaps" stat accurate
-5. Click "Browse Roadmaps" card
-6. Click "Create Roadmap" card (mentors only)
-7. Click "My Roadmaps" card
-8. Verify all navigation works
-
-**Expected:**
-- Stats display accurate counts
-- Navigation cards appear for appropriate roles
-- All cards link to correct pages
-- Layout looks good on mobile and desktop
-
-**Why human:**
-Visual verification of dashboard integration, stat accuracy, and responsive design requires manual testing across different screen sizes and user roles.
-
-#### 3. Cross-Feature Navigation Testing
-
-**Test:**
-1. Navigate through complete site: Dashboard → Roadmaps → Detail → My Roadmaps
-2. Use breadcrumbs to navigate back at each step
-3. Test deep linking to roadmap detail pages
-4. Navigate from roadmap to related mentor profile
-5. Navigate from mentor profile back to roadmaps
-6. Test browser back/forward buttons
-7. Verify breadcrumbs update correctly
-
-**Expected:**
-- All breadcrumbs accurate and functional
-- Deep links work correctly
-- Browser navigation works
-- No broken links
-- Clear navigation context at all times
-
-**Why human:**
-End-to-end navigation flow across multiple features requires manual testing to verify user experience and browser history behavior.
-
-### Overall Assessment
-
-**Status:** human_needed
-
-All automated checks PASSED:
-- ✓ All 15 observable truths verified
-- ✓ All 6 required artifacts updated and wired
-- ✓ All 8 key navigation links verified
-- ✓ 6/7 requirements satisfied (1 pending human testing)
-- ✓ No anti-patterns detected
-
-**Gaps:** None identified in automated verification
-
-**Human Testing Required:** 3 critical test suites flagged for manual verification (complete workflow, dashboard integration, cross-feature navigation)
-
-**Recommendation:** Phase 10 code changes complete and verified. Proceed with comprehensive human testing of all workflow scenarios before marking phase complete. Pay special attention to draft version workflow, admin feedback flow, and preview functionality.
+No TODO/FIXME/placeholder code comments found in gap-closure deliverables. No empty implementations or stub returns detected. HTML input `placeholder` attributes in `ProjectFilters.tsx` are legitimate UI copy, not code stubs.
 
 ---
 
-_Verified: 2026-02-12T06:30:00Z_
-_Verifier: Claude (Sonnet 4.5)_
+### Human Verification Required
+
+None. All gaps were feature-level additions (filter UI + API wiring + stat counts). Automated verification confirms the implementation is present, substantive, and correctly wired end-to-end. Visual appearance and UX quality of the new filter bar and stat cards are low-risk — they follow the exact same DaisyUI patterns as the existing admin UI.
+
+---
+
+### Gaps Summary
+
+No gaps remain. All three previously blocked requirements are now satisfied:
+
+**ADMIN-03 (resolved):** `AdminStats` interface and the stats API route were extended with `pendingProjects` and `pendingRoadmaps` fields. The API now runs three parallel Firestore queries (pending projects, pending roadmaps, roadmaps with pending drafts) and deduplicates roadmap IDs via a `Set`. The admin overview page renders two new warning-colored stat cards wired to the new fields.
+
+**ADMIN-04 (resolved):** `ProjectFilters` component now exposes "Tech Stack" and "Creator" text inputs with 300ms debounce. The admin projects page state, `handleClearFilters`, and `URLSearchParams` fetch block all include the new dimensions. The API applies them as case-insensitive substring filters after the existing search/date filters.
+
+**ADMIN-05 (resolved):** The admin roadmaps page replaced the two-option tab toggle with a full filter bar: a four-option status dropdown, an eight-option domain dropdown sourced from `DOMAIN_LABELS`, and a debounced author text input. The `useEffect` dependency array includes the full `filters` object so any change triggers a re-fetch. The roadmaps API admin branch now reads `author` alongside `domain` and applies both as client-side filters after the draft metadata overlay step.
+
+TypeScript compiles without errors (`npx tsc --noEmit` exits clean). All four task commits verified present in git history.
+
+---
+
+_Verified: 2026-03-10T14:00:00Z_
+_Verifier: Claude (gsd-verifier, Sonnet 4.6)_
