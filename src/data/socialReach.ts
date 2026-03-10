@@ -11,4 +11,5 @@ export const socialReach: Record<string, SocialPlatform> = {
   linkedin: { label: "LinkedIn", count: 8000, url: "https://www.linkedin.com/in/ahsanayaz" },
   github: { label: "GitHub", count: 2000, url: "https://github.com/ahsanayaz" },
   x: { label: "X", count: 3000, url: "https://twitter.com/codewith_ahsan" },
+  discord: { label: "Discord", count: 500, url: "https://discord.gg/codewithahsan" },
 };
