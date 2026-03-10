@@ -81,41 +81,41 @@ Requirements for Brand Identity & Site Restructure milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HOME-01 | — | Pending |
-| HOME-02 | — | Pending |
-| HOME-03 | — | Pending |
-| HOME-04 | — | Pending |
-| HOME-05 | — | Pending |
-| HOME-06 | — | Pending |
-| HOME-07 | — | Pending |
-| NAV-01 | — | Pending |
-| NAV-02 | — | Pending |
-| NAV-03 | — | Pending |
-| NAV-04 | — | Pending |
-| PORT-01 | — | Pending |
-| PORT-02 | — | Pending |
-| PORT-03 | — | Pending |
-| PORT-04 | — | Pending |
-| PORT-05 | — | Pending |
-| PORT-06 | — | Pending |
-| PORT-07 | — | Pending |
-| PORT-08 | — | Pending |
-| MENT-01 | — | Pending |
-| MENT-02 | — | Pending |
-| MENT-03 | — | Pending |
-| MENT-04 | — | Pending |
-| COMM-01 | — | Pending |
-| COMM-02 | — | Pending |
-| COMM-03 | — | Pending |
-| STATS-01 | — | Pending |
-| STATS-02 | — | Pending |
-| STATS-03 | — | Pending |
+| HOME-01 | Phase 16 | Pending |
+| HOME-02 | Phase 16 | Pending |
+| HOME-03 | Phase 16 | Pending |
+| HOME-04 | Phase 16 | Pending |
+| HOME-05 | Phase 16 | Pending |
+| HOME-06 | Phase 16 | Pending |
+| HOME-07 | Phase 16 | Pending |
+| NAV-01 | Phase 15 | Pending |
+| NAV-02 | Phase 15 | Pending |
+| NAV-03 | Phase 15 | Pending |
+| NAV-04 | Phase 15 | Pending |
+| PORT-01 | Phase 17 | Pending |
+| PORT-02 | Phase 17 | Pending |
+| PORT-03 | Phase 17 | Pending |
+| PORT-04 | Phase 17 | Pending |
+| PORT-05 | Phase 17 | Pending |
+| PORT-06 | Phase 17 | Pending |
+| PORT-07 | Phase 17 | Pending |
+| PORT-08 | Phase 17 | Pending |
+| MENT-01 | Phase 18 | Pending |
+| MENT-02 | Phase 18 | Pending |
+| MENT-03 | Phase 18 | Pending |
+| MENT-04 | Phase 18 | Pending |
+| COMM-01 | Phase 18 | Pending |
+| COMM-02 | Phase 18 | Pending |
+| COMM-03 | Phase 18 | Pending |
+| STATS-01 | Phase 15 | Pending |
+| STATS-02 | Phase 15 | Pending |
+| STATS-03 | Phase 15 | Pending |
 
 **Coverage:**
 - v3.0 requirements: 29 total
-- Mapped to phases: 0
-- Unmapped: 29
+- Mapped to phases: 29
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-10*
-*Last updated: 2026-03-10 after initial definition*
+*Last updated: 2026-03-10 after v3.0 roadmap creation*

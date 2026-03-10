@@ -8,6 +8,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 
 - ✅ **v1.0 Mentorship Admin Dashboard** — Phases 1-3 (shipped 2026-01-23)
 - ✅ **v2.0 Community Collaboration & Learning** — Phases 4-14 (shipped 2026-03-10)
+- 🚧 **v3.0 Brand Identity & Site Restructure** — Phases 15-18 (in progress)
 
 ## Phases
 
@@ -38,6 +39,65 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 
 </details>
 
+### 🚧 v3.0 Brand Identity & Site Restructure (In Progress)
+
+**Milestone Goal:** Transform the site from a personal brand page with hidden community features into a community-first platform with founder credibility, clear navigation, and a recruiter-ready portfolio page.
+
+- [ ] **Phase 15: Stats API & Navigation** - Backend stats API and flat top-level navigation restructure
+- [ ] **Phase 16: Homepage Redesign** - Community-first hero, pillars, live stats, and social proof
+- [ ] **Phase 17: Portfolio Page** - Recruiter-ready `/about` page with bio, books, courses, and work history
+- [ ] **Phase 18: Mentorship & Community Pages** - Refocus mentorship landing and repurpose community page
+
+## Phase Details
+
+### Phase 15: Stats API & Navigation
+**Goal**: Site-wide infrastructure is ready — stats are available from an API and navigation surfaces community sections at the top level
+**Depends on**: Phase 14 (v2.0 complete)
+**Requirements**: STATS-01, STATS-02, STATS-03, NAV-01, NAV-02, NAV-03, NAV-04
+**Success Criteria** (what must be TRUE):
+  1. A visitor can hit the stats API endpoint and receive live counts for mentors, mentees, active mentorships, completed mentorships, and average rating
+  2. Social reach numbers (YouTube, Instagram, etc.) are served from config, not hardcoded — updating them requires no code change
+  3. Stats are cached so repeated homepage loads do not each trigger fresh Firestore reads
+  4. Every page shows a flat top-level nav with Mentorship, Projects, Roadmaps, Courses, Books, Blog, About as direct links
+  5. Mobile nav mirrors the flat desktop structure with community sections promoted
+**Plans**: TBD
+
+### Phase 16: Homepage Redesign
+**Goal**: Visitors land on a page that communicates community identity, shows real activity, and directs them to the right pillar
+**Depends on**: Phase 15
+**Requirements**: HOME-01, HOME-02, HOME-03, HOME-04, HOME-05, HOME-06, HOME-07
+**Success Criteria** (what must be TRUE):
+  1. A first-time visitor sees a community-named hero with a tagline and a clear join CTA — no personal branding in the hero
+  2. Visitor can see all five community pillars (Mentorship, Projects, Roadmaps, Courses, Books) with descriptions and working links
+  3. Visitor sees live community stats on the page (mentor count, mentee count, active and completed mentorships, average rating) pulled from the Phase 15 API
+  4. Visitor sees Ahsan's founder credibility section (photo, GDE badge, brief community-founder bio) positioned below the community content
+  5. Visitor sees a newsletter signup section and a community FAQ section on the page
+**Plans**: TBD
+
+### Phase 17: Portfolio Page
+**Goal**: Recruiters and collaborators can learn about Ahsan's professional background, output, and contact options all from `/about`
+**Depends on**: Phase 15
+**Requirements**: PORT-01, PORT-02, PORT-03, PORT-04, PORT-05, PORT-06, PORT-07, PORT-08
+**Success Criteria** (what must be TRUE):
+  1. Visitor can read a professional bio with Ahsan's photo and GDE badge on `/about`
+  2. Visitor can see published books with covers, descriptions, and purchase links
+  3. Visitor can see courses with descriptions and enrollment links
+  4. Visitor can see open-source community projects Ahsan has authored
+  5. Visitor can see professional work history, mentee/student testimonials, a contact/hire section, and social media links with follower counts
+**Plans**: TBD
+
+### Phase 18: Mentorship & Community Pages
+**Goal**: Mentorship page converts visitors who want a mentor or to become one; community page serves as a clear get-involved hub
+**Depends on**: Phase 15
+**Requirements**: MENT-01, MENT-02, MENT-03, MENT-04, COMM-01, COMM-02, COMM-03
+**Success Criteria** (what must be TRUE):
+  1. Mentorship page hero focuses on finding or becoming a mentor — not joining the broader community
+  2. Visitor can see how the mentorship program works (steps or process overview) on the mentorship page
+  3. Visitor can browse mentors with search and filters from the mentorship landing page
+  4. `/community` page presents clear onramps to Discord, mentorship, projects, and roadmaps with community stats visible
+  5. Discord channel directory is accessible from the community page as secondary (not hero) content
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -57,6 +117,10 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 | 12. Time Slots | v2.0 | 6/6 | Complete | 2026-02-14 |
 | 13. UX Review | v2.0 | 1/1 | Complete | 2026-02-15 |
 | 14. Audit Gap Closure | v2.0 | 2/2 | Complete | 2026-03-10 |
+| 15. Stats API & Navigation | v3.0 | 0/TBD | Not started | - |
+| 16. Homepage Redesign | v3.0 | 0/TBD | Not started | - |
+| 17. Portfolio Page | v3.0 | 0/TBD | Not started | - |
+| 18. Mentorship & Community Pages | v3.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-03-10 after v2.0 milestone completion*
+*Last updated: 2026-03-10 after v3.0 roadmap creation*
