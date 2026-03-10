@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Brand Identity & Site Restructure
-status: completed
-stopped_at: Completed 17-01-PLAN.md
-last_updated: "2026-03-10T15:01:23.649Z"
-last_activity: "2026-03-10 — Phase 16 Plan 02 complete: SocialReachBar, FounderCredibility, page.tsx assembled — full homepage redesign done"
+status: executing
+stopped_at: Completed 17-02-PLAN.md
+last_updated: "2026-03-10T15:06:44.942Z"
+last_activity: "2026-03-10 — Phase 17 Plan 02 complete: CoursesSection, OpenSourceSection, SocialLinksSection + /about page fully assembled"
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 5
-  percent: 83
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 
 ## Current Position
 
-Phase: 17 of 18 (Portfolio Page)
-Plan: 01 complete — Phase 17 in progress
-Status: Phase 17 in progress
-Last activity: 2026-03-10 — Phase 17 Plan 01 complete: 3 data files + 5 server components for portfolio /about page redesign
+Phase: 17 of 18 (Portfolio Page) — COMPLETE
+Plan: 02 complete — Phase 17 complete
+Status: Phase 17 complete — all 6 plans done
+Last activity: 2026-03-10 — Phase 17 Plan 02 complete: CoursesSection, OpenSourceSection, SocialLinksSection + /about page fully assembled
 
-Progress: [████████░░] 83% (v3.0)
+Progress: [██████████] 100% (v3.0)
 
 ## Performance Metrics
 
@@ -62,6 +62,8 @@ Recent decisions affecting v3.0:
 - [Phase 16-homepage-redesign]: page.tsx section order: community proof (stats + social) before founder identity — community first
 - [Phase 17-01]: Testimonials use placeholder data with TODO comment — real testimonials require manual collection from mentees/students
 - [Phase 17-01]: All portfolio components are server components — no interactivity needed for static data display
+- [Phase 17-02]: CoursesSection receives courses as prop (not calling getCourses internally) — consistent with data-fetching at page level
+- [Phase 17-02]: SocialLinksSection returns null on error — same graceful degradation pattern as SocialReachBar
 
 ### Workflow Notes
 
@@ -77,9 +79,9 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T15:01:23.646Z
-Stopped at: Completed 17-01-PLAN.md
+Last session: 2026-03-10T15:06:41.328Z
+Stopped at: Completed 17-02-PLAN.md
 Resume file: None
 
 ---
-*Updated: 2026-03-10 after Phase 17 Plan 01 execution*
+*Updated: 2026-03-10 after Phase 17 Plan 02 execution*

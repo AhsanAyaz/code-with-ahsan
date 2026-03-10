@@ -28,12 +28,12 @@ Requirements for Brand Identity & Site Restructure milestone.
 
 - [x] **PORT-01**: Visitor can view Ahsan's professional bio with photo and GDE badge on `/about` page
 - [x] **PORT-02**: Visitor can see Ahsan's published books with covers, descriptions, and purchase links
-- [ ] **PORT-03**: Visitor can see Ahsan's courses with descriptions and enrollment links
-- [ ] **PORT-04**: Visitor can see Ahsan's open-source projects from the community
+- [x] **PORT-03**: Visitor can see Ahsan's courses with descriptions and enrollment links
+- [x] **PORT-04**: Visitor can see Ahsan's open-source projects from the community
 - [x] **PORT-05**: Visitor can see Ahsan's work history / professional experience
 - [x] **PORT-06**: Visitor can see testimonials from mentees, students, or colleagues
 - [x] **PORT-07**: Visitor can see a contact/hire section with professional inquiry options
-- [ ] **PORT-08**: Visitor can see Ahsan's social media links and follower counts
+- [x] **PORT-08**: Visitor can see Ahsan's social media links and follower counts
 
 ### Mentorship Landing
 
@@ -94,12 +94,12 @@ Requirements for Brand Identity & Site Restructure milestone.
 | NAV-04 | Phase 15 | Complete |
 | PORT-01 | Phase 17 | Complete |
 | PORT-02 | Phase 17 | Complete |
-| PORT-03 | Phase 17 | Pending |
-| PORT-04 | Phase 17 | Pending |
+| PORT-03 | Phase 17 | Complete |
+| PORT-04 | Phase 17 | Complete |
 | PORT-05 | Phase 17 | Complete |
 | PORT-06 | Phase 17 | Complete |
 | PORT-07 | Phase 17 | Complete |
-| PORT-08 | Phase 17 | Pending |
+| PORT-08 | Phase 17 | Complete |
 | MENT-01 | Phase 18 | Pending |
 | MENT-02 | Phase 18 | Pending |
 | MENT-03 | Phase 18 | Pending |
