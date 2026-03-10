@@ -52,7 +52,14 @@ Community members can find mentors, collaborate on real projects with structured
 
 ### Active
 
-(None — next milestone requirements TBD via `/gsd:new-milestone`)
+<!-- v3.0 - Brand Identity & Site Restructure -->
+
+- [ ] Community-first homepage redesign
+- [ ] Navigation overhaul (flatten dropdown, promote key sections)
+- [ ] Portfolio/founder page (`/about` redesign)
+- [ ] `/community` page rethink (merge into homepage or repurpose)
+- [ ] Mentorship landing page refocus (remove community entry role)
+- [ ] Social proof API (live stats for homepage)
 
 ### Out of Scope
 
@@ -118,12 +125,24 @@ Community members can find mentors, collaborate on real projects with structured
 | Any user can create projects | Mentor-only was too restrictive | ✓ Changed in Phase 6.1 |
 | GitHub Actions for cron jobs | Vercel cron unreliable, standalone scripts | ✓ Firebase Admin direct init |
 
+## Current Milestone: v3.0 Brand Identity & Site Restructure
+
+**Goal:** Transform the site from a personal brand page with hidden community features into a community-first platform with founder credibility, clear navigation, and a recruiter-ready portfolio page.
+
+**Target features:**
+- Community-first homepage with social proof and pillar navigation
+- Flat top-level navigation promoting key community sections
+- Portfolio/founder page for recruiter audience
+- Mentorship page refocused on mentorship (not community entry)
+- Live community stats API for homepage freshness
+
 ## Milestones
 
 | Version | Status | Completed |
 |---------|--------|-----------|
 | v1.0 | Complete | 2026-01-23 |
 | v2.0 | Complete | 2026-03-10 |
+| v3.0 | In Progress | — |
 
 ---
-*Last updated: 2026-03-10 after v2.0 milestone completion*
+*Last updated: 2026-03-10 after v3.0 milestone start*
