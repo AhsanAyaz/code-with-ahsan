@@ -95,8 +95,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 17-01-PLAN.md — Portfolio data files and static-data components (bio, books, work history, testimonials, contact)
-- [ ] 17-02-PLAN.md — Dynamic components (courses, open-source, social links) and page assembly
+- [x] 17-01-PLAN.md — Portfolio data files and static-data components (bio, books, work history, testimonials, contact)
+- [x] 17-02-PLAN.md — Dynamic components (courses, open-source, social links) and page assembly
 
 ### Phase 18: Mentorship & Community Pages
 **Goal**: Mentorship page converts visitors who want a mentor or to become one; community page serves as a clear get-involved hub
@@ -108,7 +108,11 @@ Plans:
   3. Visitor can browse mentors with search and filters from the mentorship landing page
   4. `/community` page presents clear onramps to Discord, mentorship, projects, and roadmaps with community stats visible
   5. Discord channel directory is accessible from the community page as secondary (not hero) content
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 18-01-PLAN.md — Refocus mentorship page hero, add HowItWorks section, add API-driven stats
+- [ ] 18-02-PLAN.md — Redesign community page as Get Involved hub with onramps, stats, and Discord directory
 
 ## Progress
 
@@ -131,8 +135,8 @@ Plans:
 | 14. Audit Gap Closure | v2.0 | 2/2 | Complete | 2026-03-10 |
 | 15. Stats API & Navigation | v3.0 | 2/2 | Complete | 2026-03-10 |
 | 16. Homepage Redesign | v3.0 | 2/2 | Complete | 2026-03-10 |
-| 17. Portfolio Page | 2/2 | Complete    | 2026-03-10 | - |
-| 18. Mentorship & Community Pages | v3.0 | 0/TBD | Not started | - |
+| 17. Portfolio Page | v3.0 | 2/2 | Complete | 2026-03-10 |
+| 18. Mentorship & Community Pages | v3.0 | 0/2 | Not started | - |
 
 ---
-*Last updated: 2026-03-10 after Phase 17 planning*
+*Last updated: 2026-03-10 after Phase 18 planning*
