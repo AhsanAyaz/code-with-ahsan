@@ -60,7 +60,11 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
   3. Stats are cached so repeated homepage loads do not each trigger fresh Firestore reads
   4. Every page shows a flat top-level nav with Mentorship, Projects, Roadmaps, Courses, Books, Blog, About as direct links
   5. Mobile nav mirrors the flat desktop structure with community sections promoted
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 15-01-PLAN.md — Public stats API with caching and social reach config
+- [ ] 15-02-PLAN.md — Navigation restructure (flat top-level links, More dropdown, active highlighting)
 
 ### Phase 16: Homepage Redesign
 **Goal**: Visitors land on a page that communicates community identity, shows real activity, and directs them to the right pillar
@@ -117,10 +121,10 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 | 12. Time Slots | v2.0 | 6/6 | Complete | 2026-02-14 |
 | 13. UX Review | v2.0 | 1/1 | Complete | 2026-02-15 |
 | 14. Audit Gap Closure | v2.0 | 2/2 | Complete | 2026-03-10 |
-| 15. Stats API & Navigation | v3.0 | 0/TBD | Not started | - |
+| 15. Stats API & Navigation | v3.0 | 0/2 | Not started | - |
 | 16. Homepage Redesign | v3.0 | 0/TBD | Not started | - |
 | 17. Portfolio Page | v3.0 | 0/TBD | Not started | - |
 | 18. Mentorship & Community Pages | v3.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-03-10 after v3.0 roadmap creation*
+*Last updated: 2026-03-10 after Phase 15 planning*
