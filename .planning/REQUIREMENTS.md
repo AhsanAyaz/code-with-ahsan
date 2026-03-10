@@ -91,7 +91,7 @@ Requirements for v2.0 milestone: Project Collaboration & Learning Roadmaps.
 
 - [ ] **ADMIN-01**: Admin dashboard has new "Projects" tab showing all projects by status
 - [ ] **ADMIN-02**: Admin dashboard has new "Roadmaps" tab showing all roadmaps by status
-- [ ] **ADMIN-03**: Admin dashboard shows pending approvals count for projects and roadmaps
+- [x] **ADMIN-03**: Admin dashboard shows pending approvals count for projects and roadmaps
 - [ ] **ADMIN-04**: Admin can filter projects by status, tech stack, and mentor
 - [ ] **ADMIN-05**: Admin can filter roadmaps by status, domain, and author
 

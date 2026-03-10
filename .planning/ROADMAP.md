@@ -238,8 +238,8 @@ Plans:
 - [x] 10-01: Dashboard integration (My Projects, My Roadmaps)
 - [x] 10-02: Cross-feature links and recommendations
 - [x] 10-03: Regression testing and polish
-- [ ] 10-04-PLAN.md — Gap closure: Add pending project/roadmap counts to admin overview� Gap closure: Add pending project/roadmap counts to admin overview
-- [ ] 10-05-PLAN.md — Gap closure: Add tech stack, creator, domain, author filter dimensions� Gap closure: Add tech stack, creator, domain, author filter dimensions
+- [ ] 10-04-PLAN.md — Gap closure: Add pending project/roadmap counts to admin overview� Gap closure: Add pending project/roadmap counts to admin overview
+- [ ] 10-05-PLAN.md — Gap closure: Add tech stack, creator, domain, author filter dimensions� Gap closure: Add tech stack, creator, domain, author filter dimensions
 
 ---
 
@@ -260,7 +260,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Projects Demo | v2.0 | 6/6 | Complete | 2026-02-11 |
 | 8. Roadmaps Create | v2.0 | 3/3 | Complete | 2026-02-11 |
 | 9. Roadmaps Discover | v2.0 | 2/2 | Complete | 2026-02-11 |
-| 10. Integration | 4/3 | Complete   | 2026-03-10 | 2026-02-15 |
+| 10. Integration | 5/5 | Complete   | 2026-03-10 | 2026-02-15 |
 | 11. Admin Projects | v2.0 | 3/3 | Complete | 2026-02-12 |
 | 12. Time Slots | v2.0 | 6/6 | Complete | 2026-02-14 |
 | 13. UX Review | v2.0 | 1/1 | Complete | 2026-02-15 |
@@ -269,7 +269,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 **Goal:** Admin interface for viewing all projects with comprehensive management capabilities, cascade delete with Discord cleanup and member notifications, and admin dashboard refactor from client-side tabs to nested routes for proper URL navigation.
 **Depends on:** Phase 10
-**Plans:** 4/3 plans complete
+**Plans:** 5/5 plans complete
 
 Plans:
 - [x] 11-01-PLAN.md — Admin dashboard route refactor: layout, auth gate, navigation, and migrate existing tabs to /admin/* routes
