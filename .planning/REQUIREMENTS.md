@@ -9,13 +9,13 @@ Requirements for Brand Identity & Site Restructure milestone.
 
 ### Homepage
 
-- [ ] **HOME-01**: Visitor sees community-first hero section with community name, tagline, and join CTA (not personal branding)
-- [ ] **HOME-02**: Visitor sees community pillars grid (Mentorship, Projects, Roadmaps, Courses, Books) with descriptions and links
-- [ ] **HOME-03**: Visitor sees live social proof stats (Discord members, mentors, mentees, active mentorships, completed mentorships, avg rating)
-- [ ] **HOME-04**: Visitor sees founder credibility section (Ahsan's photo, GDE badge, brief intro as community founder — not a resume)
-- [ ] **HOME-05**: Visitor sees social reach bar (YouTube, Instagram, Facebook, LinkedIn, GitHub, X follower counts)
-- [ ] **HOME-06**: Visitor sees newsletter signup section
-- [ ] **HOME-07**: Visitor sees FAQ section about the community
+- [x] **HOME-01**: Visitor sees community-first hero section with community name, tagline, and join CTA (not personal branding)
+- [x] **HOME-02**: Visitor sees community pillars grid (Mentorship, Projects, Roadmaps, Courses, Books) with descriptions and links
+- [x] **HOME-03**: Visitor sees live social proof stats (Discord members, mentors, mentees, active mentorships, completed mentorships, avg rating)
+- [x] **HOME-04**: Visitor sees founder credibility section (Ahsan's photo, GDE badge, brief intro as community founder — not a resume)
+- [x] **HOME-05**: Visitor sees social reach bar (YouTube, Instagram, Facebook, LinkedIn, GitHub, X follower counts)
+- [x] **HOME-06**: Visitor sees newsletter signup section
+- [x] **HOME-07**: Visitor sees FAQ section about the community
 
 ### Navigation
 
@@ -81,13 +81,13 @@ Requirements for Brand Identity & Site Restructure milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HOME-01 | Phase 16 | Pending |
-| HOME-02 | Phase 16 | Pending |
-| HOME-03 | Phase 16 | Pending |
-| HOME-04 | Phase 16 | Pending |
-| HOME-05 | Phase 16 | Pending |
-| HOME-06 | Phase 16 | Pending |
-| HOME-07 | Phase 16 | Pending |
+| HOME-01 | Phase 16 | Complete |
+| HOME-02 | Phase 16 | Complete |
+| HOME-03 | Phase 16 | Complete |
+| HOME-04 | Phase 16 | Complete |
+| HOME-05 | Phase 16 | Complete |
+| HOME-06 | Phase 16 | Complete |
+| HOME-07 | Phase 16 | Complete |
 | NAV-01 | Phase 15 | Complete |
 | NAV-02 | Phase 15 | Complete |
 | NAV-03 | Phase 15 | Complete |
