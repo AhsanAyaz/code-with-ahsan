@@ -19,10 +19,10 @@ Requirements for Brand Identity & Site Restructure milestone.
 
 ### Navigation
 
-- [ ] **NAV-01**: Visitor sees flat top-level nav items: Mentorship, Projects, Roadmaps, Courses, Books, Blog, About
-- [ ] **NAV-02**: Secondary items (Events, Logic Buddy, Discord) are accessible via a "More" dropdown or footer
-- [ ] **NAV-03**: Mobile nav reflects the same flat structure with community sections promoted
-- [ ] **NAV-04**: Active nav item is visually highlighted based on current route
+- [x] **NAV-01**: Visitor sees flat top-level nav items: Mentorship, Projects, Roadmaps, Courses, Books, Blog, About
+- [x] **NAV-02**: Secondary items (Events, Logic Buddy, Discord) are accessible via a "More" dropdown or footer
+- [x] **NAV-03**: Mobile nav reflects the same flat structure with community sections promoted
+- [x] **NAV-04**: Active nav item is visually highlighted based on current route
 
 ### Portfolio
 
@@ -88,10 +88,10 @@ Requirements for Brand Identity & Site Restructure milestone.
 | HOME-05 | Phase 16 | Pending |
 | HOME-06 | Phase 16 | Pending |
 | HOME-07 | Phase 16 | Pending |
-| NAV-01 | Phase 15 | Pending |
-| NAV-02 | Phase 15 | Pending |
-| NAV-03 | Phase 15 | Pending |
-| NAV-04 | Phase 15 | Pending |
+| NAV-01 | Phase 15 | Complete |
+| NAV-02 | Phase 15 | Complete |
+| NAV-03 | Phase 15 | Complete |
+| NAV-04 | Phase 15 | Complete |
 | PORT-01 | Phase 17 | Pending |
 | PORT-02 | Phase 17 | Pending |
 | PORT-03 | Phase 17 | Pending |

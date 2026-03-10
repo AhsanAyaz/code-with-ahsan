@@ -43,7 +43,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 
 **Milestone Goal:** Transform the site from a personal brand page with hidden community features into a community-first platform with founder credibility, clear navigation, and a recruiter-ready portfolio page.
 
-- [ ] **Phase 15: Stats API & Navigation** - Backend stats API and flat top-level navigation restructure
+- [x] **Phase 15: Stats API & Navigation** - Backend stats API and flat top-level navigation restructure (completed 2026-03-10)
 - [ ] **Phase 16: Homepage Redesign** - Community-first hero, pillars, live stats, and social proof
 - [ ] **Phase 17: Portfolio Page** - Recruiter-ready `/about` page with bio, books, courses, and work history
 - [ ] **Phase 18: Mentorship & Community Pages** - Refocus mentorship landing and repurpose community page
@@ -121,7 +121,7 @@ Plans:
 | 12. Time Slots | v2.0 | 6/6 | Complete | 2026-02-14 |
 | 13. UX Review | v2.0 | 1/1 | Complete | 2026-02-15 |
 | 14. Audit Gap Closure | v2.0 | 2/2 | Complete | 2026-03-10 |
-| 15. Stats API & Navigation | v3.0 | 0/2 | Not started | - |
+| 15. Stats API & Navigation | 2/2 | Complete   | 2026-03-10 | - |
 | 16. Homepage Redesign | v3.0 | 0/TBD | Not started | - |
 | 17. Portfolio Page | v3.0 | 0/TBD | Not started | - |
 | 18. Mentorship & Community Pages | v3.0 | 0/TBD | Not started | - |
