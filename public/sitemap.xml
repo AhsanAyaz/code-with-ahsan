@@ -13,6 +13,10 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/books</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/community</loc>
   </url>
 
@@ -22,10 +26,6 @@
 
   <url>
     <loc>https://codewithahsan.dev/courses</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/books</loc>
   </url>
 
   <url>
@@ -53,6 +53,10 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/rates</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/roadmaps</loc>
   </url>
 
@@ -61,15 +65,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/rates</loc>
+    <loc>https://codewithahsan.dev/admin/mentees</loc>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/admin/mentors</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/admin/mentees</loc>
   </url>
 
   <url>
@@ -133,11 +133,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/roadmaps/my</loc>
+    <loc>https://codewithahsan.dev/roadmaps/new</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/roadmaps/new</loc>
+    <loc>https://codewithahsan.dev/roadmaps/my</loc>
   </url>
 
   <url>
@@ -748,61 +748,7 @@
 
   <url>
     <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-pipes</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-directives</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/making-http-calls-in-angular-services</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-services</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-routes-in-angular</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-a-counter-component</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/event-listeners-in-angular</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/passing-data-from-parent-to-child-component</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/data-binding-in-angular</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-angular-components</loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/90ish-outro</loc
     >
   </url>
 
@@ -814,13 +760,25 @@
 
   <url>
     <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-an-angular-application</loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-cookbook-latest-edition</loc
     >
   </url>
 
   <url>
     <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/myths-about-angular</loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-directives</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-pipes</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-services</loc
     >
   </url>
 
@@ -838,13 +796,61 @@
 
   <url>
     <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/angular-cookbook-latest-edition</loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-a-counter-component</loc
     >
   </url>
 
   <url>
     <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/what-is-angular</loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-an-angular-application</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-angular-components</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/creating-routes-in-angular</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/data-binding-in-angular</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/event-listeners-in-angular</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/introduction</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/making-http-calls-in-angular-services</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/myths-about-angular</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/passing-data-from-parent-to-child-component</loc
     >
   </url>
 
@@ -856,13 +862,7 @@
 
   <url>
     <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/90ish-outro</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/introduction</loc
+      >https://codewithahsan.dev/courses/angular-in-90ish-minutes/what-is-angular</loc
     >
   </url>
 
@@ -884,73 +884,7 @@
 
   <url>
     <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/ad318c</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/e1a7ad</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/a7ad9a</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/8899a4</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/41698c</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/8e8d67</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/105f12</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/efa5da</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/b1d81d</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/dc2bf7</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/4cd559</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/aa37e4</loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/0464cf</loc
     >
   </url>
 
@@ -962,31 +896,7 @@
 
   <url>
     <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/a4dcab</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/4270c9</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/2fdad2</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/0464cf</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/5dc1c1</loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/105f12</loc
     >
   </url>
 
@@ -998,7 +908,79 @@
 
   <url>
     <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/2fdad2</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/41698c</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/4270c9</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/4cd559</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/5dc1c1</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/8899a4</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/8e8d67</loc
+    >
+  </url>
+
+  <url>
+    <loc
       >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/905425</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/a4dcab</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/a7ad9a</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/aa37e4</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/ad318c</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/b1d81d</loc
     >
   </url>
 
@@ -1010,7 +992,25 @@
 
   <url>
     <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/dc2bf7</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/e1a7ad</loc
+    >
+  </url>
+
+  <url>
+    <loc
       >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/e2489b</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/efa5da</loc
     >
   </url>
 
@@ -1190,13 +1190,13 @@
 
   <url>
     <loc
-      >https://codewithahsan.dev/courses/design-patterns-javascript/singleton-pattern-in-js</loc
+      >https://codewithahsan.dev/courses/design-patterns-javascript/factory-pattern-in-js</loc
     >
   </url>
 
   <url>
     <loc
-      >https://codewithahsan.dev/courses/design-patterns-javascript/factory-pattern-in-js</loc
+      >https://codewithahsan.dev/courses/design-patterns-javascript/observer-pattern-in-js</loc
     >
   </url>
 
@@ -1208,7 +1208,7 @@
 
   <url>
     <loc
-      >https://codewithahsan.dev/courses/design-patterns-javascript/observer-pattern-in-js</loc
+      >https://codewithahsan.dev/courses/design-patterns-javascript/singleton-pattern-in-js</loc
     >
   </url>
 
@@ -1305,15 +1305,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/796d60</loc>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/215880</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/e5bd8b</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/7e2e7c</loc>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/463323</loc>
   </url>
 
   <url>
@@ -1321,31 +1317,7 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/215880</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/courses/react-redux-toolkit/73a1ec</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/a2da32</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/eabc02</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/cf9fa3</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/b3d205</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/eeb518</loc>
   </url>
 
   <url>
@@ -1353,7 +1325,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/ddf358</loc>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/796d60</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/7e2e7c</loc>
   </url>
 
   <url>
@@ -1361,7 +1337,31 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/463323</loc>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/a2da32</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/b3d205</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/cf9fa3</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/ddf358</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/e5bd8b</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/eabc02</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/eeb518</loc>
   </url>
 
   <url>

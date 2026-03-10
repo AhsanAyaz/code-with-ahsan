@@ -3,10 +3,12 @@
 /**
  * One-time exporter from Strapi to local repo-managed content.
  * Writes:
- *  - src/content/courses.json
- *  - src/content/posts.json
+ *  - src/content/_imports/courses.strapi.json (intermediate)
  *  - src/content/banners.json
  *  - src/content/rates.json
+ * Then you can run:
+ *  - npm run content:mdx:from-json
+ *  - npm run content:build
  */
 
 require('dotenv').config({ path: '.env.local' });
@@ -25,6 +27,7 @@ if (!STRAPI_URL || !STRAPI_API_KEY) {
 }
 
 const contentDir = path.join(process.cwd(), 'src/content');
+const importDir = path.join(process.cwd(), 'src/content/_imports');
 
 const authHeaders = {
   Authorization: `Bearer ${STRAPI_API_KEY}`,
@@ -46,6 +49,18 @@ function writeJson(relPath, value) {
 }
 
 function normalizeCourse(course) {
+  const normalizedAuthors = Array.isArray(course.authors)
+    ? course.authors.map((author) => ({
+        name: author.name,
+        bio: author.bio || '',
+        avatar: author.avatar?.url
+          ? {
+              url: author.avatar.url,
+            }
+          : null,
+      }))
+    : [];
+
   return {
     id: course.id,
     name: course.name,
@@ -54,8 +69,18 @@ function normalizeCourse(course) {
     videoUrls: course.videoUrls || [],
     publishedAt: course.publishedAt || null,
     duration: course.duration || null,
-    resources: Array.isArray(course.resources) ? course.resources : [],
-    banner: course.banner || null,
+    resources: Array.isArray(course.resources)
+      ? course.resources.map((resource) => ({
+          label: resource.label,
+          url: resource.url,
+          active: resource.active ?? true,
+        }))
+      : [],
+    banner: course.banner?.url
+      ? {
+          url: course.banner.url,
+        }
+      : null,
     introVideoUrl: course.introVideoUrl || '',
     slug: course.slug,
     isExternal: !!course.isExternal,
@@ -63,7 +88,7 @@ function normalizeCourse(course) {
     externalStudentsCount:
       typeof course.externalStudentsCount === 'number' ? course.externalStudentsCount : null,
     visibilityOrder: course.visibilityOrder ?? null,
-    authors: Array.isArray(course.authors) ? course.authors : [],
+    authors: normalizedAuthors,
     chapters: Array.isArray(course.chapters)
       ? course.chapters.map((chapter) => ({
           id: chapter.id,
@@ -80,32 +105,20 @@ function normalizeCourse(course) {
                 type: post.type || 'video',
                 videoUrl: post.videoUrl || '',
                 order: post.order ?? 0,
+                hasAssignment: !!post.hasAssignment,
+                publishedAt: post.publishedAt || null,
+                resources: Array.isArray(post.resources)
+                  ? post.resources.map((resource) => ({
+                      label: resource.label,
+                      url: resource.url,
+                      active: resource.active ?? true,
+                    }))
+                  : [],
+                article: post.article || '',
               }))
             : [],
         }))
       : [],
-  };
-}
-
-function normalizePost(post) {
-  return {
-    id: post.id,
-    title: post.title,
-    slug: post.slug,
-    description: post.description || '',
-    type: post.type || 'video',
-    videoUrl: post.videoUrl || '',
-    article: post.article || '',
-    hasAssignment: !!post.hasAssignment,
-    order: post.order ?? 0,
-    publishedAt: post.publishedAt || null,
-    chapter: post.chapter
-      ? {
-          id: post.chapter.id,
-          name: post.chapter.name,
-        }
-      : null,
-    resources: Array.isArray(post.resources) ? post.resources : [],
   };
 }
 
@@ -135,6 +148,9 @@ async function main() {
   if (!fs.existsSync(contentDir)) {
     fs.mkdirSync(contentDir, { recursive: true });
   }
+  if (!fs.existsSync(importDir)) {
+    fs.mkdirSync(importDir, { recursive: true });
+  }
 
   const coursesQuery = qs.stringify(
     {
@@ -159,40 +175,26 @@ async function main() {
           fields: ['name', 'description', 'showName', 'order'],
           populate: {
             posts: {
-              fields: ['title', 'slug', 'description', 'type', 'videoUrl', 'order'],
+              fields: [
+                'title',
+                'slug',
+                'description',
+                'type',
+                'videoUrl',
+                'order',
+                'hasAssignment',
+                'publishedAt',
+                'article',
+              ],
+              populate: {
+                resources: {
+                  fields: ['*'],
+                },
+              },
             },
           },
         },
         banner: true,
-        resources: {
-          fields: ['*'],
-        },
-      },
-    },
-    { encodeValuesOnly: true }
-  );
-
-  const postsQuery = qs.stringify(
-    {
-      pagination: {
-        page: 1,
-        pageSize: 1000,
-      },
-      fields: [
-        'title',
-        'slug',
-        'description',
-        'type',
-        'videoUrl',
-        'article',
-        'hasAssignment',
-        'order',
-        'publishedAt',
-      ],
-      populate: {
-        chapter: {
-          fields: ['name'],
-        },
         resources: {
           fields: ['*'],
         },
@@ -229,50 +231,21 @@ async function main() {
     { encodeValuesOnly: true }
   );
 
-  const [coursesResp, postsResp, rateResp, bannersResp] = await Promise.all([
+  const [coursesResp, rateResp, bannersResp] = await Promise.all([
     fetchJson(`${STRAPI_URL}/api/courses?${coursesQuery}`),
-    fetchJson(`${STRAPI_URL}/api/posts?${postsQuery}`),
     fetchJson(`${STRAPI_URL}/api/posts?${rateQuery}`),
     fetchJson(`${STRAPI_URL}/api/banners?${bannersQuery}`),
   ]);
 
   const normalizedCourses = (coursesResp.data || []).map(normalizeCourse);
-  const normalizedPosts = (postsResp.data || []).map(normalizePost);
-  const postsBySlug = Object.fromEntries(normalizedPosts.map((post) => [post.slug, post]));
-
-  // Enrich chapter posts with full post detail where available.
-  normalizedCourses.forEach((course) => {
-    course.chapters.forEach((chapter) => {
-      chapter.posts = chapter.posts.map((post) => {
-        const details = postsBySlug[post.slug];
-        if (!details) return post;
-        return {
-          ...post,
-          ...details,
-          chapter: {
-            id: chapter.id,
-            name: chapter.name,
-          },
-        };
-      });
-    });
-  });
-
   const normalizedBanners = (bannersResp.data || []).map(normalizeBanner);
   const normalizedRateCard = normalizeRateCard((rateResp.data || [])[0] || null);
 
-  writeJson('src/content/courses.json', {
+  writeJson('src/content/_imports/courses.strapi.json', {
     exportedAt: new Date().toISOString(),
     source: 'strapi',
     count: normalizedCourses.length,
     courses: normalizedCourses,
-  });
-
-  writeJson('src/content/posts.json', {
-    exportedAt: new Date().toISOString(),
-    source: 'strapi',
-    count: normalizedPosts.length,
-    posts: normalizedPosts,
   });
 
   writeJson('src/content/banners.json', {
@@ -288,7 +261,7 @@ async function main() {
     rateCard: normalizedRateCard,
   });
 
-  console.log('Export complete.');
+  console.log('Export complete. Run `npm run content:mdx:from-json && npm run content:build`.');
 }
 
 main().catch((error) => {
