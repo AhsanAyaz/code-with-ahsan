@@ -44,7 +44,7 @@ export default function CommunityHero() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 pt-2">
           <a
-            href="https://discord.gg/codewithahsan"
+            href="https://codewithahsan.dev/discord"
             target="_blank"
             rel="noopener noreferrer"
           >
