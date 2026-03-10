@@ -63,8 +63,8 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 **Plans**: 2 plans
 
 Plans:
-- [ ] 15-01-PLAN.md — Public stats API with caching and social reach config
-- [ ] 15-02-PLAN.md — Navigation restructure (flat top-level links, More dropdown, active highlighting)
+- [x] 15-01-PLAN.md — Public stats API with caching and social reach config
+- [x] 15-02-PLAN.md — Navigation restructure (flat top-level links, More dropdown, active highlighting)
 
 ### Phase 16: Homepage Redesign
 **Goal**: Visitors land on a page that communicates community identity, shows real activity, and directs them to the right pillar
@@ -76,7 +76,11 @@ Plans:
   3. Visitor sees live community stats on the page (mentor count, mentee count, active and completed mentorships, average rating) pulled from the Phase 15 API
   4. Visitor sees Ahsan's founder credibility section (photo, GDE badge, brief community-founder bio) positioned below the community content
   5. Visitor sees a newsletter signup section and a community FAQ section on the page
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 16-01-PLAN.md — Community hero, pillars grid, and live stats components
+- [ ] 16-02-PLAN.md — Social reach bar, founder credibility, and homepage assembly
 
 ### Phase 17: Portfolio Page
 **Goal**: Recruiters and collaborators can learn about Ahsan's professional background, output, and contact options all from `/about`
@@ -121,10 +125,10 @@ Plans:
 | 12. Time Slots | v2.0 | 6/6 | Complete | 2026-02-14 |
 | 13. UX Review | v2.0 | 1/1 | Complete | 2026-02-15 |
 | 14. Audit Gap Closure | v2.0 | 2/2 | Complete | 2026-03-10 |
-| 15. Stats API & Navigation | 2/2 | Complete    | 2026-03-10 | - |
-| 16. Homepage Redesign | v3.0 | 0/TBD | Not started | - |
+| 15. Stats API & Navigation | v3.0 | 2/2 | Complete | 2026-03-10 |
+| 16. Homepage Redesign | v3.0 | 0/2 | Not started | - |
 | 17. Portfolio Page | v3.0 | 0/TBD | Not started | - |
 | 18. Mentorship & Community Pages | v3.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-03-10 after Phase 15 planning*
+*Last updated: 2026-03-10 after Phase 16 planning*
