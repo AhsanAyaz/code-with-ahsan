@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Brand Identity & Site Restructure
-status: planning
-stopped_at: Completed 15-01-PLAN.md
-last_updated: "2026-03-10T14:28:55.801Z"
-last_activity: 2026-03-10 — v3.0 roadmap created, 29 requirements mapped to 4 phases
+status: in-progress
+stopped_at: Completed 16-01-PLAN.md
+last_updated: "2026-03-10T14:42:07Z"
+last_activity: 2026-03-10 — Phase 16 Plan 01 executed (CommunityHero, PillarsGrid, CommunityStats components created)
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 0
+  total_plans: 3
+  completed_plans: 3
+  percent: 25
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-10)
 
 **Core value:** Community members can find mentors, collaborate on real projects with structured support, and follow clear learning roadmaps—all within a mentor-led, quality-focused environment.
-**Current focus:** Phase 15 — Stats API & Navigation
+**Current focus:** Phase 16 — Homepage Redesign
 
 ## Current Position
 
-Phase: 15 of 18 (Stats API & Navigation)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-03-10 — v3.0 roadmap created, 29 requirements mapped to 4 phases
+Phase: 16 of 18 (Homepage Redesign)
+Plan: 01 complete, 02 ready
+Status: In progress
+Last activity: 2026-03-10 — Phase 16 Plan 01 complete: CommunityHero, PillarsGrid, CommunityStats components created
 
-Progress: [░░░░░░░░░░] 0% (v3.0)
+Progress: [██░░░░░░░░] 25% (v3.0)
 
 ## Performance Metrics
 
@@ -54,6 +54,9 @@ Recent decisions affecting v3.0:
 - [Phase 15]: Nav restructured to flat top-level with More dropdown — community sections (Mentorship, Projects, Roadmaps) promoted to primary nav
 - [Phase 15-stats-api-navigation]: Mentor count filters by status==accepted to only count active mentors
 - [Phase 15-stats-api-navigation]: Social reach counts served from src/data/socialReach.ts config file — placeholder values, owner updates manually
+- [Phase 16-01]: CommunityHero uses centered single-column layout to emphasize community scale messaging
+- [Phase 16-01]: CommunityStats returns null on error — graceful hide instead of error message
+- [Phase 16-01]: Discord placeholder count set to 500 in socialReach.ts — owner updates manually
 
 ### Workflow Notes
 
@@ -69,9 +72,9 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T14:25:51.275Z
-Stopped at: Completed 15-01-PLAN.md
+Last session: 2026-03-10T14:42:07Z
+Stopped at: Completed 16-01-PLAN.md
 Resume file: None
 
 ---
-*Updated: 2026-03-10 after v3.0 roadmap creation*
+*Updated: 2026-03-10 after Phase 16 Plan 01 execution*
