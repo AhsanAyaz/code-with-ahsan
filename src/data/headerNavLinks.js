@@ -3,26 +3,24 @@ export const LINKS = {
   DISCORD: "https://discord.gg/KSPpuxD8SG",
 };
 
-// Community dropdown items
-export const COMMUNITY_LINKS = [
-  { href: "/mentorship", title: "Mentorship", icon: "mentorship" },
-  { href: "/projects", title: "Projects", icon: "projects" },
-  { href: "/roadmaps", title: "Roadmaps", icon: "roadmap" },
-  { href: "/community", title: "Community Hub", icon: "community" },
-  { href: "/events", title: "Events", icon: "events" },
-  { href: LINKS.DISCORD, title: "Discord", icon: "discord", external: true },
-  { href: "/logic-buddy", title: "Logic Buddy", icon: "brain" },
+// Primary flat nav items — shown directly in the top bar
+// Order: community sections first (promoted), then content, then about
+const headerNavLinks = [
+  { href: "/mentorship", title: "Mentorship" },
+  { href: "/projects", title: "Projects" },
+  { href: "/roadmaps", title: "Roadmaps" },
+  { href: "/courses", title: "Courses" },
+  { href: "/books", title: "Books" },
+  { href: "https://blog.codewithahsan.dev/", title: "Blog", external: true },
+  { href: "/about", title: "About" },
 ];
 
-const headerNavLinks = [
-  { href: "https://blog.codewithahsan.dev/", title: "Blog" },
-  { href: "/courses", title: "Courses" },
-  // { href: '/rates', title: 'Rates' },
-  // { href: '/tags', title: 'Tags' },
-  { href: "/books", title: "Books" },
-  // { href: '/gear', title: 'Gear' },
-  // { href: '/community', title: 'Community' },
-  { href: "/about", title: "About" },
+// Secondary items — accessible via "More" dropdown or footer
+export const MORE_LINKS = [
+  { href: "/events", title: "Events" },
+  { href: "/logic-buddy", title: "Logic Buddy" },
+  { href: "/community", title: "Community Hub" },
+  { href: LINKS.DISCORD, title: "Discord", external: true },
 ];
 
 export default headerNavLinks;
