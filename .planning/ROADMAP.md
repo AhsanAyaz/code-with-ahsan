@@ -136,7 +136,7 @@ Plans:
 | 15. Stats API & Navigation | v3.0 | 2/2 | Complete | 2026-03-10 |
 | 16. Homepage Redesign | v3.0 | 2/2 | Complete | 2026-03-10 |
 | 17. Portfolio Page | v3.0 | 2/2 | Complete | 2026-03-10 |
-| 18. Mentorship & Community Pages | 2/2 | Complete   | 2026-03-10 | - |
+| 18. Mentorship & Community Pages | 2/2 | Complete    | 2026-03-10 | - |
 
 ---
 *Last updated: 2026-03-10 after Phase 18 planning*
