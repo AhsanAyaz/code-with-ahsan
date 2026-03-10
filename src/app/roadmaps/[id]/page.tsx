@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import MarkdownRenderer from "@/components/roadmaps/MarkdownRenderer";
+import VersionHistoryList from "@/components/roadmaps/VersionHistoryList";
 import { Roadmap, MentorshipProfile } from "@/types/mentorship";
 import RelatedProjectsWidget from "@/components/roadmaps/RelatedProjectsWidget";
 import RoadmapActionsDropdown from "@/components/roadmaps/RoadmapActionsDropdown";
@@ -281,6 +282,13 @@ export default function RoadmapDetailPage() {
       <div className="mb-12">
         <MarkdownRenderer content={roadmap.content || ""} />
       </div>
+
+      {/* Version History Section (creator only) */}
+      {isCreator && (
+        <div className="mb-8">
+          <VersionHistoryList roadmapId={roadmapId} />
+        </div>
+      )}
 
       {/* Related Mentors Section */}
       {relatedMentors.length > 0 && (
