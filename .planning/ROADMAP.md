@@ -306,7 +306,7 @@ Plans:
 **Goal**: Close v2.0 audit gaps: add completed projects tab to /projects page with demo links (DEMO-03/04), surface roadmap version history UI (ROAD-11/12), and fix unauthenticated admin roadmap list endpoint (PERM-03 security).
 
 **Depends on**: Phase 13
-**Requirements**: DEMO-03, DEMO-04, ROAD-11, ROAD-12
+**Requirements**: DEMO-03, DEMO-04, ROAD-11, ROAD-12, PERM-03
 **Gap Closure**: Closes gaps from v2.0 audit
 
 **Success Criteria** (what must be TRUE):
