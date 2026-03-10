@@ -1,237 +1,121 @@
-# Requirements: Code With Ahsan v2.0
+# Requirements: Code With Ahsan
 
-**Defined:** 2026-02-02
+**Defined:** 2026-03-10
 **Core Value:** Community members can find mentors, collaborate on real projects with structured support, and follow clear learning roadmaps—all within a mentor-led, quality-focused environment.
 
-## v2.0 Requirements
+## v3.0 Requirements
 
-Requirements for v2.0 milestone: Project Collaboration & Learning Roadmaps.
+Requirements for Brand Identity & Site Restructure milestone.
 
-### Project Lifecycle
+### Homepage
 
-- [x] **PROJ-01**: Mentor can create new project proposal with title, description, and template selection
-- [x] **PROJ-02**: Admin can view pending project proposals in admin dashboard
-- [x] **PROJ-03**: Admin can approve project proposal to move it from Proposed to Active status
-- [x] **PROJ-04**: Admin can decline project proposal with reason
-- [x] **PROJ-05**: Discord channel automatically created when project moves to Active status
-- [x] **PROJ-06**: Project creator can mark project as Completed
-- [x] **PROJ-07**: Admin can archive completed projects
-- [x] **PROJ-08**: Project data includes GitHub repo URL field
-- [x] **PROJ-09**: Project stores tech stack tags for filtering
+- [ ] **HOME-01**: Visitor sees community-first hero section with community name, tagline, and join CTA (not personal branding)
+- [ ] **HOME-02**: Visitor sees community pillars grid (Mentorship, Projects, Roadmaps, Courses, Books) with descriptions and links
+- [ ] **HOME-03**: Visitor sees live social proof stats (Discord members, mentors, mentees, active mentorships, completed mentorships, avg rating)
+- [ ] **HOME-04**: Visitor sees founder credibility section (Ahsan's photo, GDE badge, brief intro as community founder — not a resume)
+- [ ] **HOME-05**: Visitor sees social reach bar (YouTube, Instagram, Facebook, LinkedIn, GitHub, X follower counts)
+- [ ] **HOME-06**: Visitor sees newsletter signup section
+- [ ] **HOME-07**: Visitor sees FAQ section about the community
 
-### Project Templates
+### Navigation
 
-- [x] **TMPL-01**: System provides project templates (Fullstack App, AI Tool, Open Source Library)
-- [x] **TMPL-02**: Template includes predefined fields (tech stack, estimated timeline, required skills)
-- [x] **TMPL-03**: Mentor can customize template fields when creating project
+- [ ] **NAV-01**: Visitor sees flat top-level nav items: Mentorship, Projects, Roadmaps, Courses, Books, Blog, About
+- [ ] **NAV-02**: Secondary items (Events, Logic Buddy, Discord) are accessible via a "More" dropdown or footer
+- [ ] **NAV-03**: Mobile nav reflects the same flat structure with community sections promoted
+- [ ] **NAV-04**: Active nav item is visually highlighted based on current route
 
-### Team Formation
+### Portfolio
 
-- [x] **TEAM-01**: Developer can browse public project discovery page showing Active projects
-- [x] **TEAM-02**: Developer can apply to join an Active project with application message
-- [x] **TEAM-03**: Project creator can view pending applications for their project
-- [x] **TEAM-04**: Project creator can approve application to add developer to team
-- [x] **TEAM-05**: Project creator can decline application with optional feedback
-- [x] **TEAM-06**: Project creator can invite specific developer by Discord username or email
-- [x] **TEAM-07**: Invited developer receives notification and can accept or decline
-- [x] **TEAM-08**: Project detail page shows current team members with roles
-- [x] **TEAM-09**: Project creator can remove team member from project
+- [ ] **PORT-01**: Visitor can view Ahsan's professional bio with photo and GDE badge on `/about` page
+- [ ] **PORT-02**: Visitor can see Ahsan's published books with covers, descriptions, and purchase links
+- [ ] **PORT-03**: Visitor can see Ahsan's courses with descriptions and enrollment links
+- [ ] **PORT-04**: Visitor can see Ahsan's open-source projects from the community
+- [ ] **PORT-05**: Visitor can see Ahsan's work history / professional experience
+- [ ] **PORT-06**: Visitor can see testimonials from mentees, students, or colleagues
+- [ ] **PORT-07**: Visitor can see a contact/hire section with professional inquiry options
+- [ ] **PORT-08**: Visitor can see Ahsan's social media links and follower counts
 
-### Discord Integration
+### Mentorship Landing
 
-- [x] **DISC-01**: Discord channel created with project name as channel name
-- [x] **DISC-02**: All team members automatically added to Discord channel with appropriate permissions
-- [x] **DISC-03**: Discord channel includes pinned message with project details and GitHub link
-- [x] **DISC-04**: Discord channel archived when project marked as Completed
+- [ ] **MENT-01**: Mentorship page hero focuses on "find a mentor" / "become a mentor" — not community entry
+- [ ] **MENT-02**: Mentorship page shows how the program works (steps/process)
+- [ ] **MENT-03**: Mentorship page shows mentor browsing with search and filters (existing, repositioned)
+- [ ] **MENT-04**: Mentorship page shows mentorship stats (mentors, active mentorships, completed, avg rating)
 
-### Demo & Showcase
+### Community Page
 
-- [x] **DEMO-01**: Project creator can submit demo when marking project as Completed
-- [x] **DEMO-02**: Demo submission includes video/presentation URL and description
-- [x] **DEMO-03**: Public showcase page displays completed projects with demos
-- [x] **DEMO-04**: Showcase page filterable by tech stack and completion date
+- [ ] **COMM-01**: `/community` page serves as a "Get Involved" page with clear onramps (Discord, mentorship, projects, roadmaps)
+- [ ] **COMM-02**: `/community` page shows community stats and social proof
+- [ ] **COMM-03**: `/community` page retains Discord channel directory (reorganized as secondary content)
 
-### Project Discovery
+### Stats API
 
-- [x] **DISC-05**: Public project discovery page shows all Active projects
-- [x] **DISC-06**: Discovery page filterable by tech stack tags and skill level
-- [x] **DISC-07**: Discovery page searchable by project name and description
-- [x] **DISC-08**: Project detail page shows full project information and team roster
-- [x] **DISC-09**: Project detail page shows application status for current user
-
-### Roadmap Creation
-
-- [x] **ROAD-01**: Mentor can create new roadmap with title, domain category, and Markdown content
-- [x] **ROAD-02**: Roadmap creation uses Markdown editor with preview
-- [x] **ROAD-03**: Mentor can save roadmap as draft (not published)
-- [x] **ROAD-04**: Mentor can submit draft roadmap for admin review
-- [x] **ROAD-05**: Admin can view pending roadmap submissions in admin dashboard
-- [x] **ROAD-06**: Admin can approve roadmap to publish it
-- [x] **ROAD-07**: Admin can request changes to roadmap with feedback
-- [x] **ROAD-08**: Mentor can edit published roadmap (creates new draft version)
-- [x] **ROAD-09**: Roadmap stores version history with timestamps
-
-### Roadmap Organization
-
-- [x] **ROAD-10**: Roadmap has domain category (Web Dev, Frontend, Backend, ML, AI, MCP Servers, AI Agents, Prompt Engineering)
-- [x] **ROAD-11**: Roadmap has difficulty level indicator (Beginner, Intermediate, Advanced)
-- [x] **ROAD-12**: Roadmap has estimated completion time
-- [x] **ROAD-13**: Roadmap displays author attribution (mentor profile link)
-- [x] **ROAD-14**: Roadmap shows last updated timestamp
-
-### Roadmap Discovery
-
-- [x] **ROAD-15**: Public roadmap catalog page lists all published roadmaps
-- [x] **ROAD-16**: Catalog filterable by domain category and difficulty level
-- [x] **ROAD-17**: Catalog searchable by title and description
-- [x] **ROAD-18**: Roadmap detail page renders Markdown content with syntax highlighting
-- [x] **ROAD-19**: Roadmap detail page shows related mentors who teach that domain
-
-### Admin Dashboard Integration
-
-- [x] **ADMIN-01**: Admin dashboard has new "Projects" tab showing all projects by status
-- [x] **ADMIN-02**: Admin dashboard has new "Roadmaps" tab showing all roadmaps by status
-- [x] **ADMIN-03**: Admin dashboard shows pending approvals count for projects and roadmaps
-- [x] **ADMIN-04**: Admin can filter projects by status, tech stack, and mentor
-- [x] **ADMIN-05**: Admin can filter roadmaps by status, domain, and author
-
-### Permissions & Security
-
-- [x] **PERM-01**: Only accepted mentors can create projects
-- [x] **PERM-02**: Only accepted mentors can create roadmaps
-- [x] **PERM-03**: Only admins can approve projects and roadmaps
-- [x] **PERM-04**: Only project creator and admins can manage team membership
-- [x] **PERM-05**: Roadmap Markdown content sanitized to prevent XSS attacks
-- [x] **PERM-06**: GitHub repo URLs validated before saving
-- [x] **PERM-07**: Only authenticated users can apply to projects
-- [x] **PERM-08**: Project creator cannot apply to their own project
+- [ ] **STATS-01**: API endpoint returns live community stats (mentor count, mentee count, active mentorships, completed mentorships, avg rating)
+- [ ] **STATS-02**: API endpoint returns social reach numbers (configurable, not hardcoded follower counts that need code changes)
+- [ ] **STATS-03**: Stats are cached to avoid excessive Firestore reads on every homepage load
 
 ## Future Requirements
 
-Deferred to post-v2.0 releases. Tracked but not in current roadmap.
+### Testimonials System
 
-### User Progress Tracking
+- **TEST-01**: Mentees can submit testimonials after mentorship completion
+- **TEST-02**: Admin can approve/reject testimonials before they appear publicly
 
-- **PROG-01**: User can mark progress on roadmap sections
-- **PROG-02**: User profile shows roadmap completion status
-- **PROG-03**: Roadmap shows number of users currently following it
+### Enhanced Social Proof
 
-### Advanced Collaboration
-
-- **COLLAB-01**: Project can have multiple project leads (co-creators)
-- **COLLAB-02**: Team members can propose changes to project description
-- **COLLAB-03**: Project activity feed shows recent updates and milestones
-
-### Notifications
-
-- **NOTIF-01**: User receives notification when application approved/declined
-- **NOTIF-02**: Project creator receives notification for new applications
-- **NOTIF-03**: Mentor receives notification when roadmap approved/rejected
-- **NOTIF-04**: User receives notification when invited to project
+- **SOCL-01**: Homepage shows recent project completions as activity feed
+- **SOCL-02**: Homepage shows recent mentorship completions
 
 ## Out of Scope
 
-Explicitly excluded. Documented to prevent scope creep.
-
 | Feature | Reason |
 |---------|--------|
-| Real-time collaborative editing | High complexity, WebSocket infrastructure, conflict resolution issues - async workflow sufficient |
-| In-app messaging/chat | Discord already integrated - avoid splitting conversations across platforms |
-| Roadmap progress tracking per user | Defer to v3 - focus on content quality first, tracking later |
-| Project voting/ranking | Popularity ≠ quality - mentor curation is the quality bar |
-| Live demo streaming | Infrastructure complexity, high failure risk - recorded demos sufficient |
-| Agile project management (milestones/sprints) | Overkill for community projects - simple status lifecycle sufficient |
-| Financial/payment features | Keep community-focused, no monetization |
-| Video conferencing integration | Discord handles synchronous communication |
-| Mobile app | Web-first approach, defer mobile native to v3+ |
+| Full visual redesign (new theme/colors) | Problem is information architecture, not visual design — keep existing DaisyUI theme |
+| Animated landing page / complex interactions | Keep it simple, content-focused — avoid performance overhead |
+| CMS for homepage content | Static content is fine for now, CMS adds complexity |
+| Auto-fetching social follower counts via APIs | API rate limits, auth complexity — use configurable values |
+| Mobile app | Web-first approach, defer to v4+ |
+| Blog migration to platform | External blog works fine, no need to move |
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PERM-01 | Phase 4 | Complete |
-| PERM-02 | Phase 4 | Complete |
-| PERM-03 | Phase 4 | Complete |
-| PERM-04 | Phase 4 | Complete |
-| PERM-05 | Phase 4 | Complete |
-| PERM-06 | Phase 4 | Complete |
-| PERM-07 | Phase 4 | Complete |
-| PERM-08 | Phase 4 | Complete |
-| PROJ-01 | Phase 5 | Complete |
-| PROJ-02 | Phase 5 | Complete |
-| PROJ-03 | Phase 5 | Complete |
-| PROJ-04 | Phase 5 | Complete |
-| PROJ-05 | Phase 5 | Complete |
-| PROJ-06 | Phase 5 | Complete |
-| PROJ-07 | Phase 5 | Complete |
-| PROJ-08 | Phase 5 | Complete |
-| PROJ-09 | Phase 5 | Complete |
-| DISC-01 | Phase 5 | Complete |
-| DISC-02 | Phase 5 | Complete |
-| DISC-03 | Phase 5 | Complete |
-| DISC-04 | Phase 5 | Complete |
-| TEAM-01 | Phase 6 | Complete |
-| TEAM-02 | Phase 6 | Complete |
-| TEAM-03 | Phase 6 | Complete |
-| TEAM-04 | Phase 6 | Complete |
-| TEAM-05 | Phase 6 | Complete |
-| TEAM-06 | Phase 6 | Complete |
-| TEAM-07 | Phase 6 | Complete |
-| TEAM-08 | Phase 6 | Complete |
-| TEAM-09 | Phase 6 | Complete |
-| DISC-05 | Phase 6 | Complete |
-| DISC-06 | Phase 6 | Complete |
-| DISC-07 | Phase 6 | Complete |
-| DISC-08 | Phase 6 | Complete |
-| DISC-09 | Phase 6 | Complete |
-| TMPL-01 | Phase 7 | Complete |
-| TMPL-02 | Phase 7 | Complete |
-| TMPL-03 | Phase 7 | Complete |
-| DEMO-01 | Phase 7 | Complete |
-| DEMO-02 | Phase 7 | Complete |
-| DEMO-03 | Phase 14 | Complete |
-| DEMO-04 | Phase 14 | Complete |
-| ROAD-01 | Phase 8 | Complete |
-| ROAD-02 | Phase 8 | Complete |
-| ROAD-03 | Phase 8 | Complete |
-| ROAD-04 | Phase 8 | Complete |
-| ROAD-05 | Phase 8 | Complete |
-| ROAD-06 | Phase 8 | Complete |
-| ROAD-07 | Phase 8 | Complete |
-| ROAD-08 | Phase 8 | Complete |
-| ROAD-09 | Phase 8 | Complete |
-| ROAD-10 | Phase 8 | Complete |
-| ROAD-11 | Phase 14 | Complete |
-| ROAD-12 | Phase 14 | Complete |
-| ROAD-13 | Phase 8 | Complete |
-| ROAD-14 | Phase 8 | Complete |
-| ROAD-15 | Phase 9 | Complete |
-| ROAD-16 | Phase 9 | Complete |
-| ROAD-17 | Phase 9 | Complete |
-| ROAD-18 | Phase 9 | Complete |
-| ROAD-19 | Phase 9 | Complete |
-| ADMIN-01 | Phase 10 | Complete |
-| ADMIN-02 | Phase 10 | Complete |
-| ADMIN-03 | Phase 10 | Complete |
-| ADMIN-04 | Phase 10 | Complete |
-| ADMIN-05 | Phase 10 | Complete |
+| HOME-01 | — | Pending |
+| HOME-02 | — | Pending |
+| HOME-03 | — | Pending |
+| HOME-04 | — | Pending |
+| HOME-05 | — | Pending |
+| HOME-06 | — | Pending |
+| HOME-07 | — | Pending |
+| NAV-01 | — | Pending |
+| NAV-02 | — | Pending |
+| NAV-03 | — | Pending |
+| NAV-04 | — | Pending |
+| PORT-01 | — | Pending |
+| PORT-02 | — | Pending |
+| PORT-03 | — | Pending |
+| PORT-04 | — | Pending |
+| PORT-05 | — | Pending |
+| PORT-06 | — | Pending |
+| PORT-07 | — | Pending |
+| PORT-08 | — | Pending |
+| MENT-01 | — | Pending |
+| MENT-02 | — | Pending |
+| MENT-03 | — | Pending |
+| MENT-04 | — | Pending |
+| COMM-01 | — | Pending |
+| COMM-02 | — | Pending |
+| COMM-03 | — | Pending |
+| STATS-01 | — | Pending |
+| STATS-02 | — | Pending |
+| STATS-03 | — | Pending |
 
 **Coverage:**
-- v2.0 requirements: 60 total
-- Mapped to phases: 60/60 (100%)
-- Unmapped: 0
-
-**Distribution:**
-- Phase 4 (Foundation): 8 requirements
-- Phase 5 (Projects Core): 13 requirements
-- Phase 6 (Projects Team): 14 requirements
-- Phase 7 (Projects Demo): 7 requirements
-- Phase 8 (Roadmaps Create): 14 requirements
-- Phase 9 (Roadmaps Discover): 5 requirements
-- Phase 10 (Integration): 5 requirements
+- v3.0 requirements: 29 total
+- Mapped to phases: 0
+- Unmapped: 29
 
 ---
-*Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after v2.0 roadmap creation with full traceability*
+*Requirements defined: 2026-03-10*
+*Last updated: 2026-03-10 after initial definition*
