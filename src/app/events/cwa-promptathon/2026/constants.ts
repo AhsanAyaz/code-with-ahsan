@@ -15,7 +15,7 @@ export const SPONSOR_STATS: StatItem[] = [
   { value: "4,300+", label: "Discord Members" },
   { value: "130,000+", label: "Social Followers" },
   { value: "50", label: "Participants" },
-  { value: "3", label: "Confirmed Judges" },
+  { value: "4", label: "Confirmed Judges" },
   { value: "GDE", label: "Founder" },
 ];
 
@@ -86,6 +86,14 @@ export const JUDGES: JudgeProfile[] = [
     linkedinUrl: "https://www.linkedin.com/in/asadkhalid305/",
     avatarUrl:
       "https://media.licdn.com/dms/image/v2/D4E03AQGk0ry36qwAsA/profile-displayphoto-shrink_800_800/B4EZQnyeDxHEAk-/0/1735834329848?e=1773878400&v=beta&t=-V4-7FVIORu5avV-4rBvCwtvyiH4gIIsNzb4xDQfQhU",
+  },
+  {
+    name: "Muhammad Faheem",
+    title: "Senior Software Engineer at Enoch Tech",
+    experience: "5+ years",
+    linkedinUrl: "https://www.linkedin.com/in/mfaheemrajput/",
+    avatarUrl:
+      "https://media.licdn.com/dms/image/v2/D4E03AQGGpdSeA3SVUg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1706203960476?e=1774483200&v=beta&t=o3atr4RehbXqwRsQHRWPQaTtUUk3qRgK3aCQvujIG34",
   },
 ];
 
