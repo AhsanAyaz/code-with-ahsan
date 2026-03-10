@@ -1,27 +1,48 @@
-// @ts-ignore
-import { MDXLayoutRenderer } from "@/components/MDXComponents";
-// @ts-ignore
-import { getFileBySlug } from "@/lib/mdx";
 import { Metadata } from "next";
+import { getCourses } from "@/lib/content/contentProvider";
+import PortfolioBio from "@/components/portfolio/PortfolioBio";
+import BooksSection from "@/components/portfolio/BooksSection";
+import CoursesSection from "@/components/portfolio/CoursesSection";
+import OpenSourceSection from "@/components/portfolio/OpenSourceSection";
+import WorkHistorySection from "@/components/portfolio/WorkHistorySection";
+import TestimonialsSection from "@/components/portfolio/TestimonialsSection";
+import ContactSection from "@/components/portfolio/ContactSection";
+import SocialLinksSection from "@/components/portfolio/SocialLinksSection";
 
 export const metadata: Metadata = {
-  title: "About - Muhammad Ahsan Ayaz",
-  description: "About me - Muhammad Ahsan Ayaz",
+  title: "About Muhammad Ahsan Ayaz - Software Architect, GDE, Author",
+  description:
+    "Software Architect at Scania, Google Developer Expert in AI & Angular, author of 4 books, and founder of Code With Ahsan community.",
 };
 
-const DEFAULT_LAYOUT = "AuthorLayout";
-
 export default async function About() {
-  const authorDetails = await getFileBySlug("authors", "ahsan_detailed");
-  const { mdxSource, frontMatter } = authorDetails;
+  const courses = await getCourses();
 
   return (
-    <div className="page-padding">
-      <MDXLayoutRenderer
-        layout={(frontMatter as any).layout || DEFAULT_LAYOUT}
-        mdxSource={mdxSource}
-        frontMatter={frontMatter}
-      />
-    </div>
+    <>
+      {/* 1. Bio / hero */}
+      <PortfolioBio />
+
+      {/* 2. Published books */}
+      <BooksSection />
+
+      {/* 3. Courses */}
+      <CoursesSection courses={courses} />
+
+      {/* 4. Open source */}
+      <OpenSourceSection />
+
+      {/* 5. Work history */}
+      <WorkHistorySection />
+
+      {/* 6. Testimonials */}
+      <TestimonialsSection />
+
+      {/* 7. Contact / hire */}
+      <ContactSection />
+
+      {/* 8. Social links with follower counts */}
+      <SocialLinksSection />
+    </>
   );
 }
