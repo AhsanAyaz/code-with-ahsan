@@ -230,6 +230,9 @@ export interface Roadmap {
   version: number;
   hasPendingDraft?: boolean;
   draftVersionNumber?: number;
+  feedback?: string;
+  feedbackAt?: Date;
+  feedbackBy?: string;
   createdAt: Date;
   updatedAt: Date;
   approvedAt?: Date;
