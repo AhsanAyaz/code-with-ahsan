@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Brand Identity & Site Restructure
 status: planning
-stopped_at: Completed 15-02-PLAN.md (Navigation Restructure)
-last_updated: "2026-03-10T14:24:31.737Z"
+stopped_at: Completed 15-01-PLAN.md
+last_updated: "2026-03-10T14:25:51.277Z"
 last_activity: 2026-03-10 — v3.0 roadmap created, 29 requirements mapped to 4 phases
 progress:
   total_phases: 4
@@ -52,6 +52,8 @@ Recent decisions affecting v3.0:
 - No new theme/colors — keep existing DaisyUI theme, fix information architecture only
 - [Phase 15]: Removed Firebase auth listener from nav — mentorship page handles own routing
 - [Phase 15]: Nav restructured to flat top-level with More dropdown — community sections (Mentorship, Projects, Roadmaps) promoted to primary nav
+- [Phase 15-stats-api-navigation]: Mentor count filters by status==accepted to only count active mentors
+- [Phase 15-stats-api-navigation]: Social reach counts served from src/data/socialReach.ts config file — placeholder values, owner updates manually
 
 ### Workflow Notes
 
@@ -67,8 +69,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T14:24:31.735Z
-Stopped at: Completed 15-02-PLAN.md (Navigation Restructure)
+Last session: 2026-03-10T14:25:51.275Z
+Stopped at: Completed 15-01-PLAN.md
 Resume file: None
 
 ---

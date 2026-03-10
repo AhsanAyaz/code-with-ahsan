@@ -50,9 +50,9 @@ Requirements for Brand Identity & Site Restructure milestone.
 
 ### Stats API
 
-- [ ] **STATS-01**: API endpoint returns live community stats (mentor count, mentee count, active mentorships, completed mentorships, avg rating)
-- [ ] **STATS-02**: API endpoint returns social reach numbers (configurable, not hardcoded follower counts that need code changes)
-- [ ] **STATS-03**: Stats are cached to avoid excessive Firestore reads on every homepage load
+- [x] **STATS-01**: API endpoint returns live community stats (mentor count, mentee count, active mentorships, completed mentorships, avg rating)
+- [x] **STATS-02**: API endpoint returns social reach numbers (configurable, not hardcoded follower counts that need code changes)
+- [x] **STATS-03**: Stats are cached to avoid excessive Firestore reads on every homepage load
 
 ## Future Requirements
 
@@ -107,9 +107,9 @@ Requirements for Brand Identity & Site Restructure milestone.
 | COMM-01 | Phase 18 | Pending |
 | COMM-02 | Phase 18 | Pending |
 | COMM-03 | Phase 18 | Pending |
-| STATS-01 | Phase 15 | Pending |
-| STATS-02 | Phase 15 | Pending |
-| STATS-03 | Phase 15 | Pending |
+| STATS-01 | Phase 15 | Complete |
+| STATS-02 | Phase 15 | Complete |
+| STATS-03 | Phase 15 | Complete |
 
 **Coverage:**
 - v3.0 requirements: 29 total
