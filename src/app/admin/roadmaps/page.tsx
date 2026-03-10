@@ -8,21 +8,48 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { getAuth } from "firebase/auth";
 import { getApp } from "firebase/app";
+import { useDebouncedCallback } from "use-debounce";
+
+const DOMAIN_LABELS: Record<string, string> = {
+  "web-dev": "Web Dev",
+  frontend: "Frontend",
+  backend: "Backend",
+  ml: "ML",
+  ai: "AI",
+  mcp: "MCP",
+  agents: "Agents",
+  "prompt-engineering": "Prompt Engineering",
+};
 
 export default function AdminRoadmapsPage() {
   const toast = useToast();
   const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
-  const [filter, setFilter] = useState<"pending" | "all">("pending");
+  const [filters, setFilters] = useState({
+    status: "pending" as string,
+    domain: "" as string,
+    author: "" as string,
+  });
   const [loadingRoadmaps, setLoadingRoadmaps] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const debouncedAuthorChange = useDebouncedCallback((value: string) => {
+    setFilters((prev) => ({ ...prev, author: value }));
+  }, 300);
+
+  const hasActiveFilters =
+    filters.status !== "pending" || filters.domain || filters.author;
 
   useEffect(() => {
     const fetchRoadmaps = async () => {
       setLoadingRoadmaps(true);
       try {
-        const response = await fetch(
-          `/api/roadmaps?admin=true&filter=${filter}`,
-        );
+        const params = new URLSearchParams();
+        params.set("admin", "true");
+        params.set("filter", filters.status);
+        if (filters.domain) params.set("domain", filters.domain);
+        if (filters.author) params.set("author", filters.author);
+
+        const response = await fetch(`/api/roadmaps?${params.toString()}`);
         if (response.ok) {
           const data = await response.json();
           setRoadmaps(data.roadmaps || []);
@@ -36,7 +63,11 @@ export default function AdminRoadmapsPage() {
     };
 
     fetchRoadmaps();
-  }, [toast, filter]);
+  }, [toast, filters]);
+
+  const handleClearFilters = () => {
+    setFilters({ status: "pending", domain: "", author: "" });
+  };
 
   const handleApprove = async (id: string, hasPendingDraft?: boolean) => {
     setActionLoading(id);
@@ -157,19 +188,97 @@ export default function AdminRoadmapsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-3xl font-bold">Roadmaps - Admin Review</h1>
-        <div className="tabs tabs-boxed w-fit">
-          <button
-            className={`tab ${filter === "pending" ? "tab-active" : ""}`}
-            onClick={() => setFilter("pending")}
-          >
-            Pending Review
-          </button>
-          <button
-            className={`tab ${filter === "all" ? "tab-active" : ""}`}
-            onClick={() => setFilter("all")}
-          >
-            All Roadmaps
-          </button>
+      </div>
+
+      {/* Filter bar */}
+      <div className="card bg-base-200 shadow-md p-4">
+        <div className="flex flex-col md:flex-row gap-4 items-start md:items-end flex-wrap">
+          {/* Status dropdown */}
+          <div className="form-control flex-1 w-full md:w-auto">
+            <label className="label">
+              <span className="label-text">Status</span>
+            </label>
+            <select
+              className="select select-bordered w-full"
+              value={filters.status}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, status: e.target.value }))
+              }
+            >
+              <option value="pending">Pending Review</option>
+              <option value="all">All Roadmaps</option>
+              <option value="approved">Approved</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+
+          {/* Domain dropdown */}
+          <div className="form-control flex-1 w-full md:w-auto">
+            <label className="label">
+              <span className="label-text">Domain</span>
+            </label>
+            <select
+              className="select select-bordered w-full"
+              value={filters.domain}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, domain: e.target.value }))
+              }
+            >
+              <option value="">All Domains</option>
+              {Object.entries(DOMAIN_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Author input */}
+          <div className="form-control flex-1 w-full md:w-auto">
+            <label className="label">
+              <span className="label-text">Author</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Filter by author name..."
+              className="input input-bordered w-full"
+              defaultValue={filters.author}
+              onChange={(e) => debouncedAuthorChange(e.target.value)}
+            />
+          </div>
+
+          {/* Clear filters button */}
+          {hasActiveFilters && (
+            <button
+              className="btn btn-ghost btn-sm gap-2 md:self-end"
+              onClick={handleClearFilters}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+              Clear Filters
+            </button>
+          )}
+        </div>
+
+        {/* Result count */}
+        <div className="mt-4 text-sm text-base-content/60">
+          {hasActiveFilters ? (
+            <span>{roadmaps.length} roadmaps (filtered)</span>
+          ) : (
+            <span>{roadmaps.length} roadmaps</span>
+          )}
         </div>
       </div>
 
@@ -179,7 +288,7 @@ export default function AdminRoadmapsPage() {
         </div>
       ) : roadmaps.length === 0 ? (
         <div className="text-center py-12 text-base-content/60">
-          No pending roadmap submissions
+          No roadmaps found
         </div>
       ) : (
         <div className="grid gap-4">
@@ -228,7 +337,7 @@ export default function AdminRoadmapsPage() {
                   <div>
                     <span className="font-semibold">Domain:</span>{" "}
                     <span className="badge badge-sm badge-outline">
-                      {roadmap.domain}
+                      {DOMAIN_LABELS[roadmap.domain] || roadmap.domain}
                     </span>
                   </div>
                   <div>

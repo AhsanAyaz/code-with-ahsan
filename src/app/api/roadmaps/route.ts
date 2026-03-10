@@ -231,13 +231,15 @@ export async function GET(request: NextRequest) {
     const filter = searchParams.get("filter") || "pending";
     const domain = searchParams.get("domain");
     const difficulty = searchParams.get("difficulty");
+    const author = searchParams.get("author");
 
     let roadmaps: any[] = [];
 
     if (adminView) {
       const roadmapMap = new Map();
 
-      if (filter === "all") {
+      if (filter !== "pending") {
+        // For "all" and status-specific filters (approved, draft), fetch all roadmaps
         const allQuery = db
           .collection("roadmaps")
           .orderBy("createdAt", "desc")
@@ -358,6 +360,24 @@ export async function GET(request: NextRequest) {
       );
 
       roadmaps = roadmapsWithDraftMetadata;
+
+      // Apply domain filter (admin view, client-side after draft metadata overlay)
+      if (domain) {
+        roadmaps = roadmaps.filter((r: any) => r.domain === domain);
+      }
+
+      // Apply author filter (match against creator display name)
+      if (author) {
+        const authorLower = author.toLowerCase();
+        roadmaps = roadmaps.filter((r: any) =>
+          r.creatorProfile?.displayName?.toLowerCase().includes(authorLower)
+        );
+      }
+
+      // Apply specific status filter (approved, draft) in admin view
+      if (filter !== "pending" && filter !== "all") {
+        roadmaps = roadmaps.filter((r: any) => r.status === filter);
+      }
     } else {
       // Normal query
       let query = db.collection("roadmaps");
