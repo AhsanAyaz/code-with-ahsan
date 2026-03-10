@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Gap Closure
 status: completed
-stopped_at: Completed 14-01-PLAN.md
-last_updated: "2026-03-10T13:26:59.088Z"
+stopped_at: Completed 14-02-PLAN.md
+last_updated: "2026-03-10T13:27:06.049Z"
 last_activity: "2026-03-06 - Completed quick task 067: Rename Remove Mentee to End Mentorship, add archived Discord channel cleanup"
 progress:
   total_phases: 15
@@ -180,6 +180,8 @@ Recent decisions affecting current work:
 - [Phase 14-01]: Lazy tab fetch with completedFetched guard: only fetch completed projects on first Completed tab activation
 - [Phase 14-01]: URL param syncing disabled for completed tab (browse experience vs search destination, consistent with Phase 07-06 pattern)
 - [Phase 14-01]: div+onClick card pattern for CompletedProjectCard to avoid nested anchor violation when demo link exists
+- [Phase 14-02]: VersionHistoryList placed after Markdown Content and before Related Mentors — logical reading order (content → history → discovery)
+- [Phase 14-02]: Admin auth check for GET /api/roadmaps?admin=true inserted at very top of adminView block — fails fast before Firestore queries; public path unprotected
 
 ### Timezone Handling Architecture
 
@@ -401,8 +403,8 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then:
 
 ## Session Continuity
 
-Last session: 2026-03-10T13:26:44.982Z
-Stopped at: Completed 14-01-PLAN.md
+Last session: 2026-03-10T13:27:06.046Z
+Stopped at: Completed 14-02-PLAN.md
 Resume file: None
 
 ---

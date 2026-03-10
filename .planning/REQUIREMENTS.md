@@ -74,8 +74,8 @@ Requirements for v2.0 milestone: Project Collaboration & Learning Roadmaps.
 ### Roadmap Organization
 
 - [x] **ROAD-10**: Roadmap has domain category (Web Dev, Frontend, Backend, ML, AI, MCP Servers, AI Agents, Prompt Engineering)
-- [ ] **ROAD-11**: Roadmap has difficulty level indicator (Beginner, Intermediate, Advanced)
-- [ ] **ROAD-12**: Roadmap has estimated completion time
+- [x] **ROAD-11**: Roadmap has difficulty level indicator (Beginner, Intermediate, Advanced)
+- [x] **ROAD-12**: Roadmap has estimated completion time
 - [x] **ROAD-13**: Roadmap displays author attribution (mentor profile link)
 - [x] **ROAD-14**: Roadmap shows last updated timestamp
 
@@ -203,8 +203,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ROAD-08 | Phase 8 | Complete |
 | ROAD-09 | Phase 8 | Complete |
 | ROAD-10 | Phase 8 | Complete |
-| ROAD-11 | Phase 14 | Pending |
-| ROAD-12 | Phase 14 | Pending |
+| ROAD-11 | Phase 14 | Complete |
+| ROAD-12 | Phase 14 | Complete |
 | ROAD-13 | Phase 8 | Complete |
 | ROAD-14 | Phase 8 | Complete |
 | ROAD-15 | Phase 9 | Complete |
