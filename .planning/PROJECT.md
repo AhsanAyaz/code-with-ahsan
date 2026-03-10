@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A comprehensive community platform for the "Code With Ahsan" developer community, providing mentorship management, project collaboration, and guided learning pathways. Built with Next.js, Firebase, and Discord integration to enable structured mentorship relationships, team-based project work, and curated learning resources.
+A comprehensive community platform for the "Code With Ahsan" developer community, providing mentorship management, project collaboration, learning roadmaps, and mentor booking. Built with Next.js, Firebase, and Discord integration to enable structured mentorship relationships, team-based project work, curated learning resources, and scheduled mentoring sessions with Google Calendar integration.
 
 ## Core Value
 
@@ -34,22 +34,25 @@ Community members can find mentors, collaborate on real projects with structured
 - ✓ Filter profiles via comprehensive filter modal (status, relationships, rating, discord) — v1.0
 - ✓ Restore declined mentors (change status to accepted) — v1.0
 
-### Active
-
 <!-- v2.0 - Project Collaboration & Learning Roadmaps -->
 
-- [ ] Mentors can create project proposals with templates
-- [ ] Admins can approve projects to move from Proposed to Active
-- [ ] Developers can browse public project discovery page
-- [ ] Developers can apply to join projects or be invited
-- [ ] Discord channels auto-created for approved projects
-- [ ] Project teams can share links, resources, and GitHub repos
-- [ ] Project lifecycle: Proposed → Active → Completed → Archived
-- [ ] Teams submit demos when marking projects complete
-- [ ] Mentors can create/edit roadmap content (Markdown)
-- [ ] Admins review and approve roadmap changes
-- [ ] Roadmaps available for: Web Dev, Frontend (React/Angular), Backend, ML, AI, MCP Servers, AI Agents, Prompt Engineering
-- [ ] Public roadmap listing and browsing
+- ✓ Project lifecycle: Proposed → Active → Completed → Archived — v2.0
+- ✓ Project templates (Fullstack App, AI Tool, Open Source Library) — v2.0
+- ✓ Team formation with applications, invitations, and skill matching — v2.0
+- ✓ Discord channels auto-created for approved projects — v2.0
+- ✓ Demo submission and showcase page for completed projects — v2.0
+- ✓ Learning roadmaps with Markdown editor and version history — v2.0
+- ✓ Roadmap catalog with domain filtering and mentor attribution — v2.0
+- ✓ Admin approval workflows for projects and roadmaps — v2.0
+- ✓ Mentor time slot availability with weekly scheduling — v2.0
+- ✓ Mentee booking with double-booking prevention — v2.0
+- ✓ Google Calendar integration for bookings — v2.0
+- ✓ Centralized permission system (60 requirements, 95 test cases) — v2.0
+- ✓ Admin project management with cascade delete — v2.0
+
+### Active
+
+(None — next milestone requirements TBD via `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -64,32 +67,33 @@ Community members can find mentors, collaborate on real projects with structured
 - Roadmap progress tracking per user — focus on content first, tracking later
 - Project financial/payment features — keep it community-focused, no monetization
 - Video/live streaming for demos — demos as recorded videos/links, not live infrastructure
+- Real-time collaborative editing — async workflow sufficient
+- Agile project management (milestones/sprints) — simple status lifecycle sufficient
+- Mobile app — web-first approach, defer to v3+
 
 ## Context
 
-**Existing Infrastructure:**
-- Admin dashboard at `src/app/mentorship/admin/page.tsx`
-- Discord integration in `src/lib/discord.ts` with channel creation, archiving, unarchiving
-- Mentorship types in `src/types/mentorship.ts` (MentorshipMatch, MentorshipProfile)
-- API routes at `src/app/api/mentorship/admin/` for profiles, stats, reviews
-- Firebase Firestore for data persistence
+**Current State (post-v2.0):**
+- 46,772 lines TypeScript/TSX across 568 files
+- Tech stack: Next.js 16, React 19, Firebase (Firestore + Storage), DaisyUI, Discord API, Google Calendar API
+- 15 phases completed, 44 plans executed, 41 quick tasks shipped
+- 60 v2.0 requirements all verified complete
+- Deployed on Vercel
 
-**Current Dashboard Tabs:**
-- Overview (stats, alerts)
-- Pending Mentors
-- All Mentors
-- All Mentees
-
-**Data Model:**
-- MentorshipProfile: has `discordUsername`, `status` (pending/accepted/declined/disabled)
-- MentorshipMatch: links mentor and mentee with `status` (pending/active/declined/completed/cancelled), stores `discordChannelId` and `discordChannelUrl`
+**Infrastructure:**
+- Admin dashboard at `/mentorship/admin/*` with nested route architecture
+- Discord integration for mentorships, projects, and notifications
+- Google Calendar OAuth for mentor booking calendar sync
+- Firebase Storage for roadmap Markdown content
+- Centralized permission system at `src/lib/permissions.ts`
+- GitHub Actions cron jobs for mentor reminders and inactivity checks
 
 ## Constraints
 
 - **Tech Stack**: Must use existing Next.js 16, React 19, Firebase, DaisyUI patterns
 - **UI Consistency**: Follow existing admin dashboard styling and component patterns
 - **Discord Integration**: Use existing `src/lib/discord.ts` functions for channel operations
-- **No New Dependencies**: Work within existing package ecosystem
+- **No New Dependencies**: Work within existing package ecosystem (exceptions require justification)
 
 ## Key Decisions
 
@@ -101,25 +105,25 @@ Community members can find mentors, collaborate on real projects with structured
 | Composite keys for edit state | Prevents jumps when same user in multiple cards | ✓ `${profileId}-${mentorshipId}` |
 | State machine for status transitions | Prevents invalid status changes | ✓ ALLOWED_TRANSITIONS map |
 | Batch fetching (30-item chunks) | Firestore 'in' query limit workaround | ✓ Chunked batch queries |
-
-## Current Milestone: v2.0 Community Collaboration & Learning
-
-**Goal:** Enable structured project collaboration and guided learning pathways, making it easy for developers to contribute while maintaining quality through mentor leadership.
-
-**Target features:**
-- Project collaboration system with lifecycle management (Proposed → Active → Completed → Archived)
-- Discord integration per project with team management
-- Project discovery, applications, invitations, and templates
-- Demo submission and showcase on project completion
-- Learning roadmap creation and management (mentor-authored, admin-approved)
-- Roadmap catalog covering key domains: Web Dev, Frontend, Backend, ML, AI, MCP, Agents, Prompt Engineering
+| Denormalized profile subset pattern | Efficient list rendering without joins | ✓ creatorProfile in projects, bookings |
+| Synchronous permission functions | No async DB lookups, simpler and faster | ✓ All context provided by caller |
+| Firebase Storage for Markdown | Avoid Firestore 1MB document limit | ✓ URL reference in Firestore |
+| Immutable version history | Audit trail integrity | ✓ No update/delete on roadmap versions |
+| Non-blocking Discord failures | API succeeds even if Discord down | ✓ Log errors, don't throw |
+| Auth at route level (not middleware) | Flexibility with public endpoints | ✓ Token verification per route |
+| AES-256-GCM for Calendar tokens | Secure refresh token storage | ✓ GOOGLE_CALENDAR_ENCRYPTION_KEY env var |
+| Firestore transactions for bookings | Atomic double-booking prevention | ✓ 409 Conflict on race condition |
+| Display times in viewer timezone | Prevents user confusion | ✓ Browser timezone + label |
+| Admin nested routes | Proper URL navigation vs client tabs | ✓ /admin/* route architecture |
+| Any user can create projects | Mentor-only was too restrictive | ✓ Changed in Phase 6.1 |
+| GitHub Actions for cron jobs | Vercel cron unreliable, standalone scripts | ✓ Firebase Admin direct init |
 
 ## Milestones
 
 | Version | Status | Completed |
 |---------|--------|-----------|
 | v1.0 | Complete | 2026-01-23 |
-| v2.0 | In Progress | — |
+| v2.0 | Complete | 2026-03-10 |
 
 ---
-*Last updated: 2026-02-02 after v2.0 milestone start*
+*Last updated: 2026-03-10 after v2.0 milestone completion*

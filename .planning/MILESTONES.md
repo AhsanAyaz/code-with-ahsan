@@ -2,6 +2,31 @@
 
 Track completed milestones and their phase ranges.
 
+## v2.0: Community Collaboration & Learning
+
+**Completed:** 2026-03-10
+**Phases:** 4-14 (11 phases + Phase 6.1 insert)
+**Plans:** 44 | **Commits:** 517 | **LOC:** 46,772 TypeScript
+**Timeline:** 36 days (2026-02-02 → 2026-03-10)
+**Archive:** `.planning/milestones/v2.0-ROADMAP.md`, `.planning/milestones/v2.0-REQUIREMENTS.md`
+
+**Delivered:**
+- Project collaboration system with full lifecycle (Proposed → Active → Completed → Archived) and Discord integration
+- Team formation with applications, invitations, skill matching, and member management
+- Project templates (Fullstack App, AI Tool, Open Source Library) and demo submission on completion
+- Showcase page for completed projects with demo links, tech stack filtering, and completion date sorting
+- Learning roadmap authoring with Markdown editor, version history, and admin approval workflow
+- Roadmap discovery catalog with domain filtering, difficulty levels, and related mentor recommendations
+- Mentor time slots with weekly availability management, mentee booking with double-booking prevention, and Google Calendar integration
+- Admin project management with cascade delete, Discord cleanup, and nested route dashboard refactor
+- Foundation: centralized permission system (95 test cases), Firestore security rules, input sanitization
+- UX improvements: smart navigation routing, dashboard widget redesign, ProfileAvatar unification
+- Security: admin token auth on sensitive endpoints, XSS prevention, HTTPS-only URL validation
+
+**Quick Tasks (Post-v2.0):** 41 quick tasks (006-071) covering bug fixes, UI polish, Discord notifications, SEO, Core Web Vitals, cron jobs, and feature refinements.
+
+---
+
 ## v1.0: Mentorship Admin Dashboard
 
 **Completed:** 2026-01-23
@@ -25,16 +50,4 @@ Track completed milestones and their phase ranges.
 
 ---
 
-## v2.0: Community Collaboration & Learning
-
-**Status:** In progress
-**Started:** 2026-02-02
-**Phases:** 4+
-
-**Target:**
-- Project collaboration system with Discord integration
-- Learning roadmaps for community skill development
-
----
-
-*Updated: 2026-02-02*
+*Updated: 2026-03-10*
