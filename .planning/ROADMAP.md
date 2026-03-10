@@ -121,7 +121,7 @@ Plans:
 | 12. Time Slots | v2.0 | 6/6 | Complete | 2026-02-14 |
 | 13. UX Review | v2.0 | 1/1 | Complete | 2026-02-15 |
 | 14. Audit Gap Closure | v2.0 | 2/2 | Complete | 2026-03-10 |
-| 15. Stats API & Navigation | 2/2 | Complete   | 2026-03-10 | - |
+| 15. Stats API & Navigation | 2/2 | Complete    | 2026-03-10 | - |
 | 16. Homepage Redesign | v3.0 | 0/TBD | Not started | - |
 | 17. Portfolio Page | v3.0 | 0/TBD | Not started | - |
 | 18. Mentorship & Community Pages | v3.0 | 0/TBD | Not started | - |
