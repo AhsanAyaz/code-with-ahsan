@@ -1,22 +1,25 @@
 import { Metadata } from "next";
+import Link from "next/link";
 // @ts-ignore
 import siteMetadata from "@/data/siteMetadata";
+import CommunityGetInvolved from "@/components/community/CommunityGetInvolved";
+import CommunityStatsBar from "@/components/community/CommunityStatsBar";
 
 export const metadata: Metadata = {
-  title: `Community Hub - ${siteMetadata.title}`,
+  title: `Get Involved - ${siteMetadata.title}`,
   description:
-    "Join 4,300+ developers in the CodeWithAhsan Discord community. Explore channels for mentorship, projects, Angular, AI/ML, and more.",
+    "Join 4,300+ developers in the CodeWithAhsan community. Find a mentor, collaborate on projects, follow learning roadmaps, and connect on Discord.",
   openGraph: {
-    title: `Community Hub - ${siteMetadata.title}`,
+    title: `Get Involved - ${siteMetadata.title}`,
     description:
-      "Join 4,300+ developers in the CodeWithAhsan Discord community. Explore channels for mentorship, projects, Angular, AI/ML, and more.",
+      "Join 4,300+ developers in the CodeWithAhsan community. Find a mentor, collaborate on projects, follow learning roadmaps, and connect on Discord.",
     images: ["/images/community-og.png"],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Community Hub - ${siteMetadata.title}`,
+    title: `Get Involved - ${siteMetadata.title}`,
     description:
-      "Join 4,300+ developers in the CodeWithAhsan Discord community. Explore channels for mentorship, projects, Angular, AI/ML, and more.",
+      "Join 4,300+ developers in the CodeWithAhsan community. Find a mentor, collaborate on projects, follow learning roadmaps, and connect on Discord.",
     images: ["/images/community-og.png"],
   },
 };
@@ -190,12 +193,12 @@ export default function CommunityPage() {
       <section className="bg-base-200 page-padding py-16">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-base-content">
-            Join the CodeWithAhsan Community
+            Get Involved with Code With Ahsan
           </h1>
           <p className="text-lg text-base-content/70 mb-10">
-            4,300+ developers learning, building, and growing together. Jump
-            into our Discord to connect, get help, and collaborate on real
-            projects.
+            4,300+ developers learning, building, and growing together. Connect
+            on Discord, find a mentor, collaborate on real projects, or follow a
+            structured learning roadmap.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
@@ -206,18 +209,24 @@ export default function CommunityPage() {
             >
               Join Discord
             </a>
-            <a href="#channels" className="btn btn-outline">
-              Browse Channels
-            </a>
+            <Link href="/mentorship" className="btn btn-outline">
+              Explore Mentorship
+            </Link>
           </div>
         </div>
       </section>
 
+      {/* Community Stats Bar */}
+      <CommunityStatsBar />
+
+      {/* Get Involved Onramp Cards */}
+      <CommunityGetInvolved />
+
       {/* Discord Channels Section */}
-      <section id="channels" className="bg-base-100 page-padding py-16">
+      <section id="channels" className="bg-base-200 page-padding py-16">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-10 text-base-content text-center">
-            Explore Our Channels
+            Explore Our Discord Channels
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {channelCategories.map((category) => (
@@ -275,7 +284,7 @@ export default function CommunityPage() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="bg-base-200 page-padding py-16">
+      <section id="faq" className="bg-base-100 page-padding py-16">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-10 text-base-content text-center">
             Frequently Asked Questions
