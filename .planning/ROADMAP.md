@@ -232,12 +232,14 @@ Plans:
   6. All existing mentorship features pass regression test suite (Discord channels, profile management, status transitions)
   7. Navigation flows work correctly between mentorship, projects, and roadmaps
 
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
 - [x] 10-01: Dashboard integration (My Projects, My Roadmaps)
 - [x] 10-02: Cross-feature links and recommendations
 - [x] 10-03: Regression testing and polish
+- [ ] 10-04-PLAN.md â€” Gap closure: Add pending project/roadmap counts to admin overview— Gap closure: Add pending project/roadmap counts to admin overview
+- [ ] 10-05-PLAN.md â€” Gap closure: Add tech stack, creator, domain, author filter dimensions— Gap closure: Add tech stack, creator, domain, author filter dimensions
 
 ---
 
