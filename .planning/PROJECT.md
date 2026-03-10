@@ -50,16 +50,16 @@ Community members can find mentors, collaborate on real projects with structured
 - ✓ Centralized permission system (60 requirements, 95 test cases) — v2.0
 - ✓ Admin project management with cascade delete — v2.0
 
-### Active
+### Validated
 
 <!-- v3.0 - Brand Identity & Site Restructure -->
 
-- [ ] Community-first homepage redesign
-- [ ] Navigation overhaul (flatten dropdown, promote key sections)
-- [ ] Portfolio/founder page (`/about` redesign)
-- [ ] `/community` page rethink (merge into homepage or repurpose)
-- [ ] Mentorship landing page refocus (remove community entry role)
-- [ ] Social proof API (live stats for homepage)
+- ✓ Community-first homepage redesign — v3.0
+- ✓ Navigation overhaul (flatten dropdown, promote key sections) — v3.0
+- ✓ Portfolio/founder page (`/about` redesign) — v3.0
+- ✓ `/community` page rethink (repurposed as Get Involved hub) — v3.0
+- ✓ Mentorship landing page refocus (removed community entry role) — v3.0
+- ✓ Social proof API (live stats for homepage) — v3.0
 
 ### Out of Scope
 
@@ -125,16 +125,17 @@ Community members can find mentors, collaborate on real projects with structured
 | Any user can create projects | Mentor-only was too restrictive | ✓ Changed in Phase 6.1 |
 | GitHub Actions for cron jobs | Vercel cron unreliable, standalone scripts | ✓ Firebase Admin direct init |
 
-## Current Milestone: v3.0 Brand Identity & Site Restructure
+## Current State (post-v3.0)
 
-**Goal:** Transform the site from a personal brand page with hidden community features into a community-first platform with founder credibility, clear navigation, and a recruiter-ready portfolio page.
+**Shipped:** v3.0 Brand Identity & Site Restructure (2026-03-10)
 
-**Target features:**
-- Community-first homepage with social proof and pillar navigation
-- Flat top-level navigation promoting key community sections
-- Portfolio/founder page for recruiter audience
-- Mentorship page refocused on mentorship (not community entry)
-- Live community stats API for homepage freshness
+The site is now a community-first platform with:
+- Community-first homepage with live stats, social proof, pillars, and founder credibility
+- Flat top-level navigation (7 primary items) promoting community sections
+- Recruiter-ready `/about` portfolio page (bio, books, courses, 11 open source repos, work history, 12 testimonials, contact)
+- Mentorship page refocused on mentor matching (not community entry)
+- `/community` page as Get Involved hub with onramps
+- Public stats API with Firestore caching
 
 ## Milestones
 
@@ -142,7 +143,7 @@ Community members can find mentors, collaborate on real projects with structured
 |---------|--------|-----------|
 | v1.0 | Complete | 2026-01-23 |
 | v2.0 | Complete | 2026-03-10 |
-| v3.0 | In Progress | — |
+| v3.0 | Complete | 2026-03-10 |
 
 ---
-*Last updated: 2026-03-10 after v3.0 milestone start*
+*Last updated: 2026-03-10 after v3.0 milestone completion*

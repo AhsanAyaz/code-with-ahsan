@@ -8,7 +8,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 
 - ✅ **v1.0 Mentorship Admin Dashboard** — Phases 1-3 (shipped 2026-01-23)
 - ✅ **v2.0 Community Collaboration & Learning** — Phases 4-14 (shipped 2026-03-10)
-- 🚧 **v3.0 Brand Identity & Site Restructure** — Phases 15-18 (in progress)
+- ✅ **v3.0 Brand Identity & Site Restructure** — Phases 15-18 (shipped 2026-03-10)
 
 ## Phases
 
@@ -39,80 +39,15 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 
 </details>
 
-### 🚧 v3.0 Brand Identity & Site Restructure (In Progress)
+<details>
+<summary>✅ v3.0 Brand Identity & Site Restructure (Phases 15-18) — SHIPPED 2026-03-10</summary>
 
-**Milestone Goal:** Transform the site from a personal brand page with hidden community features into a community-first platform with founder credibility, clear navigation, and a recruiter-ready portfolio page.
+- [x] Phase 15: Stats API & Navigation (2/2 plans) — completed 2026-03-10
+- [x] Phase 16: Homepage Redesign (2/2 plans) — completed 2026-03-10
+- [x] Phase 17: Portfolio Page (2/2 plans) — completed 2026-03-10
+- [x] Phase 18: Mentorship & Community Pages (2/2 plans) — completed 2026-03-10
 
-- [x] **Phase 15: Stats API & Navigation** - Backend stats API and flat top-level navigation restructure (completed 2026-03-10)
-- [x] **Phase 16: Homepage Redesign** - Community-first hero, pillars, live stats, and social proof (completed 2026-03-10)
-- [x] **Phase 17: Portfolio Page** - Recruiter-ready `/about` page with bio, books, courses, and work history (completed 2026-03-10)
-- [x] **Phase 18: Mentorship & Community Pages** - Refocus mentorship landing and repurpose community page (completed 2026-03-10)
-
-## Phase Details
-
-### Phase 15: Stats API & Navigation
-**Goal**: Site-wide infrastructure is ready — stats are available from an API and navigation surfaces community sections at the top level
-**Depends on**: Phase 14 (v2.0 complete)
-**Requirements**: STATS-01, STATS-02, STATS-03, NAV-01, NAV-02, NAV-03, NAV-04
-**Success Criteria** (what must be TRUE):
-  1. A visitor can hit the stats API endpoint and receive live counts for mentors, mentees, active mentorships, completed mentorships, and average rating
-  2. Social reach numbers (YouTube, Instagram, etc.) are served from config, not hardcoded — updating them requires no code change
-  3. Stats are cached so repeated homepage loads do not each trigger fresh Firestore reads
-  4. Every page shows a flat top-level nav with Mentorship, Projects, Roadmaps, Courses, Books, Blog, About as direct links
-  5. Mobile nav mirrors the flat desktop structure with community sections promoted
-**Plans**: 2 plans
-
-Plans:
-- [x] 15-01-PLAN.md — Public stats API with caching and social reach config
-- [x] 15-02-PLAN.md — Navigation restructure (flat top-level links, More dropdown, active highlighting)
-
-### Phase 16: Homepage Redesign
-**Goal**: Visitors land on a page that communicates community identity, shows real activity, and directs them to the right pillar
-**Depends on**: Phase 15
-**Requirements**: HOME-01, HOME-02, HOME-03, HOME-04, HOME-05, HOME-06, HOME-07
-**Success Criteria** (what must be TRUE):
-  1. A first-time visitor sees a community-named hero with a tagline and a clear join CTA — no personal branding in the hero
-  2. Visitor can see all five community pillars (Mentorship, Projects, Roadmaps, Courses, Books) with descriptions and working links
-  3. Visitor sees live community stats on the page (mentor count, mentee count, active and completed mentorships, average rating) pulled from the Phase 15 API
-  4. Visitor sees Ahsan's founder credibility section (photo, GDE badge, brief community-founder bio) positioned below the community content
-  5. Visitor sees a newsletter signup section and a community FAQ section on the page
-**Plans**: 2 plans
-
-Plans:
-- [x] 16-01-PLAN.md — Community hero, pillars grid, and live stats components
-- [x] 16-02-PLAN.md — Social reach bar, founder credibility, and homepage assembly
-
-### Phase 17: Portfolio Page
-**Goal**: Recruiters and collaborators can learn about Ahsan's professional background, output, and contact options all from `/about`
-**Depends on**: Phase 15
-**Requirements**: PORT-01, PORT-02, PORT-03, PORT-04, PORT-05, PORT-06, PORT-07, PORT-08
-**Success Criteria** (what must be TRUE):
-  1. Visitor can read a professional bio with Ahsan's photo and GDE badge on `/about`
-  2. Visitor can see published books with covers, descriptions, and purchase links
-  3. Visitor can see courses with descriptions and enrollment links
-  4. Visitor can see open-source community projects Ahsan has authored
-  5. Visitor can see professional work history, mentee/student testimonials, a contact/hire section, and social media links with follower counts
-**Plans**: 2 plans
-
-Plans:
-- [x] 17-01-PLAN.md — Portfolio data files and static-data components (bio, books, work history, testimonials, contact)
-- [x] 17-02-PLAN.md — Dynamic components (courses, open-source, social links) and page assembly
-
-### Phase 18: Mentorship & Community Pages
-**Goal**: Mentorship page converts visitors who want a mentor or to become one; community page serves as a clear get-involved hub
-**Depends on**: Phase 15
-**Requirements**: MENT-01, MENT-02, MENT-03, MENT-04, COMM-01, COMM-02, COMM-03
-**Success Criteria** (what must be TRUE):
-  1. Mentorship page hero focuses on finding or becoming a mentor — not joining the broader community
-  2. Visitor can see how the mentorship program works (steps or process overview) on the mentorship page
-  3. Visitor can browse mentors with search and filters from the mentorship landing page
-  4. `/community` page presents clear onramps to Discord, mentorship, projects, and roadmaps with community stats visible
-  5. Discord channel directory is accessible from the community page as secondary (not hero) content
-**Plans**: 2 plans
-
-Plans:
-- [ ] 18-01-PLAN.md — Refocus mentorship page hero, add HowItWorks section, add API-driven stats
-- [ ] 18-02-PLAN.md — Redesign community page as Get Involved hub with onramps, stats, and Discord directory
+</details>
 
 ## Progress
 
@@ -136,7 +71,7 @@ Plans:
 | 15. Stats API & Navigation | v3.0 | 2/2 | Complete | 2026-03-10 |
 | 16. Homepage Redesign | v3.0 | 2/2 | Complete | 2026-03-10 |
 | 17. Portfolio Page | v3.0 | 2/2 | Complete | 2026-03-10 |
-| 18. Mentorship & Community Pages | 2/2 | Complete    | 2026-03-10 | - |
+| 18. Mentorship & Community | v3.0 | 2/2 | Complete | 2026-03-10 |
 
 ---
-*Last updated: 2026-03-10 after Phase 18 planning*
+*Last updated: 2026-03-10 after v3.0 milestone completion*
