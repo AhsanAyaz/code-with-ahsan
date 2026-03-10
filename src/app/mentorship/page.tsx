@@ -85,10 +85,9 @@ export default function MentorshipPage() {
 
       {/* Hero Section */}
       <MentorshipHero
-        user={user}
         profile={profile}
         loading={loading}
-        onRoleClick={handleRoleClick}
+        onRoleClickAction={handleRoleClick}
       />
 
       {/* Mentorship Stats from API */}

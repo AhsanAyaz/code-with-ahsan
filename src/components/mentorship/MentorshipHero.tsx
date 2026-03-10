@@ -1,21 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import type { User } from "firebase/auth";
 import type { MentorshipProfile } from "@/types/mentorship";
 
 type MentorshipHeroProps = {
-  user: User | null;
   profile: MentorshipProfile | null;
   loading: boolean;
-  onRoleClick: (role: "mentor" | "mentee") => void;
+  onRoleClickAction: (role: "mentor" | "mentee") => void;
 };
 
 export default function MentorshipHero({
-  user,
   profile,
   loading,
-  onRoleClick,
+  onRoleClickAction,
 }: MentorshipHeroProps) {
   return (
     <div className="card bg-gradient-to-r from-primary to-secondary text-primary-content">
@@ -42,13 +39,13 @@ export default function MentorshipHero({
           ) : (
             <>
               <button
-                onClick={() => onRoleClick("mentee")}
+                onClick={() => onRoleClickAction("mentee")}
                 className="btn btn-lg bg-white/20 hover:bg-white/30 border-none"
               >
                 Find a Mentor
               </button>
               <button
-                onClick={() => onRoleClick("mentor")}
+                onClick={() => onRoleClickAction("mentor")}
                 className="btn btn-lg bg-white/20 hover:bg-white/30 border-none"
               >
                 Become a Mentor
