@@ -9,6 +9,9 @@ import type { PublicMentor } from "@/types/mentorship";
 import ProfileAvatar from "@/components/ProfileAvatar";
 
 import DiscordValidationBanner from "@/components/mentorship/DiscordValidationBanner";
+import MentorshipHero from "@/components/mentorship/MentorshipHero";
+import HowItWorks from "@/components/mentorship/HowItWorks";
+import MentorshipStats from "@/components/mentorship/MentorshipStats";
 
 export default function MentorshipPage() {
   const router = useRouter();
@@ -80,79 +83,26 @@ export default function MentorshipPage() {
         />
       )}
 
-      {/* Hero Section with CTAs */}
-      <div className="card bg-gradient-to-r from-primary to-secondary text-primary-content">
-        <div className="card-body text-center py-10">
-          <h2 className="text-3xl md:text-4xl font-bold">
-            Join Our Mentorship Community
-          </h2>
-          <p className="opacity-90 max-w-2xl mx-auto mt-2">
-            Connect with experienced professionals or share your expertise to
-            help others grow. Our mentorship program is designed to accelerate
-            career development through meaningful connections.
-          </p>
+      {/* Hero Section */}
+      <MentorshipHero
+        user={user}
+        profile={profile}
+        loading={loading}
+        onRoleClick={handleRoleClick}
+      />
 
-          <div className="card-actions justify-center mt-6 gap-4 flex-wrap">
-            {loading ? (
-              <span className="loading loading-spinner loading-md"></span>
-            ) : profile ? (
-              // User has profile - show dashboard button
-              <Link
-                href="/mentorship/dashboard"
-                className="btn btn-lg bg-white/20 hover:bg-white/30 border-none"
-              >
-                <span className="text-xl">📊</span> Go to Dashboard
-              </Link>
-            ) : (
-              // No profile - show role selection buttons
-              <>
-                <button
-                  onClick={() => handleRoleClick("mentor")}
-                  className="btn btn-lg bg-white/20 hover:bg-white/30 border-none"
-                >
-                  <span className="text-xl">🎯</span> Register as Mentor
-                </button>
-                <button
-                  onClick={() => handleRoleClick("mentee")}
-                  className="btn btn-lg bg-white/20 hover:bg-white/30 border-none"
-                >
-                  <span className="text-xl">🚀</span> Register as Mentee
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
+      {/* Mentorship Stats from API */}
+      <MentorshipStats />
 
-      {/* Stats Banner */}
-      <div className="stats shadow w-full bg-gradient-to-r from-primary/10 to-secondary/10">
-        <div className="stat">
-          <div className="stat-title">Active Mentors</div>
-          <div className="stat-value text-primary">{mentors.length}</div>
-          <div className="stat-desc">Ready to help</div>
-        </div>
-        <div className="stat">
-          <div className="stat-title">Active Mentorships</div>
-          <div className="stat-value text-secondary">
-            {mentors.reduce((sum, m) => sum + m.activeMenteeCount, 0)}
-          </div>
-          <div className="stat-desc">Ongoing relationships</div>
-        </div>
-        <div className="stat">
-          <div className="stat-title">Mentorships Completed</div>
-          <div className="stat-value text-accent">
-            {mentors.reduce((sum, m) => sum + m.completedMentorships, 0)}
-          </div>
-          <div className="stat-desc">Success stories</div>
-        </div>
-      </div>
+      {/* How It Works */}
+      <HowItWorks />
 
-      {/* Community Mentors Section */}
+      {/* Browse Mentors Section */}
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h3 className="text-2xl font-bold">
-              <span className="text-primary">🌟</span> Community Mentors
+              <span className="text-primary">🌟</span> Browse Mentors
             </h3>
             <p className="text-base-content/70 text-sm">
               Meet the amazing professionals who volunteer their time to guide
