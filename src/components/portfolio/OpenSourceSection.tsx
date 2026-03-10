@@ -24,11 +24,10 @@ export default function OpenSourceSection() {
                   >
                     {project.name}
                   </a>
-                  {project.stars && (
-                    <span className="text-xs text-base-content/50 whitespace-nowrap">
-                      ⭐ {project.stars}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2 text-xs text-base-content/50 whitespace-nowrap">
+                    {project.stars > 0 && <span>⭐ {project.stars}</span>}
+                    {project.forks > 0 && <span>🍴 {project.forks}</span>}
+                  </div>
                 </div>
 
                 {/* Description */}
