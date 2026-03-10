@@ -45,12 +45,26 @@ export async function GET() {
       .orderBy('createdAt', 'desc')
       .limit(10)
       .get()
-    
+
     const alerts = alertsSnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate?.() || null,
     }))
+
+    // Get pending project and roadmap counts
+    const [pendingProjectsSnapshot, pendingRoadmapsSnapshot, pendingDraftRoadmapsSnapshot] = await Promise.all([
+      db.collection('projects').where('status', '==', 'pending').get(),
+      db.collection('roadmaps').where('status', '==', 'pending').get(),
+      db.collection('roadmaps').where('hasPendingDraft', '==', true).get(),
+    ]);
+    const pendingProjects = pendingProjectsSnapshot.size;
+    // Deduplicate: a roadmap could be both pending AND hasPendingDraft (unlikely but safe)
+    const pendingRoadmapIds = new Set([
+      ...pendingRoadmapsSnapshot.docs.map(d => d.id),
+      ...pendingDraftRoadmapsSnapshot.docs.map(d => d.id),
+    ]);
+    const pendingRoadmaps = pendingRoadmapIds.size;
 
     return NextResponse.json({
       stats: {
@@ -64,6 +78,8 @@ export async function GET() {
         totalSessions,
         averageRating,
         lowRatingAlerts: alerts.length,
+        pendingProjects,
+        pendingRoadmaps,
       },
       alerts,
     }, { status: 200 })

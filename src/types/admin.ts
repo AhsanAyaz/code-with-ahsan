@@ -11,6 +11,8 @@ export interface AdminStats {
   totalSessions: number;
   averageRating: number;
   lowRatingAlerts: number;
+  pendingProjects: number;
+  pendingRoadmaps: number;
 }
 
 export interface Alert {
