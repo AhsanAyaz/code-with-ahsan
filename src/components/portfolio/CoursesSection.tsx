@@ -27,7 +27,7 @@ export default function CoursesSection({ courses }: Props) {
                   className="bg-base-100 border border-base-300 rounded-xl overflow-hidden hover:shadow-md transition-all flex flex-col"
                 >
                   {/* Banner */}
-                  <div className="relative w-full h-48">
+                  <div className="relative w-full aspect-video">
                     {bannerUrl ? (
                       <Image
                         src={bannerUrl}
