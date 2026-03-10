@@ -48,8 +48,8 @@ Requirements for v2.0 milestone: Project Collaboration & Learning Roadmaps.
 
 - [x] **DEMO-01**: Project creator can submit demo when marking project as Completed
 - [x] **DEMO-02**: Demo submission includes video/presentation URL and description
-- [ ] **DEMO-03**: Public showcase page displays completed projects with demos
-- [ ] **DEMO-04**: Showcase page filterable by tech stack and completion date
+- [x] **DEMO-03**: Public showcase page displays completed projects with demos
+- [x] **DEMO-04**: Showcase page filterable by tech stack and completion date
 
 ### Project Discovery
 
@@ -191,8 +191,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TMPL-03 | Phase 7 | Complete |
 | DEMO-01 | Phase 7 | Complete |
 | DEMO-02 | Phase 7 | Complete |
-| DEMO-03 | Phase 14 | Pending |
-| DEMO-04 | Phase 14 | Pending |
+| DEMO-03 | Phase 14 | Complete |
+| DEMO-04 | Phase 14 | Complete |
 | ROAD-01 | Phase 8 | Complete |
 | ROAD-02 | Phase 8 | Complete |
 | ROAD-03 | Phase 8 | Complete |
