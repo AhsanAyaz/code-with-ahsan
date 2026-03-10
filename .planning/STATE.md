@@ -64,9 +64,12 @@ Recent decisions affecting v3.0:
 - [Phase 17-01]: All portfolio components are server components — no interactivity needed for static data display
 - [Phase 17-02]: CoursesSection receives courses as prop (not calling getCourses internally) — consistent with data-fetching at page level
 - [Phase 17-02]: SocialLinksSection returns null on error — same graceful degradation pattern as SocialReachBar
-- [Phase 18-mentorship-community-pages]: MentorshipStats fetches from /api/stats instead of computing from mentor array — centralizes stats logic
-- [Phase 18-mentorship-community-pages]: HowItWorks is a server component — no interactivity needed for static content
-- [Phase 18-mentorship-community-pages]: MentorshipStats returns null on error — consistent graceful degradation pattern
+- [Phase 18-01]: MentorshipStats fetches from /api/stats instead of computing from mentor array — centralizes stats logic
+- [Phase 18-01]: HowItWorks is a server component — no interactivity needed for static content
+- [Phase 18-01]: MentorshipStats returns null on error — consistent graceful degradation pattern
+- [Phase 18-02]: CommunityStatsBar shows 4 key stats (Discord members, Active Mentors, Active Mentorships, Avg Rating) — subset of full CommunityStats for compact bar layout
+- [Phase 18-02]: Hero CTA has both Join Discord (primary) and Explore Mentorship (secondary) to surface both top community entry points
+- [Phase 18-02]: Discord channel section heading renamed to 'Explore Our Discord Channels' to clarify it is Discord-specific
 
 ### Workflow Notes
 
@@ -83,8 +86,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-10T15:21:57.353Z
-Stopped at: Completed 18-01-PLAN.md
+Stopped at: Completed 18-02-PLAN.md
 Resume file: None
 
 ---
-*Updated: 2026-03-10 after Phase 17 Plan 02 execution*
+*Updated: 2026-03-10 after Phase 18 Plan 02 execution*

@@ -44,9 +44,9 @@ Requirements for Brand Identity & Site Restructure milestone.
 
 ### Community Page
 
-- [ ] **COMM-01**: `/community` page serves as a "Get Involved" page with clear onramps (Discord, mentorship, projects, roadmaps)
-- [ ] **COMM-02**: `/community` page shows community stats and social proof
-- [ ] **COMM-03**: `/community` page retains Discord channel directory (reorganized as secondary content)
+- [x] **COMM-01**: `/community` page serves as a "Get Involved" page with clear onramps (Discord, mentorship, projects, roadmaps)
+- [x] **COMM-02**: `/community` page shows community stats and social proof
+- [x] **COMM-03**: `/community` page retains Discord channel directory (reorganized as secondary content)
 
 ### Stats API
 
@@ -104,9 +104,9 @@ Requirements for Brand Identity & Site Restructure milestone.
 | MENT-02 | Phase 18 | Complete |
 | MENT-03 | Phase 18 | Complete |
 | MENT-04 | Phase 18 | Complete |
-| COMM-01 | Phase 18 | Pending |
-| COMM-02 | Phase 18 | Pending |
-| COMM-03 | Phase 18 | Pending |
+| COMM-01 | Phase 18 | Complete |
+| COMM-02 | Phase 18 | Complete |
+| COMM-03 | Phase 18 | Complete |
 | STATS-01 | Phase 15 | Complete |
 | STATS-02 | Phase 15 | Complete |
 | STATS-03 | Phase 15 | Complete |
