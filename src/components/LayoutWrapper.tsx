@@ -35,7 +35,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="navbar bg-base-100 px-4 sm:px-8 md:px-12 lg:px-16 z-50">
-        <div className="navbar-start shrink-0 w-auto">
+        <div className="navbar-start md:shrink-0 md:w-auto">
           <Link
             href="/"
             aria-label="Code with Ahsan"
@@ -124,7 +124,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
             </div>
           </div>
         </div>
-        <div className="navbar-end shrink-0 w-auto gap-2">
+        <div className="navbar-end md:shrink-0 md:w-auto gap-2">
           <ThemeSwitch />
           <MobileNav />
           <ProfileMenu />
