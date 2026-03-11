@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v3.0
-milestone_name: Brand Identity & Site Restructure
-status: archived
-stopped_at: Milestone archived
-last_updated: "2026-03-10T20:30:00.000Z"
-last_activity: "2026-03-10 — v3.0 milestone archived"
+milestone: v4.0
+milestone_name: Admin Course Creator with YouTube Integration
+status: in-progress
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-03-11T02:48:00.000Z"
+last_activity: 2026-03-11 — Phase 01 Plan 01 complete (course API layer)
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
-  percent: 100
+  total_phases: 1
+  completed_phases: 0
+  total_plans: 2
+  completed_plans: 1
+  percent: 50
 ---
 
 # Project State
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 
 ## Current Position
 
-Phase: 18 of 18 (Mentorship & Community Pages) — COMPLETE
-Status: v3.0 milestone archived (4 phases, 8 plans, 29 requirements — all complete)
-Last activity: 2026-03-10 — v3.0 milestone archived
+Phase: 1 of 1 (Admin Course Creator with YouTube Integration) — IN PROGRESS
+Status: Plan 01 complete (API layer). Plan 02 (Admin UI) remaining.
+Last activity: 2026-03-11 — Phase 01 Plan 01 complete (course API layer)
 
-Progress: [██████████] 100% (v3.0 — ARCHIVED)
+Progress: [█████░░░░░] 50% (1/2 plans complete)
 
 ## Performance Metrics
 
@@ -47,6 +47,8 @@ Progress: [██████████] 100% (v3.0 — ARCHIVED)
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
+- [Phase 01-admin-course-creator]: Use process.env.ADMIN_TOKEN (simple env var) for course API auth — not Firestore sessions — because these routes are local-dev-only
+- [Phase 01-admin-course-creator]: YouTube courses use single chapter (chapterOrder 0) with timestamped posts, matching angular-in-90ish-minutes pattern
 
 ### Workflow Notes
 
@@ -56,14 +58,18 @@ Scheduled tasks use `.github/workflows/*.yml` running `npx tsx scripts/*.ts`. Do
 **Quick task + PR workflow:**
 For GitHub issue fixes, use `/gsd:quick` to plan and execute, then cherry-pick onto a fix branch and create PR with "Closes #NNN".
 
+### Roadmap Evolution
+
+- Phase 1 added: Admin course creator with YouTube integration for markdown generation
+
 ### Blockers/Concerns
 
 None.
 
 ## Session Continuity
 
-Last session: 2026-03-10
-Stopped at: v3.0 milestone archived
+Last session: 2026-03-11T02:36:22.033Z
+Stopped at: Completed 01-01-PLAN.md
 Resume file: None
 
 ---
