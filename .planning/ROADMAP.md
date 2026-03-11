@@ -73,5 +73,16 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 | 17. Portfolio Page | v3.0 | 2/2 | Complete | 2026-03-10 |
 | 18. Mentorship & Community | v3.0 | 2/2 | Complete | 2026-03-10 |
 
+### Phase 1: Admin course creator with YouTube integration for markdown generation
+
+**Goal:** Local admin tool to create, list, and delete courses via YouTube video/playlist IDs, auto-generating MDX chapter files from video timestamps
+**Requirements**: [COURSE-01, COURSE-02, COURSE-03, COURSE-04, COURSE-05, COURSE-06, COURSE-07]
+**Depends on:** None (standalone feature)
+**Plans:** 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — YouTube API + Course MDX CRUD library and API routes
+- [ ] 01-02-PLAN.md — Admin courses UI page with list/create/delete + human verification
+
 ---
-*Last updated: 2026-03-10 after v3.0 milestone completion*
+*Last updated: 2026-03-11 after phase 1 planning*
