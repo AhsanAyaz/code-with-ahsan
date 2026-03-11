@@ -10,7 +10,7 @@ import type {
 
 export function getLocalCourses(): CourseContent[] {
   const courses = (coursesData?.courses || []) as CourseContent[];
-  return courses.filter((course) => !!course.publishedAt);
+  return courses.filter((course) => !!course.publishedAt && course.isVisible !== false);
 }
 
 export function getLocalCourseBySlug(slug: string): CourseContent | null {

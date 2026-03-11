@@ -115,6 +115,7 @@ function buildCourse(courseDir) {
       typeof courseData.externalStudentsCount === 'number'
         ? courseData.externalStudentsCount
         : null,
+    isVisible: courseData.isVisible !== false,
     banner: courseData.banner || null,
     resources: Array.isArray(courseData.resources) ? courseData.resources : [],
     authors: Array.isArray(courseData.authors) ? courseData.authors : [],

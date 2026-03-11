@@ -41,7 +41,7 @@ export default function CoursesList({ coursesStr }: { coursesStr: string }) {
   }
 
   return (
-    <div className="max-w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="max-w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {courses?.map((course: any) => (
         <CourseCard course={course} user={user} enrollHandler={enroll} key={course.id} />
       ))}

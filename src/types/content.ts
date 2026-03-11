@@ -65,6 +65,7 @@ export interface CourseContent {
   externalCourseUrl?: string | null;
   externalStudentsCount?: number | null;
   visibilityOrder?: number | null;
+  isVisible?: boolean;
   authors: AuthorContent[];
   chapters: ChapterContent[];
 }

@@ -14,7 +14,7 @@ export default function CoursesSection({ courses }: Props) {
           <h2 className="text-2xl font-bold text-base-content mb-8">
             Courses &amp; Tutorials
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {courses.map((course) => {
               const href = course.isExternal && course.externalCourseUrl
                 ? course.externalCourseUrl
@@ -27,14 +27,14 @@ export default function CoursesSection({ courses }: Props) {
                   className="bg-base-100 border border-base-300 rounded-xl overflow-hidden hover:shadow-md transition-all flex flex-col"
                 >
                   {/* Banner */}
-                  <div className="relative w-full aspect-video">
+                  <div className="relative w-full aspect-video bg-black">
                     {bannerUrl ? (
                       <Image
                         src={bannerUrl}
                         alt={course.name}
                         fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-contain"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">

@@ -16,6 +16,8 @@ interface Course {
   chapters: number;
   posts: number;
   publishedAt: string | null;
+  visibilityOrder: number;
+  isVisible: boolean;
 }
 
 interface YouTubeVideoData {
@@ -61,6 +63,8 @@ export default function AdminCoursesPage() {
   // Course list state
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [orderChanged, setOrderChanged] = useState(false);
 
   // Form state
   const [inputMode, setInputMode] = useState<InputMode>("video");
@@ -93,6 +97,7 @@ export default function AdminCoursesPage() {
       if (response.ok) {
         const data = await response.json();
         setCourses(data.courses || []);
+        setOrderChanged(false);
       } else {
         toast.error("Failed to load courses");
       }
@@ -131,6 +136,78 @@ export default function AdminCoursesPage() {
     } catch (error) {
       console.error("Error deleting course:", error);
       toast.error("Failed to delete course");
+    }
+  };
+
+  const handleToggleVisibility = async (course: Course) => {
+    const newVisible = !course.isVisible;
+    try {
+      const response = await fetch(`/api/admin/courses/${course.slug}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminHeaders(),
+        },
+        body: JSON.stringify({ isVisible: newVisible }),
+      });
+
+      if (response.ok) {
+        setCourses((prev) =>
+          prev.map((c) =>
+            c.slug === course.slug ? { ...c, isVisible: newVisible } : c
+          )
+        );
+        toast.success(
+          newVisible
+            ? `"${course.name}" is now visible`
+            : `"${course.name}" is now hidden`
+        );
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to toggle visibility");
+      }
+    } catch (error) {
+      console.error("Error toggling visibility:", error);
+      toast.error("Failed to toggle visibility");
+    }
+  };
+
+  const moveCourse = (index: number, direction: "up" | "down") => {
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= courses.length) return;
+
+    const updated = [...courses];
+    [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
+    setCourses(updated);
+    setOrderChanged(true);
+  };
+
+  const handleSaveOrder = async () => {
+    setSaving(true);
+    try {
+      const orderedSlugs = courses.map((c) => c.slug);
+      const response = await fetch("/api/admin/courses", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminHeaders(),
+        },
+        body: JSON.stringify({ orderedSlugs }),
+      });
+
+      if (response.ok) {
+        toast.success("Course order saved");
+        setOrderChanged(false);
+        await fetchCourses();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to save order");
+      }
+    } catch (error) {
+      console.error("Error saving order:", error);
+      toast.error("Failed to save order");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -212,7 +289,6 @@ export default function AdminCoursesPage() {
           thumbnail: fetchedData.thumbnail || undefined,
         };
       } else if (inputMode === "playlist" && isPlaylistData(fetchedData)) {
-        // Each playlist item becomes a chapter post with timestampSeconds=0
         const chapters = fetchedData.items.map((item) => ({
           title: item.title,
           timestampSeconds: 0,
@@ -242,14 +318,12 @@ export default function AdminCoursesPage() {
 
       if (response.ok) {
         toast.success("Course created!");
-        // Reset form
         setYoutubeId("");
         setFetchedData(null);
         setCourseName("");
         setCourseSlug("");
         setCourseDescription("");
         setEditableChapters([]);
-        // Refresh list
         await fetchCourses();
       } else {
         const data = await response.json();
@@ -278,14 +352,34 @@ export default function AdminCoursesPage() {
       <div>
         <h1 className="text-3xl font-bold">Courses Management</h1>
         <p className="text-base-content/60 mt-1">
-          Manage courses — create from YouTube videos or playlists, delete existing courses
+          Manage courses — create, reorder, toggle visibility, or delete
         </p>
       </div>
 
       {/* Course List */}
       <div className="card bg-base-200 shadow-md">
         <div className="card-body">
-          <h2 className="card-title text-xl mb-4">Existing Courses</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="card-title text-xl">
+              Existing Courses ({courses.length})
+            </h2>
+            {orderChanged && (
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={handleSaveOrder}
+                disabled={saving}
+              >
+                {saving ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Saving...
+                  </>
+                ) : (
+                  "Save Order"
+                )}
+              </button>
+            )}
+          </div>
 
           {loading ? (
             <div className="flex justify-center py-8">
@@ -300,26 +394,62 @@ export default function AdminCoursesPage() {
               <table className="table table-zebra w-full">
                 <thead>
                   <tr>
+                    <th className="w-20">Order</th>
                     <th>Name</th>
-                    <th>Slug</th>
                     <th>Chapters</th>
                     <th>Posts</th>
                     <th>Published</th>
+                    <th>Visible</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {courses.map((course) => (
-                    <tr key={course.slug}>
-                      <td className="font-medium">{course.name}</td>
+                  {courses.map((course, index) => (
+                    <tr
+                      key={course.slug}
+                      className={!course.isVisible ? "opacity-50" : ""}
+                    >
                       <td>
-                        <code className="text-xs bg-base-300 px-2 py-1 rounded">
-                          {course.slug}
-                        </code>
+                        <div className="flex flex-col gap-1">
+                          <button
+                            className="btn btn-ghost btn-xs"
+                            onClick={() => moveCourse(index, "up")}
+                            disabled={index === 0}
+                            title="Move up"
+                          >
+                            ▲
+                          </button>
+                          <button
+                            className="btn btn-ghost btn-xs"
+                            onClick={() => moveCourse(index, "down")}
+                            disabled={index === courses.length - 1}
+                            title="Move down"
+                          >
+                            ▼
+                          </button>
+                        </div>
+                      </td>
+                      <td>
+                        <div>
+                          <span className="font-medium">{course.name}</span>
+                          <br />
+                          <code className="text-xs bg-base-300 px-2 py-0.5 rounded">
+                            {course.slug}
+                          </code>
+                        </div>
                       </td>
                       <td>{course.chapters}</td>
                       <td>{course.posts}</td>
-                      <td>{formatDate(course.publishedAt)}</td>
+                      <td className="text-sm">{formatDate(course.publishedAt)}</td>
+                      <td>
+                        <input
+                          type="checkbox"
+                          className="toggle toggle-primary toggle-sm"
+                          checked={course.isVisible}
+                          onChange={() => handleToggleVisibility(course)}
+                          title={course.isVisible ? "Hide course" : "Show course"}
+                        />
+                      </td>
                       <td>
                         <button
                           className="btn btn-error btn-sm"

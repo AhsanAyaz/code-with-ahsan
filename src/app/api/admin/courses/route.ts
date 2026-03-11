@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { execSync } from 'child_process';
-import { listCourses, createCourse } from '@/lib/course-mdx';
+import { listCourses, createCourse, reorderCourses } from '@/lib/course-mdx';
 import { db } from '@/lib/firebaseAdmin';
 
 // ─────────────────────────────────────────────
@@ -102,6 +102,49 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating course:', error);
     const message = error instanceof Error ? error.message : 'Failed to create course';
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+// ─────────────────────────────────────────────
+// PATCH /api/admin/courses — reorder courses
+// Body: { orderedSlugs: string[] }
+// ─────────────────────────────────────────────
+
+export async function PATCH(request: NextRequest) {
+  const authError = await checkAdminAuth(request);
+  if (authError) return authError;
+
+  let body: { orderedSlugs?: string[] };
+
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+
+  const { orderedSlugs } = body;
+  if (!Array.isArray(orderedSlugs) || orderedSlugs.length === 0) {
+    return NextResponse.json({ error: 'orderedSlugs array required' }, { status: 400 });
+  }
+
+  try {
+    await reorderCourses(orderedSlugs);
+
+    // Regenerate courses index
+    try {
+      execSync('node scripts/content/build-courses-index.js', {
+        cwd: process.cwd(),
+        stdio: 'pipe',
+      });
+    } catch (indexError) {
+      console.error('Failed to regenerate courses index:', indexError);
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error reordering courses:', error);
+    const message = error instanceof Error ? error.message : 'Failed to reorder courses';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

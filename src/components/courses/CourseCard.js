@@ -90,12 +90,12 @@ const CourseCard = ({ course, enrollHandler, user }) => {
       <div className="flex flex-col relative h-full p-3 sm:p-4 overflow-hidden border transition-all duration-200 border-gray-600 rounded-lg shadow-md hover:shadow-xl hover:border-primary">
         <span className="absolute inset-x-0 bottom-0 h-2  bg-gradient-to-r from-emerald-300 via-blue-500 to-primary"></span>
         {banner && (
-          <div className="mb-4">
+          <div className="mb-4 bg-black rounded-lg overflow-hidden aspect-video relative">
             <Image
-              width={900}
-              height={400}
+              fill
               src={banner}
-              style={{ objectFit: "cover" }}
+              className="object-contain"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               alt={`${course.name} banner`}
             />
           </div>

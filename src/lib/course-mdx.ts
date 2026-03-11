@@ -16,6 +16,8 @@ export interface CourseListItem {
   chapters: number;
   posts: number;
   publishedAt: string | null;
+  visibilityOrder: number;
+  isVisible: boolean;
 }
 
 export interface ChapterTimestamp {
@@ -147,10 +149,12 @@ export async function listCourses(): Promise<CourseListItem[]> {
       chapters: chapters.length,
       posts: postFiles.length,
       publishedAt: data.publishedAt ? String(data.publishedAt) : null,
+      visibilityOrder: Number(data.visibilityOrder) || 0,
+      isVisible: data.isVisible !== false,
     });
   }
 
-  results.sort((a, b) => a.name.localeCompare(b.name));
+  results.sort((a, b) => b.visibilityOrder - a.visibilityOrder);
   return results;
 }
 
@@ -187,6 +191,7 @@ export async function createCourse(data: CreateCourseInput): Promise<{ success: 
     duration: null,
     introVideoUrl: videoId ? `https://www.youtube.com/watch?v=${videoId}` : '',
     visibilityOrder: newVisibilityOrder,
+    isVisible: true,
     isExternal: false,
     externalCourseUrl: null,
     externalStudentsCount: null,
@@ -245,6 +250,48 @@ export async function createCourse(data: CreateCourseInput): Promise<{ success: 
   }
 
   return { success: true, slug };
+}
+
+// ─────────────────────────────────────────────
+// updateCourse — update frontmatter fields in course.mdx
+// ─────────────────────────────────────────────
+
+export async function updateCourse(
+  slug: string,
+  updates: Record<string, unknown>
+): Promise<{ success: boolean }> {
+  const courseDir = path.join(COURSES_ROOT, slug);
+  const courseFile = path.join(courseDir, 'course.mdx');
+
+  if (!fs.existsSync(courseFile)) {
+    throw new Error(`Course with slug "${slug}" does not exist`);
+  }
+
+  const source = fs.readFileSync(courseFile, 'utf8');
+  const parsed = matter(source);
+
+  Object.assign(parsed.data, updates);
+
+  const mdx = matter.stringify(parsed.content, parsed.data);
+  fs.writeFileSync(courseFile, mdx, 'utf8');
+
+  return { success: true };
+}
+
+// ─────────────────────────────────────────────
+// reorderCourses — bulk update visibilityOrder for all courses
+// ─────────────────────────────────────────────
+
+export async function reorderCourses(
+  orderedSlugs: string[]
+): Promise<{ success: boolean }> {
+  // Highest visibilityOrder = first in list (descending sort)
+  for (let i = 0; i < orderedSlugs.length; i++) {
+    const slug = orderedSlugs[i];
+    const order = orderedSlugs.length - i;
+    await updateCourse(slug, { visibilityOrder: order });
+  }
+  return { success: true };
 }
 
 // ─────────────────────────────────────────────
