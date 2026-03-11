@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { db } from '@/lib/firebaseAdmin';
 
 // ─────────────────────────────────────────────
-// Auth helper
+// Auth helper — Firestore session verification
 // ─────────────────────────────────────────────
 
-function checkAdminAuth(request: NextRequest): NextResponse | null {
+async function checkAdminAuth(request: NextRequest): Promise<NextResponse | null> {
   const token = request.headers.get('x-admin-token');
-  if (token !== process.env.ADMIN_TOKEN) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!token) {
+    return NextResponse.json({ error: 'Admin authentication required' }, { status: 401 });
+  }
+  const sessionDoc = await db.collection('admin_sessions').doc(token).get();
+  if (!sessionDoc.exists) {
+    return NextResponse.json({ error: 'Admin authentication required' }, { status: 401 });
+  }
+  const session = sessionDoc.data();
+  const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
+  if (expiresAt < new Date()) {
+    await db.collection('admin_sessions').doc(token).delete();
+    return NextResponse.json({ error: 'Admin authentication required' }, { status: 401 });
   }
   return null;
 }
@@ -53,7 +64,7 @@ function parseChapterTimestamps(description: string): ChapterTimestamp[] {
 // ─────────────────────────────────────────────
 
 export async function GET(request: NextRequest) {
-  const authError = checkAdminAuth(request);
+  const authError = await checkAdminAuth(request);
   if (authError) return authError;
 
   const { searchParams } = new URL(request.url);
