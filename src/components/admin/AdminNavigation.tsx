@@ -15,6 +15,7 @@ export default function AdminNavigation() {
     { label: "All Mentees", href: "/admin/mentees", exact: false },
     { label: "Projects", href: "/admin/projects", exact: false },
     { label: "Roadmaps", href: "/admin/roadmaps", exact: false },
+    { label: "Courses", href: "/admin/courses", exact: false },
   ];
 
   const isActive = (href: string, exact: boolean) => {
