@@ -23,6 +23,7 @@ export interface CourseListItem {
 export interface ChapterTimestamp {
   title: string;
   timestampSeconds: number;
+  videoId?: string;
 }
 
 export interface CreateCourseInput {
@@ -224,7 +225,10 @@ export async function createCourse(data: CreateCourseInput): Promise<{ success: 
   for (let i = 0; i < chapters.length; i++) {
     const chapter = chapters[i];
     const postSlug = slugger.slug(chapter.title);
-    const videoUrl = `https://www.youtube.com/watch?v=${videoId}&t=${chapter.timestampSeconds}`;
+    const chapterVideoId = chapter.videoId || videoId;
+    const videoUrl = chapter.timestampSeconds > 0
+      ? `https://www.youtube.com/watch?v=${chapterVideoId}&t=${chapter.timestampSeconds}`
+      : `https://www.youtube.com/watch?v=${chapterVideoId}`;
     const postOrder = i;
 
     const postFrontmatter: Record<string, unknown> = {
