@@ -209,6 +209,7 @@ export default function AdminCoursesPage() {
           outline: courseDescription,
           videoId: youtubeId.trim(),
           chapters: editableChapters,
+          thumbnail: fetchedData.thumbnail || undefined,
         };
       } else if (inputMode === "playlist" && isPlaylistData(fetchedData)) {
         // Each playlist item becomes a chapter post with timestampSeconds=0

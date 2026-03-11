@@ -30,6 +30,7 @@ export interface CreateCourseInput {
   outline: string;
   videoId: string;
   chapters: ChapterTimestamp[];
+  thumbnail?: string | null;
 }
 
 export interface MaxIds {
@@ -158,7 +159,7 @@ export async function listCourses(): Promise<CourseListItem[]> {
 // ─────────────────────────────────────────────
 
 export async function createCourse(data: CreateCourseInput): Promise<{ success: boolean; slug: string }> {
-  const { slug, name, description, outline, videoId, chapters } = data;
+  const { slug, name, description, outline, videoId, chapters, thumbnail } = data;
 
   const courseDir = path.join(COURSES_ROOT, slug);
   if (fs.existsSync(courseDir)) {
@@ -189,7 +190,7 @@ export async function createCourse(data: CreateCourseInput): Promise<{ success: 
     isExternal: false,
     externalCourseUrl: null,
     externalStudentsCount: null,
-    banner: null,
+    banner: thumbnail ? { url: thumbnail } : null,
     resources: [],
     authors: [
       {

@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
     outline?: string;
     videoId?: string;
     chapters?: Array<{ title: string; timestampSeconds: number }>;
+    thumbnail?: string;
   };
 
   try {
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { slug, name, description = '', outline = '', videoId = '', chapters = [] } = body;
+  const { slug, name, description = '', outline = '', videoId = '', chapters = [], thumbnail } = body;
 
   // Validate required fields
   if (!slug || !name) {
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await createCourse({ slug, name, description, outline, videoId, chapters });
+    const result = await createCourse({ slug, name, description, outline, videoId, chapters, thumbnail });
 
     // Regenerate courses index
     try {
