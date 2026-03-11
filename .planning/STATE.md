@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v4.0
-milestone_name: Admin Course Creator with YouTube Integration
-status: in-progress
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-03-11T02:48:00.000Z"
+milestone: v1.0
+milestone_name: milestone
+status: completed
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-03-11T02:41:30.212Z"
 last_activity: 2026-03-11 — Phase 01 Plan 01 complete (course API layer)
 progress:
   total_phases: 1
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
   percent: 50
 ---
 
@@ -49,6 +49,7 @@ Progress: [█████░░░░░] 50% (1/2 plans complete)
 Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01-admin-course-creator]: Use process.env.ADMIN_TOKEN (simple env var) for course API auth — not Firestore sessions — because these routes are local-dev-only
 - [Phase 01-admin-course-creator]: YouTube courses use single chapter (chapterOrder 0) with timestamped posts, matching angular-in-90ish-minutes pattern
+- [Phase 01-admin-course-creator]: getAdminHeaders() typed as Record<string,string> for TypeScript HeadersInit compatibility in admin courses UI
 
 ### Workflow Notes
 
@@ -68,8 +69,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-11T02:36:22.033Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-03-11T02:41:30.210Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
 
 ---
