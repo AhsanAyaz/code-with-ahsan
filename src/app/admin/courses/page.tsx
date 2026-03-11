@@ -79,7 +79,9 @@ export default function AdminCoursesPage() {
 
   const getAdminHeaders = (): Record<string, string> => {
     const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-    return token ? { "x-admin-token": token } : {};
+    const headers: Record<string, string> = {};
+    if (token) headers["x-admin-token"] = token;
+    return headers;
   };
 
   const fetchCourses = useCallback(async () => {
