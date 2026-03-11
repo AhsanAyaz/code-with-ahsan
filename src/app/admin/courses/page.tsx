@@ -35,6 +35,7 @@ interface PlaylistItem {
 
 interface YouTubePlaylistData {
   items: PlaylistItem[];
+  thumbnail?: string | null;
 }
 
 type InputMode = "video" | "playlist";
@@ -80,6 +81,7 @@ export default function AdminCoursesPage() {
 
   // Create state
   const [creating, setCreating] = useState(false);
+  const [generatingDesc, setGeneratingDesc] = useState(false);
 
   const getAdminHeaders = (): Record<string, string> => {
     const token = localStorage.getItem(ADMIN_TOKEN_KEY);
@@ -268,6 +270,45 @@ export default function AdminCoursesPage() {
     );
   };
 
+  const handleGenerateDescription = async () => {
+    if (!courseName) {
+      toast.error("Course name is required to generate description");
+      return;
+    }
+
+    setGeneratingDesc(true);
+    try {
+      const chapters = editableChapters.length > 0
+        ? editableChapters.map((ch) => ch.title)
+        : isPlaylistData(fetchedData)
+          ? fetchedData.items.map((item) => item.title)
+          : [];
+
+      const response = await fetch("/api/admin/courses/generate-description", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminHeaders(),
+        },
+        body: JSON.stringify({ courseName, chapters }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCourseDescription(data.description);
+        toast.success("Description generated");
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to generate description");
+      }
+    } catch (error) {
+      console.error("Error generating description:", error);
+      toast.error("Failed to generate description");
+    } finally {
+      setGeneratingDesc(false);
+    }
+  };
+
   const handleCreate = async () => {
     if (!courseSlug || !courseName) {
       toast.error("Course name and slug are required");
@@ -301,6 +342,7 @@ export default function AdminCoursesPage() {
           outline: courseDescription,
           videoId: fetchedData.items[0]?.videoId || youtubeId.trim(),
           chapters,
+          thumbnail: fetchedData.thumbnail || undefined,
         };
       } else {
         toast.error("No YouTube data fetched. Please fetch first.");
@@ -609,9 +651,19 @@ export default function AdminCoursesPage() {
               {/* Playlist preview */}
               {inputMode === "playlist" && isPlaylistData(fetchedData) && (
                 <div className="space-y-2">
-                  <p className="text-sm text-base-content/60">
-                    {fetchedData.items.length} videos in playlist — each will become a post
-                  </p>
+                  <div className="flex gap-4 items-start">
+                    {fetchedData.thumbnail && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={fetchedData.thumbnail}
+                        alt="Playlist thumbnail"
+                        className="w-40 rounded-lg shadow"
+                      />
+                    )}
+                    <p className="text-sm text-base-content/60">
+                      {fetchedData.items.length} videos in playlist — each will become a post
+                    </p>
+                  </div>
                   <div className="space-y-1 max-h-48 overflow-y-auto border border-base-300 rounded-lg p-3">
                     {fetchedData.items.map((item, index) => (
                       <div key={item.videoId} className="flex gap-2 items-center text-sm">
@@ -651,9 +703,26 @@ export default function AdminCoursesPage() {
                 </div>
               </div>
               <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Description</span>
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="label">
+                    <span className="label-text">Description</span>
+                  </label>
+                  <button
+                    className="btn btn-ghost btn-xs gap-1"
+                    onClick={handleGenerateDescription}
+                    disabled={generatingDesc || !courseName}
+                    title="Generate SEO description with AI"
+                  >
+                    {generatingDesc ? (
+                      <>
+                        <span className="loading loading-spinner loading-xs"></span>
+                        Generating...
+                      </>
+                    ) : (
+                      "AI Generate"
+                    )}
+                  </button>
+                </div>
                 <textarea
                   className="textarea textarea-bordered"
                   value={courseDescription}

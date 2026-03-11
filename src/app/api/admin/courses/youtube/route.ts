@@ -129,7 +129,23 @@ export async function GET(request: NextRequest) {
         position: item.snippet?.position ?? 0,
       }));
 
-      return NextResponse.json({ playlistId, items });
+      // Fetch first video's thumbnail for the course banner
+      let thumbnail: string | null = null;
+      const firstVideoId = items[0]?.videoId;
+      if (firstVideoId) {
+        const videoRes = await youtube.videos.list({
+          part: ['snippet'],
+          id: [firstVideoId],
+        });
+        const firstSnippet = videoRes.data.items?.[0]?.snippet;
+        thumbnail =
+          firstSnippet?.thumbnails?.maxres?.url ||
+          firstSnippet?.thumbnails?.high?.url ||
+          firstSnippet?.thumbnails?.default?.url ||
+          null;
+      }
+
+      return NextResponse.json({ playlistId, items, thumbnail });
     }
   } catch (error) {
     console.error('YouTube API error:', error);
