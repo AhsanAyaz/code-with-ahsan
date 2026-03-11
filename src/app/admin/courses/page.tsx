@@ -676,60 +676,59 @@ export default function AdminCoursesPage() {
               )}
 
               {/* Editable course fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="form-control">
+              <div className="space-y-4 mt-2">
+                <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text">Course Name</span>
+                    <span className="label-text font-semibold">Course Name</span>
                   </label>
                   <input
                     type="text"
-                    className="input input-bordered"
+                    className="input input-bordered w-full"
                     value={courseName}
                     onChange={(e) => handleNameChange(e.target.value)}
                     placeholder="Course name"
                   />
                 </div>
-                <div className="form-control">
+                <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text">Slug</span>
+                    <span className="label-text font-semibold">Slug</span>
                   </label>
                   <input
                     type="text"
-                    className="input input-bordered"
+                    className="input input-bordered w-full font-mono text-sm"
                     value={courseSlug}
                     onChange={(e) => setCourseSlug(e.target.value)}
                     placeholder="course-slug"
                   />
                 </div>
-              </div>
-              <div className="form-control">
-                <div className="flex items-center justify-between">
+                <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text">Description</span>
+                    <span className="label-text font-semibold">Description</span>
                   </label>
-                  <button
-                    className="btn btn-ghost btn-xs gap-1"
-                    onClick={handleGenerateDescription}
-                    disabled={generatingDesc || !courseName}
-                    title="Generate SEO description with AI"
-                  >
-                    {generatingDesc ? (
-                      <>
-                        <span className="loading loading-spinner loading-xs"></span>
-                        Generating...
-                      </>
-                    ) : (
-                      "AI Generate"
-                    )}
-                  </button>
+                  <textarea
+                    className="textarea textarea-bordered w-full"
+                    value={courseDescription}
+                    onChange={(e) => setCourseDescription(e.target.value)}
+                    placeholder="Course description..."
+                    rows={4}
+                  />
+                  <div className="flex justify-end mt-2">
+                    <button
+                      className="btn btn-outline btn-sm gap-2"
+                      onClick={handleGenerateDescription}
+                      disabled={generatingDesc || !courseName}
+                    >
+                      {generatingDesc ? (
+                        <>
+                          <span className="loading loading-spinner loading-xs"></span>
+                          Generating...
+                        </>
+                      ) : (
+                        "AI Generate Description"
+                      )}
+                    </button>
+                  </div>
                 </div>
-                <textarea
-                  className="textarea textarea-bordered"
-                  value={courseDescription}
-                  onChange={(e) => setCourseDescription(e.target.value)}
-                  placeholder="Course description..."
-                  rows={3}
-                />
               </div>
             </div>
           )}
