@@ -54,6 +54,63 @@
 
 ---
 
+## Milestone: v3.0 — Brand Identity & Site Restructure
+
+**Shipped:** 2026-03-10
+**Phases:** 4 | **Plans:** 8
+**Timeline:** 1 day (2026-03-10)
+
+### What Was Built
+- Community-first homepage with live stats, social proof pillars, and founder credibility
+- Flat top-level navigation (7 primary items)
+- Recruiter-ready `/about` portfolio page
+- Mentorship page refocused, `/community` as Get Involved hub
+- Public stats API with Firestore caching
+
+### What Worked
+- Entire milestone completed in a single day — tight scope paid off
+- Brand-first thinking (identity before implementation) kept design coherent
+
+### Key Lessons
+1. Small, focused milestones ship faster than large ones
+2. Brand identity work benefits from top-down design (overall vision before components)
+
+---
+
+## Milestone: v4.0 — Admin Course Creator with YouTube Integration
+
+**Shipped:** 2026-03-11
+**Phases:** 1 | **Plans:** 2
+**Timeline:** 7 days (2026-03-04 → 2026-03-11)
+
+### What Was Built
+- YouTube chapter-timestamp to MDX pipeline
+- Admin courses page with full CRUD, visibility toggle, and reorder
+- YouTube playlist support with per-video URLs
+- AI-generated SEO descriptions via Gemini
+- Course card 3-column layout with black background thumbnails
+
+### What Worked
+- UAT-driven development: 8/9 tests passed on first run, 1 bug (playlist URLs) caught and fixed immediately
+- User feedback loop during UAT surfaced valuable enhancements (visibility toggle, reorder, AI descriptions, form UX)
+- Firestore session auth consistency — initial plan used env var, UAT revealed mismatch, fixed quickly
+
+### What Was Inefficient
+- Auth pattern initially diverged from existing admin routes (env var vs Firestore session) — should have checked existing patterns before planning
+- Multiple post-plan enhancements (visibility, reorder, AI descriptions, form layout) suggest initial scope was too minimal
+
+### Patterns Established
+- `visibilityOrder` numeric field in MDX frontmatter for ordered display
+- `@google/genai` integration pattern for Gemini AI features
+- YouTube chapter regex: `^(?:(\d+):)?(\d{1,2}):(\d{2})\s+(.+)$`
+
+### Key Lessons
+1. Check existing auth patterns before implementing new routes — consistency saves UAT rework
+2. Course management features (visibility, reorder) should be table stakes in initial scope
+3. AI-generated content (descriptions) adds polish with minimal implementation cost
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -62,8 +119,12 @@
 |-----------|----------|--------|------------|
 | v1.0 | ~1 day | 3 | Initial GSD setup, manual workflow |
 | v2.0 | 36 days | 15 | Wave-based parallelism, quick tasks, decimal phase inserts, audit cycle |
+| v3.0 | 1 day | 4 | Tight scope, brand-first design, single-day delivery |
+| v4.0 | 7 days | 1 | UAT-driven development, user feedback loop, AI integration |
 
 ### Top Lessons (Verified Across Milestones)
 
 1. Foundation-first: types and permissions before features (validated across v1.0 admin + v2.0 projects/roadmaps)
 2. Non-blocking external calls: Discord operations should never fail APIs (validated across mentorship channels, project channels, booking notifications)
+3. Check existing patterns before new implementations — auth, styling, data patterns (validated v4.0 auth mismatch)
+4. UAT feedback loops surface high-value features cheaply (validated v4.0 visibility/reorder/AI additions)

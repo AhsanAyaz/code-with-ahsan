@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-03-04T00:04:51.647Z",
+  "generatedAt": "2026-03-11T09:45:57.400Z",
   "source": "mdx",
-  "count": 9,
+  "count": 11,
   "courses": [
     {
       "id": 309,
@@ -12,10 +12,11 @@
       "publishedAt": "2025-01-28T17:35:31.586Z",
       "duration": null,
       "introVideoUrl": "https://youtu.be/Knn0TN2j8vc",
-      "visibilityOrder": 10,
+      "visibilityOrder": 11,
       "isExternal": false,
       "externalCourseUrl": null,
       "externalStudentsCount": null,
+      "isVisible": true,
       "banner": {
         "url": "https://res.cloudinary.com/cwa/image/upload/v1693898404/web_dev_basics_cover_38ed715a8d.jpg"
       },
@@ -1936,10 +1937,11 @@
       "publishedAt": "2026-01-18T13:16:35.033Z",
       "duration": null,
       "introVideoUrl": "",
-      "visibilityOrder": 9,
+      "visibilityOrder": 10,
       "isExternal": true,
       "externalCourseUrl": "https://www.udemy.com/course/practical-reactjs-essentials-in-hindi-urdu/?couponCode=35F94B376C0B8FE3AD38",
       "externalStudentsCount": 329,
+      "isVisible": true,
       "banner": {
         "url": "https://res.cloudinary.com/cwa/image/upload/v1737364236/React_Project_Tutorial_2_b1af7a0e04.png"
       },
@@ -1954,6 +1956,179 @@
       "chapters": []
     },
     {
+      "id": 330,
+      "slug": "google-agent-development-kit-for-beginners",
+      "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)",
+      "description": "Master the essentials of AI agent creation with this comprehensive guide to the Google Agent Development Kit (ADK) for beginners. You will learn to build, deploy, and scale intelligent agents using Vertex AI, function calling, and multi-model integration with LiteLLM. By the end of this course, you will be able to manage session states and develop custom user interfaces, transforming from a novice into a proficient AI developer.",
+      "outline": "Master the essentials of AI agent creation with this comprehensive guide to the Google Agent Development Kit (ADK) for beginners. You will learn to build, deploy, and scale intelligent agents using Vertex AI, function calling, and multi-model integration with LiteLLM. By the end of this course, you will be able to manage session states and develop custom user interfaces, transforming from a novice into a proficient AI developer.",
+      "publishedAt": "2026-03-11T09:45:32.004Z",
+      "duration": null,
+      "introVideoUrl": "https://www.youtube.com/watch?v=r-JsrEoctCQ",
+      "visibilityOrder": 9,
+      "isExternal": false,
+      "externalCourseUrl": null,
+      "externalStudentsCount": null,
+      "isVisible": true,
+      "banner": {
+        "url": "https://i.ytimg.com/vi/r-JsrEoctCQ/maxresdefault.jpg"
+      },
+      "resources": [],
+      "authors": [
+        {
+          "name": "Muhammad Ahsan Ayaz",
+          "bio": "Muhammad Ahsan Ayaz is a Google Developers Expert in Angular and a Software Architect at Scania. He loves helping the startup ecosystem and product owners bring their ideas to life using JavaScript, Angular & Web Technologies. He has built several open-source projects that he maintains, speaks at events, writes articles, and makes video tutorials. https://bio.link/muhd_ahsanayaz",
+          "avatar": null
+        }
+      ],
+      "chapters": [
+        {
+          "id": 447,
+          "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)",
+          "description": "",
+          "showName": false,
+          "order": 0,
+          "posts": [
+            {
+              "id": 4887,
+              "slug": "building-your-first-ai-agent---google-agent-development-kit-for-beginners-part-1",
+              "title": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=r-JsrEoctCQ",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:45:32.004Z",
+              "chapter": {
+                "id": 447,
+                "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4888,
+              "slug": "working-with-tools--function-calling---google-agent-development-kit-for-beginners-part-2",
+              "title": "Working with Tools & Function calling - Google Agent Development Kit for Beginners (Part 2)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=nRpyp2m6mn8",
+              "order": 1,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:45:32.004Z",
+              "chapter": {
+                "id": 447,
+                "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4889,
+              "slug": "using-multiple-ai-models-with-litellm---google-agent-development-kit-for-beginners-part-3",
+              "title": "Using multiple AI models with LiteLLM - Google Agent Development Kit for Beginners (Part 3)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=Dg7laIcb1I8",
+              "order": 2,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:45:32.004Z",
+              "chapter": {
+                "id": 447,
+                "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4890,
+              "slug": "using-structured-datastructured-output---google-agent-development-kit-for-beginners-part-4",
+              "title": "Using Structured Data/Structured Output - Google Agent Development Kit for Beginners (Part 4)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=u8tSzHb45MM",
+              "order": 3,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:45:32.004Z",
+              "chapter": {
+                "id": 447,
+                "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4891,
+              "slug": "how-to-use-sessions--state-in-google-adk---google-agent-development-kit-for-beginners-part-5",
+              "title": "How to use Sessions & State in Google ADK - Google Agent Development Kit for Beginners (Part 5)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=z8Q3qLi9m78",
+              "order": 4,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:45:32.004Z",
+              "chapter": {
+                "id": 447,
+                "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4892,
+              "slug": "deploy-ai-agents-on-agent-engine-vertex-ai---google-agent-development-kit-for-beginners-part-6",
+              "title": "Deploy AI Agents on Agent Engine (Vertex AI) - Google Agent Development Kit for Beginners (Part 6)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=6ISS31L3bqI",
+              "order": 5,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:45:32.004Z",
+              "chapter": {
+                "id": 447,
+                "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4893,
+              "slug": "how-to-use-callbacks-in-google-adk--google-agent-development-kit-for-beginners-part-7",
+              "title": "How to use callbacks in Google ADK ? Google Agent Development Kit for Beginners (Part 7)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=yhUlAl08kII",
+              "order": 6,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:45:32.004Z",
+              "chapter": {
+                "id": 447,
+                "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4894,
+              "slug": "build-ui-for-your-ai-agent-google-agent-development-kit-for-beginners-part-8",
+              "title": "Build UI for your AI Agent! Google Agent Development Kit for Beginners (Part 8)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=y7damsm8Qos",
+              "order": 7,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:45:32.004Z",
+              "chapter": {
+                "id": 447,
+                "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
+              },
+              "resources": [],
+              "article": "\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": 293,
       "slug": "angular-in-90ish-minutes",
       "name": "Angular in 90ish minutes",
@@ -1966,6 +2141,7 @@
       "isExternal": false,
       "externalCourseUrl": null,
       "externalStudentsCount": 0,
+      "isVisible": true,
       "banner": {
         "url": "https://res.cloudinary.com/cwa/image/upload/v1729179983/maxresdefault_7c6be0c92f.jpg"
       },
@@ -2330,6 +2506,1006 @@
       ]
     },
     {
+      "id": 329,
+      "slug": "react-19-crash-course-for-beginners-2026-learn-in-90-minutes",
+      "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)",
+      "description": "Learn React JS in just 90 minutes! This 2026 beginner's guide covers React 19, Hooks, AI integration, and full-stack development. We don't just learn syntax; we build a fast, AI-powered application from scratch.",
+      "outline": "Learn React JS in just 90 minutes! This 2026 beginner's guide covers React 19, Hooks, AI integration, and full-stack development. We don't just learn syntax; we build a fast, AI-powered application from scratch.",
+      "publishedAt": "2026-03-11T09:07:43.861Z",
+      "duration": null,
+      "introVideoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4",
+      "visibilityOrder": 7,
+      "isExternal": false,
+      "externalCourseUrl": null,
+      "externalStudentsCount": null,
+      "isVisible": true,
+      "banner": {
+        "url": "https://i.ytimg.com/vi/tqjJrXd27m4/maxresdefault.jpg"
+      },
+      "resources": [],
+      "authors": [
+        {
+          "name": "Muhammad Ahsan Ayaz",
+          "bio": "Muhammad Ahsan Ayaz is a Google Developers Expert in Angular and a Software Architect at Scania. He loves helping the startup ecosystem and product owners bring their ideas to life using JavaScript, Angular & Web Technologies. He has built several open-source projects that he maintains, speaks at events, writes articles, and makes video tutorials. https://bio.link/muhd_ahsanayaz",
+          "avatar": null
+        }
+      ],
+      "chapters": [
+        {
+          "id": 446,
+          "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)",
+          "description": "",
+          "showName": false,
+          "order": 0,
+          "posts": [
+            {
+              "id": 4864,
+              "slug": "--introduction--roadmap",
+              "title": "- Introduction & Roadmap",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=0",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4865,
+              "slug": "--environment-setup-vite--react",
+              "title": "- Environment Setup (Vite & React)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=91",
+              "order": 1,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4866,
+              "slug": "--agenda--instructor-intro",
+              "title": "- Agenda & Instructor Intro",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=150",
+              "order": 2,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4867,
+              "slug": "--what-is-react-architecture-explained",
+              "title": "- What is React? (Architecture Explained)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=589",
+              "order": 3,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4868,
+              "slug": "--understanding-jsx",
+              "title": "- Understanding JSX",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=830",
+              "order": 4,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4869,
+              "slug": "--virtual-dom-vs-real-dom",
+              "title": "- Virtual DOM vs Real DOM",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=1482",
+              "order": 5,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4870,
+              "slug": "--components--props-deep-dive",
+              "title": "- Components & Props Deep Dive",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=1715",
+              "order": 6,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4871,
+              "slug": "--handling-events-in-react",
+              "title": "- Handling Events in React",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=2595",
+              "order": 7,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4872,
+              "slug": "--conditional-rendering-patterns",
+              "title": "- Conditional Rendering Patterns",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=3263",
+              "order": 8,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4873,
+              "slug": "--rendering-lists--loops",
+              "title": "- Rendering Lists & Loops",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=3927",
+              "order": 9,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4874,
+              "slug": "--forms--input-handling",
+              "title": "- Forms & Input Handling",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=4538",
+              "order": 10,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4875,
+              "slug": "--state-management-context-api-vs-prop-drilling",
+              "title": "- State Management: Context API vs Prop Drilling",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=4985",
+              "order": 11,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4876,
+              "slug": "--react-router--navigation",
+              "title": "- React Router & Navigation",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=5940",
+              "order": 12,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4877,
+              "slug": "--react-19-features-overview",
+              "title": "- React 19 Features Overview",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=6466",
+              "order": 13,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4878,
+              "slug": "--project-building-a-full-stack-ai-app",
+              "title": "- PROJECT: Building a Full Stack AI App",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=6540",
+              "order": 14,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4879,
+              "slug": "--api-integration-gemini-ai",
+              "title": "- API Integration (Gemini AI)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=6855",
+              "order": 15,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4880,
+              "slug": "--state-handlers--logic",
+              "title": "- State Handlers & Logic",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=7104",
+              "order": 16,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4881,
+              "slug": "--custom-hooks--data-fetching",
+              "title": "- Custom Hooks & Data Fetching",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=7460",
+              "order": 17,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4882,
+              "slug": "--theming-with-context-api",
+              "title": "- Theming with Context API",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=7805",
+              "order": 18,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4883,
+              "slug": "--performance-usememo--optimization",
+              "title": "- Performance: useMemo & Optimization",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=8005",
+              "order": 19,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4884,
+              "slug": "--lazy-loading--suspense",
+              "title": "- Lazy Loading & Suspense",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=8290",
+              "order": 20,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4885,
+              "slug": "--error-boundaries--best-practices",
+              "title": "- Error Boundaries & Best Practices",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=8452",
+              "order": 21,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4886,
+              "slug": "--what-to-learn-next",
+              "title": "- What to learn next?",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=tqjJrXd27m4&t=8600",
+              "order": 22,
+              "hasAssignment": false,
+              "publishedAt": "2026-03-11T09:07:43.861Z",
+              "chapter": {
+                "id": 446,
+                "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
+              },
+              "resources": [],
+              "article": "\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 321,
+      "slug": "react-redux-toolkit",
+      "name": "React Redux Toolkit tutorial for beginners",
+      "description": "",
+      "outline": "This is the only React Redux Toolkit tutorial you need to get started with React and TypeScript. In this video, we start with React using Vite, start working on including Redux Toolkit in the project, configure the redux slices, create redux actions, create redux selectors, dispatch redux actions from our components, and also create an async thunk using the rtk (Redux tool kit). This short yet informative tutorial will save you hours of searching the internet to really get started with these.\nCode repository:\nhttps://github.com/code-with-ahsan/react-rtk",
+      "publishedAt": "2025-01-29T15:31:50.675Z",
+      "duration": null,
+      "introVideoUrl": "",
+      "visibilityOrder": 6,
+      "isExternal": false,
+      "externalCourseUrl": null,
+      "externalStudentsCount": null,
+      "isVisible": true,
+      "banner": {
+        "url": "https://res.cloudinary.com/cwa/image/upload/v1729413069/react_redux_tutorial_cb3315f716.jpg"
+      },
+      "resources": [],
+      "authors": [],
+      "chapters": [
+        {
+          "id": 432,
+          "name": "React Redux Toolkit tutorial for beginners",
+          "description": "",
+          "showName": false,
+          "order": 0,
+          "posts": [
+            {
+              "id": 4793,
+              "slug": "215880",
+              "title": "Cleaning up and implementing Redux.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=86",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:00:42.612Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4803,
+              "slug": "463323",
+              "title": "Conclusion.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=1006",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:01:59.717Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4792,
+              "slug": "6a5e1f",
+              "title": "Running the application.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=73",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:00:35.828Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4794,
+              "slug": "73a1ec",
+              "title": "Explaining Redux.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=140",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:00:49.746Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4800,
+              "slug": "77556d",
+              "title": "Working with slices.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=508",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:01:43.620Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4789,
+              "slug": "796d60",
+              "title": "Introduction",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=0",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:59:55.489Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4791,
+              "slug": "7e2e7c",
+              "title": "Installing dependencies in Visual Studio Code.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=46",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:00:28.589Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4802,
+              "slug": "a24361",
+              "title": "Using thunk.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=867",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:01:54.549Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4795,
+              "slug": "a2da32",
+              "title": "Getting started with Redux Toolkit.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=169",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:00:55.752Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4798,
+              "slug": "b3d205",
+              "title": "Installing redux-devtools extension.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=381",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:01:30.603Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4797,
+              "slug": "cf9fa3",
+              "title": "Creating store using Redux Toolkit.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=366",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:01:23.128Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4801,
+              "slug": "ddf358",
+              "title": "Using a selector.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=590",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:01:49.890Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4790,
+              "slug": "e5bd8b",
+              "title": "Starting new project in React with Redux Toolkit.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=23",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:00:19.612Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4796,
+              "slug": "eabc02",
+              "title": "Installing Redux Toolkit.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=340",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:01:05.003Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4799,
+              "slug": "eeb518",
+              "title": "Defining state type and reducers.",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=448",
+              "order": 0,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T18:01:38.700Z",
+              "chapter": {
+                "id": 432,
+                "name": "React Redux Toolkit tutorial for beginners"
+              },
+              "resources": [],
+              "article": "\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 319,
+      "slug": "mern-stack-crash-course",
+      "name": "MERN Stack Crash Course for beginners (MongoDB, ExpressJs, React, NodeJS in 8 hours)",
+      "description": "Build a full-fledged MERN stack application from scratch as you follow along this video containing a series of recorded videos, and live streams. You'll be creating a Notes application using React, MongoDB, Express JS, and NodeJS.",
+      "outline": "",
+      "publishedAt": "2025-01-29T15:29:58.012Z",
+      "duration": null,
+      "introVideoUrl": "",
+      "visibilityOrder": 5,
+      "isExternal": false,
+      "externalCourseUrl": null,
+      "externalStudentsCount": null,
+      "isVisible": true,
+      "banner": {
+        "url": "https://res.cloudinary.com/cwa/image/upload/v1709468949/maxresdefault_1f247192b7.jpg"
+      },
+      "resources": [],
+      "authors": [],
+      "chapters": [
+        {
+          "id": 431,
+          "name": "MERN Stack Crash Course Default Chapter",
+          "description": "",
+          "showName": false,
+          "order": 0,
+          "posts": [
+            {
+              "id": 4761,
+              "slug": "intro-and-app-preview",
+              "title": "Intro & app overview",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 1,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:50:03.919Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4762,
+              "slug": "creating-the-backend-nodejs-app",
+              "title": "Creating the Backend (Nodejs) app",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 2,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:50:28.650Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4763,
+              "slug": "creating-the-frontend-react-app",
+              "title": "Creating the Frontend (React) app",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 3,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:52:05.570Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4764,
+              "slug": "creating-the-notes-ui",
+              "title": "Creating the notes user interface (UI)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 4,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:52:15.992Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4765,
+              "slug": "updating-notes-ui",
+              "title": "Updating notes UI",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 5,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:52:26.554Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4766,
+              "slug": "making-notes-editable",
+              "title": "Making notes editable",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 6,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:52:37.925Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4767,
+              "slug": "saving-notes-to-localstorage",
+              "title": "Saving notes to localstorage",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 7,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:52:48.536Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4768,
+              "slug": "deploying-react-app-to-ghpages",
+              "title": "Deploying react app to GitHub pages",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 8,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:53:25.054Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4769,
+              "slug": "setting-up-database-mongodb",
+              "title": "Setting up database (MongoDB)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 9,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:53:44.964Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4770,
+              "slug": "implementing-backend-routes-expressjs",
+              "title": "Implementing backend routes (ExpressJS)",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 10,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:54:01.861Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4771,
+              "slug": "connecting-the-backend-and-the-database",
+              "title": "Connecting the backend and the database",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 11,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:54:11.678Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4772,
+              "slug": "creating-mongoose-models-crud",
+              "title": "Creating mongoose models and db methods for CRUD",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 12,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:54:20.616Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4773,
+              "slug": "implementing-crud-api-in-backend",
+              "title": "Implementing CRUD API in backend",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 13,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:54:28.546Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4774,
+              "slug": "integrating-frontend-and-backend",
+              "title": "Integrating the frontend and backend",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 14,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:54:37.977Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            },
+            {
+              "id": 4776,
+              "slug": "outro",
+              "title": "Outro",
+              "description": "",
+              "type": "video",
+              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
+              "order": 15,
+              "hasAssignment": false,
+              "publishedAt": "2025-01-28T17:55:01.752Z",
+              "chapter": {
+                "id": 431,
+                "name": "MERN Stack Crash Course Default Chapter"
+              },
+              "resources": [],
+              "article": "\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": 294,
       "slug": "angular-nestjs-fullstack-course",
       "name": "Full Stack TypeScript - Let's build a \"Threads\" app with Angular & Nest JS",
@@ -2338,10 +3514,11 @@
       "publishedAt": "2025-01-23T08:51:36.021Z",
       "duration": null,
       "introVideoUrl": "",
-      "visibilityOrder": 7,
+      "visibilityOrder": 4,
       "isExternal": false,
       "externalCourseUrl": null,
       "externalStudentsCount": null,
+      "isVisible": true,
       "banner": {
         "url": "https://res.cloudinary.com/cwa/image/upload/v1729233505/maxresdefault_2_7e879afd25.jpg"
       },
@@ -2734,291 +3911,6 @@
       ]
     },
     {
-      "id": 319,
-      "slug": "mern-stack-crash-course",
-      "name": "MERN Stack Crash Course for beginners (MongoDB, ExpressJs, React, NodeJS in 8 hours)",
-      "description": "Build a full-fledged MERN stack application from scratch as you follow along this video containing a series of recorded videos, and live streams. You'll be creating a Notes application using React, MongoDB, Express JS, and NodeJS.",
-      "outline": "",
-      "publishedAt": "2025-01-29T15:29:58.012Z",
-      "duration": null,
-      "introVideoUrl": "",
-      "visibilityOrder": 6,
-      "isExternal": false,
-      "externalCourseUrl": null,
-      "externalStudentsCount": null,
-      "banner": {
-        "url": "https://res.cloudinary.com/cwa/image/upload/v1709468949/maxresdefault_1f247192b7.jpg"
-      },
-      "resources": [],
-      "authors": [],
-      "chapters": [
-        {
-          "id": 431,
-          "name": "MERN Stack Crash Course Default Chapter",
-          "description": "",
-          "showName": false,
-          "order": 0,
-          "posts": [
-            {
-              "id": 4761,
-              "slug": "intro-and-app-preview",
-              "title": "Intro & app overview",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 1,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:50:03.919Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4762,
-              "slug": "creating-the-backend-nodejs-app",
-              "title": "Creating the Backend (Nodejs) app",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 2,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:50:28.650Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4763,
-              "slug": "creating-the-frontend-react-app",
-              "title": "Creating the Frontend (React) app",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 3,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:52:05.570Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4764,
-              "slug": "creating-the-notes-ui",
-              "title": "Creating the notes user interface (UI)",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 4,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:52:15.992Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4765,
-              "slug": "updating-notes-ui",
-              "title": "Updating notes UI",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 5,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:52:26.554Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4766,
-              "slug": "making-notes-editable",
-              "title": "Making notes editable",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 6,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:52:37.925Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4767,
-              "slug": "saving-notes-to-localstorage",
-              "title": "Saving notes to localstorage",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 7,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:52:48.536Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4768,
-              "slug": "deploying-react-app-to-ghpages",
-              "title": "Deploying react app to GitHub pages",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 8,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:53:25.054Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4769,
-              "slug": "setting-up-database-mongodb",
-              "title": "Setting up database (MongoDB)",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 9,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:53:44.964Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4770,
-              "slug": "implementing-backend-routes-expressjs",
-              "title": "Implementing backend routes (ExpressJS)",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 10,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:54:01.861Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4771,
-              "slug": "connecting-the-backend-and-the-database",
-              "title": "Connecting the backend and the database",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 11,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:54:11.678Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4772,
-              "slug": "creating-mongoose-models-crud",
-              "title": "Creating mongoose models and db methods for CRUD",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 12,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:54:20.616Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4773,
-              "slug": "implementing-crud-api-in-backend",
-              "title": "Implementing CRUD API in backend",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 13,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:54:28.546Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4774,
-              "slug": "integrating-frontend-and-backend",
-              "title": "Integrating the frontend and backend",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 14,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:54:37.977Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4776,
-              "slug": "outro",
-              "title": "Outro",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://youtu.be/E8vYlkx9EQw",
-              "order": 15,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:55:01.752Z",
-              "chapter": {
-                "id": 431,
-                "name": "MERN Stack Crash Course Default Chapter"
-              },
-              "resources": [],
-              "article": "\n"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "id": 320,
       "slug": "web-dev-bootcamp",
       "name": "Web Development Bootcamp (Figma Design to HTML and CSS)",
@@ -3027,10 +3919,11 @@
       "publishedAt": "2025-01-29T15:30:53.866Z",
       "duration": null,
       "introVideoUrl": "",
-      "visibilityOrder": 5,
+      "visibilityOrder": 3,
       "isExternal": false,
       "externalCourseUrl": null,
       "externalStudentsCount": null,
+      "isVisible": true,
       "banner": {
         "url": "https://res.cloudinary.com/cwa/image/upload/v1738087465/JS_Beginners_Series_1_7a6d5b35f1_e2f255118f.webp"
       },
@@ -3185,10 +4078,11 @@
       "publishedAt": "2025-01-29T15:32:07.690Z",
       "duration": "1 hour, 30 minutes",
       "introVideoUrl": "",
-      "visibilityOrder": 4,
+      "visibilityOrder": 2,
       "isExternal": false,
       "externalCourseUrl": null,
       "externalStudentsCount": null,
+      "isVisible": false,
       "banner": null,
       "resources": [],
       "authors": [],
@@ -3332,10 +4226,11 @@
       "publishedAt": "2025-01-29T15:31:59.662Z",
       "duration": "35 minutes",
       "introVideoUrl": "",
-      "visibilityOrder": 4,
+      "visibilityOrder": 1,
       "isExternal": false,
       "externalCourseUrl": null,
       "externalStudentsCount": null,
+      "isVisible": false,
       "banner": null,
       "resources": [],
       "authors": [],
@@ -3513,291 +4408,6 @@
               "chapter": {
                 "id": 437,
                 "name": "JavaScript Beginners Series"
-              },
-              "resources": [],
-              "article": "\n"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": 321,
-      "slug": "react-redux-toolkit",
-      "name": "React Redux Toolkit tutorial for beginners",
-      "description": "",
-      "outline": "This is the only React Redux Toolkit tutorial you need to get started with React and TypeScript. In this video, we start with React using Vite, start working on including Redux Toolkit in the project, configure the redux slices, create redux actions, create redux selectors, dispatch redux actions from our components, and also create an async thunk using the rtk (Redux tool kit). This short yet informative tutorial will save you hours of searching the internet to really get started with these.\nCode repository:\nhttps://github.com/code-with-ahsan/react-rtk",
-      "publishedAt": "2025-01-29T15:31:50.675Z",
-      "duration": null,
-      "introVideoUrl": "",
-      "visibilityOrder": 4,
-      "isExternal": false,
-      "externalCourseUrl": null,
-      "externalStudentsCount": null,
-      "banner": {
-        "url": "https://res.cloudinary.com/cwa/image/upload/v1729413069/react_redux_tutorial_cb3315f716.jpg"
-      },
-      "resources": [],
-      "authors": [],
-      "chapters": [
-        {
-          "id": 432,
-          "name": "React Redux Toolkit tutorial for beginners",
-          "description": "",
-          "showName": false,
-          "order": 0,
-          "posts": [
-            {
-              "id": 4793,
-              "slug": "215880",
-              "title": "Cleaning up and implementing Redux.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=86",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:00:42.612Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4803,
-              "slug": "463323",
-              "title": "Conclusion.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=1006",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:01:59.717Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4792,
-              "slug": "6a5e1f",
-              "title": "Running the application.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=73",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:00:35.828Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4794,
-              "slug": "73a1ec",
-              "title": "Explaining Redux.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=140",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:00:49.746Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4800,
-              "slug": "77556d",
-              "title": "Working with slices.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=508",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:01:43.620Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4789,
-              "slug": "796d60",
-              "title": "Introduction",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=0",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T17:59:55.489Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4791,
-              "slug": "7e2e7c",
-              "title": "Installing dependencies in Visual Studio Code.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=46",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:00:28.589Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4802,
-              "slug": "a24361",
-              "title": "Using thunk.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=867",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:01:54.549Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4795,
-              "slug": "a2da32",
-              "title": "Getting started with Redux Toolkit.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=169",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:00:55.752Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4798,
-              "slug": "b3d205",
-              "title": "Installing redux-devtools extension.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=381",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:01:30.603Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4797,
-              "slug": "cf9fa3",
-              "title": "Creating store using Redux Toolkit.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=366",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:01:23.128Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4801,
-              "slug": "ddf358",
-              "title": "Using a selector.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=590",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:01:49.890Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4790,
-              "slug": "e5bd8b",
-              "title": "Starting new project in React with Redux Toolkit.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=23",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:00:19.612Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4796,
-              "slug": "eabc02",
-              "title": "Installing Redux Toolkit.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=340",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:01:05.003Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
-              },
-              "resources": [],
-              "article": "\n"
-            },
-            {
-              "id": 4799,
-              "slug": "eeb518",
-              "title": "Defining state type and reducers.",
-              "description": "",
-              "type": "video",
-              "videoUrl": "https://www.youtube.com/watch?v=RmPGtHrvT8Y&t=448",
-              "order": 0,
-              "hasAssignment": false,
-              "publishedAt": "2025-01-28T18:01:38.700Z",
-              "chapter": {
-                "id": 432,
-                "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
               "article": "\n"

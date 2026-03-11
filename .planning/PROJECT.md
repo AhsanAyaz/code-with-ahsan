@@ -61,6 +61,15 @@ Community members can find mentors, collaborate on real projects with structured
 - ✓ Mentorship landing page refocus (removed community entry role) — v3.0
 - ✓ Social proof API (live stats for homepage) — v3.0
 
+<!-- v4.0 - Admin Course Creator with YouTube Integration -->
+
+- ✓ Admin course list with CRUD operations — v4.0
+- ✓ YouTube video chapter extraction for auto-generating course posts — v4.0
+- ✓ YouTube playlist support with per-video URLs — v4.0
+- ✓ Course visibility toggle and reorder from admin — v4.0
+- ✓ AI-generated SEO course descriptions via Gemini — v4.0
+- ✓ Course card 3-column layout with black background thumbnails — v4.0
+
 ### Out of Scope
 
 **v1.0 Exclusions:**
@@ -124,18 +133,21 @@ Community members can find mentors, collaborate on real projects with structured
 | Admin nested routes | Proper URL navigation vs client tabs | ✓ /admin/* route architecture |
 | Any user can create projects | Mentor-only was too restrictive | ✓ Changed in Phase 6.1 |
 | GitHub Actions for cron jobs | Vercel cron unreliable, standalone scripts | ✓ Firebase Admin direct init |
+| Firestore session auth for course routes | Consistency with other admin routes | ✓ Replaced env var check after UAT |
+| Single chapter per YouTube course | Matches angular-in-90ish-minutes pattern | ✓ chapterOrder 0, posts from timestamps |
+| Gemini for course descriptions | Auto-generate SEO-optimized text | ✓ gemini-flash-latest via @google/genai |
+| visibilityOrder for course ordering | Simple numeric ordering in MDX frontmatter | ✓ Higher value = first in list |
 
-## Current State (post-v3.0)
+## Current State (post-v4.0)
 
-**Shipped:** v3.0 Brand Identity & Site Restructure (2026-03-10)
+**Shipped:** v4.0 Admin Course Creator with YouTube Integration (2026-03-11)
 
-The site is now a community-first platform with:
-- Community-first homepage with live stats, social proof, pillars, and founder credibility
-- Flat top-level navigation (7 primary items) promoting community sections
-- Recruiter-ready `/about` portfolio page (bio, books, courses, 11 open source repos, work history, 12 testimonials, contact)
-- Mentorship page refocused on mentor matching (not community entry)
-- `/community` page as Get Involved hub with onramps
-- Public stats API with Firestore caching
+The platform now includes a local admin tool for course management:
+- Admin courses page at `/admin/courses` — list, create, delete, toggle visibility, reorder
+- YouTube video/playlist integration — auto-extracts chapter timestamps into MDX course posts
+- AI-generated SEO descriptions via Gemini API
+- Course visibility and ordering reflected on public `/courses` page
+- 3-column course card layout with centered thumbnails on black backgrounds
 
 ## Milestones
 
@@ -144,6 +156,7 @@ The site is now a community-first platform with:
 | v1.0 | Complete | 2026-01-23 |
 | v2.0 | Complete | 2026-03-10 |
 | v3.0 | Complete | 2026-03-10 |
+| v4.0 | Complete | 2026-03-11 |
 
 ---
-*Last updated: 2026-03-10 after v3.0 milestone completion*
+*Last updated: 2026-03-11 after v4.0 milestone completion*

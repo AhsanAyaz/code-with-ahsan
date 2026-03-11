@@ -1,6 +1,21 @@
 # Milestones
 
-Track completed milestones and their phase ranges.
+## v4.0: Admin Course Creator with YouTube Integration
+
+**Completed:** 2026-03-11
+**Phases:** 1 (Phase 1 only)
+**Plans:** 2 | **Commits:** 15 | **LOC:** +11,603 / -3,459
+**Timeline:** 7 days (2026-03-04 → 2026-03-11)
+**Archive:** `.planning/milestones/v4.0-ROADMAP.md`
+
+**Delivered:**
+- YouTube chapter-timestamp to MDX pipeline — auto-extracts video chapters and creates course post files
+- Admin courses page with full CRUD — list, create, delete, toggle visibility, and reorder courses
+- YouTube playlist support — each playlist video becomes a separate course post with its own video URL
+- AI-generated SEO descriptions via Gemini for auto-filling course descriptions
+- Course visibility and ordering system — toggle visibility and drag-reorder from admin, reflected on public site
+
+---
 
 ## v2.0: Community Collaboration & Learning
 

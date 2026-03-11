@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "firebasestorage.googleapis.com" },
       { protocol: "https", hostname: "unavatar.io" },
       { protocol: "https", hostname: "media.licdn.com" },
+      { protocol: "https", hostname: "i.ytimg.com" },
     ],
   },
   async rewrites() {
