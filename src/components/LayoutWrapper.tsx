@@ -35,7 +35,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="navbar bg-base-100 px-4 sm:px-8 md:px-12 lg:px-16 z-50">
-        <div className="navbar-start">
+        <div className="navbar-start shrink-0 w-auto">
           <Link
             href="/"
             aria-label="Code with Ahsan"
@@ -49,11 +49,11 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                 height={50}
                 style={{ objectFit: "cover" }}
               />
-              <span className="hidden sm:inline font-bold text-base-content no-underline">{siteMetadata.headerTitle}</span>
+              <span className="hidden lg:inline font-bold text-base-content no-underline">{siteMetadata.headerTitle}</span>
             </div>
           </Link>
         </div>
-        <div className="navbar-center hidden md:flex">
+        <div className="navbar-center hidden md:flex flex-1 justify-center">
           <div className="flex items-center gap-1">
             {headerNavLinks.map((link) => (
               <Link
@@ -124,7 +124,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
             </div>
           </div>
         </div>
-        <div className="navbar-end gap-2">
+        <div className="navbar-end shrink-0 w-auto gap-2">
           <ThemeSwitch />
           <MobileNav />
           <ProfileMenu />
