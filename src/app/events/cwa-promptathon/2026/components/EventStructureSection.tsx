@@ -16,6 +16,17 @@ const EventStructureSection = () => {
           <p className="text-base-content/70 max-w-2xl mx-auto text-sm sm:text-base">
             Key timeline and themes for CWA Prompt-a-thon 2026.
           </p>
+          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="mt-4">
+            <a
+              href="https://docs.google.com/document/d/1fZ7ACZCrpSshl1Yaqe5auighP51ggut9xB7oIK_981E/edit?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline btn-primary btn-md rounded-xl gap-2 shadow-[0_0_18px_rgba(143,39,224,0.25)] hover:shadow-[0_0_28px_rgba(143,39,224,0.45)] transition-shadow duration-300"
+            >
+              <FileText className="w-4 h-4" />
+              View Event Structure Document
+            </a>
+          </motion.div>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
