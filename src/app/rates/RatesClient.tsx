@@ -115,7 +115,7 @@ export default function RatesClient({ post }: { post: any }) {
               }`}
             >
               {pkg.badge && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-neon-purple-dark text-white text-xs font-bold px-3 py-1 rounded-full">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#9B00D9] text-white text-xs font-bold px-3 py-1 rounded-full">
                   {pkg.badge}
                 </span>
               )}
@@ -181,7 +181,7 @@ export default function RatesClient({ post }: { post: any }) {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
             href="mailto:ahsan.ubitian@gmail.com?subject=Collaboration%20Inquiry%20%E2%80%94%20%5BYour%20Brand%5D"
-            className="inline-block px-8 py-3 bg-neon-purple-dark text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
+            className="inline-block px-8 py-3 bg-[#9B00D9] text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
           >
             Send a brief
           </a>
@@ -201,7 +201,7 @@ export default function RatesClient({ post }: { post: any }) {
         href="https://calendar.app.google/Z6g5dMyczq25hmjYA"
         target="_blank"
         rel="noreferrer"
-        className="hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 z-50 flex-col items-center gap-1 bg-neon-purple-dark text-white font-bold px-3 py-5 rounded-full shadow-lg hover:opacity-90 transition-opacity"
+        className="hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 z-50 flex-col items-center gap-1 bg-[#9B00D9] text-white font-bold px-3 py-5 rounded-full shadow-lg hover:opacity-90 transition-opacity"
         style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
       >
         Book a call
@@ -213,7 +213,7 @@ export default function RatesClient({ post }: { post: any }) {
           href="https://calendar.app.google/Z6g5dMyczq25hmjYA"
           target="_blank"
           rel="noreferrer"
-          className="block w-full text-center py-3 bg-neon-purple-dark text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
+          className="block w-full text-center py-3 bg-[#9B00D9] text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
         >
           Book a call
         </a>
