@@ -5,7 +5,7 @@ milestone_name: Admin Course Creator with YouTube Integration
 status: completed
 stopped_at: v4.0 milestone archived
 last_updated: "2026-03-11T10:00:00.000Z"
-last_activity: 2026-03-11 — v4.0 milestone archived
+last_activity: 2026-03-17 - Completed quick task 72: update the rates card according to feedback
 progress:
   total_phases: 1
   completed_phases: 1
@@ -60,6 +60,12 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then cherry-pick o
 ### Blockers/Concerns
 
 None.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 72 | update the rates card according to feedback | 2026-03-17 | f0efea9 | [72-update-the-rates-card-according-to-feedb](./quick/72-update-the-rates-card-according-to-feedb/) |
 
 ## Session Continuity
 
