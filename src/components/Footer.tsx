@@ -21,6 +21,9 @@ export default function Footer() {
         </div>
       </nav>
       <nav className="grid grid-flow-col gap-4">
+        <Link href="/rates" className="link link-hover text-sm">
+          Rates
+        </Link>
         <Link href="/privacy" className="link link-hover text-sm">
           Privacy Policy
         </Link>
