@@ -33,7 +33,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   // Fix hydration mismatch for ThemeProvider if needed, but next-themes handles it usually.
 
   return (
-    <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="data-theme" forcedTheme="dark">
       <ToastProvider>
         <AuthContext.Provider
           value={{

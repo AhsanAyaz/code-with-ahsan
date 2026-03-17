@@ -4,7 +4,7 @@ import headerNavLinks, { MORE_LINKS } from "@/data/headerNavLinks";
 import Link from "./Link";
 import Footer from "./Footer";
 import MobileNav from "./MobileNav";
-import ThemeSwitch from "./ThemeSwitch";
+
 import Image from "./Image";
 import ProfileMenu from "./ProfileMenu";
 import { ReactNode, useState, useRef, useEffect } from "react";
@@ -125,8 +125,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
           </div>
         </div>
         <div className="navbar-end md:shrink-0 md:w-auto gap-2">
-          <ThemeSwitch />
-          <MobileNav />
+<MobileNav />
           <ProfileMenu />
         </div>
       </header>
