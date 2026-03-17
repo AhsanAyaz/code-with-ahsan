@@ -70,9 +70,9 @@ export default function RatesClient({ post }: { post: any }) {
         </h1>
         <p className="text-lg text-gray-300 max-w-3xl mx-auto mb-6">
           Muhammad Ahsan Ayaz&apos;s audience includes software architects, senior engineers, and developers at top-tier companies. Past brand collaborations include{" "}
-          <a href="https://airia.com" target="_blank" rel="noopener noreferrer" className="text-neon-cyan underline underline-offset-2 hover:opacity-80">Airia</a>,{" "}
-          <a href="https://kimi.com" target="_blank" rel="noopener noreferrer" className="text-neon-cyan underline underline-offset-2 hover:opacity-80">Kimi (Moonshot AI)</a>,{" "}
-          <a href="https://cloudways.com" target="_blank" rel="noopener noreferrer" className="text-neon-cyan underline underline-offset-2 hover:opacity-80">Cloudways</a> and more.{" "}
+          <a href="https://airia.com" target="_blank" rel="noopener noreferrer" className="text-neon-purple underline underline-offset-2 hover:opacity-80">Airia</a>,{" "}
+          <a href="https://kimi.com" target="_blank" rel="noopener noreferrer" className="text-neon-purple underline underline-offset-2 hover:opacity-80">Kimi (Moonshot AI)</a>,{" "}
+          <a href="https://cloudways.com" target="_blank" rel="noopener noreferrer" className="text-neon-purple underline underline-offset-2 hover:opacity-80">Cloudways</a> and more.{" "}
           Ahsan is a Google Developer Expert in AI and Angular, author of 4 published books, and creator of open-source libraries with 13M+ installs.
         </p>
         {/* Credential pills */}
@@ -80,7 +80,7 @@ export default function RatesClient({ post }: { post: any }) {
           {CREDENTIAL_PILLS.map((pill) => (
             <span
               key={pill}
-              className="px-3 py-1 rounded-full border border-neon-cyan text-neon-cyan text-sm font-medium"
+              className="px-3 py-1 rounded-full border border-neon-purple text-neon-purple text-sm font-medium"
             >
               {pill}
             </span>
@@ -93,7 +93,7 @@ export default function RatesClient({ post }: { post: any }) {
               key={stat.label}
               className="bg-white/5 rounded-xl p-4 text-center border border-white/10"
             >
-              <div className="text-2xl font-bold text-neon-cyan">{stat.value}</div>
+              <div className="text-2xl font-bold text-neon-purple">{stat.value}</div>
               <div className="text-sm font-semibold">{stat.label}</div>
               <div className="text-xs text-gray-400">{stat.sub}</div>
             </div>
@@ -122,7 +122,7 @@ export default function RatesClient({ post }: { post: any }) {
               <div className="mb-4">
                 <h3 className="text-xl font-bold">{pkg.name}</h3>
                 <div className="flex items-baseline gap-2 mt-1">
-                  <span className="text-2xl font-bold text-neon-cyan">{pkg.price}</span>
+                  <span className="text-2xl font-bold text-neon-purple">{pkg.price}</span>
                   <span className="text-sm text-green-400">({pkg.savings})</span>
                 </div>
                 <p className="text-sm text-gray-400 mt-2">{pkg.description}</p>
@@ -147,7 +147,7 @@ export default function RatesClient({ post }: { post: any }) {
             components={{
               a: (props: any) => (
                 <a
-                  className="text-neon-cyan"
+                  className="text-neon-purple"
                   target={"_blank"}
                   rel="noreferrer"
                   {...props}
@@ -181,7 +181,7 @@ export default function RatesClient({ post }: { post: any }) {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
             href="mailto:ahsan.ubitian@gmail.com?subject=Collaboration%20Inquiry%20%E2%80%94%20%5BYour%20Brand%5D"
-            className="inline-block px-8 py-3 bg-neon-cyan text-black font-bold rounded-lg hover:opacity-90 transition-opacity"
+            className="inline-block px-8 py-3 bg-neon-purple text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
           >
             Send a brief
           </a>
