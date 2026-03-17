@@ -9,6 +9,7 @@ module.exports = {
       colors: {
         "neon-cyan": "#00F0FF",
         "neon-purple": "#BC13FE",
+        "neon-purple-dark": "#9B00D9",
         "neon-green": "#00FF41",
         "void-black": "#050505",
       },
