@@ -111,6 +111,12 @@ export const CONFIRMED_SPONSORS: ConfirmedSponsor[] = [
     websiteUrl: "https://commandcode.ai",
     tier: "Tool Partner",
   },
+  {
+    name: "Google",
+    logoUrl: "/static/images/events/cwa-promptathon-2026/sponsors/google-transparent.png",
+    websiteUrl: "https://google.com",
+    tier: "Tool Partner",
+  },
 ];
 
 export type SponsorLogoPlaceholder = {
