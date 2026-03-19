@@ -44,7 +44,7 @@ const CurrentSponsorsSection = () => {
                 alt={`${sponsor.name} logo`}
                 width={80}
                 height={60}
-                className="object-contain mask mask-squircle"
+                className="object-contain mask mask-squircle p-2"
               />
               <span className="text-[11px] font-bold text-white mt-1 leading-tight">{sponsor.name}</span>
               <span className={`text-[10px] font-semibold ${getTierColor(sponsor.tier)}`}>{sponsor.tier}</span>
