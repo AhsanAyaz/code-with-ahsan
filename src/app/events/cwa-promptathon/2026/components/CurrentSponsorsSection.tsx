@@ -37,7 +37,7 @@ const CurrentSponsorsSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.1 }}
               transition={{ delay: index * 0.04, duration: 0.3 }}
-              className="h-28 rounded-xl border border-primary/40 bg-base-200 flex flex-col items-center justify-center text-center px-3 hover:border-primary/70 transition-colors"
+              className="h-36 mask mask-squircle bg-base-200 flex flex-col items-center justify-center text-center p-5 hover:bg-base-300 transition-colors"
             >
               <Image
                 src={sponsor.logoUrl}
@@ -57,7 +57,7 @@ const CurrentSponsorsSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.1 }}
               transition={{ delay: (CONFIRMED_SPONSORS.length + index) * 0.04, duration: 0.3 }}
-              className="h-28 rounded-xl border border-dashed border-primary/30 bg-base-200 flex flex-col items-center justify-center text-center px-3"
+              className="h-36 mask mask-squircle border border-dashed border-primary/30 bg-base-200 flex flex-col items-center justify-center text-center p-5"
             >
               <Building2 className="w-5 h-5 text-primary/70 mb-2" />
               <span className="text-xs font-semibold text-base-content/80">{item.tierHint}</span>
