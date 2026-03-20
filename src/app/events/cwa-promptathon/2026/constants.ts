@@ -69,7 +69,7 @@ export const JUDGES: JudgeProfile[] = [
     experience: "18+ years",
     linkedinUrl: "https://www.linkedin.com/in/mimrans",
     avatarUrl:
-      "https://media.licdn.com/dms/image/v2/D4D03AQHSxewilpWE9w/profile-displayphoto-crop_800_800/B4DZxX59rOJ8AM-/0/1771001340116?e=1773878400&v=beta&t=L_O4YqFD79gvEnJbe9EVKmbcmIBTSMKbgU5aW5IIbOU",
+      "/static/images/events/cwa-promptathon-2026/judges/imran-siddiqui.jpg",
   },
   {
     name: "Muhammad Noman",
@@ -77,7 +77,7 @@ export const JUDGES: JudgeProfile[] = [
     experience: "9+ years",
     linkedinUrl: "https://www.linkedin.com/in/mnomanmemon",
     avatarUrl:
-      "https://media.licdn.com/dms/image/v2/C4D03AQFqEykx6PGlaA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1663789669818?e=1773878400&v=beta&t=2uUBASpllh1HSJaiqInEb9C4aVQT5tazTaleq5aMpWw",
+      "/static/images/events/cwa-promptathon-2026/judges/muhammad-noman.jpg",
   },
   {
     name: "Asad Ullah Khalid",
@@ -85,7 +85,7 @@ export const JUDGES: JudgeProfile[] = [
     experience: "6+ years",
     linkedinUrl: "https://www.linkedin.com/in/asadkhalid305/",
     avatarUrl:
-      "https://media.licdn.com/dms/image/v2/D4E03AQGk0ry36qwAsA/profile-displayphoto-shrink_800_800/B4EZQnyeDxHEAk-/0/1735834329848?e=1773878400&v=beta&t=-V4-7FVIORu5avV-4rBvCwtvyiH4gIIsNzb4xDQfQhU",
+      "/static/images/events/cwa-promptathon-2026/judges/asadullah-khalid.jpg",
   },
   {
     name: "Muhammad Faheem",
@@ -93,7 +93,7 @@ export const JUDGES: JudgeProfile[] = [
     experience: "5+ years",
     linkedinUrl: "https://www.linkedin.com/in/mfaheemrajput/",
     avatarUrl:
-      "https://media.licdn.com/dms/image/v2/D4E03AQGGpdSeA3SVUg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1706203960476?e=1774483200&v=beta&t=o3atr4RehbXqwRsQHRWPQaTtUUk3qRgK3aCQvujIG34",
+      "/static/images/events/cwa-promptathon-2026/judges/muhammad-faheem.jpg",
   },
 ];
 
