@@ -21,11 +21,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/events</loc>
+    <loc>https://codewithahsan.dev/courses</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses</loc>
+    <loc>https://codewithahsan.dev/events</loc>
   </url>
 
   <url>
@@ -49,11 +49,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/projects</loc>
+    <loc>https://codewithahsan.dev/rates</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/rates</loc>
+    <loc>https://codewithahsan.dev/projects</loc>
   </url>
 
   <url>
@@ -62,6 +62,10 @@
 
   <url>
     <loc>https://codewithahsan.dev/terms</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/admin/courses</loc>
   </url>
 
   <url>
@@ -133,15 +137,15 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/roadmaps/new</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/roadmaps/my</loc>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/events/cwa-promptathon/2026</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/roadmaps/new</loc>
   </url>
 
   <url>
@@ -743,6 +747,72 @@
   </url>
 
   <url>
+    <loc
+      >https://codewithahsan.dev/courses/google-agent-development-kit-for-beginners</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/google-agent-development-kit-for-beginners/building-your-first-ai-agent---google-agent-development-kit-for-beginners-part-1</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/google-agent-development-kit-for-beginners/working-with-tools--function-calling---google-agent-development-kit-for-beginners-part-2</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/google-agent-development-kit-for-beginners/using-multiple-ai-models-with-litellm---google-agent-development-kit-for-beginners-part-3</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/google-agent-development-kit-for-beginners/using-structured-datastructured-output---google-agent-development-kit-for-beginners-part-4</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/google-agent-development-kit-for-beginners/how-to-use-sessions--state-in-google-adk---google-agent-development-kit-for-beginners-part-5</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/google-agent-development-kit-for-beginners/deploy-ai-agents-on-agent-engine-vertex-ai---google-agent-development-kit-for-beginners-part-6</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/google-agent-development-kit-for-beginners/how-to-use-callbacks-in-google-adk--google-agent-development-kit-for-beginners-part-7</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/google-agent-development-kit-for-beginners/build-ui-for-your-ai-agent-google-agent-development-kit-for-beginners-part-8</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/google-agent-development-kit-for-beginners/resources</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/google-agent-development-kit-for-beginners/submissions</loc
+    >
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/courses/angular-in-90ish-minutes</loc>
   </url>
 
@@ -875,6 +945,338 @@
   <url>
     <loc
       >https://codewithahsan.dev/courses/angular-in-90ish-minutes/submissions</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--introduction--roadmap</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--environment-setup-vite--react</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--agenda--instructor-intro</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--what-is-react-architecture-explained</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--understanding-jsx</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--virtual-dom-vs-real-dom</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--components--props-deep-dive</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--handling-events-in-react</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--conditional-rendering-patterns</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--rendering-lists--loops</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--forms--input-handling</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--state-management-context-api-vs-prop-drilling</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--react-router--navigation</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--react-19-features-overview</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--project-building-a-full-stack-ai-app</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--api-integration-gemini-ai</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--state-handlers--logic</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--custom-hooks--data-fetching</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--theming-with-context-api</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--performance-usememo--optimization</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--lazy-loading--suspense</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--error-boundaries--best-practices</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/--what-to-learn-next</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/resources</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/react-19-crash-course-for-beginners-2026-learn-in-90-minutes/submissions</loc
+    >
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/215880</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/463323</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/6a5e1f</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/73a1ec</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/77556d</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/796d60</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/7e2e7c</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/a24361</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/a2da32</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/b3d205</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/cf9fa3</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/ddf358</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/e5bd8b</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/eabc02</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/eeb518</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/resources</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/submissions</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course</loc>
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/intro-and-app-preview</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/creating-the-backend-nodejs-app</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/creating-the-frontend-react-app</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/creating-the-notes-ui</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/updating-notes-ui</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/making-notes-editable</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/saving-notes-to-localstorage</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/deploying-react-app-to-ghpages</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/setting-up-database-mongodb</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/implementing-backend-routes-expressjs</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/connecting-the-backend-and-the-database</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/creating-mongoose-models-crud</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/implementing-crud-api-in-backend</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/integrating-frontend-and-backend</loc
+    >
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/outro</loc>
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/resources</loc
+    >
+  </url>
+
+  <url>
+    <loc
+      >https://codewithahsan.dev/courses/mern-stack-crash-course/submissions</loc
     >
   </url>
 
@@ -1023,110 +1425,6 @@
   <url>
     <loc
       >https://codewithahsan.dev/courses/angular-nestjs-fullstack-course/submissions</loc
-    >
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course</loc>
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/intro-and-app-preview</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/creating-the-backend-nodejs-app</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/creating-the-frontend-react-app</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/creating-the-notes-ui</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/updating-notes-ui</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/making-notes-editable</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/saving-notes-to-localstorage</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/deploying-react-app-to-ghpages</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/setting-up-database-mongodb</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/implementing-backend-routes-expressjs</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/connecting-the-backend-and-the-database</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/creating-mongoose-models-crud</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/implementing-crud-api-in-backend</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/integrating-frontend-and-backend</loc
-    >
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/mern-stack-crash-course/outro</loc>
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/resources</loc
-    >
-  </url>
-
-  <url>
-    <loc
-      >https://codewithahsan.dev/courses/mern-stack-crash-course/submissions</loc
     >
   </url>
 
@@ -1298,77 +1596,5 @@
 
   <url>
     <loc>https://codewithahsan.dev/courses/js-beginners-series/submissions</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/215880</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/463323</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/6a5e1f</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/73a1ec</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/77556d</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/796d60</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/7e2e7c</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/a24361</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/a2da32</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/b3d205</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/cf9fa3</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/ddf358</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/e5bd8b</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/eabc02</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/eeb518</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/resources</loc>
-  </url>
-
-  <url>
-    <loc>https://codewithahsan.dev/courses/react-redux-toolkit/submissions</loc>
   </url>
 </urlset>

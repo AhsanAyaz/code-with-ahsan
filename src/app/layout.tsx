@@ -5,6 +5,7 @@ import { Providers } from "./providers";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import Analytics from "@/components/analytics";
 import GoogleAdsense from "@/components/analytics/GoogleAdsense";
+import LoupeFeedback from "@/components/analytics/LoupeFeedback";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import siteMetadata from "@/data/siteMetadata";
@@ -103,6 +104,7 @@ export default function RootLayout({
           <LayoutWrapper>
             <Analytics />
             <GoogleAdsense pId="ca-pub-9844853681537365" />
+            <LoupeFeedback />
             {children}
           </LayoutWrapper>
         </Providers>
