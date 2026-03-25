@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  transpilePackages: ["@loupeink/web-sdk"],
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -105,6 +106,7 @@ const nextConfig: NextConfig = {
     ];
   },
   turbopack: {
+    root: "..",
     rules: {
       "*.svg": {
         loaders: ["@svgr/webpack"],

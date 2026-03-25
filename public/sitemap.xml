@@ -21,11 +21,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/courses</loc>
+    <loc>https://codewithahsan.dev/events</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/events</loc>
+    <loc>https://codewithahsan.dev/courses</loc>
   </url>
 
   <url>
@@ -49,15 +49,15 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/rates</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/projects</loc>
   </url>
 
   <url>
     <loc>https://codewithahsan.dev/roadmaps</loc>
+  </url>
+
+  <url>
+    <loc>https://codewithahsan.dev/rates</loc>
   </url>
 
   <url>
@@ -93,10 +93,6 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/admin</loc>
-  </url>
-
-  <url>
     <loc>https://codewithahsan.dev/mentorship/browse</loc>
   </url>
 
@@ -105,11 +101,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/goals</loc>
+    <loc>https://codewithahsan.dev/mentorship/mentors</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/mentors</loc>
+    <loc>https://codewithahsan.dev/mentorship/goals</loc>
   </url>
 
   <url>
@@ -117,15 +113,19 @@
   </url>
 
   <url>
+    <loc>https://codewithahsan.dev/mentorship/admin</loc>
+  </url>
+
+  <url>
     <loc>https://codewithahsan.dev/mentorship/onboarding</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/mentorship/requests</loc>
+    <loc>https://codewithahsan.dev/projects/discover</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/projects/discover</loc>
+    <loc>https://codewithahsan.dev/mentorship/requests</loc>
   </url>
 
   <url>
@@ -141,11 +141,11 @@
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/events/cwa-promptathon/2026</loc>
+    <loc>https://codewithahsan.dev/roadmaps/new</loc>
   </url>
 
   <url>
-    <loc>https://codewithahsan.dev/roadmaps/new</loc>
+    <loc>https://codewithahsan.dev/events/cwa-promptathon/2026</loc>
   </url>
 
   <url>
