@@ -55,7 +55,7 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then cherry-pick o
 
 ### Roadmap Evolution
 
-(clean — no pending phases)
+- Phase 1 added: Promptathon live host panel with presenter slides, admin winner management, and permanent winners display
 
 ### Blockers/Concerns
 
