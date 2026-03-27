@@ -16,6 +16,7 @@ export default function AdminNavigation() {
     { label: "Projects", href: "/admin/projects", exact: false },
     { label: "Roadmaps", href: "/admin/roadmaps", exact: false },
     { label: "Courses", href: "/admin/courses", exact: false },
+    { label: "Events", href: "/admin/events/cwa-promptathon-2026", exact: false },
   ];
 
   const isActive = (href: string, exact: boolean) => {
