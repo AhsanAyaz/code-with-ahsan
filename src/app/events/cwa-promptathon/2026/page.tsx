@@ -8,6 +8,7 @@ import EventStructureSection from "./components/EventStructureSection";
 import JudgesMentorsSection from "./components/JudgesMentorsSection";
 import SponsorshipPackagesSection from "./components/SponsorshipPackagesSection";
 import CurrentSponsorsSection from "./components/CurrentSponsorsSection";
+import WinnersDisplay from "./components/WinnersDisplay";
 
 const CwaPromptathon2026Page = () => {
   return (
@@ -20,6 +21,7 @@ const CwaPromptathon2026Page = () => {
       <JudgesMentorsSection />
       <SponsorshipPackagesSection />
       <CurrentSponsorsSection />
+      <WinnersDisplay />
     </main>
   );
 };
