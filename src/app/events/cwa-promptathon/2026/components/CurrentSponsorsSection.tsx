@@ -22,7 +22,7 @@ const CurrentSponsorsSection = () => {
         <div className="text-center mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-3">Our Sponsors</h2>
           <p className="text-sm sm:text-base text-base-content/70">
-            Sponsorship spots available. Confirmed partners will appear here.
+            Proudly supported by our partners.
           </p>
         </div>
 

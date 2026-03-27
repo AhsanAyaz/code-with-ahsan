@@ -125,11 +125,7 @@ export type SponsorLogoPlaceholder = {
   tierHint: string;
 };
 
-export const SPONSOR_PLACEHOLDERS: SponsorLogoPlaceholder[] = [
-  { tierHint: "Spot Available" },
-  { tierHint: "Spot Available" },
-  { tierHint: "Spot Available" },
-];
+export const SPONSOR_PLACEHOLDERS: SponsorLogoPlaceholder[] = [];
 
 export type SponsorshipFeature = {
   name: string;
