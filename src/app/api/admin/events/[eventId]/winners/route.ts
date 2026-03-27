@@ -45,6 +45,25 @@ export async function GET(
   }
 }
 
+// ─── DELETE /api/admin/events/[eventId]/winners — admin clear ────────────────
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ eventId: string }> }
+) {
+  const authError = await checkAdminAuth(request);
+  if (authError) return authError;
+
+  const { eventId } = await params;
+  try {
+    await db.doc(`events/${eventId}/winners/data`).delete();
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error clearing winners:", error);
+    return NextResponse.json({ error: "Failed to clear winners" }, { status: 500 });
+  }
+}
+
 // ─── PUT /api/admin/events/[eventId]/winners — admin write ───────────────────
 
 export async function PUT(

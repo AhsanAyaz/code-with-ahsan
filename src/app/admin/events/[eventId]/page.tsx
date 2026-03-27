@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useToast } from "@/contexts/ToastContext";
 import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
@@ -39,6 +39,21 @@ export default function AdminEventWinnersPage() {
     third: emptyPlacement(),
   });
   const [saving, setSaving] = useState(false);
+  const [clearing, setClearing] = useState(false);
+  const [loadedAt, setLoadedAt] = useState<string | null>(null);
+
+  // Load existing winners on mount
+  useEffect(() => {
+    fetch(`/api/admin/events/${eventId}/winners`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && data.first) {
+          setFormData({ first: data.first, second: data.second, third: data.third });
+          setLoadedAt(data.announcedAt ?? null);
+        }
+      })
+      .catch(() => {});
+  }, [eventId]);
 
   const updatePlacement = (
     placement: keyof WinnersFormData,
@@ -49,6 +64,28 @@ export default function AdminEventWinnersPage() {
       ...prev,
       [placement]: { ...prev[placement], [field]: value },
     }));
+  };
+
+  const handleClear = async () => {
+    const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
+    setClearing(true);
+    try {
+      const res = await fetch(`/api/admin/events/${eventId}/winners`, {
+        method: "DELETE",
+        headers: { "x-admin-token": token ?? "" },
+      });
+      if (res.ok) {
+        setFormData({ first: emptyPlacement(), second: emptyPlacement(), third: emptyPlacement() });
+        setLoadedAt(null);
+        success("Winners cleared");
+      } else {
+        error("Failed to clear winners");
+      }
+    } catch {
+      error("Failed to clear winners");
+    } finally {
+      setClearing(false);
+    }
   };
 
   const handleSave = async () => {
@@ -87,6 +124,11 @@ export default function AdminEventWinnersPage() {
         <p className="text-base-content/60 mt-1">
           Set the winning teams and their project details for the public display.
         </p>
+        {loadedAt && (
+          <div className="alert alert-info mt-3 py-2 text-sm">
+            Winners currently saved — announced {new Date(loadedAt).toLocaleString()}
+          </div>
+        )}
       </div>
 
       <div className="space-y-6">
@@ -155,11 +197,25 @@ export default function AdminEventWinnersPage() {
         ))}
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center">
+        <button
+          className="btn btn-error btn-outline btn-sm"
+          onClick={handleClear}
+          disabled={clearing || saving || !loadedAt}
+        >
+          {clearing ? (
+            <>
+              <span className="loading loading-spinner loading-sm"></span>
+              Clearing...
+            </>
+          ) : (
+            "Clear Winners"
+          )}
+        </button>
         <button
           className="btn btn-primary"
           onClick={handleSave}
-          disabled={saving}
+          disabled={saving || clearing}
         >
           {saving ? (
             <>
