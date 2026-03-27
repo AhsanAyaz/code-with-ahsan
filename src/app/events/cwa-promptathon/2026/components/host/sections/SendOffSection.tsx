@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import SlideBackground from "../SlideBackground";
+import { headingFont } from "../../../constants";
 
 // 17:00 PKT = UTC+5 = 12:00 UTC on March 28 2026
 const DEADLINE = new Date("2026-03-28T12:00:00Z");
@@ -63,7 +64,7 @@ export default function SendOffSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           style={{
-            fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+            fontFamily: headingFont,
             fontSize: "clamp(72px, 14vw, 160px)",
             color: "#F0EEFF",
             letterSpacing: "0.06em",
@@ -98,7 +99,7 @@ export default function SendOffSection() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               style={{
-                fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+                fontFamily: headingFont,
                 fontSize: "clamp(48px, 8vw, 96px)",
                 color: "#FF4D6A",
                 letterSpacing: "0.06em",
@@ -109,7 +110,7 @@ export default function SendOffSection() {
           ) : (
             <div
               style={{
-                fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+                fontFamily: headingFont,
                 fontSize: "clamp(56px, 10vw, 120px)",
                 color: "#00F5FF",
                 letterSpacing: "0.08em",

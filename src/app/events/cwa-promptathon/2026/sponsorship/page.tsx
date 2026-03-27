@@ -83,10 +83,10 @@ const SponsorshipPage = () => {
           <p className="text-xs uppercase tracking-wider text-base-content/60 mb-2">Primary Contact</p>
           <h3 className="text-xl font-semibold text-base-content">Maham Tahir</h3>
           <a
-            href="mailto:maham.visionwiseab@gmail.com"
+            href="mailto:maham.tahir@visionwise.solutions"
             className="text-primary hover:underline text-sm sm:text-base"
           >
-            maham.visionwiseab@gmail.com
+            maham.tahir@visionwise.solutions
           </a>
         </article>
         <article className="rounded-2xl border border-primary/20 bg-base-200 p-6">

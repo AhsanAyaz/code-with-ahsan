@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ExternalLink } from "lucide-react";
 import SlideBackground from "../SlideBackground";
-import { JUDGES } from "../../../constants";
+import { JUDGES, headingFont } from "../../../constants";
 
 interface JudgesSectionProps {
   revealedCount: number;
@@ -40,7 +40,7 @@ export default function JudgesSection({ revealedCount }: JudgesSectionProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           style={{
-            fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+            fontFamily: headingFont,
             fontSize: "clamp(48px, 7vw, 88px)",
             color: "#F0EEFF",
             letterSpacing: "0.06em",
@@ -114,7 +114,7 @@ export default function JudgesSection({ revealedCount }: JudgesSectionProps) {
                     <div
                       style={{
                         fontFamily:
-                          "var(--font-bebas, 'Bebas Neue', sans-serif)",
+                          headingFont,
                         fontSize: 22,
                         color: "#F0EEFF",
                         letterSpacing: "0.06em",

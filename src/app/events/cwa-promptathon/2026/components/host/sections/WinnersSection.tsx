@@ -7,6 +7,7 @@ import { getApp } from "firebase/app";
 import confetti from "canvas-confetti";
 import SlideBackground from "../SlideBackground";
 import type { WinnersData } from "@/types/events";
+import { headingFont } from "../../../constants";
 
 const EVENT_ID = "cwa-promptathon-2026";
 
@@ -83,7 +84,7 @@ function PlacementCard({
       </div>
       <div
         style={{
-          fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+          fontFamily: headingFont,
           fontSize: isFirst ? "clamp(32px, 4vw, 52px)" : "clamp(24px, 3vw, 38px)",
           color: "#F0EEFF",
           letterSpacing: "0.05em",
@@ -197,7 +198,7 @@ export default function WinnersSection({ revealedCount, onReveal: _onReveal }: W
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           style={{
-            fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+            fontFamily: headingFont,
             fontSize: "clamp(48px, 7vw, 88px)",
             color: "#FFD600",
             letterSpacing: "0.06em",

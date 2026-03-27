@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import SlideBackground from "../SlideBackground";
-import { HACKATHON_TEAMS } from "../../../constants";
+import { HACKATHON_TEAMS, headingFont } from "../../../constants";
 
 interface TeamRollCallSectionProps {
   revealedCount: number;
@@ -42,7 +42,7 @@ export default function TeamRollCallSection({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           style={{
-            fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+            fontFamily: headingFont,
             fontSize: "clamp(48px, 7vw, 88px)",
             color: "#F0EEFF",
             letterSpacing: "0.06em",
@@ -126,7 +126,7 @@ export default function TeamRollCallSection({
                   <div
                     style={{
                       fontFamily:
-                        "var(--font-bebas, 'Bebas Neue', sans-serif)",
+                        headingFont,
                       fontSize: 28,
                       color: "#F0EEFF",
                       letterSpacing: "0.06em",

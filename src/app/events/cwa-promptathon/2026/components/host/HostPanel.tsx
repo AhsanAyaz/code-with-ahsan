@@ -13,13 +13,14 @@ import ThemesSection from "./sections/ThemesSection";
 import TwistRevealSection from "./sections/TwistRevealSection";
 import SendOffSection from "./sections/SendOffSection";
 import WinnersSection from "./sections/WinnersSection";
+import WrapUpSection from "./sections/WrapUpSection";
 
 // Section indexes
 const SECTION_ROLLCALL = 5;
 const SECTION_JUDGES = 3;
 const SECTION_TWIST = 7;
 const SECTION_WINNERS = 9;
-const TOTAL_SECTIONS = 10;
+const TOTAL_SECTIONS = 11;
 
 export default function HostPanel() {
   const [sectionIndex, setSectionIndex] = useState(0);
@@ -155,6 +156,8 @@ export default function HostPanel() {
             onReveal={() => setRevealedCount((c) => Math.min(c + 1, 3))}
           />
         );
+      case 10:
+        return <WrapUpSection />;
       default:
         return null;
     }

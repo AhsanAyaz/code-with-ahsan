@@ -11,6 +11,7 @@ const SECTION_NAMES = [
   "Twist Reveal",
   "Send Off",
   "Winners",
+  "Wrap Up",
 ];
 
 const SECTION_HINTS = [
@@ -24,6 +25,7 @@ const SECTION_HINTS = [
   "Space: start countdown",
   "Space: next section",
   "Space: reveal next placement",
+  "Space: next section",
 ];
 
 interface ControlBarProps {

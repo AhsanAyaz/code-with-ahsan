@@ -1,5 +1,13 @@
 import { Metadata } from "next";
+import { Bebas_Neue } from "next/font/google";
 import ForceDarkTheme from "./components/ForceDarkTheme";
+
+const bebasNeue = Bebas_Neue({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-bebas",
+  display: "swap",
+});
 
 const promptathonOgImage =
   "https://www.codewithahsan.dev/images/cwa-promptathon-2026-og.png";
@@ -38,9 +46,9 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <div className={bebasNeue.variable}>
       <ForceDarkTheme />
       {children}
-    </>
+    </div>
   );
 }

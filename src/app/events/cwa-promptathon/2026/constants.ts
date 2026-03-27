@@ -1,5 +1,12 @@
 import type { HackathonTwist } from "@/types/events";
 
+// ─── Font switch ─────────────────────────────────────────────────────────────
+// Set to false to use Rubik (site default) for all headings instead of Bebas Neue.
+const USE_BEBAS_HEADINGS = true;
+export const headingFont = USE_BEBAS_HEADINGS
+  ? "var(--font-bebas, 'Bebas Neue', sans-serif)"
+  : "var(--font-rubik, 'Rubik', sans-serif)";
+
 export type StatItem = {
   label: string;
   value: string;
@@ -227,4 +234,13 @@ export const HACKATHON_TWIST: HackathonTwist = {
   ],
 };
 
-export const MENTORS: string[] = [];
+export const MENTORS: string[] = ["Talha", "Mohammad Noman", "Haroon Taufiq", "Nabeel Hassan"];
+
+export const ORGANIZERS: string[] = [
+  "Haroon Taufiq",
+  "Ayesha",
+  "Hashir Afzal",
+  "Nabeel Hassan",
+  "Naeem ur Rehman",
+  "Mohammad Noman",
+];

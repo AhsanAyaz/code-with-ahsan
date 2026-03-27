@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import SlideBackground from "../SlideBackground";
+import { headingFont } from "../../../constants";
 
 export default function KeynoteSection() {
   return (
@@ -59,7 +60,7 @@ export default function KeynoteSection() {
         >
           <h1
             style={{
-              fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+              fontFamily: headingFont,
               fontSize: "clamp(60px, 10vw, 120px)",
               color: "#F0EEFF",
               letterSpacing: "0.06em",
@@ -83,7 +84,7 @@ export default function KeynoteSection() {
             />
             <span
               style={{
-                fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+                fontFamily: headingFont,
                 fontSize: "clamp(36px, 6vw, 72px)",
                 color: "#6C2BD9",
                 letterSpacing: "0.1em",

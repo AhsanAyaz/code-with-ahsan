@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SlideBackground from "../SlideBackground";
-import { HACKATHON_TWIST } from "../../../constants";
+import { HACKATHON_TWIST, headingFont } from "../../../constants";
 
 interface TwistRevealSectionProps {
   twistPhase: "idle" | "countdown" | "revealed";
@@ -85,7 +85,7 @@ export default function TwistRevealSection({
                 animate={{ opacity: [0.6, 1, 0.6] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                 style={{
-                  fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+                  fontFamily: headingFont,
                   fontSize: "clamp(48px, 8vw, 100px)",
                   color: "#FFD600",
                   letterSpacing: "0.06em",
@@ -126,7 +126,7 @@ export default function TwistRevealSection({
                   transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                   style={{
                     display: "block",
-                    fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+                    fontFamily: headingFont,
                     fontSize: "clamp(100px, 20vw, 240px)",
                     color: "#FFD600",
                     letterSpacing: "0.02em",
@@ -167,7 +167,7 @@ export default function TwistRevealSection({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.6 }}
                 style={{
-                  fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+                  fontFamily: headingFont,
                   fontSize: "clamp(40px, 7vw, 80px)",
                   color: "#F0EEFF",
                   letterSpacing: "0.06em",
@@ -216,7 +216,7 @@ export default function TwistRevealSection({
                     <div
                       style={{
                         fontFamily:
-                          "var(--font-bebas, 'Bebas Neue', sans-serif)",
+                          headingFont,
                         fontSize: 16,
                         color: "#FFD600",
                         letterSpacing: "0.06em",

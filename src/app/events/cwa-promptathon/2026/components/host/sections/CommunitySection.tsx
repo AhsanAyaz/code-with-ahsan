@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import SlideBackground from "../SlideBackground";
-import { COMMUNITY_STATS } from "../../../constants";
+import { COMMUNITY_STATS, headingFont } from "../../../constants";
 
 export default function CommunitySection() {
   return (
@@ -34,7 +34,7 @@ export default function CommunitySection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           style={{
-            fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+            fontFamily: headingFont,
             fontSize: "clamp(48px, 7vw, 88px)",
             color: "#F0EEFF",
             letterSpacing: "0.06em",
@@ -72,7 +72,7 @@ export default function CommunitySection() {
             >
               <div
                 style={{
-                  fontFamily: "var(--font-bebas, 'Bebas Neue', sans-serif)",
+                  fontFamily: headingFont,
                   fontSize: "clamp(36px, 5vw, 56px)",
                   color: "#00F5FF",
                   letterSpacing: "0.04em",
