@@ -20,7 +20,7 @@ const CTA_ITEMS = [
     border: "rgba(108,43,217,0.4)",
     bg: "rgba(108,43,217,0.08)",
     text: "Join our community for more meetups, hackathons & workshops.",
-    link: "discord.gg/codewithahsan",
+    link: "codewithahsan.dev/discord",
   },
   {
     icon: "🤝",
