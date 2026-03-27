@@ -19,9 +19,9 @@ function PodiumCard({
     <div
       className={`flex-1 rounded-2xl p-6 flex flex-col gap-3 ${featured ? "max-w-sm" : "max-w-xs"}`}
       style={{
-        background: "rgba(255,255,255,0.04)",
+        background: `rgba(20,10,40,0.85)`,
         border: `2px solid ${accentColor}`,
-        boxShadow: `0 0 24px ${accentColor}40`,
+        boxShadow: `0 0 32px ${accentColor}55`,
       }}
     >
       <div
@@ -79,7 +79,7 @@ export default function WinnersDisplay() {
   if (!winners) return null;
 
   return (
-    <section className="py-20 px-4" style={{ background: "#07020F" }}>
+    <section className="py-20 px-4" style={{ background: "#07020F", borderTop: "1px solid rgba(108,43,217,0.3)" }}>
       {/* Section header */}
       <div className="max-w-5xl mx-auto text-center mb-12">
         <h2
