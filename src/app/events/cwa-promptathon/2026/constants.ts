@@ -64,12 +64,12 @@ export type JudgeProfile = {
 
 export const JUDGES: JudgeProfile[] = [
   {
-    name: "Imran Siddiqui",
-    title: "Principal Presales Architect at HP Enterprise",
-    experience: "18+ years",
-    linkedinUrl: "https://www.linkedin.com/in/mimrans",
+    name: "Muhammad Ali",
+    title: "Full Stack Developer at KAJ Consultancy",
+    experience: "> 5 years",
+    linkedinUrl: "https://www.linkedin.com/in/muhammadaliashraf01/",
     avatarUrl:
-      "/static/images/events/cwa-promptathon-2026/judges/imran-siddiqui.jpg",
+      "/static/images/events/cwa-promptathon-2026/judges/muhammad-ali.png",
   },
   {
     name: "Muhammad Noman",
