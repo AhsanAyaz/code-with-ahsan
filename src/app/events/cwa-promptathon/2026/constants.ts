@@ -1,3 +1,5 @@
+import type { HackathonTwist } from "@/types/events";
+
 export type StatItem = {
   label: string;
   value: string;
@@ -108,13 +110,13 @@ export const CONFIRMED_SPONSORS: ConfirmedSponsor[] = [
   {
     name: "CommandCode",
     logoUrl: "/static/images/events/cwa-promptathon-2026/sponsors/commandcode-logo.jpg",
-    websiteUrl: "https://commandcode.ai",
+    websiteUrl: "https://commandcode.ai?utm_source=codewithahsan",
     tier: "Tool Partner",
   },
   {
     name: "Google",
     logoUrl: "/static/images/events/cwa-promptathon-2026/sponsors/google-transparent.png",
-    websiteUrl: "https://google.com",
+    websiteUrl: "https://ai.dev?utm_source=codewithahsan",
     tier: "Tool Partner",
   },
 ];
@@ -192,3 +194,41 @@ export const SPONSORSHIP_FEATURES: SponsorshipFeature[] = [
     platinum: "Yes",
   },
 ];
+
+export const HACKATHON_TEAMS: string[] = [
+  "Zenith",
+  "Cipher",
+  "Quasar",
+  "Vortex",
+  "Axiom",
+  "Aether",
+  "Omnia",
+  "Meridian",
+  "Horizon",
+  "Nexus",
+];
+
+export const HACKATHON_TWIST: HackathonTwist = {
+  title: "The Human in the Loop",
+  description:
+    "Every AI output must display a confidence score or uncertainty indicator. The user must be able to override or correct the AI — with the AI acknowledging or adapting to that correction in the same session.",
+  perThemeExamples: [
+    {
+      theme: "AI Brand Architect",
+      example:
+        'When generating a logo concept, show confidence: "82% match to brand voice". Let the user reject it and see the AI re-generate with an adjusted style.',
+    },
+    {
+      theme: "AI Community Board",
+      example:
+        'When surfacing a collaborator recommendation, display: "67% relevance". Let the user dismiss it and have the AI refine its next suggestion.',
+    },
+    {
+      theme: "Personal AI Trainer",
+      example:
+        'When suggesting a study plan, show: "Confidence: Medium — based on 3 sessions". Let the user adjust a goal and have the AI acknowledge the change.',
+    },
+  ],
+};
+
+export const MENTORS: string[] = [];
