@@ -88,7 +88,14 @@ export default function AdminEventWinnersPage() {
     }
   };
 
+  const allTeamsSelected =
+    !!formData.first.teamName && !!formData.second.teamName && !!formData.third.teamName;
+
   const handleSave = async () => {
+    if (!allTeamsSelected) {
+      error("Please select a team for all three placements");
+      return;
+    }
     const token =
       typeof window !== "undefined"
         ? localStorage.getItem(ADMIN_TOKEN_KEY)
@@ -215,7 +222,7 @@ export default function AdminEventWinnersPage() {
         <button
           className="btn btn-primary"
           onClick={handleSave}
-          disabled={saving || clearing}
+          disabled={saving || clearing || !allTeamsSelected}
         >
           {saving ? (
             <>

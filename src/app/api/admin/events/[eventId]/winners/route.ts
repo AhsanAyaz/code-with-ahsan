@@ -82,8 +82,8 @@ export async function PUT(
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  if (!body.first || !body.second || !body.third) {
-    return NextResponse.json({ error: "first, second, and third placements required" }, { status: 400 });
+  if (!body.first?.teamName || !body.second?.teamName || !body.third?.teamName) {
+    return NextResponse.json({ error: "All three placements must have a team selected" }, { status: 400 });
   }
 
   try {
