@@ -6,7 +6,7 @@ export type StatItem = {
 };
 
 export const COMMUNITY_STATS: StatItem[] = [
-  { value: "4,300+", label: "Discord Members" },
+  { value: "4,500+", label: "Discord Members" },
   { value: "130,000+", label: "Social Followers" },
   { value: "60+", label: "Active Mentorships" },
   { value: "20+", label: "Weekly Meetups" },
@@ -14,7 +14,7 @@ export const COMMUNITY_STATS: StatItem[] = [
 ];
 
 export const SPONSOR_STATS: StatItem[] = [
-  { value: "4,300+", label: "Discord Members" },
+  { value: "4,500+", label: "Discord Members" },
   { value: "130,000+", label: "Social Followers" },
   { value: "50", label: "Participants" },
   { value: "4", label: "Confirmed Judges" },

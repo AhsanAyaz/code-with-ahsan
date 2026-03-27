@@ -107,7 +107,7 @@ export default function ControlBar({
           letterSpacing: "0.06em",
         }}
       >
-        [H] toggle · [F] fullscreen
+        ←/→ sections · [H] toggle · [F] fullscreen
       </div>
 
       <button

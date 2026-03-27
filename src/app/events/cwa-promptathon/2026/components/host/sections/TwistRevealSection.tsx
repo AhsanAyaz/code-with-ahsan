@@ -27,7 +27,6 @@ export default function TwistRevealSection({
           if (prev <= 1) {
             clearInterval(intervalRef.current!);
             intervalRef.current = null;
-            onRevealed();
             return 0;
           }
           return prev - 1;
@@ -40,7 +39,14 @@ export default function TwistRevealSection({
         intervalRef.current = null;
       }
     };
-  }, [twistPhase, onRevealed]);
+  }, [twistPhase]);
+
+  // Call onRevealed after countdown reaches 0 — kept separate to avoid setState-in-render
+  useEffect(() => {
+    if (count === 0 && twistPhase === "countdown") {
+      onRevealed();
+    }
+  }, [count, twistPhase, onRevealed]);
 
   return (
     <div

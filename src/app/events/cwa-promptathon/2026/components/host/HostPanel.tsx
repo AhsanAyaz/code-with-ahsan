@@ -101,6 +101,9 @@ export default function HostPanel() {
         case "KeyF":
           document.documentElement.requestFullscreen?.();
           break;
+        case "ArrowLeft":
+          retreatSection();
+          break;
         case "Space":
         case "ArrowRight":
           handleAdvance();
