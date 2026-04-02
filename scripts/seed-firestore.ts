@@ -89,7 +89,7 @@ const FAKE_USERS = Array.from({ length: 8 }, () => randUser({ gender: "male" }))
 
 function fakeUser(n: number) { return FAKE_USERS[n - 1]; } // 1-indexed
 function displayName(n: number) { const u = fakeUser(n); return `${u.firstName} ${u.lastName}`; }
-function photoURL(n: number) { return fakeUser(n).img; }
+function photoURL(n: number) { return fakeUser(n).img + `?u=${fakeUser(n).id}`; }
 function email(n: number) { return fakeUser(n).email; }
 function username(n: number) { return fakeUser(n).username.toLowerCase(); }
 
