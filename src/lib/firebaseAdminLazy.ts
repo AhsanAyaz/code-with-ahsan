@@ -11,7 +11,12 @@
 import * as admin from "firebase-admin";
 
 if (!admin.apps.length) {
-  if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+  if (process.env.FIRESTORE_EMULATOR_HOST) {
+    // Emulator mode — no real credentials needed, SDK routes all calls locally
+    admin.initializeApp({
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "demo-codewithahsan",
+    });
+  } else if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
     if (serviceAccount.private_key) {
       serviceAccount.private_key = serviceAccount.private_key.replace(

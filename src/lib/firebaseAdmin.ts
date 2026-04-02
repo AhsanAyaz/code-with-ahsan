@@ -1,14 +1,12 @@
 import * as admin from "firebase-admin";
 
 if (!admin.apps.length) {
-  // If we have a service account env var, use it. Otherwise, rely on default Google Cloud credentials (ADC)
-  // or assume we are just using the project ID if locally authenticated via gcloud.
-  // Ideally, for production, you'd use cert(serviceAccount).
-  // For this environment, we try default/inferred.
-
-  // Check if we have explicit credentials strings (common in Vercel/local envs)
-  // Check if we have explicit credentials strings (common in Vercel/local envs)
-  if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+  if (process.env.FIRESTORE_EMULATOR_HOST) {
+    // Emulator mode — no real credentials needed, SDK routes all calls locally
+    admin.initializeApp({
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "demo-codewithahsan",
+    });
+  } else if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
     if (serviceAccount.private_key) {
       serviceAccount.private_key = serviceAccount.private_key.replace(
