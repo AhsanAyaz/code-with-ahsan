@@ -87,7 +87,7 @@ async function clearAll() {
 
 // ─── Users (generated once, reused across all seed functions) ─────────────────
 
-const FAKE_USERS = Array.from({ length: 8 }, () => randUser({ gender: "male" }));
+const FAKE_USERS = Array.from({ length: 8 }, () => randUser());
 
 function fakeUser(n: number) { return FAKE_USERS[n - 1]; } // 1-indexed
 function displayName(n: number) { const u = fakeUser(n); return `${u.firstName} ${u.lastName}`; }
