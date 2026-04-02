@@ -16,7 +16,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "test:rules": "firebase emulators:exec --only firestore 'npx vitest run src/__tests__/security-rules/'"
+    "test:rules": "firebase emulators:exec --only firestore 'npx vitest run src/__tests__/security-rules/'",
+    "seed": "FIRESTORE_EMULATOR_HOST=localhost:8080 npx tsx scripts/seed-firestore.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
