@@ -181,6 +181,7 @@ async function seedMentorshipProfiles() {
       expertise: [],
       bio: randParagraph({ length: 1 }),
       username: username(i),
+      discordUsername: `${username(i)}#0001`,
       createdAt: pastTimestamp(),
       updatedAt: pastTimestamp(),
     };
