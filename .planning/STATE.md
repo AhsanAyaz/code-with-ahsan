@@ -71,10 +71,7 @@ None.
 |---|-------------|------|--------|-----------|
 | 72 | update the rates card according to feedback | 2026-03-17 | f0efea9 | [72-update-the-rates-card-according-to-feedb](./quick/72-update-the-rates-card-according-to-feedb/) |
 | 73 | rates page redesign — sponsorship pitch deck layout | 2026-03-18 | 96fb4c7 | [73-rates-page-redesign-codewithahsan-dev-ra](./quick/73-rates-page-redesign-codewithahsan-dev-ra/) |
-| 260402-ls1 | improve DX for open-source contributors (.env.example, seed script, README, CONTRIBUTING.md) | 2026-04-02 | a46e4c9 | [260402-ls1-improve-dx-for-open-source-contributors-](./quick/260402-ls1-improve-dx-for-open-source-contributors-/) |
-| Phase 01-promptathon-live-host-panel-with-presenter-slides-admin-winner-management-and-permanent-winners-display P01 | 2 | 3 tasks | 3 files |
-| Phase 01 P03 | 2 | 2 tasks | 4 files |
-| Phase 01 P02 | 10 | 2 tasks | 16 files |
+| 260402-ls1 | improve DX for open-source contributors (.env.example, seed script, README, CONTRIBUTING.md) | 2026-04-02 | b39387d | [260402-ls1-improve-dx-for-open-source-contributors-](./quick/260402-ls1-improve-dx-for-open-source-contributors-/) |
 
 ## Session Continuity
 
