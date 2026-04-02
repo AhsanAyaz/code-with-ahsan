@@ -15,6 +15,7 @@
 
 import * as admin from "firebase-admin";
 import { randUser, randParagraph, randPastDate, randJobTitle } from "@ngneat/falso";
+import bcrypt from "bcryptjs";
 
 // ─── Init ────────────────────────────────────────────────────────────────────
 
@@ -56,6 +57,7 @@ const SEED_COLLECTIONS = [
   "mentor_ratings",
   "projects",
   "roadmaps",
+  "admin_sessions",
 ];
 
 async function clearCollection(name: string) {
@@ -381,6 +383,19 @@ async function seedRoadmaps() {
   }
 }
 
+// ─── Seed: Admin Config ───────────────────────────────────────────────────────
+
+async function seedAdminConfig() {
+  log("\n[config/admin] Seeding admin password (password: \"admin\")...");
+  if (DRY_RUN) {
+    log('  [dry-run] Would set config/admin with bcrypt hash of "admin"');
+    return;
+  }
+  const passwordHash = await bcrypt.hash("admin", 10);
+  await db.collection("config").doc("admin").set({ passwordHash });
+  log('  Set admin password to "admin" (bcrypt hashed)');
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -408,6 +423,7 @@ async function main() {
   await seedMentorRatings();
   await seedProjects();
   await seedRoadmaps();
+  await seedAdminConfig();
 
   console.log("\n" + "=".repeat(60));
   if (DRY_RUN) {
