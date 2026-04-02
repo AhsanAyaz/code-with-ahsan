@@ -42,10 +42,11 @@ function OnboardingContent() {
   useEffect(() => {
     // Skip profile redirect in DEV_MODE
     if (!DEV_MODE && !loading && !profileLoading && profile) {
-      // User already has a profile, redirect to dashboard
-      router.push("/mentorship/dashboard");
+      // User already has a profile — go to redirect target or dashboard
+      const redirectTo = searchParams.get("redirect") || "/mentorship/dashboard";
+      router.push(redirectTo);
     }
-  }, [loading, profileLoading, profile, router]);
+  }, [loading, profileLoading, profile, router, searchParams]);
 
   if (!DEV_MODE && (loading || profileLoading)) {
     return (
@@ -106,9 +107,10 @@ function OnboardingContent() {
       if (response.ok) {
         await refreshProfile();
         setCurrentStep(3);
-        // Short delay then redirect
+        // Short delay then redirect — honour ?redirect= if present
+        const redirectTo = searchParams.get("redirect") || "/mentorship/dashboard";
         setTimeout(() => {
-          router.push("/mentorship/dashboard");
+          router.push(redirectTo);
         }, 2000);
       } else {
         const error = await response.json();
