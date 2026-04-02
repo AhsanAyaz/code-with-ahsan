@@ -71,22 +71,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Fetch creator's mentorship profile
-    const creatorDoc = await db
-      .collection("mentorship_profiles")
-      .doc(creatorId)
-      .get();
+    // Fetch creator profile — prefer mentorship_profiles, fall back to users
+    const [mentorshipDoc, userDoc] = await Promise.all([
+      db.collection("mentorship_profiles").doc(creatorId).get(),
+      db.collection("users").doc(creatorId).get(),
+    ]);
 
-    if (!creatorDoc.exists) {
-      return NextResponse.json(
-        { error: "Creator profile not found" },
-        { status: 404 }
-      );
-    }
+    const creatorData = mentorshipDoc.exists
+      ? mentorshipDoc.data()
+      : userDoc.exists
+      ? userDoc.data()
+      : null;
 
-    const creatorData = creatorDoc.data();
-
-    // Check permission: only authenticated users can create projects
+    // Check permission: only authenticated users can create projects (PERM-01)
     const permissionUser: PermissionUser = {
       uid: creatorId,
       role: creatorData?.role || null,
