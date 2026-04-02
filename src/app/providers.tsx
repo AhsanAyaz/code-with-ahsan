@@ -6,7 +6,7 @@ import { ToastProvider } from "@/contexts/ToastContext";
 import { useState } from "react";
 import { initializeApp, getApps } from "firebase/app";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
-import { getAuth, connectAuthEmulator } from "firebase/auth";
+import { initializeAuth, connectAuthEmulator, browserLocalPersistence } from "firebase/auth";
 import CookieConsent from "react-cookie-consent";
 import LoginModal from "@/components/LoginModal";
 
@@ -26,9 +26,9 @@ if (typeof window !== "undefined" && getApps().length === 0) {
     const app = initializeApp(firebaseConfig);
     if (process.env.NODE_ENV === "development") {
       connectFirestoreEmulator(getFirestore(app), "localhost", 8080);
-      connectAuthEmulator(getAuth(app), "http://localhost:9099", {
-        disableWarnings: true,
-      });
+      // Use initializeAuth so the emulator URL is set before any token refresh fires
+      const auth = initializeAuth(app, { persistence: browserLocalPersistence });
+      connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
     }
   } catch (e) {
     console.error("Firebase initialization error", e);

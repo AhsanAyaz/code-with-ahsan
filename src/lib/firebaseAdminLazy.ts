@@ -34,8 +34,9 @@ if (!admin.apps.length) {
       }),
     });
   } else if (process.env.NODE_ENV === "development") {
-    // Local dev — emulator mode, no real credentials needed.
-    // Ensure FIRESTORE_EMULATOR_HOST and FIREBASE_AUTH_EMULATOR_HOST are set in .env.local
+    // Local dev — always use emulators, set hosts before Firestore client is created
+    process.env.FIRESTORE_EMULATOR_HOST ??= "localhost:8080";
+    process.env.FIREBASE_AUTH_EMULATOR_HOST ??= "localhost:9099";
     admin.initializeApp({
       projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "demo-codewithahsan",
     });
