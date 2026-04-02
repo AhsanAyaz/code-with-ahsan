@@ -18,7 +18,8 @@
     "test:ui": "vitest --ui",
     "test:rules": "firebase emulators:exec --only firestore 'npx vitest run src/__tests__/security-rules/'",
     "emulators": "firebase emulators:start --project demo-codewithahsan --only auth,firestore,storage",
-    "seed": "FIRESTORE_EMULATOR_HOST=localhost:8080 NEXT_PUBLIC_FIREBASE_PROJECT_ID=demo-codewithahsan npx tsx scripts/seed-firestore.ts"
+    "seed": "FIRESTORE_EMULATOR_HOST=localhost:8080 NEXT_PUBLIC_FIREBASE_PROJECT_ID=demo-codewithahsan npx tsx scripts/seed-firestore.ts",
+    "seed:clear": "FIRESTORE_EMULATOR_HOST=localhost:8080 NEXT_PUBLIC_FIREBASE_PROJECT_ID=demo-codewithahsan npx tsx scripts/seed-firestore.ts --clear"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
