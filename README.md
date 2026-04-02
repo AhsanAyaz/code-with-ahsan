@@ -73,10 +73,10 @@ A community platform for mentorship, open-source project collaboration, learning
 4. **Start Firebase emulators**
 
    ```bash
-   firebase emulators:start
+   npm run emulators
    ```
 
-   This starts Auth (port 9099), Firestore (port 8080), Storage (port 9199), and Functions (port 5001). The emulator UI is available at <http://localhost:4000>.
+   This starts Auth (port 9099), Firestore (port 8080), and Storage (port 9199) under the local `demo-codewithahsan` project. The emulator UI is available at <http://localhost:4000>.
 
 5. **Seed the emulator with sample data**
 
@@ -86,7 +86,7 @@ A community platform for mentorship, open-source project collaboration, learning
    npm run seed
    ```
 
-   This populates Firestore with sample users, projects, and roadmaps so you can explore the app immediately.
+   This populates Firestore with sample users, mentorship profiles, projects, roadmaps, and an admin password (`admin`). Re-running the command clears and re-seeds all data.
 
 6. **Start the development server**
 
@@ -103,13 +103,15 @@ A community platform for mentorship, open-source project collaboration, learning
 | Script | Description |
 |---|---|
 | `npm run dev` | Start Next.js dev server with Turbopack |
+| `npm run emulators` | Start Firebase emulators (Auth, Firestore, Storage) |
+| `npm run seed` | Clear and re-seed emulator with sample data |
+| `npm run seed:clear` | Clear all seed data without re-seeding |
 | `npm run build` | Production build (also runs content prebuild and sitemap) |
 | `npm start` | Start production server (after build) |
 | `npm run lint` | Run ESLint |
 | `npm test` | Run all Vitest unit tests |
 | `npm run test:watch` | Run Vitest in watch mode |
 | `npm run test:rules` | Run Firestore security rules tests against emulator |
-| `npm run seed` | Seed Firebase emulator with sample data |
 
 ---
 
