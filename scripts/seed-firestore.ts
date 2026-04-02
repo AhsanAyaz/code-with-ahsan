@@ -5,33 +5,25 @@
  * can explore the app without needing production credentials.
  *
  * Usage:
- *   npm run seed                    # writes data to the emulator
+ *   npm run seed                    # clears and writes fresh data
  *   npm run seed -- --dry-run       # prints what would be written, no writes
+ *   npm run seed:clear              # clears all seed data without re-seeding
  *
  * Prerequisites:
- *   firebase emulators:start        # must be running on localhost:8080
+ *   npm run emulators               # must be running on localhost:8080
  */
 
 import * as admin from "firebase-admin";
-import {
-  randFullName,
-  randEmail,
-  randPhrase,
-  randParagraph,
-  randWord,
-  randNumber,
-  randPastDate,
-  randUrl,
-} from "@ngneat/falso";
+import { randUser, randParagraph, randPastDate, randJobTitle } from "@ngneat/falso";
 
 // ─── Init ────────────────────────────────────────────────────────────────────
 
 const DRY_RUN = process.argv.includes("--dry-run");
+const CLEAR_ONLY = process.argv.includes("--clear");
 const PROJECT_ID = "demo-codewithahsan";
 const EMULATOR_HOST = process.env.FIRESTORE_EMULATOR_HOST ?? "localhost:8080";
 
 if (!DRY_RUN) {
-  // Must be set before initialising firebase-admin so it points at the emulator
   process.env.FIRESTORE_EMULATOR_HOST = EMULATOR_HOST;
 }
 
@@ -47,236 +39,344 @@ function log(msg: string) {
   console.log(msg);
 }
 
-function fakeUserId(n: number) {
+function userId(n: number) {
   return `seed-user-${String(n).padStart(4, "0")}`;
 }
 
-function now() {
-  return admin.firestore.FieldValue.serverTimestamp();
-}
-
-function pastDate() {
+function pastTimestamp() {
   return admin.firestore.Timestamp.fromDate(
     randPastDate({ years: 1 }) as unknown as Date
   );
 }
 
-async function clearCollection(collectionName: string) {
+const SEED_COLLECTIONS = [
+  "users",
+  "mentorship_profiles",
+  "mentorship_sessions",
+  "mentor_ratings",
+  "projects",
+  "roadmaps",
+];
+
+async function clearCollection(name: string) {
   if (DRY_RUN) return;
-  const snap = await db.collection(collectionName).get();
-  const batch = db.batch();
-  snap.docs.forEach((doc) => batch.delete(doc.ref));
-  await batch.commit();
-  log(`  Cleared ${snap.size} existing docs from "${collectionName}"`);
+  const snap = await db.collection(name).get();
+  if (snap.empty) return;
+  const batches: admin.firestore.WriteBatch[] = [];
+  let batch = db.batch();
+  let count = 0;
+  for (const doc of snap.docs) {
+    batch.delete(doc.ref);
+    count++;
+    if (count % 500 === 0) {
+      batches.push(batch);
+      batch = db.batch();
+    }
+  }
+  batches.push(batch);
+  await Promise.all(batches.map((b) => b.commit()));
+  log(`  Cleared ${snap.size} docs from "${name}"`);
 }
 
-// ─── Seed functions ───────────────────────────────────────────────────────────
+async function clearAll() {
+  log("\nClearing all seed collections...");
+  await Promise.all(SEED_COLLECTIONS.map(clearCollection));
+}
+
+// ─── Users (generated once, reused across all seed functions) ─────────────────
+
+const FAKE_USERS = Array.from({ length: 8 }, () => randUser({ gender: "male" }));
+
+function fakeUser(n: number) { return FAKE_USERS[n - 1]; } // 1-indexed
+function displayName(n: number) { const u = fakeUser(n); return `${u.firstName} ${u.lastName}`; }
+function photoURL(n: number) { return fakeUser(n).img; }
+function email(n: number) { return fakeUser(n).email; }
+function username(n: number) { return fakeUser(n).username.toLowerCase(); }
+
+// ─── Seed: Users (Firebase Auth stand-ins) ───────────────────────────────────
+
+async function seedUsers() {
+  log("\n[users] Seeding 8 sample users...");
+
+  const roles = ["mentor", "mentor", "mentor", "mentor", "member", "member", "member", "member"];
+
+  for (let i = 1; i <= 8; i++) {
+    const id = userId(i);
+    const name = displayName(i);
+    const role = roles[i - 1];
+    const data = {
+      uid: id,
+      displayName: name,
+      email: email(i),
+      photoURL: photoURL(i),
+      role,
+      createdAt: pastTimestamp(),
+      updatedAt: pastTimestamp(),
+    };
+    if (DRY_RUN) {
+      log(`  [dry-run] Would create user ${name} (${role})`);
+    } else {
+      await db.collection("users").doc(id).set(data);
+      log(`  Created user ${name} (${role})`);
+    }
+  }
+}
+
+// ─── Seed: Mentorship Profiles ────────────────────────────────────────────────
+
+const EXPERTISE_SETS = [
+  ["React", "Next.js", "TypeScript", "Firebase"],
+  ["Python", "FastAPI", "Machine Learning", "Docker"],
+  ["Node.js", "PostgreSQL", "GraphQL", "AWS"],
+  ["Angular", "Java", "Spring Boot", "Kubernetes"],
+];
+
+async function seedMentorshipProfiles() {
+  log("\n[mentorship_profiles] Seeding mentor and mentee profiles...");
+
+  const mentorRoles = ["Senior Frontend Engineer", "ML Engineer", "Staff Backend Engineer", "Engineering Manager"];
+
+  for (let i = 1; i <= 4; i++) {
+    const id = userId(i);
+    const name = displayName(i);
+    const data = {
+      uid: id,
+      displayName: name,
+      photoURL: photoURL(i),
+      email: email(i),
+      role: "mentor",
+      status: "accepted",
+      isPublic: true,
+      currentRole: mentorRoles[i - 1],
+      expertise: EXPERTISE_SETS[i - 1],
+      bio: randParagraph({ length: 1 }),
+      username: username(i),
+      discordUsername: `${username(i)}#0001`,
+      maxMentees: 3,
+      createdAt: pastTimestamp(),
+      updatedAt: pastTimestamp(),
+    };
+    if (DRY_RUN) {
+      log(`  [dry-run] Would create mentor profile: ${name}`);
+    } else {
+      await db.collection("mentorship_profiles").doc(id).set(data);
+      log(`  Created mentor profile: ${name} (${mentorRoles[i - 1]})`);
+    }
+  }
+
+  for (let i = 5; i <= 8; i++) {
+    const id = userId(i);
+    const name = displayName(i);
+    const data = {
+      uid: id,
+      displayName: name,
+      photoURL: photoURL(i),
+      email: email(i),
+      role: "mentee",
+      status: "accepted",
+      isPublic: false,
+      currentRole: randJobTitle(),
+      expertise: [],
+      bio: randParagraph({ length: 1 }),
+      username: username(i),
+      createdAt: pastTimestamp(),
+      updatedAt: pastTimestamp(),
+    };
+    if (DRY_RUN) {
+      log(`  [dry-run] Would create mentee profile: ${name}`);
+    } else {
+      await db.collection("mentorship_profiles").doc(id).set(data);
+      log(`  Created mentee profile: ${name}`);
+    }
+  }
+}
+
+// ─── Seed: Mentorship Sessions ────────────────────────────────────────────────
+
+async function seedMentorshipSessions() {
+  log("\n[mentorship_sessions] Seeding mentorship sessions...");
+
+  const sessions = [
+    { mentorId: userId(1), menteeId: userId(5), status: "active" },
+    { mentorId: userId(1), menteeId: userId(6), status: "active" },
+    { mentorId: userId(2), menteeId: userId(7), status: "active" },
+    { mentorId: userId(3), menteeId: userId(8), status: "active" },
+    { mentorId: userId(2), menteeId: userId(5), status: "completed" },
+    { mentorId: userId(4), menteeId: userId(6), status: "completed" },
+  ];
+
+  for (let i = 0; i < sessions.length; i++) {
+    const s = sessions[i];
+    const data = { mentorId: s.mentorId, menteeId: s.menteeId, status: s.status, createdAt: pastTimestamp(), updatedAt: pastTimestamp() };
+    if (DRY_RUN) {
+      log(`  [dry-run] Would create session ${s.mentorId} → ${s.menteeId} (${s.status})`);
+    } else {
+      await db.collection("mentorship_sessions").doc(`seed-session-${String(i + 1).padStart(3, "0")}`).set(data);
+      log(`  Created session: ${s.mentorId} → ${s.menteeId} (${s.status})`);
+    }
+  }
+}
+
+// ─── Seed: Mentor Ratings ─────────────────────────────────────────────────────
+
+async function seedMentorRatings() {
+  log("\n[mentor_ratings] Seeding mentor ratings...");
+
+  const ratings = [
+    { mentorId: userId(1), menteeId: userId(5), rating: 5 },
+    { mentorId: userId(2), menteeId: userId(5), rating: 4 },
+    { mentorId: userId(3), menteeId: userId(8), rating: 5 },
+    { mentorId: userId(4), menteeId: userId(6), rating: 4 },
+    { mentorId: userId(1), menteeId: userId(7), rating: 5 },
+  ];
+
+  for (let i = 0; i < ratings.length; i++) {
+    const r = ratings[i];
+    const data = { mentorId: r.mentorId, menteeId: r.menteeId, rating: r.rating, createdAt: pastTimestamp() };
+    if (DRY_RUN) {
+      log(`  [dry-run] Would create rating ${r.rating}★ for ${r.mentorId}`);
+    } else {
+      await db.collection("mentor_ratings").doc(`seed-rating-${String(i + 1).padStart(3, "0")}`).set(data);
+      log(`  Created rating: ${r.rating}★ for ${r.mentorId}`);
+    }
+  }
+}
+
+// ─── Seed: Projects ───────────────────────────────────────────────────────────
 
 const TECH_STACKS = [
   ["React", "Next.js", "TypeScript", "Firebase"],
-  ["Angular", "Node.js", "MongoDB", "Tailwind CSS"],
-  ["Vue.js", "Express", "PostgreSQL", "Docker"],
+  ["Python", "FastAPI", "OpenAI", "GitHub Actions"],
   ["React Native", "Expo", "Firebase", "TypeScript"],
-  ["SvelteKit", "PocketBase", "Tailwind CSS"],
+  ["Angular", "Node.js", "MongoDB", "Tailwind CSS"],
 ];
+
+function creatorProfile(n: number) {
+  return { displayName: displayName(n), photoURL: photoURL(n), username: username(n) };
+}
 
 async function seedProjects() {
   log("\n[projects] Seeding 4 sample projects...");
-  await clearCollection("projects");
 
   const projects = [
     {
       id: "seed-project-001",
-      data: {
-        name: "Community Learning Dashboard",
-        description: randParagraph({ length: 3 }),
-        status: "active",
-        creatorId: fakeUserId(1),
-        creatorName: randFullName(),
-        techStack: TECH_STACKS[0],
-        repoUrl: randUrl(),
-        lookingFor: ["Frontend Developer", "Designer"],
-        maxTeamSize: 5,
-        currentTeamSize: 2,
-        createdAt: pastDate(),
-        updatedAt: pastDate(),
-      },
+      title: "Community Learning Dashboard",
+      description: "A collaborative dashboard where learners track their progress, share resources, and celebrate milestones together. Integrates with GitHub to pull commit activity and visualises learning streaks.",
+      status: "active",
+      creatorId: userId(1),
+      creatorProfile: creatorProfile(1),
+      techStack: TECH_STACKS[0],
+      githubRepo: "https://github.com/demo/community-learning-dashboard",
+      difficulty: "intermediate",
+      maxTeamSize: 5,
+      memberCount: 2,
     },
     {
       id: "seed-project-002",
-      data: {
-        name: "Open-Source Blog Engine",
-        description: randParagraph({ length: 2 }),
-        status: "approved",
-        creatorId: fakeUserId(2),
-        creatorName: randFullName(),
-        techStack: TECH_STACKS[1],
-        repoUrl: randUrl(),
-        lookingFor: ["Backend Developer"],
-        maxTeamSize: 3,
-        currentTeamSize: 1,
-        createdAt: pastDate(),
-        updatedAt: pastDate(),
-      },
+      title: "AI Code Review Bot",
+      description: "A GitHub bot that uses OpenAI to give constructive code review comments on pull requests. Catches common patterns, suggests improvements, and explains reasoning for each suggestion.",
+      status: "active",
+      creatorId: userId(2),
+      creatorProfile: creatorProfile(2),
+      techStack: TECH_STACKS[1],
+      githubRepo: "https://github.com/demo/ai-code-review-bot",
+      difficulty: "advanced",
+      maxTeamSize: 3,
+      memberCount: 2,
     },
     {
       id: "seed-project-003",
-      data: {
-        name: "Mobile Mentorship Tracker",
-        description: randParagraph({ length: 2 }),
-        status: "pending",
-        creatorId: fakeUserId(3),
-        creatorName: randFullName(),
-        techStack: TECH_STACKS[3],
-        repoUrl: "",
-        lookingFor: ["Mobile Developer", "Backend Developer"],
-        maxTeamSize: 4,
-        currentTeamSize: 1,
-        createdAt: pastDate(),
-        updatedAt: pastDate(),
-      },
+      title: "Mobile Mentorship Tracker",
+      description: "Cross-platform mobile app for mentors and mentees to schedule sessions, set goals, track progress, and share resources — all in one place.",
+      status: "active",
+      creatorId: userId(3),
+      creatorProfile: creatorProfile(3),
+      techStack: TECH_STACKS[2],
+      githubRepo: "",
+      difficulty: "intermediate",
+      maxTeamSize: 4,
+      memberCount: 1,
     },
     {
       id: "seed-project-004",
-      data: {
-        name: "AI Code Review Bot",
-        description: randParagraph({ length: 3 }),
-        status: "active",
-        creatorId: fakeUserId(4),
-        creatorName: randFullName(),
-        techStack: ["Python", "FastAPI", "OpenAI", "GitHub Actions"],
-        repoUrl: randUrl(),
-        lookingFor: ["ML Engineer"],
-        maxTeamSize: 3,
-        currentTeamSize: 2,
-        createdAt: pastDate(),
-        updatedAt: pastDate(),
-      },
+      title: "Open-Source Blog Engine",
+      description: "A lightweight, markdown-first blog engine built for developers. Supports syntax highlighting, RSS feeds, dark mode, and deploys to any static host in seconds.",
+      status: "completed",
+      creatorId: userId(4),
+      creatorProfile: creatorProfile(4),
+      techStack: TECH_STACKS[3],
+      githubRepo: "https://github.com/demo/open-source-blog-engine",
+      difficulty: "beginner",
+      maxTeamSize: 3,
+      memberCount: 3,
     },
   ];
 
-  for (const { id, data } of projects) {
+  for (const p of projects) {
+    const { id, ...data } = p;
+    const doc = { ...data, lastActivityAt: pastTimestamp(), createdAt: pastTimestamp(), updatedAt: pastTimestamp() };
     if (DRY_RUN) {
-      log(`  [dry-run] Would create project "${data.name}" (${data.status})`);
+      log(`  [dry-run] Would create project "${data.title}" (${data.status})`);
     } else {
-      await db.collection("projects").doc(id).set(data);
-      log(`  Created project "${data.name}" (${data.status})`);
+      await db.collection("projects").doc(id).set(doc);
+      log(`  Created project "${data.title}" (${data.status})`);
     }
   }
 }
 
+// ─── Seed: Roadmaps ───────────────────────────────────────────────────────────
+
 async function seedRoadmaps() {
-  log("\n[roadmaps] Seeding 2 sample roadmaps...");
-  await clearCollection("roadmaps");
+  log("\n[roadmaps] Seeding 3 sample roadmaps...");
 
   const roadmaps = [
     {
       id: "seed-roadmap-001",
-      data: {
-        title: "Full-Stack Web Development with Next.js",
-        description: randParagraph({ length: 2 }),
-        status: "approved",
-        creatorId: fakeUserId(5),
-        creatorName: randFullName(),
-        tags: ["Next.js", "React", "TypeScript", "Firebase"],
-        estimatedWeeks: randNumber({ min: 8, max: 24 }),
-        milestones: [
-          {
-            title: "HTML & CSS Fundamentals",
-            description: randPhrase(),
-            order: 1,
-          },
-          {
-            title: "JavaScript Essentials",
-            description: randPhrase(),
-            order: 2,
-          },
-          {
-            title: "React Basics",
-            description: randPhrase(),
-            order: 3,
-          },
-          {
-            title: "Next.js & SSR",
-            description: randPhrase(),
-            order: 4,
-          },
-        ],
-        createdAt: pastDate(),
-        updatedAt: pastDate(),
-      },
+      title: "Full-Stack Web Development with Next.js",
+      description: "Go from zero to deploying production Next.js apps. Covers React fundamentals, server components, Firebase, and CI/CD.",
+      domain: "web-dev",
+      difficulty: "beginner",
+      estimatedHours: 120,
+      status: "approved",
+      contentUrl: null,
+      creatorId: userId(1),
+      creatorProfile: creatorProfile(1),
     },
     {
       id: "seed-roadmap-002",
-      data: {
-        title: "Backend Engineering with Node.js",
-        description: randParagraph({ length: 2 }),
-        status: "draft",
-        creatorId: fakeUserId(6),
-        creatorName: randFullName(),
-        tags: ["Node.js", "Express", "PostgreSQL", "Docker"],
-        estimatedWeeks: randNumber({ min: 12, max: 20 }),
-        milestones: [
-          {
-            title: "Node.js Core Concepts",
-            description: randPhrase(),
-            order: 1,
-          },
-          {
-            title: "REST API Design",
-            description: randPhrase(),
-            order: 2,
-          },
-          {
-            title: "Database Design & SQL",
-            description: randPhrase(),
-            order: 3,
-          },
-        ],
-        createdAt: pastDate(),
-        updatedAt: pastDate(),
-      },
+      title: "Backend Engineering with Node.js",
+      description: "Master server-side development: REST APIs, databases, authentication, and cloud deployment with Node.js and PostgreSQL.",
+      domain: "backend",
+      difficulty: "intermediate",
+      estimatedHours: 80,
+      status: "approved",
+      contentUrl: null,
+      creatorId: userId(3),
+      creatorProfile: creatorProfile(3),
+    },
+    {
+      id: "seed-roadmap-003",
+      title: "Practical Machine Learning with Python",
+      description: "Hands-on ML: from data wrangling with pandas to deploying scikit-learn and PyTorch models in production.",
+      domain: "ml",
+      difficulty: "advanced",
+      estimatedHours: 160,
+      status: "approved",
+      contentUrl: null,
+      creatorId: userId(2),
+      creatorProfile: creatorProfile(2),
     },
   ];
 
-  for (const { id, data } of roadmaps) {
+  for (const r of roadmaps) {
+    const { id, ...data } = r;
+    const doc = { ...data, version: 1, createdAt: pastTimestamp(), updatedAt: pastTimestamp() };
     if (DRY_RUN) {
-      log(`  [dry-run] Would create roadmap "${data.title}" (${data.status})`);
+      log(`  [dry-run] Would create roadmap "${data.title}" (${data.domain} / ${data.difficulty})`);
     } else {
-      await db.collection("roadmaps").doc(id).set(data);
-      log(`  Created roadmap "${data.title}" (${data.status})`);
-    }
-  }
-}
-
-async function seedUsers() {
-  log("\n[users] Seeding 6 sample users...");
-  await clearCollection("users");
-
-  const roles = ["member", "member", "mentor", "mentor", "member", "mentor"];
-
-  for (let i = 1; i <= 6; i++) {
-    const id = fakeUserId(i);
-    const role = roles[i - 1];
-    const data = {
-      uid: id,
-      displayName: randFullName(),
-      email: randEmail(),
-      photoURL: `https://i.pravatar.cc/150?u=${id}`,
-      role,
-      status: role === "mentor" ? "accepted" : "active",
-      bio: randPhrase(),
-      skills: [randWord(), randWord(), randWord()],
-      linkedinUrl: randUrl(),
-      createdAt: pastDate(),
-      updatedAt: pastDate(),
-    };
-
-    if (DRY_RUN) {
-      log(`  [dry-run] Would create user ${data.displayName} (${role})`);
-    } else {
-      await db.collection("users").doc(id).set(data);
-      log(`  Created user ${data.displayName} (${role})`);
+      await db.collection("roadmaps").doc(id).set(doc);
+      log(`  Created roadmap "${data.title}" (${data.domain})`);
     }
   }
 }
@@ -290,12 +390,22 @@ async function main() {
 
   if (DRY_RUN) {
     console.log("\nMode: DRY RUN (no data will be written)\n");
+  } else if (CLEAR_ONLY) {
+    console.log("\nMode: CLEAR ONLY\n");
+    await clearAll();
+    console.log("\nDone. All seed collections cleared.");
+    console.log("=".repeat(60));
+    return;
   } else {
     console.log(`\nTarget: Firestore emulator at ${EMULATOR_HOST}`);
-    console.log("Clearing existing seed data and writing fresh records...\n");
+    console.log("Clearing and re-seeding all collections...\n");
+    await clearAll();
   }
 
   await seedUsers();
+  await seedMentorshipProfiles();
+  await seedMentorshipSessions();
+  await seedMentorRatings();
   await seedProjects();
   await seedRoadmaps();
 

@@ -6,7 +6,7 @@ import { ToastProvider } from "@/contexts/ToastContext";
 import { useState } from "react";
 import { initializeApp, getApps } from "firebase/app";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
-import { initializeAuth, connectAuthEmulator, browserLocalPersistence } from "firebase/auth";
+import { initializeAuth, connectAuthEmulator, browserLocalPersistence, browserPopupRedirectResolver } from "firebase/auth";
 import CookieConsent from "react-cookie-consent";
 import LoginModal from "@/components/LoginModal";
 
@@ -27,7 +27,10 @@ if (typeof window !== "undefined" && getApps().length === 0) {
     if (process.env.NODE_ENV === "development") {
       connectFirestoreEmulator(getFirestore(app), "localhost", 8080);
       // Use initializeAuth so the emulator URL is set before any token refresh fires
-      const auth = initializeAuth(app, { persistence: browserLocalPersistence });
+      const auth = initializeAuth(app, {
+          persistence: browserLocalPersistence,
+          popupRedirectResolver: browserPopupRedirectResolver,
+        });
       connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
     }
   } catch (e) {
