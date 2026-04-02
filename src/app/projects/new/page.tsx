@@ -125,7 +125,14 @@ export default function CreateProjectPage() {
     }
   };
 
-  // Check authentication and role
+  // Check authentication and profile
+  useEffect(() => {
+    if (!loading && !user) return; // handled below
+    if (!loading && user && !profile) {
+      router.push("/mentorship/onboarding?redirect=/projects/new");
+    }
+  }, [loading, user, profile, router]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -165,7 +172,13 @@ export default function CreateProjectPage() {
     );
   }
 
-  // All authenticated users can create projects (no role restriction)
+  if (!profile) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
 
   // Show success state
   if (state.success) {
