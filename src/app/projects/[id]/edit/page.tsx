@@ -21,14 +21,6 @@ export default function EditProjectPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-  const [confirmModal, setConfirmModal] = useState<{
-    isOpen: boolean;
-    title: string;
-    message: string;
-    confirmLabel: string;
-    confirmClass: string;
-    onConfirm: () => void;
-  } | null>(null);
 
   // Form state
   const [title, setTitle] = useState("");
@@ -123,87 +115,75 @@ export default function EditProjectPage() {
     fetchProject();
   }, [projectId, user, profile, authLoading, isAdmin, router]);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
-    
-    // Show confirmation modal before submitting
-    setConfirmModal({
-      isOpen: true,
-      title: "Submit Edit Request",
-      message: "When you submit your edit request, your changes will be sent to admins for approval. The project will be marked as pending updates and you won't be able to make further changes until the review is complete.\n\nAre you sure you want to submit these changes?",
-      confirmLabel: "Submit for Approval",
-      confirmClass: "btn-primary",
-      onConfirm: async () => {
-        setConfirmModal(null);
-        setSaving(true);
+    setSaving(true);
 
-        // Client-side validation
-        if (title.trim().length < 3 || title.trim().length > 100) {
-          setError("Title must be between 3 and 100 characters");
-          setSaving(false);
-          return;
-        }
+    // Client-side validation
+    if (title.trim().length < 3 || title.trim().length > 100) {
+      setError("Title must be between 3 and 100 characters");
+      setSaving(false);
+      return;
+    }
 
-        if (description.trim().length < 10 || description.trim().length > 2000) {
-          setError("Description must be between 10 and 2000 characters");
-          setSaving(false);
-          return;
-        }
+    if (description.trim().length < 10 || description.trim().length > 2000) {
+      setError("Description must be between 10 and 2000 characters");
+      setSaving(false);
+      return;
+    }
 
-        // Parse tech stack
-        const techStackArray = techStack
-          .split(",")
-          .map((t) => t.trim())
-          .filter((t) => t.length > 0);
+    // Parse tech stack
+    const techStackArray = techStack
+      .split(",")
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0);
 
-        try {
-          const requestBody = {
-            title: title.trim(),
-            description: description.trim(),
-            githubRepo: githubRepo.trim() || undefined,
-            techStack: techStackArray,
-            difficulty,
-            maxTeamSize,
-          };
+    try {
+      const requestBody = {
+        title: title.trim(),
+        description: description.trim(),
+        githubRepo: githubRepo.trim() || undefined,
+        techStack: techStackArray,
+        difficulty,
+        maxTeamSize,
+      };
 
-          let response;
+      let response;
 
-          if (isAdmin) {
-            // Admin: include x-admin-token header
-            const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-            response = await fetch(`/api/projects/${projectId}`, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                ...(token ? { "x-admin-token": token } : {}),
-              },
-              body: JSON.stringify(requestBody),
-            });
-          } else {
-            // Creator: use authFetch for Firebase Auth token
-            response = await authFetch(`/api/projects/${projectId}`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(requestBody),
-            });
-          }
+      if (isAdmin) {
+        // Admin: include x-admin-token header
+        const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+        response = await fetch(`/api/projects/${projectId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { "x-admin-token": token } : {}),
+          },
+          body: JSON.stringify(requestBody),
+        });
+      } else {
+        // Creator: use authFetch for Firebase Auth token
+        response = await authFetch(`/api/projects/${projectId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody),
+        });
+      }
 
-          if (response.ok) {
-            // Success - navigate back to project detail page
-            router.push(`/projects/${projectId}`);
-          } else {
-            const data = await response.json();
-            setError(data.error || "Failed to update project");
-            setSaving(false);
-          }
-        } catch (err: any) {
-          console.error("Error updating project:", err);
-          setError("An error occurred while updating the project");
-          setSaving(false);
-        }
-      },
-    });
+      if (response.ok) {
+        // Success - navigate back to project detail page
+        router.push(`/projects/${projectId}`);
+      } else {
+        const data = await response.json();
+        setError(data.error || "Failed to update project");
+        setSaving(false);
+      }
+    } catch (err: any) {
+      console.error("Error updating project:", err);
+      setError("An error occurred while updating the project");
+      setSaving(false);
+    }
   };
 
   if (loading || authLoading) {
@@ -415,37 +395,6 @@ export default function EditProjectPage() {
           </div>
         </div>
       </div>
-
-    {/* Confirmation Modal */}
-    {confirmModal && (
-      <div className="modal modal-open">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">{confirmModal.title}</h3>
-          <p className="py-4 whitespace-pre-wrap">{confirmModal.message}</p>
-          <div className="modal-action">
-            <button
-              onClick={() => setConfirmModal(null)}
-              className="btn btn-ghost"
-              disabled={saving}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={confirmModal.onConfirm}
-              className={`btn ${confirmModal.confirmClass}`}
-              disabled={saving}
-            >
-              {saving ? (
-                <><span className="loading loading-spinner loading-sm"></span> Submitting...</>
-              ) : (
-                confirmModal.confirmLabel
-              )}
-            </button>
-          </div>
-        </div>
-        <div className="modal-backdrop" onClick={() => !saving && setConfirmModal(null)}></div>
-      </div>
-    )}
     </div>
   );
 }
