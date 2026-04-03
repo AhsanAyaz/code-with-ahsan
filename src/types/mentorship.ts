@@ -120,7 +120,7 @@ export type RequestStatus =
 
 // ─── v2.0 Project Collaboration Types ───────────────────────
 
-export type ProjectStatus = "pending" | "approved" | "active" | "completed" | "archived" | "declined";
+export type ProjectStatus = "pending" | "approved" | "active" | "completed" | "archived" | "declined" | "update_pending";
 export type RoadmapStatus = "draft" | "pending" | "approved" | "active" | "archived";
 export type ProjectDifficulty = "beginner" | "intermediate" | "advanced";
 export type ProjectMemberRole = "owner" | "member";
@@ -155,6 +155,23 @@ export interface Project {
   demoUrl?: string;           // URL to demo video/presentation (YouTube, Loom, Vimeo, Google Drive)
   demoDescription?: string;   // Description of what the demo shows
   completedAt?: Date;         // When project was completed
+
+  // Pending updates (when creator submits changes to active project)
+  pendingUpdates?: {
+    title?: string;
+    description?: string;
+    githubRepo?: string | null;
+    techStack?: string[];
+    difficulty?: ProjectDifficulty;
+    maxTeamSize?: number;
+  };
+  updateRequestedAt?: Date;
+  updateRequestedBy?: string;
+  updateApprovedAt?: Date;
+  updateApprovedBy?: string;
+  updateDeclinedAt?: Date;
+  updateDeclinedBy?: string;
+  updateDeclineReason?: string;
 }
 
 export interface ProjectMember {

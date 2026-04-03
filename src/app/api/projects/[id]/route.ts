@@ -120,7 +120,7 @@ export async function PUT(
       // Field update flow: edit project fields
       // Phase 2: Authorization check
       if (!isAdmin) {
-        // Non-admin: must be creator and project must be pending or declined
+        // Non-admin: must be creator
         if (projectData?.creatorId !== userId) {
           return NextResponse.json(
             { error: "You can only edit your own projects" },
@@ -128,9 +128,10 @@ export async function PUT(
           );
         }
 
-        if (projectData?.status !== "pending" && projectData?.status !== "declined") {
+        // Cannot edit if there is already a pending update
+        if (projectData?.status === "update_pending") {
           return NextResponse.json(
-            { error: "You can only edit pending or declined projects" },
+            { error: "This project already has pending updates waiting for approval" },
             { status: 403 }
           );
         }
@@ -199,15 +200,30 @@ export async function PUT(
         lastActivityAt: FieldValue.serverTimestamp(),
       };
 
-      if (title !== undefined) updateData.title = title;
-      if (description !== undefined) updateData.description = description;
+      const proposedChanges: Record<string, any> = {};
+
+      if (title !== undefined) proposedChanges.title = title;
+      if (description !== undefined) proposedChanges.description = description;
       if (githubRepo !== undefined) {
         // Allow clearing GitHub repo by passing empty string
-        updateData.githubRepo = githubRepo || FieldValue.delete();
+        proposedChanges.githubRepo = githubRepo || null;
       }
-      if (techStack !== undefined) updateData.techStack = techStack;
-      if (difficulty !== undefined) updateData.difficulty = difficulty;
-      if (maxTeamSize !== undefined) updateData.maxTeamSize = maxTeamSize;
+      if (techStack !== undefined) proposedChanges.techStack = techStack;
+      if (difficulty !== undefined) proposedChanges.difficulty = difficulty;
+      if (maxTeamSize !== undefined) proposedChanges.maxTeamSize = maxTeamSize;
+
+      // Phase 5: Handle update based on project status and user role
+      if (isAdmin || projectData?.status === "pending" || projectData?.status === "declined") {
+        // Admin can always edit directly
+        // Creators can edit directly when project is pending or declined
+        Object.assign(updateData, proposedChanges);
+      } else {
+        // Creator is updating an active project - create pending update
+        updateData.pendingUpdates = proposedChanges;
+        updateData.status = "update_pending";
+        updateData.updateRequestedAt = FieldValue.serverTimestamp();
+        updateData.updateRequestedBy = userId;
+      }
 
       // Phase 5: Update project
       await projectRef.update(updateData);
@@ -348,6 +364,94 @@ export async function PUT(
         { success: true, message: "Project declined" },
         { status: 200 }
       );
+    } else if (action === "approve_update") {
+      // Approve pending updates
+      if (!isAdmin) {
+        return NextResponse.json(
+          { error: "Only admins can approve updates" },
+          { status: 403 }
+        );
+      }
+
+      if (projectData?.status !== "update_pending" || !projectData?.pendingUpdates) {
+        return NextResponse.json(
+          { error: "No pending updates to approve" },
+          { status: 400 }
+        );
+      }
+
+      // Apply pending updates
+      const applyUpdates: Record<string, any> = {
+        ...projectData.pendingUpdates,
+        status: "active",
+        pendingUpdates: FieldValue.delete(),
+        updateApprovedAt: FieldValue.serverTimestamp(),
+        updateApprovedBy: userId,
+        updatedAt: FieldValue.serverTimestamp(),
+        lastActivityAt: FieldValue.serverTimestamp(),
+      };
+
+      await projectRef.update(applyUpdates);
+
+      return NextResponse.json(
+        { success: true, message: "Project updates approved and applied" },
+        { status: 200 }
+      );
+
+    } else if (action === "decline_update") {
+      // Decline pending updates
+      if (!isAdmin) {
+        return NextResponse.json(
+          { error: "Only admins can decline updates" },
+          { status: 403 }
+        );
+      }
+
+      if (projectData?.status !== "update_pending" || !projectData?.pendingUpdates) {
+        return NextResponse.json(
+          { error: "No pending updates to decline" },
+          { status: 400 }
+        );
+      }
+
+      // Clear pending updates
+      await projectRef.update({
+        status: "active",
+        pendingUpdates: FieldValue.delete(),
+        updateDeclinedAt: FieldValue.serverTimestamp(),
+        updateDeclinedBy: userId,
+        updateDeclineReason: declineReason || null,
+        updatedAt: FieldValue.serverTimestamp(),
+        lastActivityAt: FieldValue.serverTimestamp(),
+      });
+
+      // Send notification to creator
+      if (declineReason && projectData?.creatorId) {
+        try {
+          const creatorDoc = await db
+            .collection("mentorship_profiles")
+            .doc(projectData.creatorId)
+            .get();
+
+          const creatorData = creatorDoc.exists ? creatorDoc.data() : null;
+          const discordUsername = creatorData?.discordUsername;
+
+          if (discordUsername) {
+            const dmMessage =
+              `Your update request for project "${projectData.title}" was not approved.\n\n` +
+              `**Reason:** ${declineReason}`;
+            await sendDirectMessage(discordUsername, dmMessage);
+          }
+        } catch (error) {
+          console.error("Error sending update decline notification:", error);
+        }
+      }
+
+      return NextResponse.json(
+        { success: true, message: "Project updates declined" },
+        { status: 200 }
+      );
+
     } else if (action === "complete") {
       // Verify creator owns the project
       if (projectData?.creatorId !== userId) {

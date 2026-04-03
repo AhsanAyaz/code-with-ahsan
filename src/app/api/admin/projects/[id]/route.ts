@@ -34,7 +34,7 @@ export async function PUT(
       );
     }
 
-    const session = sessionDoc.data();
+    const session = sessionDoc.data()!;
     const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
 
     if (expiresAt < new Date()) {
@@ -199,6 +199,80 @@ export async function PUT(
         { success: true, message: "Project declined" },
         { status: 200 }
       );
+    } else if (action === "approve_update") {
+      // Approve pending updates
+      if (projectData.status !== "update_pending" || !projectData.pendingUpdates) {
+        return NextResponse.json(
+          { error: "No pending updates to approve" },
+          { status: 400 }
+        );
+      }
+
+      // Apply pending updates
+      const applyUpdates: Record<string, any> = {
+        ...projectData.pendingUpdates,
+        status: "active",
+        pendingUpdates: FieldValue.delete(),
+        updateApprovedAt: FieldValue.serverTimestamp(),
+        updateApprovedBy: session.adminId || "admin",
+        updatedAt: FieldValue.serverTimestamp(),
+        lastActivityAt: FieldValue.serverTimestamp(),
+      };
+
+      await projectRef.update(applyUpdates);
+
+      return NextResponse.json(
+        { success: true, message: "Project updates approved and applied" },
+        { status: 200 }
+      );
+
+    } else if (action === "decline_update") {
+      // Decline pending updates
+      if (projectData.status !== "update_pending" || !projectData.pendingUpdates) {
+        return NextResponse.json(
+          { error: "No pending updates to decline" },
+          { status: 400 }
+        );
+      }
+
+      // Clear pending updates
+      await projectRef.update({
+        status: "active",
+        pendingUpdates: FieldValue.delete(),
+        updateDeclinedAt: FieldValue.serverTimestamp(),
+        updateDeclinedBy: session.adminId || "admin",
+        updateDeclineReason: declineReason || null,
+        updatedAt: FieldValue.serverTimestamp(),
+        lastActivityAt: FieldValue.serverTimestamp(),
+      });
+
+      // Send notification to creator
+      if (projectData.creatorId) {
+        try {
+          const creatorDoc = await db
+            .collection("mentorship_profiles")
+            .doc(projectData.creatorId)
+            .get();
+
+          const creatorData = creatorDoc.exists ? creatorDoc.data() : null;
+          const discordUsername = creatorData?.discordUsername;
+
+          if (discordUsername && declineReason) {
+            const dmMessage =
+              `Your update request for project "${projectData.title}" was not approved.\n\n` +
+              `**Reason:** ${declineReason}`;
+            await sendDirectMessage(discordUsername, dmMessage);
+          }
+        } catch (error) {
+          console.error("Error sending update decline notification:", error);
+        }
+      }
+
+      return NextResponse.json(
+        { success: true, message: "Project updates declined" },
+        { status: 200 }
+      );
+
     } else {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }

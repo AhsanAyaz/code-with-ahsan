@@ -126,9 +126,12 @@ export function canEditProject(
   // Admin can always edit any project
   if (isAdminUser(user)) return true;
 
-  // Creator can only edit pending or declined projects
+  // Creator can edit pending, declined, active or update_pending projects
   if (isOwner(user, project)) {
-    return project.status === "pending" || project.status === "declined";
+    return project.status === "pending" 
+        || project.status === "declined" 
+        || project.status === "active"
+        || project.status === "update_pending";
   }
 
   return false;

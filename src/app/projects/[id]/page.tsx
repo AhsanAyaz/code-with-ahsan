@@ -107,6 +107,7 @@ export default function ProjectDetailPage() {
     active: "badge-success",
     complete: "badge-info",
     archived: "badge-ghost",
+    update_pending: "badge-warning",
   };
 
   const showToast = (message: string, type: ToastType) => {
@@ -606,33 +607,69 @@ export default function ProjectDetailPage() {
 
       {/* Header */}
       <div className="space-y-4">
+        {/* Pending Updates Banner */}
+        {project.status === "update_pending" && project.pendingUpdates && (
+          <div className="alert alert-warning">
+            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div className="flex-1">
+              <h3 className="font-bold">Updates Waiting for Approval</h3>
+              <div className="text-sm">
+                This project has changes submitted that are waiting for admin review.
+                {isAdmin && (
+                  <div className="mt-2 space-y-1">
+                    {project.pendingUpdates.title && <p>• Title: {project.pendingUpdates.title}</p>}
+                    {project.pendingUpdates.maxTeamSize && <p>• Max Team Size: {project.pendingUpdates.maxTeamSize}</p>}
+                    {project.pendingUpdates.description && <p>• Description updated</p>}
+                    {project.pendingUpdates.techStack && <p>• Tech Stack updated</p>}
+                    {project.pendingUpdates.githubRepo && <p>• GitHub Repository updated</p>}
+                  </div>
+                )}
+              </div>
+            </div>
+            {isAdmin && (
+              <div className="text-xs text-base-content/70 mt-1">
+                Review pending updates in the Admin Dashboard
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h1 className="text-3xl font-bold mb-2">{project.title}</h1>
           </div>
-          <button onClick={handleShare} className="btn btn-ghost btn-sm gap-1">
-            {copied ? (
-              "Copied!"
-            ) : (
-              <>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-                  />
-                </svg>
-                Share
-              </>
+          <div className="flex gap-2">
+            {isCreator && project.status !== "update_pending" && (
+              <Link href={`/projects/${projectId}/edit`} className="btn btn-primary btn-sm">
+                ✏️ Edit Project
+              </Link>
             )}
-          </button>
+            <button onClick={handleShare} className="btn btn-ghost btn-sm gap-1">
+              {copied ? (
+                "Copied!"
+              ) : (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                    />
+                  </svg>
+                  Share
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         <div className="flex gap-2">
