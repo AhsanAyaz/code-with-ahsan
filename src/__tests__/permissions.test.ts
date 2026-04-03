@@ -193,6 +193,16 @@ describe("Permission System", () => {
       expect(canEditProject(acceptedMentorOwner, testProject)).toBe(true);
     });
 
+    it("returns true for accepted mentor (owner) when project is active", () => {
+      const activeProject = { ...testProject, status: "active" as const };
+      expect(canEditProject(acceptedMentorOwner, activeProject)).toBe(true);
+    });
+
+    it("returns false for accepted mentor (owner) when project is completed", () => {
+      const completedProject = { ...testProject, status: "completed" as const };
+      expect(canEditProject(acceptedMentorOwner, completedProject)).toBe(false);
+    });
+
     it("returns false for accepted mentor (non-owner)", () => {
       expect(canEditProject(acceptedMentor, testProject)).toBe(false);
     });

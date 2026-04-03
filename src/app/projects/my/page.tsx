@@ -401,9 +401,12 @@ export default function MyProjectsPage() {
           {projects.map((project) => (
             <div key={project.id} className="relative">
               <ProjectCard project={project} />
-              {activeTab === "created" && (project.status === "pending" || project.status === "declined") && (
+              {activeTab === "created" &&
+                (project.status === "pending" ||
+                  project.status === "active" ||
+                  project.status === "declined") && (
                 <div className="absolute top-2 right-2 flex gap-2">
-                  {/* Edit button - shown for both pending and declined */}
+                  {/* Edit button - shown for pending, active, and declined */}
                   <Link
                     href={`/projects/${project.id}/edit`}
                     className="btn btn-primary btn-xs"

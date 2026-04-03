@@ -120,7 +120,7 @@ export async function PUT(
       // Field update flow: edit project fields
       // Phase 2: Authorization check
       if (!isAdmin) {
-        // Non-admin: must be creator and project must be pending or declined
+        // Non-admin: must be creator and project must be pending, active, or declined
         if (projectData?.creatorId !== userId) {
           return NextResponse.json(
             { error: "You can only edit your own projects" },
@@ -128,9 +128,13 @@ export async function PUT(
           );
         }
 
-        if (projectData?.status !== "pending" && projectData?.status !== "declined") {
+        if (
+          projectData?.status !== "pending" &&
+          projectData?.status !== "active" &&
+          projectData?.status !== "declined"
+        ) {
           return NextResponse.json(
-            { error: "You can only edit pending or declined projects" },
+            { error: "You can only edit pending, active, or declined projects" },
             { status: 403 }
           );
         }
@@ -198,6 +202,13 @@ export async function PUT(
         updatedAt: FieldValue.serverTimestamp(),
         lastActivityAt: FieldValue.serverTimestamp(),
       };
+
+      // If a creator edits an active project, send it back to pending for re-approval
+      if (!isAdmin && projectData?.status === "active") {
+        updateData.status = "pending";
+        updateData.approvedAt = FieldValue.delete();
+        updateData.approvedBy = FieldValue.delete();
+      }
 
       if (title !== undefined) updateData.title = title;
       if (description !== undefined) updateData.description = description;

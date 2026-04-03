@@ -117,7 +117,7 @@ export function canApproveProject(
 
 /**
  * PERM-04: Can edit projects
- * Admin can edit any project status, creators can only edit pending/declined projects
+ * Admin can edit any project status, creators can edit pending/active/declined projects
  */
 export function canEditProject(
   user: PermissionUser | null,
@@ -126,9 +126,13 @@ export function canEditProject(
   // Admin can always edit any project
   if (isAdminUser(user)) return true;
 
-  // Creator can only edit pending or declined projects
+  // Creator can edit pending, active, or declined projects
   if (isOwner(user, project)) {
-    return project.status === "pending" || project.status === "declined";
+    return (
+      project.status === "pending" ||
+      project.status === "active" ||
+      project.status === "declined"
+    );
   }
 
   return false;

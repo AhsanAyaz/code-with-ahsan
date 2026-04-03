@@ -97,7 +97,10 @@ export default function MyProjectsWidget({
                             {project.pendingApplicationCount} app{project.pendingApplicationCount > 1 ? "s" : ""}
                           </span>
                         )}
-                      {project.creatorId === userId && (
+                      {project.creatorId === userId &&
+                        (project.status === "pending" ||
+                          project.status === "active" ||
+                          project.status === "declined") && (
                         <span className="text-base-content/40 hover:text-primary transition-colors" title="Edit Project">
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                             <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
@@ -109,7 +112,10 @@ export default function MyProjectsWidget({
                 </Link>
 
                 {/* Clickable edit overlay - positioned over the edit icon area */}
-                {project.creatorId === userId && (
+                {project.creatorId === userId &&
+                  (project.status === "pending" ||
+                    project.status === "active" ||
+                    project.status === "declined") && (
                   <Link
                     href={`/projects/${project.id}/edit`}
                     className="absolute bottom-4 right-4 w-8 h-8 z-10"
