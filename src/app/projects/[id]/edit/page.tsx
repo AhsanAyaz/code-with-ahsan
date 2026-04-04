@@ -21,6 +21,8 @@ export default function EditProjectPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  // Custom confirm modal state for re-approval flow
+  const [showReapprovalConfirm, setShowReapprovalConfirm] = useState(false);
 
   // Form state
   const [title, setTitle] = useState("");
@@ -29,6 +31,12 @@ export default function EditProjectPage() {
   const [techStack, setTechStack] = useState("");
   const [difficulty, setDifficulty] = useState<"beginner" | "intermediate" | "advanced">("intermediate");
   const [maxTeamSize, setMaxTeamSize] = useState(4);
+
+  const isReapprovalRequired = !isAdmin && project?.status === "active";
+  const submissionNotice = isReapprovalRequired
+    ? "This project is currently active. Submitting changes will move it back to pending for admin review."
+    : "Changes will be saved immediately.";
+  const submissionNoticeTone = isReapprovalRequired ? "alert-warning" : "alert-info";
 
   // Check admin status
   useEffect(() => {
@@ -106,8 +114,8 @@ export default function EditProjectPage() {
     fetchProject();
   }, [projectId, user, profile, authLoading, isAdmin, router]);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  // Shared submit logic so modal confirm can trigger the same update path
+  const submitUpdate = async () => {
     setError("");
     setSaving(true);
 
@@ -175,6 +183,26 @@ export default function EditProjectPage() {
       setError("An error occurred while updating the project");
       setSaving(false);
     }
+  };
+
+  // Form submit: show confirm modal only when re-approval is required
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (isReapprovalRequired) {
+      setShowReapprovalConfirm(true);
+      return;
+    }
+    void submitUpdate();
+  };
+
+  // Modal confirm: proceed with update and re-approval
+  const handleConfirmReapproval = async () => {
+    setShowReapprovalConfirm(false);
+    await submitUpdate();
+  };
+
+  const handleCancelReapproval = () => {
+    setShowReapprovalConfirm(false);
   };
 
   if (loading || authLoading) {
@@ -263,6 +291,9 @@ export default function EditProjectPage() {
 
             {/* Edit form */}
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div className={`alert ${submissionNoticeTone}`}>
+                <span>{submissionNotice}</span>
+              </div>
               {/* Title */}
               <div className="form-control">
                 <label className="label">
@@ -386,6 +417,42 @@ export default function EditProjectPage() {
           </div>
         </div>
       </div>
+
+      {showReapprovalConfirm && (
+        // Re-approval confirmation modal
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={handleCancelReapproval}></div>
+          <div className="relative w-full max-w-lg mx-4 rounded-2xl bg-base-100 shadow-2xl border border-base-200">
+            <div className="p-6 border-b border-base-200 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-warning/15 text-warning flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l6.518 11.592c.75 1.336-.213 2.99-1.742 2.99H3.48c-1.53 0-2.493-1.654-1.743-2.99L8.257 3.1zM11 14a1 1 0 10-2 0 1 1 0 002 0zm-1-7a1 1 0 00-.993.883L9 8v3a1 1 0 001.993.117L11 11V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold">Send for Re-Approval?</h3>
+                <p className="text-sm text-base-content/70">
+                  This project is currently active.
+                </p>
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-base-content/80">
+                Submitting these changes will move the project back to <span className="font-semibold">pending</span> so
+                an admin can review it again. You can still edit while it is pending.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+                <button className="btn btn-ghost" onClick={handleCancelReapproval}>
+                  Cancel
+                </button>
+                <button className="btn btn-warning" onClick={handleConfirmReapproval}>
+                  Yes, Send for Review
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
