@@ -204,7 +204,7 @@ export default function AllMentorsPage() {
       toast.success(
         newStatus === "completed"
           ? "Mentorship marked as completed"
-          : "Mentorship reverted to active"
+          : "Mentorship re-activated"
       );
     } catch (error) {
       toast.error(
@@ -786,6 +786,7 @@ export default function AllMentorsPage() {
                                 setShowDeleteModal={setShowDeleteModal}
                                 showCompleteButton={true}
                                 showRevertButton={false}
+                                showReactivateButton={false}
                               />
                             ))}
                           </div>
@@ -822,6 +823,7 @@ export default function AllMentorsPage() {
                                 setShowDeleteModal={setShowDeleteModal}
                                 showCompleteButton={false}
                                 showRevertButton={true}
+                                showReactivateButton={false}
                               />
                             ))}
                           </div>
@@ -858,6 +860,7 @@ export default function AllMentorsPage() {
                                 setShowDeleteModal={setShowDeleteModal}
                                 showCompleteButton={false}
                                 showRevertButton={false}
+                                showReactivateButton={false}
                               />
                             ))}
                           </div>
@@ -875,60 +878,33 @@ export default function AllMentorsPage() {
                         <div className="collapse-content">
                           <div className="space-y-3 pt-2">
                             {cancelledMentorships.map((mentorship) => (
-                              <div key={mentorship.id} className="card bg-base-100">
-                                <div className="card-body p-4">
-                                  <div className="flex items-start gap-3">
-                                    <ProfileAvatar
-                                      photoURL={mentorship.partnerProfile?.photoURL}
-                                      displayName={getAnonymizedDisplayName(
-                                        mentorship.partnerProfile?.displayName,
-                                        mentorship.partnerProfile?.uid || "partner",
-                                        isStreamerMode
-                                      )}
-                                      size="lg"
-                                    />
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-2 flex-wrap">
-                                        <h4 className="font-semibold">
-                                          {getAnonymizedDisplayName(
-                                            mentorship.partnerProfile?.displayName,
-                                            mentorship.partnerProfile?.uid || "partner",
-                                            isStreamerMode
-                                          ) || "Unknown"}
-                                        </h4>
-                                        {getMentorshipStatusBadge(mentorship.status)}
-                                      </div>
-                                      <p className="text-xs text-base-content/60">
-                                        {getAnonymizedEmail(
-                                          mentorship.partnerProfile?.email,
-                                          mentorship.partnerProfile?.uid || "partner",
-                                          isStreamerMode
-                                        )}
-                                      </p>
-                                      {mentorship.cancelledAt && (
-                                        <div className="text-xs text-base-content/50 mt-2">
-                                          Cancelled:{" "}
-                                          {format(
-                                            new Date(mentorship.cancelledAt),
-                                            "MMM d, yyyy"
-                                          )}
-                                        </div>
-                                      )}
-                                      {mentorship.cancellationReason && (
-                                        <div className="mt-2 p-2 bg-base-200 rounded text-xs">
-                                          <span className="font-semibold">Reason: </span>
-                                          {mentorship.cancellationReason}
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
+                              <MentorshipCard
+                                key={mentorship.id}
+                                mentorship={mentorship}
+                                isStreamerMode={isStreamerMode}
+                                editingDiscord={editingDiscord}
+                                setEditingDiscord={setEditingDiscord}
+                                editingDiscordValue={editingDiscordValue}
+                                setEditingDiscordValue={setEditingDiscordValue}
+                                savingDiscord={savingDiscord}
+                                handleDiscordSave={handleDiscordSave}
+                                getMentorshipStatusBadge={getMentorshipStatusBadge}
+                                updatingStatus={updatingStatus}
+                                handleSessionStatusChange={handleSessionStatusChange}
+                                regeneratingChannel={regeneratingChannel}
+                                handleRegenerateChannel={handleRegenerateChannel}
+                                setSessionToDelete={setSessionToDelete}
+                                setShowDeleteModal={setShowDeleteModal}
+                                showCompleteButton={false}
+                                showRevertButton={false}
+                                showReactivateButton={true}
+                              />
                             ))}
                           </div>
                         </div>
                       </div>
                     )}
+
 
                     {/* No mentorships message */}
                     {item.mentorships.length === 0 && (
@@ -1347,6 +1323,7 @@ function MentorshipCard({
   setShowDeleteModal,
   showCompleteButton,
   showRevertButton,
+  showReactivateButton,
 }: {
   mentorship: MentorshipWithPartner;
   isStreamerMode: boolean;
@@ -1365,6 +1342,7 @@ function MentorshipCard({
   setShowDeleteModal: (val: boolean) => void;
   showCompleteButton: boolean;
   showRevertButton: boolean;
+  showReactivateButton: boolean;
 }) {
   return (
     <div className="card bg-base-100">
@@ -1566,6 +1544,19 @@ function MentorshipCard({
                     <span className="loading loading-spinner loading-xs"></span>
                   ) : (
                     "Revert to Active"
+                  )}
+                </button>
+              )}
+              {showReactivateButton && (
+                <button
+                  className="btn btn-success btn-xs"
+                  disabled={updatingStatus === mentorship.id}
+                  onClick={() => handleSessionStatusChange(mentorship.id, "active")}
+                >
+                  {updatingStatus === mentorship.id ? (
+                    <span className="loading loading-spinner loading-xs"></span>
+                  ) : (
+                    "Re-activate"
                   )}
                 </button>
               )}

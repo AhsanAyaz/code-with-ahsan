@@ -13,7 +13,7 @@ const ALLOWED_TRANSITIONS: Record<string, string[]> = {
   pending: ['active', 'cancelled'],
   active: ['completed', 'cancelled'],
   completed: ['active'], // Allows revert
-  cancelled: [], // Terminal state
+  cancelled: ['active'], // Can be re-activated by admin
 }
 
 // PUT: Update session status with state machine validation
@@ -64,6 +64,11 @@ export async function PUT(request: NextRequest) {
     // Add revertedAt timestamp when reverting from completed to active
     if (currentStatus === 'completed' && status === 'active') {
       updateData.revertedAt = new Date()
+    }
+
+    // Add reactivatedAt timestamp when re-activating from cancelled to active
+    if (currentStatus === 'cancelled' && status === 'active') {
+      updateData.reactivatedAt = new Date()
     }
 
     await sessionRef.update(updateData)
