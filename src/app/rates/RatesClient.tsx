@@ -108,6 +108,28 @@ export default function RatesClient({ post }: { post: any }) {
         </p>
       </header>
 
+      {/* === SOCIAL PROOF === */}
+      <section className="mb-12 text-center">
+        <p className="text-xs uppercase tracking-widest text-gray-500 mb-4">Past brand collaborations</p>
+        <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-10">
+          {[
+            { name: "Airia", url: "https://airia.com" },
+            { name: "Kimi (Moonshot AI)", url: "https://kimi.com" },
+            { name: "Cloudways", url: "https://cloudways.com" },
+          ].map((brand) => (
+            <a
+              key={brand.name}
+              href={brand.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-lg sm:text-xl font-bold text-gray-400 hover:text-neon-purple transition-colors"
+            >
+              {brand.name}
+            </a>
+          ))}
+        </div>
+      </section>
+
       {/* === FEATURED PACKAGES === */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-6 text-center">Featured packages</h2>
@@ -184,23 +206,36 @@ export default function RatesClient({ post }: { post: any }) {
 
       {/* === A LA CARTE MARKDOWN === */}
       {post.article && (
-        <section>
-          <LegitMarkdown
-            components={{
-              a: (props: any) => (
-                <a
-                  className="text-neon-purple"
-                  target={"_blank"}
-                  rel="noreferrer"
-                  {...props}
-                >
-                  {props.children}
-                </a>
-              ),
-            }}
-          >
-            {post.article}
-          </LegitMarkdown>
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-center">A la carte options</h2>
+          <p className="text-center text-gray-400 mb-6 text-sm">Individual placements if you prefer to build your own package.</p>
+          <div className="collapse collapse-arrow border border-white/10 bg-white/5 rounded-2xl">
+            <input type="checkbox" />
+            <div className="collapse-title text-lg font-semibold">
+              View all platform pricing
+            </div>
+            <div className="collapse-content">
+              <LegitMarkdown
+                components={{
+                  a: (props: any) => (
+                    <a
+                      className="text-neon-purple"
+                      target={"_blank"}
+                      rel="noreferrer"
+                      {...props}
+                    >
+                      {props.children}
+                    </a>
+                  ),
+                }}
+              >
+                {post.article}
+              </LegitMarkdown>
+            </div>
+          </div>
+          <p className="text-center text-sm text-gray-500 mt-4">
+            Usage rights, whitelisting, and add-ons are available — details discussed on call.
+          </p>
         </section>
       )}
 
