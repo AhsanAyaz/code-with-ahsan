@@ -22,6 +22,7 @@ const FEATURED_PACKAGES = [
   {
     name: "Awareness",
     price: "$1,850",
+    alaCarteValue: "$1,950",
     savings: "Save $100",
     badge: null,
     description: "Best for product launches.",
@@ -35,6 +36,7 @@ const FEATURED_PACKAGES = [
   {
     name: "Growth",
     price: "$4,000",
+    alaCarteValue: "$4,400",
     savings: "Save $400",
     badge: "Most popular",
     description: "Two dedicated YouTube videos with maximum organic reach.",
@@ -48,6 +50,7 @@ const FEATURED_PACKAGES = [
   {
     name: "Authority",
     price: "$5,500",
+    alaCarteValue: "$6,600",
     savings: "Save $1,100",
     badge: null,
     description: "Maximum reach across video, email, and community.",
@@ -99,6 +102,10 @@ export default function RatesClient({ post }: { post: any }) {
             </div>
           ))}
         </div>
+        <p className="mt-4 text-sm text-gray-400">
+          <span className="inline-block w-2 h-2 rounded-full bg-green-400 mr-2 animate-pulse"></span>
+          Currently accepting 4 brand partnerships per month
+        </p>
       </header>
 
       {/* === FEATURED PACKAGES === */}
@@ -110,7 +117,7 @@ export default function RatesClient({ post }: { post: any }) {
               key={pkg.name}
               className={`relative rounded-2xl border p-6 flex flex-col ${
                 pkg.badge
-                  ? "border-neon-purple bg-neon-purple/5"
+                  ? "border-neon-purple bg-neon-purple/5 shadow-lg shadow-neon-purple/20 md:scale-[1.02]"
                   : "border-white/10 bg-white/5"
               }`}
             >
@@ -122,6 +129,7 @@ export default function RatesClient({ post }: { post: any }) {
               <div className="mb-4">
                 <h3 className="text-xl font-bold">{pkg.name}</h3>
                 <div className="flex items-baseline gap-2 mt-1">
+                  <span className="text-sm text-gray-500 line-through">{pkg.alaCarteValue}</span>
                   <span className="text-2xl font-bold text-neon-purple">{pkg.price}</span>
                   <span className="text-sm text-green-400">({pkg.savings})</span>
                 </div>
@@ -135,8 +143,42 @@ export default function RatesClient({ post }: { post: any }) {
                   </li>
                 ))}
               </ul>
+              <a
+                href="https://calendar.app.google/Z6g5dMyczq25hmjYA"
+                target="_blank"
+                rel="noreferrer"
+                className={`mt-6 block w-full text-center py-2.5 font-bold rounded-lg ${
+                  pkg.badge
+                    ? "bg-[#9B00D9] text-white hover:opacity-90 transition-opacity"
+                    : "border border-neon-purple text-neon-purple hover:bg-neon-purple/10 transition-colors"
+                }`}
+              >
+                Book a call
+              </a>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* === MID-PAGE CTA === */}
+      <section className="mb-12 text-center py-8 border-y border-white/10">
+        <p className="text-xl font-semibold mb-2">Not sure which package fits?</p>
+        <p className="text-gray-400 mb-6">Tell us about your product and goals — we will recommend the right format.</p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <a
+            href="mailto:ahsan.ubitian@gmail.com?subject=Collaboration%20Inquiry%20%E2%80%94%20%5BYour%20Brand%5D"
+            className="inline-block px-6 py-2.5 bg-[#9B00D9] text-white font-bold rounded-lg hover:opacity-90 transition-opacity"
+          >
+            Send a brief
+          </a>
+          <a
+            href="https://calendar.app.google/Z6g5dMyczq25hmjYA"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-block px-6 py-2.5 border border-neon-purple text-neon-purple font-bold rounded-lg hover:bg-neon-purple/10 transition-colors"
+          >
+            Book a quick call
+          </a>
         </div>
       </section>
 
