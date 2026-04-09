@@ -278,8 +278,7 @@ export default function RatesClient({ post }: { post: any }) {
         href="https://calendar.app.google/Z6g5dMyczq25hmjYA"
         target="_blank"
         rel="noreferrer"
-        className="hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 z-50 flex-col items-center gap-1 bg-[#9B00D9] text-white font-bold px-3 py-5 rounded-full shadow-lg hover:opacity-90 transition-opacity"
-        style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
+        className="hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 z-50 items-center gap-2 bg-[#9B00D9] text-white font-bold px-6 py-3 rounded-2xl shadow-lg shadow-neon-purple/20 hover:opacity-90 transition-opacity"
       >
         Book a call
       </a>
