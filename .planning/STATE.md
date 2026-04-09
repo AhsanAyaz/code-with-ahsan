@@ -72,11 +72,12 @@ None.
 | 72 | update the rates card according to feedback | 2026-03-17 | f0efea9 | [72-update-the-rates-card-according-to-feedb](./quick/72-update-the-rates-card-according-to-feedb/) |
 | 73 | rates page redesign — sponsorship pitch deck layout | 2026-03-18 | 96fb4c7 | [73-rates-page-redesign-codewithahsan-dev-ra](./quick/73-rates-page-redesign-codewithahsan-dev-ra/) |
 | 260402-ls1 | improve DX for open-source contributors (.env.example, seed script, README, CONTRIBUTING.md) | 2026-04-02 | b39387d | [260402-ls1-improve-dx-for-open-source-contributors-](./quick/260402-ls1-improve-dx-for-open-source-contributors-/) |
+| 260409-lsg | add Re-activate button to cancelled mentorship cards (GH-160) | 2026-04-09 | 852e56d | [260409-lsg-add-button-to-re-activate-mentorship-for](./quick/260409-lsg-add-button-to-re-activate-mentorship-for/) |
 
 ## Session Continuity
 
-Last session: 2026-04-02T13:47:00Z
-Stopped at: Completed quick task 260402-ls1 (improve DX for open-source contributors)
+Last session: 2026-04-09T00:00:00Z
+Stopped at: Completed quick task 260409-lsg (add Re-activate button to cancelled mentorship cards)
 Resume file: None
 
 ---
