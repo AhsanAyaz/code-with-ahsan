@@ -81,4 +81,4 @@ Stopped at: Completed quick task 260409-lsg (add Re-activate button to cancelled
 Resume file: None
 
 ---
-*Updated: 2026-03-11 after v4.0 milestone completion*
+*Last activity: 2026-04-09 - Completed quick task 260409-lsg: Add button to re-activate mentorship for any mentee with that mentor*
