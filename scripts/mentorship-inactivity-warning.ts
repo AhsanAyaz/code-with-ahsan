@@ -154,11 +154,31 @@ async function main() {
 
       console.log(`  → Inactive for ${INACTIVITY_DAYS}+ days, sending warning...`);
 
-      // Send Discord warning
+      // Fetch mentor and mentee profiles UPFRONT so we can @mention them in the
+      // Discord warning (and reuse the docs for the email step below).
+      const [mentorDoc, menteeDoc] = await Promise.all([
+        db.collection("mentorship_profiles").doc(data.mentorId).get(),
+        db.collection("mentorship_profiles").doc(data.menteeId).get(),
+      ]);
+
+      const mentorData = mentorDoc.exists ? mentorDoc.data() : null;
+      const menteeData = menteeDoc.exists ? menteeDoc.data() : null;
+
+      // Build @mentions with displayName fallback
+      // (mirrors scripts/create-mentor-pending-channel.ts:389-400)
+      const mentorMention = mentorData?.discordUserId
+        ? `<@${mentorData.discordUserId}>`
+        : `**${mentorData?.displayName ?? "Mentor"}**`;
+      const menteeMention = menteeData?.discordUserId
+        ? `<@${menteeData.discordUserId}>`
+        : `**${menteeData?.displayName ?? "Mentee"}**`;
+
+      // Send Discord warning (now with mentions)
       if (channelId) {
         await sendChannelMessage(
           channelId,
-          `⚠️ **Inactivity Notice** — This mentorship channel has had no activity for ${INACTIVITY_DAYS} days.\n\n` +
+          `⚠️ **Inactivity Notice** — ${mentorMention} ${menteeMention}\n\n` +
+          `This mentorship channel has had no activity for ${INACTIVITY_DAYS} days.\n\n` +
           `If no messages are sent within the next **7 days**, this channel will be archived and the mentorship marked as cancelled.\n\n` +
           `To keep this mentorship active, simply send a message here. 💬`
         );
@@ -169,12 +189,7 @@ async function main() {
         inactivityWarningAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      // Send warning emails to both parties
-      const [mentorDoc, menteeDoc] = await Promise.all([
-        db.collection("mentorship_profiles").doc(data.mentorId).get(),
-        db.collection("mentorship_profiles").doc(data.menteeId).get(),
-      ]);
-
+      // Send warning emails to both parties (reuse already-fetched docs)
       if (mentorDoc.exists && menteeDoc.exists) {
         const mentor = { uid: mentorDoc.id, ...mentorDoc.data() } as MentorshipProfile;
         const mentee = { uid: menteeDoc.id, ...menteeDoc.data() } as MentorshipProfile;
