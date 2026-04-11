@@ -2,21 +2,25 @@ from collections import Counter
 
 from google.adk.agents import LlmAgent
 
-from ..platform_client import fetch_roadmaps
+from ..platform_client import BASE_URL, fetch_roadmaps
 
 _ROADMAP_LIMIT = 10
 
 
 def _shape_roadmap(raw: dict) -> dict:
-    creator = raw.get("creatorProfile", {}) or {}
+    creator = raw.get("creatorProfile") or {}
+    author_username = creator.get("username")
+    roadmap_id = raw.get("id")
     return {
-        "id": raw.get("id"),
+        "id": roadmap_id,
         "title": raw.get("title"),
+        "url": f"{BASE_URL}/roadmaps/{roadmap_id}" if roadmap_id else None,
         "description": (raw.get("description") or "")[:300],
         "domain": raw.get("domain"),
         "difficulty": raw.get("difficulty"),
         "estimated_hours": raw.get("estimatedHours"),
-        "author": creator.get("displayName") or creator.get("username"),
+        "author": creator.get("displayName") or author_username,
+        "author_url": f"{BASE_URL}/mentors/{author_username}" if author_username else None,
         "content_url": raw.get("contentUrl"),
     }
 

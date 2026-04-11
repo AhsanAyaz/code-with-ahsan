@@ -1,15 +1,18 @@
 from google.adk.agents import LlmAgent
 
-from ..platform_client import fetch_projects
+from ..platform_client import BASE_URL, fetch_projects
 
 _PROJECT_LIMIT = 15
 
 
 def _shape_project(raw: dict) -> dict:
-    creator = raw.get("creatorProfile", {}) or {}
+    creator = raw.get("creatorProfile") or {}
+    creator_username = creator.get("username")
+    project_id = raw.get("id")
     return {
-        "id": raw.get("id"),
+        "id": project_id,
         "title": raw.get("title"),
+        "url": f"{BASE_URL}/projects/{project_id}" if project_id else None,
         "description": (raw.get("description") or "")[:300],
         "tech_stack": raw.get("techStack", []),
         "difficulty": raw.get("difficulty"),
@@ -17,7 +20,8 @@ def _shape_project(raw: dict) -> dict:
         "member_count": raw.get("memberCount", 0),
         "max_team_size": raw.get("maxTeamSize"),
         "github": raw.get("githubRepo"),
-        "creator": creator.get("displayName") or creator.get("username"),
+        "creator": creator.get("displayName") or creator_username,
+        "creator_url": f"{BASE_URL}/mentors/{creator_username}" if creator_username else None,
     }
 
 
