@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-adk-community-assistant-for-discord-google-cloud-next-2026-demo/02-00-PLAN.md
-last_updated: "2026-04-11T23:04:53.690Z"
+stopped_at: Completed 02-adk-community-assistant-for-discord-google-cloud-next-2026-demo/02-01-PLAN.md
+last_updated: "2026-04-11T23:10:32.537Z"
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 9
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -52,6 +52,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02]: pytest-asyncio asyncio_mode=auto chosen so async tests need no decorator
 - [Phase 02]: mock_platform_client uses monkeypatch.setattr on _get — decouples tests from transport layer
 - [Phase 02]: outputDimensionality:768 confirmed in @google/genai 1.33.0 type definitions; live probe requires GOOGLE_API_KEY in .env.local
+- [Phase 02]: BASE_URL default changed to https://codewithahsan.dev — production is opt-out via PLATFORM_API_BASE_URL env var, not opt-in
+- [Phase 02]: url fields are Python None (not string 'None') when id/username missing — prevents broken /mentors/None links in Discord replies
 
 ### Workflow Notes
 
@@ -84,8 +86,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-11T23:04:53.688Z
-Stopped at: Completed 02-adk-community-assistant-for-discord-google-cloud-next-2026-demo/02-00-PLAN.md
+Last session: 2026-04-11T23:10:32.535Z
+Stopped at: Completed 02-adk-community-assistant-for-discord-google-cloud-next-2026-demo/02-01-PLAN.md
 Resume file: None
 
 ---
