@@ -69,5 +69,15 @@ Plans:
 - [ ] 01-02-PLAN.md — Presenter panel: HostAuthGate, host route, all 10 fullscreen sections with keyboard navigation and real-time winners
 - [ ] 01-03-PLAN.md — Admin winner form + public winners podium display on event page
 
+### Phase 2: ADK Community Assistant for Discord (Google Cloud Next 2026 demo)
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 1
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 2 to break down)
+
 ---
 *Last updated: 2026-03-27 after Phase 1 planning*

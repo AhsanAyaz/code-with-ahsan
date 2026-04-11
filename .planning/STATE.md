@@ -61,6 +61,7 @@ For GitHub issue fixes, use `/gsd:quick` to plan and execute, then cherry-pick o
 ### Roadmap Evolution
 
 - Phase 1 added: Promptathon live host panel with presenter slides, admin winner management, and permanent winners display
+- Phase 2 added: ADK Community Assistant for Discord (Google Cloud Next 2026 demo)
 
 ### Blockers/Concerns
 
