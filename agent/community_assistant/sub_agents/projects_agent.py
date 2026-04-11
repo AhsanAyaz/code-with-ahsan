@@ -1,58 +1,62 @@
 from google.adk.agents import LlmAgent
 
-_MOCK_PROJECTS = [
-    {
-        "name": "Voice Cloner",
-        "tags": ["ai", "python", "audio"],
-        "difficulty": "intermediate",
-        "seeking": ["contributors", "testers"],
-        "repo": "https://github.com/codewithahsan/voice-cloner",
-    },
-    {
-        "name": "Community Assistant",
-        "tags": ["ai", "python", "adk", "discord"],
-        "difficulty": "advanced",
-        "seeking": ["contributors"],
-        "repo": "https://github.com/codewithahsan/community-assistant",
-    },
-    {
-        "name": "Starter Portfolio Template",
-        "tags": ["nextjs", "typescript", "beginner-friendly"],
-        "difficulty": "beginner",
-        "seeking": ["contributors", "design help"],
-        "repo": "https://github.com/codewithahsan/starter-portfolio",
-    },
-    {
-        "name": "Learning Roadmap Viewer",
-        "tags": ["react", "typescript", "beginner-friendly"],
-        "difficulty": "beginner",
-        "seeking": ["contributors"],
-        "repo": "https://github.com/codewithahsan/roadmap-viewer",
-    },
-]
+from ..platform_client import fetch_projects
+
+_PROJECT_LIMIT = 15
+
+
+def _shape_project(raw: dict) -> dict:
+    creator = raw.get("creatorProfile", {}) or {}
+    return {
+        "id": raw.get("id"),
+        "title": raw.get("title"),
+        "description": (raw.get("description") or "")[:300],
+        "tech_stack": raw.get("techStack", []),
+        "difficulty": raw.get("difficulty"),
+        "status": raw.get("status"),
+        "member_count": raw.get("memberCount", 0),
+        "max_team_size": raw.get("maxTeamSize"),
+        "github": raw.get("githubRepo"),
+        "creator": creator.get("displayName") or creator.get("username"),
+    }
 
 
 def list_open_projects(tag: str = "") -> dict:
-    """Lists community open-source projects available for collaboration.
+    """Lists community projects currently open for collaboration.
+
+    Fetches live data from the platform (active and completed projects only) and optionally
+    filters by a technology tag or keyword (case-insensitive substring match on tech stack,
+    title, or description).
 
     Args:
-        tag: Optional filter by technology or label (e.g., "python", "beginner-friendly").
-            Pass an empty string to list all projects.
+        tag: Optional filter (e.g., "python", "ai", "beginner"). Empty string returns all.
 
     Returns:
-        A dict with projects matching the tag and a count.
+        A dict with status, tag, count, and a list of projects (id, title, description,
+        tech_stack, difficulty, status, member_count, max_team_size, github, creator).
     """
+    result = fetch_projects()
+    if not result["ok"]:
+        return {"status": "error", "message": result["error"], "projects": []}
+
+    all_projects = result["data"].get("projects", [])
     if tag:
-        matched = [
-            p for p in _MOCK_PROJECTS if tag.lower() in [t.lower() for t in p["tags"]]
+        needle = tag.lower().strip()
+        filtered = [
+            p
+            for p in all_projects
+            if needle in (p.get("title") or "").lower()
+            or needle in (p.get("description") or "").lower()
+            or any(needle in str(t).lower() for t in p.get("techStack", []))
         ]
     else:
-        matched = _MOCK_PROJECTS
+        filtered = all_projects
+
     return {
         "status": "success",
         "tag": tag or "all",
-        "projects": matched,
-        "count": len(matched),
+        "count": len(filtered),
+        "projects": [_shape_project(p) for p in filtered[:_PROJECT_LIMIT]],
     }
 
 
@@ -82,14 +86,15 @@ projects_agent = LlmAgent(
     model="gemini-2.5-flash",
     description=(
         "Helps developers discover open-source projects in the Code with Ahsan community and "
-        "understand how to contribute."
+        "understand how to contribute. Reads live project data from the platform."
     ),
     instruction="""You help community members find projects to contribute to and get started.
 
-Use list_open_projects to browse or filter by tag.
+Use list_open_projects to browse or filter. The tool fetches live data from the platform.
 Use get_contribution_guide once they've picked a specific project.
 
 Match project difficulty to the user's stated skill level. If they're a beginner, don't recommend \
-advanced projects without a clear warning. Always end with a single concrete next action.""",
+advanced projects without a clear warning. If no projects match, suggest they broaden the filter \
+or visit https://codewithahsan.dev/projects. Always end with a single concrete next action.""",
     tools=[list_open_projects, get_contribution_guide],
 )
