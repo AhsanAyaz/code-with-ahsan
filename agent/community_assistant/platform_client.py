@@ -10,7 +10,8 @@ import os
 
 import httpx
 
-BASE_URL = os.getenv("PLATFORM_API_BASE_URL", "http://localhost:3000").rstrip("/")
+"""Public production base URL. Override locally with PLATFORM_API_BASE_URL=http://localhost:3000."""
+BASE_URL = os.getenv("PLATFORM_API_BASE_URL", "https://codewithahsan.dev").rstrip("/")
 TIMEOUT_SECONDS = 10.0
 
 _client = httpx.Client(
