@@ -2,7 +2,7 @@ from collections import Counter
 
 from google.adk.agents import LlmAgent
 
-from ..platform_client import fetch_mentors
+from ..platform_client import BASE_URL, fetch_mentors
 
 _MENTOR_LIMIT = 10
 _CATEGORY_LIMIT = 25
@@ -17,9 +17,11 @@ def _shape_mentor(raw: dict) -> dict:
         if at_capacity
         else f"Accepting mentees ({active}/{max_mentees} slots used)"
     )
+    username = raw.get("username")
     return {
-        "name": raw.get("displayName") or raw.get("username") or "Unknown",
-        "username": raw.get("username"),
+        "name": raw.get("displayName") or username or "Unknown",
+        "username": username,
+        "url": f"{BASE_URL}/mentors/{username}" if username else None,
         "expertise": raw.get("expertise", []),
         "availability": availability,
         "rating": raw.get("avgRating") or None,
