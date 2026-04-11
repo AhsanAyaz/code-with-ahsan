@@ -219,6 +219,11 @@ export async function PUT(
         lastActivityAt: FieldValue.serverTimestamp(),
       };
 
+      // Handle null githubRepo properly by deleting the field instead of storing null
+      if (applyUpdates.githubRepo === null) {
+        applyUpdates.githubRepo = FieldValue.delete();
+      }
+
       await projectRef.update(applyUpdates);
 
       return NextResponse.json(

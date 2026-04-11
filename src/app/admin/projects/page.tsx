@@ -633,7 +633,7 @@ export default function AdminProjectsPage() {
                 </div>
               )}
 
-              {reviewTarget.pendingUpdates.githubRepo && (
+              {"githubRepo" in reviewTarget.pendingUpdates && (
                 <div className="card bg-base-200 p-4">
                   <div className="font-medium">GitHub Repository</div>
                   <div className="grid grid-cols-2 gap-4 mt-2">
