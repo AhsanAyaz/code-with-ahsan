@@ -1,0 +1,31 @@
+{
+  "projects": [
+    {
+      "id": "proj-1",
+      "title": "Open AI Tutor",
+      "description": "An interactive AI-powered tutor that generates personalised exercises and feedback for learners using OpenAI's GPT-4o and structured output mode.",
+      "techStack": ["python", "openai", "fastapi", "react"],
+      "difficulty": "intermediate",
+      "status": "active",
+      "memberCount": 3,
+      "maxTeamSize": 5,
+      "githubRepo": "https://github.com/cwa/open-ai-tutor",
+      "creatorProfile": {
+        "username": "alice",
+        "displayName": "Alice"
+      }
+    },
+    {
+      "id": "proj-2",
+      "title": "Community Roadmap Visualiser",
+      "description": "A visual graph explorer for Code with Ahsan learning roadmaps, rendered as interactive node graphs using D3 and Next.js.",
+      "techStack": ["typescript", "nextjs", "d3", "tailwindcss"],
+      "difficulty": "beginner",
+      "status": "active",
+      "memberCount": 2,
+      "maxTeamSize": 4,
+      "githubRepo": "https://github.com/cwa/roadmap-visualiser",
+      "creatorProfile": null
+    }
+  ]
+}

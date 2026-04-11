@@ -1,0 +1,26 @@
+{
+  "mentors": [
+    {
+      "name": "Muhammad Ali",
+      "username": "muhammad-ali",
+      "url": "https://codewithahsan.dev/mentors/muhammad-ali",
+      "expertise": ["Web Development", "Career Growth"],
+      "availability": "Accepting mentees (2/5 slots used)",
+      "rating": 4.8,
+      "completed_sessions": 12,
+      "bio_excerpt": "Frontend specialist with 8 years of Angular and React experience. Has shipped large-scale enterprise apps using NgRx and React Query. Passionate about helping juniors level up.",
+      "match_score": 0.18
+    },
+    {
+      "name": "Alex ML",
+      "username": null,
+      "url": null,
+      "expertise": ["Machine Learning", "AI"],
+      "availability": "Accepting mentees (1/4 slots used)",
+      "rating": 4.9,
+      "completed_sessions": 5,
+      "bio_excerpt": "ML researcher turned practitioner. Built production recommendation systems and LLM-powered features. Enjoys guiding people through the complexity of ML pipelines and model evaluation.",
+      "match_score": 0.42
+    }
+  ]
+}

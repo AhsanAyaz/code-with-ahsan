@@ -1,0 +1,32 @@
+{
+  "roadmaps": [
+    {
+      "id": "rm-ai",
+      "title": "AI Engineer Roadmap",
+      "description": "A structured path from Python basics through ML fundamentals, LLMs, and production AI systems. Covers data pipelines, model evaluation, RAG, and agentic workflows.",
+      "domain": "ai",
+      "difficulty": "intermediate",
+      "status": "approved",
+      "estimatedHours": 80,
+      "contentUrl": "https://raw.githubusercontent.com/cwa/roadmaps/main/ai-engineer.md",
+      "creatorProfile": {
+        "username": "ahsan",
+        "displayName": "Ahsan"
+      }
+    },
+    {
+      "id": "rm-frontend",
+      "title": "Frontend Developer Roadmap",
+      "description": "A curated roadmap for developers targeting modern frontend roles. Covers HTML/CSS fundamentals, JavaScript ES2024, React 19, Next.js 15, testing, and performance optimisation.",
+      "domain": "frontend",
+      "difficulty": "beginner",
+      "status": "approved",
+      "estimatedHours": 60,
+      "contentUrl": "https://raw.githubusercontent.com/cwa/roadmaps/main/frontend-developer.md",
+      "creatorProfile": {
+        "username": "muhammad-ali",
+        "displayName": "Muhammad Ali"
+      }
+    }
+  ]
+}

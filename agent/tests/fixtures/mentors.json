@@ -1,0 +1,52 @@
+{
+  "mentors": [
+    {
+      "uid": "uid-001",
+      "username": "muhammad-ali",
+      "displayName": "Muhammad Ali",
+      "expertise": ["Web Development", "Career Growth"],
+      "bio": "Frontend specialist with 8 years of Angular and React experience. Has shipped large-scale enterprise apps using NgRx and React Query. Passionate about helping juniors level up.",
+      "maxMentees": 5,
+      "activeMenteeCount": 2,
+      "completedMentorships": 12,
+      "avgRating": 4.8,
+      "ratingCount": 18,
+      "isAtCapacity": false,
+      "isPublic": true,
+      "status": "accepted",
+      "role": "mentor"
+    },
+    {
+      "uid": "uid-002",
+      "username": "sara-backend",
+      "displayName": "Sara Backend",
+      "expertise": ["Backend Development", "DevOps & Cloud"],
+      "bio": "Senior backend engineer with 10 years building scalable APIs with Node.js, Go, and FastAPI. Deployed production workloads to GCP and AWS. Mentor focused on system design and career transitions into backend.",
+      "maxMentees": 3,
+      "activeMenteeCount": 3,
+      "completedMentorships": 8,
+      "avgRating": 4.6,
+      "ratingCount": 10,
+      "isAtCapacity": true,
+      "isPublic": true,
+      "status": "accepted",
+      "role": "mentor"
+    },
+    {
+      "uid": "uid-003",
+      "username": null,
+      "displayName": "Alex ML",
+      "expertise": ["Machine Learning", "AI"],
+      "bio": "ML researcher turned practitioner. Built production recommendation systems and LLM-powered features. Enjoys guiding people through the complexity of ML pipelines and model evaluation.",
+      "maxMentees": 4,
+      "activeMenteeCount": 1,
+      "completedMentorships": 5,
+      "avgRating": 4.9,
+      "ratingCount": 6,
+      "isAtCapacity": false,
+      "isPublic": true,
+      "status": "accepted",
+      "role": "mentor"
+    }
+  ]
+}
