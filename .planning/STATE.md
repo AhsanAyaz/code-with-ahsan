@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-adk-community-assistant-for-discord-google-cloud-next-2026-demo/02-01-PLAN.md
-last_updated: "2026-04-11T23:10:32.537Z"
+stopped_at: "Completed 02-adk-community-assistant-for-discord-google-cloud-next-2026-demo/02-02-PLAN.md (checkpoint:human-verify for Task 5 pending)"
+last_updated: "2026-04-12T07:09:16.060Z"
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -54,6 +54,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02]: outputDimensionality:768 confirmed in @google/genai 1.33.0 type definitions; live probe requires GOOGLE_API_KEY in .env.local
 - [Phase 02]: BASE_URL default changed to https://codewithahsan.dev — production is opt-out via PLATFORM_API_BASE_URL env var, not opt-in
 - [Phase 02]: url fields are Python None (not string 'None') when id/username missing — prevents broken /mentors/None links in Discord replies
+- [Phase 02]: outputDimensionality:768 hard-coded in embed script and route — matches Firestore COSINE flat vector index
+- [Phase 02]: semantic_search_mentors count reports sliced length (capped at _SEMANTIC_LIMIT=5), not raw API count
+- [Phase 02]: Route Handler uses new URL(request.url).searchParams (synchronous) — async searchParams only applies to page.tsx/layout.tsx
 
 ### Workflow Notes
 
@@ -86,8 +89,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-11T23:10:32.535Z
-Stopped at: Completed 02-adk-community-assistant-for-discord-google-cloud-next-2026-demo/02-01-PLAN.md
+Last session: 2026-04-12T07:09:07.812Z
+Stopped at: Completed 02-adk-community-assistant-for-discord-google-cloud-next-2026-demo/02-02-PLAN.md (checkpoint:human-verify for Task 5 pending)
 Resume file: None
 
 ---
