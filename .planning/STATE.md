@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-adk-community-assistant-for-discord-google-cloud-next-2026-demo/02-02-PLAN.md
-last_updated: "2026-04-12T07:11:42.594Z"
+stopped_at: Completed 02-adk-community-assistant-for-discord-google-cloud-next-2026-demo/02-03-PLAN.md (T4/T5 pending human checkpoints)
+last_updated: "2026-04-12T07:58:15.099Z"
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -57,6 +57,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02]: outputDimensionality:768 hard-coded in embed script and route — matches Firestore COSINE flat vector index
 - [Phase 02]: semantic_search_mentors count reports sliced length (capped at _SEMANTIC_LIMIT=5), not raw API count
 - [Phase 02]: Route Handler uses new URL(request.url).searchParams (synchronous) — async searchParams only applies to page.tsx/layout.tsx
+- [Phase 02]: bot.py uses lazy _wire_bot() to keep discord.py and google-adk out of module-level imports — tests run without those deps installed
+- [Phase 02]: .env.sample renamed to .env.example to match project gitignore allowlist (!.env.example pattern)
+- [Phase 02]: runner.run_async() enforced in on_message handler — sync runner.run() causes RuntimeError in discord.py asyncio event loop
 
 ### Workflow Notes
 
@@ -89,8 +92,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-12T07:11:42.591Z
-Stopped at: Completed 02-adk-community-assistant-for-discord-google-cloud-next-2026-demo/02-02-PLAN.md
+Last session: 2026-04-12T07:58:06.550Z
+Stopped at: Completed 02-adk-community-assistant-for-discord-google-cloud-next-2026-demo/02-03-PLAN.md (T4/T5 pending human checkpoints)
 Resume file: None
 
 ---
