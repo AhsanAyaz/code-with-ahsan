@@ -48,6 +48,14 @@ def fetch_mentors() -> dict:
     return _get("/api/mentorship/mentors", {"public": "true"})
 
 
+def fetch_mentors_semantic(query: str) -> dict:
+    """Fetch ranked mentors via vector similarity over bio embeddings.
+
+    Calls /api/mentorship/mentors/semantic-search?q=... — backed by Firestore Vector Search.
+    """
+    return _get("/api/mentorship/mentors/semantic-search", {"q": query})
+
+
 def fetch_projects() -> dict:
     """Fetch all publicly visible projects from /api/projects (active + completed)."""
     return _get("/api/projects")
