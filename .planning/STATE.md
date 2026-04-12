@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-adk-community-assistant-for-discord-google-cloud-next-2026-demo/02-03-PLAN.md (T4/T5 pending human checkpoints)
+stopped_at: 02-03-PLAN.md Task 5 (Cloud Run deploy) — checkpoint:human-action awaiting gcloud deploy
 last_updated: "2026-04-12T07:58:15.099Z"
 progress:
   total_phases: 3

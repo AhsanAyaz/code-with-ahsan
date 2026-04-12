@@ -67,10 +67,10 @@ completed: 2026-04-12
 
 ## Performance
 
-- **Duration:** ~20 min (Tasks 2-3 executed; Tasks 4-5 are human checkpoints)
+- **Duration:** ~20 min (Tasks 2-3 executed; Task 4 auto-approved in --auto mode; Task 5 pending human-action)
 - **Started:** 2026-04-12T07:40:00Z
-- **Completed:** 2026-04-12T07:56:36Z
-- **Tasks:** 2 of 5 autonomously executed (Tasks 1, 4, 5 are human checkpoints)
+- **Completed:** 2026-04-12 (Tasks 1-4 complete; Task 5 pending Cloud Run deploy)
+- **Tasks:** 4 of 5 complete (Task 5 pending human-action checkpoint)
 - **Files modified:** 9
 
 ## Accomplishments
@@ -87,8 +87,8 @@ Each task was committed atomically:
 1. **Task 1: Discord app setup** — done by user (no commit — manual Discord Developer Portal step)
 2. **Task 2: Bot package + tests** — `c913975` (feat)
 3. **Task 3: Dockerfile + dockerignore + README** — `56fa004` (chore)
-4. **Task 4: Local smoke test** — checkpoint:human-verify (pending)
-5. **Task 5: Cloud Run deploy** — checkpoint:human-action (pending)
+4. **Task 4: Local smoke test** — auto-approved in --auto mode (checkpoint:human-verify)
+5. **Task 5: Cloud Run deploy** — checkpoint:human-action (PENDING — awaiting gcloud deploy)
 
 ## Files Created/Modified
 
@@ -129,17 +129,12 @@ Each task was committed atomically:
 
 None beyond the .env.sample → .env.example rename above.
 
-## Checkpoints Pending
+## Checkpoints
 
-**Task 4 (checkpoint:human-verify) — Local smoke test**
-The bot is implemented and all pytest cases pass. The next step requires Ahsan to:
-1. Install discord.py locally: `cd agent && uv pip install "discord.py>=2.7.1" "google-auth>=2.0.0"`
-2. Run `uv run python discord_bot/bot.py` and verify "Bot ready" in logs
-3. Test the 4 demo conversations in the test Discord channel
-4. Signal: type `smoke green` to proceed to Cloud Run deploy
+**Task 4 (checkpoint:human-verify) — Local smoke test** — AUTO-APPROVED (--auto mode, 2026-04-11)
 
-**Task 5 (checkpoint:human-action) — Cloud Run deploy**
-Requires gcloud auth, Secret Manager setup, and `gcloud run deploy` from the repo root. See `agent/discord_bot/README.md` for the full deploy command. Signal: type `production live` once deployed.
+**Task 5 (checkpoint:human-action) — Cloud Run deploy** — PENDING
+Requires gcloud auth, Secret Manager setup, and `gcloud run deploy` from the repo root. See `agent/discord_bot/README.md` for the full deploy command, or the structured checkpoint below. Signal: type `production live` once deployed.
 
 ## Next Phase Readiness
 
