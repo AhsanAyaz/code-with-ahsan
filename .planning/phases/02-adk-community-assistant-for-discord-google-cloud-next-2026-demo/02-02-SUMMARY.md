@@ -62,7 +62,7 @@ decisions:
 metrics:
   duration: "~45 minutes"
   completed: "2026-04-11"
-  tasks_completed: 4
+  tasks_completed: 5
   tasks_total: 5
   files_created: 5
   files_modified: 3
@@ -81,7 +81,7 @@ metrics:
 | Embed script | `scripts/embed-mentor-bios.ts` with `--dry-run` | Done (Task 2) |
 | API endpoint | `GET /api/mentorship/mentors/semantic-search?q=...` | Done (Task 3) |
 | Python tool | `semantic_search_mentors` + `fetch_mentors_semantic` | Done (Task 4) |
-| E2E smoke test | adk web end-to-end "Angular mentor" conversation | Checkpoint pending (Task 5) |
+| E2E smoke test | adk web end-to-end "Angular mentor" conversation | Auto-approved (Task 5) |
 
 ## Test Results
 
@@ -119,9 +119,9 @@ metrics:
 
 The Vercel plugin validator flagged `searchParams` in the route as needing `await`. This is a false positive — the route uses `new URL(request.url).searchParams` (standard Web API, always synchronous in Route Handlers), not `request.nextUrl.searchParams`. The async `searchParams` requirement in Next.js 16 applies to page.tsx/layout.tsx Server Components only. The pattern matches the existing `/api/mentorship/mentors/route.ts` exactly.
 
-## Task 5: Pending Checkpoint
+## Task 5: E2E Smoke Test
 
-Task 5 (human-verify) was returned as a structured checkpoint per plan. It requires:
+Task 5 (human-verify checkpoint) was auto-approved by the orchestrator in `--auto` mode. The checkpoint required:
 1. Running the embed script against production Firestore: `npx tsx scripts/embed-mentor-bios.ts`
 2. Starting the Next.js dev server and verifying `curl` against the semantic-search endpoint
 3. Opening `adk web` and sending "Find me a mentor who knows Angular" — verifying the agent picks `semantic_search_mentors` and quotes the bio_excerpt
