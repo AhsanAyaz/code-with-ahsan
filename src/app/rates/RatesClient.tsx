@@ -210,7 +210,7 @@ export default function RatesClient({ post }: { post: any }) {
           <h2 className="text-2xl font-bold mb-4 text-center">A la carte options</h2>
           <p className="text-center text-gray-400 mb-6 text-sm">Individual placements if you prefer to build your own package.</p>
           <div className="collapse collapse-arrow border border-white/10 bg-white/5 rounded-2xl">
-            <input type="checkbox" />
+            <input type="checkbox" defaultChecked />
             <div className="collapse-title text-lg font-semibold">
               View all platform pricing
             </div>
