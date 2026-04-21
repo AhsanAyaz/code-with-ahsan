@@ -14,6 +14,7 @@ import AvailabilityManager from "@/components/mentorship/AvailabilityManager";
 import BookingsList from "@/components/mentorship/BookingsList";
 import { authFetch } from "@/lib/apiClient";
 import { TimeSlotAvailability, UnavailableDate } from "@/types/mentorship";
+import { hasRole } from "@/lib/permissions";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -54,7 +55,7 @@ export default function SettingsPage() {
 
   // Load availability data for mentors
   useEffect(() => {
-    if (profile?.uid && profile.role === "mentor") {
+    if (profile?.uid && hasRole(profile, "mentor")) {
       fetch(`/api/mentorship/availability?mentorId=${profile.uid}`)
         .then((res) => res.json())
         .then((data) => {
@@ -64,7 +65,7 @@ export default function SettingsPage() {
         })
         .catch((err) => console.error("Failed to load availability:", err));
     }
-  }, [profile?.uid, profile?.role]);
+  }, [profile?.uid, profile?.roles, profile?.role]);
 
   // Check for calendar connection status from URL params (after OAuth redirect)
   useEffect(() => {
@@ -228,7 +229,7 @@ export default function SettingsPage() {
 
   // Convert availability back to boolean format if needed
   const mentorInitialData =
-    profile.role === "mentor"
+    hasRole(profile, "mentor")
       ? {
           username: profile.username || "",
           displayName: profile.displayName || "",
@@ -253,7 +254,7 @@ export default function SettingsPage() {
       : undefined;
 
   const menteeInitialData =
-    profile.role === "mentee"
+    hasRole(profile, "mentee")
       ? {
           displayName: profile.displayName || "",
           education: profile.education || "",
@@ -273,7 +274,7 @@ export default function SettingsPage() {
         <div>
           <h2 className="text-2xl font-bold">Profile Settings</h2>
           <p className="text-base-content/70">
-            Update your {profile.role} profile details
+            Update your {profile.roles?.[0] ?? profile.role} profile details
           </p>
         </div>
         <Link href="/mentorship/dashboard" className="btn btn-ghost btn-sm">
@@ -344,14 +345,14 @@ export default function SettingsPage() {
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body">
           <h3 className="card-title">
-            {profile.role === "mentor"
+            {hasRole(profile, "mentor")
               ? "🎯 Mentor Profile"
               : "🚀 Mentee Profile"}
           </h3>
 
           <div className="divider"></div>
 
-          {profile.role === "mentor" ? (
+          {hasRole(profile, "mentor") ? (
             <MentorRegistrationForm
               key={`mentor-${profile.updatedAt?.toString()}`}
               onSubmit={handleSubmit}
@@ -387,7 +388,7 @@ export default function SettingsPage() {
           )}
 
           {/* Mentor Announcement Section - Moved to Bottom */}
-          {profile.role === "mentor" && user && (
+          {hasRole(profile, "mentor") && user && (
             <div className="mt-12">
               <div className="divider"></div>
               <MentorAnnouncementCard
@@ -402,7 +403,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Availability Management Section - Mentors Only */}
-      {profile?.role === "mentor" && (
+      {hasRole(profile, "mentor") && (
         <>
           {/* Section Divider */}
           <div className="divider text-lg font-semibold mt-8">Time Slot Availability</div>
