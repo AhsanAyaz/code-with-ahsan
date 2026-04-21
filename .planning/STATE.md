@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: Completed 01-05-PLAN.md
-last_updated: "2026-04-21T21:39:06.057Z"
+stopped_at: Completed 01-06-PLAN.md
+last_updated: "2026-04-21T21:43:52.899Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 10
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 ## Current Position
 
 Phase: 01 (foundation-roles-array-migration) — EXECUTING
-Plan: 5 of 10
+Plan: 6 of 10
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -69,6 +69,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01-03]: isAcceptedMentor promoted from private helper to exported function during refactor onto hasRole — public signature preserved, dual-read benefit now automatic
 - [Phase 01-03]: Dual-read pattern uses nullish-coalescing ?? (NOT ||) because [].includes(x) returns false, so empty roles array correctly short-circuits without silently falling back to legacy role field
 - [Phase 01-foundation-roles-array-migration]: Firestore rules isAcceptedMentor() dual-claim: OR(legacy role, "roles" in token && "mentor" in token.roles) — existence guard ordering is mandatory (Firestore in operator throws on unset field)
+- [Phase 01-foundation-roles-array-migration]: syncRoleClaim helper mirrors scripts/sync-custom-claims.ts merge pattern ({...existing, roles, role: roles[0] ?? null, admin}) — Plan 10 Deploy #5 cleanup must patch both files in lock-step
+- [Phase 01-foundation-roles-array-migration]: verifyAuth extended with optional roles?/admin?/role? fields via new AuthContext interface; AuthResult kept as deprecated type alias for backward compat (zero external callers found)
+- [Phase 01-foundation-roles-array-migration]: PUT /api/mentorship/profile syncs claims on every update (not just role/isAdmin changes) — ~50-150ms RPC trade-off for guaranteed D-14 invariant if future refactor adds role mutations via this handler
+- [Phase 01-foundation-roles-array-migration]: admin/profiles/route.ts received invariant-documenting comment instead of syncRoleClaim wiring (PUT handler mutates only status/discord/notes/feedback, never roles/isAdmin — Step C audit confirmed no other admin write surfaces in mentorship API tree)
 
 ### Workflow Notes
 
@@ -107,11 +111,12 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 01-foundation-roles-array-migration P04 | 2 min | 2 tasks | 3 files |
 | Phase 01-foundation-roles-array-migration P03 | 4 min | 2 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P05 | 1 min | 1 tasks | 1 files |
+| Phase 01-foundation-roles-array-migration P06 | 4min | 4 tasks | 4 files |
 
 ## Session Continuity
 
-Last session: 2026-04-21T21:38:55.387Z
-Stopped at: Completed 01-05-PLAN.md
+Last session: 2026-04-21T21:43:52.896Z
+Stopped at: Completed 01-06-PLAN.md
 Resume file: None
 
 ---
