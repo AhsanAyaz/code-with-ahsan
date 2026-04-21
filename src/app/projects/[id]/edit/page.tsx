@@ -70,6 +70,7 @@ export default function EditProjectPage() {
           ? {
               uid: user.uid,
               role: profile?.role || "mentee",
+              roles: profile?.roles,
               status: profile?.status,
               isAdmin: isAdmin,
             }

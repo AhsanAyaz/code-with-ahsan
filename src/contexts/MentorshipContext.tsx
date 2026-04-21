@@ -90,7 +90,7 @@ export function MentorshipProvider({ children }: MentorshipProviderProps) {
     }
     try {
       const response = await fetch(
-        `/api/mentorship/match?uid=${user.uid}&role=${profile.role}`,
+        `/api/mentorship/match?uid=${user.uid}&role=${profile.roles?.[0] ?? profile.role ?? ""}`,
       );
       if (response.ok) {
         const data = await response.json();
