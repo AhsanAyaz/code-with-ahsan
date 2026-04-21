@@ -98,6 +98,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.5",
     "@vitest/ui": "^4.0.18",
     "baseline-browser-mapping": "^2.10.0",
     "dotenv": "^17.2.3",
