@@ -19,7 +19,7 @@ Scoped requirements for v6.0. Each maps to exactly one roadmap phase (populated 
 - [ ] **ROLE-05**: Firebase custom-claims sync script propagates the new `roles` claim to every active user's ID token, with a force-refresh signal handled client-side
 - [ ] **ROLE-06**: All 95 existing permission test cases are migrated to the new `roles` shape in the same PR as the type change (TypeScript-breaking so no fixture silently passes)
 - [ ] **ROLE-07**: All 29 non-test files that read `.role` are migrated to the array-aware helpers with zero regression to existing mentor / mentee / admin flows
-- [ ] **ROLE-08**: `FEATURE_AMBASSADOR_PROGRAM` feature flag gates every new `/ambassadors` route so Foundation can ship without exposing half-built ambassador features
+- [x] **ROLE-08**: `FEATURE_AMBASSADOR_PROGRAM` feature flag gates every new `/ambassadors` route so Foundation can ship without exposing half-built ambassador features
 
 ### Cohort Management
 
@@ -186,7 +186,7 @@ Every v1 REQ-ID maps to exactly one phase. Populated during roadmap creation (20
 | ROLE-05 | Phase 1 — Foundation: Roles Array Migration | Pending |
 | ROLE-06 | Phase 1 — Foundation: Roles Array Migration | Pending |
 | ROLE-07 | Phase 1 — Foundation: Roles Array Migration | Pending |
-| ROLE-08 | Phase 1 — Foundation: Roles Array Migration | Pending |
+| ROLE-08 | Phase 1 — Foundation: Roles Array Migration | Complete |
 | COHORT-01 | Phase 2 — Application Subsystem | Pending |
 | COHORT-02 | Phase 2 — Application Subsystem | Pending |
 | COHORT-03 | Phase 2 — Application Subsystem | Pending |

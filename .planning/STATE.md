@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: Completed 01-01-PLAN.md (types + Zod role schema)
-last_updated: "2026-04-21T21:24:12.191Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-04-21T21:26:37.810Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 10
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 ## Current Position
 
 Phase: 01 (foundation-roles-array-migration) — EXECUTING
-Plan: 2 of 10
+Plan: 3 of 10
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -61,6 +61,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [v6.0 roadmap]: Reconciliation cron for missing Discord roles (DISC-04) lives in Phase 4 because it's cron infrastructure paired with the strike-check cron; role assignment at acceptance (DISC-01..03) stays in Phase 2.
 - [Phase 01]: Four-role vocabulary (mentor/mentee/ambassador/alumni-ambassador) locked as Zod enum + TS union in src/types/mentorship.ts (D-01)
 - [Phase 01]: MentorshipProfile.roles is required Role[] (never null/undefined) — dual-read window keeps role? optional until Deploy #5 (D-04, D-06)
+- [Phase 01-foundation-roles-array-migration]: Footer Ambassadors link placed first in /rates /privacy /terms nav block (no existing Mentorship/Projects links in Footer to sit next to)
+- [Phase 01-foundation-roles-array-migration]: headerNavLinks.js and Footer.tsx read process.env inline (D-12 exception authorized by plan: bundle-time Next.js inlining requires literal env reference)
 
 ### Workflow Notes
 
@@ -95,11 +97,12 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | 260410 | CRO audit and optimize rates page (CTAs, social proof, collapsible a la carte) | 2026-04-09 | d11b30f | [260410-cro-audit-and-optimize-mentorship-rates-](./quick/260410-cro-audit-and-optimize-mentorship-rates-/) |
 | 260411 | update inactivity warning message to @mention mentor and mentee (GH-151) | 2026-04-10 | 3fa2bff | [260411-update-inactivity-warning-message-to-men](./quick/260411-update-inactivity-warning-message-to-men/) |
 | Phase 01 P01 | 2min | 1 tasks | 1 files |
+| Phase 01-foundation-roles-array-migration P02 | 3 min | 3 tasks | 6 files |
 
 ## Session Continuity
 
-Last session: 2026-04-21T21:24:12.186Z
-Stopped at: Completed 01-01-PLAN.md (types + Zod role schema)
+Last session: 2026-04-21T21:26:37.807Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
 
 ---
