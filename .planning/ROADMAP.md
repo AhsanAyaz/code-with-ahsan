@@ -10,6 +10,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 - ✅ **v2.0 Community Collaboration & Learning** — Phases 4-14 (shipped 2026-03-10)
 - ✅ **v3.0 Brand Identity & Site Restructure** — Phases 15-18 (shipped 2026-03-10)
 - ✅ **v4.0 Admin Course Creator with YouTube Integration** — Phase 1 (shipped 2026-03-11)
+- ✅ **v5.0 CWA Promptathon 2026** — Phase 1 (shipped 2026-04-21)
 
 ## Phases
 
@@ -57,17 +58,12 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 
 </details>
 
-### Phase 1: Promptathon live host panel with presenter slides, admin winner management, and permanent winners display
+<details>
+<summary>✅ v5.0 CWA Promptathon 2026 (Phase 1) — SHIPPED 2026-04-21</summary>
 
-**Goal:** Fullscreen live-stream presenter panel for the CWA Prompt-A-Thon 2026 host, with admin winner management and a permanent podium display on the public event page.
-**Requirements**: context-driven (see 01-CONTEXT.md)
-**Depends on:** Phase 0
-**Plans:** 3 plans
+- [x] Phase 1: Promptathon live host panel with presenter slides, admin winner management, and permanent winners display (3/3 plans) — completed 2026-03-28
 
-Plans:
-- [ ] 01-01-PLAN.md — Data & API layer: constants (teams, twist, mentors, UTM links), TypeScript types, winners Firestore API route
-- [ ] 01-02-PLAN.md — Presenter panel: HostAuthGate, host route, all 10 fullscreen sections with keyboard navigation and real-time winners
-- [ ] 01-03-PLAN.md — Admin winner form + public winners podium display on event page
+</details>
 
 ---
-*Last updated: 2026-03-27 after Phase 1 planning*
+*Last updated: 2026-04-21 after v5.0 milestone completion*

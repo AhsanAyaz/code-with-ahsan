@@ -70,6 +70,14 @@ Community members can find mentors, collaborate on real projects with structured
 - ✓ AI-generated SEO course descriptions via Gemini — v4.0
 - ✓ Course card 3-column layout with black background thumbnails — v4.0
 
+<!-- v5.0 - CWA Promptathon 2026 -->
+
+- ✓ Fullscreen live-stream presenter panel at `/events/cwa-promptathon/2026/host` with token-only auth and keyboard navigation — v5.0
+- ✓ Real-time Firestore winners reveal with confetti on 2→3 transition — v5.0
+- ✓ Admin winner management at `/admin/events/[eventId]` with team dropdowns, judge quotes, load-existing, and clear action — v5.0
+- ✓ Public winners podium via `WinnersDisplay` component (hidden until `announcedAt`) — v5.0
+- ✓ Event constants: `HACKATHON_TEAMS`, `HACKATHON_TWIST`, `MENTORS`, plus UTM link fixes — v5.0
+
 ### Out of Scope
 
 **v1.0 Exclusions:**
@@ -137,17 +145,32 @@ Community members can find mentors, collaborate on real projects with structured
 | Single chapter per YouTube course | Matches angular-in-90ish-minutes pattern | ✓ chapterOrder 0, posts from timestamps |
 | Gemini for course descriptions | Auto-generate SEO-optimized text | ✓ gemini-flash-latest via @google/genai |
 | visibilityOrder for course ordering | Simple numeric ordering in MDX frontmatter | ✓ Higher value = first in list |
+| Public GET on winners API | Let public display panel read without auth | ✓ v5.0 — decouples display from admin state |
+| HostAuthGate decoupled from Firebase user | Token-only auth for live-stream presenter | ✓ v5.0 — imports only ADMIN_TOKEN_KEY |
+| TwistRevealSection owns its countdown | Parent only flips phase; section runs setInterval in useRef | ✓ v5.0 — keeps parent state minimal |
+| WinnersSection uses prevRevealedCount ref | Detects 2→3 transition to prevent double-fire confetti | ✓ v5.0 — reliable single-fire |
+| PLACEMENTS config array in admin form | DRY up 3 placement sections | ✓ v5.0 — single source of truth |
 
-## Current State (post-v4.0)
+## Current State (post-v5.0)
 
-**Shipped:** v4.0 Admin Course Creator with YouTube Integration (2026-03-11)
+**Shipped:** v5.0 CWA Promptathon 2026 (2026-04-21)
 
-The platform now includes a local admin tool for course management:
-- Admin courses page at `/admin/courses` — list, create, delete, toggle visibility, reorder
-- YouTube video/playlist integration — auto-extracts chapter timestamps into MDX course posts
-- AI-generated SEO descriptions via Gemini API
-- Course visibility and ordering reflected on public `/courses` page
-- 3-column course card layout with centered thumbnails on black backgrounds
+The platform now hosts the live CWA Prompt-A-Thon 2026 event infrastructure:
+- Fullscreen presenter panel at `/events/cwa-promptathon/2026/host` (token-gated, keyboard-navigable, 10 sections)
+- Admin winner management at `/admin/events/[eventId]` (team dropdowns, judge quotes, load-existing, clear action)
+- Public winners podium via `WinnersDisplay` on the event page (hidden until `announcedAt`)
+- Firestore winners API (public GET, admin PUT, admin DELETE) backing all three surfaces
+- Event constants module (`constants.ts`) with teams, twist, mentors, UTM links
+
+Also carrying forward from v4.0: admin courses page + YouTube-to-MDX pipeline.
+
+## Next Milestone Goals
+
+**v6.0 Student Ambassador Program** (designed — spec at `docs/superpowers/specs/2026-04-21-student-ambassador-program-design.md`):
+- Application pipeline (apply form + admin review + Discord role assign on acceptance)
+- Public presentation (ambassador badge + `/ambassadors` cohort page)
+- Activity tracking (referral links, event host tracker, monthly report form)
+- Dashboard + leaderboard (private, gated to ambassador role)
 
 ## Milestones
 
@@ -157,6 +180,7 @@ The platform now includes a local admin tool for course management:
 | v2.0 | Complete | 2026-03-10 |
 | v3.0 | Complete | 2026-03-10 |
 | v4.0 | Complete | 2026-03-11 |
+| v5.0 | Complete | 2026-04-21 |
 
 ---
-*Last updated: 2026-03-11 after v4.0 milestone completion*
+*Last updated: 2026-04-21 after v5.0 milestone completion*

@@ -1,5 +1,25 @@
 # Milestones
 
+## v5.0: CWA Promptathon 2026
+
+**Completed:** 2026-04-21
+**Phases:** 1 (Phase 1 only)
+**Plans:** 3 | **Commits:** ~22 scoped | **LOC:** +5,514 / -37
+**Timeline:** 2 days (2026-03-27 → 2026-03-28)
+**Archive:** `.planning/milestones/v5.0-ROADMAP.md`, `.planning/milestones/v5.0-phases/`
+
+**Delivered:**
+
+- Firestore winners GET/PUT API with TypeScript contracts, `HACKATHON_TEAMS` (10 team names), `HACKATHON_TWIST`, and `MENTORS` constants for the CWA Promptathon 2026 event
+- Fullscreen presenter panel at `/events/cwa-promptathon/2026/host` with token-only `HostAuthGate`, 10-section keyboard-navigable slide deck, Framer Motion transitions, and real-time Firestore winners reveal with confetti
+- Admin winner management at `/admin/events/[eventId]` with team dropdowns, judge quotes, load-existing-winners-on-mount, and clear-winners action (DELETE endpoint)
+- Public winners podium via `WinnersDisplay` component on the event page, hidden until `announcedAt` is populated
+- Event-day polish: font consistency, mentors/organizers + wrap-up slide, sponsor copy cleanup, judges list corrections
+
+**Note:** On archival, the CLI initially cross-contaminated v5.0 stats with leftover v4.0 phase directory (admin course creator) that was not cleaned up when v4.0 shipped. That phase was subsequently moved to `v4.0-phases/` and this entry was corrected to reflect only the Promptathon work.
+
+---
+
 ## v4.0: Admin Course Creator with YouTube Integration
 
 **Completed:** 2026-03-11
@@ -9,6 +29,7 @@
 **Archive:** `.planning/milestones/v4.0-ROADMAP.md`
 
 **Delivered:**
+
 - YouTube chapter-timestamp to MDX pipeline — auto-extracts video chapters and creates course post files
 - Admin courses page with full CRUD — list, create, delete, toggle visibility, and reorder courses
 - YouTube playlist support — each playlist video becomes a separate course post with its own video URL
@@ -26,6 +47,7 @@
 **Archive:** `.planning/milestones/v2.0-ROADMAP.md`, `.planning/milestones/v2.0-REQUIREMENTS.md`
 
 **Delivered:**
+
 - Project collaboration system with full lifecycle (Proposed → Active → Completed → Archived) and Discord integration
 - Team formation with applications, invitations, skill matching, and member management
 - Project templates (Fullstack App, AI Tool, Open Source Library) and demo submission on completion
@@ -49,6 +71,7 @@
 **Archive:** `.planning/milestones/v1.0/`
 
 **Delivered:**
+
 - Mentor-mentee relationship mapping and visualization
 - Discord username management for mentors and mentees
 - Discord channel regeneration for mentorships
@@ -57,6 +80,7 @@
 - Declined mentor restoration capability
 
 **Quick Tasks (Post-v1.0):**
+
 1. Fix Discord channel name fallback and timezone handling
 2. Assign Discord roles on mentor/mentee signup
 3. Add profile preview buttons for admins and mentors
