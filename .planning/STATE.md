@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: Completed 01-06-PLAN.md
-last_updated: "2026-04-21T21:43:52.899Z"
+stopped_at: Completed 01-07-call-site-migration-PLAN.md
+last_updated: "2026-04-21T22:08:36.487Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 10
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 ## Current Position
 
 Phase: 01 (foundation-roles-array-migration) — EXECUTING
-Plan: 6 of 10
+Plan: 7 of 10
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -73,6 +73,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01-foundation-roles-array-migration]: verifyAuth extended with optional roles?/admin?/role? fields via new AuthContext interface; AuthResult kept as deprecated type alias for backward compat (zero external callers found)
 - [Phase 01-foundation-roles-array-migration]: PUT /api/mentorship/profile syncs claims on every update (not just role/isAdmin changes) — ~50-150ms RPC trade-off for guaranteed D-14 invariant if future refactor adds role mutations via this handler
 - [Phase 01-foundation-roles-array-migration]: admin/profiles/route.ts received invariant-documenting comment instead of syncRoleClaim wiring (PUT handler mutates only status/discord/notes/feedback, never roles/isAdmin — Step C audit confirmed no other admin write surfaces in mentorship API tree)
+- [Phase 01]: Plan 07 call-site migration: 30 files modified, 66 hasRole occurrences across 17 files. Dual-read/dual-write pattern established. Rule 3 deviation: relaxed PermissionUser.role to optional, extended lib/email.ts local shim with roles.
 
 ### Workflow Notes
 
@@ -112,11 +113,12 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 01-foundation-roles-array-migration P03 | 4 min | 2 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P05 | 1 min | 1 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P06 | 4min | 4 tasks | 4 files |
+| Phase 01 P07 | 32min | 2 tasks | 30 files |
 
 ## Session Continuity
 
-Last session: 2026-04-21T21:43:52.896Z
-Stopped at: Completed 01-06-PLAN.md
+Last session: 2026-04-21T22:08:36.484Z
+Stopped at: Completed 01-07-call-site-migration-PLAN.md
 Resume file: None
 
 ---
