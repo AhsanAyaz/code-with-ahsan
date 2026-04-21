@@ -13,6 +13,7 @@
  */
 
 import { MentorshipRole, Project, Roadmap } from "@/types/mentorship";
+import type { Role } from "@/types/mentorship";
 
 /**
  * User context for permission checks
@@ -21,6 +22,7 @@ import { MentorshipRole, Project, Roadmap } from "@/types/mentorship";
 export interface PermissionUser {
   uid: string;
   role: MentorshipRole;
+  roles?: Role[]; // Post-migration: always present. Pre-migration: undefined -> helpers fall back to `role`.
   status?: "pending" | "accepted" | "declined" | "disabled" | "changes_requested";
   isAdmin?: boolean;
 }
@@ -46,14 +48,6 @@ export enum RoadmapAction {
 }
 
 // ─── Helper Functions ───────────────────────────────────────────
-
-/**
- * Check if user is an accepted mentor
- */
-function isAcceptedMentor(user: PermissionUser | null): boolean {
-  if (!user) return false;
-  return user.role === "mentor" && user.status === "accepted";
-}
 
 /**
  * Check if user is an admin
@@ -92,6 +86,77 @@ function canOwnerOrAdminAccess(
   if (isAdminUser(user)) return true;
   if (isAuthenticated(user) && isOwner(user, resource)) return true;
   return false;
+}
+
+// ─── Role Helpers (v6.0 roles-array migration) ──────────────────
+
+/**
+ * Returns true if the profile has the given role.
+ *
+ * Dual-read (per D-06 in 01-CONTEXT.md):
+ *   - Prefers profile.roles (the new invariant shape)
+ *   - Falls back to profile.role (legacy single-role field) when profile.roles is undefined
+ *
+ * Null-safe (per D-07): returns false for null/undefined profiles instead of throwing.
+ *
+ * Three-verb API (per D-05): passing an array to `role` is a TypeScript compile error.
+ * Use hasAnyRole / hasAllRoles for multi-role semantics.
+ */
+export function hasRole(
+  profile: PermissionUser | null | undefined,
+  role: Role
+): boolean {
+  if (!profile) return false;
+  return profile.roles?.includes(role) ?? profile.role === role;
+}
+
+/**
+ * Returns true if the profile has AT LEAST ONE of the given roles.
+ * Dual-read + null-safe (same semantics as hasRole).
+ */
+export function hasAnyRole(
+  profile: PermissionUser | null | undefined,
+  roles: Role[]
+): boolean {
+  if (!profile) return false;
+  if (roles.length === 0) return false;
+  if (profile.roles) {
+    return roles.some((r) => profile.roles!.includes(r));
+  }
+  // Legacy fallback: compare against the single role field
+  return profile.role !== null && profile.role !== undefined && roles.includes(profile.role as Role);
+}
+
+/**
+ * Returns true if the profile has EVERY given role.
+ * Dual-read + null-safe. During the legacy fallback window, returns true only if
+ * the argument list is exactly one role matching profile.role (a single-role
+ * legacy profile cannot satisfy multi-role queries).
+ */
+export function hasAllRoles(
+  profile: PermissionUser | null | undefined,
+  roles: Role[]
+): boolean {
+  if (!profile) return false;
+  if (roles.length === 0) return true; // vacuous truth — matches Array.prototype.every
+  if (profile.roles) {
+    return roles.every((r) => profile.roles!.includes(r));
+  }
+  // Legacy fallback: only satisfiable if exactly one role requested matches the legacy field
+  return (
+    roles.length === 1 &&
+    profile.role !== null &&
+    profile.role !== undefined &&
+    roles[0] === profile.role
+  );
+}
+
+/**
+ * Check if user is an accepted mentor.
+ * Refactored onto hasRole (DRY + dual-read benefit for free).
+ */
+export function isAcceptedMentor(user: PermissionUser | null): boolean {
+  return hasRole(user, "mentor") && user?.status === "accepted";
 }
 
 // ─── Project Permissions ────────────────────────────────────────
