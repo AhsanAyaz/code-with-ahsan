@@ -21,7 +21,11 @@ import type { Role } from "@/types/mentorship";
  */
 export interface PermissionUser {
   uid: string;
-  role: MentorshipRole;
+  // `role` is optional during the roles-array dual-read window (per Plan 01/03/07): MentorshipProfile.role
+  // became optional in Plan 01, and the helpers (`hasRole`, `hasAnyRole`, etc.) gracefully handle absent
+  // legacy role via the `profile.roles?.includes(r) ?? profile.role === r` dual-read. Kept as legacy
+  // field only; Plan 10 removes entirely in Deploy #5.
+  role?: MentorshipRole;
   roles?: Role[]; // Post-migration: always present. Pre-migration: undefined -> helpers fall back to `role`.
   status?: "pending" | "accepted" | "declined" | "disabled" | "changes_requested";
   isAdmin?: boolean;

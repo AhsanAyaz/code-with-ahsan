@@ -6,6 +6,7 @@ import { useMentorship } from "@/contexts/MentorshipContext";
 import RoadmapCard from "@/components/roadmaps/RoadmapCard";
 import RoadmapFilters from "@/components/roadmaps/RoadmapFilters";
 import { Roadmap, RoadmapDomain, ProjectDifficulty } from "@/types/mentorship";
+import { hasRole } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
@@ -112,7 +113,7 @@ function RoadmapsCatalogContent() {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-3xl font-bold">Learning Roadmaps</h1>
-          {profile?.role === "mentor" && (
+          {hasRole(profile, "mentor") && (
             <div className="flex gap-2">
               <Link href="/roadmaps/my" className="btn btn-ghost">
                 My Roadmaps
