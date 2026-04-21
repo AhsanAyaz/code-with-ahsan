@@ -9,6 +9,7 @@ import Link from "next/link";
 import ContactInfo from "@/components/mentorship/ContactInfo";
 import { DashboardContext, type MatchDetails } from "./DashboardContext";
 import ProfileAvatar from "@/components/ProfileAvatar";
+import { hasRole } from "@/lib/permissions";
 
 // DEV_MODE: Set to true to bypass authentication for testing form layouts
 const DEV_MODE = false;
@@ -24,6 +25,7 @@ const MOCK_MATCH_DETAILS: MatchDetails = {
   partner: {
     uid: "test-partner",
     role: "mentee",
+    roles: ["mentee"],
     displayName: "Test Mentee",
     email: "test@example.com",
     photoURL: "",
@@ -245,9 +247,9 @@ export default function DashboardLayout({
       }
 
       const mentorProfile =
-        profile.role === "mentor" ? profile : matchDetails.partner;
+        hasRole(profile, "mentor") ? profile : matchDetails.partner;
       const menteeProfile =
-        profile.role === "mentee" ? profile : matchDetails.partner;
+        hasRole(profile, "mentee") ? profile : matchDetails.partner;
 
       const response = await fetch("/api/mentorship/announcement-image", {
         method: "POST",
@@ -281,8 +283,8 @@ export default function DashboardLayout({
 
   const shareToTwitter = () => {
     const mentorName =
-      profile?.role === "mentor"
-        ? profile.displayName
+      hasRole(profile, "mentor")
+        ? profile?.displayName
         : matchDetails?.partner.displayName;
     const text = encodeURIComponent(
       `🎉 I am now a mentee of ${mentorName} in the Code with Ahsan Mentorship Program! #Mentorship #CodeWithAhsan #LearningJourney`,
@@ -331,7 +333,7 @@ export default function DashboardLayout({
   }
 
   const currentMatchDetails = matchDetails!;
-  const currentIsMentor = DEV_MODE ? false : profile?.role === "mentor";
+  const currentIsMentor = DEV_MODE ? false : hasRole(profile, "mentor");
   const currentUserId = DEV_MODE ? "dev-user-123" : (user?.uid ?? "");
 
   // Determine active tab from pathname

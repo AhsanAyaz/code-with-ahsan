@@ -4,6 +4,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import Link from "next/link";
+import { hasRole } from "@/lib/permissions";
 
 interface Goal {
   id: string;
@@ -39,7 +40,7 @@ export default function GoalsPage() {
 
       try {
         const response = await fetch(
-          `/api/mentorship/all-goals?uid=${user.uid}&role=${profile.role}`,
+          `/api/mentorship/all-goals?uid=${user.uid}&role=${profile.roles?.[0] ?? profile.role ?? ""}`,
         );
         if (response.ok) {
           const data = await response.json();
@@ -144,7 +145,7 @@ export default function GoalsPage() {
             <div className="text-5xl mb-4">🎯</div>
             <h3 className="text-xl font-semibold">No goals yet</h3>
             <p className="text-base-content/70">
-              Connect with a {profile.role === "mentor" ? "mentee" : "mentor"}{" "}
+              Connect with a {hasRole(profile, "mentor") ? "mentee" : "mentor"}{" "}
               and start setting goals together!
             </p>
           </div>

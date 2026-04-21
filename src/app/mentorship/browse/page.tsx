@@ -7,6 +7,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { useMentorship, MentorshipProfile } from "@/contexts/MentorshipContext";
 import MentorCard from "@/components/mentorship/MentorCard";
 import Link from "next/link";
+import { hasRole } from "@/lib/permissions";
 
 type RequestStatus = "none" | "pending" | "declined" | "active" | "completed";
 
@@ -41,7 +42,7 @@ export default function BrowseMentorsPage() {
   }, [loading, profileLoading, user, setShowLoginPopup]);
 
   useEffect(() => {
-    if (!loading && !profileLoading && profile && profile.role !== "mentee") {
+    if (!loading && !profileLoading && profile && !hasRole(profile, "mentee")) {
       router.push("/mentorship");
     }
   }, [loading, profileLoading, profile, router]);
@@ -61,7 +62,7 @@ export default function BrowseMentorsPage() {
       }
     };
 
-    if (user && profile?.role === "mentee") {
+    if (user && hasRole(profile, "mentee")) {
       fetchMentors();
     }
   }, [user, profile]);
@@ -109,7 +110,7 @@ export default function BrowseMentorsPage() {
       }
     };
 
-    if (user && profile?.role === "mentee") {
+    if (user && hasRole(profile, "mentee")) {
       fetchMyRequests();
     }
   }, [user, profile]);

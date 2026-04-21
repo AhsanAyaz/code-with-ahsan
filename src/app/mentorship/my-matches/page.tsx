@@ -12,6 +12,7 @@ import Link from "next/link";
 import ContactInfo from "@/components/mentorship/ContactInfo";
 import DiscordValidationBanner from "@/components/mentorship/DiscordValidationBanner";
 import ProfileAvatar from "@/components/ProfileAvatar";
+import { hasRole } from "@/lib/permissions";
 
 interface MatchWithProfile extends MentorshipMatch {
   partnerProfile?: MentorshipProfile;
@@ -38,7 +39,7 @@ export default function MyMatchesPage() {
 
       try {
         const response = await fetch(
-          `/api/mentorship/my-matches?uid=${user.uid}&role=${profile.role}`,
+          `/api/mentorship/my-matches?uid=${user.uid}&role=${profile.roles?.[0] ?? profile.role ?? ""}`,
         );
         if (response.ok) {
           const data = await response.json();
@@ -125,7 +126,7 @@ export default function MyMatchesPage() {
         <div>
           <h2 className="text-2xl font-bold">My Mentorship Connections</h2>
           <p className="text-base-content/70">
-            {profile.role === "mentor" ? "Your mentees" : "Your mentors"}
+            {hasRole(profile, "mentor") ? "Your mentees" : "Your mentors"}
           </p>
         </div>
         <Link href="/mentorship/dashboard" className="btn btn-ghost btn-sm">
@@ -138,7 +139,7 @@ export default function MyMatchesPage() {
         <div>
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
             <span className="badge badge-warning">Pending</span>
-            {profile.role === "mentee"
+            {hasRole(profile, "mentee")
               ? "Awaiting Response"
               : "Your Pending Approvals"}
           </h3>
@@ -161,7 +162,7 @@ export default function MyMatchesPage() {
                       </div>
                     </div>
                   </div>
-                  {profile.role === "mentee" && (
+                  {hasRole(profile, "mentee") && (
                     <div className="flex items-center justify-between mt-2">
                       <div className="text-sm text-warning">
                         ⏳ Waiting for mentor approval
@@ -205,11 +206,11 @@ export default function MyMatchesPage() {
                 No active connections yet
               </h3>
               <p className="text-base-content/70">
-                {profile.role === "mentee"
+                {hasRole(profile, "mentee")
                   ? "Browse mentors and request a match to get started!"
                   : "When you accept mentee requests, they'll appear here."}
               </p>
-              {profile.role === "mentee" && (
+              {hasRole(profile, "mentee") && (
                 <div className="card-actions justify-center mt-4">
                   <Link href="/mentorship/browse" className="btn btn-primary">
                     Browse Mentors

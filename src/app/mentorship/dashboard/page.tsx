@@ -8,6 +8,7 @@ import { useToast } from "@/contexts/ToastContext";
 import Link from "next/link";
 import type { MentorshipProfile, MatchWithProfile } from "@/types/mentorship";
 import DiscordValidationBanner from "@/components/mentorship/DiscordValidationBanner";
+import { hasRole } from "@/lib/permissions";
 
 // Widgets
 import StatsWidget from "@/components/mentorship/dashboard/StatsWidget";
@@ -72,7 +73,7 @@ export default function MentorshipDashboardPage() {
       try {
         // Fetch mentorship matches
         const matchesResponse = await fetch(
-          `/api/mentorship/my-matches?uid=${user.uid}&role=${profile?.role}`,
+          `/api/mentorship/my-matches?uid=${user.uid}&role=${profile?.roles?.[0] ?? profile?.role ?? ""}`,
         );
         if (matchesResponse.ok) {
           const data = await matchesResponse.json();
@@ -92,7 +93,7 @@ export default function MentorshipDashboardPage() {
             }
 
             // Get user's roadmaps (if mentor)
-            if (profile?.role === "mentor") {
+            if (hasRole(profile, "mentor")) {
               const myResponse = await fetch(
                 `/api/roadmaps?creatorId=${user.uid}`,
               );
@@ -215,7 +216,7 @@ function DashboardContent({
     const fetchMatches = async () => {
       try {
         const response = await fetch(
-          `/api/mentorship/my-matches?uid=${user.uid}&role=${profile.role}`,
+          `/api/mentorship/my-matches?uid=${user.uid}&role=${profile.roles?.[0] ?? profile.role ?? ""}`,
         );
         if (response.ok) {
           const data = await response.json();
@@ -228,7 +229,7 @@ function DashboardContent({
       }
     };
     fetchMatches();
-  }, [user.uid, profile.role]);
+  }, [user.uid, profile.roles, profile.role]);
 
   // Fetch Projects (Owned + Member)
   useEffect(() => {
@@ -268,7 +269,7 @@ function DashboardContent({
 
   // Fetch Roadmaps (Mentor only)
   useEffect(() => {
-    if (profile.role !== "mentor") {
+    if (!hasRole(profile, "mentor")) {
       setLoadingRoadmaps(false);
       return;
     }
@@ -288,7 +289,7 @@ function DashboardContent({
       }
     };
     fetchRoadmaps();
-  }, [user.uid, profile.role]);
+  }, [user.uid, profile.roles, profile.role]);
 
   const handleAction = async (
     type: "request" | "invitation",
@@ -313,7 +314,7 @@ function DashboardContent({
           await refreshMatches();
           // Re-fetch local matches
           const matchesRes = await fetch(
-            `/api/mentorship/my-matches?uid=${user.uid}&role=${profile.role}`,
+            `/api/mentorship/my-matches?uid=${user.uid}&role=${profile.roles?.[0] ?? profile.role ?? ""}`,
           );
           if (matchesRes.ok) {
             const data = await matchesRes.json();
@@ -345,13 +346,13 @@ function DashboardContent({
             Welcome back, {user.displayName?.split(" ")[0] || "Friend"}!
           </h1>
           <p className="text-base-content/70">
-            {profile.role === "mentor"
+            {hasRole(profile, "mentor")
               ? "Ready to inspire the next generation?"
               : "Your journey to mastery continues."}
           </p>
         </div>
         <div className="badge badge-primary badge-lg capitalize">
-          {profile.role}
+          {profile.roles?.[0] ?? profile.role}
         </div>
       </div>
 
@@ -363,14 +364,14 @@ function DashboardContent({
           <ActionRequiredWidget
             requests={pendingRequests}
             invitations={[]} // TODO: Fetch invitations
-            role={profile.role!}
+            role={(profile.roles?.[0] ?? profile.role) as "mentor" | "mentee"}
             onAction={handleAction}
           />
 
           {/* Active Mentorships */}
           <ActiveMatchesWidget
             matches={activeMatches}
-            role={profile.role!}
+            role={(profile.roles?.[0] ?? profile.role) as "mentor" | "mentee"}
             loading={loadingMatches}
           />
           
@@ -382,17 +383,17 @@ function DashboardContent({
           />
 
           {/* My Roadmaps (Mentor Only) */}
-          {profile.role === "mentor" && (
+          {hasRole(profile, "mentor") && (
             <MyRoadmapsWidget roadmaps={myRoadmaps} loading={loadingRoadmaps} />
           )}
 
           {/* Guidelines Accordion */}
-           <GuidelinesWidget role={profile.role!} />
+           <GuidelinesWidget role={(profile.roles?.[0] ?? profile.role) as "mentor" | "mentee"} />
         </div>
 
         {/* Right Column (1/3 width) - Stats & Quick Links */}
         <div className="space-y-6">
-          <StatsWidget stats={stats} role={profile.role!} />
+          <StatsWidget stats={stats} role={(profile.roles?.[0] ?? profile.role) as "mentor" | "mentee"} />
           <QuickLinksWidget profile={profile} user={user} stats={stats} />
         </div>
       </div>
