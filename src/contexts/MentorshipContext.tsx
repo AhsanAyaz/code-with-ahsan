@@ -9,6 +9,7 @@ import {
 } from "react";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { getApp } from "firebase/app";
+import { refreshClaimsNow } from "@/lib/hooks/useClaimRefresh";
 
 // Import and re-export types from centralized types file
 export type {
@@ -17,6 +18,21 @@ export type {
   MentorshipMatch,
 } from "@/types/mentorship";
 import type { MentorshipProfile, MentorshipMatch } from "@/types/mentorship";
+
+/**
+ * Shape of the `_claimSync` server-generated signal that Plan 06's
+ * /api/mentorship/profile POST/PUT handlers attach to their response body
+ * after calling syncRoleClaim(). When `refreshed === true`, the client should
+ * force a Firebase ID-token refresh so the next getIdTokenResult() call
+ * reflects the updated custom claims (per D-14 in 01-CONTEXT.md).
+ */
+type ClaimSyncSignal =
+  | { refreshed: true }
+  | { refreshed: false; error?: string };
+
+interface MutationResponseWithClaimSync {
+  _claimSync?: ClaimSyncSignal;
+}
 
 interface MentorshipContextType {
   user: User | null;
@@ -27,6 +43,23 @@ interface MentorshipContextType {
   pendingRequests: MentorshipMatch[];
   refreshProfile: () => Promise<void>;
   refreshMatches: () => Promise<void>;
+  /**
+   * Inspect a mutation response body for the `_claimSync.refreshed === true`
+   * signal (set server-side by syncRoleClaim in Plan 06's route handlers) and,
+   * when present, force-refresh the current user's Firebase ID token so the
+   * updated custom claims (roles, admin) become visible to subsequent
+   * getIdTokenResult() calls without waiting for Firebase's ~1-hour TTL.
+   *
+   * Non-fatal: if the refresh fails (network blip, token expired, etc.) the
+   * mutation still succeeded server-side; the client silently retries on next
+   * interaction. See src/lib/hooks/useClaimRefresh.ts.
+   *
+   * Call sites: /profile, /mentorship/onboarding and any future page that
+   * POSTs/PUTs to /api/mentorship/profile. Per the D-14 contract this is
+   * mutation-triggered — NEVER wire it into a setInterval or useEffect on
+   * user-state changes.
+   */
+  syncClaimsFromResponse: (data: unknown) => Promise<boolean>;
 }
 
 const MentorshipContext = createContext<MentorshipContextType | undefined>(
@@ -80,6 +113,27 @@ export function MentorshipProvider({ children }: MentorshipProviderProps) {
     } finally {
       setProfileLoading(false);
     }
+  };
+
+  /**
+   * Inspect a mutation response body for _claimSync.refreshed === true and
+   * force-refresh the Firebase ID token when the signal is present.
+   *
+   * Strict `=== true` check (NOT truthy) — the failure shape is
+   * `{ refreshed: false, error: string }` which would be truthy under a loose
+   * check. The server is the signal source; the refresh is mutation-triggered,
+   * never time-based (per D-14).
+   *
+   * Safe to call with any value — non-objects, null, objects without the
+   * signal field — all short-circuit to false.
+   */
+  const syncClaimsFromResponse = async (data: unknown): Promise<boolean> => {
+    if (!data || typeof data !== "object") return false;
+    const payload = data as MutationResponseWithClaimSync;
+    if (payload._claimSync?.refreshed === true && user) {
+      return refreshClaimsNow(user);
+    }
+    return false;
   };
 
   const refreshMatches = async () => {
@@ -161,6 +215,7 @@ export function MentorshipProvider({ children }: MentorshipProviderProps) {
         pendingRequests,
         refreshProfile,
         refreshMatches,
+        syncClaimsFromResponse,
       }}
     >
       {children}
