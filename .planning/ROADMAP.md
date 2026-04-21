@@ -90,7 +90,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 **Plans**: 10 plans
 - [x] 01-types-zod-role-schema-PLAN.md — Role union + RoleSchema Zod enum + MentorshipProfile.roles field (Deploy #1 / Wave 1 / ROLE-01)
 - [x] 02-feature-flag-helper-PLAN.md — `isAmbassadorProgramEnabled()`, `/ambassadors/*` 404 gates, nav filtering (Deploy #1 / Wave 1 / ROLE-08)
-- [ ] 03-permission-helpers-PLAN.md — hasRole/hasAnyRole/hasAllRoles + claim-side mirrors with dual-read; refactor isAcceptedMentor (Deploy #1 / Wave 2 / ROLE-02)
+- [x] 03-permission-helpers-PLAN.md — hasRole/hasAnyRole/hasAllRoles + claim-side mirrors with dual-read; refactor isAcceptedMentor (Deploy #1 / Wave 2 / ROLE-02)
 - [x] 04-migration-scripts-PLAN.md — `migrate-roles-to-array.ts` + `sync-custom-claims.ts` (Deploys #2 + #2.5 / Wave 2 / ROLE-03 + ROLE-05)
 - [ ] 05-firestore-rules-dual-read-PLAN.md — `firestore.rules isAcceptedMentor()` dual-claim read (Deploy #3 / Wave 3 / ROLE-04)
 - [ ] 06-role-mutation-helper-PLAN.md — `syncRoleClaim` stub + wire into profile POST + extend `verifyAuth` (Deploy #4 / Wave 3 / ROLE-05 + ROLE-07)

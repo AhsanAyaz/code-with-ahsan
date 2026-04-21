@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-04-21T21:33:10.154Z"
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-04-21T21:34:10.809Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 10
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 ## Current Position
 
 Phase: 01 (foundation-roles-array-migration) — EXECUTING
-Plan: 3 of 10
+Plan: 4 of 10
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -65,6 +65,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01-foundation-roles-array-migration]: headerNavLinks.js and Footer.tsx read process.env inline (D-12 exception authorized by plan: bundle-time Next.js inlining requires literal env reference)
 - [Phase 01-foundation-roles-array-migration]: VALID_ROLES duplicated (not imported) in migration scripts — keeps tsx runs decoupled from Next.js path-mappings; role vocabulary is locked (D-01) so drift risk is acceptable
 - [Phase 01-foundation-roles-array-migration]: Custom claims sync uses merge-preserve spread (...customClaims, roles, role, admin) — setCustomUserClaims is replace-not-merge, the spread prevents clobbering pre-existing admin/beta/etc claims
+- [Phase 01-03]: PermissionUser.role stays required (narrower than MentorshipProfile.role which is optional) to minimize churn in the 29 call-sites and 95 test fixtures migrated by Plans 07/08
+- [Phase 01-03]: isAcceptedMentor promoted from private helper to exported function during refactor onto hasRole — public signature preserved, dual-read benefit now automatic
+- [Phase 01-03]: Dual-read pattern uses nullish-coalescing ?? (NOT ||) because [].includes(x) returns false, so empty roles array correctly short-circuits without silently falling back to legacy role field
 
 ### Workflow Notes
 
@@ -101,11 +104,12 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 01 P01 | 2min | 1 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P02 | 3 min | 3 tasks | 6 files |
 | Phase 01-foundation-roles-array-migration P04 | 2 min | 2 tasks | 3 files |
+| Phase 01-foundation-roles-array-migration P03 | 4 min | 2 tasks | 1 files |
 
 ## Session Continuity
 
-Last session: 2026-04-21T21:33:10.151Z
-Stopped at: Completed 01-04-PLAN.md
+Last session: 2026-04-21T21:34:10.807Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None
 
 ---

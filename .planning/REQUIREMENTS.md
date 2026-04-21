@@ -13,7 +13,7 @@ Scoped requirements for v6.0. Each maps to exactly one roadmap phase (populated 
 ### Role System (Foundation — prerequisite)
 
 - [x] **ROLE-01**: `mentorship_profiles/{uid}` schema supports `roles: string[]` (array) in place of `role: string`, with legacy `role` field retained during a dual-claim compatibility window
-- [ ] **ROLE-02**: `src/lib/permissions.ts` exposes `hasRole(profile, role)`, `hasAnyRole(profile, roles)`, and `hasAllRoles(profile, roles)` helpers backed by array-membership semantics
+- [x] **ROLE-02**: `src/lib/permissions.ts` exposes `hasRole(profile, role)`, `hasAnyRole(profile, roles)`, and `hasAllRoles(profile, roles)` helpers backed by array-membership semantics
 - [x] **ROLE-03**: Idempotent, paginated migration script (`scripts/migrate-roles-to-array.ts`) backfills every existing `mentorship_profiles` doc with a `roles` array, with dry-run mode and null-safe handling
 - [ ] **ROLE-04**: `firestore.rules` are updated to dual-read accept both `role == "X"` and `"X" in roles` during the migration window, then switched to array-only after rollout
 - [x] **ROLE-05**: Firebase custom-claims sync script propagates the new `roles` claim to every active user's ID token, with a force-refresh signal handled client-side
@@ -180,7 +180,7 @@ Every v1 REQ-ID maps to exactly one phase. Populated during roadmap creation (20
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | ROLE-01 | Phase 1 — Foundation: Roles Array Migration | Complete |
-| ROLE-02 | Phase 1 — Foundation: Roles Array Migration | Pending |
+| ROLE-02 | Phase 1 — Foundation: Roles Array Migration | Complete |
 | ROLE-03 | Phase 1 — Foundation: Roles Array Migration | Complete |
 | ROLE-04 | Phase 1 — Foundation: Roles Array Migration | Pending |
 | ROLE-05 | Phase 1 — Foundation: Roles Array Migration | Complete |
