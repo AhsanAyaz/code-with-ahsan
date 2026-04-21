@@ -87,7 +87,17 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
   4. `/ambassadors/*` routes are fully deployed but return 404 when `FEATURE_AMBASSADOR_PROGRAM` is disabled, so half-built ambassador features cannot be reached by real users during foundation rollout.
   5. Every one of the 95 permission test fixtures uses the new `roles: [...]` shape, the TypeScript build is green, and coverage reports show the new `roles.includes(...)` code paths are exercised (no fixture silently passing on a legacy fallback).
 
-**Plans**: TBD
+**Plans**: 10 plans
+- [ ] 01-types-zod-role-schema-PLAN.md — Role union + RoleSchema Zod enum + MentorshipProfile.roles field (Deploy #1 / Wave 1 / ROLE-01)
+- [ ] 02-feature-flag-helper-PLAN.md — `isAmbassadorProgramEnabled()`, `/ambassadors/*` 404 gates, nav filtering (Deploy #1 / Wave 1 / ROLE-08)
+- [ ] 03-permission-helpers-PLAN.md — hasRole/hasAnyRole/hasAllRoles + claim-side mirrors with dual-read; refactor isAcceptedMentor (Deploy #1 / Wave 2 / ROLE-02)
+- [ ] 04-migration-scripts-PLAN.md — `migrate-roles-to-array.ts` + `sync-custom-claims.ts` (Deploys #2 + #2.5 / Wave 2 / ROLE-03 + ROLE-05)
+- [ ] 05-firestore-rules-dual-read-PLAN.md — `firestore.rules isAcceptedMentor()` dual-claim read (Deploy #3 / Wave 3 / ROLE-04)
+- [ ] 06-role-mutation-helper-PLAN.md — `syncRoleClaim` stub + wire into profile POST + extend `verifyAuth` (Deploy #4 / Wave 3 / ROLE-05 + ROLE-07)
+- [ ] 07-call-site-migration-PLAN.md — Migrate 29 files from `profile.role === "x"` to `hasRole(profile, "x")` (Deploy #4 / Wave 3 / ROLE-07)
+- [ ] 08-test-fixture-migration-PLAN.md — Migrate 95 fixtures to dual-shape + new coverage for the six helpers (Deploy #4 / Wave 4 / ROLE-06)
+- [ ] 09-client-claim-refresh-PLAN.md — `useClaimRefresh` hook + `MentorshipContext` refresh on `_claimSync.refreshed` (Deploy #4 / Wave 4 / ROLE-05)
+- [ ] 10-final-cleanup-deploy5-PLAN.md — Manual gate + drop MentorshipRole + array-only rules + `drop-legacy-role-field.ts` (Deploy #5 / Wave 5 / ROLE-04 final)
 
 ### Phase 2: Application Subsystem
 **Goal**: A prospective student can submit a complete ambassador application (identity + video or link + academic verification) through a public form, an admin can triage the queue end-to-end (list → detail → accept / decline with notes), and acceptance atomically seeds a real ambassador on the platform — Firestore role + ambassador subdoc + cohort attachment commit first, then Discord role assignment is attempted with an admin-visible retry path if Discord is unreachable.
@@ -147,11 +157,11 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| v6.0 Phase 1: Foundation — Roles Array Migration | 0/0 | Not started | — |
+| v6.0 Phase 1: Foundation — Roles Array Migration | 0/10 | Planned | — |
 | v6.0 Phase 2: Application Subsystem | 0/0 | Not started | — |
 | v6.0 Phase 3: Public Presentation | 0/0 | Not started | — |
 | v6.0 Phase 4: Activity Subsystem | 0/0 | Not started | — |
 | v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 0/0 | Not started | — |
 
 ---
-*Last updated: 2026-04-21 — v6.0 Student Ambassador Program roadmap created (5 phases, 66 requirements mapped)*
+*Last updated: 2026-04-21 — v6.0 Phase 1 planned (10 plans, 5 waves, Deploys #1-#5)*
