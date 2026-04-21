@@ -3,6 +3,20 @@
  * Import from '@/types/mentorship' instead of defining locally
  */
 
+import { z } from "zod";
+
+/**
+ * Canonical role vocabulary for v6.0+.
+ * Locked as a Zod enum + TypeScript union so typos fail at compile time
+ * and at the API boundary (per D-01 in 01-CONTEXT.md).
+ *
+ * NOTE: `admin` is deliberately NOT in this union. Admin remains a separate
+ * `isAdmin: boolean` field on MentorshipProfile + `token.admin` custom claim
+ * (per D-02 in 01-CONTEXT.md).
+ */
+export const RoleSchema = z.enum(["mentor", "mentee", "ambassador", "alumni-ambassador"]);
+export type Role = z.infer<typeof RoleSchema>;
+
 export type MentorshipRole = "mentor" | "mentee" | null;
 
 /**
@@ -12,7 +26,8 @@ export type MentorshipRole = "mentor" | "mentee" | null;
 export interface MentorshipProfile {
   uid: string;
   username?: string; // Public username for profile URLs
-  role: MentorshipRole;
+  role?: MentorshipRole; // LEGACY — removed in Deploy #5 cleanup PR (per D-06 dual-read)
+  roles: Role[]; // Post-migration invariant: always an array (possibly empty). Never undefined/null (per D-04).
   displayName: string;
   email: string;
   photoURL: string;
