@@ -35,7 +35,7 @@ Fixed-term is intentional: it provides a clean exit ramp for underperformers wit
 
 A candidate must meet **all** of the following:
 
-- Currently enrolled in a university/college (any degree level). Verification: valid `.edu` (or national equivalent, e.g., `.edu.pk`, `.ac.uk`) email address at application time.
+- Currently enrolled in a university/college (any degree level). Preferred verification: valid `.edu` (or national equivalent, e.g., `.edu.pk`, `.ac.uk`) email address at application time. **Fallback:** for universities without a standardized academic TLD, a student ID photo upload is accepted and verified by the admin reviewer. Global openness must not be gated on email-TLD alone.
 - Has been a member of the Code With Ahsan Discord for **≥ 30 days** at application time.
 - Accepts the program commitments (Section 6) in writing as part of the application.
 
@@ -64,18 +64,23 @@ Stretch activities (not required, but rewarded via recognition/benefits): full w
 
 ### 7.1 Baseline (all ambassadors)
 
-Low-cost, high-perceived-value benefits. All ambassadors receive these from day one:
+Low-cost, high-perceived-value benefits guaranteed to every accepted ambassador.
+
+**Granted on acceptance:**
 
 - Exclusive "Ambassador" role on Discord
 - Ambassador badge on their Code With Ahsan platform profile
 - Private `#ambassadors` Discord channel (cohort community + staff)
 - Monthly 1:1 or group call with Ahsan
-- LinkedIn recommendation at term end (delivered by Ahsan)
-- Certificate of completion at term end (PDF)
 - Early access to new platform features / beta program
 - First-pick on open-source project leadership roles within the community
 - Listed on the public `/ambassadors` page (photo, bio, social links)
 - Free access to all **self-hosted** Code With Ahsan premium courses during the term (Packt books and other externally-published material are **excluded** because the author would incur direct cost; up to one externally-published book may optionally be gifted to top performers at term end as a stretch perk)
+
+**Granted on term completion (subject to not being offboarded):**
+
+- LinkedIn recommendation (delivered by Ahsan)
+- Certificate of completion (PDF)
 
 ### 7.2 Selective / stretch
 
@@ -100,6 +105,8 @@ Low-cost, high-perceived-value benefits. All ambassadors receive these from day 
   - Self-reported data from the monthly report
   - (Optional future) Discord activity score pulled via bot integration
 - **Monthly self-report form:** each ambassador fills out a short form covering what they did, blockers they hit, and what they need from Ahsan. Missing a monthly report counts as one strike.
+
+**The monthly report is the primary accountability surface.** Failing to deliver on the commitments in Section 6 (events, referrals, campus touchpoint, Discord presence) does not itself generate an automatic strike — it is visible on the dashboard and is the subject of the monthly 1:1 call. This is deliberate: the strike system protects against *absenteeism*, while the 1:1 call addresses *under-delivery*. Planning should not design a stricter auto-enforcement system without an explicit policy change.
 
 ### 8.2 Offboarding policy
 
@@ -145,7 +152,7 @@ Each subsystem is testable in isolation: application subsystem can be tested wit
 - `applications/{applicationId}`: applicant info, video URL, status, reviewerNotes, cohortTarget
 - `cohorts/{cohortId}`: name, startDate, endDate, maxSize, status (`upcoming | active | closed`)
 - `users/{userId}.role`: extended to include `ambassador`
-- `users/{userId}.ambassador`: `{ cohortId, strikes, joinedAt, endedAt, active }` subdoc
+- `users/{userId}.ambassador`: `{ cohortId, strikes, joinedAt, endedAt, active }` subdoc (v1 assumes a single ambassador tenure per user; evolving to an array or subcollection is a v2 planning concern if alumni are re-invited to later cohorts)
 - `referrals/{referralId}`: `{ ambassadorId, referredUserId, convertedAt, sourceLink }`
 - `events/{eventId}`: `{ ambassadorId, date, type, attendees, link, notes }` (ambassador-hosted events only; separate from platform-wide events)
 - `monthlyReports/{reportId}`: `{ ambassadorId, month, cohortId, text, submittedAt }`
@@ -162,7 +169,7 @@ The program is considered successful at term end if:
 
 - ≥ 75% of ambassadors complete the term (i.e., not offboarded via strikes)
 - The cohort collectively hosts ≥ 60 events (avg ≥ 3 per ambassador over 6 months, above the 1/month baseline)
-- At least 150 new Discord members are attributed to ambassador referral links
+- At least 150 new **platform signups** are attributed to ambassador referral links (platform signup is the attribution surface; Discord-join attribution is materially harder to track and is out of scope for v1's referral system — see Section 9.1 Feature #5)
 - At least 3 paid workshops are brought in by ambassadors (validating revshare mechanic)
 - Post-term survey: ≥ 80% of ambassadors say they'd recommend the program to another student
 
