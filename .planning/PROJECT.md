@@ -164,13 +164,40 @@ The platform now hosts the live CWA Prompt-A-Thon 2026 event infrastructure:
 
 Also carrying forward from v4.0: admin courses page + YouTube-to-MDX pipeline.
 
-## Next Milestone Goals
+## Current Milestone: v6.0 Student Ambassador Program
 
-**v6.0 Student Ambassador Program** (designed — spec at `docs/superpowers/specs/2026-04-21-student-ambassador-program-design.md`):
-- Application pipeline (apply form + admin review + Discord role assign on acceptance)
-- Public presentation (ambassador badge + `/ambassadors` cohort page)
-- Activity tracking (referral links, event host tracker, monthly report form)
-- Dashboard + leaderboard (private, gated to ambassador role)
+**Goal:** Ship the v1 Student Ambassador Program — application pipeline, public cohort presentation, activity tracking, and private dashboard/leaderboard — to recruit and activate the first 15–25 ambassadors.
+
+**Target features:**
+- **Role system migration** — `users.role: string` → `users.roles: string[]` across profile, permissions, security rules, and all mentor/mentee/admin queries (prerequisite for ambassador role coexisting with mentor/mentee)
+- `/ambassadors/apply` form (video upload + `.edu` or student-ID verification)
+- Admin review panel (list → review → accept/reject → Discord role auto-assign)
+- Public `/ambassadors` cohort page + ambassador profile badge
+- Referral link/code system with platform-signup attribution
+- Event hosting tracker (ambassador-logged events)
+- Monthly self-report form (feeds 2-strike counter)
+- Private ambassador dashboard + cohort leaderboard (gated to `roles.includes('ambassador')`)
+
+**Design reference:** `docs/superpowers/specs/2026-04-21-student-ambassador-program-design.md`
+
+**Success criteria:** ≥75% cohort completion, ≥60 events hosted, ≥150 referral signups, ≥3 paid workshops, ≥80% post-term NPS.
+
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd:transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd:complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
 
 ## Milestones
 
@@ -183,4 +210,4 @@ Also carrying forward from v4.0: admin courses page + YouTube-to-MDX pipeline.
 | v5.0 | Complete | 2026-04-21 |
 
 ---
-*Last updated: 2026-04-21 after v5.0 milestone completion*
+*Last updated: 2026-04-21 — v6.0 Student Ambassador Program milestone started*

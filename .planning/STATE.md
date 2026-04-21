@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v5.0
-milestone_name: CWA Promptathon 2026
-status: shipped
-stopped_at: v5.0 milestone complete (2026-04-21)
-last_updated: "2026-04-21T12:39:14.611Z"
+milestone: v6.0
+milestone_name: Student Ambassador Program
+status: defining_requirements
+stopped_at: milestone started, defining requirements (2026-04-21)
+last_updated: "2026-04-21T13:00:00.000Z"
 progress:
-  total_phases: 1
-  completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -19,11 +19,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-21)
 
 **Core value:** Community members can find mentors, collaborate on real projects with structured support, and follow clear learning roadmaps—all within a mentor-led, quality-focused environment.
-**Current focus:** v5.0 milestone archived — v6.0 Student Ambassador Program spec ready at `docs/superpowers/specs/2026-04-21-student-ambassador-program-design.md`; next step is `/gsd:new-milestone` to formalize.
+**Current focus:** v6.0 Student Ambassador Program — milestone started 2026-04-21; defining requirements. Design reference: `docs/superpowers/specs/2026-04-21-student-ambassador-program-design.md`.
 
 ## Current Position
 
-v5.0 complete. No active milestone.
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-21 — Milestone v6.0 started
 
 ## Performance Metrics
 
@@ -84,8 +87,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-21
-Stopped at: v5.0 milestone complete; v6.0 Student Ambassador Program spec written
+Stopped at: v6.0 milestone started; defining requirements
 Resume file: None
 
 ---
-*Last activity: 2026-04-21 - Shipped v5.0 CWA Promptathon 2026 milestone; drafted v6.0 Student Ambassador Program design spec*
+*Last activity: 2026-04-21 - Started v6.0 Student Ambassador Program milestone; defining requirements*

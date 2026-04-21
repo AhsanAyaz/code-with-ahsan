@@ -124,10 +124,10 @@ The core loop — **apply → get accepted → track activity → see leaderboar
 |---|---------|---------|-------|
 | 1 | `/ambassadors/apply` application form page | Public form with .edu verification + video upload | Uses Firebase Storage for video; Firestore for application record |
 | 2 | Admin review panel | List, review, accept/reject applications | Reuses existing admin auth pattern |
-| 3 | Ambassador badge on user profile | Public indicator | `role=ambassador` flag on user doc; UI reads it |
+| 3 | Ambassador badge on user profile | Public indicator | `roles` array on user doc contains `"ambassador"`; UI reads it |
 | 4 | Public `/ambassadors` page | Lists current cohort (photo, bio, university, socials) | Static-ish page reading cohort collection |
 | 5 | Referral link/code system | Unique link per ambassador; tracks signups | Attribution written to Firestore on signup; aggregated in dashboard |
-| 6 | Private ambassador dashboard | Each ambassador sees their own stats + cohort leaderboard | Gated to `role=ambassador`; reads aggregated activity |
+| 6 | Private ambassador dashboard | Each ambassador sees their own stats + cohort leaderboard | Gated to `roles` array containing `"ambassador"`; reads aggregated activity |
 | 7 | Monthly self-report form | Simple form → Firestore | Drives the 2-strike counter |
 | 8 | Event hosting tracker | Ambassadors log events they ran (date, type, attendance estimate, link) | Feeds dashboard |
 | 9 | Discord role auto-assign | On application approval, assign Ambassador role in Discord | Extends existing Discord integration (README confirms this already exists) |
@@ -140,7 +140,7 @@ The core loop — **apply → get accepted → track activity → see leaderboar
 
 ### 9.3 Component boundaries
 
-- **Application subsystem:** application form page + admin review panel + acceptance workflow. Interface: writes `applications` and (on accept) `users.role` + `cohorts` docs. Consumers of its output: Discord integration, dashboard, public `/ambassadors` page.
+- **Application subsystem:** application form page + admin review panel + acceptance workflow. Interface: writes `applications` and (on accept) appends `"ambassador"` to `users.roles` + writes `users.ambassador` subdoc + `cohorts` docs. Consumers of its output: Discord integration, dashboard, public `/ambassadors` page.
 - **Activity subsystem:** referral system + event tracker + monthly report form. Interface: writes activity events keyed by `ambassadorId` + `cohortId`. Consumer: dashboard.
 - **Dashboard subsystem:** reads the above, aggregates per ambassador, renders individual view + cohort leaderboard. Pure read-side; does not own data.
 - **Public presentation:** `/ambassadors` page (read-only view of accepted cohort members) and profile badge rendering (reads `role` flag). Separate from the dashboard because it has different access requirements and change cadence.
@@ -151,7 +151,7 @@ Each subsystem is testable in isolation: application subsystem can be tested wit
 
 - `applications/{applicationId}`: applicant info, video URL, status, reviewerNotes, cohortTarget
 - `cohorts/{cohortId}`: name, startDate, endDate, maxSize, status (`upcoming | active | closed`)
-- `users/{userId}.role`: extended to include `ambassador`
+- `users/{userId}.roles`: **array of role strings** (e.g., `["mentor", "ambassador"]`). Replaces the previous single `role` field. A user can hold multiple roles simultaneously — an ambassador can also be a mentee, a mentee can also mentor others, etc. All role checks become array-membership checks (`roles.includes('ambassador')`), and Firestore queries use `array-contains`. Migration of existing `role: string` data to `roles: string[]` is a prerequisite task in the first phase.
 - `users/{userId}.ambassador`: `{ cohortId, strikes, joinedAt, endedAt, active }` subdoc (v1 assumes a single ambassador tenure per user; evolving to an array or subcollection is a v2 planning concern if alumni are re-invited to later cohorts)
 - `referrals/{referralId}`: `{ ambassadorId, referredUserId, convertedAt, sourceLink }`
 - `events/{eventId}`: `{ ambassadorId, date, type, attendees, link, notes }` (ambassador-hosted events only; separate from platform-wide events)
