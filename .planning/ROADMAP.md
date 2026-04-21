@@ -95,7 +95,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 - [x] 05-firestore-rules-dual-read-PLAN.md — `firestore.rules isAcceptedMentor()` dual-claim read (Deploy #3 / Wave 3 / ROLE-04)
 - [x] 06-role-mutation-helper-PLAN.md — `syncRoleClaim` stub + wire into profile POST + extend `verifyAuth` (Deploy #4 / Wave 3 / ROLE-05 + ROLE-07)
 - [x] 07-call-site-migration-PLAN.md — Migrate 29 files from `profile.role === "x"` to `hasRole(profile, "x")` (Deploy #4 / Wave 3 / ROLE-07)
-- [ ] 08-test-fixture-migration-PLAN.md — Migrate 95 fixtures to dual-shape + new coverage for the six helpers (Deploy #4 / Wave 4 / ROLE-06)
+- [x] 08-test-fixture-migration-PLAN.md — Migrate 95 fixtures to dual-shape + new coverage for the six helpers (Deploy #4 / Wave 4 / ROLE-06)
 - [x] 09-client-claim-refresh-PLAN.md — `useClaimRefresh` hook + `MentorshipContext` refresh on `_claimSync.refreshed` (Deploy #4 / Wave 4 / ROLE-05)
 - [ ] 10-final-cleanup-deploy5-PLAN.md — Manual gate + drop MentorshipRole + array-only rules + `drop-legacy-role-field.ts` (Deploy #5 / Wave 5 / ROLE-04 final)
 
