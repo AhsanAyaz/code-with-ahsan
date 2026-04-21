@@ -140,7 +140,7 @@ The core loop — **apply → get accepted → track activity → see leaderboar
 
 ### 9.3 Component boundaries
 
-- **Application subsystem:** application form page + admin review panel + acceptance workflow. Interface: writes `applications` and (on accept) appends `"ambassador"` to `users.roles` + writes `users.ambassador` subdoc + `cohorts` docs. Consumers of its output: Discord integration, dashboard, public `/ambassadors` page.
+- **Application subsystem:** application form page + admin review panel + acceptance workflow. Interface: writes `applications` and (on accept) appends `"ambassador"` to `mentorship_profiles.{uid}.roles` + writes `mentorship_profiles.{uid}.ambassador` subdoc + `cohorts` docs. Consumers of its output: Discord integration, dashboard, public `/ambassadors` page.
 - **Activity subsystem:** referral system + event tracker + monthly report form. Interface: writes activity events keyed by `ambassadorId` + `cohortId`. Consumer: dashboard.
 - **Dashboard subsystem:** reads the above, aggregates per ambassador, renders individual view + cohort leaderboard. Pure read-side; does not own data.
 - **Public presentation:** `/ambassadors` page (read-only view of accepted cohort members) and profile badge rendering (reads `role` flag). Separate from the dashboard because it has different access requirements and change cadence.
@@ -151,8 +151,8 @@ Each subsystem is testable in isolation: application subsystem can be tested wit
 
 - `applications/{applicationId}`: applicant info, video URL, status, reviewerNotes, cohortTarget
 - `cohorts/{cohortId}`: name, startDate, endDate, maxSize, status (`upcoming | active | closed`)
-- `users/{userId}.roles`: **array of role strings** (e.g., `["mentor", "ambassador"]`). Replaces the previous single `role` field. A user can hold multiple roles simultaneously — an ambassador can also be a mentee, a mentee can also mentor others, etc. All role checks become array-membership checks (`roles.includes('ambassador')`), and Firestore queries use `array-contains`. Migration of existing `role: string` data to `roles: string[]` is a prerequisite task in the first phase.
-- `users/{userId}.ambassador`: `{ cohortId, strikes, joinedAt, endedAt, active }` subdoc (v1 assumes a single ambassador tenure per user; evolving to an array or subcollection is a v2 planning concern if alumni are re-invited to later cohorts)
+- `mentorship_profiles/{uid}.roles`: **array of role strings** (e.g., `["mentor", "ambassador"]`). Replaces the previous single `role` field on the same document. A user can hold multiple roles simultaneously — an ambassador can also be a mentee, a mentee can also mentor others, etc. All role checks become array-membership checks (`roles.includes('ambassador')`), and Firestore queries use `array-contains`. Migration of existing `role: string` data to `roles: string[]` (on `mentorship_profiles/{uid}`, the same document) is a prerequisite task in the first phase. This migration must follow a staged 5-deploy sequence with a dual-claim window to avoid bricking live mentor/admin sessions — see research summary and PITFALLS.md for the sequence.
+- `mentorship_profiles/{uid}.ambassador`: `{ cohortId, strikes, joinedAt, endedAt, active, discordMemberId }` subdoc (v1 assumes a single ambassador tenure per user; `discordMemberId` is captured at application-time lookup so acceptance doesn't depend on the username being current. Evolving to an array or subcollection is a v2 planning concern if alumni are re-invited to later cohorts.)
 - `referrals/{referralId}`: `{ ambassadorId, referredUserId, convertedAt, sourceLink }`
 - `events/{eventId}`: `{ ambassadorId, date, type, attendees, link, notes }` (ambassador-hosted events only; separate from platform-wide events)
 - `monthlyReports/{reportId}`: `{ ambassadorId, month, cohortId, text, submittedAt }`
@@ -177,10 +177,18 @@ If these thresholds are met, v2 should explore: larger cohort, tiered structure 
 
 ## 12. Open questions (for implementation planning)
 
-- Does the existing Discord integration support programmatic role assignment for arbitrary Discord users, or only on account signup? If the latter, a webhook/bot extension is required as part of Feature #9.
-- What is the referral attribution window (e.g., click → signup within 30 days)?
-- For ambassadors who sign up through *other* ambassadors' referral links before joining the program — do we attribute their referrals to the sponsor? (Suggestion: no — ambassador activity starts from their acceptance date, cleanly.)
-- Which existing platform courses are "self-hosted" vs. published externally (Packt, Amazon)? This list needs to be enumerated before the "free course access" benefit is delivered.
-- Admin review panel: single reviewer (Ahsan) or multi-reviewer with voting? Affects UI complexity.
+**Resolved during v6.0 research (2026-04-21):**
 
-These are not design blockers — they're planning-phase decisions for when this moves into the implementation plan (GSD `v5.0 Student Ambassador Program` milestone).
+- ~~Does the existing Discord integration support programmatic role assignment for arbitrary Discord users?~~ **Answered YES.** `src/lib/discord.ts:829` `assignDiscordRole()` already works against any guild member. No webhook/bot extension required. See `.planning/research/ARCHITECTURE.md`.
+- ~~Referral attribution window?~~ **Answered: 30 days** (industry default — Google Ads, Amazon Associates). Lands in the `cwa_ref` cookie `Max-Age`.
+- ~~Ambassador-to-ambassador referrals?~~ **Answered:** allow pre-acceptance attribution; freeze once `roles.includes("ambassador")` (referred ambassadors start clean from acceptance).
+
+**Still open — surfaced to requirements phase for explicit decision:**
+
+- **Video submission mode:** upload-only vs upload OR external link (Loom / unlisted YouTube)? Research recommends accepting both to reduce mobile-upload flakiness.
+- **Leaderboard metric display:** raw per-category (referrals / events / reports) vs composite "activity score"? Research strongly recommends raw (composite scoring flagged as #1 community-decay driver in small cohorts).
+- **Leaderboard reveal:** visible from day 1 vs 4-week grace period? Research recommends grace period (small-N day-1 leaderboards create toxic early dynamics).
+- **Admin review:** single reviewer (Ahsan) or multi-reviewer with voting? Affects admin panel state machine.
+- **Self-hosted premium courses enumeration:** which existing platform courses are "self-hosted" vs. externally published (Packt, Amazon)? Needed before the "free course access" benefit is delivered.
+
+These are planning-phase decisions for the **v6.0 Student Ambassador Program** milestone (GSD milestone kicked off 2026-04-21).
