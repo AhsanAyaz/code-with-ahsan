@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
-status: defining_requirements
-stopped_at: milestone started, defining requirements (2026-04-21)
-last_updated: "2026-04-21T13:00:00.000Z"
+status: roadmap_complete
+stopped_at: roadmap complete, ready to plan Phase 1 (2026-04-21)
+last_updated: "2026-04-21T14:00:00.000Z"
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -19,14 +19,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-21)
 
 **Core value:** Community members can find mentors, collaborate on real projects with structured support, and follow clear learning roadmaps—all within a mentor-led, quality-focused environment.
-**Current focus:** v6.0 Student Ambassador Program — milestone started 2026-04-21; defining requirements. Design reference: `docs/superpowers/specs/2026-04-21-student-ambassador-program-design.md`.
+**Current focus:** v6.0 Student Ambassador Program — roadmap complete (5 phases, 66 v1 requirements mapped). Next step: plan Phase 1 (Foundation — Roles Array Migration). Design reference: `docs/superpowers/specs/2026-04-21-student-ambassador-program-design.md`.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-04-21 — Milestone v6.0 started
+Phase: Phase 1 — Foundation: Roles Array Migration (next)
+Plan: — (no plans yet; awaiting `/gsd:plan-phase 1`)
+Status: Roadmap complete — ready to plan Phase 1
+Last activity: 2026-04-21 — v6.0 roadmap created (5 phases, 66 requirements, 100% coverage)
 
 ## Performance Metrics
 
@@ -55,6 +55,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: TwistRevealSection owns its countdown internally via setInterval in useRef — parent HostPanel only flips twistPhase state
 - [Phase 01]: WinnersSection uses prevRevealedCount ref to detect 2->3 transition for confetti (prevents double-fire)
 - [Phase quick-260410]: Used text-based social proof strip and single DaisyUI collapse for a la carte markdown
+- [v6.0 roadmap]: Phase structure mirrors research consensus — Phase 1 Foundation (roles migration, 5-deploy sequence) → Phase 2 Application (seeds real ambassadors) → Phase 3 Public Presentation || Phase 4 Activity (parallel; independent subsystems) → Phase 5 Dashboard/Leaderboard/Offboarding/Alumni (aggregates over Activity outputs).
+- [v6.0 roadmap]: Offboarding (DISC-05, EMAIL-04) is landed in Phase 5 alongside the strike-triggered flow because the strike counter and admin offboarding UI both live in Phase 4's strike system but the atomic roles-array mutation + Discord removal is tightly coupled to the alumni-flag transition mechanics in ALUMNI-01..03.
+- [v6.0 roadmap]: Reconciliation cron for missing Discord roles (DISC-04) lives in Phase 4 because it's cron infrastructure paired with the strike-check cron; role assignment at acceptance (DISC-01..03) stays in Phase 2.
 
 ### Workflow Notes
 
@@ -64,14 +67,19 @@ Scheduled tasks use `.github/workflows/*.yml` running `npx tsx scripts/*.ts`. Do
 **Quick task + PR workflow:**
 For GitHub issue fixes, use `/gsd:quick` to plan and execute, then cherry-pick onto a fix branch and create PR with "Closes #NNN".
 
+**v6.0 foundation rollout — 5-deploy sequence (Phase 1):**
+Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-claim rules window must stay for ≥2 weeks. Rollback of rules must be one command away during deploy. `FEATURE_AMBASSADOR_PROGRAM` gates every `/ambassadors/*` route through Phase 1 and only flips on at the start of Phase 2.
+
 ### Roadmap Evolution
 
 - v5.0 CWA Promptathon 2026 shipped 2026-04-21 (1 phase, 3 plans)
-- v6.0 Student Ambassador Program spec drafted 2026-04-21 — awaiting `/gsd:new-milestone` to formalize
+- v6.0 Student Ambassador Program spec drafted 2026-04-21
+- v6.0 requirements defined 2026-04-21 — 63 v1 + 9 future + out-of-scope catalog
+- v6.0 roadmap created 2026-04-21 — 5 phases, 66 requirements mapped (counted actual REQ-IDs in REQUIREMENTS.md; milestone spec's "63" figure is a minor undercount — see Blockers/Concerns)
 
 ### Blockers/Concerns
 
-None.
+- **Minor requirement-count discrepancy:** Milestone planning context stated 63 v1 requirements, but `.planning/REQUIREMENTS.md` contains 66 REQ-IDs (ROLE ×8, COHORT ×4, APPLY ×8, REVIEW ×5, DISC ×5, PRESENT ×4, REF ×5, EVENT ×4, REPORT ×7, DASH ×9, ALUMNI ×3, EMAIL ×4 = 66). All 66 are mapped in the roadmap. Likely an off-by-three in the original milestone brief; REQUIREMENTS.md is treated as authoritative and the "Coverage" footer in REQUIREMENTS.md should be updated from 63 → 66 during the next requirements edit.
 
 ### Quick Tasks Completed
 
@@ -87,8 +95,8 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-21
-Stopped at: v6.0 milestone started; defining requirements
-Resume file: None
+Stopped at: v6.0 roadmap complete (5 phases, 66 requirements mapped); ready to plan Phase 1
+Resume file: None — run `/gsd:plan-phase 1` to begin Foundation planning
 
 ---
-*Last activity: 2026-04-21 - Started v6.0 Student Ambassador Program milestone; defining requirements*
+*Last activity: 2026-04-21 - v6.0 Student Ambassador Program roadmap created; 5 phases, 66 requirements, 100% coverage*

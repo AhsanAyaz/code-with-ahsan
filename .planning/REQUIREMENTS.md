@@ -175,82 +175,85 @@ Explicitly excluded from v6.0. Documented to prevent scope creep — anti-featur
 
 ## Traceability
 
-Phase-to-requirement mapping is populated during roadmap creation.
+Every v1 REQ-ID maps to exactly one phase. Populated during roadmap creation (2026-04-21).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ROLE-01 | — | Pending |
-| ROLE-02 | — | Pending |
-| ROLE-03 | — | Pending |
-| ROLE-04 | — | Pending |
-| ROLE-05 | — | Pending |
-| ROLE-06 | — | Pending |
-| ROLE-07 | — | Pending |
-| ROLE-08 | — | Pending |
-| COHORT-01 | — | Pending |
-| COHORT-02 | — | Pending |
-| COHORT-03 | — | Pending |
-| COHORT-04 | — | Pending |
-| APPLY-01 | — | Pending |
-| APPLY-02 | — | Pending |
-| APPLY-03 | — | Pending |
-| APPLY-04 | — | Pending |
-| APPLY-05 | — | Pending |
-| APPLY-06 | — | Pending |
-| APPLY-07 | — | Pending |
-| APPLY-08 | — | Pending |
-| REVIEW-01 | — | Pending |
-| REVIEW-02 | — | Pending |
-| REVIEW-03 | — | Pending |
-| REVIEW-04 | — | Pending |
-| REVIEW-05 | — | Pending |
-| DISC-01 | — | Pending |
-| DISC-02 | — | Pending |
-| DISC-03 | — | Pending |
-| DISC-04 | — | Pending |
-| DISC-05 | — | Pending |
-| PRESENT-01 | — | Pending |
-| PRESENT-02 | — | Pending |
-| PRESENT-03 | — | Pending |
-| PRESENT-04 | — | Pending |
-| REF-01 | — | Pending |
-| REF-02 | — | Pending |
-| REF-03 | — | Pending |
-| REF-04 | — | Pending |
-| REF-05 | — | Pending |
-| EVENT-01 | — | Pending |
-| EVENT-02 | — | Pending |
-| EVENT-03 | — | Pending |
-| EVENT-04 | — | Pending |
-| REPORT-01 | — | Pending |
-| REPORT-02 | — | Pending |
-| REPORT-03 | — | Pending |
-| REPORT-04 | — | Pending |
-| REPORT-05 | — | Pending |
-| REPORT-06 | — | Pending |
-| REPORT-07 | — | Pending |
-| DASH-01 | — | Pending |
-| DASH-02 | — | Pending |
-| DASH-03 | — | Pending |
-| DASH-04 | — | Pending |
-| DASH-05 | — | Pending |
-| DASH-06 | — | Pending |
-| DASH-07 | — | Pending |
-| DASH-08 | — | Pending |
-| DASH-09 | — | Pending |
-| ALUMNI-01 | — | Pending |
-| ALUMNI-02 | — | Pending |
-| ALUMNI-03 | — | Pending |
-| EMAIL-01 | — | Pending |
-| EMAIL-02 | — | Pending |
-| EMAIL-03 | — | Pending |
-| EMAIL-04 | — | Pending |
+| ROLE-01 | Phase 1 — Foundation: Roles Array Migration | Pending |
+| ROLE-02 | Phase 1 — Foundation: Roles Array Migration | Pending |
+| ROLE-03 | Phase 1 — Foundation: Roles Array Migration | Pending |
+| ROLE-04 | Phase 1 — Foundation: Roles Array Migration | Pending |
+| ROLE-05 | Phase 1 — Foundation: Roles Array Migration | Pending |
+| ROLE-06 | Phase 1 — Foundation: Roles Array Migration | Pending |
+| ROLE-07 | Phase 1 — Foundation: Roles Array Migration | Pending |
+| ROLE-08 | Phase 1 — Foundation: Roles Array Migration | Pending |
+| COHORT-01 | Phase 2 — Application Subsystem | Pending |
+| COHORT-02 | Phase 2 — Application Subsystem | Pending |
+| COHORT-03 | Phase 2 — Application Subsystem | Pending |
+| COHORT-04 | Phase 2 — Application Subsystem | Pending |
+| APPLY-01 | Phase 2 — Application Subsystem | Pending |
+| APPLY-02 | Phase 2 — Application Subsystem | Pending |
+| APPLY-03 | Phase 2 — Application Subsystem | Pending |
+| APPLY-04 | Phase 2 — Application Subsystem | Pending |
+| APPLY-05 | Phase 2 — Application Subsystem | Pending |
+| APPLY-06 | Phase 2 — Application Subsystem | Pending |
+| APPLY-07 | Phase 2 — Application Subsystem | Pending |
+| APPLY-08 | Phase 2 — Application Subsystem | Pending |
+| REVIEW-01 | Phase 2 — Application Subsystem | Pending |
+| REVIEW-02 | Phase 2 — Application Subsystem | Pending |
+| REVIEW-03 | Phase 2 — Application Subsystem | Pending |
+| REVIEW-04 | Phase 2 — Application Subsystem | Pending |
+| REVIEW-05 | Phase 2 — Application Subsystem | Pending |
+| DISC-01 | Phase 2 — Application Subsystem | Pending |
+| DISC-02 | Phase 2 — Application Subsystem | Pending |
+| DISC-03 | Phase 2 — Application Subsystem | Pending |
+| DISC-04 | Phase 4 — Activity Subsystem | Pending |
+| DISC-05 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
+| PRESENT-01 | Phase 3 — Public Presentation | Pending |
+| PRESENT-02 | Phase 3 — Public Presentation | Pending |
+| PRESENT-03 | Phase 3 — Public Presentation | Pending |
+| PRESENT-04 | Phase 3 — Public Presentation | Pending |
+| REF-01 | Phase 4 — Activity Subsystem | Pending |
+| REF-02 | Phase 4 — Activity Subsystem | Pending |
+| REF-03 | Phase 4 — Activity Subsystem | Pending |
+| REF-04 | Phase 4 — Activity Subsystem | Pending |
+| REF-05 | Phase 4 — Activity Subsystem | Pending |
+| EVENT-01 | Phase 4 — Activity Subsystem | Pending |
+| EVENT-02 | Phase 4 — Activity Subsystem | Pending |
+| EVENT-03 | Phase 4 — Activity Subsystem | Pending |
+| EVENT-04 | Phase 4 — Activity Subsystem | Pending |
+| REPORT-01 | Phase 4 — Activity Subsystem | Pending |
+| REPORT-02 | Phase 4 — Activity Subsystem | Pending |
+| REPORT-03 | Phase 4 — Activity Subsystem | Pending |
+| REPORT-04 | Phase 4 — Activity Subsystem | Pending |
+| REPORT-05 | Phase 4 — Activity Subsystem | Pending |
+| REPORT-06 | Phase 4 — Activity Subsystem | Pending |
+| REPORT-07 | Phase 4 — Activity Subsystem | Pending |
+| DASH-01 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
+| DASH-02 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
+| DASH-03 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
+| DASH-04 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
+| DASH-05 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
+| DASH-06 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
+| DASH-07 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
+| DASH-08 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
+| DASH-09 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
+| ALUMNI-01 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
+| ALUMNI-02 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
+| ALUMNI-03 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
+| EMAIL-01 | Phase 2 — Application Subsystem | Pending |
+| EMAIL-02 | Phase 2 — Application Subsystem | Pending |
+| EMAIL-03 | Phase 2 — Application Subsystem | Pending |
+| EMAIL-04 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
 
 **Coverage:**
-- v1 requirements: 63 total
-- Mapped to phases: 0 (roadmap not yet created)
-- Unmapped: 63 ⚠️ (expected — populated during roadmap step)
+- v1 requirements: 66 total (counted across ROLE ×8, COHORT ×4, APPLY ×8, REVIEW ×5, DISC ×5, PRESENT ×4, REF ×5, EVENT ×4, REPORT ×7, DASH ×9, ALUMNI ×3, EMAIL ×4)
+- Mapped to phases: 66 ✓
+- Unmapped: 0 ✓
+- Phase distribution: Phase 1 = 8 · Phase 2 = 23 · Phase 3 = 4 · Phase 4 = 17 · Phase 5 = 14
+
+*Note on "63" figure:* Earlier milestone context referenced 63 v1 requirements. Actual REQ-ID count in this file is 66; the roadmap maps all 66. Discrepancy is a minor off-by-three in the original brief, surfaced here for transparency — no requirements were added or dropped during roadmapping.
 
 ---
 *Requirements defined: 2026-04-21*
-*Last updated: 2026-04-21 after initial definition*
+*Last updated: 2026-04-21 — traceability populated during roadmap creation (5 phases, 100% coverage)*
