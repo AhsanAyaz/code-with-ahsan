@@ -123,21 +123,34 @@ Write-side rubric (for forms / API writes that previously set single role):
   <action>
     Produce a write-once inventory of every file that references `.role` in `src/` so Task 2 can migrate mechanically. The output goes into `.planning/phases/01-foundation-roles-array-migration/01-07-CALL-SITES.md` and becomes the driving checklist.
 
+    **BROAD PRIMARY GREP — DO NOT ENUMERATE VARIABLE PREFIXES.** The previous iteration of this plan restricted matches to an enumerated prefix list `(profile|user|u|token|decoded|member|m|owner|creator)` which would have missed call sites with variables named outside that set (e.g., `mentorUser.role`, `currentUser.role`, `targetMentor.role`, `activeProfile.role`). The inventory MUST capture every `.role` access on any identifier; false positives (e.g., `someObject.roleName`, `rolePermissions`, `RoleSchema`) are filtered via explicit exclude greps.
+
     Run these exact grep commands and capture their outputs in the inventory doc:
 
     ```bash
-    # 1. Every file with .role on a profile/user/token object (exclude node_modules, .next, tests)
-    grep -rn --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" -E "\b(profile|user|u|token|decoded|member|m|owner|creator)\??\.role\b" src/ | grep -v "\.roles" | grep -v "roleName" | grep -v "RoleSchema" | grep -v "rolePermissions" > /tmp/role-sites.txt
+    # 1. Every .role access on ANY object in src/, excluding false-positive neighbors and the two intentional-exception files.
+    grep -rEn --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" "\??\.role\b" src/ \
+      | grep -v "\.roles" \
+      | grep -v "\.roleName" \
+      | grep -v "\.rolePermissions" \
+      | grep -v "RoleSchema" \
+      | grep -v "MentorshipRole" \
+      | grep -v "src/lib/permissions.ts" \
+      | grep -v "src/types/mentorship.ts" \
+      | grep -v "node_modules" \
+      > /tmp/role-sites.txt
 
     # 2. Every write-side occurrence (forms, API bodies, Firestore sets/updates)
-    grep -rn --include="*.ts" --include="*.tsx" -E "role:\s*\"(mentor|mentee|ambassador|alumni-ambassador)\"" src/ > /tmp/role-writes.txt
+    grep -rEn --include="*.ts" --include="*.tsx" "role:\s*\"(mentor|mentee|ambassador|alumni-ambassador)\"" src/ > /tmp/role-writes.txt
 
     # 3. Every switch/case on role
-    grep -rn --include="*.ts" --include="*.tsx" -B1 -A5 "switch.*\.role" src/ > /tmp/role-switches.txt
+    grep -rEn --include="*.ts" --include="*.tsx" -B1 -A5 "switch.*\.role" src/ > /tmp/role-switches.txt
 
     # 4. Every MentorshipRole union import (need updating to also import Role)
-    grep -rn --include="*.ts" --include="*.tsx" "MentorshipRole" src/ > /tmp/role-imports.txt
+    grep -rEn --include="*.ts" --include="*.tsx" "MentorshipRole" src/ > /tmp/role-imports.txt
     ```
+
+    The broader pattern `\??\.role\b` will inevitably surface false positives (e.g., a variable named `role` being read as `x.role` where x is not a profile/user/token/etc.). Manually review `/tmp/role-sites.txt` when building the inventory and mark each row as either "MIGRATE" (legit role comparison) or "SKIP" (false positive — e.g., a `role` field on a UI event object or a typed form field that isn't the mentorship role). Every SKIP must have a one-line reason recorded in the inventory.
 
     Write `01-07-CALL-SITES.md` in this structure:
 
@@ -149,10 +162,11 @@ Write-side rubric (for forms / API writes that previously set single role):
 
     ## Read-side call sites (N total across M files)
 
-    | File | Line | Code | Replacement |
-    |---|---|---|---|
-    | src/app/admin/page.tsx | 42 | `profile.role === "mentor"` | `hasRole(profile, "mentor")` |
-    | ... | ... | ... | ... |
+    | File | Line | Code | Status | Replacement / Reason |
+    |---|---|---|---|---|
+    | src/app/admin/page.tsx | 42 | `profile.role === "mentor"` | MIGRATE | `hasRole(profile, "mentor")` |
+    | src/components/forms/Field.tsx | 12 | `field.role === "input"` | SKIP | false positive — `role` here is an ARIA role attribute, not the mentorship role |
+    | ... | ... | ... | ... | ... |
 
     ## Write-side call sites
 
@@ -178,20 +192,21 @@ Write-side rubric (for forms / API writes that previously set single role):
     - src/__tests__/permissions.test.ts — fixtures migrate in Plan 08 (separate concern; keeping them separate keeps this PR reviewable)
     ```
 
-    After writing the file, commit it separately so Task 2 has a fixed target — every row must be ticked.
+    After writing the file, commit it separately so Task 2 has a fixed target — every MIGRATE row must be ticked.
   </action>
   <verify>
     <automated>ls .planning/phases/01-foundation-roles-array-migration/01-07-CALL-SITES.md &amp;&amp; wc -l .planning/phases/01-foundation-roles-array-migration/01-07-CALL-SITES.md</automated>
   </verify>
   <acceptance_criteria>
     - `ls .planning/phases/01-foundation-roles-array-migration/01-07-CALL-SITES.md` returns the path
-    - The file has at least one row in the "Read-side call sites" table (the scout found 75 occurrences — expect 50+ rows minimum across the Read + Write tables combined)
+    - The file has at least one row in the "Read-side call sites" table (the scout found 75 occurrences — expect 50+ rows minimum across the Read + Write tables combined; broader grep may surface more)
     - The file explicitly lists `src/lib/permissions.ts`, `src/types/mentorship.ts`, and `src/__tests__/permissions.test.ts` under "Files INTENTIONALLY left untouched"
-    - Each row in the "Read-side" table has a concrete replacement (no "TBD" entries)
+    - Each row in the "Read-side" table has a Status (MIGRATE or SKIP) and a concrete replacement or skip-reason (no "TBD" entries)
     - `grep -c "hasRole" .planning/phases/01-foundation-roles-array-migration/01-07-CALL-SITES.md` returns at least `10`
+    - The inventory used the BROADER primary grep pattern `\??\.role\b` (not the enumerated prefix list). Confirm by grepping the inventory file's "Source:" footer or methodology note for the exact command used.
   </acceptance_criteria>
   <done>
-    01-07-CALL-SITES.md exists, lists every legacy role comparison with its mechanical replacement, and enumerates the three intentional exceptions. Task 2's migration has a ticked-checklist target.
+    01-07-CALL-SITES.md exists, lists every legacy role comparison with its mechanical replacement (or explicit skip-reason for false positives), and enumerates the three intentional exceptions. Task 2's migration has a ticked-checklist target.
   </done>
 </task>
 
@@ -205,7 +220,7 @@ Write-side rubric (for forms / API writes that previously set single role):
     - .planning/phases/01-foundation-roles-array-migration/01-CONTEXT.md §decisions D-05 (three-verb helpers), D-06 (dual-read fallback is in the helper, not in call-sites)
   </read_first>
   <action>
-    Work through the inventory file top-to-bottom. For EACH row:
+    Work through the inventory file top-to-bottom. For EACH row marked MIGRATE:
 
     **Read-side edits** (mechanical):
     1. Ensure `import { hasRole, hasAnyRole, hasAllRoles } from "@/lib/permissions";` is present in the file (add if missing; merge with existing permissions import if already there).
@@ -252,19 +267,23 @@ Write-side rubric (for forms / API writes that previously set single role):
     Commit in small logical groups (by directory: api/, components/, hooks/, etc.) — makes review + potential revert easier.
   </action>
   <verify>
-    <automated>npx tsc --noEmit 2>&amp;1 | tee /tmp/tsc-after-plan-07.log | wc -l ; grep -rEn --include="*.ts" --include="*.tsx" "(profile|user|token|decoded)\??\.role\s*===" src/ | grep -v "src/lib/permissions.ts" | grep -v "src/types/mentorship.ts" | wc -l</automated>
+    <automated>npx tsc --noEmit 2>&amp;1 | tee /tmp/tsc-after-plan-07.log | wc -l ; grep -rEn --include="*.ts" --include="*.tsx" "\??\.role\s*===" src/ | grep -v "\.roles" | grep -v "src/lib/permissions.ts" | grep -v "src/types/mentorship.ts" | grep -v "src/__tests__/" | wc -l</automated>
+    <manual>Smoke check: run `npm run dev`, open the mentor directory (e.g., http://localhost:3000/mentorship) and a single mentor profile page (e.g., http://localhost:3000/mentorship/[username]), confirm both render without console errors or hydration warnings. 25-file blast radius warrants a quick dev-server sanity check before handing off.</manual>
   </verify>
   <acceptance_criteria>
     - `npx tsc --noEmit 2>&1` exits 0 (ZERO TypeScript errors across the whole repo — the end-state invariant for Plan 07)
-    - `grep -rEn --include="*.ts" --include="*.tsx" "(profile|user|token|decoded)\??\.role\s*===" src/ | grep -v "src/lib/permissions.ts" | grep -v "src/types/mentorship.ts" | wc -l` returns `0` — NO remaining direct role-string comparisons outside the exception files
+    - **Post-migration coverage sweep uses the SAME broadened pattern as Task 1's inventory**, asserting result count is `0`:
+      `grep -rEn --include="*.ts" --include="*.tsx" "\??\.role\s*===" src/ | grep -v "\.roles" | grep -v "src/lib/permissions.ts" | grep -v "src/types/mentorship.ts" | grep -v "src/__tests__/" | wc -l` returns `0` — NO remaining direct role-string comparisons outside the three exception files, regardless of the variable name preceding `.role`.
+    - Equivalent inequality sweep: `grep -rEn --include="*.ts" --include="*.tsx" "\??\.role\s*!==" src/ | grep -v "\.roles" | grep -v "src/lib/permissions.ts" | grep -v "src/types/mentorship.ts" | grep -v "src/__tests__/" | wc -l` returns `0`.
     - `grep -rcE "hasRole\(" src/ | grep -v ":0$" | wc -l` returns at least `15` (hasRole is used in at least 15 files)
-    - Every row in 01-07-CALL-SITES.md is marked with a "migrated" tick (update the inventory file as you go — this is the checklist)
+    - Every MIGRATE row in 01-07-CALL-SITES.md is marked with a "migrated" tick (update the inventory file as you go — this is the checklist)
     - `git diff --stat src/` shows modifications in at least 20 files
     - `npm test` (if the project has a test command) — run this AFTER Plan 08 migrates fixtures. If Plan 08 hasn't run yet, tests will fail with type errors from fixtures; that's expected and handled by Plan 08.
     - No new `any` casts introduced: `git diff src/ | grep -E "^\+.*as any" | wc -l` returns `0`
+    - Manual smoke check (see `<verify>` `<manual>`): dev server renders mentor directory + profile page without console errors.
   </acceptance_criteria>
   <done>
-    Every call site in src/ outside the three exception files uses hasRole/hasAnyRole/hasAllRoles (or their claim-side mirrors). TypeScript strict mode compiles with zero errors. Write-side paths dual-write both `role` and `roles` during the migration window.
+    Every call site in src/ outside the three exception files uses hasRole/hasAnyRole/hasAllRoles (or their claim-side mirrors). TypeScript strict mode compiles with zero errors. The broadened `\??\.role\s*===` sweep returns zero matches. Write-side paths dual-write both `role` and `roles` during the migration window. Dev-server smoke check passes.
   </done>
 </task>
 
@@ -272,17 +291,18 @@ Write-side rubric (for forms / API writes that previously set single role):
 
 <verification>
 - `npx tsc --noEmit` returns zero errors — the primary coverage signal.
-- `grep -rEn --include="*.ts" --include="*.tsx" "\.role\s*===" src/ | grep -v permissions.ts | grep -v types/mentorship.ts | wc -l` returns `0`.
+- Broadened pattern sweep: `grep -rEn --include="*.ts" --include="*.tsx" "\??\.role\s*===" src/ | grep -v "\.roles" | grep -v permissions.ts | grep -v types/mentorship.ts | grep -v __tests__ | wc -l` returns `0`.
 - `git grep "hasRole" src/ | wc -l` returns at least 30 (coverage is broad, not just one file).
 - Manual smoke test via `npm run dev`: load the existing mentor directory page, verify mentor-tagged cards still render correctly (no regressions from the migration).
 </verification>
 
 <success_criteria>
-- [x] Call-site inventory written to 01-07-CALL-SITES.md
-- [x] Every legacy `profile.role === "x"` migrated to `hasRole(profile, "x")` outside the three exception files
+- [x] Call-site inventory written to 01-07-CALL-SITES.md using the broadened `\??\.role\b` grep pattern
+- [x] Every legacy `profile.role === "x"` (any variable prefix) migrated to `hasRole(profile, "x")` outside the three exception files
 - [x] Every write-side path dual-writes `role` + `roles` during the migration window
 - [x] Zod schemas accept `roles: z.array(RoleSchema).default([])` alongside optional legacy `role`
 - [x] TypeScript strict compile passes with zero errors across the full repo
+- [x] Dev-server smoke check (mentor directory + profile) passes
 </success_criteria>
 
 <output>
@@ -290,6 +310,7 @@ After completion, create `.planning/phases/01-foundation-roles-array-migration/0
 - Final count of files modified (from `git diff --stat src/ | tail -1`)
 - Final count of hasRole occurrences introduced (`grep -rc "hasRole" src/ | awk -F: '{s+=$2} END{print s}'`)
 - The three files intentionally left untouched (permissions.ts, types/mentorship.ts, __tests__/permissions.test.ts)
-- Confirmation that `npx tsc --noEmit` exits 0
+- Confirmation that `npx tsc --noEmit` exits 0 AND the broadened `\??\.role\s*===` sweep returns 0
 - Any unexpected call-sites found during migration that weren't in the Plan 01 scout (surface for future refactor consideration)
+- Smoke check result: dev server rendered /mentorship and /mentorship/[username] without console errors
 </output>

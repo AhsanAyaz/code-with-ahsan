@@ -21,7 +21,7 @@ requirements:
 deploy: "#5 (manual close of dual-claim window — per D-16, held until prod verification gates pass)"
 must_haves:
   truths:
-    - "All four human gates are satisfied before this plan's tasks run: (a) zero permission-denied errors in Vercel logs over ≥2 weeks of dual-claim window, (b) 100% of mentorship_profiles docs have roles field populated, (c) 100% of active Firebase Auth users have roles custom claim, (d) no call sites outside src/lib/permissions.ts and src/types/mentorship.ts still read the legacy role field"
+    - "All five human gates are satisfied before this plan's tasks run: (a) ≥2 weeks have elapsed since the rules dual-read deploy, (b) zero permission-denied errors in Vercel logs over ≥2 weeks of dual-claim window, (c) 100% of mentorship_profiles docs have roles field populated, (d) 100% of active Firebase Auth users have roles custom claim, (e) no call sites outside src/lib/permissions.ts and src/types/mentorship.ts still read the legacy role field"
     - "`MentorshipRole` type export is deleted from src/types/mentorship.ts"
     - "`role` field on MentorshipProfile is deleted (both the optional field and every write path)"
     - "`role?: MentorshipRole` is deleted from PermissionUser in src/lib/permissions.ts"
@@ -50,7 +50,7 @@ must_haves:
 <objective>
 Close the dual-claim migration window by removing every legacy-compatibility bridge that was intentionally left during Plans 01-09: the `MentorshipRole` type, the optional `role` field on `MentorshipProfile` and `PermissionUser`, the dual-read fallback in helpers, the dual-claim arm in firestore.rules, the legacy-role custom claim writes, the legacy-role column in Firestore docs (removed by a cleanup script), and the legacy fixture shape in tests. After this plan, the roles-array is the sole source of truth everywhere.
 
-Purpose: Implements the final arm of ROLE-04 (rules become array-only) and completes the migration's endgame per D-16 (manual close of dual-claim window after explicit "all clear" verification).
+Purpose: Implements the final arm of ROLE-04 (rules become array-only) and completes the migration's endgame per D-16 (manual close of dual-claim window after explicit "all clear" verification across five gates).
 Output: ~8 touched files + a one-shot cleanup script + a checkpoint task that gates on the human verification.
 Deploy: Deploy #5. `autonomous: false` because the first task is a mandatory human-verify checkpoint per D-16.
 </objective>
@@ -99,10 +99,10 @@ Target end state:
 <tasks>
 
 <task type="checkpoint:human-verify" gate="blocking">
-  <name>Task 0 (CHECKPOINT): Verify all four dual-claim close gates have been met</name>
+  <name>Task 0 (CHECKPOINT): Verify all five dual-claim close gates have been met</name>
   <files>.planning/phases/01-foundation-roles-array-migration/01-10-SUMMARY.md</files>
   <what-built>
-    Deploys #1 through #4 have shipped. The migration is now in the dual-claim window. Per D-16 in 01-CONTEXT.md, Plan 10 MUST NOT proceed until four verification gates pass. This checkpoint halts execution until the user confirms all four — or reports findings that require a return to Plan 04 (claims sync) or Plan 07 (call-site) fixes.
+    Deploys #1 through #4 have shipped. The migration is now in the dual-claim window. Per D-16 in 01-CONTEXT.md, Plan 10 MUST NOT proceed until five verification gates pass. This checkpoint halts execution until the user confirms all five — or reports findings that require a return to Plan 04 (claims sync) or Plan 07 (call-site) fixes.
   </what-built>
   <action>
     This is a human-verification checkpoint — NO automated changes. Pause execution and present the five gates below to the user. Wait for an explicit "all five gates pass" resume signal before moving to Task 1. If ANY gate fails, return a CHECKPOINT INCONCLUSIVE status to the orchestrator with the failing gate details, and do not proceed. See <how-to-verify> for the verification steps.
@@ -142,7 +142,8 @@ Target end state:
     **Gate 5 — Zero direct legacy-role reads outside exception files:**
     Confirm the codebase does not read `.role === "..."` anywhere except the intentional two files:
     ```bash
-    grep -rEn --include="*.ts" --include="*.tsx" "(profile|user|token|decoded)\??\.role\s*===" src/ \
+    grep -rEn --include="*.ts" --include="*.tsx" "\??\.role\s*===" src/ \
+      | grep -v "\.roles" \
       | grep -v "src/lib/permissions.ts" \
       | grep -v "src/types/mentorship.ts"
     ```
@@ -173,7 +174,7 @@ Target end state:
     - src/types/mentorship.ts (Plan 01 output + whatever accreted since)
     - src/lib/permissions.ts (Plan 03 output — the six helpers with dual-read)
     - src/__tests__/permissions.test.ts (Plan 08 output — dual-shape fixtures)
-    - .planning/phases/01-foundation-roles-array-migration/01-CONTEXT.md §decisions D-06 (dual-read removal trigger), D-16 (manual close gate)
+    - .planning/phases/01-foundation-roles-array-migration/01-CONTEXT.md §decisions D-06 (dual-read removal trigger), D-16 (manual close gate — all FIVE gates)
   </read_first>
   <action>
     Execute in this exact order to keep TypeScript happy at every intermediate step:
@@ -330,37 +331,19 @@ Target end state:
 
     **Step 2 — scripts/sync-custom-claims.ts:**
 
-    Remove the legacy `role` claim from the merge:
-    ```typescript
-    // BEFORE:
-    const merged: Record<string, unknown> = {
-      ...(userRecord.customClaims ?? {}),
-      roles,
-      role: roles[0] ?? null, // legacy claim — removed in Deploy #5
-      admin: isAdminFlag,
-    };
-
-    // AFTER:
-    const merged: Record<string, unknown> = {
-      ...(userRecord.customClaims ?? {}),
-      roles,
-      role: admin.firestore.FieldValue.delete(), // explicit delete (custom claims use undefined to remove)
-      admin: isAdminFlag,
-    };
-    ```
-
-    Actually, custom claims don't support FieldValue.delete — you remove a key by setting it to `undefined` in the merged object, which Firebase ignores, OR by omitting it entirely. Since we want to ACTIVELY strip the stale `role` claim from existing users, use this pattern instead:
+    Actively strip the legacy `role` claim from every user's existing customClaims. Use destructure-and-drop:
 
     ```typescript
     // AFTER:
     const priorClaims = userRecord.customClaims ?? {};
-    // Actively strip the legacy `role` claim — it was populated during the dual-claim window.
+    // Firebase custom claims API does not accept FieldValue sentinels — destructure to drop the field.
     const { role: _legacyRole, ...preserved } = priorClaims;
     const merged: Record<string, unknown> = {
       ...preserved,
       roles,
       admin: isAdminFlag,
     };
+    await auth.setCustomUserClaims(uid, merged);
     ```
 
     Also update `claimsMatchTarget` to no longer require the legacy `role` claim to match — it's actively dropped now:
@@ -376,6 +359,7 @@ Target end state:
     ```typescript
     // Inside syncRoleClaim:
     const existing = userRecord.customClaims ?? {};
+    // Firebase custom claims API does not accept FieldValue sentinels — destructure to drop the field.
     const { role: _legacyRole, ...preserved } = existing;
     const merged: Record<string, unknown> = {
       ...preserved,
@@ -410,11 +394,13 @@ Target end state:
     - `grep -c "role: input.roles\[0\]" src/lib/ambassador/roleMutation.ts` returns `0` (legacy claim write removed)
     - `grep -c "role: _legacyRole, ...preserved" scripts/sync-custom-claims.ts` returns `1` (active strip pattern present)
     - `grep -c "role: _legacyRole, ...preserved" src/lib/ambassador/roleMutation.ts` returns `1` (same pattern in the runtime helper)
+    - `grep -c "FieldValue.delete" scripts/sync-custom-claims.ts` returns `0` (confusion-avoidance check — FieldValue.delete() is NOT valid for custom claims)
+    - `grep -c "FieldValue.delete" src/lib/ambassador/roleMutation.ts` returns `0` (same)
     - `firebase deploy --only firestore:rules --dry-run` exits 0
     - `npx tsc --noEmit` exits 0
   </acceptance_criteria>
   <done>
-    firestore.rules array-only. sync-custom-claims.ts and roleMutation.ts both actively strip the legacy `role` claim from existing customClaims. Deploy ordering documented for #5.
+    firestore.rules array-only. sync-custom-claims.ts and roleMutation.ts both actively strip the legacy `role` claim from existing customClaims using the destructure-and-drop pattern (NOT FieldValue.delete() — that sentinel is not supported by the custom-claims API). Deploy ordering documented for #5.
   </done>
 </task>
 
@@ -522,6 +508,7 @@ Target end state:
           const hasLegacyRoleField = Object.prototype.hasOwnProperty.call(data, "role");
 
           // 1. Firestore doc cleanup — remove the legacy `role` field if present.
+          // FieldValue.delete() IS valid here — Firestore documents (unlike custom claims) support it.
           if (hasLegacyRoleField) {
             if (dryRun) {
               console.log(`[DRY-RUN] doc ${doc.id}: would delete legacy role field (current value: ${JSON.stringify(data.role)})`);
@@ -537,6 +524,7 @@ Target end state:
           }
 
           // 2. Auth claims cleanup — strip legacy `role` claim if present.
+          // Firebase custom claims API does NOT support FieldValue.delete() — destructure to drop.
           try {
             const userRecord = await auth.getUser(doc.id);
             const current = userRecord.customClaims ?? {};
@@ -608,8 +596,8 @@ Target end state:
   </verify>
   <acceptance_criteria>
     - `ls scripts/drop-legacy-role-field.ts` returns the path
-    - `grep -c "FieldValue.delete()" scripts/drop-legacy-role-field.ts` returns `1` (Firestore field deletion)
-    - `grep -c "const { role: _legacyRole, ...preserved }" scripts/drop-legacy-role-field.ts` returns `1` (destructure-and-drop for claims)
+    - `grep -c "FieldValue.delete()" scripts/drop-legacy-role-field.ts` returns `1` (Firestore field deletion — valid for docs, NOT claims)
+    - `grep -c "const { role: _legacyRole, ...preserved }" scripts/drop-legacy-role-field.ts` returns `1` (destructure-and-drop for claims — the ONLY valid pattern for custom-claims key removal)
     - `grep -c "hasOwnProperty.call(data, \"role\")" scripts/drop-legacy-role-field.ts` returns `1` (existence check — distinguishes "field absent" from "field present with null value")
     - `grep -c '"drop-legacy-role:dry-run"' package.json` returns `1`
     - `grep -c '"drop-legacy-role"' package.json` returns at least `1`
@@ -617,7 +605,7 @@ Target end state:
     - `npm run drop-legacy-role:dry-run` (against staging or dev Firestore) completes without unhandled errors and prints a report footer
   </acceptance_criteria>
   <done>
-    scripts/drop-legacy-role-field.ts exists, idempotently strips legacy role field from Firestore docs AND legacy role claim from Auth users, supports --dry-run + --limit. package.json has three npm script invocations. Deploy ordering is documented.
+    scripts/drop-legacy-role-field.ts exists, idempotently strips legacy role field from Firestore docs (via FieldValue.delete() — valid for docs) AND legacy role claim from Auth users (via destructure-and-drop — the ONLY valid pattern for custom claims). Supports --dry-run + --limit. package.json has three npm script invocations. Deploy ordering is documented.
   </done>
 </task>
 
@@ -636,7 +624,7 @@ Target end state:
 - [x] MentorshipRole type + MentorshipProfile.role + PermissionUser.role all deleted
 - [x] Dual-read / dual-claim fallback removed from all six helpers
 - [x] firestore.rules flipped to array-only (with existence guard preserved)
-- [x] sync-custom-claims.ts + roleMutation.ts actively strip legacy claim from existing customClaims
+- [x] sync-custom-claims.ts + roleMutation.ts actively strip legacy claim from existing customClaims (destructure-and-drop — NOT FieldValue.delete, which is not valid for custom claims)
 - [x] scripts/drop-legacy-role-field.ts exists and has been run in prod (reported in SUMMARY)
 - [x] Test fixtures migrated to roles-only shape
 - [x] TypeScript strict compile passes with zero errors

@@ -4,10 +4,12 @@ plan: 06
 title: roleMutation helper stub + wire into profile write path
 type: execute
 wave: 3
-depends_on: [03]
+depends_on: [03, 04]
 files_modified:
   - src/lib/ambassador/roleMutation.ts
   - src/app/api/mentorship/profile/route.ts
+  - src/app/api/mentorship/[uid]/route.ts
+  - src/app/api/mentorship/admin/profiles/route.ts
   - src/lib/auth.ts
 autonomous: true
 requirements:
@@ -18,9 +20,10 @@ must_haves:
   truths:
     - "src/lib/ambassador/roleMutation.ts exports a syncRoleClaim(uid, {roles, admin}) helper that merges with existing custom claims and calls admin.auth().setCustomUserClaims"
     - "The primary profile-write path in src/app/api/mentorship/profile/route.ts calls syncRoleClaim after the Firestore write"
+    - "EVERY admin-side write path that mutates mentorship_profiles.roles or isAdmin also calls syncRoleClaim — specifically src/app/api/mentorship/[uid]/route.ts (if it exists post-Plan 07) and src/app/api/mentorship/admin/profiles/route.ts"
     - "Claim-sync failures do NOT block the Firestore write — they are logged and surfaced in the response body as a non-fatal warning"
     - "src/lib/auth.ts verifyAuth() extends its return type to expose roles?: string[], admin?: boolean, role?: string from the decoded token"
-    - "All three surfaces compile under TypeScript strict mode"
+    - "All surfaces compile under TypeScript strict mode"
   artifacts:
     - path: src/lib/ambassador/roleMutation.ts
       provides: "syncRoleClaim helper — merged custom-claims write"
@@ -29,11 +32,20 @@ must_haves:
     - path: src/app/api/mentorship/profile/route.ts
       provides: "Profile POST handler now syncs claims after write"
       contains: "syncRoleClaim"
+    - path: src/app/api/mentorship/[uid]/route.ts
+      provides: "Admin-side profile write path now syncs claims after any roles/isAdmin mutation (covered IF this file exists post-Plan 07; otherwise skip with a note in SUMMARY)"
+      contains: "syncRoleClaim"
+    - path: src/app/api/mentorship/admin/profiles/route.ts
+      provides: "Existing admin status/flag write path — audited; if it mutates roles or isAdmin anywhere, syncRoleClaim is wired in after the write"
     - path: src/lib/auth.ts
       provides: "verifyAuth returns extended token shape with roles + admin claims"
       contains: "roles"
   key_links:
     - from: src/app/api/mentorship/profile/route.ts
+      to: src/lib/ambassador/roleMutation.ts
+      via: 'import { syncRoleClaim } from "@/lib/ambassador/roleMutation"'
+      pattern: "syncRoleClaim\\("
+    - from: src/app/api/mentorship/[uid]/route.ts
       to: src/lib/ambassador/roleMutation.ts
       via: 'import { syncRoleClaim } from "@/lib/ambassador/roleMutation"'
       pattern: "syncRoleClaim\\("
@@ -46,8 +58,8 @@ must_haves:
 <objective>
 Create the runtime half of the claims-sync strategy: a shared `syncRoleClaim` helper in `src/lib/ambassador/roleMutation.ts` that every profile write path calls after a successful Firestore mutation. This closes the drift window — without it, a user who changes roles would wait up to 1 hour for the next token refresh before their claims catch up (and `scripts/sync-custom-claims.ts` only runs on demand). Additionally, extend `src/lib/auth.ts`'s `verifyAuth()` to expose `roles` and `admin` from the decoded token so API routes can authorize without a Firestore round-trip.
 
-Purpose: Implements ROLE-05 server side (synchronous claim refresh on every mutation) and ROLE-07 for the primary write path. Honors D-13 (active claim sync), D-14 (no >1-hour stale-claim window).
-Output: One new helper file, one modified API route, one extended auth helper.
+Purpose: Implements ROLE-05 server side (synchronous claim refresh on every mutation) and ROLE-07 for the primary write path. Honors D-13 (active claim sync), D-14 (no >1-hour stale-claim window for ANY role mutation — including admin-initiated ones). Depends on Plan 04 because D-15 requires the data backfill (migrate-roles-to-array.ts + sync-custom-claims.ts) to have run BEFORE the runtime claim-sync helper goes live; otherwise syncRoleClaim would be operating on partial data.
+Output: One new helper file, multiple modified API routes (user-initiated + admin-initiated write paths), one extended auth helper.
 Deploy: Part of Deploy #4 (app code closes the drift window).
 </objective>
 
@@ -344,17 +356,130 @@ return NextResponse.json({
   </done>
 </task>
 
+<task type="auto" tdd="false">
+  <name>Task 4: Wire syncRoleClaim into EVERY admin-side write path that mutates roles or isAdmin</name>
+  <files>src/app/api/mentorship/[uid]/route.ts, src/app/api/mentorship/admin/profiles/route.ts</files>
+  <read_first>
+    - src/app/api/mentorship/[uid]/route.ts (FULL file — IF IT EXISTS. This path is listed in Plan 07's files_modified as a scout-inferred admin write surface. If Plan 07 does not create it, this file may be absent at execute time. Report that finding in the SUMMARY and move on to the next file. If it IS created by Plan 07 (which runs in Wave 3 alongside this plan — dependency graph means Plan 07 tasks may land before or after this one in wall-clock time; the file-ownership frontmatter adds src/app/api/mentorship/[uid]/route.ts to BOTH plans so the orchestrator serializes them), wait for Plan 07 to create it before patching.)
+    - src/app/api/mentorship/admin/profiles/route.ts (FULL file — this is an EXISTING admin route that currently updates status / discordUsername / adminNotes / feedback / acceptedAt on `mentorship_profiles`. Confirm by reading: does this file's PATCH/PUT/DELETE handler directly set `roles`, `role`, or `isAdmin`? If yes, wire syncRoleClaim. If no, add a comment marking the handler as "roles/isAdmin not mutated here — no claim sync needed" and report in SUMMARY so future refactors know the invariant.)
+    - src/lib/ambassador/roleMutation.ts (your Task 1 output)
+    - .planning/phases/01-foundation-roles-array-migration/01-CONTEXT.md §decisions D-14 (no >1hr stale-claim window applies to ADMIN-initiated role mutations too — this task is the admin-side arm of that invariant)
+    - .planning/phases/01-foundation-roles-array-migration/01-CONTEXT.md §decisions D-15 (backfill before runtime sync — satisfied by this plan's depends_on: [04])
+  </read_first>
+  <action>
+    D-14 requires that ALL role mutations — user-initiated (Task 2) AND admin-initiated (this task) — sync custom claims synchronously. This task audits every admin-side write path that can mutate `mentorship_profiles.roles` or `isAdmin` and wires `syncRoleClaim` into each.
+
+    **Step A — Handle src/app/api/mentorship/[uid]/route.ts:**
+
+    1. Check file existence: `ls src/app/api/mentorship/[uid]/route.ts`.
+       - If it does NOT exist at execute time (Plan 07 has not created it yet, or it was dropped from Plan 07's scope): record in SUMMARY that "admin-by-uid route not present at Plan 06 execute time — Plan 07 should cover claim sync when it lands, OR the route is covered elsewhere (see src/app/api/mentorship/admin/profiles/route.ts)". Skip to Step B.
+       - If it exists: read the full file.
+
+    2. For EVERY handler (GET / POST / PUT / PATCH / DELETE) that calls `db.collection("mentorship_profiles").doc(uid).set(...)` or `.update(...)` with a body containing `roles`, `role`, or `isAdmin` (inspect each `.set(...)` / `.update(...)` call's object literal or the variable passed in):
+
+       Add the claim-sync call immediately after the Firestore write succeeds, before the 200 response is sent:
+
+       ```typescript
+       await profileRef.update(updateData);
+       // Admin-initiated role/isAdmin mutation — sync claims so the target user's
+       // next ID token carries the new roles without waiting >1hr (per D-14).
+       // Non-fatal: a claim-sync failure is logged but does not reject the admin's request.
+       const claimSync = await syncRoleClaim(uid, {
+         roles: Array.isArray(updateData.roles)
+           ? (updateData.roles as string[])
+           : (profileDoc.data()?.roles ?? []),
+         admin: typeof updateData.isAdmin === "boolean"
+           ? updateData.isAdmin
+           : (profileDoc.data()?.isAdmin === true),
+       });
+       if (!claimSync.ok) {
+         console.warn(`[admin.profile[uid]] claim sync failed for ${uid}:`, claimSync.error);
+       }
+       ```
+
+       The source of truth is the POST-write state: if the update body contains `roles`, use that; otherwise fall back to whatever was already in the Firestore doc (since only some admin fields may be changing). Same for `isAdmin`.
+
+    3. Add the response-body `_claimSync` signal (matching Task 2's pattern), so an admin UI listening to this response can force-refresh the target user's claims if it has their session context.
+
+    4. Add the import at the top of the file:
+       ```typescript
+       import { syncRoleClaim } from "@/lib/ambassador/roleMutation";
+       ```
+
+    **Step B — Handle src/app/api/mentorship/admin/profiles/route.ts:**
+
+    1. Read the full file. Identify every `.set(...)` / `.update(...)` call on `mentorship_profiles`.
+
+    2. Inspect each call's payload:
+       - If ANY call mutates `roles`, `role`, or `isAdmin` (directly or via spread): wire `syncRoleClaim` after the await, using the same pattern as Step A.
+       - If NO call mutates those fields (e.g., the route only updates status/discordUsername/adminNotes/feedback): add a one-line comment above the first `.update(...)` call:
+         ```typescript
+         // Admin profile mutation: status/discordUsername/adminNotes/feedback only.
+         // No claim sync needed (per D-14, only roles / isAdmin mutations trigger claim refresh).
+         // If future edits add roles or isAdmin to this handler, ALSO add a syncRoleClaim call here.
+         ```
+         This comment is load-bearing — it documents the invariant for future editors and makes the grep pattern "grep -rc 'syncRoleClaim' src/app/api/mentorship/ + grep 'claim sync' src/app/api/mentorship/" produce consistent audit output.
+
+    3. If wiring was needed: add the import at the top.
+
+    **Step C — Audit sweep for any other missed write surfaces:**
+
+    Run these greps and record output in SUMMARY:
+
+    ```bash
+    # Any other file that writes roles or isAdmin to mentorship_profiles (excluding profile/route.ts which Task 2 already covers, excluding scripts/ which use sync-custom-claims.ts batch):
+    grep -rEn --include="*.ts" "mentorship_profiles" src/app/api/ \
+      | grep -v "src/app/api/mentorship/profile/route.ts" \
+      | grep -v "src/app/api/mentorship/[uid]/route.ts" \
+      | grep -v "src/app/api/mentorship/admin/profiles/route.ts"
+
+    # And specifically any route that touches roles or isAdmin:
+    grep -rEn --include="*.ts" "(roles|isAdmin)\s*:" src/app/api/mentorship/ \
+      | grep -v "profile/route.ts" \
+      | grep -v "\[uid\]/route.ts" \
+      | grep -v "admin/profiles/route.ts"
+    ```
+
+    If any additional routes surface in the grep output and they mutate `roles` / `isAdmin`, wire `syncRoleClaim` into them too using the same pattern. Note them in the SUMMARY's "additional admin surfaces covered" section.
+
+    Do NOT touch verifyAuth's admin-token-check path (src/lib/auth.ts) — Task 3 already extended the return type to expose `admin`; no further admin-path wiring is needed in auth.ts.
+
+    **Critical invariants:**
+    - syncRoleClaim is always `await`-ed.
+    - The call runs AFTER the Firestore write succeeded (not in parallel, not before).
+    - A sync failure logs a console.warn but DOES NOT throw or reject the admin's request.
+    - Never add an `any` cast to silence a type error — the roleMutation helper's `string[]` + `boolean` shape is narrow enough to work with every reasonable source.
+  </action>
+  <verify>
+    <automated>ls src/app/api/mentorship/[uid]/route.ts 2>/dev/null ; grep -c "syncRoleClaim" src/app/api/mentorship/[uid]/route.ts 2>/dev/null ; grep -c "syncRoleClaim" src/app/api/mentorship/admin/profiles/route.ts 2>/dev/null ; grep -c "claim sync" src/app/api/mentorship/admin/profiles/route.ts 2>/dev/null ; npx tsc --noEmit 2>&amp;1 | grep -E "(\[uid\]/route|admin/profiles/route)" | head -20</automated>
+    <manual>Record in SUMMARY: (1) did src/app/api/mentorship/[uid]/route.ts exist at execute time? (2) which admin write paths actually mutate roles/isAdmin (got a syncRoleClaim wire) vs. which only mutate status/discord/notes (got the invariant comment)? (3) did the Step C audit surface any additional routes?</manual>
+  </verify>
+  <acceptance_criteria>
+    - IF `src/app/api/mentorship/[uid]/route.ts` exists: `grep -c "syncRoleClaim" src/app/api/mentorship/\[uid\]/route.ts` returns `>= 1`. Otherwise the SUMMARY records the file was absent and the admin route is covered by src/app/api/mentorship/admin/profiles/route.ts.
+    - For `src/app/api/mentorship/admin/profiles/route.ts`: EITHER `grep -c "syncRoleClaim" src/app/api/mentorship/admin/profiles/route.ts` returns `>= 1` (if the route mutates roles/isAdmin) OR `grep -c "claim sync" src/app/api/mentorship/admin/profiles/route.ts` returns `>= 1` (the invariant-documenting comment is present when the route doesn't mutate those fields).
+    - `grep -rc "await syncRoleClaim" src/app/api/` summed across all files returns `>= 2` (profile/route.ts from Task 2 + at least one admin surface from this task) OR `>= 1` with a documented reason in SUMMARY explaining why exactly one wire was needed.
+    - `npx tsc --noEmit` reports zero errors from the files touched in this task.
+    - No `any` casts introduced in the admin routes: `git diff src/app/api/mentorship/` | `grep -E "^\+.*as any"` returns empty.
+    - Step C audit output captured in SUMMARY — confirms no silent admin write surface was missed.
+  </acceptance_criteria>
+  <done>
+    Every admin-side write path that mutates `mentorship_profiles.roles` or `isAdmin` either (a) calls `syncRoleClaim` after the write with a non-fatal-on-failure signal or (b) carries an explicit invariant-documenting comment noting it does NOT mutate those fields. D-14's "no >1hr stale-claim window" holds for admin-initiated mutations, not just user-initiated ones.
+  </done>
+</task>
+
 </tasks>
 
 <verification>
-- `npx tsc --noEmit` surfaces no new errors from the three touched files.
+- `npx tsc --noEmit` surfaces no new errors from the touched files.
 - An end-to-end manual test via `npm run dev` + Postman: POST to /api/mentorship/profile with a valid auth token and a profile body containing `roles: ["mentor"]`. Response includes `_claimSync: { refreshed: true }`. Run `firebase-admin` one-off script to read the user's customClaims — confirm they match.
+- Admin-side manual test: if admin tooling is wired to src/app/api/mentorship/[uid]/route.ts (or src/app/api/mentorship/admin/profiles/route.ts when it mutates roles), perform an admin-initiated role change and confirm the target user's custom claims update within the same response cycle.
 - If claim sync mocking is desired in tests, Phase 2 tests can spy on `syncRoleClaim` — no Phase 1 test coverage required (claim sync is observable via response body).
 </verification>
 
 <success_criteria>
 - [x] src/lib/ambassador/roleMutation.ts exists with syncRoleClaim helper
 - [x] src/app/api/mentorship/profile/route.ts calls syncRoleClaim after every write + returns _claimSync signal
+- [x] Every admin-side write path that mutates roles/isAdmin wires syncRoleClaim (or carries the invariant-documenting comment when the path doesn't mutate those fields)
 - [x] src/lib/auth.ts verifyAuth returns extended AuthContext with roles/admin/role optional fields
 - [x] No breaking changes to existing callers of verifyAuth
 - [x] Claim-sync failures are non-fatal (logged, surfaced in response, not thrown)
@@ -364,6 +489,9 @@ return NextResponse.json({
 After completion, create `.planning/phases/01-foundation-roles-array-migration/01-06-SUMMARY.md` documenting:
 - The exact syncRoleClaim signature + result type
 - The list of mentorship_profiles write call sites in src/app/api/mentorship/profile/route.ts that were wired (file + line numbers)
+- Whether src/app/api/mentorship/[uid]/route.ts existed at execute time + its wiring status
+- src/app/api/mentorship/admin/profiles/route.ts: did it mutate roles/isAdmin (got wiring) or not (got the invariant comment)?
+- Step C audit: any additional admin write surfaces found + their treatment
 - The final AuthContext interface shape
 - Confirmation the merge pattern (...existing, roles, role, admin) is present in BOTH scripts/sync-custom-claims.ts (Plan 04) and src/lib/ambassador/roleMutation.ts (this plan) — single source of merge-semantics truth
 </output>

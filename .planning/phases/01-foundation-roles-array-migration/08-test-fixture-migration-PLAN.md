@@ -18,7 +18,7 @@ must_haves:
     - "New test coverage exists for hasRoleClaim, hasAnyRoleClaim, hasAllRoleClaimsClaim (3+ cases each)"
     - "Every existing test that was passing before Plan 01 still passes after Plan 08"
     - "`npm test` exits 0 with no warnings about deprecated fixture shape"
-    - "Coverage on src/lib/permissions.ts reaches 100% line + branch (or as close as Jest/Vitest reports)"
+    - "Coverage numbers (line + branch) on src/lib/permissions.ts are MEASURED and asserted at ≥ 90% branch coverage — not just claimed in prose. The `<verify>` block runs the coverage-flagged test command and greps the report output."
   artifacts:
     - path: src/__tests__/permissions.test.ts
       provides: "Migrated fixtures + comprehensive coverage for the six new helpers"
@@ -31,10 +31,10 @@ must_haves:
 ---
 
 <objective>
-Migrate the 95 test fixtures in `src/__tests__/permissions.test.ts` from the legacy single-role shape (`role: "mentor"`) to the dual-shape expected during the migration window (`role: "mentor", roles: ["mentor"]`). Also add comprehensive new coverage for the six helpers introduced in Plan 03 so the test suite validates dual-read semantics, null-safety, and three-verb separation at every boundary.
+Migrate the 95 test fixtures in `src/__tests__/permissions.test.ts` from the legacy single-role shape (`role: "mentor"`) to the dual-shape expected during the migration window (`role: "mentor", roles: ["mentor"]`). Also add comprehensive new coverage for the six helpers introduced in Plan 03 so the test suite validates dual-read semantics, null-safety, and three-verb separation at every boundary. Finally, produce measurable coverage numbers for `src/lib/permissions.ts` — Phase 1 Success Criterion #5 requires PROOF that `roles.includes(...)` code paths are actually exercised, not just that tests pass.
 
-Purpose: Implements ROLE-06. Closes the "tests silently passing on stub data" pitfall from PITFALLS.md §Pitfall 3.
-Output: One large edit to src/__tests__/permissions.test.ts.
+Purpose: Implements ROLE-06. Closes the "tests silently passing on stub data" pitfall from PITFALLS.md §Pitfall 3. Satisfies Phase 1 Success Criterion #5 (measurable coverage on the helper module).
+Output: One large edit to src/__tests__/permissions.test.ts plus a verified coverage report for src/lib/permissions.ts.
 Deploy: Part of Deploy #4 (tests updated alongside app code).
 </objective>
 
@@ -49,9 +49,25 @@ Deploy: Part of Deploy #4 (tests updated alongside app code).
 @src/__tests__/permissions.test.ts
 @src/lib/permissions.ts
 @src/types/mentorship.ts
+@package.json
 </context>
 
 <interfaces>
+**Test framework reality (verified from package.json at plan time):** This repo uses **vitest** (not Jest). Key entries:
+- `"test": "vitest run"`
+- `"test:watch": "vitest"`
+- `"test:ui": "vitest --ui"`
+- devDeps: `vitest@^4.0.18`, `@vitest/ui@^4.0.18`
+
+**Coverage flag syntax (vitest):** `vitest run --coverage` (or `npm test -- --coverage`). Vitest uses v8 or istanbul coverage under the hood depending on `vitest.config.*`. If no coverage provider is configured at execute time, vitest will prompt to install one. In that case, add `@vitest/coverage-v8` to devDependencies via `npm install -D @vitest/coverage-v8` and re-run.
+
+**Executor: verify the command before relying on it:**
+```bash
+cat package.json | grep -E '"test"|vitest|coverage'
+npm test -- --help 2>&1 | grep -i coverage | head -5
+```
+If the above confirms `--coverage` is supported, proceed. If not, install `@vitest/coverage-v8` and re-run.
+
 Current test fixture shape (example from scout):
 
 ```typescript
@@ -104,12 +120,14 @@ const legacyProfile: PermissionUser = {
 <tasks>
 
 <task type="auto" tdd="false">
-  <name>Task 1: Migrate all 95 existing fixtures to dual-shape + add new coverage for the six helpers</name>
+  <name>Task 1: Migrate all 95 existing fixtures to dual-shape + add new coverage for the six helpers + prove coverage numbers</name>
   <files>src/__tests__/permissions.test.ts</files>
   <read_first>
     - src/__tests__/permissions.test.ts (FULL file — read every describe/it block so the migration preserves existing semantics)
     - src/lib/permissions.ts (Plan 03 output — signatures for hasRole, hasAnyRole, hasAllRoles, hasRoleClaim, hasAnyRoleClaim, hasAllRoleClaimsClaim)
     - src/types/mentorship.ts (Plan 01 output — Role type + RoleSchema)
+    - package.json (CONFIRM the test framework — vitest at plan time; executor must re-verify and use whatever flags that framework exposes)
+    - vitest.config.* (if present) — confirm coverage provider (v8 / istanbul) and includePatterns; if coverage is not configured, `npm install -D @vitest/coverage-v8` is the canonical install
     - .planning/research/PITFALLS.md §Pitfall 3 (tests silently passing on stub data — the core risk this plan defends against)
     - .planning/phases/01-foundation-roles-array-migration/01-CONTEXT.md §decisions D-07 (null-safe helpers)
   </read_first>
@@ -298,9 +316,42 @@ const legacyProfile: PermissionUser = {
     If the existing file imports helpers individually, merge them into a single import statement to avoid duplicate-import lint errors.
 
     Do NOT remove any existing describe / it block. Do NOT change any assertion. If the existing test file has 95 fixtures across N describe blocks, the output file has at least 95+new-coverage fixtures across N+4 describe blocks.
+
+    **Part E — Prove measured coverage numbers (NEW — closes Success Criterion #5):**
+
+    After Parts A-D are complete and tests pass, run the coverage-flagged command and assert specific numbers. Save the output to `/tmp/coverage-plan-08.txt` so the automated verify grep has a parseable target.
+
+    1. Confirm the test framework's coverage flag works:
+       ```bash
+       # Vitest — the confirmed framework at plan time:
+       npm test -- --coverage --coverage.include="src/lib/permissions.ts" 2>&1 | tee /tmp/coverage-plan-08.txt
+       ```
+       If vitest reports that no coverage provider is installed, install one and re-run:
+       ```bash
+       npm install -D @vitest/coverage-v8
+       npm test -- --coverage --coverage.include="src/lib/permissions.ts" 2>&1 | tee /tmp/coverage-plan-08.txt
+       ```
+
+    2. Inspect the output. Vitest's default reporter prints a table like:
+       ```
+       File                       | % Stmts | % Branch | % Funcs | % Lines |
+       ---------------------------|---------|----------|---------|---------|
+       src/lib/permissions.ts     |   95.5  |   92.3   |  100    |   95.5  |
+       ```
+
+       Read the `src/lib/permissions.ts` row. Both `% Branch` and `% Lines` must be `>= 90.0`. Record the exact numbers in the SUMMARY.
+
+    3. If branch coverage is below 90%, identify which branches are uncovered by running with the HTML reporter:
+       ```bash
+       npm test -- --coverage --coverage.include="src/lib/permissions.ts" --coverage.reporter=html
+       open coverage/index.html   # inspect src/lib/permissions.ts — uncovered branches highlighted
+       ```
+       Add the missing test cases (likely additional null-argument or empty-array branches) and re-run until the number clears 90%.
+
+    4. **Load-bearing constraint:** Phase 1 Success Criterion #5 requires PROOF that `roles.includes(...)` code paths are exercised, not just that the tests pass. The grep-parseable check in `<verify>` asserts the coverage number explicitly — the executor CANNOT move on by simply noting "tests pass". The coverage command + report inspection is part of the task's done-state.
   </action>
   <verify>
-    <automated>npm test -- src/__tests__/permissions.test.ts 2>&amp;1 | tail -30 ; grep -c "hasRole(" src/__tests__/permissions.test.ts ; grep -c "roles: \[" src/__tests__/permissions.test.ts</automated>
+    <automated>npm test -- src/__tests__/permissions.test.ts 2>&amp;1 | tail -30 ; grep -c "hasRole(" src/__tests__/permissions.test.ts ; grep -c "roles: \[" src/__tests__/permissions.test.ts ; npm test -- --coverage --coverage.include="src/lib/permissions.ts" 2>&amp;1 | tee /tmp/coverage-plan-08.txt | grep -E "(Branches|Lines|Stmts|Funcs|permissions\.ts)" | head -20 ; awk '/permissions\.ts/ { for(i=1; i<=NF; i++) if ($i ~ /^[0-9.]+$/ &amp;&amp; $i+0 < 90.0) { print "FAIL: number below 90:", $i; exit 1 } }' /tmp/coverage-plan-08.txt &amp;&amp; echo "coverage-gate: PASS"</automated>
   </verify>
   <acceptance_criteria>
     - `npm test -- src/__tests__/permissions.test.ts` exits 0 (all tests pass)
@@ -315,10 +366,14 @@ const legacyProfile: PermissionUser = {
     - `grep -c "hasAllRoleClaimsClaim(" src/__tests__/permissions.test.ts` returns at least `2`
     - `grep -c "roles: \[" src/__tests__/permissions.test.ts` returns at least `50` (all existing fixtures migrated + new ones)
     - `grep -c "role: \"mentor\"" src/__tests__/permissions.test.ts` returns at least `20` (legacy field preserved for dual-shape testing)
-    - Coverage report (if `npm test -- --coverage` is supported): src/lib/permissions.ts shows 100% line + branch coverage, or as close as the tooling reports
+    - **Measured coverage gate (NEW — satisfies Phase 1 Success Criterion #5):**
+      - `/tmp/coverage-plan-08.txt` exists after the coverage-flagged test run
+      - `grep -E "src/lib/permissions\.ts" /tmp/coverage-plan-08.txt` returns at least one line with the coverage numbers
+      - Every numeric field in the `src/lib/permissions.ts` row of the coverage table reads ≥ 90.0 — specifically `% Branch` ≥ 90.0 and `% Lines` ≥ 90.0 (the awk check in `<verify>` asserts this and prints "coverage-gate: PASS" when satisfied)
+      - The exact coverage numbers (`% Stmts`, `% Branch`, `% Funcs`, `% Lines`) are copied into the SUMMARY
   </acceptance_criteria>
   <done>
-    src/__tests__/permissions.test.ts has every existing fixture migrated to dual-shape, all pre-existing tests still pass, and four new describe blocks cover hasRole/hasAnyRole/hasAllRoles + claim-side mirrors with null-safety, legacy-fallback, multi-role, and empty-argument edge cases.
+    src/__tests__/permissions.test.ts has every existing fixture migrated to dual-shape, all pre-existing tests still pass, and four new describe blocks cover hasRole/hasAnyRole/hasAllRoles + claim-side mirrors with null-safety, legacy-fallback, multi-role, and empty-argument edge cases. The coverage-flagged test run produces a report showing branch + line coverage ≥ 90% on src/lib/permissions.ts, and those numbers are recorded in the SUMMARY.
   </done>
 </task>
 
@@ -326,7 +381,7 @@ const legacyProfile: PermissionUser = {
 
 <verification>
 - `npm test` exits 0 across the whole repo.
-- Coverage of src/lib/permissions.ts reaches 100% line + branch (inspect `coverage/lcov-report/src/lib/permissions.ts.html` if available).
+- Measured coverage of src/lib/permissions.ts: `% Branch` ≥ 90.0 AND `% Lines` ≥ 90.0 per the vitest (or whatever the repo uses) coverage report — checked via `/tmp/coverage-plan-08.txt`.
 - `git diff --stat src/__tests__/permissions.test.ts` shows a large additive diff (hundreds of line-insertions) but no fixture removals beyond whitespace cleanup.
 - Manual spot-check: pick one migrated fixture, run the single test in isolation: `npm test -- -t "hasRole returns true for a role present"` passes.
 </verification>
@@ -337,6 +392,7 @@ const legacyProfile: PermissionUser = {
 - [x] Null-safe, legacy-fallback, multi-role, and empty-argument edge cases all covered
 - [x] Import statement consolidated to include the six new helpers alongside existing ones
 - [x] npm test exits 0
+- [x] Measured coverage on src/lib/permissions.ts: branch + line coverage ≥ 90% (numbers captured in SUMMARY)
 </success_criteria>
 
 <output>
@@ -344,6 +400,6 @@ After completion, create `.planning/phases/01-foundation-roles-array-migration/0
 - Total number of fixtures migrated (from `grep -c "PermissionUser =" src/__tests__/permissions.test.ts`)
 - Total new describe blocks (should be 4)
 - Total new it() tests added (count from `grep -c "^    it(" src/__tests__/permissions.test.ts` minus the pre-existing count)
-- Coverage numbers for src/lib/permissions.ts (line/branch/function)
+- **Measured coverage numbers for src/lib/permissions.ts: paste the exact row from `/tmp/coverage-plan-08.txt` showing `% Stmts`, `% Branch`, `% Funcs`, `% Lines`.** If the numbers came from a non-default coverage provider (e.g., istanbul instead of v8), note which.
 - Confirmation that all previously-passing tests still pass
 </output>
