@@ -10,6 +10,7 @@ import {
   getAnonymizedDiscord,
 } from "@/utils/streamer-mode";
 import ProfileAvatar from "@/components/ProfileAvatar";
+import { hasRole } from "@/lib/permissions";
 
 export default function PendingMentorsPage() {
   const toast = useToast();
@@ -213,7 +214,7 @@ export default function PendingMentorsPage() {
                         </h3>
                         {getStatusBadge(p.status)}
                         <span className="badge badge-outline">
-                          {p.role === "mentor" ? "🎯 Mentor" : "🚀 Mentee"}
+                          {hasRole(p, "mentor") ? "🎯 Mentor" : "🚀 Mentee"}
                         </span>
                       </div>
                       <p className="text-sm text-base-content/70">
@@ -240,7 +241,7 @@ export default function PendingMentorsPage() {
                       )}
 
                       {/* Star Rating (for mentors) - clickable to view reviews */}
-                      {p.role === "mentor" && (p.ratingCount ?? 0) > 0 && (
+                      {hasRole(p, "mentor") && (p.ratingCount ?? 0) > 0 && (
                         <button
                           className="flex items-center gap-1 mt-2 hover:bg-base-200 rounded px-2 py-1 -mx-2 transition-colors cursor-pointer"
                           onClick={() => handleViewReviews(p)}
