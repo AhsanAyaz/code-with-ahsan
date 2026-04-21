@@ -150,6 +150,7 @@ export async function PUT(
     const permissionUser: PermissionUser = {
       uid: authResult.uid,
       role: actorData?.role || null,
+      roles: actorData?.roles,
       status: actorData?.status,
       isAdmin: actorData?.isAdmin,
     };
@@ -740,6 +741,7 @@ export async function DELETE(
     const permissionUser: PermissionUser = {
       uid: authResult.uid,
       role: actorData?.role || null,
+      roles: actorData?.roles,
       status: actorData?.status,
       isAdmin: actorData?.isAdmin,
     };

@@ -56,6 +56,7 @@ export async function DELETE(
     const permissionUser: PermissionUser = {
       uid: requestorId,
       role: requestorData?.role || null,
+      roles: requestorData?.roles,
       status: requestorData?.status,
       isAdmin: requestorData?.isAdmin,
     };

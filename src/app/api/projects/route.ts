@@ -90,6 +90,7 @@ export async function POST(request: NextRequest) {
     const permissionUser: PermissionUser = {
       uid: creatorId,
       role: creatorData?.role || null,
+      roles: creatorData?.roles,
       status: creatorData?.status,
       isAdmin: creatorData?.isAdmin,
     };

@@ -83,6 +83,7 @@ export async function POST(
     const permissionUser: PermissionUser = {
       uid: userId,
       role: userData?.role || null,
+      roles: userData?.roles,
       status: userData?.status,
       isAdmin: userData?.isAdmin,
     };

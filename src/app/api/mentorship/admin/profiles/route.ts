@@ -211,6 +211,7 @@ export async function PUT(request: NextRequest) {
         displayName: profileData.displayName || '',
         email: profileData.email,
         role: profileData.role,
+        roles: profileData.roles ?? (profileData.role ? [profileData.role] : []),
       }
       
       // Registration approval/decline emails (only for pending -> accepted/declined)
