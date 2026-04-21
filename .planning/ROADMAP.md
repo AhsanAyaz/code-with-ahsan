@@ -88,7 +88,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
   5. Every one of the 95 permission test fixtures uses the new `roles: [...]` shape, the TypeScript build is green, and coverage reports show the new `roles.includes(...)` code paths are exercised (no fixture silently passing on a legacy fallback).
 
 **Plans**: 10 plans
-- [ ] 01-types-zod-role-schema-PLAN.md — Role union + RoleSchema Zod enum + MentorshipProfile.roles field (Deploy #1 / Wave 1 / ROLE-01)
+- [x] 01-types-zod-role-schema-PLAN.md — Role union + RoleSchema Zod enum + MentorshipProfile.roles field (Deploy #1 / Wave 1 / ROLE-01)
 - [ ] 02-feature-flag-helper-PLAN.md — `isAmbassadorProgramEnabled()`, `/ambassadors/*` 404 gates, nav filtering (Deploy #1 / Wave 1 / ROLE-08)
 - [ ] 03-permission-helpers-PLAN.md — hasRole/hasAnyRole/hasAllRoles + claim-side mirrors with dual-read; refactor isAcceptedMentor (Deploy #1 / Wave 2 / ROLE-02)
 - [ ] 04-migration-scripts-PLAN.md — `migrate-roles-to-array.ts` + `sync-custom-claims.ts` (Deploys #2 + #2.5 / Wave 2 / ROLE-03 + ROLE-05)
