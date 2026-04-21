@@ -12,8 +12,18 @@ service cloud.firestore {
     }
 
     function isAcceptedMentor() {
+      // Dual-claim window (per D-13, D-16 in 01-CONTEXT.md, ROLE-04).
+      // Accept either the legacy single-role claim OR the new roles-array claim.
+      // The array-side is the post-migration authority (set by scripts/sync-custom-claims.ts
+      // and by the roleMutation helper on every profile write).
+      // The legacy-side is a fallback for users whose ID token predates the claims sync
+      // (token TTL ~1 hour; after that the new claim is present).
+      // Plan 10 / Deploy #5 drops the legacy arm after explicit "all clear" verification.
       return isSignedIn() &&
-             request.auth.token.role == "mentor" &&
+             (
+               request.auth.token.role == "mentor"
+               || ("roles" in request.auth.token && "mentor" in request.auth.token.roles)
+             ) &&
              request.auth.token.status == "accepted";
     }
 
