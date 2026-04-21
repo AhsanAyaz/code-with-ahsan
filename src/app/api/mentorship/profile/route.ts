@@ -100,6 +100,7 @@ export async function POST(request: NextRequest) {
       uid,
       username,
       role,
+      roles: [role], // dual-write: legacy `role` + new `roles` array (per Plan 07)
       status,
       displayName: displayName || "",
       email: email || "",

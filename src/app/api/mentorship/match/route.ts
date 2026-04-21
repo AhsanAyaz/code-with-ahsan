@@ -220,12 +220,14 @@ export async function POST(request: NextRequest) {
             displayName: mentorData.displayName || "",
             email: mentorData.email || "",
             role: "mentor",
+            roles: ["mentor"],
           },
           {
             uid: menteeId,
             displayName: menteeData?.displayName || "",
             email: menteeData?.email || "",
             role: "mentee",
+            roles: ["mentee"],
             education: menteeData?.education,
             skillsSought: menteeData?.skillsSought,
             careerGoals: menteeData?.careerGoals,
@@ -446,12 +448,14 @@ export async function PUT(request: NextRequest) {
             displayName: menteeData?.displayName || "",
             email: menteeData?.email || "",
             role: "mentee",
+            roles: ["mentee"],
           },
           {
             uid: matchData?.mentorId,
             displayName: mentorProfileData.displayName || "",
             email: mentorProfileData.email || "",
             role: "mentor",
+            roles: ["mentor"],
             expertise: mentorProfileData.expertise,
             currentRole: mentorProfileData.currentRole,
           }
@@ -518,12 +522,14 @@ export async function PUT(request: NextRequest) {
             displayName: menteeData?.displayName || "",
             email: menteeData?.email || "",
             role: "mentee",
+            roles: ["mentee"],
           },
           {
             uid: matchData?.mentorId,
             displayName: mentorProfileData?.displayName || "",
             email: mentorProfileData?.email || "",
             role: "mentor",
+            roles: ["mentor"],
           }
         ).catch((err) => console.error("Failed to send decline email:", err));
       }
