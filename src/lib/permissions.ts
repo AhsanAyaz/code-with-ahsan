@@ -151,6 +151,79 @@ export function hasAllRoles(
   );
 }
 
+// ─── Claim-side Mirrors (decoded Firebase ID tokens, per D-08) ───
+
+/**
+ * Narrow structural type for decoded Firebase ID tokens with our custom claims.
+ * Intentionally decoupled from firebase-admin's DecodedIdToken to keep this
+ * helper module dep-free. Callers (e.g., verifyAuth) can pass the full decoded
+ * token directly; extra fields are ignored.
+ */
+export interface DecodedRoleClaim {
+  role?: string | null;     // legacy single-role claim (dropped in Deploy #5)
+  roles?: string[] | null;  // new array claim (set by sync-custom-claims + roleMutation)
+  admin?: boolean;
+  [key: string]: unknown;
+}
+
+/**
+ * Returns true if the decoded token carries the given role claim.
+ *
+ * Dual-claim (per D-06 + D-13): prefers token.roles, falls back to legacy token.role.
+ * Null-safe (per D-07): returns false for null/undefined tokens.
+ *
+ * Use this in API route handlers that already have a decoded token from verifyAuth()
+ * and don't want a Firestore round-trip just to authorize.
+ */
+export function hasRoleClaim(
+  token: DecodedRoleClaim | null | undefined,
+  role: Role
+): boolean {
+  if (!token) return false;
+  return token.roles?.includes(role) ?? token.role === role;
+}
+
+/**
+ * Returns true if the decoded token carries AT LEAST ONE of the given role claims.
+ * Dual-claim + null-safe.
+ */
+export function hasAnyRoleClaim(
+  token: DecodedRoleClaim | null | undefined,
+  roles: Role[]
+): boolean {
+  if (!token) return false;
+  if (roles.length === 0) return false;
+  if (token.roles) {
+    return roles.some((r) => token.roles!.includes(r));
+  }
+  // Legacy fallback: compare against the single role claim
+  return token.role !== null && token.role !== undefined && roles.includes(token.role as Role);
+}
+
+/**
+ * Returns true if the decoded token carries EVERY given role claim.
+ * Dual-claim + null-safe. During the legacy fallback window, satisfiable only
+ * when the argument list is exactly one role matching token.role.
+ *
+ * Name matches the D-08 contract in 01-CONTEXT.md: hasAllRoleClaimsClaim.
+ */
+export function hasAllRoleClaimsClaim(
+  token: DecodedRoleClaim | null | undefined,
+  roles: Role[]
+): boolean {
+  if (!token) return false;
+  if (roles.length === 0) return true;
+  if (token.roles) {
+    return roles.every((r) => token.roles!.includes(r));
+  }
+  return (
+    roles.length === 1 &&
+    token.role !== null &&
+    token.role !== undefined &&
+    roles[0] === token.role
+  );
+}
+
 /**
  * Check if user is an accepted mentor.
  * Refactored onto hasRole (DRY + dual-read benefit for free).
