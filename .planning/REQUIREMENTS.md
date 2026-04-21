@@ -14,9 +14,9 @@ Scoped requirements for v6.0. Each maps to exactly one roadmap phase (populated 
 
 - [x] **ROLE-01**: `mentorship_profiles/{uid}` schema supports `roles: string[]` (array) in place of `role: string`, with legacy `role` field retained during a dual-claim compatibility window
 - [ ] **ROLE-02**: `src/lib/permissions.ts` exposes `hasRole(profile, role)`, `hasAnyRole(profile, roles)`, and `hasAllRoles(profile, roles)` helpers backed by array-membership semantics
-- [ ] **ROLE-03**: Idempotent, paginated migration script (`scripts/migrate-roles-to-array.ts`) backfills every existing `mentorship_profiles` doc with a `roles` array, with dry-run mode and null-safe handling
+- [x] **ROLE-03**: Idempotent, paginated migration script (`scripts/migrate-roles-to-array.ts`) backfills every existing `mentorship_profiles` doc with a `roles` array, with dry-run mode and null-safe handling
 - [ ] **ROLE-04**: `firestore.rules` are updated to dual-read accept both `role == "X"` and `"X" in roles` during the migration window, then switched to array-only after rollout
-- [ ] **ROLE-05**: Firebase custom-claims sync script propagates the new `roles` claim to every active user's ID token, with a force-refresh signal handled client-side
+- [x] **ROLE-05**: Firebase custom-claims sync script propagates the new `roles` claim to every active user's ID token, with a force-refresh signal handled client-side
 - [ ] **ROLE-06**: All 95 existing permission test cases are migrated to the new `roles` shape in the same PR as the type change (TypeScript-breaking so no fixture silently passes)
 - [ ] **ROLE-07**: All 29 non-test files that read `.role` are migrated to the array-aware helpers with zero regression to existing mentor / mentee / admin flows
 - [x] **ROLE-08**: `FEATURE_AMBASSADOR_PROGRAM` feature flag gates every new `/ambassadors` route so Foundation can ship without exposing half-built ambassador features
@@ -181,9 +181,9 @@ Every v1 REQ-ID maps to exactly one phase. Populated during roadmap creation (20
 |-------------|-------|--------|
 | ROLE-01 | Phase 1 — Foundation: Roles Array Migration | Complete |
 | ROLE-02 | Phase 1 — Foundation: Roles Array Migration | Pending |
-| ROLE-03 | Phase 1 — Foundation: Roles Array Migration | Pending |
+| ROLE-03 | Phase 1 — Foundation: Roles Array Migration | Complete |
 | ROLE-04 | Phase 1 — Foundation: Roles Array Migration | Pending |
-| ROLE-05 | Phase 1 — Foundation: Roles Array Migration | Pending |
+| ROLE-05 | Phase 1 — Foundation: Roles Array Migration | Complete |
 | ROLE-06 | Phase 1 — Foundation: Roles Array Migration | Pending |
 | ROLE-07 | Phase 1 — Foundation: Roles Array Migration | Pending |
 | ROLE-08 | Phase 1 — Foundation: Roles Array Migration | Complete |

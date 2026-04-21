@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-04-21T21:26:37.810Z"
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-04-21T21:33:10.154Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 10
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -63,6 +63,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: MentorshipProfile.roles is required Role[] (never null/undefined) — dual-read window keeps role? optional until Deploy #5 (D-04, D-06)
 - [Phase 01-foundation-roles-array-migration]: Footer Ambassadors link placed first in /rates /privacy /terms nav block (no existing Mentorship/Projects links in Footer to sit next to)
 - [Phase 01-foundation-roles-array-migration]: headerNavLinks.js and Footer.tsx read process.env inline (D-12 exception authorized by plan: bundle-time Next.js inlining requires literal env reference)
+- [Phase 01-foundation-roles-array-migration]: VALID_ROLES duplicated (not imported) in migration scripts — keeps tsx runs decoupled from Next.js path-mappings; role vocabulary is locked (D-01) so drift risk is acceptable
+- [Phase 01-foundation-roles-array-migration]: Custom claims sync uses merge-preserve spread (...customClaims, roles, role, admin) — setCustomUserClaims is replace-not-merge, the spread prevents clobbering pre-existing admin/beta/etc claims
 
 ### Workflow Notes
 
@@ -98,11 +100,12 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | 260411 | update inactivity warning message to @mention mentor and mentee (GH-151) | 2026-04-10 | 3fa2bff | [260411-update-inactivity-warning-message-to-men](./quick/260411-update-inactivity-warning-message-to-men/) |
 | Phase 01 P01 | 2min | 1 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P02 | 3 min | 3 tasks | 6 files |
+| Phase 01-foundation-roles-array-migration P04 | 2 min | 2 tasks | 3 files |
 
 ## Session Continuity
 
-Last session: 2026-04-21T21:26:37.807Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-04-21T21:33:10.151Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None
 
 ---
