@@ -806,6 +806,15 @@ export function isDiscordConfigured(): boolean {
 // Discord role IDs for automatic assignment
 export const DISCORD_MENTOR_ROLE_ID = "1422193153397493893";
 export const DISCORD_MENTEE_ROLE_ID = "1445734846730338386";
+/**
+ * Student Ambassador role ID. Assigned by two-stage acceptance flow (DISC-02).
+ *
+ * PLACEHOLDER: The string "PENDING_DISCORD_ROLE_CREATION" MUST be replaced with
+ * the real Discord role ID before Phase 2 goes live. Plan 09 checkpoint gates on
+ * this replacement — acceptance API returns discordRoleAssigned=false while the
+ * placeholder is set, so no ambassador accepts will silently fail against a fake ID.
+ */
+export const DISCORD_AMBASSADOR_ROLE_ID = "PENDING_DISCORD_ROLE_CREATION";
 
 // The #find-a-mentor channel ID for completion announcements
 const FIND_A_MENTOR_CHANNEL_ID = "1419645845258768385";
