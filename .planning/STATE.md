@@ -4,13 +4,13 @@ milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
 stopped_at: Completed 02-05-applications-submit-api-PLAN.md
-last_updated: "2026-04-22T11:18:20.442Z"
-last_activity: 2026-04-22
+last_updated: "2026-04-22T11:35:04.939Z"
+last_activity: 2026-04-22 -- Phase 02 execution started
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 19
-  completed_plans: 14
+  completed_plans: 17
 ---
 
 # Project State
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 ## Current Position
 
 Phase: 02 (application-subsystem) — EXECUTING
-Plan: 3 of 9
-Status: Ready to execute
-Last activity: 2026-04-22
+Plan: 1 of 9
+Status: Executing Phase 02
+Last activity: 2026-04-22 -- Phase 02 execution started
 
 ## Performance Metrics
 
@@ -84,6 +84,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02-05]: FieldValue imported directly from firebase-admin/firestore (not re-exported from firebaseAdmin.ts)
 - [Phase 02-05]: Plan 07 wizard uses client crypto.randomUUID() for upload path; Firestore doc id is auto-generated and need not match
 - [Phase 02-05]: EMAIL-01 failure is logged but never fails the submission response (submission persists regardless)
+- [Phase 02-06]: runAcceptanceTransaction uses db.runTransaction() for atomic COHORT-04 maxSize enforcement; acceptance idempotent (re-accept returns 200 alreadyAccepted:true, no double count); Discord failure never rolls back Firestore (D-17, discordRetryNeeded:true persisted); /discord-resolve always re-resolves handle freshly (Pitfall 2); reviewedBy=admin.uid on every decision (APPLY-08)
+- [Phase 02-07]: Inlined validateAcademicEmailClient (regex-only) in wizard because academicEmail.ts uses Node fs — server still runs full Hipo check on submission. Wizard uses crypto.randomUUID() for upload path; Firestore doc id is auto-generated independent
+- [Phase 02-08]: Pagination cursor stack in ApplicationsList — Firestore cursors are forward-only so previous-page stack replays cursors on Previous click. First admin detail-page pattern (D-09) — shape should be mirrored by future admin detail pages
 
 ### Workflow Notes
 
