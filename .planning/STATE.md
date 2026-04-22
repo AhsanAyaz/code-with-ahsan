@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: Completed 02-04-cohort-api-admin-panel-PLAN.md
+stopped_at: Completed 02-05-applications-submit-api-PLAN.md
 last_updated: "2026-04-22T11:18:20.442Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 19
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Project State
@@ -81,6 +81,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02-04]: requireAdmin returns { ok: true; uid: string } discriminated union — uid synthesised as admin:token12 prefix for Plan 06 reviewedBy audit field (legacy admin auth has no Firebase uid)
 - [Phase 02-04]: featureGate() helper extracted per-file — all /api/ambassador/cohorts/* handlers return 404 when FEATURE_AMBASSADOR_PROGRAM is off (Pitfall 3)
 - [Phase 02-04]: GET /cohorts scope=open (no auth, upcoming+windowOpen) vs scope=all (admin-only) — Plan 07 apply wizard uses open scope without admin credentials
+- [Phase 02-05]: FieldValue imported directly from firebase-admin/firestore (not re-exported from firebaseAdmin.ts)
+- [Phase 02-05]: Plan 07 wizard uses client crypto.randomUUID() for upload path; Firestore doc id is auto-generated and need not match
+- [Phase 02-05]: EMAIL-01 failure is logged but never fails the submission response (submission persists regardless)
 
 ### Workflow Notes
 
@@ -125,11 +128,12 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 01 P08 | ~6min | 1 tasks | 3 files |
 | Phase 02-application-subsystem P01 | 3 | 3 tasks | 4 files |
 | Phase 02-application-subsystem P04 | 6min | 3 tasks | 4 files |
+| Phase 02-application-subsystem P05 | 17min | 3 tasks | 5 files |
 
 ## Session Continuity
 
-Last session: 2026-04-22T11:18:20.439Z
-Stopped at: Completed 02-04-cohort-api-admin-panel-PLAN.md
+Last session: 2026-04-22T11:18:20.442Z
+Stopped at: Completed 02-05-applications-submit-api-PLAN.md
 Resume file: None
 
 ---
