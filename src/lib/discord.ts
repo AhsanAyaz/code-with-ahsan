@@ -809,12 +809,11 @@ export const DISCORD_MENTEE_ROLE_ID = "1445734846730338386";
 /**
  * Student Ambassador role ID. Assigned by two-stage acceptance flow (DISC-02).
  *
- * PLACEHOLDER: The string "PENDING_DISCORD_ROLE_CREATION" MUST be replaced with
- * the real Discord role ID before Phase 2 goes live. Plan 09 checkpoint gates on
- * this replacement — acceptance API returns discordRoleAssigned=false while the
- * placeholder is set, so no ambassador accepts will silently fail against a fake ID.
+ * Set to the real Discord role ID in the CWA server (created 2026-04-22 as part of
+ * Plan 02-09 pre-flight checkpoint). If the role is ever recreated or renamed,
+ * update this constant to the new numeric ID — all acceptance flows import from here.
  */
-export const DISCORD_AMBASSADOR_ROLE_ID = "PENDING_DISCORD_ROLE_CREATION";
+export const DISCORD_AMBASSADOR_ROLE_ID = "1496485291228139641";
 
 // The #find-a-mentor channel ID for completion announcements
 const FIND_A_MENTOR_CHANNEL_ID = "1419645845258768385";

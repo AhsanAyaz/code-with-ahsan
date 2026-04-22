@@ -55,7 +55,7 @@ vi.mock("@/lib/firebaseAdmin", () => {
 
 vi.mock("@/lib/discord", () => ({
   assignDiscordRole: vi.fn(),
-  DISCORD_AMBASSADOR_ROLE_ID: "PENDING_DISCORD_ROLE_CREATION",
+  DISCORD_AMBASSADOR_ROLE_ID: "1496485291228139641",
 }));
 
 vi.mock("@/lib/ambassador/roleMutation", () => ({
@@ -260,7 +260,7 @@ describe("assignAmbassadorDiscordRoleSoft", () => {
     // Should have called update with discordRoleAssigned:true, discordRetryNeeded:false
     const updateCall = (db.collection("applications").doc("app-1").update as MockedFunction<typeof db.collection>).mock?.calls;
     // The update is called via db.collection().doc().update
-    expect(assignDiscordRole).toHaveBeenCalledWith("discord-member-1", "PENDING_DISCORD_ROLE_CREATION");
+    expect(assignDiscordRole).toHaveBeenCalledWith("discord-member-1", "1496485291228139641");
   });
 
   it("8 — missing memberId: returns missing_member_id and flips discordRetryNeeded", async () => {
