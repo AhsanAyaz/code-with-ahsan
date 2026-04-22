@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: "Phase 03 (Public Presentation) CONTEXT.md gathered — ready for /gsd:plan-phase 3"
-last_updated: "2026-04-22T21:58:57.582Z"
-last_activity: 2026-04-22 -- Phase 03 execution started
+stopped_at: Completed 03-02-acceptance-snapshot-and-projection-write-PLAN.md
+last_updated: "2026-04-22T22:04:27.189Z"
+last_activity: 2026-04-22
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 25
-  completed_plans: 19
+  completed_plans: 20
 ---
 
 # Project State
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 ## Current Position
 
 Phase: 03 (public-presentation) — EXECUTING
-Plan: 1 of 6
-Status: Executing Phase 03
-Last activity: 2026-04-22 -- Phase 03 execution started
+Plan: 2 of 6
+Status: Ready to execute
+Last activity: 2026-04-22
 
 ## Performance Metrics
 
@@ -99,6 +99,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 03-public-presentation]: Single AmbassadorBadge component handles both "ambassador" and "alumni-ambassador" variants — built in Phase 3, reused unchanged in Phase 5 (D-10)
 - [Phase 03-public-presentation]: Badge placement scoped to /u/[username] only (PRESENT-03 minimum); MentorCard, project/roadmap byline chips deferred to future quick task (D-11)
 - [Phase 03-public-presentation]: Cross-phase contract — Phase 5 alumni transition + 2-strike offboarding MUST update or remove `public_ambassadors/{uid}`; Phase 4 referral/event/report writes do NOT touch it (D-12, D-13)
+- [Phase 03]: Pre-transaction username resolution: ensureUniqueUsername runs outside db.runTransaction() because where().limit().get() is illegal inside txn.get; resolvedUsername passed as closure into txn body
+- [Phase 03]: Re-accept NO-OP invariant locked: subdocPayload build, projection write (public_ambassadors/{uid}), and username backfill are all gated inside if (!alreadyAccepted) — in-life updates are PATCH endpoint's responsibility (plan 03-03)
 
 ### Workflow Notes
 
@@ -145,12 +147,13 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 02-application-subsystem P04 | 6min | 3 tasks | 4 files |
 | Phase 02-application-subsystem P05 | 17min | 3 tasks | 5 files |
 | Phase 02-application-subsystem P09 | 46min | 4 tasks | 5 files |
+| Phase 03 P03-02 | 3min | 2 tasks | 2 files |
 
 ## Session Continuity
 
-Last session: 2026-04-22T13:00:00.000Z
-Stopped at: Phase 03 (Public Presentation) CONTEXT.md gathered — ready for /gsd:plan-phase 3
-Resume file: .planning/phases/03-public-presentation/03-CONTEXT.md
+Last session: 2026-04-22T22:04:27.186Z
+Stopped at: Completed 03-02-acceptance-snapshot-and-projection-write-PLAN.md
+Resume file: None
 
 ---
 *Last activity: 2026-04-22 - Phase 03 discuss-phase complete; 4 gray areas resolved, 13 decisions locked*

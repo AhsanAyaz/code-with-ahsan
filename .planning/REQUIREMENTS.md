@@ -57,10 +57,10 @@ Scoped requirements for v6.0. Each maps to exactly one roadmap phase (populated 
 
 ### Public Presentation
 
-- [ ] **PRESENT-01**: Public `/ambassadors` page lists active-cohort ambassadors with photo, display name, university, 1-line bio, and social links
+- [x] **PRESENT-01**: Public `/ambassadors` page lists active-cohort ambassadors with photo, display name, university, 1-line bio, and social links
 - [ ] **PRESENT-02**: `/ambassadors` page reads from a denormalized projection (no sensitive fields — no email, no Discord handle) backed by an array-contains query on `mentorship_profiles.roles`
 - [ ] **PRESENT-03**: Any user profile page renders an "Ambassador" badge when the profile has `"ambassador"` in `roles`, and an "Alumni Ambassador" badge when it has `"alumni-ambassador"`
-- [ ] **PRESENT-04**: Optional public `cohortPresentationVideo` (separate from the private application video) can be uploaded by the ambassador after acceptance and is rendered on their `/ambassadors` card
+- [x] **PRESENT-04**: Optional public `cohortPresentationVideo` (separate from the private application video) can be uploaded by the ambassador after acceptance and is rendered on their `/ambassadors` card
 
 ### Referral System
 
@@ -209,10 +209,10 @@ Every v1 REQ-ID maps to exactly one phase. Populated during roadmap creation (20
 | DISC-03 | Phase 2 — Application Subsystem | Complete |
 | DISC-04 | Phase 4 — Activity Subsystem | Pending |
 | DISC-05 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
-| PRESENT-01 | Phase 3 — Public Presentation | Pending |
+| PRESENT-01 | Phase 3 — Public Presentation | Complete |
 | PRESENT-02 | Phase 3 — Public Presentation | Pending |
 | PRESENT-03 | Phase 3 — Public Presentation | Pending |
-| PRESENT-04 | Phase 3 — Public Presentation | Pending |
+| PRESENT-04 | Phase 3 — Public Presentation | Complete |
 | REF-01 | Phase 4 — Activity Subsystem | Pending |
 | REF-02 | Phase 4 — Activity Subsystem | Pending |
 | REF-03 | Phase 4 — Activity Subsystem | Pending |
