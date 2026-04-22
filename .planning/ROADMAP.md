@@ -111,7 +111,16 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
   5. On accept, the Firestore commit (`roles += "ambassador"` + ambassador subdoc + cohort attach) succeeds independently of the Discord call, and if the Discord role assignment fails the admin panel shows a retry button — clicking it is idempotent (never double-assigns) and surfaces success.
   6. Applicants receive the right transactional email at the right moment — confirmation on submit, acceptance email with onboarding steps on accept, decline email with kind-but-firm messaging and reapply encouragement on decline — and declined-application videos are auto-deleted 30 days after the decline decision.
 
-**Plans**: TBD
+**Plans**: 9 plans
+- [ ] 02-01-types-zod-feature-foundations-PLAN.md — ApplicationDoc/CohortDoc interfaces + Zod schemas + Discord role ID / age constants (Wave 1 / COHORT-01, APPLY-01/02, DISC-02/03)
+- [ ] 02-02-validators-academic-email-video-url-PLAN.md — TDD for `validateAcademicEmail` (Hipo snapshot lazy-init + soft-warn per D-15) and `classifyVideoUrl` / `isValidVideoUrl` (YouTube / Loom / Drive per D-07) (Wave 1 / APPLY-03/04)
+- [ ] 02-03-firestore-rules-email-templates-PLAN.md — firestore.rules + storage.rules for `applications/` + `cohorts/` (deny client writes, applicant read-own, admin read-all) + three `sendAmbassadorApplication*Email` functions (Wave 1 / APPLY-06, EMAIL-01/02/03)
+- [ ] 02-04-cohort-api-admin-panel-PLAN.md — `/api/ambassador/cohorts` GET/POST + `[cohortId]` GET/PATCH + `/admin/ambassadors/cohorts` panel (create / toggle window / view attached ambassadors) (Wave 2 / COHORT-01/02/03)
+- [ ] 02-05-applications-submit-api-PLAN.md — POST submit + GET admin list + GET `/me` + POST `student-id-upload-url` (signed PUT); age gate + cohort window + duplicate guard + DISC-01 fail-soft lookup + EMAIL-01 trigger (Wave 2 / APPLY-01..08, DISC-01, EMAIL-01)
+- [ ] 02-06-accept-decline-api-PLAN.md — TDD `runAcceptanceTransaction` (Firestore transaction for COHORT-04 race safety) + PATCH accept/decline route + `/discord-resolve` retry endpoint (Pitfall 2 fresh re-resolve) (Wave 3 / COHORT-04, REVIEW-03/05, DISC-02/03, EMAIL-02/03)
+- [ ] 02-07-apply-wizard-ui-PLAN.md — 4-step `/ambassadors/apply` wizard + `useApplyForm` hook + `AmbassadorApplicationStatus` on profile page; D-13 radio path choice + D-15 blur warning + direct-to-GCS upload (Wave 3 / APPLY-01/02/03/04/05/07)
+- [ ] 02-08-admin-review-ui-PLAN.md — `/admin/ambassadors` list (URL-query filters + cursor pagination) + `[applicationId]` detail (first admin detail page per D-09) + VideoEmbed / DiscordBanner / DecisionDialog components (Wave 3 / REVIEW-01/02/05)
+- [ ] 02-09-cleanup-cron-preflight-PLAN.md — Weekly `cleanup-declined-application-media.ts` + GitHub Actions workflow + pre-flight checkpoints (AMBASSADOR_DISCORD_MIN_AGE_DAYS decision + DISCORD_AMBASSADOR_ROLE_ID creation) (Wave 4 / REVIEW-04)
 
 ### Phase 3: Public Presentation
 **Goal**: The world can see the active ambassador cohort on `codewithahsan.dev/ambassadors` with only the fields each ambassador has chosen to share publicly, and any user's profile page correctly displays an Ambassador (or Alumni Ambassador) badge so status is visible wherever an ambassador shows up on the platform.
@@ -158,10 +167,10 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | v6.0 Phase 1: Foundation — Roles Array Migration | 0/10 | Planned | — |
-| v6.0 Phase 2: Application Subsystem | 0/0 | Not started | — |
+| v6.0 Phase 2: Application Subsystem | 0/9 | Planned | — |
 | v6.0 Phase 3: Public Presentation | 0/0 | Not started | — |
 | v6.0 Phase 4: Activity Subsystem | 0/0 | Not started | — |
 | v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 0/0 | Not started | — |
 
 ---
-*Last updated: 2026-04-21 — v6.0 Phase 1 planned (10 plans, 5 waves, Deploys #1-#5)*
+*Last updated: 2026-04-22 — v6.0 Phase 2 planned (9 plans, 4 waves)*
