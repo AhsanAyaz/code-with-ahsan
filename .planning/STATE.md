@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
-status: executing
-stopped_at: Completed 02-09-cleanup-cron-preflight-PLAN.md
-last_updated: "2026-04-22T12:24:02.312Z"
+status: discussing
+stopped_at: Phase 03 (Public Presentation) CONTEXT.md gathered — ready for /gsd:plan-phase 3
+last_updated: "2026-04-22T13:00:00.000Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 19
   completed_plans: 18
 ---
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-21)
 
 **Core value:** Community members can find mentors, collaborate on real projects with structured support, and follow clear learning roadmaps—all within a mentor-led, quality-focused environment.
-**Current focus:** Phase 02 — application-subsystem (complete; ready to transition to Phase 03 Public Presentation)
+**Current focus:** Phase 03 — public-presentation (CONTEXT.md gathered; awaiting `/gsd:plan-phase 3`)
 
 ## Current Position
 
-Phase: 02 (application-subsystem) — COMPLETE
-Plan: 9 of 9 (all plans shipped; Phase 2 ship gate cleared)
-Status: Ready for Phase 03 (Public Presentation) — awaiting `/gsd:transition`
-Last activity: 2026-04-22 — Plan 09 pre-flight + REVIEW-04 cleanup cron complete
+Phase: 03 (public-presentation) — DISCUSSING (CONTEXT gathered)
+Plan: 0 of TBD — `/gsd:plan-phase 3` is the next step
+Status: Phase 03 CONTEXT.md + DISCUSSION-LOG.md written 2026-04-22
+Last activity: 2026-04-22 — Phase 03 discuss-phase complete (4 gray areas resolved, 13 decisions locked)
 
 ## Performance Metrics
 
@@ -90,6 +90,15 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02-application-subsystem]: Plan 09 pre-flight: AMBASSADOR_DISCORD_MIN_AGE_DAYS=7 (option-b, user chose lower-friction first-cohort value over spec-default 30 per D-03)
 - [Phase 02-application-subsystem]: Plan 09 pre-flight: Ambassador Discord role created in CWA server; DISCORD_AMBASSADOR_ROLE_ID set to real 19-digit role ID (replaces PENDING_DISCORD_ROLE_CREATION); Phase 2 ship gate cleared
 - [Phase 02-application-subsystem]: Plan 09 REVIEW-04: cleanup-declined-application-media runs weekly (Mon 04:00 UTC); Firestore composite index (status ASC, declinedAt ASC) created on first-run failure; idempotent via studentIdCleanedUp flag + { ignoreNotFound:true } Storage delete
+- [Phase 03-public-presentation]: `/u/[username]` is canonical public profile route; `/mentorship/mentors/[username]` 308-redirects to it; cards on `/ambassadors` link to `/u/[username]` (D-01)
+- [Phase 03-public-presentation]: Public ambassador fields live on `mentorship_profiles/{uid}/ambassador/v1` subdoc — extends Phase 2 shape with university/city (snapshot from app doc on accept), publicTagline, twitterUrl, githubUrl, personalSiteUrl, cohortPresentationVideoUrl/EmbedType (D-02..D-04)
+- [Phase 03-public-presentation]: linkedinUrl stays on parent MentorshipProfile (mentor reuse); card render joins parent + subdoc (D-03a)
+- [Phase 03-public-presentation]: cohortPresentationVideo is URL-paste only, reuses Phase 2 isValidVideoUrl/classifyVideoUrl validators; Storage upload deferred to future quick task (D-04, D-04a)
+- [Phase 03-public-presentation]: New PATCH /api/ambassador/profile endpoint writes to subdoc + public_ambassadors/{uid} projection in a single batched write; do NOT extend /api/mentorship/profile (D-05a, D-08)
+- [Phase 03-public-presentation]: `public_ambassadors/{uid}` denormalized projection (top-level collection, public-read rules) — written on accept (in-transaction) and on PATCH; /ambassadors uses single collection query (D-07..D-09)
+- [Phase 03-public-presentation]: Single AmbassadorBadge component handles both "ambassador" and "alumni-ambassador" variants — built in Phase 3, reused unchanged in Phase 5 (D-10)
+- [Phase 03-public-presentation]: Badge placement scoped to /u/[username] only (PRESENT-03 minimum); MentorCard, project/roadmap byline chips deferred to future quick task (D-11)
+- [Phase 03-public-presentation]: Cross-phase contract — Phase 5 alumni transition + 2-strike offboarding MUST update or remove `public_ambassadors/{uid}`; Phase 4 referral/event/report writes do NOT touch it (D-12, D-13)
 
 ### Workflow Notes
 
@@ -139,9 +148,9 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 
 ## Session Continuity
 
-Last session: 2026-04-22T12:24:02.309Z
-Stopped at: Completed 02-09-cleanup-cron-preflight-PLAN.md
-Resume file: None
+Last session: 2026-04-22T13:00:00.000Z
+Stopped at: Phase 03 (Public Presentation) CONTEXT.md gathered — ready for /gsd:plan-phase 3
+Resume file: .planning/phases/03-public-presentation/03-CONTEXT.md
 
 ---
-*Last activity: 2026-04-21 - v6.0 Student Ambassador Program roadmap created; 5 phases, 66 requirements, 100% coverage*
+*Last activity: 2026-04-22 - Phase 03 discuss-phase complete; 4 gray areas resolved, 13 decisions locked*
