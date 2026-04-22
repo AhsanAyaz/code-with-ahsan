@@ -133,7 +133,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
   4. Offboarded or not-yet-accepted users never appear on `/ambassadors` — the page is strictly gated to currently-active members of the current cohort, verified by a `roles array-contains "ambassador"` + `ambassador.active == true` query.
 
 **Plans**: 6 plans
-  - [ ] 03-01-types-rules-projection-schema-PLAN.md — AmbassadorPublicFields + PublicAmbassadorDoc types, Zod schema, buildPublicAmbassadorProjection helper, firestore.rules for public_ambassadors/{uid} (Wave 1)
+  - [x] 03-01-types-rules-projection-schema-PLAN.md — AmbassadorPublicFields + PublicAmbassadorDoc types, Zod schema, buildPublicAmbassadorProjection helper, firestore.rules for public_ambassadors/{uid} (Wave 1)
   - [ ] 03-02-acceptance-snapshot-and-projection-write-PLAN.md — Extend runAcceptanceTransaction: username backfill, university/city snapshot on first accept, in-txn public_ambassadors/{uid} write (Wave 2)
   - [ ] 03-03-patch-ambassador-profile-endpoint-PLAN.md — PATCH /api/ambassador/profile (feature-flag + auth + role + Zod gates; batched subdoc + projection write) (Wave 2)
   - [ ] 03-04-badge-canonical-profile-route-redirect-PLAN.md — AmbassadorBadge component, /u/[username] canonical profile route, 308 redirect from /mentorship/mentors/[username] (Wave 3)
