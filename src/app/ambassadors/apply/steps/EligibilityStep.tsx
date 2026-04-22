@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useMentorship } from "@/contexts/MentorshipContext";
-import { authFetch } from "@/lib/apiClient";
 import { AMBASSADOR_DISCORD_MIN_AGE_DAYS } from "@/lib/ambassador/constants";
 
 type Check =
@@ -13,43 +12,30 @@ export default function EligibilityStep({
 }: {
   onEligible: () => void;
 }) {
-  const { user } = useMentorship();
+  const { user, loading } = useMentorship();
   const [check, setCheck] = useState<Check>({ loading: true });
 
   useEffect(() => {
-    async function load() {
-      if (!user) {
-        setCheck({ loading: false, eligible: false, profileAgeDays: 0 });
-        return;
-      }
-      try {
-        const res = await authFetch("/api/mentorship/profile");
-        if (!res.ok) {
-          setCheck({ loading: false, eligible: false, profileAgeDays: 0 });
-          return;
-        }
-        const body = await res.json();
-        const createdAt = body.profile?.createdAt;
-        const createdMs =
-          typeof createdAt === "object" && createdAt?._seconds
-            ? createdAt._seconds * 1000
-            : typeof createdAt === "string"
-            ? Date.parse(createdAt)
-            : Number(createdAt);
-        const ageDays = Number.isFinite(createdMs)
-          ? Math.floor((Date.now() - createdMs) / (24 * 60 * 60 * 1000))
-          : 0;
-        setCheck({
-          loading: false,
-          eligible: ageDays >= AMBASSADOR_DISCORD_MIN_AGE_DAYS,
-          profileAgeDays: ageDays,
-        });
-      } catch {
-        setCheck({ loading: false, eligible: false, profileAgeDays: 0 });
-      }
+    if (loading) return;
+    if (!user) {
+      setCheck({ loading: false, eligible: false, profileAgeDays: 0 });
+      return;
     }
-    void load();
-  }, [user]);
+    // Use Firebase Auth account creation time — persists for the life of
+    // the platform account, unlike mentorship_profiles.createdAt which is
+    // only populated if the user onboarded as mentor/mentee.
+    const createdMs = user.metadata.creationTime
+      ? Date.parse(user.metadata.creationTime)
+      : NaN;
+    const ageDays = Number.isFinite(createdMs)
+      ? Math.floor((Date.now() - createdMs) / (24 * 60 * 60 * 1000))
+      : 0;
+    setCheck({
+      loading: false,
+      eligible: ageDays >= AMBASSADOR_DISCORD_MIN_AGE_DAYS,
+      profileAgeDays: ageDays,
+    });
+  }, [user, loading]);
 
   if (check.loading) {
     return (
