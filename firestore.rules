@@ -215,5 +215,17 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }
+
+    // ─── Ambassador Public Projection (Phase 3, D-07) ───────
+    // PRESENT-01 / PRESENT-02: Read source for the public /ambassadors page.
+    // Public-readable by design (no auth required) — page is unauthenticated.
+    // Admin SDK only writes this collection; two write paths keep it in sync (D-08):
+    //   1. runAcceptanceTransaction (src/lib/ambassador/acceptance.ts)
+    //   2. PATCH /api/ambassador/profile
+    // Phase 5 alumni transition + offboarding will also Admin-SDK write this (D-12).
+    match /public_ambassadors/{uid} {
+      allow read: if true;
+      allow write: if false;
+    }
   }
 }
