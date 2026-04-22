@@ -185,5 +185,35 @@ service cloud.firestore {
     // If existing rules are needed, they should be added here.
     // For now, deny client access to mentorship collections
     // (all mentorship operations go through API routes using Admin SDK).
+
+    // ─── Ambassador Applications (Phase 2) ───────
+    // APPLY-06: applicant can create + read own; admin can read + write all.
+    // Writes (accept/decline) go through Admin SDK in API routes.
+    match /applications/{applicationId} {
+      // Applicants read only their OWN application (APPLY-07).
+      allow read: if isSignedIn() && (
+        resource.data.applicantUid == request.auth.uid ||
+        isAdmin()
+      );
+
+      // Applicants can create their own application with status=submitted.
+      // All other fields are server-controlled (discordMemberId, videoEmbedType, etc.),
+      // so the API route (Plan 05, via Admin SDK) bypasses these rules anyway.
+      // This rule is kept restrictive as defense-in-depth.
+      allow create: if isSignedIn() &&
+                       request.resource.data.applicantUid == request.auth.uid &&
+                       request.resource.data.status == "submitted";
+
+      // No client-side updates (reviewer workflow is admin-only through API).
+      allow update, delete: if isAdmin();
+    }
+
+    // ─── Ambassador Cohorts (Phase 2) ────────────
+    // COHORT-01: any signed-in user reads cohorts for the apply flow (Plan 07).
+    // Writes go through Admin SDK in API routes (Plan 04).
+    match /cohorts/{cohortId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
   }
 }
