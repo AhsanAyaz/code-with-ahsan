@@ -135,7 +135,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 **Plans**: 6 plans
   - [x] 03-01-types-rules-projection-schema-PLAN.md — AmbassadorPublicFields + PublicAmbassadorDoc types, Zod schema, buildPublicAmbassadorProjection helper, firestore.rules for public_ambassadors/{uid} (Wave 1)
   - [x] 03-02-acceptance-snapshot-and-projection-write-PLAN.md — Extend runAcceptanceTransaction: username backfill, university/city snapshot on first accept, in-txn public_ambassadors/{uid} write (Wave 2)
-  - [ ] 03-03-patch-ambassador-profile-endpoint-PLAN.md — PATCH /api/ambassador/profile (feature-flag + auth + role + Zod gates; batched subdoc + projection write) (Wave 2)
+  - [x] 03-03-patch-ambassador-profile-endpoint-PLAN.md — PATCH /api/ambassador/profile (feature-flag + auth + role + Zod gates; batched subdoc + projection write) (Wave 2)
   - [ ] 03-04-badge-canonical-profile-route-redirect-PLAN.md — AmbassadorBadge component, /u/[username] canonical profile route, 308 redirect from /mentorship/mentors/[username] (Wave 3)
   - [ ] 03-05-public-ambassadors-listing-page-PLAN.md — /ambassadors SSR listing page, getCurrentCohortId helper, GET /api/ambassadors/public, AmbassadorCard with inline cohort-presentation VideoEmbed (Wave 3)
   - [ ] 03-06-profile-ambassador-public-card-section-PLAN.md — AmbassadorPublicCardSection on /profile with 7 editable fields + live video preview, role-gated via hasRole (Wave 3)

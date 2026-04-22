@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: Completed 03-02-acceptance-snapshot-and-projection-write-PLAN.md
-last_updated: "2026-04-22T22:04:27.189Z"
+stopped_at: Completed 03-03-patch-ambassador-profile-endpoint-PLAN.md
+last_updated: "2026-04-22T22:09:27.572Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 5
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 ## Current Position
 
 Phase: 03 (public-presentation) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-04-22
 
@@ -101,6 +101,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 03-public-presentation]: Cross-phase contract — Phase 5 alumni transition + 2-strike offboarding MUST update or remove `public_ambassadors/{uid}`; Phase 4 referral/event/report writes do NOT touch it (D-12, D-13)
 - [Phase 03]: Pre-transaction username resolution: ensureUniqueUsername runs outside db.runTransaction() because where().limit().get() is illegal inside txn.get; resolvedUsername passed as closure into txn body
 - [Phase 03]: Re-accept NO-OP invariant locked: subdocPayload build, projection write (public_ambassadors/{uid}), and username backfill are all gated inside if (!alreadyAccepted) — in-life updates are PATCH endpoint's responsibility (plan 03-03)
+- [Phase 03-03]: AuthContext cast as unknown as DecodedRoleClaim for hasRoleClaim compatibility — index signature missing in AuthContext but structural fields (roles/role/admin) are identical
+- [Phase 03-03]: PATCH diff-oriented: empty-string body values map to FieldValue.delete() on subdoc; projection re-derived locally from post-write state to avoid second Firestore read
 
 ### Workflow Notes
 
@@ -148,11 +150,12 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 02-application-subsystem P05 | 17min | 3 tasks | 5 files |
 | Phase 02-application-subsystem P09 | 46min | 4 tasks | 5 files |
 | Phase 03 P03-02 | 3min | 2 tasks | 2 files |
+| Phase 03 P03-03 | 8 | 2 tasks | 1 files |
 
 ## Session Continuity
 
-Last session: 2026-04-22T22:04:27.186Z
-Stopped at: Completed 03-02-acceptance-snapshot-and-projection-write-PLAN.md
+Last session: 2026-04-22T22:09:27.568Z
+Stopped at: Completed 03-03-patch-ambassador-profile-endpoint-PLAN.md
 Resume file: None
 
 ---
