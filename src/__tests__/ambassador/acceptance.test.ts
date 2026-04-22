@@ -30,7 +30,7 @@ vi.mock("@/lib/firebaseAdmin", () => {
   const mockGet = vi.fn();
 
   // Transaction mock: runs the callback with a transaction object that has get/update/set
-  const txn = {
+  const txn: { get: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn>; set: ReturnType<typeof vi.fn> } = {
     get: vi.fn(),
     update: vi.fn(),
     set: vi.fn(),
@@ -47,7 +47,7 @@ vi.mock("@/lib/firebaseAdmin", () => {
         })),
       })),
     })),
-    runTransaction: vi.fn(async (fn: (txn: typeof txn) => unknown) => fn(txn)),
+    runTransaction: vi.fn(async (fn: (txn: unknown) => unknown) => fn(txn)),
   };
 
   return { db };
@@ -121,9 +121,9 @@ function setupTransactionMock(docs: {
   cohort?: Record<string, unknown> | null;
   profile?: Record<string, unknown> | null;
 }) {
-  const txn = (db as unknown as { runTransaction: MockedFunction<typeof db.runTransaction> }).runTransaction;
+  const txn = (db as unknown as { runTransaction: MockedFunction<(fn: (t: unknown) => unknown) => Promise<unknown>> }).runTransaction;
 
-  txn.mockImplementation(async (fn: (t: { get: MockedFunction<(ref: unknown) => Promise<unknown>>; update: MockedFunction<(...args: unknown[]) => void>; set: MockedFunction<(...args: unknown[]) => void> }) => unknown) => {
+  txn.mockImplementation(async (fn: (t: unknown) => unknown) => {
     const snapFor = (data: Record<string, unknown> | null | undefined) => ({
       exists: data != null,
       data: () => data ?? undefined,
@@ -258,7 +258,7 @@ describe("assignAmbassadorDiscordRoleSoft", () => {
 
     expect(result).toEqual({ ok: true });
     // Should have called update with discordRoleAssigned:true, discordRetryNeeded:false
-    const updateCall = (db.collection("applications").doc("app-1").update as MockedFunction<typeof db.collection>).mock?.calls;
+    const updateCall = (db.collection("applications").doc("app-1").update as unknown as MockedFunction<(...args: unknown[]) => unknown>).mock?.calls;
     // The update is called via db.collection().doc().update
     expect(assignDiscordRole).toHaveBeenCalledWith("discord-member-1", "1496485291228139641");
   });
