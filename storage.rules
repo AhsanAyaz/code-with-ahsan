@@ -1,10 +1,22 @@
 rules_version = '2';
-
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
+
+    // ─── Ambassador Applications: student-ID uploads (Phase 2, D-14) ───
+    // Path: applications/{applicantUid}/{applicationId}/student_id.{ext}
+    // Writer: the applicant only (signed-in + matching uid).
+    // Reader: admin only — applicants do NOT re-read their own student-ID
+    //   (avoids leaking the file if their account is compromised later).
+    // Admin reads go through Admin SDK with getSignedUrl() (1-hour expiry per REVIEW-02).
+    match /applications/{applicantUid}/{applicationId}/{fileName} {
+      allow write: if request.auth != null
+                      && request.auth.uid == applicantUid
+                      && request.resource.size < 10 * 1024 * 1024          // 10 MB cap
+                      && request.resource.contentType.matches('image/.*'); // images only
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    // Deny everything else by default (default-deny policy).
     match /{allPaths=**} {
       allow read, write: if false;
     }
