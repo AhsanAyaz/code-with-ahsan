@@ -44,7 +44,7 @@ Scoped requirements for v6.0. Each maps to exactly one roadmap phase (populated 
 - [ ] **REVIEW-01**: Admin review panel at `/admin/ambassadors` lists applications with filters (cohort, status, submission date) and pagination
 - [ ] **REVIEW-02**: Admin can open an application detail view that shows all form fields, streams the video via a short-lived signed URL (1-hour expiry, regenerated each page load), and displays prior reviewer notes
 - [ ] **REVIEW-03**: Admin can accept or decline an application with an optional note; single-reviewer workflow (no voting in v1)
-- [ ] **REVIEW-04**: Declined applications trigger a retention cron that deletes the stored video 30 days after the decline decision
+- [x] **REVIEW-04**: Declined applications trigger a retention cron that deletes the stored video 30 days after the decline decision
 - [ ] **REVIEW-05**: Admin panel shows a Discord integration banner if acceptance cannot resolve a `discordMemberId` for an applicant (allows retry / manual link)
 
 ### Discord Integration
@@ -202,7 +202,7 @@ Every v1 REQ-ID maps to exactly one phase. Populated during roadmap creation (20
 | REVIEW-01 | Phase 2 — Application Subsystem | Pending |
 | REVIEW-02 | Phase 2 — Application Subsystem | Pending |
 | REVIEW-03 | Phase 2 — Application Subsystem | Pending |
-| REVIEW-04 | Phase 2 — Application Subsystem | Pending |
+| REVIEW-04 | Phase 2 — Application Subsystem | Complete |
 | REVIEW-05 | Phase 2 — Application Subsystem | Pending |
 | DISC-01 | Phase 2 — Application Subsystem | Complete |
 | DISC-02 | Phase 2 — Application Subsystem | Complete |

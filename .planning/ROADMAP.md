@@ -120,7 +120,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 - [x] 02-06-accept-decline-api-PLAN.md — TDD `runAcceptanceTransaction` (Firestore transaction for COHORT-04 race safety) + PATCH accept/decline route + `/discord-resolve` retry endpoint (Pitfall 2 fresh re-resolve) (Wave 3 / COHORT-04, REVIEW-03/05, DISC-02/03, EMAIL-02/03)
 - [x] 02-07-apply-wizard-ui-PLAN.md — 4-step `/ambassadors/apply` wizard + `useApplyForm` hook + `AmbassadorApplicationStatus` on profile page; D-13 radio path choice + D-15 blur warning + direct-to-GCS upload (Wave 3 / APPLY-01/02/03/04/05/07)
 - [x] 02-08-admin-review-ui-PLAN.md — `/admin/ambassadors` list (URL-query filters + cursor pagination) + `[applicationId]` detail (first admin detail page per D-09) + VideoEmbed / DiscordBanner / DecisionDialog components (Wave 3 / REVIEW-01/02/05)
-- [ ] 02-09-cleanup-cron-preflight-PLAN.md — Weekly `cleanup-declined-application-media.ts` + GitHub Actions workflow + pre-flight checkpoints (AMBASSADOR_DISCORD_MIN_AGE_DAYS decision + DISCORD_AMBASSADOR_ROLE_ID creation) (Wave 4 / REVIEW-04)
+- [x] 02-09-cleanup-cron-preflight-PLAN.md — Weekly `cleanup-declined-application-media.ts` + GitHub Actions workflow + pre-flight checkpoints (AMBASSADOR_DISCORD_MIN_AGE_DAYS decision + DISCORD_AMBASSADOR_ROLE_ID creation) (Wave 4 / REVIEW-04)
 
 ### Phase 3: Public Presentation
 **Goal**: The world can see the active ambassador cohort on `codewithahsan.dev/ambassadors` with only the fields each ambassador has chosen to share publicly, and any user's profile page correctly displays an Ambassador (or Alumni Ambassador) badge so status is visible wherever an ambassador shows up on the platform.

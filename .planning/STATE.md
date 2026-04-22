@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: "Stopped at checkpoint: Task 4 of 02-09-cleanup-cron-preflight-PLAN.md (checkpoint:human-action — DISCORD_AMBASSADOR_ROLE_ID)"
-last_updated: "2026-04-22T12:03:52.557Z"
-last_activity: 2026-04-22 -- Phase 02 execution started
+stopped_at: Completed 02-09-cleanup-cron-preflight-PLAN.md
+last_updated: "2026-04-22T12:24:02.312Z"
+last_activity: 2026-04-22
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 19
-  completed_plans: 17
+  completed_plans: 18
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-21)
 
 **Core value:** Community members can find mentors, collaborate on real projects with structured support, and follow clear learning roadmaps—all within a mentor-led, quality-focused environment.
-**Current focus:** Phase 02 — application-subsystem
+**Current focus:** Phase 02 — application-subsystem (complete; ready to transition to Phase 03 Public Presentation)
 
 ## Current Position
 
-Phase: 02 (application-subsystem) — EXECUTING
-Plan: 1 of 9
-Status: Executing Phase 02
-Last activity: 2026-04-22 -- Phase 02 execution started
+Phase: 02 (application-subsystem) — COMPLETE
+Plan: 9 of 9 (all plans shipped; Phase 2 ship gate cleared)
+Status: Ready for Phase 03 (Public Presentation) — awaiting `/gsd:transition`
+Last activity: 2026-04-22 — Plan 09 pre-flight + REVIEW-04 cleanup cron complete
 
 ## Performance Metrics
 
@@ -87,6 +87,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02-06]: runAcceptanceTransaction uses db.runTransaction() for atomic COHORT-04 maxSize enforcement; acceptance idempotent (re-accept returns 200 alreadyAccepted:true, no double count); Discord failure never rolls back Firestore (D-17, discordRetryNeeded:true persisted); /discord-resolve always re-resolves handle freshly (Pitfall 2); reviewedBy=admin.uid on every decision (APPLY-08)
 - [Phase 02-07]: Inlined validateAcademicEmailClient (regex-only) in wizard because academicEmail.ts uses Node fs — server still runs full Hipo check on submission. Wizard uses crypto.randomUUID() for upload path; Firestore doc id is auto-generated independent
 - [Phase 02-08]: Pagination cursor stack in ApplicationsList — Firestore cursors are forward-only so previous-page stack replays cursors on Previous click. First admin detail-page pattern (D-09) — shape should be mirrored by future admin detail pages
+- [Phase 02-application-subsystem]: Plan 09 pre-flight: AMBASSADOR_DISCORD_MIN_AGE_DAYS=7 (option-b, user chose lower-friction first-cohort value over spec-default 30 per D-03)
+- [Phase 02-application-subsystem]: Plan 09 pre-flight: Ambassador Discord role created in CWA server; DISCORD_AMBASSADOR_ROLE_ID set to real 19-digit role ID (replaces PENDING_DISCORD_ROLE_CREATION); Phase 2 ship gate cleared
+- [Phase 02-application-subsystem]: Plan 09 REVIEW-04: cleanup-declined-application-media runs weekly (Mon 04:00 UTC); Firestore composite index (status ASC, declinedAt ASC) created on first-run failure; idempotent via studentIdCleanedUp flag + { ignoreNotFound:true } Storage delete
 
 ### Workflow Notes
 
@@ -132,11 +135,12 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 02-application-subsystem P01 | 3 | 3 tasks | 4 files |
 | Phase 02-application-subsystem P04 | 6min | 3 tasks | 4 files |
 | Phase 02-application-subsystem P05 | 17min | 3 tasks | 5 files |
+| Phase 02-application-subsystem P09 | 46min | 4 tasks | 5 files |
 
 ## Session Continuity
 
-Last session: 2026-04-22T12:03:52.554Z
-Stopped at: Stopped at checkpoint: Task 4 of 02-09-cleanup-cron-preflight-PLAN.md (checkpoint:human-action — DISCORD_AMBASSADOR_ROLE_ID)
+Last session: 2026-04-22T12:24:02.309Z
+Stopped at: Completed 02-09-cleanup-cron-preflight-PLAN.md
 Resume file: None
 
 ---
