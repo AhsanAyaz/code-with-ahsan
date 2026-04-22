@@ -23,6 +23,16 @@ import {
   AMBASSADOR_COHORTS_COLLECTION,
 } from "@/lib/ambassador/constants";
 import type { ApplicationDoc, CohortDoc } from "@/types/ambassador";
+import {
+  buildPublicAmbassadorProjection,
+} from "@/lib/ambassador/publicProjection";
+import {
+  PUBLIC_AMBASSADORS_COLLECTION,
+} from "@/types/ambassador";
+import {
+  deriveBaseUsername,
+  ensureUniqueUsername,
+} from "@/lib/ambassador/username";
 
 // ─── Return types ───────────────────────────────────────────────────────────
 
@@ -63,6 +73,36 @@ export async function runAcceptanceTransaction(
   adminUid: string,
   notes: string | undefined,
 ): Promise<AcceptanceResult> {
+  // ── Pre-transaction: resolve the applicant's mentorship_profiles doc to check if
+  // a username backfill is needed (D-01a). Username uniqueness requires a
+  // `where().limit().get()` query which is ILLEGAL inside a Firestore transaction
+  // (`txn.get` only accepts document refs). So we read the applicant + profile here,
+  // derive/resolve the username here, then pass `resolvedUsername` into the txn body.
+  //
+  // The txn body re-reads appRef/profileRef via `txn.get` to preserve Firestore's
+  // read-before-write invariant — costs 2 extra reads per acceptance, which is
+  // acceptable for a rare, one-time-per-applicant operation.
+  const preAppSnap = await db
+    .collection(AMBASSADOR_APPLICATIONS_COLLECTION)
+    .doc(applicationId)
+    .get();
+  if (!preAppSnap.exists) return { ok: false, error: "application_not_found" };
+  const preApp = preAppSnap.data() as ApplicationDoc;
+
+  const preProfileSnap = await db
+    .collection("mentorship_profiles")
+    .doc(preApp.applicantUid)
+    .get();
+  const preProfileData = preProfileSnap.exists
+    ? (preProfileSnap.data() as { username?: string; linkedinUrl?: string; photoURL?: string; displayName?: string })
+    : undefined;
+
+  let resolvedUsername = preProfileData?.username;
+  if (!resolvedUsername || resolvedUsername.trim().length === 0) {
+    const base = deriveBaseUsername(preApp.applicantName, preApp.applicantEmail);
+    resolvedUsername = await ensureUniqueUsername(base);
+  }
+
   return db.runTransaction<AcceptanceResult>(async (txn) => {
     // ── Reads (all before writes) ─────────────────────────────────────────
     const appRef = db.collection(AMBASSADOR_APPLICATIONS_COLLECTION).doc(applicationId);
@@ -103,16 +143,28 @@ export async function runAcceptanceTransaction(
     txn.update(appRef, appUpdate);
 
     // Profile roles — arrayUnion is idempotent, safe to call on re-accept.
+    // Username backfill (D-01a): if the parent profile has no username, set
+    // `resolvedUsername` (derived pre-txn via ensureUniqueUsername) alongside
+    // the roles update. No-op if a username already exists.
     if (profileSnap.exists) {
-      txn.update(profileRef, { roles: FieldValue.arrayUnion("ambassador") });
+      const existingUsername = (profileSnap.data() as { username?: string })?.username;
+      const profileUpdate: Record<string, unknown> = {
+        roles: FieldValue.arrayUnion("ambassador"),
+      };
+      if (!existingUsername || existingUsername.trim().length === 0) {
+        profileUpdate.username = resolvedUsername;
+      }
+      txn.update(profileRef, profileUpdate);
     } else {
-      // Edge case: profile doc missing — create it with ambassador role.
+      // Edge case: profile doc missing — create it with ambassador role AND the
+      // resolved username so /u/[username] doesn't fall back to /u/{uid}.
       txn.set(
         profileRef,
         {
           uid: app.applicantUid,
           email: app.applicantEmail,
           displayName: app.applicantName,
+          username: resolvedUsername,
           roles: ["ambassador"],
           createdAt: now,
         },
@@ -120,20 +172,72 @@ export async function runAcceptanceTransaction(
       );
     }
 
-    // Ambassador subdoc + cohort increment — only on first accept.
+    // Ambassador subdoc + cohort increment + public projection — only on first accept.
+    // Subdoc snapshot + public projection write are FIRST-ACCEPT-ONLY. Re-accept
+    // is a no-op for both: in-life edits flow through PATCH /api/ambassador/profile
+    // (plan 03-03), which batches subdoc + projection updates atomically.
     if (!alreadyAccepted) {
       const ambassadorRef = profileRef.collection("ambassador").doc("v1");
-      txn.set(ambassadorRef, {
+      const subdocPayload: Record<string, unknown> = {
         cohortId: app.targetCohortId,
         joinedAt: now,
         active: true,
         strikes: 0,
         discordMemberId: app.discordMemberId ?? null,
-      });
+      };
+      // D-06: snapshot university + city from the application doc onto the subdoc
+      // on FIRST accept. Conditionally spread — Admin SDK rejects undefined.
+      if (typeof app.university === "string" && app.university.trim().length > 0) {
+        subdocPayload.university = app.university.trim();
+      }
+      if (typeof app.city === "string" && app.city.trim().length > 0) {
+        subdocPayload.city = app.city.trim();
+      }
+      txn.set(ambassadorRef, subdocPayload);
       txn.update(cohortRef, {
         acceptedCount: FieldValue.increment(1),
         updatedAt: now,
       });
+
+      // D-08 path 1: write the denormalized public_ambassadors projection inside the
+      // SAME transaction so /ambassadors never sees an ambassador whose projection
+      // is missing. Joins parent profile fields (photoURL, displayName, linkedinUrl)
+      // with the application's university/city snapshot.
+      //
+      // Subdoc snapshot + public projection write are FIRST-ACCEPT-ONLY. Re-accept
+      // is a no-op for both: in-life edits flow through PATCH /api/ambassador/profile
+      // (plan 03-03), which batches subdoc + projection updates atomically.
+      const parentProfile =
+        profileSnap.exists
+          ? (profileSnap.data() as {
+              username?: string;
+              displayName?: string;
+              photoURL?: string;
+              linkedinUrl?: string;
+            })
+          : undefined;
+
+      const publicRef = db.collection(PUBLIC_AMBASSADORS_COLLECTION).doc(app.applicantUid);
+      const projection = buildPublicAmbassadorProjection({
+        uid: app.applicantUid,
+        username: resolvedUsername,
+        displayName:
+          parentProfile?.displayName ?? app.applicantName ?? "Ambassador",
+        photoURL: parentProfile?.photoURL ?? "",
+        cohortId: app.targetCohortId,
+        linkedinUrl: parentProfile?.linkedinUrl,
+        university:
+          typeof app.university === "string" && app.university.trim().length > 0
+            ? app.university.trim()
+            : undefined,
+        city:
+          typeof app.city === "string" && app.city.trim().length > 0
+            ? app.city.trim()
+            : undefined,
+        // Phase-3 editable fields are absent at acceptance time; PATCH populates them later.
+        updatedAt: now,
+      });
+      txn.set(publicRef, projection);
     }
 
     return {
