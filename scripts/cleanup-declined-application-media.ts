@@ -5,7 +5,7 @@
  * Idempotent — re-runs on the same decline skip because the doc is flagged { studentIdCleanedUp: true }.
  *
  * Env vars required:
- *   FIREBASE_SERVICE_ACCOUNT_KEY               (JSON-serialized service account)
+ *   FIREBASE_SERVICE_ACCOUNT                   (JSON-serialized service account)
  *   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET        (e.g. project-id.appspot.com)
  *   NEXT_PUBLIC_FIREBASE_PROJECT_ID            (optional; admin SDK derives from SA key)
  *
@@ -31,9 +31,9 @@ function daysAgoMs(days: number): number {
 
 function initAdmin(): void {
   if (admin.apps.length > 0) return;
-  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
   if (!raw) {
-    throw new Error("FIREBASE_SERVICE_ACCOUNT_KEY env var is required.");
+    throw new Error("FIREBASE_SERVICE_ACCOUNT env var is required.");
   }
   const serviceAccount = JSON.parse(raw) as { private_key?: string };
   // Normalize private_key: env vars sometimes store \n as literal \\n
