@@ -132,7 +132,13 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
   3. An accepted ambassador can (optionally) upload a separate public `cohortPresentationVideo` from their profile and it renders on their `/ambassadors` card — distinct from their private application video, which never becomes publicly accessible.
   4. Offboarded or not-yet-accepted users never appear on `/ambassadors` — the page is strictly gated to currently-active members of the current cohort, verified by a `roles array-contains "ambassador"` + `ambassador.active == true` query.
 
-**Plans**: TBD
+**Plans**: 6 plans
+  - [ ] 03-01-types-rules-projection-schema-PLAN.md — AmbassadorPublicFields + PublicAmbassadorDoc types, Zod schema, buildPublicAmbassadorProjection helper, firestore.rules for public_ambassadors/{uid} (Wave 1)
+  - [ ] 03-02-acceptance-snapshot-and-projection-write-PLAN.md — Extend runAcceptanceTransaction: username backfill, university/city snapshot on first accept, in-txn public_ambassadors/{uid} write (Wave 2)
+  - [ ] 03-03-patch-ambassador-profile-endpoint-PLAN.md — PATCH /api/ambassador/profile (feature-flag + auth + role + Zod gates; batched subdoc + projection write) (Wave 2)
+  - [ ] 03-04-badge-canonical-profile-route-redirect-PLAN.md — AmbassadorBadge component, /u/[username] canonical profile route, 308 redirect from /mentorship/mentors/[username] (Wave 3)
+  - [ ] 03-05-public-ambassadors-listing-page-PLAN.md — /ambassadors SSR listing page, getCurrentCohortId helper, GET /api/ambassadors/public, AmbassadorCard with inline cohort-presentation VideoEmbed (Wave 3)
+  - [ ] 03-06-profile-ambassador-public-card-section-PLAN.md — AmbassadorPublicCardSection on /profile with 7 editable fields + live video preview, role-gated via hasRole (Wave 3)
 **UI hint**: yes
 
 ### Phase 4: Activity Subsystem
@@ -168,7 +174,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 |-------|----------------|--------|-----------|
 | v6.0 Phase 1: Foundation — Roles Array Migration | 0/10 | Planned | — |
 | v6.0 Phase 2: Application Subsystem | 0/9 | Planned | — |
-| v6.0 Phase 3: Public Presentation | 0/0 | Not started | — |
+| v6.0 Phase 3: Public Presentation | 0/6 | Planned | — |
 | v6.0 Phase 4: Activity Subsystem | 0/0 | Not started | — |
 | v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 0/0 | Not started | — |
 
