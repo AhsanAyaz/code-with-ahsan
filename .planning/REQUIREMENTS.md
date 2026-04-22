@@ -24,8 +24,8 @@ Scoped requirements for v6.0. Each maps to exactly one roadmap phase (populated 
 ### Cohort Management
 
 - [x] **COHORT-01**: Admin can create a cohort (`name`, `startDate`, `endDate`, `maxSize`, `status: upcoming | active | closed`) from the admin panel
-- [ ] **COHORT-02**: Admin can open / close an application window on a cohort (applications accepted only while status is `upcoming` and window is open)
-- [ ] **COHORT-03**: Admin can view the list of all accepted ambassadors attached to a cohort
+- [x] **COHORT-02**: Admin can open / close an application window on a cohort (applications accepted only while status is `upcoming` and window is open)
+- [x] **COHORT-03**: Admin can view the list of all accepted ambassadors attached to a cohort
 - [ ] **COHORT-04**: System enforces cohort `maxSize` at acceptance time (acceptance request rejected if cohort is full)
 
 ### Application Pipeline
@@ -188,8 +188,8 @@ Every v1 REQ-ID maps to exactly one phase. Populated during roadmap creation (20
 | ROLE-07 | Phase 1 — Foundation: Roles Array Migration | Complete |
 | ROLE-08 | Phase 1 — Foundation: Roles Array Migration | Complete |
 | COHORT-01 | Phase 2 — Application Subsystem | Complete |
-| COHORT-02 | Phase 2 — Application Subsystem | Pending |
-| COHORT-03 | Phase 2 — Application Subsystem | Pending |
+| COHORT-02 | Phase 2 — Application Subsystem | Complete |
+| COHORT-03 | Phase 2 — Application Subsystem | Complete |
 | COHORT-04 | Phase 2 — Application Subsystem | Pending |
 | APPLY-01 | Phase 2 — Application Subsystem | Complete |
 | APPLY-02 | Phase 2 — Application Subsystem | Complete |

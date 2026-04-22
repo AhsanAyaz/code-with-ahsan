@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: Completed 02-01-types-zod-feature-foundations-PLAN.md
-last_updated: "2026-04-22T11:05:04.750Z"
+stopped_at: Completed 02-04-cohort-api-admin-panel-PLAN.md
+last_updated: "2026-04-22T11:18:20.442Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 19
-  completed_plans: 10
+  completed_plans: 13
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 ## Current Position
 
 Phase: 02 (application-subsystem) — EXECUTING
-Plan: 2 of 9
+Plan: 3 of 9
 Status: Ready to execute
 Last activity: 2026-04-22
 
@@ -78,6 +78,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: Plan 08 test fixture migration: dual-shape fixtures (role+roles both present), 108 tests (53 pre-existing + 55 new), measured v8 coverage on src/lib/permissions.ts = 90.54% branch / 94.91% line (gate >=90% PASS); installed @vitest/coverage-v8 and backfilled missing @rollup native dep (Rule-3 blocker)
 - [Phase 02-application-subsystem]: AMBASSADOR_DISCORD_MIN_AGE_DAYS defaults to 30 (spec §4); 7-day alternative reviewed at Plan 09 pre-flight (D-03)
 - [Phase 02-application-subsystem]: DISCORD_AMBASSADOR_ROLE_ID set to PENDING_DISCORD_ROLE_CREATION placeholder; acceptance API returns discordRoleAssigned=false while placeholder is active (DISC-02)
+- [Phase 02-04]: requireAdmin returns { ok: true; uid: string } discriminated union — uid synthesised as admin:token12 prefix for Plan 06 reviewedBy audit field (legacy admin auth has no Firebase uid)
+- [Phase 02-04]: featureGate() helper extracted per-file — all /api/ambassador/cohorts/* handlers return 404 when FEATURE_AMBASSADOR_PROGRAM is off (Pitfall 3)
+- [Phase 02-04]: GET /cohorts scope=open (no auth, upcoming+windowOpen) vs scope=all (admin-only) — Plan 07 apply wizard uses open scope without admin credentials
 
 ### Workflow Notes
 
@@ -121,11 +124,12 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 01-foundation-roles-array-migration P09 | ~3min | 2 tasks | 2 files |
 | Phase 01 P08 | ~6min | 1 tasks | 3 files |
 | Phase 02-application-subsystem P01 | 3 | 3 tasks | 4 files |
+| Phase 02-application-subsystem P04 | 6min | 3 tasks | 4 files |
 
 ## Session Continuity
 
-Last session: 2026-04-22T11:05:04.747Z
-Stopped at: Completed 02-01-types-zod-feature-foundations-PLAN.md
+Last session: 2026-04-22T11:18:20.439Z
+Stopped at: Completed 02-04-cohort-api-admin-panel-PLAN.md
 Resume file: None
 
 ---
