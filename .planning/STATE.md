@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: Completed 03-04-badge-canonical-profile-route-redirect-PLAN.md
-last_updated: "2026-04-22T22:15:42.356Z"
+stopped_at: Completed 03-06-profile-ambassador-public-card-section-PLAN.md
+last_updated: "2026-04-22T22:20:51.994Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 25
-  completed_plans: 22
+  completed_plans: 23
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 ## Current Position
 
 Phase: 03 (public-presentation) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-04-22
 
@@ -105,6 +105,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 03-03]: PATCH diff-oriented: empty-string body values map to FieldValue.delete() on subdoc; projection re-derived locally from post-write state to avoid second Firestore read
 - [Phase 03]: AmbassadorBadge is a single component switching on role prop (D-10) so Phase 5 alumni transition reuses it unchanged — badge placement scoped to /u/[username] only for Phase 3 (D-11)
 - [Phase 03]: 308 redirect /mentorship/mentors/:username → /u/:username lives in next.config.ts redirects() (D-01) — applies at edge before Next.js routing, natively preserves query strings; existing route files kept as dead code for post-launch cleanup
+- [Phase 03-06]: AmbassadorPublicCardSection uses diff-based payload (initial vs form) — only changed fields sent to PATCH; empty string is meaningful (server treats as FieldValue.delete())
+- [Phase 03-06]: /profile AmbassadorPublicCardSection gated by isAmbassadorProgramEnabled() + profile null-guard + hasRole ambassador|alumni-ambassador (D-05 — alumni keep the edit surface)
 
 ### Workflow Notes
 
@@ -154,11 +156,12 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 03 P03-02 | 3min | 2 tasks | 2 files |
 | Phase 03 P03-03 | 8 | 2 tasks | 1 files |
 | Phase 03 P03-04 | 2min | 3 tasks | 4 files |
+| Phase 03-public-presentation P03-06 | 3min | 3 tasks | 2 files |
 
 ## Session Continuity
 
-Last session: 2026-04-22T22:15:42.352Z
-Stopped at: Completed 03-04-badge-canonical-profile-route-redirect-PLAN.md
+Last session: 2026-04-22T22:20:51.991Z
+Stopped at: Completed 03-06-profile-ambassador-public-card-section-PLAN.md
 Resume file: None
 
 ---
