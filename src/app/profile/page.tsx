@@ -17,6 +17,7 @@ import { TimeSlotAvailability, UnavailableDate } from "@/types/mentorship";
 import { hasRole } from "@/lib/permissions";
 import { isAmbassadorProgramEnabled } from "@/lib/features";
 import AmbassadorApplicationStatus from "./AmbassadorApplicationStatus";
+import AmbassadorPublicCardSection from "./AmbassadorPublicCardSection";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -305,6 +306,14 @@ export default function SettingsPage() {
 
       {/* Ambassador Application Status (APPLY-07) — feature-gated */}
       {isAmbassadorProgramEnabled() && <AmbassadorApplicationStatus />}
+
+      {/* Ambassador Public Card (PRESENT-03) — role-gated + feature-gated */}
+      {isAmbassadorProgramEnabled() &&
+        profile &&
+        (hasRole(profile, "ambassador") ||
+          hasRole(profile, "alumni-ambassador")) && (
+          <AmbassadorPublicCardSection />
+        )}
 
       {/* Skill Level Card */}
       <div className="card bg-base-100 shadow-xl">
