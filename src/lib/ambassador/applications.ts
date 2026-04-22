@@ -10,7 +10,7 @@
  */
 
 import { FieldValue } from "firebase-admin/firestore";
-import { db } from "@/lib/firebaseAdmin";
+import { db, auth } from "@/lib/firebaseAdmin";
 import {
   AMBASSADOR_APPLICATIONS_COLLECTION,
   AMBASSADOR_COHORTS_COLLECTION,
@@ -31,21 +31,26 @@ export interface EligibilityCheck {
 }
 
 /**
- * APPLY-01 age gate. Reads mentorship_profiles/{uid}.createdAt.
- * Returns eligible:false if the doc is missing (safer default).
+ * APPLY-01 age gate. Reads Firebase Auth account creationTime — matches the client
+ * EligibilityStep source (src/app/ambassadors/apply/steps/EligibilityStep.tsx) so the
+ * server and client agree. mentorship_profiles.createdAt is only populated for users
+ * who onboarded as mentor/mentee, so admin-only or ambassador-only users would 403.
  */
 export async function ensureDiscordAgeEligible(uid: string): Promise<EligibilityCheck> {
-  const snap = await db.collection("mentorship_profiles").doc(uid).get();
-  if (!snap.exists) {
+  let createdMs: number;
+  try {
+    const user = await auth.getUser(uid);
+    const creationTime = user.metadata.creationTime;
+    if (!creationTime) {
+      return { eligible: false, reason: "profile_missing", requiredDays: AMBASSADOR_DISCORD_MIN_AGE_DAYS };
+    }
+    createdMs = Date.parse(creationTime);
+    if (!Number.isFinite(createdMs)) {
+      return { eligible: false, reason: "profile_missing", requiredDays: AMBASSADOR_DISCORD_MIN_AGE_DAYS };
+    }
+  } catch {
     return { eligible: false, reason: "profile_missing", requiredDays: AMBASSADOR_DISCORD_MIN_AGE_DAYS };
   }
-  const data = snap.data();
-  const createdAt = data?.createdAt;
-  if (!createdAt) {
-    return { eligible: false, reason: "profile_missing", requiredDays: AMBASSADOR_DISCORD_MIN_AGE_DAYS };
-  }
-  // createdAt may be a Firestore Timestamp or a serialized number. Handle both.
-  const createdMs = typeof createdAt.toMillis === "function" ? createdAt.toMillis() : Number(createdAt);
   const ageDays = (Date.now() - createdMs) / MS_PER_DAY;
   if (ageDays < AMBASSADOR_DISCORD_MIN_AGE_DAYS) {
     return {
@@ -152,9 +157,10 @@ export function buildApplicationDoc(
     city: input.city,
     discordHandle: input.discordHandle,
     discordMemberId,
-    academicEmail: input.academicEmail,
+    // Optional academic fields: omit when undefined — Firestore Admin SDK rejects undefined.
+    ...(input.academicEmail !== undefined && { academicEmail: input.academicEmail }),
     academicEmailVerified,
-    studentIdStoragePath: input.studentIdStoragePath,
+    ...(input.studentIdStoragePath !== undefined && { studentIdStoragePath: input.studentIdStoragePath }),
     academicVerificationPath: input.academicVerificationPath,
     motivation: input.motivation,
     experience: input.experience,
