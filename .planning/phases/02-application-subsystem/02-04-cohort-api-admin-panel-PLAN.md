@@ -10,6 +10,7 @@ files_modified:
   - src/app/api/ambassador/cohorts/route.ts
   - src/app/api/ambassador/cohorts/[cohortId]/route.ts
   - src/app/admin/ambassadors/cohorts/page.tsx
+  - src/lib/ambassador/adminAuth.ts
 autonomous: true
 requirements:
   - COHORT-01
@@ -20,7 +21,8 @@ must_haves:
     - "Admin can create a cohort (name, startDate, endDate, maxSize, status) and see it appear in the list."
     - "Admin can toggle applicationWindowOpen on a cohort (COHORT-02) — the change is visible in the UI immediately and returned by the GET endpoint."
     - "Admin can view the list of ambassadors attached to a cohort (COHORT-03) — a count + link to the application-list page filtered by cohort."
-    - "POST /api/ambassador/cohorts returns 401/403 for non-admin callers (x-admin-token check) and 400 for invalid CohortCreateSchema body."
+    - "POST /api/ambassador/cohorts returns 401 for non-admin callers (x-admin-token missing or expired) and 400 for invalid CohortCreateSchema body."
+    - "requireAdmin() returns { ok: true, uid: string } on success (uid is synthesised from the admin_sessions token because the legacy admin password flow has no Firebase uid); Plans 05 and 06 consume this shape for the reviewedBy audit field."
     - "Every /api/ambassador/cohorts/* handler returns 404 when FEATURE_AMBASSADOR_PROGRAM is off (RESEARCH.md Pitfall 3)."
   artifacts:
     - path: "src/app/api/ambassador/cohorts/route.ts"
@@ -36,6 +38,12 @@ must_haves:
     - path: "src/app/admin/ambassadors/cohorts/page.tsx"
       provides: "Admin cohort panel: create form + list + toggle window + click-through to application-list by cohort"
       min_lines: 120
+    - path: "src/lib/ambassador/adminAuth.ts"
+      provides: "Shared admin-session helpers consumed by Plans 04/05/06/08. requireAdmin returns { ok: true; uid: string } | { ok: false; status; error }."
+      exports:
+        - "isValidAdminToken"
+        - "getAdminToken"
+        - "requireAdmin"
   key_links:
     - from: "src/app/api/ambassador/cohorts/route.ts"
       to: "isAmbassadorProgramEnabled"
@@ -49,6 +57,10 @@ must_haves:
       to: "/api/ambassador/cohorts"
       via: "fetch() with x-admin-token header from ADMIN_TOKEN_KEY localStorage"
       pattern: "x-admin-token"
+    - from: "src/lib/ambassador/adminAuth.ts"
+      to: "admin_sessions/{token}"
+      via: "requireAdmin resolves the session doc and surfaces a synthesised uid (admin_sessions is legacy password-keyed; no Firebase uid is stored) for Plan 06's reviewedBy audit field."
+      pattern: "admin_sessions"
 ---
 
 <objective>
@@ -57,8 +69,10 @@ Build the cohort management subsystem (COHORT-01/02/03). Admin creates cohorts, 
 Purpose:
 - Without a cohort, the apply wizard (Plan 07) has nothing to target. This plan unblocks 07 and 05.
 - Firestore-level gating (applicationWindowOpen + status=upcoming) runs in the submit-route (Plan 05); admin panel just toggles the flag.
+- This plan also owns the shared `src/lib/ambassador/adminAuth.ts` helper. It returns `{ ok: true; uid: string }` on success so Plan 06 can audit acceptance decisions with a stable identifier (`reviewedBy`) without each plan inventing its own admin-id scheme.
 
 Output:
+- `src/lib/ambassador/adminAuth.ts` — the first artifact created in Task 1; consumed by every subsequent ambassador admin route.
 - Cohort API routes (GET/POST list, GET/PATCH detail).
 - Admin cohort management page at `/admin/ambassadors/cohorts`.
 </objective>
@@ -99,6 +113,11 @@ export const db;  // firestore-admin Firestore
 // Admin session validation pattern (existing):
 //   Client sends: headers: { "x-admin-token": localStorage.getItem(ADMIN_TOKEN_KEY) }
 //   Server validates by looking up doc in admin_sessions/{token} and checking expiresAt > now.
+//   Session docs are created by src/app/api/mentorship/admin/auth/route.ts; they store
+//   { createdAt, expiresAt } — there is NO Firebase uid associated with an admin session
+//   (the legacy flow is password-based, not user-based). requireAdmin therefore synthesises
+//   a stable identifier from the session token so downstream audit fields have something to
+//   persist; future work can replace this with a real uid once admin users are migrated.
 ```
 
 Existing admin-session validation pattern (from src/app/api/mentorship/admin/auth/route.ts):
@@ -122,17 +141,19 @@ DaisyUI component patterns (from existing /admin/mentors/page.tsx):
 <tasks>
 
 <task type="auto">
-  <name>Task 1: Create cohort collection API (GET list + POST create)</name>
+  <name>Task 1: Create shared admin-auth helper + cohort collection API (GET list + POST create)</name>
   <files>src/app/api/ambassador/cohorts/route.ts, src/lib/ambassador/adminAuth.ts</files>
   <read_first>
     - src/app/api/mentorship/profile/route.ts (existing API route pattern — NextResponse, Admin SDK, error shape)
-    - src/app/api/mentorship/admin/auth/route.ts (x-admin-token session validation pattern)
+    - src/app/api/mentorship/admin/auth/route.ts (x-admin-token session validation pattern; confirms admin_sessions stores { createdAt, expiresAt } only)
     - src/lib/features.ts (isAmbassadorProgramEnabled)
     - src/types/ambassador.ts (CohortCreateSchema — from Plan 01)
     - src/lib/ambassador/constants.ts (AMBASSADOR_COHORTS_COLLECTION)
   </read_first>
   <action>
-STEP A — Create the shared admin-auth helper `src/lib/ambassador/adminAuth.ts`:
+STEP A — Create the shared admin-auth helper `src/lib/ambassador/adminAuth.ts`.
+
+Design note: the legacy admin auth in this codebase is password-based; the `admin_sessions/{token}` doc stores only `{ createdAt, expiresAt }`. There is no Firebase `uid` linked to an admin session. However, Plan 06 (accept/decline) needs a stable identifier for the `reviewedBy` audit field on application docs. Rather than requiring every Plan 06 caller to reinvent this, `requireAdmin` SHALL return a synthesised uid derived from the session token so every admin action has a consistent per-session audit identifier.
 
 ```typescript
 /**
@@ -140,9 +161,23 @@ STEP A — Create the shared admin-auth helper `src/lib/ambassador/adminAuth.ts`
  *
  * Shared admin-session validator for all /api/ambassador/* routes.
  * Mirrors the existing pattern in src/app/api/mentorship/admin/auth/route.ts.
+ *
+ * Return shape rationale: requireAdmin returns { ok: true; uid: string } so
+ * Plan 06 (accept/decline) can persist `reviewedBy = uid` on application docs
+ * without every caller synthesising its own identifier. The uid is derived from
+ * the admin_sessions token (first 12 chars, prefixed `admin:`) because the
+ * legacy admin flow is password-based — there is no real Firebase user behind
+ * an admin session. This can be replaced with a true uid if admin auth is ever
+ * migrated to Firebase Auth.
  */
 
 import { db } from "@/lib/firebaseAdmin";
+
+/** Synthesise a stable per-session admin identifier from the raw token. */
+function deriveAdminUid(token: string): string {
+  // Keep it short enough to fit comfortably in audit fields, long enough to be unique per session.
+  return `admin:${token.slice(0, 12)}`;
+}
 
 /**
  * Validate an admin session token against the admin_sessions/{token} doc.
@@ -171,13 +206,28 @@ export function getAdminToken(request: Request): string | null {
   return request.headers.get("x-admin-token");
 }
 
-/** Convenience — validate in one call. */
-export async function requireAdmin(request: Request): Promise<boolean> {
-  return isValidAdminToken(getAdminToken(request));
+/**
+ * Validate and return a discriminated-union result.
+ *
+ * On success: `{ ok: true, uid }` where uid is synthesised from the admin_sessions
+ *             token (deriveAdminUid above). Plan 06 uses this for `reviewedBy`.
+ * On failure: `{ ok: false, status, error }` suitable for direct return to NextResponse.
+ */
+export async function requireAdmin(
+  request: Request,
+): Promise<
+  | { ok: true; uid: string }
+  | { ok: false; status: number; error: string }
+> {
+  const token = getAdminToken(request);
+  if (!token) return { ok: false, status: 401, error: "Admin token required" };
+  const valid = await isValidAdminToken(token);
+  if (!valid) return { ok: false, status: 401, error: "Invalid or expired admin session" };
+  return { ok: true, uid: deriveAdminUid(token) };
 }
 ```
 
-STEP B — Create `src/app/api/ambassador/cohorts/route.ts`:
+STEP B — Create `src/app/api/ambassador/cohorts/route.ts`. Consume the new `requireAdmin` discriminated-union shape (not a boolean).
 
 ```typescript
 import { NextRequest, NextResponse } from "next/server";
@@ -215,8 +265,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     if (scope === "open") {
       query = query.where("status", "==", "upcoming").where("applicationWindowOpen", "==", true);
     } else if (scope === "all") {
-      const adminOk = await requireAdmin(request);
-      if (!adminOk) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      const admin = await requireAdmin(request);
+      if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
     }
 
     const snapshot = await query.get();
@@ -247,8 +297,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (gate) return gate;
 
   try {
-    const adminOk = await requireAdmin(request);
-    if (!adminOk) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const admin = await requireAdmin(request);
+    if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
 
     const body = await request.json();
     const parsed = CohortCreateSchema.safeParse(body);
@@ -271,7 +321,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       updatedAt: now,
     };
     const ref = await db.collection(AMBASSADOR_COHORTS_COLLECTION).add(newDoc);
-    log.info("Cohort created", { cohortId: ref.id, name: parsed.data.name });
+    log.info("Cohort created", { cohortId: ref.id, name: parsed.data.name, by: admin.uid });
     return NextResponse.json({ cohortId: ref.id, ...newDoc }, { status: 201 });
   } catch (error) {
     log.error("POST /cohorts failed", { error });
@@ -281,20 +331,23 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 ```
   </action>
   <verify>
-    <automated>test -f src/app/api/ambassador/cohorts/route.ts && test -f src/lib/ambassador/adminAuth.ts && grep -q "export async function GET" src/app/api/ambassador/cohorts/route.ts && grep -q "export async function POST" src/app/api/ambassador/cohorts/route.ts && grep -q "isAmbassadorProgramEnabled" src/app/api/ambassador/cohorts/route.ts && grep -q "CohortCreateSchema.safeParse" src/app/api/ambassador/cohorts/route.ts && grep -q "requireAdmin" src/app/api/ambassador/cohorts/route.ts && npx tsc --noEmit</automated>
+    <automated>test -f src/app/api/ambassador/cohorts/route.ts && test -f src/lib/ambassador/adminAuth.ts && grep -q "export async function GET" src/app/api/ambassador/cohorts/route.ts && grep -q "export async function POST" src/app/api/ambassador/cohorts/route.ts && grep -q "isAmbassadorProgramEnabled" src/app/api/ambassador/cohorts/route.ts && grep -q "CohortCreateSchema.safeParse" src/app/api/ambassador/cohorts/route.ts && grep -q "requireAdmin" src/app/api/ambassador/cohorts/route.ts && grep -q "ok: true; uid: string" src/lib/ambassador/adminAuth.ts && grep -q "deriveAdminUid" src/lib/ambassador/adminAuth.ts && npx tsc --noEmit</automated>
   </verify>
   <acceptance_criteria>
     - File `src/app/api/ambassador/cohorts/route.ts` exists
     - File `src/lib/ambassador/adminAuth.ts` exists with exports `isValidAdminToken`, `getAdminToken`, `requireAdmin`
+    - `grep -q "ok: true; uid: string" src/lib/ambassador/adminAuth.ts` (return type includes uid — satisfies Plan 06's reviewedBy need)
+    - `grep -q "deriveAdminUid" src/lib/ambassador/adminAuth.ts` (uid synthesised from token)
     - `grep -c "^export async function" src/app/api/ambassador/cohorts/route.ts` returns 2 (GET, POST)
     - `grep -q "if (!isAmbassadorProgramEnabled())" src/app/api/ambassador/cohorts/route.ts` (feature gate present — Pitfall 3)
-    - `grep -q "status: 401" src/app/api/ambassador/cohorts/route.ts` (admin auth enforcement)
+    - `grep -q "!admin.ok" src/app/api/ambassador/cohorts/route.ts` (consumes discriminated-union shape, not a boolean)
+    - `grep -q "status: admin.status" src/app/api/ambassador/cohorts/route.ts` (propagates 401)
     - `grep -q "status: 400" src/app/api/ambassador/cohorts/route.ts` (Zod failure path)
     - `grep -q "status: 201" src/app/api/ambassador/cohorts/route.ts` (create success)
     - `npx tsc --noEmit` exits 0
   </acceptance_criteria>
   <done>
-    `curl -X GET http://localhost:3000/api/ambassador/cohorts` returns `{cohorts:[]}` when flag is on; returns 404 when flag is off. `curl -X POST -H "x-admin-token: ${valid}" -d '{...}'` creates a cohort.
+    `curl -X GET http://localhost:3000/api/ambassador/cohorts` returns `{cohorts:[]}` when flag is on; returns 404 when flag is off. `curl -X POST -H "x-admin-token: ${valid}" -d '{...}'` creates a cohort. `requireAdmin(request)` in Plans 05, 06, 08 returns `{ ok: true; uid }` on success — Plan 06 uses `admin.uid` as `reviewedBy`.
   </done>
 </task>
 
@@ -337,8 +390,8 @@ export async function GET(request: NextRequest, ctx: RouteContext): Promise<Next
   if (gate) return gate;
   try {
     const { cohortId } = await ctx.params;
-    const adminOk = await requireAdmin(request);
-    if (!adminOk) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const admin = await requireAdmin(request);
+    if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
 
     const doc = await db.collection(AMBASSADOR_COHORTS_COLLECTION).doc(cohortId).get();
     if (!doc.exists) return NextResponse.json({ error: "Cohort not found" }, { status: 404 });
@@ -376,8 +429,8 @@ export async function PATCH(request: NextRequest, ctx: RouteContext): Promise<Ne
   const gate = featureGate();
   if (gate) return gate;
   try {
-    const adminOk = await requireAdmin(request);
-    if (!adminOk) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const admin = await requireAdmin(request);
+    if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
 
     const { cohortId } = await ctx.params;
     const body = await request.json();
@@ -395,7 +448,7 @@ export async function PATCH(request: NextRequest, ctx: RouteContext): Promise<Ne
 
     const patch: Record<string, unknown> = { ...parsed.data, updatedAt: new Date() };
     await ref.update(patch);
-    log.info("Cohort updated", { cohortId, fields: Object.keys(parsed.data) });
+    log.info("Cohort updated", { cohortId, fields: Object.keys(parsed.data), by: admin.uid });
     return NextResponse.json({ cohortId, ...patch }, { status: 200 });
   } catch (error) {
     log.error("PATCH /cohorts/[id] failed", { error });
@@ -414,6 +467,7 @@ export async function PATCH(request: NextRequest, ctx: RouteContext): Promise<Ne
     - PATCH validates with `CohortPatchSchema.safeParse`
     - Feature gate guards BOTH handlers (grep returns 2 for `if (!isAmbassadorProgramEnabled())`)
     - Admin auth enforced on both handlers (2 occurrences of `requireAdmin(request)`)
+    - Both handlers consume the discriminated-union shape (`!admin.ok` / `admin.uid`)
     - `npx tsc --noEmit` exits 0
   </acceptance_criteria>
   <done>
@@ -729,6 +783,7 @@ Manual smoke (done in wave 4 as part of checkpoint):
 </verification>
 
 <success_criteria>
+- `requireAdmin` returns `{ ok: true; uid: string } | { ok: false; status; error }` — Plans 05/06/08 consume this shape
 - Cohorts API: GET/POST/GET-detail/PATCH all compile and feature-gated
 - Admin cohort panel UI renders, creates cohorts, toggles windows, changes status
 - COHORT-03 count flows from applications query to detail endpoint
@@ -740,5 +795,7 @@ After completion, create `.planning/phases/02-application-subsystem/02-04-SUMMAR
 - API endpoints with request/response shapes
 - Admin panel URL + route hierarchy
 - Shared admin-auth helper (`src/lib/ambassador/adminAuth.ts`) — used by Plans 05, 06, 08
-- Note: Plan 05 (applications API) imports `requireAdmin` from this plan's adminAuth.ts helper
+- Exact `requireAdmin` return type: `{ ok: true; uid: string } | { ok: false; status; error }` — note the uid is synthesised (`admin:` + token prefix), NOT a real Firebase uid
+- Note: Plan 06 reads `admin.uid` for the `reviewedBy` audit field on application docs
+</output>
 </output>

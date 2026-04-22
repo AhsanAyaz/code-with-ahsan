@@ -22,6 +22,7 @@ requirements:
   - DISC-03
   - EMAIL-02
   - EMAIL-03
+  - APPLY-08
 must_haves:
   truths:
     - "PATCH {action:'accept'} runs Firestore writes (roles += 'ambassador', ambassador subdoc, cohort acceptedCount increment) in a Firestore TRANSACTION, not a batch — guarantees COHORT-04 maxSize is never exceeded."
@@ -31,6 +32,7 @@ must_haves:
     - "POST discord-resolve re-calls lookupMemberByUsername (NOT cached from submission — Pitfall 2 — handle may have changed), writes fresh discordMemberId, then re-attempts assignDiscordRole, flipping discordRoleAssigned / discordRetryNeeded on the doc."
     - "All handlers gate on isAmbassadorProgramEnabled() and require admin via requireAdmin() from Plan 04."
     - "COHORT-04: if cohort.acceptedCount >= cohort.maxSize at transaction-read time, return 409 'Cohort is full' and do NOT write anything."
+    - "reviewedBy audit field on the application doc is populated from admin.uid returned by Plan 04's requireAdmin (APPLY-08 — admin identity captured on every decision)."
   artifacts:
     - path: "src/app/api/ambassador/applications/[applicationId]/route.ts"
       provides: "GET detail (admin, returns signed student-ID URL), PATCH accept/decline (admin)"
@@ -70,6 +72,10 @@ must_haves:
       to: "sendAmbassadorApplicationAcceptedEmail | sendAmbassadorApplicationDeclinedEmail"
       via: "EMAIL-02/03 triggered after decision persisted"
       pattern: "sendAmbassadorApplication(Accepted|Declined)Email"
+    - from: "src/app/api/ambassador/applications/[applicationId]/route.ts"
+      to: "admin.uid (from requireAdmin)"
+      via: "APPLY-08 — reviewedBy audit field populated from Plan 04's discriminated-union requireAdmin() return"
+      pattern: "reviewedBy.*admin\\.uid"
     - from: "src/app/api/ambassador/applications/[applicationId]/discord-resolve/route.ts"
       to: "lookupMemberByUsername"
       via: "Pitfall 2 — re-resolve on retry to avoid stale discordMemberId"
@@ -88,6 +94,7 @@ Purpose:
 - COHORT-04 race-safe enforcement: a naive `db.batch()` can over-enroll (Pitfall 1). Use `db.runTransaction()` to read the cohort doc and decide atomically.
 - D-17 / DISC-02: the Firestore transaction MUST commit independently of Discord. Discord failure stores `discordRoleAssigned: false, discordRetryNeeded: true` on the doc and surfaces as the admin retry banner (REVIEW-05).
 - DISC-03 idempotency: the transaction uses `FieldValue.arrayUnion("ambassador")` (already idempotent); Discord's PUT-based role assignment via `assignDiscordRole` is idempotent at the API level; the retry endpoint re-resolves member ID (Pitfall 2).
+- APPLY-08: every decision persists `reviewedBy: admin.uid` on the application doc — admin identity is captured from Plan 04's discriminated-union `requireAdmin()` which synthesises a stable uid from the admin_sessions token.
 - Pre-flight note: `DISCORD_AMBASSADOR_ROLE_ID` is a placeholder (`"PENDING_DISCORD_ROLE_CREATION"`) from Plan 01. Plan 09's checkpoint replaces it with the real role ID before the first acceptance.
 
 Output:
@@ -134,7 +141,14 @@ export const ADMIN_SIGNED_URL_EXPIRY_MS: number;   // 1 hour (Plan 01)
 
 From @/lib/ambassador/adminAuth (Plan 04):
 ```typescript
-export async function requireAdmin(request: Request): Promise<{ ok: true } | { ok: false; status: number; error: string }>;
+// Plan 04 formally guarantees uid on the ok branch. uid is synthesised from the
+// admin_sessions token (legacy admin flow has no Firebase uid) — stable per-session.
+export async function requireAdmin(
+  request: Request,
+): Promise<
+  | { ok: true; uid: string }
+  | { ok: false; status: number; error: string }
+>;
 ```
 
 From @/lib/ambassador/roleMutation (Phase 1):
@@ -421,7 +435,7 @@ After GREEN, verify all 10 tests pass. No REFACTOR expected beyond removing dupl
   <files>src/app/api/ambassador/applications/[applicationId]/route.ts</files>
   <read_first>
     - @src/lib/ambassador/acceptance.ts (Task 1 helpers)
-    - @src/lib/ambassador/adminAuth.ts (Plan 04 requireAdmin)
+    - @src/lib/ambassador/adminAuth.ts (Plan 04 requireAdmin — discriminated union with uid)
     - @src/lib/firebaseAdmin.ts (storage may be null — Pitfall 7)
     - @src/types/ambassador.ts (ApplicationReviewSchema)
     - @src/lib/email.ts (Plan 03 email helpers)
@@ -492,7 +506,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   if (!isAmbassadorProgramEnabled()) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const admin = await requireAdmin(request);
   if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
-  const adminUid = admin.uid ?? "admin";   // requireAdmin may not surface uid; fallback is acceptable for audit
+  // APPLY-08: Plan 04's requireAdmin formally guarantees uid on the ok branch (synthesised from
+  // the admin_sessions token). Every decision persists it to reviewedBy for admin attribution.
+  const adminUid = admin.uid;
 
   const { applicationId } = await params;
 
@@ -570,11 +586,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 }
 ```
 
-NOTE: `requireAdmin` from Plan 04 currently returns `{ ok: true } | { ok: false; status; error }`. If the `{ ok: true }` branch does not include the admin's uid, Plan 04's executor should extend it to `{ ok: true; uid: string }` — the PATCH handler needs it for the `reviewedBy` audit field. If Plan 04 did NOT include `uid`, this plan's executor must add it: open `src/lib/ambassador/adminAuth.ts`, change the `{ ok: true }` branch to `{ ok: true; uid: string }`, and read the uid from the admin_sessions doc during lookup. This is a small, additive change.
-
 Implementation notes:
 - `action: "accept"` routes through `runAcceptanceTransaction` (Task 1) — all COHORT-04 + DISC-03 idempotency logic lives there.
 - `action: "decline"` is a simple update; it does NOT touch `mentorship_profiles` or `cohorts`.
+- `adminUid = admin.uid` — Plan 04 now formally guarantees this field on the ok branch (synthesised per-session from the admin_sessions token). No fallback needed (APPLY-08).
 - Discord role assignment runs AFTER the transaction commits. If it fails, the doc has `discordRetryNeeded: true` and the admin UI (Plan 08) shows a retry banner (REVIEW-05).
 - EMAIL-02/03 are non-fatal — the decision is already persisted.
 - D-15 note: declined applications do NOT trigger the 30-day Storage cleanup here. The `declinedAt` timestamp is the clock, and Plan 09's cron reads it.
@@ -582,10 +597,11 @@ Implementation notes:
   <verify>
     <automated>npx tsc --noEmit</automated>
   </verify>
-  <done>GET returns application + 1-hour signed URL for student-ID. PATCH accepts (via transaction, idempotent, maxSize-guarded) or declines (simple update). Discord failure never rolls back Firestore.</done>
+  <done>GET returns application + 1-hour signed URL for student-ID. PATCH accepts (via transaction, idempotent, maxSize-guarded) or declines (simple update). Discord failure never rolls back Firestore. reviewedBy captured from admin.uid (APPLY-08).</done>
   <acceptance_criteria>
     - `grep -q "isAmbassadorProgramEnabled" src/app/api/ambassador/applications/\[applicationId\]/route.ts`
     - `grep -q "requireAdmin" src/app/api/ambassador/applications/\[applicationId\]/route.ts`
+    - `grep -q "admin.uid" src/app/api/ambassador/applications/\[applicationId\]/route.ts` (APPLY-08 reviewedBy attribution)
     - `grep -q "runAcceptanceTransaction" src/app/api/ambassador/applications/\[applicationId\]/route.ts`
     - `grep -q "assignAmbassadorDiscordRoleSoft" src/app/api/ambassador/applications/\[applicationId\]/route.ts`
     - `grep -q "sendAmbassadorApplicationAcceptedEmail" src/app/api/ambassador/applications/\[applicationId\]/route.ts`
@@ -735,6 +751,7 @@ Smoke test (requires local dev):
 - [ ] `/discord-resolve` re-resolves the Discord handle freshly (Pitfall 2), never trusts the cached `discordMemberId`.
 - [ ] All three handlers gate on `isAmbassadorProgramEnabled()` and `requireAdmin`.
 - [ ] EMAIL-02 fires on first accept; EMAIL-03 fires on decline; both failures are logged and non-fatal.
+- [ ] `reviewedBy` is set from `admin.uid` on every accept/decline (APPLY-08 admin attribution).
 - [ ] `npx tsc --noEmit` passes.
 - [ ] 10+ acceptance.test.ts assertions pass.
 </success_criteria>
@@ -744,6 +761,6 @@ After completion, create `.planning/phases/02-application-subsystem/02-06-SUMMAR
 - Summary of the two-stage commit shape (txn first, Discord second, retry endpoint for failures)
 - Exports from `src/lib/ambassador/acceptance.ts` that Plan 08 (admin detail UI) should call
 - Confirmation that COHORT-04 is enforced race-safely via transaction
-- Any adjustments made to Plan 04's `requireAdmin` contract (e.g. adding `uid` to the ok branch)
+- Confirmation that APPLY-08 is satisfied via `reviewedBy = admin.uid` on both accept and decline paths
 - Any deviations from the plan with rationale
 </output>

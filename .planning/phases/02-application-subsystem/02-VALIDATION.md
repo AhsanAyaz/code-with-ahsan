@@ -2,8 +2,8 @@
 phase: 2
 slug: application-subsystem
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-22
 ---
 
@@ -38,11 +38,11 @@ created: 2026-04-22
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 2-xx-01 | xx | 1 | APPLY-03 | unit | `npx vitest run src/__tests__/ambassador/videoUrl.test.ts` | ❌ W0 | ⬜ pending |
-| 2-xx-02 | xx | 1 | APPLY-04 | unit | `npx vitest run src/__tests__/ambassador/academicEmail.test.ts` | ❌ W0 | ⬜ pending |
-| 2-xx-03 | xx | 1 | DISC-02 | unit (mock) | `npx vitest run src/__tests__/ambassador/acceptance.test.ts` | ❌ W0 | ⬜ pending |
-| 2-xx-04 | xx | 1 | REVIEW-02 | unit (mock storage) | `npx vitest run src/__tests__/ambassador/signedUrl.test.ts` | ❌ W0 | ⬜ pending |
-| 2-xx-05 | xx | 1 | EMAIL-01/02/03 | unit (mock sendEmail) | `npx vitest run src/__tests__/ambassador/emails.test.ts` | ❌ W0 | ⬜ pending |
+| 2-xx-01 | xx | 1 | APPLY-03 | unit | `npx vitest run src/__tests__/ambassador/videoUrl.test.ts` | ✅ W0 in Plan 02 | ⬜ pending |
+| 2-xx-02 | xx | 1 | APPLY-04 | unit | `npx vitest run src/__tests__/ambassador/academicEmail.test.ts` | ✅ W0 in Plan 02 | ⬜ pending |
+| 2-xx-03 | xx | 1 | DISC-02 | unit (mock) | `npx vitest run src/__tests__/ambassador/acceptance.test.ts` | ✅ TDD in Plan 06 | ⬜ pending |
+| 2-xx-04 | xx | 1 | REVIEW-02 | unit (mock storage) | `npx vitest run src/__tests__/ambassador/signedUrl.test.ts` | ✅ W0 in Plan 03 | ⬜ pending |
+| 2-xx-05 | xx | 1 | EMAIL-01/02/03 | unit (mock sendEmail) | `npx vitest run src/__tests__/ambassador/emails.test.ts` | ✅ W0 in Plan 03 | ⬜ pending |
 | 2-xx-06 | xx | 2 | COHORT-04 | integration (manual) | manual: POST accept with full cohort fixture | — | ⬜ pending |
 | 2-xx-07 | xx | 2 | DISC-03 | manual | verify Discord PUT idempotency per API docs | — | ⬜ pending |
 | 2-xx-08 | xx | 2 | APPLY-07 | manual smoke | open `/profile` after submitting; verify status badge | — | ⬜ pending |
@@ -55,11 +55,11 @@ created: 2026-04-22
 
 ## Wave 0 Requirements
 
-- [ ] `src/__tests__/ambassador/videoUrl.test.ts` — stubs for APPLY-03 (URL regex accepts Loom/YouTube/Drive; rejects others)
-- [ ] `src/__tests__/ambassador/academicEmail.test.ts` — stubs for APPLY-04 (academic email regex; unknown TLD → `needsManualVerification: true`)
-- [ ] `src/__tests__/ambassador/acceptance.test.ts` — stubs for DISC-02 (Firestore write succeeds independently of Discord call)
-- [ ] `src/__tests__/ambassador/signedUrl.test.ts` — stubs for REVIEW-02 (signed URL 1-hour expiry)
-- [ ] `src/__tests__/ambassador/emails.test.ts` — stubs for EMAIL-01/02/03 (correct subject, recipient, trigger timing)
+- [x] `src/__tests__/ambassador/videoUrl.test.ts` — stubs for APPLY-03 (URL regex accepts Loom/YouTube/Drive; rejects others) — created in Plan 02 Task 1 (RED-phase TDD).
+- [x] `src/__tests__/ambassador/academicEmail.test.ts` — stubs for APPLY-04 (academic email regex; unknown TLD → `needsManualVerification: true`) — created in Plan 02 Task 2 (RED-phase TDD).
+- [x] `src/__tests__/ambassador/acceptance.test.ts` — stubs for DISC-02 (Firestore write succeeds independently of Discord call) — created in Plan 06 Task 1 as RED-phase TDD (feature-owned; no stranded reference so a separate Wave 0 stub is unnecessary).
+- [x] `src/__tests__/ambassador/signedUrl.test.ts` — stubs for REVIEW-02 (signed URL 1-hour expiry) — scaffolded in Plan 03 Task 4 with `describe.skip`/`it.todo` placeholders. Wave 2 owner (Plan 08 detail page task) fills in RED-phase assertions.
+- [x] `src/__tests__/ambassador/emails.test.ts` — stubs for EMAIL-01/02/03 (correct subject, recipient, trigger timing) — scaffolded in Plan 03 Task 4 with `describe.skip`/`it.todo` placeholders. Wave 2 owners (Plans 05 + 06) fill in RED-phase assertions when wiring `sendEmail`.
 
 ---
 
@@ -88,11 +88,11 @@ created: 2026-04-22
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 30s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 30s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** pending execution

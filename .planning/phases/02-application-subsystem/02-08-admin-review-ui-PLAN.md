@@ -850,7 +850,7 @@ Notes:
 - DiscordBanner posts to the Plan 06 retry endpoint (Pitfall 2 re-resolution happens server-side).
   </action>
   <verify>
-    <automated>npx tsc --noEmit && npx next build 2>&1 | grep -E "(error|Type error)" | head -5</automated>
+    <automated>npx tsc --noEmit</automated>
   </verify>
   <done>VideoEmbed renders YouTube via react-lite-youtube-embed, Loom via iframe with allowFullScreen, Drive via /preview iframe. DiscordBanner retries via POST /discord-resolve. DecisionDialog PATCHes with action + notes.</done>
   <acceptance_criteria>

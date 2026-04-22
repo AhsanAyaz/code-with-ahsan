@@ -8,12 +8,15 @@ files_modified:
   - firestore.rules
   - storage.rules
   - src/lib/email.ts
+  - src/__tests__/ambassador/signedUrl.test.ts
+  - src/__tests__/ambassador/emails.test.ts
 autonomous: true
 requirements:
   - APPLY-06
   - EMAIL-01
   - EMAIL-02
   - EMAIL-03
+  - REVIEW-02
 must_haves:
   truths:
     - "firestore.rules explicitly covers applications/{applicationId} and cohorts/{cohortId} — no accidental fall-through to deny-all during APPLY-07 reads."
@@ -21,6 +24,7 @@ must_haves:
     - "Client-side writes to applications/ and cohorts/ are DENIED — all writes go through Admin SDK in API routes (Plans 04-06)."
     - "Storage rules deny-by-default on applications/{applicantUid}/* paths except for the owner writing + admin reading (D-14)."
     - "Three new email functions (sendAmbassadorApplicationSubmittedEmail, sendAmbassadorApplicationAcceptedEmail, sendAmbassadorApplicationDeclinedEmail) exist in src/lib/email.ts following the exact same pattern as sendAdminMentorPendingEmail (EMAIL-01/02/03)."
+    - "Wave 0 test stub files exist for REVIEW-02 (signedUrl.test.ts) and EMAIL-01/02/03 (emails.test.ts) so that Wave 2 tasks can flip describe.skip → describe without creating the scaffold."
   artifacts:
     - path: "firestore.rules"
       provides: "applications/ and cohorts/ collection rules; applicant read-own pattern; admin bypass via Admin SDK"
@@ -34,6 +38,12 @@ must_haves:
         - "sendAmbassadorApplicationSubmittedEmail"
         - "sendAmbassadorApplicationAcceptedEmail"
         - "sendAmbassadorApplicationDeclinedEmail"
+    - path: "src/__tests__/ambassador/signedUrl.test.ts"
+      provides: "Wave 0 stub for REVIEW-02 signed URL 1-hour expiry; Wave 2 (Plan 06) will fill in the assertions."
+      contains: "describe.*signedUrl"
+    - path: "src/__tests__/ambassador/emails.test.ts"
+      provides: "Wave 0 stub for EMAIL-01/02/03 subject/recipient/trigger; Wave 2 (Plans 05/06) will fill in the assertions."
+      contains: "describe.*Ambassador.*Email"
   key_links:
     - from: "firestore.rules"
       to: "request.auth.uid == resource.data.applicantUid"
@@ -56,11 +66,13 @@ Three concerns, bundled because they are all "infrastructure glue" consumed by A
 1. Firestore rules for new `applications/` and `cohorts/` collections (APPLY-06, prevents Pitfall 4 in RESEARCH.md).
 2. Storage rules for the student-ID upload path (D-14).
 3. Three new email functions added to the existing `src/lib/email.ts` using the existing `sendEmail` + `wrapEmailHtml` helpers (EMAIL-01/02/03, D-21).
+4. Wave 0 test-stub scaffolds for `signedUrl.test.ts` (REVIEW-02) and `emails.test.ts` (EMAIL-01/02/03) so the Nyquist sampling contract from 02-VALIDATION.md is satisfied before Wave 2 begins.
 
 Output:
 - `firestore.rules` updated with new match blocks.
 - `storage.rules` created (if missing) or updated with applications path.
 - `src/lib/email.ts` gains three named exports.
+- `src/__tests__/ambassador/signedUrl.test.ts` + `src/__tests__/ambassador/emails.test.ts` scaffolded with `describe.skip`/`it.todo` placeholders (NO RED-phase assertions yet — Wave 2 owners fill those in).
 </objective>
 
 <execution_context>
@@ -72,6 +84,7 @@ Output:
 @.planning/STATE.md
 @.planning/phases/02-application-subsystem/02-CONTEXT.md
 @.planning/phases/02-application-subsystem/02-RESEARCH.md
+@.planning/phases/02-application-subsystem/02-VALIDATION.md
 
 <interfaces>
 Existing firestore.rules helpers (do NOT duplicate):
@@ -94,6 +107,11 @@ export async function sendAdminMentorPendingEmail(profile, adminEmail) {
   return sendEmail(adminEmail, subject, wrapEmailHtml(content, subject));
 }
 ```
+
+Existing vitest layout (from Phase 1):
+- Tests live under `src/__tests__/...`.
+- `vitest.config.ts` has `@/` → `./src` alias and `environment: "node"` for server-side mocks.
+- Wave 0 stubs use Vitest's `describe.skip` block (or `it.todo`) so `npx vitest run` passes zero assertions but file-exists checks succeed.
 </interfaces>
 </context>
 
@@ -375,6 +393,116 @@ Do NOT modify any existing function in `src/lib/email.ts`. Do NOT move the exist
   </done>
 </task>
 
+<task type="auto">
+  <name>Task 4: Scaffold Wave 0 test stubs for signedUrl + emails (Nyquist)</name>
+  <files>src/__tests__/ambassador/signedUrl.test.ts, src/__tests__/ambassador/emails.test.ts</files>
+  <read_first>
+    - .planning/phases/02-application-subsystem/02-VALIDATION.md (Wave 0 Requirements checklist — rows 4 and 5)
+    - src/__tests__ (any existing Phase 1 test file to mirror the import-shape)
+    - vitest.config.ts (confirm alias `@/` → `./src` and `environment: 'node'`)
+  </read_first>
+  <action>
+Create two test-stub files. Each file MUST:
+- Exist at the exact path the VALIDATION map expects so `test -f` passes and `npx vitest run <file>` succeeds with 0 executed assertions.
+- Use Vitest's `describe.skip` (or a top-level `describe` containing only `it.todo(...)` calls) so the Wave 0 sample runs green.
+- Embed TODO comments that the Wave 2 owner (Plans 05/06) can replace with real tests without restructuring the file.
+
+Do NOT import from `@/lib/ambassador/applications`, `@/lib/ambassador/acceptance`, or `@/lib/email` yet — those modules do not exist in Wave 1, and importing them would break typecheck. The stub files are scaffold-only.
+
+**File 1: `src/__tests__/ambassador/signedUrl.test.ts`** (REVIEW-02)
+
+```typescript
+import { describe, it } from "vitest";
+
+/**
+ * Wave 0 stub — REVIEW-02: signed URL 1-hour expiry.
+ *
+ * This file exists so Plan 06's GET /api/ambassador/applications/[applicationId]
+ * executor can replace `it.todo(...)` with real assertions WITHOUT creating the
+ * file. The VALIDATION.md Nyquist contract expects this path to exist before
+ * Wave 2 begins.
+ *
+ * Wave 2 owner: Plan 02-06 (accept/decline API + signed URL generation).
+ * Unblocking imports will be:
+ *   - `ADMIN_SIGNED_URL_EXPIRY_MS` from `@/lib/ambassador/constants`
+ *   - signed-URL generation helper (GET detail route)
+ *   - firebaseAdmin `storage.file(path).getSignedUrl({ expires: Date.now() + ADMIN_SIGNED_URL_EXPIRY_MS })`
+ *
+ * DO NOT import those here until Plans 01/06 have landed — typecheck would fail.
+ */
+describe.skip("REVIEW-02 signed URL expiry (Wave 0 stub)", () => {
+  it.todo("generates a 1-hour expiring signed read URL for student-ID photos");
+  it.todo("rejects generation when storage bucket is unconfigured (Pitfall 7)");
+  it.todo("does NOT include the raw storagePath in the returned URL object");
+  it.todo("uses ADMIN_SIGNED_URL_EXPIRY_MS from constants (no hardcoded ms)");
+});
+```
+
+**File 2: `src/__tests__/ambassador/emails.test.ts`** (EMAIL-01/02/03)
+
+```typescript
+import { describe, it } from "vitest";
+
+/**
+ * Wave 0 stub — EMAIL-01/02/03: subject, recipient, and trigger timing.
+ *
+ * This file exists so Plan 05 (submit → EMAIL-01) and Plan 06 (accept → EMAIL-02,
+ * decline → EMAIL-03) can replace `it.todo(...)` with real assertions without
+ * creating the file. The VALIDATION.md Nyquist contract expects this path to
+ * exist before Wave 2 begins.
+ *
+ * Wave 2 owners:
+ *   - Plan 02-05 Task 2 fills EMAIL-01 tests (mock sendEmail; assert subject + recipient match applicant)
+ *   - Plan 02-06 Task 2 fills EMAIL-02/03 tests (accept / decline paths)
+ *
+ * Strategy: mock `@/lib/email` via `vi.mock` and assert the three exported
+ *           functions are invoked with the expected (email, name, cohortName[, notes])
+ *           arguments AFTER the Firestore write succeeds.
+ *
+ * DO NOT import from `@/lib/email` here — the three sendAmbassador* functions
+ * are created in Task 3 of THIS plan, but importing them would still require
+ * the Task 3 work to have committed. Keep this file scaffold-only until Wave 2.
+ */
+describe.skip("EMAIL-01 application submitted (Wave 0 stub)", () => {
+  it.todo("is invoked with applicantEmail, applicantName, cohortName after Firestore write");
+  it.todo("uses subject: 'Your Ambassador Application Has Been Received'");
+  it.todo("failure does NOT roll back the Firestore submission");
+});
+
+describe.skip("EMAIL-02 application accepted (Wave 0 stub)", () => {
+  it.todo("is invoked only after runAcceptanceTransaction returns ok:true");
+  it.todo("includes discordInviteUrl as the fourth argument");
+  it.todo("is NOT re-sent on idempotent re-accept (alreadyAccepted === true)");
+});
+
+describe.skip("EMAIL-03 application declined (Wave 0 stub)", () => {
+  it.todo("is invoked with reviewerNotes from PATCH body (may be undefined)");
+  it.todo("uses subject: 'Your Ambassador Application — Update'");
+  it.todo("fires only when status transitions submitted/under_review → declined");
+});
+```
+
+After creating both files, run `npx vitest run src/__tests__/ambassador/signedUrl.test.ts src/__tests__/ambassador/emails.test.ts` to confirm they execute cleanly (0 tests run, 0 failures because everything is skipped/todo). The Wave 0 sample (VALIDATION.md line ~30 "After every task commit") now reports green for these paths.
+  </action>
+  <verify>
+    <automated>test -f src/__tests__/ambassador/signedUrl.test.ts && test -f src/__tests__/ambassador/emails.test.ts && grep -q "describe.skip" src/__tests__/ambassador/signedUrl.test.ts && grep -q "describe.skip" src/__tests__/ambassador/emails.test.ts && npx vitest run src/__tests__/ambassador/signedUrl.test.ts src/__tests__/ambassador/emails.test.ts</automated>
+  </verify>
+  <acceptance_criteria>
+    - File `src/__tests__/ambassador/signedUrl.test.ts` exists
+    - File `src/__tests__/ambassador/emails.test.ts` exists
+    - Both files import `describe, it` from "vitest"
+    - Both files use `describe.skip` so they execute without running assertions
+    - `signedUrl.test.ts` references REVIEW-02 in its TODO comments
+    - `emails.test.ts` covers EMAIL-01, EMAIL-02, and EMAIL-03 via three separate describe blocks
+    - Neither file imports from `@/lib/email`, `@/lib/ambassador/applications`, or `@/lib/ambassador/acceptance` (defer to Wave 2)
+    - `npx vitest run src/__tests__/ambassador/signedUrl.test.ts src/__tests__/ambassador/emails.test.ts` exits 0 (no failing tests)
+    - `npx tsc --noEmit` still passes after the new files are added
+  </acceptance_criteria>
+  <done>
+    Wave 0 Nyquist contract from 02-VALIDATION.md is satisfied for REVIEW-02 and EMAIL-01/02/03. Plan 05 (submit) and Plan 06 (accept/decline) can open these files in Wave 2 and replace `it.todo` with real assertions without spending context creating the file scaffold.
+  </done>
+</task>
+
 </tasks>
 
 <verification>
@@ -382,6 +510,9 @@ Do NOT modify any existing function in `src/lib/email.ts`. Do NOT move the exist
 npx tsc --noEmit
 grep -c "match /" firestore.rules   # should be >= 8 (existing + 2 new)
 grep -c "^export async function send" src/lib/email.ts   # should be >= 16 (existing 13 + 3 new)
+test -f src/__tests__/ambassador/signedUrl.test.ts
+test -f src/__tests__/ambassador/emails.test.ts
+npx vitest run src/__tests__/ambassador/
 ```
 </verification>
 
@@ -389,6 +520,7 @@ grep -c "^export async function send" src/lib/email.ts   # should be >= 16 (exis
 - firestore.rules covers applications/ and cohorts/ with correct applicant-read-own / admin-write semantics
 - storage.rules exists with default-deny and the applications path rule
 - Three new email functions compile and are importable from `@/lib/email`
+- Two Wave 0 stub test files exist and execute cleanly under Vitest
 - Zero Phase 1 rules or exports altered
 </success_criteria>
 
@@ -397,5 +529,7 @@ After completion, create `.planning/phases/02-application-subsystem/02-03-SUMMAR
 - New firestore.rules blocks (with line numbers)
 - storage.rules full content if newly created
 - Email function signatures with example invocations for the API routes
+- Wave 0 stub file locations + note for Plan 05/06 owners on how to flip `describe.skip` → `describe`
 - Deploy note: firestore.rules and storage.rules must be deployed via `firebase deploy --only firestore:rules,storage` before Phase 2 goes live
+</output>
 </output>

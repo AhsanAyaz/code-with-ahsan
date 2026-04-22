@@ -6,6 +6,7 @@ wave: 3
 depends_on:
   - "02-01"
   - "02-02"
+  - "02-03"
   - "02-04"
   - "02-05"
 files_modified:
@@ -29,10 +30,10 @@ must_haves:
   truths:
     - "A signed-in user with a profile older than AMBASSADOR_DISCORD_MIN_AGE_DAYS can complete all 4 steps at /ambassadors/apply and submit an application (D-01)."
     - "Step 1 (Eligibility) blocks younger accounts with a 'come back in N days' screen; no subsequent steps render (D-02)."
-    - "Step 2 shows a cohort dropdown populated by GET /api/ambassador/cohorts?scope=open. If empty, shows 'No open cohorts' + deferred 'Notify me' placeholder (D-05)."
+    - "Step 2 shows a cohort dropdown populated by GET /api/ambassador/cohorts?scope=open (response shape: { cohorts: [...] } — matches Plan 04 Task 3). If empty, shows 'No open cohorts' + deferred 'Notify me' placeholder (D-05)."
     - "Step 3 validates the Discord handle, academic email (or student-ID path), and video URL client-side using isValidVideoUrl (D-07) and validateAcademicEmail (D-15) from Plan 02 — the same helpers the server uses."
     - "Step 3 enforces D-13: explicit two-path choice ('I have an academic email' vs 'I don't have a .edu email'). No mid-field surprise reveal."
-    - "Step 3 student-ID upload follows the signed-URL flow: POST /api/ambassador/applications/student-id-upload-url → PUT directly to Google Cloud Storage → persist returned storagePath into the form state (APPLY-05)."
+    - "Step 3 student-ID upload follows the signed-URL flow: POST /api/ambassador/applications/student-id-upload-url → PUT directly to Google Cloud Storage → persist returned storagePath into the form state (APPLY-05). Upload path depends on Plan 03's storage.rules being in place."
     - "Step 4 shows a read-only review and a Submit button that POSTs to /api/ambassador/applications; on 201 redirects to /profile with a success toast."
     - "The applicant's own profile page surfaces application status (APPLY-07) by reading GET /api/ambassador/applications/me and rendering a status badge block."
     - "D-15 soft-warning: if academic email TLD is not recognized, show a warning next to the field ('We couldn't auto-verify — you can continue by uploading a student ID'); form remains submittable."
@@ -80,11 +81,11 @@ must_haves:
       pattern: "validateAcademicEmail"
     - from: "src/app/ambassadors/apply/steps/ApplicationStep.tsx"
       to: "/api/ambassador/applications/student-id-upload-url"
-      via: "POST to get a signed upload URL, then PUT file bytes directly to GCS"
+      via: "POST to get a signed upload URL, then PUT file bytes directly to GCS (Plan 03 storage.rules permit the write path)"
       pattern: "student-id-upload-url"
     - from: "src/app/ambassadors/apply/steps/PersonalInfoStep.tsx"
       to: "/api/ambassador/cohorts?scope=open"
-      via: "GET cohort list for the dropdown"
+      via: "GET cohort list for the dropdown — consumes body.cohorts (Plan 04 Task 3 response shape)"
       pattern: "api/ambassador/cohorts.*scope=open"
     - from: "src/app/ambassadors/apply/steps/EligibilityStep.tsx"
       to: "AMBASSADOR_DISCORD_MIN_AGE_DAYS"
@@ -120,6 +121,7 @@ Output:
 @.planning/phases/02-application-subsystem/02-RESEARCH.md
 @.planning/phases/02-application-subsystem/02-01-SUMMARY.md
 @.planning/phases/02-application-subsystem/02-02-SUMMARY.md
+@.planning/phases/02-application-subsystem/02-03-SUMMARY.md
 @.planning/phases/02-application-subsystem/02-04-SUMMARY.md
 @.planning/phases/02-application-subsystem/02-05-SUMMARY.md
 
@@ -184,7 +186,9 @@ From @/contexts/ToastContext (existing):
 
 Cohort API response shape (Plan 04 GET /api/ambassador/cohorts?scope=open):
 ```typescript
-{ items: Array<{ cohortId: string; name: string; startDate: string; endDate: string; maxSize: number; acceptedCount: number; applicationWindowOpen: boolean; }> }
+// NOTE: property name is `cohorts`, NOT `items`. Plan 04 Task 3's open-cohort list endpoint
+// returns `{ cohorts: [...] }`. The admin list endpoint uses `{ items: [...] }` — do not confuse them.
+{ cohorts: Array<{ cohortId: string; name: string; startDate: string; endDate: string; maxSize: number; acceptedCount: number; applicationWindowOpen: boolean; }> }
 ```
 
 Submit API response shape (Plan 05 POST /api/ambassador/applications):
@@ -536,6 +540,11 @@ import type { useApplyForm } from "../useApplyForm";
 
 type CohortItem = { cohortId: string; name: string; startDate: string; endDate: string };
 
+// CohortListResponse mirrors Plan 04 Task 3's GET /api/ambassador/cohorts?scope=open shape.
+// KEY-LINK: property is `cohorts`, NOT `items`. The admin list route (Plan 04 Task 2) uses
+// `items`; do not confuse the two shapes.
+type CohortListResponse = { cohorts?: CohortItem[] };
+
 export default function PersonalInfoStep({
   form,
   onNext,
@@ -550,8 +559,8 @@ export default function PersonalInfoStep({
 
   useEffect(() => {
     fetch("/api/ambassador/cohorts?scope=open")
-      .then((r) => r.json())
-      .then((b) => setCohorts(b.items ?? []))
+      .then((r) => r.json() as Promise<CohortListResponse>)
+      .then((b) => setCohorts(b.cohorts ?? []))
       .catch(() => setCohorts([]))
       .finally(() => setLoading(false));
   }, []);
@@ -854,6 +863,7 @@ export default function ReviewStep({
 
 Notes:
 - Form field names MUST match `ApplicationSubmitInput` exactly (Plan 01) or the POST in Plan 05 will 400. The `_`-prefixed keys (`_academicPath`, `_studentIdFile`, `_academicEmailWarning`) are stripped by `buildSubmitPayload`.
+- PersonalInfoStep reads `body.cohorts` — Plan 04 Task 3's open-cohort list endpoint returns `{ cohorts: [...] }`. Do NOT reach for `body.items` (that's the admin list shape).
 - `APPLICATION_VIDEO_PROMPTS` comes from Plan 01's constants.ts; the three prompts render in order.
 - The video URL input does NOT render an embed in this step — embedding is admin-side (Plan 08).
 - D-13 explicit choice: the radio buttons force the applicant to choose a path before fields for that path render.
@@ -863,13 +873,15 @@ Notes:
   <verify>
     <automated>npx tsc --noEmit</automated>
   </verify>
-  <done>Four step components exist. EligibilityStep calls /api/mentorship/profile and compares age to AMBASSADOR_DISCORD_MIN_AGE_DAYS. PersonalInfoStep loads cohorts via GET /api/ambassador/cohorts?scope=open. ApplicationStep uses APPLICATION_VIDEO_PROMPTS, D-13 radio path choice, D-15 soft warning, signed-URL student-ID upload. ReviewStep renders read-only summary with Submit button.</done>
+  <done>Four step components exist. EligibilityStep calls /api/mentorship/profile and compares age to AMBASSADOR_DISCORD_MIN_AGE_DAYS. PersonalInfoStep loads cohorts via GET /api/ambassador/cohorts?scope=open and consumes body.cohorts. ApplicationStep uses APPLICATION_VIDEO_PROMPTS, D-13 radio path choice, D-15 soft warning, signed-URL student-ID upload. ReviewStep renders read-only summary with Submit button.</done>
   <acceptance_criteria>
     - `grep -q "AMBASSADOR_DISCORD_MIN_AGE_DAYS" src/app/ambassadors/apply/steps/EligibilityStep.tsx`
     - `grep -q "api/mentorship/profile" src/app/ambassadors/apply/steps/EligibilityStep.tsx` (profile age fetch)
     - `grep -q "Not quite yet" src/app/ambassadors/apply/steps/EligibilityStep.tsx` (ineligible branch)
     - `grep -q "api/ambassador/cohorts" src/app/ambassadors/apply/steps/PersonalInfoStep.tsx`
     - `grep -q "scope=open" src/app/ambassadors/apply/steps/PersonalInfoStep.tsx`
+    - `grep -q "b.cohorts" src/app/ambassadors/apply/steps/PersonalInfoStep.tsx` (API shape parity with Plan 04 Task 3)
+    - `! grep -q "b.items" src/app/ambassadors/apply/steps/PersonalInfoStep.tsx` (admin-list shape NOT used here)
     - `grep -q "No open cohorts" src/app/ambassadors/apply/steps/PersonalInfoStep.tsx` (D-05 empty state)
     - `grep -q "APPLICATION_VIDEO_PROMPTS" src/app/ambassadors/apply/steps/ApplicationStep.tsx` (3 prompts)
     - `grep -c "textarea" src/app/ambassadors/apply/steps/ApplicationStep.tsx` returns >= 3 (3 motivation fields)
@@ -950,6 +962,7 @@ export default function AmbassadorApplicationStatus() {
         });
         if (!res.ok) { setItems([]); return; }
         const body = await res.json();
+        // NOTE: /api/ambassador/applications/me returns `{ items: [...] }` — keep this shape.
         setItems(body.items ?? []);
       } catch {
         setItems([]);
@@ -1045,7 +1058,6 @@ Executor instructions:
 <verification>
 ```bash
 npx tsc --noEmit
-npx next build --debug 2>&1 | grep -E "(error|Type error)" | head -5
 ```
 
 Smoke test (requires local dev server + feature flag on + open cohort):
@@ -1064,14 +1076,14 @@ Smoke test (requires local dev server + feature flag on + open cohort):
 - [ ] All 4 steps are reachable in order; each enforces its own validation before advancing.
 - [ ] Step 1 uses AMBASSADOR_DISCORD_MIN_AGE_DAYS constant — no hardcoded "30".
 - [ ] Step 2 shows "No open cohorts" empty state if GET /api/ambassador/cohorts?scope=open returns 0 items (D-05).
+- [ ] Step 2 reads `body.cohorts` (not `body.items`) — matches Plan 04 Task 3's public list shape.
 - [ ] Step 3 enforces D-13 explicit two-path choice; hides the "other" path's inputs after choice.
-- [ ] Step 3 student-ID upload uses signed URL flow (POST → PUT to GCS).
+- [ ] Step 3 student-ID upload uses signed URL flow (POST → PUT to GCS) — Plan 03's storage.rules permit the write path.
 - [ ] Step 3 video URL validated by isValidVideoUrl from Plan 02 (client-side + server-side parity).
 - [ ] D-15 soft warning fires on unknown academic TLD; form remains submittable.
 - [ ] Submit POSTs to /api/ambassador/applications with Bearer idToken, handles 201/400/403/409 responses.
 - [ ] AmbassadorApplicationStatus renders on /profile and shows the applicant's application status (APPLY-07).
 - [ ] `npx tsc --noEmit` passes.
-- [ ] `npx next build` succeeds (no route errors).
 </success_criteria>
 
 <output>

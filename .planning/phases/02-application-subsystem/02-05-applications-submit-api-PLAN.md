@@ -175,7 +175,7 @@ From @/lib/ambassador/adminAuth (Plan 04):
 ```typescript
 export function isValidAdminToken(token: string | null): Promise<boolean>;
 export function getAdminToken(request: Request): string | null;
-export async function requireAdmin(request: Request): Promise<{ ok: true } | { ok: false; status: number; error: string }>;
+export async function requireAdmin(request: Request): Promise<{ ok: true; uid: string } | { ok: false; status: number; error: string }>;
 ```
 
 From @/lib/email (Plan 03):
@@ -588,7 +588,7 @@ Implementation notes:
 - DO NOT send `auth.admin: true` to the Discord API — this is the APPLICANT's submission; discord-lookup uses the applicant's handle only.
   </action>
   <verify>
-    <automated>npx tsc --noEmit && npx next build --debug 2>&1 | grep -E "(error|Type error)" | head -5</automated>
+    <automated>npx tsc --noEmit</automated>
   </verify>
   <done>POST submits applications (validates via ApplicationSubmitSchema, re-checks video URL + academic email + cohort window + duplicate + profile age + Discord handle, writes to Firestore, triggers EMAIL-01, returns 201). GET lists applications for admins with cursor pagination. Both handlers return 404 when feature flag is off.</done>
   <acceptance_criteria>
@@ -791,4 +791,5 @@ After completion, create `.planning/phases/02-application-subsystem/02-05-SUMMAR
 - How Plan 07 (wizard UI) should call these three routes in order (signed upload → upload → POST submit)
 - How Plan 08 (admin list + detail) should call GET /applications with cursor pagination
 - Any deviations from the plan with rationale
+</output>
 </output>
