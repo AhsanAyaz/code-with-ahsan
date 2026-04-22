@@ -15,6 +15,8 @@ import BookingsList from "@/components/mentorship/BookingsList";
 import { authFetch } from "@/lib/apiClient";
 import { TimeSlotAvailability, UnavailableDate } from "@/types/mentorship";
 import { hasRole } from "@/lib/permissions";
+import { isAmbassadorProgramEnabled } from "@/lib/features";
+import AmbassadorApplicationStatus from "./AmbassadorApplicationStatus";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -300,6 +302,9 @@ export default function SettingsPage() {
           </div>
         </div>
       )}
+
+      {/* Ambassador Application Status (APPLY-07) — feature-gated */}
+      {isAmbassadorProgramEnabled() && <AmbassadorApplicationStatus />}
 
       {/* Skill Level Card */}
       <div className="card bg-base-100 shadow-xl">
