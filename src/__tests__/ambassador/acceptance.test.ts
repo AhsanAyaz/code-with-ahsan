@@ -14,6 +14,14 @@ import { describe, it, expect, vi, beforeEach, type MockedFunction } from "vites
 
 // ── Module mocks ────────────────────────────────────────────────────────────
 
+vi.mock("firebase-admin/firestore", () => ({
+  FieldValue: {
+    arrayUnion: vi.fn((...items: unknown[]) => ({ _type: "arrayUnion", items })),
+    increment: vi.fn((n: number) => ({ _type: "increment", n })),
+    serverTimestamp: vi.fn(() => ({ _type: "serverTimestamp" })),
+  },
+}));
+
 vi.mock("@/lib/firebaseAdmin", () => {
   const mockUpdate = vi.fn().mockResolvedValue(undefined);
   const mockSet = vi.fn().mockResolvedValue(undefined);
@@ -42,13 +50,7 @@ vi.mock("@/lib/firebaseAdmin", () => {
     runTransaction: vi.fn(async (fn: (txn: typeof txn) => unknown) => fn(txn)),
   };
 
-  const FieldValue = {
-    arrayUnion: vi.fn((...items: unknown[]) => ({ _type: "arrayUnion", items })),
-    increment: vi.fn((n: number) => ({ _type: "increment", n })),
-    serverTimestamp: vi.fn(() => ({ _type: "serverTimestamp" })),
-  };
-
-  return { db, FieldValue };
+  return { db };
 });
 
 vi.mock("@/lib/discord", () => ({
@@ -63,7 +65,7 @@ vi.mock("@/lib/ambassador/roleMutation", () => ({
 // ── Import after mocks ──────────────────────────────────────────────────────
 
 import { runAcceptanceTransaction, assignAmbassadorDiscordRoleSoft } from "@/lib/ambassador/acceptance";
-import { db, FieldValue } from "@/lib/firebaseAdmin";
+import { db } from "@/lib/firebaseAdmin";
 import { assignDiscordRole } from "@/lib/discord";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────

@@ -14,7 +14,8 @@
  *     retry paths; the PATCH route calls `syncAmbassadorClaim` after commit.
  */
 
-import { db, FieldValue } from "@/lib/firebaseAdmin";
+import { db } from "@/lib/firebaseAdmin";
+import { FieldValue } from "firebase-admin/firestore";
 import { assignDiscordRole, DISCORD_AMBASSADOR_ROLE_ID } from "@/lib/discord";
 import { syncRoleClaim } from "@/lib/ambassador/roleMutation";
 import {
