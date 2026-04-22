@@ -23,33 +23,48 @@ Ship the editing surface that turns the ambassador subdoc's public fields into s
 </objective>
 
 <context>
-- Depends on plan 03-03 (`PATCH /api/ambassador/profile`) — the endpoint MUST exist before this section can save. Plan 03-03 itself depends only on plan 03-01, so by the time 03-03 is merged, both the PATCH endpoint and the required types exist.
+- Depends on plan 03-03 (`PATCH /api/ambassador/profile` AND `GET /api/ambassador/profile`) — both endpoints MUST exist before this section can hydrate/save. Plan 03-03 Task 1 ships PATCH; Plan 03-03 Task 2 ships GET alongside it. By the time 03-03 is merged, both handlers live in `src/app/api/ambassador/profile/route.ts`.
 - Does NOT depend on plans 03-04 or 03-05 — the form can ship independently of the public-facing render.
 - Firestore Admin SDK guardrail: this plan only sends JSON to an HTTP endpoint; it does not write to Firestore directly. The guardrail concern is fully absorbed by plan 03-03's handler.
 - Form state management: prefer React local `useState` per-field. No Zod on the client — the server is the source of truth for validation; the client only prevents obvious nulls and gives inline URL feedback for the video field.
-- Initial field values: load from the parent `MentorshipProfile` + an initial GET call to `/api/ambassador/profile` (lightweight — returns the current subdoc public fields). Plan 03-03 must expose this GET alongside the PATCH, else this plan's loader has no source. Verify during task 0 that 03-03 ships the GET; if it only shipped the PATCH, extend 03-03 via its own plan rather than papering over it here.
+- Initial field values: load from the GET handler Plan 03-03 Task 2 ships. Task 0 below is a hard pre-flight assertion — if the GET handler is missing, this plan STOPS with a pointer back to 03-03 Task 2. No inline "decide at execution" branching.
 </context>
 
 <tasks>
 
-<task id="0" title="Pre-flight — confirm GET /api/ambassador/profile exists or add it to 03-03">
+<task id="0" title="Pre-flight assertion — GET /api/ambassador/profile must exist">
   <read_first>
-    - .planning/phases/03-public-presentation/03-03-patch-ambassador-profile-endpoint-PLAN.md (specifically the task defining `src/app/api/ambassador/profile/route.ts`)
-    - src/app/api/ambassador/profile/route.ts (if it exists at execution time)
+    - src/app/api/ambassador/profile/route.ts (must already exist from plan 03-03)
+    - .planning/phases/03-public-presentation/03-03-patch-ambassador-profile-endpoint-PLAN.md (Task 2 defines the GET handler)
   </read_first>
   <action>
-    This is a read-only executor step. Open `src/app/api/ambassador/profile/route.ts` and grep for `export async function GET`. Three possible states:
+    Run this single assertion. It is a gate, not a decision. The form loader in Task 1 calls `GET /api/ambassador/profile`; plan 03-03 Task 2 is the agreed source for that handler. If either the file is missing or the GET export is absent, STOP this plan and hand back to the orchestrator with a pointer to plan 03-03 Task 2.
 
-    1. **GET handler present** (plan 03-03 shipped it) — continue to task 1. No action.
-    2. **GET handler absent** (plan 03-03 shipped PATCH only) — STOP and raise a blocker. The loader in task 1 depends on a GET that returns the seven public subdoc fields. Options: (a) add a tiny GET handler to `route.ts` in this same commit, shape `{ university, city, publicTagline, twitterUrl, githubUrl, personalSiteUrl, cohortPresentationVideoUrl, cohortPresentationVideoEmbedType }` (all optional), gated by the same feature-flag + auth + role guards as the PATCH and reading `mentorship_profiles/{uid}/ambassador/v1`; or (b) escalate to the planner to amend plan 03-03. Prefer (a) — it's a two-dozen-line addition and keeps the surface coherent. If you take option (a), also update plan 03-03's SUMMARY to record the GET addition.
-    3. **File does not exist at all** — plan 03-03 has not been executed yet. Abort this plan and execute 03-03 first; this plan declares `depends_on: ["03-03"]` for exactly this reason.
+    ```bash
+    test -f src/app/api/ambassador/profile/route.ts \
+      && grep -q "export async function GET" src/app/api/ambassador/profile/route.ts \
+      || {
+        echo "STOP: GET /api/ambassador/profile is missing."
+        echo "Plan 03-06 requires the GET handler shipped by Plan 03-03 Task 2."
+        echo "Either execute Plan 03-03 first, or revisit it if Task 2 was skipped."
+        exit 1
+      }
+    ```
 
-    Document the outcome of this pre-flight in the 03-06 SUMMARY.
+    Additionally confirm the PATCH handler is present (sanity — Plan 03-03 Task 1 should have shipped it):
+
+    ```bash
+    grep -q "export async function PATCH" src/app/api/ambassador/profile/route.ts \
+      || { echo "STOP: PATCH /api/ambassador/profile is missing — Plan 03-03 Task 1 incomplete."; exit 1; }
+    ```
+
+    No files are created or modified in this task. On success, proceed to Task 1.
   </action>
   <acceptance_criteria>
-    - `src/app/api/ambassador/profile/route.ts` exports both `GET` and `PATCH`.
-    - `GET` returns a JSON body containing the seven public subdoc fields (all optional) for the authenticated ambassador.
-    - No other behavior of the PATCH handler changes.
+    - `test -f src/app/api/ambassador/profile/route.ts` exits 0.
+    - `grep -q "export async function GET" src/app/api/ambassador/profile/route.ts` exits 0.
+    - `grep -q "export async function PATCH" src/app/api/ambassador/profile/route.ts` exits 0.
+    - No new files created, no existing files modified.
   </acceptance_criteria>
 </task>
 
@@ -481,5 +496,5 @@ New files:
 Modified files:
 - `src/app/profile/page.tsx` (one import + one conditional render block)
 
-Summary file: `.planning/phases/03-public-presentation/03-06-SUMMARY.md` — executor produces this after merge, noting the outcome of the task-0 pre-flight (whether 03-03 shipped GET or whether this plan added it) and any deviation from the planned task sequence.
+Summary file: `.planning/phases/03-public-presentation/03-06-SUMMARY.md` — executor produces this after merge. Note in the summary that the Task 0 pre-flight confirmed the GET handler shipped by plan 03-03 Task 2.
 </output>

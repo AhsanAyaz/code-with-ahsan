@@ -9,7 +9,8 @@ files_modified:
   - "src/app/api/ambassadors/public/route.ts"
   - "src/components/ambassador/AmbassadorCard.tsx"
   - "src/app/ambassadors/page.tsx"
-autonomous: true
+  - "firestore.indexes.json"
+autonomous: false
 requirements:
   - "PRESENT-01"
   - "PRESENT-04"
@@ -18,6 +19,7 @@ must_haves:
   - "Each card displays `photoURL`, `displayName`, `publicTagline` (when set), `university`/`city` chips (when set), social link icons for `linkedinUrl` / `twitterUrl` / `githubUrl` / `personalSiteUrl`, and links to `/u/[username]` using `username || uid` fallback — matching the MentorCard 3-column responsive pattern."
   - "When `cohortPresentationVideoUrl` + `cohortPresentationVideoEmbedType` are set on the projection, the shared `VideoEmbed` component renders the cohort presentation video inline in the card (PRESENT-04) — the same `videoUrl.ts` classifier/extractors are reused, no new validators."
   - "Empty state (zero matching ambassadors) and no-active-cohort state render a friendly message — not a crash or empty grid — so the route is never broken in a pre-acceptance cohort."
+  - "The new composite index on `public_ambassadors(active, cohortId, updatedAt)` AND the new `public_ambassadors/{uid}` rules block are deployed to Firestore BEFORE the page ships — otherwise the first production request throws `FAILED_PRECONDITION` (same pattern as Phase 2 REVIEW-04)."
 ---
 
 <objective>
@@ -26,10 +28,12 @@ Ship the public `/ambassadors` page (PRESENT-01) that lists every accepted ambas
 
 <context>
 - Depends on plan 03-02: `public_ambassadors/{uid}` projections must exist (seeded in the acceptance transaction) before this page can return anything meaningful. Local dev testing requires at least one accepted ambassador.
-- Depends on plan 03-01: `PublicAmbassadorDoc` type + `PUBLIC_AMBASSADORS_COLLECTION` constant must exist.
+- Depends on plan 03-01: `PublicAmbassadorDoc` type + `PUBLIC_AMBASSADORS_COLLECTION` constant must exist, AND the `public_ambassadors/{uid}` Firestore rules block must be authored.
 - Does NOT depend on plan 03-03 or 03-04 — those are independent Wave-2/Wave-3 surfaces.
 - Feature flag: already enforced by `src/app/ambassadors/layout.tsx`. The new page tree inherits it.
+- Firestore Admin SDK import: the project's `src/lib/firebaseAdmin.ts` exports `db` (NOT `adminDb`). All other plans in this phase use `import { db } from "@/lib/firebaseAdmin"`. Match that convention here to avoid a TS compile error.
 - Firestore Admin SDK guardrail (MEMORY.md): the server endpoint ONLY reads — no write path here — so the `ignoreUndefinedProperties` issue does not apply to this plan. But any derived/computed fields must still be strictly typed so the client does not receive `undefined` where it expects `null`.
+- Composite-index + rules deploy: `npm run build` does NOT push `firestore.indexes.json` or `firestore.rules` to Firestore. Without an explicit deploy the first production request to `/ambassadors` throws `FAILED_PRECONDITION` (Phase 2 hit the same pattern as REVIEW-04). Task 4 below runs that deploy as a blocking checkpoint so we never ship a broken page.
 </context>
 
 <tasks>
@@ -38,14 +42,14 @@ Ship the public `/ambassadors` page (PRESENT-01) that lists every accepted ambas
   <read_first>
     - src/lib/ambassador/constants.ts
     - src/types/ambassador.ts (CohortDoc, CohortStatus)
-    - src/lib/firebaseAdmin.ts
+    - src/lib/firebaseAdmin.ts (confirm: exported symbol is `db`, not `adminDb`)
     - .planning/phases/03-public-presentation/03-CONTEXT.md (D-09)
   </read_first>
   <action>
     Create `src/lib/ambassador/currentCohort.ts` with a single exported function `getCurrentCohortId(): Promise<string | null>` that implements D-09's "current cohort" heuristic. Contents VERBATIM:
 
     ```typescript
-    import { adminDb } from "@/lib/firebaseAdmin";
+    import { db } from "@/lib/firebaseAdmin";
     import { AMBASSADOR_COHORTS_COLLECTION } from "./constants";
 
     /**
@@ -62,7 +66,7 @@ Ship the public `/ambassadors` page (PRESENT-01) that lists every accepted ambas
      * Server-only. Uses Admin SDK. Consumers MUST handle the `null` case.
      */
     export async function getCurrentCohortId(): Promise<string | null> {
-      const col = adminDb.collection(AMBASSADOR_COHORTS_COLLECTION);
+      const col = db.collection(AMBASSADOR_COHORTS_COLLECTION);
 
       // Step 1: try active cohort first.
       const activeSnap = await col
@@ -89,10 +93,13 @@ Ship the public `/ambassadors` page (PRESENT-01) that lists every accepted ambas
     }
     ```
 
-    This helper is server-only (imports `adminDb`). Co-locate with `acceptance.ts` inside `src/lib/ambassador/` — it is an ambassador-subsystem concern.
+    This helper is server-only (imports `db`). Co-locate with `acceptance.ts` inside `src/lib/ambassador/` — it is an ambassador-subsystem concern.
   </action>
   <acceptance_criteria>
     - `src/lib/ambassador/currentCohort.ts` exists and exports `getCurrentCohortId()`.
+    - `grep -q "import { db } from \"@/lib/firebaseAdmin\"" src/lib/ambassador/currentCohort.ts` (correct symbol).
+    - `! grep -q "adminDb" src/lib/ambassador/currentCohort.ts` (the rejected symbol must not appear).
+    - `grep -q "db.collection(AMBASSADOR_COHORTS_COLLECTION)" src/lib/ambassador/currentCohort.ts`.
     - When called with zero cohort docs, returns `null`.
     - When called with one `status: "active"` cohort, returns that cohort's ID.
     - When called with only `status: "upcoming"` + `status: "closed"` cohorts, returns the one with the most recent `startDate`.
@@ -105,7 +112,7 @@ Ship the public `/ambassadors` page (PRESENT-01) that lists every accepted ambas
   <read_first>
     - src/types/ambassador.ts (PublicAmbassadorDoc, PUBLIC_AMBASSADORS_COLLECTION — added in plan 03-01)
     - src/lib/ambassador/currentCohort.ts (just created)
-    - src/lib/firebaseAdmin.ts
+    - src/lib/firebaseAdmin.ts (exports `db`, NOT `adminDb`)
     - src/lib/features.ts (isAmbassadorProgramEnabled)
     - src/app/api/mentorship/mentors/route.ts (existing public listing API — shape reference)
   </read_first>
@@ -126,11 +133,11 @@ Ship the public `/ambassadors` page (PRESENT-01) that lists every accepted ambas
     - `items` is `[]` when `cohortId` is `null` OR when zero projections match.
     - Sort: `joinedAt` ascending — but `joinedAt` lives on the SUBDOC, not the projection. To keep the single-query invariant, sort by `updatedAt` ascending on the projection (which is effectively a monotonic proxy for acceptance order since updates after accept are rare in v1). Document this tradeoff in a comment.
 
-    Contents VERBATIM:
+    Contents VERBATIM (note: import `db`, not `adminDb` — the module exports only `db`, `auth`, `storage`):
 
     ```typescript
     import { NextResponse } from "next/server";
-    import { adminDb } from "@/lib/firebaseAdmin";
+    import { db } from "@/lib/firebaseAdmin";
     import { isAmbassadorProgramEnabled } from "@/lib/features";
     import { getCurrentCohortId } from "@/lib/ambassador/currentCohort";
     import {
@@ -163,7 +170,7 @@ Ship the public `/ambassadors` page (PRESENT-01) that lists every accepted ambas
         return NextResponse.json({ cohortId: null, items: [] });
       }
 
-      const snap = await adminDb
+      const snap = await db
         .collection(PUBLIC_AMBASSADORS_COLLECTION)
         .where("active", "==", true)
         .where("cohortId", "==", cohortId)
@@ -194,10 +201,13 @@ Ship the public `/ambassadors` page (PRESENT-01) that lists every accepted ambas
 
     (Append to the existing `indexes` array in `firestore.indexes.json`.)
 
-    Client deploy: user must run `firebase deploy --only firestore:indexes` after merging — noted for the deploy runbook; NOT a planner task to execute.
+    The index + rules deploy is handled by Task 4 below (blocking checkpoint); do not skip it.
   </action>
   <acceptance_criteria>
     - `src/app/api/ambassadors/public/route.ts` exists and exports `GET`.
+    - `grep -q "import { db } from \"@/lib/firebaseAdmin\"" src/app/api/ambassadors/public/route.ts` (correct symbol).
+    - `! grep -q "adminDb" src/app/api/ambassadors/public/route.ts` (rejected symbol absent).
+    - `grep -q "db.collection(PUBLIC_AMBASSADORS_COLLECTION)" src/app/api/ambassadors/public/route.ts`.
     - `firestore.indexes.json` contains the new composite index on `public_ambassadors`.
     - When `FEATURE_AMBASSADOR_PROGRAM` is false, the endpoint returns `404`.
     - When no cohorts exist, the endpoint returns `200 { cohortId: null, items: [] }`.
@@ -214,6 +224,7 @@ Ship the public `/ambassadors` page (PRESENT-01) that lists every accepted ambas
     - src/app/admin/ambassadors/[applicationId]/VideoEmbed.tsx (shared Phase-2 VideoEmbed — reuse)
     - src/types/ambassador.ts (PublicAmbassadorDoc)
     - src/components/ProfileAvatar.tsx
+    - src/lib/firebaseAdmin.ts (exports `db`, NOT `adminDb`)
   </read_first>
   <action>
     Create two files. The card component first, then the page that consumes it.
@@ -358,16 +369,14 @@ Ship the public `/ambassadors` page (PRESENT-01) that lists every accepted ambas
     }
     ```
 
-    ### B. `src/app/ambassadors/page.tsx` (SERVER component — fetches via fetch() to the public endpoint)
+    ### B. `src/app/ambassadors/page.tsx` (SERVER component — direct Admin SDK read)
 
-    Approach: use a Next.js server component that calls the internal endpoint with `{ cache: "no-store" }` so SSR-fresh data ships on each request. This is intentional — the list is small (~25 ambassadors per cohort), the data changes only on accept/patch, and SSR avoids flashing a loading spinner on first paint. Because the page is server-rendered we use a relative fetch; set the base URL from `process.env.NEXT_PUBLIC_SITE_URL` (already used elsewhere in the codebase — grep `NEXT_PUBLIC_SITE_URL` before committing), falling back to the request's `x-forwarded-host`/`host` headers if the env var is not set.
+    Approach: server component, direct Admin SDK call via `db` (avoids an unnecessary internal fetch round-trip and the URL-resolution footgun). Feature-flag gating is already handled by `src/app/ambassadors/layout.tsx`, so this page inherits the 404 when the flag is off.
 
-    Actually — keep it simpler. The feature flag and CohortId resolution both live server-side, and we have direct Admin SDK access here. Skip the internal fetch round-trip and call the helpers DIRECTLY from the server component. This eliminates an unnecessary hop and the URL-resolution footgun:
-
-    Contents VERBATIM:
+    Contents VERBATIM (note: import `db`, not `adminDb`):
 
     ```tsx
-    import { adminDb } from "@/lib/firebaseAdmin";
+    import { db } from "@/lib/firebaseAdmin";
     import { getCurrentCohortId } from "@/lib/ambassador/currentCohort";
     import {
       PUBLIC_AMBASSADORS_COLLECTION,
@@ -387,7 +396,7 @@ Ship the public `/ambassadors` page (PRESENT-01) that lists every accepted ambas
       const cohortId = await getCurrentCohortId();
       if (!cohortId) return { cohortId: null, items: [] };
 
-      const snap = await adminDb
+      const snap = await db
         .collection(PUBLIC_AMBASSADORS_COLLECTION)
         .where("active", "==", true)
         .where("cohortId", "==", cohortId)
@@ -455,6 +464,9 @@ Ship the public `/ambassadors` page (PRESENT-01) that lists every accepted ambas
   <acceptance_criteria>
     - `src/components/ambassador/AmbassadorCard.tsx` exists with the above content and compiles.
     - `src/app/ambassadors/page.tsx` exists with the above content and compiles.
+    - `grep -q "import { db } from \"@/lib/firebaseAdmin\"" src/app/ambassadors/page.tsx` (correct symbol).
+    - `! grep -q "adminDb" src/app/ambassadors/page.tsx` (rejected symbol absent).
+    - `grep -q "db.collection(PUBLIC_AMBASSADORS_COLLECTION)" src/app/ambassadors/page.tsx`.
     - Navigating to `/ambassadors` with `FEATURE_AMBASSADOR_PROGRAM=true` renders: the header, the info paragraph, and either (a) the no-active-cohort alert, (b) the empty-cohort alert, or (c) the 3-column responsive card grid. Case (c) shows each ambassador's photo, name, Ambassador badge, optional tagline, optional university/city chips, optional cohort video embed, social icons, and a "View profile" button that navigates to `/u/{username || uid}`.
     - Navigating to `/ambassadors` with `FEATURE_AMBASSADOR_PROGRAM=false` returns a 404 (from the layout gate — unchanged from today).
     - `npx tsc --noEmit` passes.
@@ -463,25 +475,86 @@ Ship the public `/ambassadors` page (PRESENT-01) that lists every accepted ambas
   </acceptance_criteria>
 </task>
 
+<task id="4" type="checkpoint:human-action" title="Deploy Firestore indexes + rules for public_ambassadors (BLOCKING)">
+  <read_first>
+    - firebase.json
+    - firestore.indexes.json (after Task 2 appended the new composite index)
+    - firestore.rules (after Plan 03-01 Task 3 added the `public_ambassadors/{uid}` rules block)
+  </read_first>
+  <action>
+    BLOCKING CHECKPOINT — run this AFTER Tasks 1–3 have committed. The composite index on `public_ambassadors(active, cohortId, updatedAt)` added in Task 2 and the `public_ambassadors/{uid}` rules block added in Plan 03-01 Task 3 are NOT deployed by `npm run build`. The first production request to `/ambassadors` without the deployed index throws `FAILED_PRECONDITION`, and without the deployed rules the public read is denied. Phase 2 REVIEW-04 recorded this same pitfall; do not repeat it.
+
+    Roll BOTH the rules and the indexes out in a single deploy so there is no window where one is live without the other.
+
+    ### Automated path (preferred — runs if `firebase` CLI is authenticated)
+
+    ```bash
+    # Deploy indexes + rules atomically.
+    firebase deploy --only firestore:indexes,firestore:rules --non-interactive
+    ```
+
+    Then poll until the new composite index reports `READY` (index builds can take 1–20 minutes even on small collections):
+
+    ```bash
+    # List indexes and confirm the new public_ambassadors entry is present.
+    firebase firestore:indexes | tee /tmp/fs-indexes.json
+    grep -q "public_ambassadors" /tmp/fs-indexes.json || { echo "Index missing — deploy did not apply"; exit 1; }
+    ```
+
+    If the CLI reports the index in `CREATING` state, wait ~60s and re-run `firebase firestore:indexes`. Proceed only when the new composite entry is listed (the CLI omits non-READY entries from the default output, so presence in the list implies READY).
+
+    ### Manual fallback
+
+    If the Firebase CLI is not authenticated in the executor environment (no service account, no interactive auth), STOP and pause for the human operator to run the deploy from their workstation:
+
+    1. From a shell with `firebase login` credentials: `firebase deploy --only firestore:indexes,firestore:rules`.
+    2. Wait for "✔ Deploy complete!" and for the Firebase console's "Firestore → Indexes" tab to show the new composite entry in state "Enabled".
+    3. Confirm in this checkpoint by running `firebase firestore:indexes | grep public_ambassadors`.
+
+    ### Post-deploy smoke
+
+    Optional but recommended — against the dev/preview environment, confirm the endpoint does not throw:
+
+    ```bash
+    # Should return JSON, NOT a 500 with FAILED_PRECONDITION in the logs.
+    curl -sS "$NEXT_PUBLIC_SITE_URL/api/ambassadors/public" | head -c 200
+    ```
+
+    Resume only after both the rules and indexes are confirmed live. If the deploy fails with an auth error, escalate to the human operator rather than skipping.
+  </action>
+  <acceptance_criteria>
+    - `firebase firestore:indexes` output contains `public_ambassadors` (index deployed and READY).
+    - `firestore.rules` block for `public_ambassadors/{uid}` is live (verifiable via a production `curl` to `/api/ambassadors/public` that does NOT return a 500 with `FAILED_PRECONDITION` in the server logs; or via the Firebase console Rules tab showing the latest rules version timestamp post-deploy).
+    - The human operator (or automated CI) explicitly confirms "rules + indexes deployed" in the checkpoint resume signal.
+  </acceptance_criteria>
+  <resume_signal>
+    Type "deployed" once `firebase firestore:indexes` lists `public_ambassadors` AND the rules deploy succeeded. If the deploy failed, paste the error.
+  </resume_signal>
+</task>
+
 </tasks>
 
 <verification>
-After all three tasks are merged, the phase-level public-listing truth holds:
+After all four tasks are merged AND the deploy checkpoint has cleared, the phase-level public-listing truth holds:
 
-1. **Local smoke test** — seed a cohort with `status: "active"` and at least one `public_ambassadors/{uid}` doc (either by manual Firestore write or by running through the Phase 2 accept flow once plan 03-02 is merged):
+1. **Import-symbol sanity** — `grep -rn "adminDb" src/lib/ambassador/currentCohort.ts src/app/api/ambassadors/public/route.ts src/app/ambassadors/page.tsx` returns no matches (all references use `db`).
+
+2. **Local smoke test** — seed a cohort with `status: "active"` and at least one `public_ambassadors/{uid}` doc (either by manual Firestore write or by running through the Phase 2 accept flow once plan 03-02 is merged):
    ```bash
    npm run dev
    # visit http://localhost:3000/ambassadors
    ```
    Expect: 3-column grid of ambassador cards, each linking to `/u/{username||uid}`.
 
-2. **Empty state** — delete all `public_ambassadors` docs for the active cohort and reload; expect the "just starting" alert, not a crash.
+3. **Empty state** — delete all `public_ambassadors` docs for the active cohort and reload; expect the "just starting" alert, not a crash.
 
-3. **No-cohort state** — set every cohort's `status` away from `"active"` AND delete their `startDate` (or rename the collection temporarily); expect the "no active cohort" alert.
+4. **No-cohort state** — set every cohort's `status` away from `"active"` AND delete their `startDate` (or rename the collection temporarily); expect the "no active cohort" alert.
 
-4. **Video embed** — set `cohortPresentationVideoUrl` (YouTube/Loom/Drive link) + matching `cohortPresentationVideoEmbedType` on one projection; reload and expect an inline embed inside that card (PRESENT-04).
+5. **Video embed** — set `cohortPresentationVideoUrl` (YouTube/Loom/Drive link) + matching `cohortPresentationVideoEmbedType` on one projection; reload and expect an inline embed inside that card (PRESENT-04).
 
-5. **Feature flag off** — set `FEATURE_AMBASSADOR_PROGRAM=false` in env, restart dev; expect `/ambassadors` to 404.
+6. **Feature flag off** — set `FEATURE_AMBASSADOR_PROGRAM=false` in env, restart dev; expect `/ambassadors` to 404.
+
+7. **Deployed index** — `firebase firestore:indexes | grep public_ambassadors` exits 0 against the target environment.
 
 No automated test file is introduced in this plan — the server component + simple card are thin enough that manual smoke + TS typecheck catches regressions. A future plan can add a Playwright e2e once the broader Phase 3 surface is wired.
 </verification>
@@ -492,6 +565,7 @@ No automated test file is introduced in this plan — the server component + sim
 - One-query invariant holds: the page fetches from a single composite-indexed `public_ambassadors` query — no N+1, no per-card fan-out.
 - Graceful degradation: both empty-cohort and no-cohort states render a friendly alert, not a blank page or a crash.
 - Feature flag still gates everything via the inherited `src/app/ambassadors/layout.tsx` — no per-page duplication of `isAmbassadorProgramEnabled()`.
+- Composite index + rules block are deployed to Firestore before the page is reachable in production (no FAILED_PRECONDITION on first request).
 </success_criteria>
 
 <output>
@@ -504,5 +578,5 @@ New files:
 Modified files:
 - `firestore.indexes.json` (new composite index entry)
 
-Summary file: `.planning/phases/03-public-presentation/03-05-SUMMARY.md` — executor produces this after merge, listing every file touched plus any deviation from this plan.
+Summary file: `.planning/phases/03-public-presentation/03-05-SUMMARY.md` — executor produces this after merge, listing every file touched plus any deviation from this plan. MUST note the outcome of the Task 4 deploy checkpoint (automated success, manual fallback, or deploy failure).
 </output>

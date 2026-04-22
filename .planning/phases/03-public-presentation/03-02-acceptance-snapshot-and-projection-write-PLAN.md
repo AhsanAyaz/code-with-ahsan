@@ -13,12 +13,12 @@ requirements:
   - "PRESENT-04"
 must_haves:
   - "On FIRST accept, `runAcceptanceTransaction` snapshots `university` and `city` from the application doc onto the ambassador subdoc (D-06); on re-accept the snapshot is preserved (idempotency)."
-  - "On FIRST accept, `runAcceptanceTransaction` writes `public_ambassadors/{uid}` inside the SAME transaction so the projection is guaranteed to exist for every accepted ambassador listed on `/ambassadors` (D-08 path 1)."
+  - "On FIRST accept, `runAcceptanceTransaction` writes `public_ambassadors/{uid}` inside the SAME transaction so the projection is guaranteed to exist for every accepted ambassador listed on `/ambassadors` (D-08 path 1). Re-accept is a NO-OP for both the subdoc snapshot and the public projection — in-life field updates flow through `PATCH /api/ambassador/profile` (plan 03-03)."
   - "Ambassador-only users who lack a `username` are backfilled with a unique slug (derived from displayName/email, with collision loop) at acceptance time so `/u/[username]` never falls back to `uid` for new acceptances (D-01a recommended path)."
 ---
 
 <objective>
-Extend the Phase 2 acceptance transaction so that first-accept produces everything the public surface needs in a single atomic operation. Specifically: (1) snapshot `university` + `city` from the application doc onto the ambassador subdoc (D-06), (2) write the `public_ambassadors/{uid}` projection inside the SAME transaction as the role/subdoc/cohort writes (D-08 path 1, so drift is impossible between "has ambassador role" and "shows on /ambassadors"), and (3) backfill a unique `username` on the parent `mentorship_profiles` doc if one does not already exist — ambassador-only users may never have gone through mentor onboarding, so without backfill the `/u/[username]` route would fall back to `/u/{uid}` (D-01a). Re-accept remains idempotent: the subdoc snapshot is NOT overwritten, the projection `updatedAt` is refreshed, and the username backfill no-ops if one is already present.
+Extend the Phase 2 acceptance transaction so that first-accept produces everything the public surface needs in a single atomic operation. Specifically: (1) snapshot `university` + `city` from the application doc onto the ambassador subdoc (D-06), (2) write the `public_ambassadors/{uid}` projection inside the SAME transaction as the role/subdoc/cohort writes (D-08 path 1, so drift is impossible between "has ambassador role" and "shows on /ambassadors"), and (3) backfill a unique `username` on the parent `mentorship_profiles` doc if one does not already exist — ambassador-only users may never have gone through mentor onboarding, so without backfill the `/u/[username]` route would fall back to `/u/{uid}` (D-01a). Re-accept remains idempotent: the subdoc snapshot is NOT overwritten, the public projection is NOT rewritten on re-accept, and the username backfill no-ops if one is already present. Post-acceptance field updates are the PATCH endpoint's job (plan 03-03), not the acceptance transaction's.
 </objective>
 
 <tasks>
@@ -143,8 +143,14 @@ Extend the Phase 2 acceptance transaction so that first-accept produces everythi
 
     ```typescript
     // ── Pre-transaction: resolve the applicant's mentorship_profiles doc to check if
-    // a username backfill is needed (D-01a). where() queries cannot run inside a txn,
-    // so we do the lookup here and pass the resolved username into the transaction.
+    // a username backfill is needed (D-01a). Username uniqueness requires a
+    // `where().limit().get()` query which is ILLEGAL inside a Firestore transaction
+    // (`txn.get` only accepts document refs). So we read the applicant + profile here,
+    // derive/resolve the username here, then pass `resolvedUsername` into the txn body.
+    //
+    // The txn body re-reads appRef/profileRef via `txn.get` to preserve Firestore's
+    // read-before-write invariant — costs 2 extra reads per acceptance, which is
+    // acceptable for a rare, one-time-per-applicant operation.
     const preAppSnap = await db
       .collection(AMBASSADOR_APPLICATIONS_COLLECTION)
       .doc(applicationId)
@@ -213,6 +219,10 @@ Extend the Phase 2 acceptance transaction so that first-accept produces everythi
           // SAME transaction so /ambassadors never sees an ambassador whose projection
           // is missing. Joins parent profile fields (photoURL, displayName, linkedinUrl)
           // with the application's university/city snapshot.
+          //
+          // Subdoc snapshot + public projection write are FIRST-ACCEPT-ONLY. Re-accept
+          // is a no-op for both: in-life edits flow through PATCH /api/ambassador/profile
+          // (plan 03-03), which batches subdoc + projection updates atomically.
           const parentProfile =
             profileSnap.exists
               ? (profileSnap.data() as {
@@ -246,9 +256,37 @@ Extend the Phase 2 acceptance transaction so that first-accept produces everythi
           txn.set(publicRef, projection);
     ```
 
-    STEP E — Inside the `if (profileSnap.exists)` branch of the existing roles-array write (currently `txn.update(profileRef, { roles: FieldValue.arrayUnion("ambassador") });`), augment to also backfill the username if the parent profile has none. Replace the single `txn.update(...)` with:
+    STEP E — Replace the entire existing `if (profileSnap.exists) { … } else { … }` block (currently lines 106–121 of `src/lib/ambassador/acceptance.ts`) with the AFTER block below. This is a SINGLE textual replace — no non-contiguous edits.
+
+    **BEFORE (verbatim — what currently exists at lines 106–121):**
 
     ```typescript
+        // Profile roles — arrayUnion is idempotent, safe to call on re-accept.
+        if (profileSnap.exists) {
+          txn.update(profileRef, { roles: FieldValue.arrayUnion("ambassador") });
+        } else {
+          // Edge case: profile doc missing — create it with ambassador role.
+          txn.set(
+            profileRef,
+            {
+              uid: app.applicantUid,
+              email: app.applicantEmail,
+              displayName: app.applicantName,
+              roles: ["ambassador"],
+              createdAt: now,
+            },
+            { merge: true },
+          );
+        }
+    ```
+
+    **AFTER (replace the BEFORE block above in full, preserving indentation and the surrounding blank lines):**
+
+    ```typescript
+        // Profile roles — arrayUnion is idempotent, safe to call on re-accept.
+        // Username backfill (D-01a): if the parent profile has no username, set
+        // `resolvedUsername` (derived pre-txn via ensureUniqueUsername) alongside
+        // the roles update. No-op if a username already exists.
         if (profileSnap.exists) {
           const existingUsername = (profileSnap.data() as { username?: string })?.username;
           const profileUpdate: Record<string, unknown> = {
@@ -259,11 +297,8 @@ Extend the Phase 2 acceptance transaction so that first-accept produces everythi
           }
           txn.update(profileRef, profileUpdate);
         } else {
-    ```
-
-    And inside the matching `else` block (the `txn.set(profileRef, { ... merge: true });` branch for the "profile missing" edge case), ensure the `set` payload includes `username: resolvedUsername,` as a field. Replace the existing `txn.set(profileRef, {...})` with:
-
-    ```typescript
+          // Edge case: profile doc missing — create it with ambassador role AND the
+          // resolved username so /u/[username] doesn't fall back to /u/{uid}.
           txn.set(
             profileRef,
             {
@@ -276,7 +311,10 @@ Extend the Phase 2 acceptance transaction so that first-accept produces everythi
             },
             { merge: true },
           );
+        }
     ```
+
+    Line-number hint: as of the current file the BEFORE block spans lines 105–121 (including the leading comment line 105). The AFTER block is a drop-in replacement — do not move surrounding code. After the edit, run `npx tsc --noEmit` and manually scan to confirm every brace opened in the AFTER block is balanced.
 
     STEP F — The transaction must remain read-before-write. Since `buildPublicAmbassadorProjection` is pure (no Firestore reads) and STEP D happens AFTER all `txn.get` calls (appRef, cohortRef, profileRef), there is NO new read phase — the existing order is preserved. Confirm this by scanning the final function: every `txn.get` call must appear BEFORE the first `txn.set`/`txn.update`/`txn.create`.
 
@@ -297,6 +335,20 @@ Extend the Phase 2 acceptance transaction so that first-accept produces everythi
     - `grep -q "subdocPayload.city = app.city.trim()" src/lib/ambassador/acceptance.ts`
     - `grep -q "txn.set(publicRef, projection)" src/lib/ambassador/acceptance.ts`
     - `grep -q "profileUpdate.username = resolvedUsername" src/lib/ambassador/acceptance.ts`
+    - **Structural idempotency (re-accept = no-op for snapshot + projection):** run the following awk check — EVERY occurrence of the tokens `subdocPayload`, `PUBLIC_AMBASSADORS_COLLECTION`, `publicRef`, `projection`, `buildPublicAmbassadorProjection`, `subdocPayload.university`, `subdocPayload.city`, and `txn.set(publicRef` must fall INSIDE the `if (!alreadyAccepted) { ... }` block, NOT in the outer txn body or in an `else` branch. Command:
+      ```bash
+      awk '
+        /if \(!alreadyAccepted\) \{/ { depth=1; inblock=1; next }
+        inblock && /\{/ { depth++ }
+        inblock && /\}/ { depth--; if (depth==0) inblock=0 }
+        /subdocPayload|PUBLIC_AMBASSADORS_COLLECTION|publicRef|buildPublicAmbassadorProjection|txn\.set\(publicRef/ {
+          if (!inblock) { print "LEAK: " NR ": " $0; bad=1 }
+        }
+        END { exit bad ? 1 : 0 }
+      ' src/lib/ambassador/acceptance.ts
+      ```
+    - Inline comment proving the intent: `grep -q "first-accept-only\\|FIRST-ACCEPT-ONLY\\|first accept only" src/lib/ambassador/acceptance.ts` (case-insensitive via `-i` if needed — the AFTER block above includes "FIRST-ACCEPT-ONLY").
+    - Runbook assertion (executor records in SUMMARY, not an auto-checked grep): "Re-accept of an already-accepted application is a no-op for the public projection. In-life field updates flow through PATCH /api/ambassador/profile (plan 03-03), not acceptance."
     - `npx tsc --noEmit` exits 0
     - `npm run lint -- --quiet src/lib/ambassador/acceptance.ts src/lib/ambassador/username.ts` exits 0
   </acceptance_criteria>
@@ -314,6 +366,6 @@ Extend the Phase 2 acceptance transaction so that first-accept produces everythi
 
 <must_haves>
 - On first accept, `runAcceptanceTransaction` snapshots `university` and `city` from the application doc onto the ambassador subdoc (D-06); on re-accept the snapshot is preserved (idempotency).
-- On first accept, `runAcceptanceTransaction` writes `public_ambassadors/{uid}` inside the SAME transaction so the projection is guaranteed to exist for every accepted ambassador listed on `/ambassadors` (D-08 path 1).
+- On first accept, `runAcceptanceTransaction` writes `public_ambassadors/{uid}` inside the SAME transaction so the projection is guaranteed to exist for every accepted ambassador listed on `/ambassadors` (D-08 path 1). Re-accept is a NO-OP for both the subdoc snapshot and the public projection.
 - Ambassador-only users who lack a `username` are backfilled with a unique slug at acceptance time so `/u/[username]` never falls back to `uid` for new acceptances (D-01a recommended path).
 </must_haves>

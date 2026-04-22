@@ -19,6 +19,7 @@ must_haves:
   - "A `public_ambassadors/{uid}` Firestore collection exists with read-public, write-denied rules so the Admin SDK is the only writer."
   - "The ambassador subdoc shape `mentorship_profiles/{uid}/ambassador/v1` is extended with the seven public fields (`university?`, `city?`, `publicTagline?`, `twitterUrl?`, `githubUrl?`, `personalSiteUrl?`, `cohortPresentationVideoUrl?`, `cohortPresentationVideoEmbedType?`) and Zod-validated via a new `AmbassadorPublicFieldsSchema`."
   - "A single `buildPublicAmbassadorProjection` helper returns the exact `PublicAmbassadorDoc` payload that both `acceptance.ts` (D-06/D-08) and the `PATCH /api/ambassador/profile` handler will write — optional fields conditionally spread so Firestore Admin SDK never receives `undefined` (feedback_firestore_admin_undefined)."
+  - "URL fields on `AmbassadorPublicFieldsSchema` accept whitespace-only input as an intentional clear (trimmed to `\"\"` before validation) AND reject non-https schemes (ftp://, javascript:, data:, etc.) — matches the PATCH handler's `empty-after-trim ⇒ FieldValue.delete()` contract, and prevents XSS/phishing surface via pasted URLs."
 ---
 
 <objective>
@@ -52,6 +53,50 @@ Lay the type, schema, and security foundation Phase 3 builds on. This plan is pu
     >;
 
     /**
+     * Trimmed optional-URL schema used for social fields (twitter/github/personalSite).
+     *
+     * Two reasons this is NOT a plain `z.string().trim().url()`:
+     *
+     *   1. The PATCH handler at src/app/api/ambassador/profile/route.ts treats
+     *      "empty after trim" as FieldValue.delete() (see plan 03-03 Task 1,
+     *      `applyStringField`). A pure `z.string().url()` rejects `"   "` with a
+     *      400 before the handler ever sees it — but the user's intent is
+     *      "clear this field", not "this is invalid". Preprocessing to trim-first
+     *      makes the client-server contract symmetric (whitespace ≡ empty ≡ clear).
+     *
+     *   2. `z.string().url()` accepts ftp://, javascript:, data:, file:, and other
+     *      non-https schemes. Persisting those on the public card is a phishing /
+     *      XSS vector — a `javascript:alert(1)` URL that then becomes an
+     *      `<a href="…">` is a known MentorCard-class issue. We only allow https://.
+     *
+     * Applied to: twitterUrl, githubUrl, personalSiteUrl.
+     */
+    const trimmedOptionalUrl = z.preprocess(
+      (v) => (typeof v === "string" ? v.trim() : v),
+      z
+        .string()
+        .max(2048)
+        .refine((s) => s === "" || /^https:\/\/\S+$/.test(s), {
+          message: "must be an https:// URL or empty string",
+        })
+        .optional(),
+    );
+
+    /**
+     * Trimmed optional schema for cohortPresentationVideoUrl. Same trim-first
+     * semantics as `trimmedOptionalUrl` (whitespace-only ≡ clear), but NO https://
+     * refine here because the PATCH route runs `isValidVideoUrl()` +
+     * `classifyVideoUrl()` on the trimmed value to enforce YouTube/Loom/Drive
+     * specifically. Adding an https refine here would be redundant and would
+     * prevent the server-side classifier from producing a more helpful 400
+     * message ("Unsupported video URL provider" vs a generic schema error).
+     */
+    const trimmedOptionalVideoUrl = z.preprocess(
+      (v) => (typeof v === "string" ? v.trim() : v),
+      z.string().max(2048).optional(),
+    );
+
+    /**
      * PATCH /api/ambassador/profile body. All fields optional; at least one must be present.
      *
      * Size limits:
@@ -59,19 +104,23 @@ Lay the type, schema, and security foundation Phase 3 builds on. This plan is pu
      *   - URLs: 2048 chars defensive cap
      *   - university/city: 120 chars
      *
-     * The video URL itself is validated via isValidVideoUrl() in the route handler, not here,
+     * The video URL itself is further validated via isValidVideoUrl() in the route handler,
      * because the classifier needs to run server-side to set cohortPresentationVideoEmbedType
-     * on the doc. The schema only enforces a string shape + length cap.
+     * on the doc. The schema here only enforces a string shape + length cap + the trim-first
+     * preprocess so empty-after-trim round-trips to FieldValue.delete().
+     *
+     * The `https://` refine on social fields blocks non-https schemes (ftp:, javascript:,
+     * data:, etc.) which would otherwise render as <a href> attack vectors on public cards.
      */
     export const AmbassadorPublicFieldsSchema = z
       .object({
         university: z.string().trim().max(120).optional(),
         city: z.string().trim().max(120).optional(),
         publicTagline: z.string().trim().max(120).optional(),
-        twitterUrl: z.string().trim().url().max(2048).optional().or(z.literal("")),
-        githubUrl: z.string().trim().url().max(2048).optional().or(z.literal("")),
-        personalSiteUrl: z.string().trim().url().max(2048).optional().or(z.literal("")),
-        cohortPresentationVideoUrl: z.string().trim().max(2048).optional().or(z.literal("")),
+        twitterUrl: trimmedOptionalUrl,
+        githubUrl: trimmedOptionalUrl,
+        personalSiteUrl: trimmedOptionalUrl,
+        cohortPresentationVideoUrl: trimmedOptionalVideoUrl,
       })
       .refine((d) => Object.keys(d).length > 0, { message: "At least one field required" });
 
@@ -139,6 +188,19 @@ Lay the type, schema, and security foundation Phase 3 builds on. This plan is pu
     ```
 
     Then verify the file still parses cleanly with `npx tsc --noEmit`.
+
+    Runtime sanity check (executor runs this as a quick assertion — no new test file):
+
+    ```bash
+    node -e "
+    const { AmbassadorPublicFieldsSchema } = require('./src/types/ambassador.ts');
+    // (adjust for ts-node/tsx as needed; if ambiguous, skip this inline probe and cover via
+    // a throwaway REPL in your editor. The grep-based acceptance criteria below are
+    // the authoritative checks.)
+    "
+    ```
+
+    If inline probing is awkward under the project's TS setup, rely on the grep-based acceptance criteria below + the behavioural cases enumerated there.
   </action>
   <acceptance_criteria>
     - `grep -q "export const AmbassadorPublicFieldsSchema" src/types/ambassador.ts`
@@ -146,6 +208,19 @@ Lay the type, schema, and security foundation Phase 3 builds on. This plan is pu
     - `grep -q "export interface AmbassadorSubdoc" src/types/ambassador.ts`
     - `grep -q "PUBLIC_AMBASSADORS_COLLECTION = \"public_ambassadors\"" src/types/ambassador.ts`
     - `grep -q "CohortPresentationVideoEmbedTypeSchema" src/types/ambassador.ts`
+    - `grep -q "trimmedOptionalUrl" src/types/ambassador.ts` (the shared preprocess constant exists)
+    - `grep -q "trimmedOptionalVideoUrl" src/types/ambassador.ts`
+    - `grep -qE "\\^https://" src/types/ambassador.ts` (https-scheme refine is present — blocks ftp:/javascript:/data:)
+    - `grep -q "z.preprocess" src/types/ambassador.ts` (trim-first preprocess is wired in)
+    - `! grep -q "z.string().trim().url().max(2048).optional().or(z.literal(\"\"))" src/types/ambassador.ts` (the rejected old schema shape is gone — SHOULD-FIX-4/5)
+    - Behavioural cases the schema MUST satisfy (verify by spinning up a quick REPL or an ad-hoc script; no test file required in this plan):
+      - `AmbassadorPublicFieldsSchema.safeParse({ twitterUrl: "   " }).success === true` AND the parsed `twitterUrl` is `""` (whitespace-only → clear, not 400)
+      - `AmbassadorPublicFieldsSchema.safeParse({ twitterUrl: "" }).success === true` (empty string → clear)
+      - `AmbassadorPublicFieldsSchema.safeParse({ twitterUrl: "https://twitter.com/x" }).success === true` (valid https)
+      - `AmbassadorPublicFieldsSchema.safeParse({ twitterUrl: "javascript:alert(1)" }).success === false` (XSS scheme rejected)
+      - `AmbassadorPublicFieldsSchema.safeParse({ twitterUrl: "ftp://example.com" }).success === false` (non-https scheme rejected)
+      - `AmbassadorPublicFieldsSchema.safeParse({ twitterUrl: "http://example.com" }).success === false` (plain http rejected — https only)
+      - `AmbassadorPublicFieldsSchema.safeParse({ cohortPresentationVideoUrl: "   " }).success === true` with parsed value `""` (video URL also trim-first, server classifier handles provider)
     - `npx tsc --noEmit` exits 0
   </acceptance_criteria>
 </task>
@@ -335,6 +410,8 @@ Lay the type, schema, and security foundation Phase 3 builds on. This plan is pu
     ```
 
     Ensure correct brace nesting: the new block lives inside `match /databases/{database}/documents { ... }`. Run `grep -c '^    match' firestore.rules` before and after to confirm exactly one new `match` statement was added.
+
+    NOTE: these rules ship to production via Plan 03-05 Task 4 (the blocking deploy checkpoint). Merging this plan alone does NOT activate the rules in Firestore; the deploy in 03-05 is what publishes both the rules AND the composite index together.
   </action>
   <acceptance_criteria>
     - `grep -q "match /public_ambassadors/{uid}" firestore.rules`
@@ -349,6 +426,8 @@ Lay the type, schema, and security foundation Phase 3 builds on. This plan is pu
 <verification>
 - `grep -q "PublicAmbassadorDoc" src/types/ambassador.ts` (type exists)
 - `grep -q "AmbassadorPublicFieldsSchema" src/types/ambassador.ts` (schema exists)
+- `grep -q "trimmedOptionalUrl" src/types/ambassador.ts` (preprocess-based URL schema exists — SHOULD-FIX-4)
+- `grep -qE "\\^https://" src/types/ambassador.ts` (https-only scheme constraint — SHOULD-FIX-5)
 - `grep -q "buildPublicAmbassadorProjection" src/lib/ambassador/publicProjection.ts` (helper exists)
 - `grep -q "match /public_ambassadors/{uid}" firestore.rules` (rules added)
 - `npx tsc --noEmit` exits 0
@@ -359,4 +438,5 @@ Lay the type, schema, and security foundation Phase 3 builds on. This plan is pu
 - A `public_ambassadors/{uid}` Firestore collection exists with read-public, write-denied rules so the Admin SDK is the only writer.
 - The ambassador subdoc shape `mentorship_profiles/{uid}/ambassador/v1` is extended with the seven public fields and Zod-validated via a new `AmbassadorPublicFieldsSchema`.
 - A single `buildPublicAmbassadorProjection` helper returns the exact `PublicAmbassadorDoc` payload that both `acceptance.ts` (D-06/D-08) and the `PATCH /api/ambassador/profile` handler will write — optional fields conditionally spread so Firestore Admin SDK never receives `undefined`.
+- URL fields on `AmbassadorPublicFieldsSchema` accept whitespace-only input as an intentional clear (trimmed to `""` before validation) AND reject non-https schemes (ftp://, javascript:, data:, etc.) — matches the PATCH handler's `empty-after-trim ⇒ FieldValue.delete()` contract, and prevents XSS/phishing surface via pasted URLs.
 </must_haves>
