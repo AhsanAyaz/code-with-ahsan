@@ -103,6 +103,14 @@ const nextConfig: NextConfig = {
           "https://n8n.codewithahsan.dev/form/42d5787c-cba9-457e-b05e-a1116d5d1c3f",
         permanent: true,
       },
+      {
+        // Phase 3 D-01: /u/[username] is the canonical public profile URL.
+        // /mentorship/mentors/[username] 308-redirects here so existing deep-links
+        // (inbound SEO, OG shares, social cards) keep resolving.
+        source: "/mentorship/mentors/:username",
+        destination: "/u/:username",
+        permanent: true,
+      },
     ];
   },
   turbopack: {
