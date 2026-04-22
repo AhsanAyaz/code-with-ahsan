@@ -12,9 +12,12 @@
  * changed without code search. Default 30 days per spec §4 eligibility; 7-day alternative
  * explicitly reviewed in Plan 09 pre-flight checkpoint.
  *
- * Changing this value to 7 is a supported one-line edit — all callers import this constant.
+ * Plan 09 pre-flight decision (2026-04-22): Set to 7 days to lower friction for the first
+ * cohort. Rationale: the program is new and the community is still small; filtering out
+ * same-day sign-ups is sufficient initial signal. Can be raised once the pipeline is proven
+ * — all callers import this constant, so a future change is a supported one-line edit.
  */
-export const AMBASSADOR_DISCORD_MIN_AGE_DAYS = 30;
+export const AMBASSADOR_DISCORD_MIN_AGE_DAYS = 7;
 
 /** Firestore top-level collection name for ambassador applications (APPLY-06). */
 export const AMBASSADOR_APPLICATIONS_COLLECTION = "applications";
