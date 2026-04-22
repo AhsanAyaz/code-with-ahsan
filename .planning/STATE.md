@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: Phase 2 context gathered
-last_updated: "2026-04-22T09:33:58.949Z"
-last_activity: 2026-04-21
+stopped_at: Completed 02-01-types-zod-feature-foundations-PLAN.md
+last_updated: "2026-04-22T11:05:04.750Z"
+last_activity: 2026-04-22
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 10
-  completed_plans: 9
+  total_plans: 19
+  completed_plans: 10
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-21)
 
 **Core value:** Community members can find mentors, collaborate on real projects with structured support, and follow clear learning roadmaps—all within a mentor-led, quality-focused environment.
-**Current focus:** Phase 01 — foundation-roles-array-migration
+**Current focus:** Phase 02 — application-subsystem
 
 ## Current Position
 
-Phase: 01 (foundation-roles-array-migration) — EXECUTING
-Plan: 9 of 10
+Phase: 02 (application-subsystem) — EXECUTING
+Plan: 2 of 9
 Status: Ready to execute
-Last activity: 2026-04-21
+Last activity: 2026-04-22
 
 ## Performance Metrics
 
@@ -76,6 +76,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: Plan 07 call-site migration: 30 files modified, 66 hasRole occurrences across 17 files. Dual-read/dual-write pattern established. Rule 3 deviation: relaxed PermissionUser.role to optional, extended lib/email.ts local shim with roles.
 - [Phase 01-foundation-roles-array-migration]: Plan 09 client-claim-refresh: exposed syncClaimsFromResponse on MentorshipContext + refreshClaimsNow/useClaimRefresh helpers; call-site wiring deferred (plan scope limited to context + hook file); strict === true check to discriminate from truthy failure shape
 - [Phase 01]: Plan 08 test fixture migration: dual-shape fixtures (role+roles both present), 108 tests (53 pre-existing + 55 new), measured v8 coverage on src/lib/permissions.ts = 90.54% branch / 94.91% line (gate >=90% PASS); installed @vitest/coverage-v8 and backfilled missing @rollup native dep (Rule-3 blocker)
+- [Phase 02-application-subsystem]: AMBASSADOR_DISCORD_MIN_AGE_DAYS defaults to 30 (spec §4); 7-day alternative reviewed at Plan 09 pre-flight (D-03)
+- [Phase 02-application-subsystem]: DISCORD_AMBASSADOR_ROLE_ID set to PENDING_DISCORD_ROLE_CREATION placeholder; acceptance API returns discordRoleAssigned=false while placeholder is active (DISC-02)
 
 ### Workflow Notes
 
@@ -118,12 +120,13 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 01 P07 | 32min | 2 tasks | 30 files |
 | Phase 01-foundation-roles-array-migration P09 | ~3min | 2 tasks | 2 files |
 | Phase 01 P08 | ~6min | 1 tasks | 3 files |
+| Phase 02-application-subsystem P01 | 3 | 3 tasks | 4 files |
 
 ## Session Continuity
 
-Last session: 2026-04-22T09:33:58.945Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-application-subsystem/02-CONTEXT.md
+Last session: 2026-04-22T11:05:04.747Z
+Stopped at: Completed 02-01-types-zod-feature-foundations-PLAN.md
+Resume file: None
 
 ---
 *Last activity: 2026-04-21 - v6.0 Student Ambassador Program roadmap created; 5 phases, 66 requirements, 100% coverage*

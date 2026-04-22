@@ -23,15 +23,15 @@ Scoped requirements for v6.0. Each maps to exactly one roadmap phase (populated 
 
 ### Cohort Management
 
-- [ ] **COHORT-01**: Admin can create a cohort (`name`, `startDate`, `endDate`, `maxSize`, `status: upcoming | active | closed`) from the admin panel
+- [x] **COHORT-01**: Admin can create a cohort (`name`, `startDate`, `endDate`, `maxSize`, `status: upcoming | active | closed`) from the admin panel
 - [ ] **COHORT-02**: Admin can open / close an application window on a cohort (applications accepted only while status is `upcoming` and window is open)
 - [ ] **COHORT-03**: Admin can view the list of all accepted ambassadors attached to a cohort
 - [ ] **COHORT-04**: System enforces cohort `maxSize` at acceptance time (acceptance request rejected if cohort is full)
 
 ### Application Pipeline
 
-- [ ] **APPLY-01**: Public `/ambassadors/apply` page renders the application form behind a Firebase-authenticated gate (must be signed in, must be ≥30 days since Discord-linked account creation)
-- [ ] **APPLY-02**: Application form captures: name, university, year of study, country / city, Discord handle, academic email, 2–3 short-answer prompts, target cohort
+- [x] **APPLY-01**: Public `/ambassadors/apply` page renders the application form behind a Firebase-authenticated gate (must be signed in, must be ≥30 days since Discord-linked account creation)
+- [x] **APPLY-02**: Application form captures: name, university, year of study, country / city, Discord handle, academic email, 2–3 short-answer prompts, target cohort
 - [ ] **APPLY-03**: Applicant can submit the 60–90s application video either as direct upload to Firebase Storage **or** as an unlisted external link (Loom / YouTube) — both must validate duration / accessibility
 - [ ] **APPLY-04**: Academic email is validated against a layered allowlist — regex for `.edu`, `.edu.{cc}`, `.ac.{cc}` domains plus the Hipo `world_universities_and_domains.json` snapshot, with graceful fallback messaging when an unknown TLD is submitted
 - [ ] **APPLY-05**: Applicants whose email fails automatic validation can upload a student-ID photo as a first-class fallback path (admin reviewer verifies manually)
@@ -50,8 +50,8 @@ Scoped requirements for v6.0. Each maps to exactly one roadmap phase (populated 
 ### Discord Integration
 
 - [ ] **DISC-01**: At the point of application, the applicant's Discord handle is resolved to an immutable `discordMemberId` stored on the `applications/{applicationId}` doc (fails soft — admin sees a warning but can still review)
-- [ ] **DISC-02**: Acceptance uses a two-stage flow — Firestore commit (roles update + ambassador subdoc + cohort attach) must succeed independently; Discord role assignment is attempted right after and any failure surfaces in the admin panel with a retry button
-- [ ] **DISC-03**: Discord role assignment is idempotent — the accept endpoint never double-assigns, and the retry button works from any prior failure state
+- [x] **DISC-02**: Acceptance uses a two-stage flow — Firestore commit (roles update + ambassador subdoc + cohort attach) must succeed independently; Discord role assignment is attempted right after and any failure surfaces in the admin panel with a retry button
+- [x] **DISC-03**: Discord role assignment is idempotent — the accept endpoint never double-assigns, and the retry button works from any prior failure state
 - [ ] **DISC-04**: Scheduled reconciliation cron flags (does not auto-mutate) any accepted ambassador who is missing the Discord Ambassador role, so admin can act
 - [ ] **DISC-05**: Offboarding an ambassador (strike-based or admin-initiated) removes the Discord Ambassador role via the same integration; failures surface in the admin panel for retry
 
@@ -187,12 +187,12 @@ Every v1 REQ-ID maps to exactly one phase. Populated during roadmap creation (20
 | ROLE-06 | Phase 1 — Foundation: Roles Array Migration | Complete |
 | ROLE-07 | Phase 1 — Foundation: Roles Array Migration | Complete |
 | ROLE-08 | Phase 1 — Foundation: Roles Array Migration | Complete |
-| COHORT-01 | Phase 2 — Application Subsystem | Pending |
+| COHORT-01 | Phase 2 — Application Subsystem | Complete |
 | COHORT-02 | Phase 2 — Application Subsystem | Pending |
 | COHORT-03 | Phase 2 — Application Subsystem | Pending |
 | COHORT-04 | Phase 2 — Application Subsystem | Pending |
-| APPLY-01 | Phase 2 — Application Subsystem | Pending |
-| APPLY-02 | Phase 2 — Application Subsystem | Pending |
+| APPLY-01 | Phase 2 — Application Subsystem | Complete |
+| APPLY-02 | Phase 2 — Application Subsystem | Complete |
 | APPLY-03 | Phase 2 — Application Subsystem | Pending |
 | APPLY-04 | Phase 2 — Application Subsystem | Pending |
 | APPLY-05 | Phase 2 — Application Subsystem | Pending |
@@ -205,8 +205,8 @@ Every v1 REQ-ID maps to exactly one phase. Populated during roadmap creation (20
 | REVIEW-04 | Phase 2 — Application Subsystem | Pending |
 | REVIEW-05 | Phase 2 — Application Subsystem | Pending |
 | DISC-01 | Phase 2 — Application Subsystem | Pending |
-| DISC-02 | Phase 2 — Application Subsystem | Pending |
-| DISC-03 | Phase 2 — Application Subsystem | Pending |
+| DISC-02 | Phase 2 — Application Subsystem | Complete |
+| DISC-03 | Phase 2 — Application Subsystem | Complete |
 | DISC-04 | Phase 4 — Activity Subsystem | Pending |
 | DISC-05 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
 | PRESENT-01 | Phase 3 — Public Presentation | Pending |

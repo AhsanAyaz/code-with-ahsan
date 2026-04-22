@@ -112,7 +112,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
   6. Applicants receive the right transactional email at the right moment — confirmation on submit, acceptance email with onboarding steps on accept, decline email with kind-but-firm messaging and reapply encouragement on decline — and declined-application videos are auto-deleted 30 days after the decline decision.
 
 **Plans**: 9 plans
-- [ ] 02-01-types-zod-feature-foundations-PLAN.md — ApplicationDoc/CohortDoc interfaces + Zod schemas + Discord role ID / age constants (Wave 1 / COHORT-01, APPLY-01/02, DISC-02/03)
+- [x] 02-01-types-zod-feature-foundations-PLAN.md — ApplicationDoc/CohortDoc interfaces + Zod schemas + Discord role ID / age constants (Wave 1 / COHORT-01, APPLY-01/02, DISC-02/03)
 - [ ] 02-02-validators-academic-email-video-url-PLAN.md — TDD for `validateAcademicEmail` (Hipo snapshot lazy-init + soft-warn per D-15) and `classifyVideoUrl` / `isValidVideoUrl` (YouTube / Loom / Drive per D-07) (Wave 1 / APPLY-03/04)
 - [ ] 02-03-firestore-rules-email-templates-PLAN.md — firestore.rules + storage.rules for `applications/` + `cohorts/` (deny client writes, applicant read-own, admin read-all) + three `sendAmbassadorApplication*Email` functions (Wave 1 / APPLY-06, EMAIL-01/02/03)
 - [ ] 02-04-cohort-api-admin-panel-PLAN.md — `/api/ambassador/cohorts` GET/POST + `[cohortId]` GET/PATCH + `/admin/ambassadors/cohorts` panel (create / toggle window / view attached ambassadors) (Wave 2 / COHORT-01/02/03)
