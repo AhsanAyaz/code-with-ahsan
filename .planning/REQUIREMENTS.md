@@ -26,7 +26,7 @@ Scoped requirements for v6.0. Each maps to exactly one roadmap phase (populated 
 - [x] **COHORT-01**: Admin can create a cohort (`name`, `startDate`, `endDate`, `maxSize`, `status: upcoming | active | closed`) from the admin panel
 - [x] **COHORT-02**: Admin can open / close an application window on a cohort (applications accepted only while status is `upcoming` and window is open)
 - [x] **COHORT-03**: Admin can view the list of all accepted ambassadors attached to a cohort
-- [ ] **COHORT-04**: System enforces cohort `maxSize` at acceptance time (acceptance request rejected if cohort is full)
+- [x] **COHORT-04**: System enforces cohort `maxSize` at acceptance time (acceptance request rejected if cohort is full)
 
 ### Application Pipeline
 
@@ -41,11 +41,11 @@ Scoped requirements for v6.0. Each maps to exactly one roadmap phase (populated 
 
 ### Admin Review
 
-- [ ] **REVIEW-01**: Admin review panel at `/admin/ambassadors` lists applications with filters (cohort, status, submission date) and pagination
-- [ ] **REVIEW-02**: Admin can open an application detail view that shows all form fields, streams the video via a short-lived signed URL (1-hour expiry, regenerated each page load), and displays prior reviewer notes
-- [ ] **REVIEW-03**: Admin can accept or decline an application with an optional note; single-reviewer workflow (no voting in v1)
+- [x] **REVIEW-01**: Admin review panel at `/admin/ambassadors` lists applications with filters (cohort, status, submission date) and pagination
+- [x] **REVIEW-02**: Admin can open an application detail view that shows all form fields, streams the video via a short-lived signed URL (1-hour expiry, regenerated each page load), and displays prior reviewer notes
+- [x] **REVIEW-03**: Admin can accept or decline an application with an optional note; single-reviewer workflow (no voting in v1)
 - [x] **REVIEW-04**: Declined applications trigger a retention cron that deletes the stored video 30 days after the decline decision
-- [ ] **REVIEW-05**: Admin panel shows a Discord integration banner if acceptance cannot resolve a `discordMemberId` for an applicant (allows retry / manual link)
+- [x] **REVIEW-05**: Admin panel shows a Discord integration banner if acceptance cannot resolve a `discordMemberId` for an applicant (allows retry / manual link)
 
 ### Discord Integration
 
@@ -108,8 +108,8 @@ Scoped requirements for v6.0. Each maps to exactly one roadmap phase (populated 
 ### Email Notifications
 
 - [x] **EMAIL-01**: Application-submitted confirmation email (transactional)
-- [ ] **EMAIL-02**: Application accepted email (with onboarding steps)
-- [ ] **EMAIL-03**: Application declined email (with kind-but-firm messaging and encouragement to reapply for future cohorts)
+- [x] **EMAIL-02**: Application accepted email (with onboarding steps)
+- [x] **EMAIL-03**: Application declined email (with kind-but-firm messaging and encouragement to reapply for future cohorts)
 - [ ] **EMAIL-04**: Offboarding email on 2-strike removal (from the admin panel flow)
 
 ## Future Requirements (v1.x / v2)
@@ -190,7 +190,7 @@ Every v1 REQ-ID maps to exactly one phase. Populated during roadmap creation (20
 | COHORT-01 | Phase 2 — Application Subsystem | Complete |
 | COHORT-02 | Phase 2 — Application Subsystem | Complete |
 | COHORT-03 | Phase 2 — Application Subsystem | Complete |
-| COHORT-04 | Phase 2 — Application Subsystem | Pending |
+| COHORT-04 | Phase 2 — Application Subsystem | Complete |
 | APPLY-01 | Phase 2 — Application Subsystem | Complete |
 | APPLY-02 | Phase 2 — Application Subsystem | Complete |
 | APPLY-03 | Phase 2 — Application Subsystem | Complete |
@@ -199,11 +199,11 @@ Every v1 REQ-ID maps to exactly one phase. Populated during roadmap creation (20
 | APPLY-06 | Phase 2 — Application Subsystem | Complete |
 | APPLY-07 | Phase 2 — Application Subsystem | Complete |
 | APPLY-08 | Phase 2 — Application Subsystem | Complete |
-| REVIEW-01 | Phase 2 — Application Subsystem | Pending |
-| REVIEW-02 | Phase 2 — Application Subsystem | Pending |
-| REVIEW-03 | Phase 2 — Application Subsystem | Pending |
+| REVIEW-01 | Phase 2 — Application Subsystem | Complete |
+| REVIEW-02 | Phase 2 — Application Subsystem | Complete |
+| REVIEW-03 | Phase 2 — Application Subsystem | Complete |
 | REVIEW-04 | Phase 2 — Application Subsystem | Complete |
-| REVIEW-05 | Phase 2 — Application Subsystem | Pending |
+| REVIEW-05 | Phase 2 — Application Subsystem | Complete |
 | DISC-01 | Phase 2 — Application Subsystem | Complete |
 | DISC-02 | Phase 2 — Application Subsystem | Complete |
 | DISC-03 | Phase 2 — Application Subsystem | Complete |
@@ -242,8 +242,8 @@ Every v1 REQ-ID maps to exactly one phase. Populated during roadmap creation (20
 | ALUMNI-02 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
 | ALUMNI-03 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
 | EMAIL-01 | Phase 2 — Application Subsystem | Complete |
-| EMAIL-02 | Phase 2 — Application Subsystem | Pending |
-| EMAIL-03 | Phase 2 — Application Subsystem | Pending |
+| EMAIL-02 | Phase 2 — Application Subsystem | Complete |
+| EMAIL-03 | Phase 2 — Application Subsystem | Complete |
 | EMAIL-04 | Phase 5 — Dashboard, Leaderboard, Offboarding & Alumni | Pending |
 
 **Coverage:**
@@ -257,3 +257,4 @@ Every v1 REQ-ID maps to exactly one phase. Populated during roadmap creation (20
 ---
 *Requirements defined: 2026-04-21*
 *Last updated: 2026-04-21 — traceability populated during roadmap creation (5 phases, 100% coverage)*
+*2026-04-22 — Phase 2 complete: COHORT-04, REVIEW-01/02/03/05, EMAIL-02/03 flipped to Complete per VERIFICATION.md evidence.*
