@@ -23,7 +23,9 @@
  *   npx tsx scripts/sync-custom-claims.ts
  */
 
-import "dotenv/config";
+import { config } from "dotenv";
+config({ path: ".env.local" });
+config(); // fallback to .env
 import * as admin from "firebase-admin";
 
 const COLLECTION = "mentorship_profiles";
@@ -34,9 +36,11 @@ function initAdmin(): void {
   if (admin.apps.length > 0) return;
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
   if (serviceAccountJson) {
-    admin.initializeApp({
-      credential: admin.credential.cert(JSON.parse(serviceAccountJson)),
-    });
+    const parsed = JSON.parse(serviceAccountJson);
+    if (parsed.private_key) {
+      parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
+    }
+    admin.initializeApp({ credential: admin.credential.cert(parsed) });
     return;
   }
   if (process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PROJECT_ID) {

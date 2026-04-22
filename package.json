@@ -20,12 +20,12 @@
     "emulators": "firebase emulators:start --project demo-codewithahsan --only auth,firestore,storage",
     "seed": "FIRESTORE_EMULATOR_HOST=localhost:8080 NEXT_PUBLIC_FIREBASE_PROJECT_ID=demo-codewithahsan npx tsx scripts/seed-firestore.ts",
     "seed:clear": "FIRESTORE_EMULATOR_HOST=localhost:8080 NEXT_PUBLIC_FIREBASE_PROJECT_ID=demo-codewithahsan npx tsx scripts/seed-firestore.ts --clear",
-    "migrate-roles:dry-run": "tsx scripts/migrate-roles-to-array.ts --dry-run",
-    "migrate-roles": "tsx scripts/migrate-roles-to-array.ts",
-    "migrate-roles:limit-10": "tsx scripts/migrate-roles-to-array.ts --limit=10",
-    "sync-claims:dry-run": "tsx scripts/sync-custom-claims.ts --dry-run",
-    "sync-claims": "tsx scripts/sync-custom-claims.ts",
-    "sync-claims:limit-10": "tsx scripts/sync-custom-claims.ts --limit=10"
+    "migrate-roles:dry-run": "npx tsx scripts/migrate-roles-to-array.ts --dry-run",
+    "migrate-roles": "npx tsx scripts/migrate-roles-to-array.ts",
+    "migrate-roles:limit-10": "npx tsx scripts/migrate-roles-to-array.ts --limit=10",
+    "sync-claims:dry-run": "npx tsx scripts/sync-custom-claims.ts --dry-run",
+    "sync-claims": "npx tsx scripts/sync-custom-claims.ts",
+    "sync-claims:limit-10": "npx tsx scripts/sync-custom-claims.ts --limit=10"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
