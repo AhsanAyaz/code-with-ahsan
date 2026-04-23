@@ -255,5 +255,17 @@ service cloud.firestore {
       allow read: if false;
       allow write: if false;
     }
+
+    // Phase 4 (REPORT-02, REPORT-06): Monthly self-reports are written ONLY via the
+    // Admin SDK from /api/ambassador/report. Deny all client-SDK access.
+    match /monthly_reports/{reportId} {
+      allow read, write: if false;
+    }
+
+    // Phase 4 (REPORT-04, DISC-04, D-06): Cron-generated review flags. Written ONLY by
+    // server-side cron scripts. Admin reads/updates via Admin SDK endpoints. Deny client.
+    match /ambassador_cron_flags/{flagId} {
+      allow read, write: if false;
+    }
   }
 }
