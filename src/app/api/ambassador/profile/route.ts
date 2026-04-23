@@ -250,10 +250,10 @@ export async function PATCH(request: NextRequest) {
     );
   }
 
-  return NextResponse.json({
-    success: true,
-    public: projection,
-  });
+  // Response mirrors GET's flat-field shape (absent keys omitted, not null)
+  // so the /profile editor's `{ ...EMPTY, ...body }` hydration pattern works
+  // symmetrically on PATCH success and initial load.
+  return NextResponse.json(extractPublicFieldsFromSubdoc(postWrite));
 }
 
 /**
