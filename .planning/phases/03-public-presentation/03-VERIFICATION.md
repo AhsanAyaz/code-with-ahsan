@@ -2,13 +2,13 @@
 phase: 03-public-presentation
 verified: 2026-04-22T23:00:00Z
 updated: 2026-04-22T23:45:00Z
-status: passed
-score: 4/4 must-haves verified — initial PRESENT-04 gap resolved inline before phase close-out
+status: human_needed
+score: 4/4 must-haves verified at code-layer — 6 human-verification items pending browser confirmation
 requirement_coverage:
-  PRESENT-01: verified
-  PRESENT-02: verified
-  PRESENT-03: verified
-  PRESENT-04: verified (resolved inline — see Gap Resolution section below)
+  PRESENT-01: verified (code) — human confirmation pending (item 1)
+  PRESENT-02: verified (code) — human confirmation pending (items 2, 3)
+  PRESENT-03: verified (code) — human confirmation pending (item 2)
+  PRESENT-04: verified (code — resolved inline, see Gap Resolution) — human confirmation pending (items 4, 5, 6)
 gaps_resolved_inline:
   - truth: "An accepted ambassador can set a cohortPresentationVideo from their profile and it renders on their /ambassadors card"
     original_status: partial
