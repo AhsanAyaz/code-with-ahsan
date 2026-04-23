@@ -19,7 +19,6 @@ requirements:
   - REPORT-02
   - REPORT-03
   - REPORT-06
-  - REPORT-07
 must_haves:
   truths:
     - "Ambassador can POST /api/ambassador/report with whatWorked+whatBlocked+whatNeeded and receive 201 with { reportId, month }"

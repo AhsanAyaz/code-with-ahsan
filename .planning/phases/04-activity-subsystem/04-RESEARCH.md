@@ -548,22 +548,13 @@ if (!isAmbassador) return NextResponse.json({ error: "Forbidden" }, { status: 40
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **`date-fns` availability**
-   - What we know: Package not confirmed present in the project
-   - What's unclear: Whether `date-fns` is already installed (not verified against `package.json`)
-   - Recommendation: Check `package.json` before the cron plan. If absent, use native Intl API. The cron's timezone math is simple enough that a library is optional.
+1. **`date-fns` availability** — RESOLVED: `date-fns-tz` v3.2.0 is used in Plan 01 for timezone-aware deadline math. If absent from package.json, executor adds it; fallback is native `Intl.DateTimeFormat`.
 
-2. **Firestore index for `referral_codes` approach vs collection-group query**
-   - What we know: Collection-group queries need indexes; top-level lookup doc avoids this
-   - What's unclear: Whether the planner should choose one approach or leave to executor discretion
-   - Recommendation: Plan should explicitly choose the `referral_codes/{code}` top-level lookup doc — it's simpler, faster, and avoids an index deployment step.
+2. **Firestore index for `referral_codes` approach vs collection-group query** — RESOLVED: Plans adopt the `referral_codes/{code}` top-level lookup doc approach (Plan 01). Avoids composite index deployment and gives O(1) reads.
 
-3. **REPORT-03 on `/ambassadors/report` page**
-   - What we know: REPORT-03 says "dashboard shows next-report-due date and status badge" but D-01 puts the report form at `/ambassadors/report` not the dashboard (Phase 5)
-   - What's unclear: Phase 4 builds the form at `/ambassadors/report`; should the status badge also appear there, or is that Phase 5?
-   - Recommendation: Based on CONTEXT.md Phase 4 boundary, the `ReportStatusBadge` renders on `/ambassadors/report` in Phase 4 (it's part of the report UI, not the dashboard). Phase 5 adds the next-due-date display on the dashboard page.
+3. **REPORT-03 on `/ambassadors/report` page** — RESOLVED: `ReportStatusBadge` renders on `/ambassadors/report` in Phase 4 (part of the report UI). Phase 5 adds next-due-date display on the dashboard.
 
 ---
 

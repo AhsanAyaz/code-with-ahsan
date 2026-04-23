@@ -104,7 +104,7 @@ From Plan 01 (MUST be complete before this plan runs):
 - `interface AmbassadorSubdoc { timezone?, active, discordMemberId, ... }` — `@/types/ambassador`
 
 Existing discord.ts exports (confirmed from src/lib/discord.ts):
-- `sendDirectMessage(discordUsername: string, message: string): Promise<boolean>` — line ~526; returns true on success, false on failure, NEVER throws (safe to call without try/catch per its contract)
+- `sendDirectMessage(discordUsername: string, message: string): Promise<boolean>` — line ~526; returns true on success, false on failure, NEVER throws (safe to call without try/catch per its contract). **Known limitation:** takes a Discord username (mutable) not a member ID. DMs may silently fail if an ambassador changes their Discord username; this is acceptable for v1 since DM failure is non-fatal and the flag write still succeeds.
 - `getGuildMember(discordMemberId: string): Promise<GuildMember | null>` — fetches by immutable Discord member id; returns null on 404/error
 - `DISCORD_AMBASSADOR_ROLE_ID` — constant exported from `src/lib/ambassador/constants.ts` (set in Phase 2 preflight)
 - `DISCORD_GUILD_ID` — env var read directly via `process.env.DISCORD_GUILD_ID`

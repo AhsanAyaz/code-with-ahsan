@@ -8,6 +8,7 @@ depends_on:
   - 04-04-report-and-strike-api
 files_modified:
   - src/app/ambassadors/report/page.tsx
+  - src/app/ambassadors/report/ReportPageClient.tsx
   - src/app/admin/ambassadors/members/page.tsx
   - src/app/admin/ambassadors/members/MembersList.tsx
   - src/app/admin/ambassadors/members/[uid]/page.tsx
@@ -25,7 +26,6 @@ requirements:
   - REF-01
   - REPORT-03
   - REPORT-06
-  - REPORT-07
   - DISC-04
 must_haves:
   truths:
