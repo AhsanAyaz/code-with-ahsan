@@ -16,30 +16,23 @@ if (wantsEmulator) {
   process.env.FIREBASE_STORAGE_EMULATOR_HOST ??= "localhost:9199";
 }
 
-// Hot-reload guard. The firebase-admin module lives in node_modules and persists
-// across `next dev` hot reloads, so `admin.apps` may already contain an app from
-// a previous compile that ran under an older version of this file. If that app
-// was initialized with production credentials but we now want emulator mode,
-// tear it down and let the init below run on a clean slate.
-if (wantsEmulator && admin.apps.length > 0) {
-  const app = admin.apps[0];
-  const hasCredential = !!(app && (app.options as { credential?: unknown })?.credential);
-  if (hasCredential) {
-    console.warn(
-      "[firebaseAdmin] dev+emulator detected but existing app has production credentials. " +
-        "Deleting and re-initializing for emulator. If auth still fails, fully restart `next dev` " +
-        "and clear the .next cache.",
-    );
-    // .delete() is async, but we need admin.apps cleared synchronously before
-    // initializeApp below. Fire the delete; then clear admin.apps in place.
-    try {
-      void app!.delete();
-    } catch {
-      /* ignore */
+// Hot-reload guard. In emulator mode we exclusively use a named app (EMU_APP_NAME)
+// so the DEFAULT app is never returned by getOrInitApp(). However, a previous
+// hot-reload cycle may have initialized the DEFAULT app with prod credentials —
+// delete that specific app so it doesn't occupy the [DEFAULT] slot.
+if (wantsEmulator) {
+  const defaultApp = admin.apps.find((a) => a?.name === "[DEFAULT]");
+  if (defaultApp) {
+    const hasCredential = !!(
+      defaultApp.options as { credential?: unknown }
+    )?.credential;
+    if (hasCredential) {
+      console.warn(
+        "[firebaseAdmin] dev+emulator: DEFAULT app has prod credentials — deleting it. " +
+          "If auth still fails, fully restart `next dev` and clear the .next cache.",
+      );
+      try { void defaultApp.delete(); } catch { /* ignore */ }
     }
-    // admin.apps is a live getter that reads from an internal array; we can't
-    // modify it directly. But initializeApp with a NAMED app sidesteps the
-    // "default app already exists" error. We use a named app and re-export.
   }
 }
 
@@ -48,28 +41,21 @@ if (wantsEmulator && admin.apps.length > 0) {
 const EMU_APP_NAME = "dev-emulator-app";
 
 function getOrInitApp(): admin.app.App {
-  // If we're in dev-emulator mode and the default app already has credentials,
-  // use a named app instead.
   if (wantsEmulator) {
+    // In emulator mode always use the named app — never admin.apps[0], which may
+    // be a stale or already-deleted DEFAULT app from a prior hot-reload cycle.
     const existing = admin.apps.find((a) => a?.name === EMU_APP_NAME);
     if (existing) return existing;
-    const defaultHasCredential =
-      admin.apps.length > 0 &&
-      !!(admin.apps[0] && (admin.apps[0]!.options as { credential?: unknown })?.credential);
-    if (defaultHasCredential) {
-      return admin.initializeApp(
-        {
-          projectId:
-            process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "demo-codewithahsan",
-        },
-        EMU_APP_NAME,
-      );
-    }
+    return admin.initializeApp(
+      { projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "demo-codewithahsan" },
+      EMU_APP_NAME,
+    );
   }
 
   if (admin.apps.length > 0) return admin.apps[0]!;
 
   if (wantsEmulator) {
+    // Unreachable — emulator path above always returns early — kept for safety.
     return admin.initializeApp({
       projectId:
         process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "demo-codewithahsan",

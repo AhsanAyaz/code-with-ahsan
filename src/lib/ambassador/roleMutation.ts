@@ -15,7 +15,7 @@
  * because setCustomUserClaims atomically replaces the entire claims object.
  */
 
-import { getAuth } from "firebase-admin/auth";
+import { auth } from "@/lib/firebaseAdmin";
 
 export interface SyncRoleClaimInput {
   /** The roles-array to write. Pass the final post-mutation array (possibly empty). */
@@ -45,7 +45,6 @@ export async function syncRoleClaim(
   input: SyncRoleClaimInput
 ): Promise<SyncRoleClaimResult> {
   try {
-    const auth = getAuth();
     const userRecord = await auth.getUser(uid);
     const existing = userRecord.customClaims ?? {};
     const merged: Record<string, unknown> = {
