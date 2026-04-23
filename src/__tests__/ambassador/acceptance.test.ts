@@ -62,6 +62,14 @@ vi.mock("@/lib/ambassador/roleMutation", () => ({
   syncRoleClaim: vi.fn().mockResolvedValue({ ok: true }),
 }));
 
+// Stub username module so tests don't exercise the real ensureUniqueUsername
+// query path against a mock Firestore. Plan 03-02 added pre-transaction reads
+// + username backfill to runAcceptanceTransaction.
+vi.mock("@/lib/ambassador/username", () => ({
+  deriveBaseUsername: vi.fn(() => "alice-abc123"),
+  ensureUniqueUsername: vi.fn(async (base: string) => base),
+}));
+
 // ── Import after mocks ──────────────────────────────────────────────────────
 
 import { runAcceptanceTransaction, assignAmbassadorDiscordRoleSoft } from "@/lib/ambassador/acceptance";
@@ -121,14 +129,36 @@ function setupTransactionMock(docs: {
   cohort?: Record<string, unknown> | null;
   profile?: Record<string, unknown> | null;
 }) {
-  const txn = (db as unknown as { runTransaction: MockedFunction<(fn: (t: unknown) => unknown) => Promise<unknown>> }).runTransaction;
+  const snapFor = (data: Record<string, unknown> | null | undefined) => ({
+    exists: data != null,
+    data: () => data ?? undefined,
+  });
 
-  txn.mockImplementation(async (fn: (t: unknown) => unknown) => {
-    const snapFor = (data: Record<string, unknown> | null | undefined) => ({
-      exists: data != null,
-      data: () => data ?? undefined,
-    });
+  // Plan 03-02 added pre-transaction reads: first a read of the application
+  // doc, then (if it exists) the applicant's mentorship_profiles doc. These
+  // route through db.collection(..).doc(..).get — NOT txn.get — so we wire
+  // collection-scoped get mocks to return the matching doc per call.
+  const dbMock = db as unknown as {
+    collection: MockedFunction<(name: string) => unknown>;
+    runTransaction: MockedFunction<(fn: (t: unknown) => unknown) => Promise<unknown>>;
+  };
 
+  dbMock.collection.mockImplementation((name: string) => ({
+    doc: vi.fn((_id: string) => ({
+      get: vi.fn(async () => {
+        if (name === "applications") return snapFor(docs.app);
+        if (name === "mentorship_profiles") return snapFor(docs.profile);
+        return snapFor(null);
+      }),
+      update: vi.fn().mockResolvedValue(undefined),
+      set: vi.fn().mockResolvedValue(undefined),
+      collection: vi.fn((_subName: string) => ({
+        doc: vi.fn((_subId: string) => ({ set: vi.fn(), update: vi.fn() })),
+      })),
+    })),
+  }));
+
+  dbMock.runTransaction.mockImplementation(async (fn: (t: unknown) => unknown) => {
     const callOrder: Array<Record<string, unknown> | null | undefined> = [
       docs.app,
       docs.cohort,
