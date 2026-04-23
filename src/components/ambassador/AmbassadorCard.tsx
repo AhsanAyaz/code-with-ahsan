@@ -7,8 +7,12 @@ import VideoEmbed from "@/app/admin/ambassadors/[applicationId]/VideoEmbed";
 import AmbassadorBadge from "@/components/ambassador/AmbassadorBadge";
 import type { PublicAmbassadorDoc } from "@/types/ambassador";
 
+/** Card consumes the client-safe projection — no `updatedAt` Timestamp, which
+ *  isn't serializable across the Server→Client Component boundary. */
+type PublicAmbassadorCardData = Omit<PublicAmbassadorDoc, "updatedAt">;
+
 interface Props {
-  ambassador: PublicAmbassadorDoc;
+  ambassador: PublicAmbassadorCardData;
 }
 
 export default function AmbassadorCard({ ambassador }: Props) {

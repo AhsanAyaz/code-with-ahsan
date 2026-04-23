@@ -11,9 +11,13 @@ export const dynamic = "force-dynamic";
 // NOTE: feature-flag gating is handled by src/app/ambassadors/layout.tsx.
 // This page inherits the 404 when FEATURE_AMBASSADOR_PROGRAM is off.
 
+/** Client-safe shape: PublicAmbassadorDoc minus the Firestore `updatedAt` Timestamp,
+ *  which isn't a plain object and can't cross the Server→Client Component boundary. */
+type PublicAmbassadorCardData = Omit<PublicAmbassadorDoc, "updatedAt">;
+
 async function loadCohortAmbassadors(): Promise<{
   cohortId: string | null;
-  items: PublicAmbassadorDoc[];
+  items: PublicAmbassadorCardData[];
 }> {
   const cohortId = await getCurrentCohortId();
   if (!cohortId) return { cohortId: null, items: [] };
@@ -27,7 +31,10 @@ async function loadCohortAmbassadors(): Promise<{
 
   return {
     cohortId,
-    items: snap.docs.map((d) => d.data() as PublicAmbassadorDoc),
+    items: snap.docs.map((d) => {
+      const { updatedAt: _updatedAt, ...rest } = d.data() as PublicAmbassadorDoc;
+      return rest;
+    }),
   };
 }
 

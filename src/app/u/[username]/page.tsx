@@ -12,6 +12,10 @@ interface PageProps {
   params: Promise<{ username: string }>;
 }
 
+/** Client-safe shape: omit `updatedAt` Timestamp (non-plain, can't cross the
+ *  Server→Client Component boundary). */
+type PublicAmbassadorClientData = Omit<PublicAmbassadorDoc, "updatedAt">;
+
 export interface PublicProfileData {
   uid: string;
   username: string;
@@ -21,7 +25,7 @@ export interface PublicProfileData {
   // Mentor-section fields (rendered only if roles includes "mentor" and status accepted)
   mentorPublic: boolean;
   // Ambassador-section fields (rendered only if roles includes "ambassador" or "alumni-ambassador")
-  ambassadorPublic: PublicAmbassadorDoc | null;
+  ambassadorPublic: PublicAmbassadorClientData | null;
   linkedinUrl?: string;
   bio?: string;
   currentRole?: string;
@@ -63,14 +67,16 @@ async function getPublicProfile(
 
     // Ambassador projection (public read — the single source of truth for
     // ambassador-section content on this page).
-    let ambassadorPublic: PublicAmbassadorDoc | null = null;
+    let ambassadorPublic: PublicAmbassadorClientData | null = null;
     if (roles.includes("ambassador") || roles.includes("alumni-ambassador")) {
       const ambSnap = await db
         .collection(PUBLIC_AMBASSADORS_COLLECTION)
         .doc(uid)
         .get();
       if (ambSnap.exists) {
-        ambassadorPublic = { ...(ambSnap.data() as PublicAmbassadorDoc), uid };
+        const { updatedAt: _updatedAt, ...rest } =
+          ambSnap.data() as PublicAmbassadorDoc;
+        ambassadorPublic = { ...rest, uid };
       }
     }
 

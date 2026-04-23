@@ -20,5 +20,11 @@ export default function AmbassadorsLayout({
   if (!isAmbassadorProgramEnabled()) {
     notFound();
   }
-  return <MentorshipProvider>{children}</MentorshipProvider>;
+  return (
+    <MentorshipProvider>
+      <div className="min-h-screen bg-base-200">
+        <main className="max-w-6xl mx-auto px-4 py-8">{children}</main>
+      </div>
+    </MentorshipProvider>
+  );
 }

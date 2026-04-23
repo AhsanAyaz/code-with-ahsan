@@ -40,6 +40,9 @@ export default function AmbassadorPublicCardSection() {
     if (!user) return;
     (async () => {
       try {
+        // authFetch auto-retries 401/403 once with a force-refreshed token,
+        // which covers both the newly-accepted-ambassador claims race and
+        // dev-emulator token staleness after a server restart.
         const res = await authFetch("/api/ambassador/profile");
         if (!res.ok) {
           setLoaded(true);
@@ -133,7 +136,7 @@ export default function AmbassadorPublicCardSection() {
         <form onSubmit={(e) => { e.preventDefault(); void save(e); }} className="space-y-4">
           {/* university + city */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="form-control">
+            <div className="flex flex-col gap-1">
               <label className="label" htmlFor="ap-university">
                 <span className="label-text font-semibold">University</span>
               </label>
@@ -146,7 +149,7 @@ export default function AmbassadorPublicCardSection() {
                 onChange={update("university")}
               />
             </div>
-            <div className="form-control">
+            <div className="flex flex-col gap-1">
               <label className="label" htmlFor="ap-city">
                 <span className="label-text font-semibold">City</span>
               </label>
@@ -162,7 +165,7 @@ export default function AmbassadorPublicCardSection() {
           </div>
 
           {/* publicTagline */}
-          <div className="form-control">
+          <div className="flex flex-col gap-1">
             <label className="label" htmlFor="ap-tagline">
               <span className="label-text font-semibold">
                 Public tagline
@@ -186,7 +189,7 @@ export default function AmbassadorPublicCardSection() {
 
           {/* social links */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="form-control">
+            <div className="flex flex-col gap-1">
               <label className="label" htmlFor="ap-twitter">
                 <span className="label-text font-semibold">Twitter URL</span>
               </label>
@@ -199,7 +202,7 @@ export default function AmbassadorPublicCardSection() {
                 placeholder="https://twitter.com/you"
               />
             </div>
-            <div className="form-control">
+            <div className="flex flex-col gap-1">
               <label className="label" htmlFor="ap-github">
                 <span className="label-text font-semibold">GitHub URL</span>
               </label>
@@ -212,7 +215,7 @@ export default function AmbassadorPublicCardSection() {
                 placeholder="https://github.com/you"
               />
             </div>
-            <div className="form-control">
+            <div className="flex flex-col gap-1">
               <label className="label" htmlFor="ap-site">
                 <span className="label-text font-semibold">
                   Personal site
@@ -230,7 +233,7 @@ export default function AmbassadorPublicCardSection() {
           </div>
 
           {/* cohort presentation video */}
-          <div className="form-control">
+          <div className="flex flex-col gap-1">
             <label className="label" htmlFor="ap-video">
               <span className="label-text font-semibold">
                 Cohort presentation video URL
