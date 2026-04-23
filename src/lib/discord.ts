@@ -791,6 +791,49 @@ export async function getLastChannelActivityDate(
 }
 
 /**
+ * Fetch a guild member by their Discord user ID (immutable snowflake).
+ * Returns the full member object including `roles` array, or null if not found.
+ *
+ * Used by the DISC-04 weekly reconciliation cron to check role assignments without
+ * mutating any state. Safe for cron use: catches all errors, never throws.
+ *
+ * @param memberId - Immutable Discord user snowflake ID (not username)
+ */
+export async function getGuildMemberById(
+  memberId: string
+): Promise<{ id: string; username: string; roles: string[] } | null> {
+  try {
+    const guildId = getGuildId();
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/guilds/${guildId}/members/${memberId}`,
+      { headers: getHeaders() }
+    );
+
+    if (response.status === 404) {
+      log.debug(`[Discord] Guild member ${memberId} not found (404)`);
+      return null;
+    }
+    if (!response.ok) {
+      const errorText = await response.text();
+      log.error(
+        `[Discord] Failed to fetch guild member ${memberId}: ${response.status} - ${errorText}`
+      );
+      return null;
+    }
+
+    const data = await response.json();
+    return {
+      id: data.user?.id ?? memberId,
+      username: data.user?.username ?? "",
+      roles: Array.isArray(data.roles) ? data.roles : [],
+    };
+  } catch (error) {
+    log.error(`[Discord] Error fetching guild member ${memberId}:`, error);
+    return null;
+  }
+}
+
+/**
  * Check if Discord integration is properly configured
  */
 export function isDiscordConfigured(): boolean {
