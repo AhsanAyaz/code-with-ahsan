@@ -8,6 +8,7 @@
 
 import { z } from "zod";
 import { APPLICATION_VIDEO_PROMPTS } from "@/lib/ambassador/constants";
+import { EventTypeSchema, type EventType } from "@/lib/ambassador/eventTypes";
 
 /** Application lifecycle status (APPLY-07). */
 export const ApplicationStatusSchema = z.enum([
@@ -137,6 +138,12 @@ export interface AmbassadorSubdoc {
   personalSiteUrl?: string;
   cohortPresentationVideoUrl?: string;
   cohortPresentationVideoEmbedType?: CohortPresentationVideoEmbedType;
+
+  // ─── Phase 4 fields ────────────────────────────────────────────────
+  /** REF-01: Human-readable referral code assigned at acceptance. Format `{PREFIX}-{4HEX}`. Guaranteed unique via `referral_codes/{code}` lookup doc. */
+  referralCode?: string;
+  /** D-04: IANA timezone string (e.g. "Asia/Karachi"). Default to "UTC" when absent. Read by REPORT-04 cron to compute per-ambassador deadlines. */
+  timezone?: string;
 }
 
 /**
@@ -318,3 +325,122 @@ export const ApplicationReviewSchema = z.object({
   notes: z.string().trim().max(2000).optional(),
 });
 export type ApplicationReviewInput = z.infer<typeof ApplicationReviewSchema>;
+
+// ─── Phase 4: Referral attribution (REF-01..REF-05) ──────────────────────
+
+/**
+ * Top-level collection `referral_codes/{code}` — O(1) lookup doc written at
+ * acceptance time (REF-01) and read during referral consumption (REF-03).
+ * Avoids a collection-group index on `ambassador.referralCode` (RESEARCH Pitfall 3).
+ */
+export interface ReferralCodeLookup {
+  ambassadorId: string;
+  uid: string;
+}
+
+/**
+ * Top-level collection `referrals/{referralId}` — one doc per successful
+ * attribution (REF-03). `referredUserId` is unique within this collection
+ * (enforced by the consume helper, REF-04).
+ */
+export interface ReferralDoc {
+  ambassadorId: string;
+  referredUserId: string;
+  convertedAt: Date;
+  sourceCode: string;
+}
+
+// ─── Phase 4: Event logging (EVENT-01..EVENT-04) ─────────────────────────
+
+/**
+ * Top-level collection `ambassador_events/{eventId}` — one doc per logged event.
+ * `hidden: true` removes an event from leaderboard counts (EVENT-03/04).
+ */
+export interface AmbassadorEventDoc {
+  ambassadorId: string;
+  cohortId: string;
+  date: Date;
+  type: EventType;
+  attendanceEstimate: number;
+  link?: string;
+  notes?: string;
+  hidden: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/** Zod schema for POST /api/ambassador/events body (EVENT-01). */
+export const LogEventSchema = z.object({
+  date: z.string().datetime({ offset: true }),
+  type: EventTypeSchema,
+  attendanceEstimate: z.number().int().min(0).max(100000),
+  link: z
+    .string()
+    .trim()
+    .max(2048)
+    .url()
+    .optional()
+    .or(z.literal("")),
+  notes: z.string().trim().max(1000).optional().or(z.literal("")),
+});
+export type LogEventInput = z.infer<typeof LogEventSchema>;
+
+/** Zod schema for PATCH /api/ambassador/events/[eventId] body (EVENT-02). All fields optional. */
+export const UpdateEventSchema = LogEventSchema.partial();
+export type UpdateEventInput = z.infer<typeof UpdateEventSchema>;
+
+// ─── Phase 4: Monthly report (REPORT-01..REPORT-07) ──────────────────────
+
+/**
+ * Top-level collection `monthly_reports/{ambassadorId}_{YYYY-MM}` — deterministic
+ * doc id enforces "one report per ambassador per month" at write time (REPORT-02).
+ */
+export interface MonthlyReportDoc {
+  ambassadorId: string;
+  cohortId: string;
+  month: string; // "YYYY-MM" in ambassador timezone
+  whatWorked: string;
+  whatBlocked: string;
+  whatNeeded: string;
+  submittedAt: Date;
+}
+
+/** Zod schema for POST /api/ambassador/report body (REPORT-01). */
+export const MonthlyReportSchema = z.object({
+  whatWorked: z.string().trim().min(1).max(2000),
+  whatBlocked: z.string().trim().min(1).max(2000),
+  whatNeeded: z.string().trim().min(1).max(2000),
+});
+export type MonthlyReportInput = z.infer<typeof MonthlyReportSchema>;
+
+// ─── Phase 4: Cron admin-review flags (REPORT-04, DISC-04) ───────────────
+
+export const CronFlagTypeSchema = z.enum(["missing_report", "missing_discord_role"]);
+export type CronFlagType = z.infer<typeof CronFlagTypeSchema>;
+
+/**
+ * Top-level collection `ambassador_cron_flags/{flagId}` — written by the daily /
+ * weekly crons; admin marks `resolved: true`. Cron NEVER mutates strikes/roles
+ * (D-06, REPORT-04, DISC-04).
+ */
+export interface AmbassadorCronFlagDoc {
+  ambassadorId: string;
+  type: CronFlagType;
+  /** "YYYY-MM" for `missing_report`; undefined for `missing_discord_role`. */
+  period?: string;
+  flaggedAt: Date;
+  resolved: boolean;
+}
+
+// ─── Phase 4: Re-export collection constants for callers who prefer the types barrel ───
+
+export {
+  REFERRAL_CODES_COLLECTION,
+  REFERRALS_COLLECTION,
+  AMBASSADOR_EVENTS_COLLECTION,
+  MONTHLY_REPORTS_COLLECTION,
+  AMBASSADOR_CRON_FLAGS_COLLECTION,
+  REFERRAL_COOKIE_NAME,
+  REFERRAL_COOKIE_MAX_AGE_SECONDS,
+  EVENT_EDIT_WINDOW_MS,
+} from "@/lib/ambassador/constants";
