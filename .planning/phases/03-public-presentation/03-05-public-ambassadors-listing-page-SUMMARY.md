@@ -131,3 +131,13 @@ None — all data flows are wired. The page reads live Firestore data via the `p
 ---
 *Phase: 03-public-presentation*
 *Completed: 2026-04-22*
+
+## Self-Check: PASSED
+
+- SUMMARY.md: FOUND
+- 981e69c (Task 1 — getCurrentCohortId helper): FOUND
+- 38dd0f3 (Task 2 — GET /api/ambassadors/public + composite index): FOUND
+- 5580bf7 (Task 3 — AmbassadorCard + /ambassadors page): FOUND
+- 2f955c6 (Task 4 — Firestore indexes sync): FOUND
+- f44db93 (SUMMARY commit): FOUND
+- 8f12d7f (STATE/ROADMAP commit): FOUND
