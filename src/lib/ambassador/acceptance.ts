@@ -21,7 +21,9 @@ import { syncRoleClaim } from "@/lib/ambassador/roleMutation";
 import {
   AMBASSADOR_APPLICATIONS_COLLECTION,
   AMBASSADOR_COHORTS_COLLECTION,
+  REFERRAL_CODES_COLLECTION,
 } from "@/lib/ambassador/constants";
+import { generateUniqueReferralCode } from "@/lib/ambassador/referralCode";
 import type { ApplicationDoc, CohortDoc } from "@/types/ambassador";
 import {
   buildPublicAmbassadorProjection,
@@ -48,6 +50,7 @@ export type AcceptanceResult =
       cohortName: string;
       discordHandle: string;
       discordMemberId: string | null;
+      referralCode?: string; // Phase 4 (REF-01) — present on first-accept path
     }
   | {
       ok: false;
@@ -102,6 +105,12 @@ export async function runAcceptanceTransaction(
     const base = deriveBaseUsername(preApp.applicantName, preApp.applicantEmail);
     resolvedUsername = await ensureUniqueUsername(base);
   }
+
+  // Phase 4 (REF-01): Generate unique referral code before entering the transaction.
+  // Collection lookup (.doc().get()) is illegal inside db.runTransaction via txn.get for
+  // a non-document query; we read outside and pass resolvedReferralCode into the txn body.
+  // The txn itself writes the referral_codes/{code} lookup doc, making the generation+write atomic.
+  const resolvedReferralCode = await generateUniqueReferralCode(resolvedUsername);
 
   return db.runTransaction<AcceptanceResult>(async (txn) => {
     // ── Reads (all before writes) ─────────────────────────────────────────
@@ -184,6 +193,7 @@ export async function runAcceptanceTransaction(
         active: true,
         strikes: 0,
         discordMemberId: app.discordMemberId ?? null,
+        referralCode: resolvedReferralCode, // REF-01: Phase 4 — set at first-accept only
       };
       // D-06: snapshot university + city from the application doc onto the subdoc
       // on FIRST accept. Conditionally spread — Admin SDK rejects undefined.
@@ -194,6 +204,15 @@ export async function runAcceptanceTransaction(
         subdocPayload.city = app.city.trim();
       }
       txn.set(ambassadorRef, subdocPayload);
+
+      // Phase 4 (REF-01): Write the top-level lookup doc atomically with the subdoc.
+      // RESEARCH Pitfall 3 — avoids a collection-group index on ambassador.referralCode.
+      const refCodeRef = db.collection(REFERRAL_CODES_COLLECTION).doc(resolvedReferralCode);
+      txn.set(refCodeRef, {
+        ambassadorId: app.applicantUid,
+        uid: app.applicantUid,
+      });
+
       txn.update(cohortRef, {
         acceptedCount: FieldValue.increment(1),
         updatedAt: now,
@@ -251,6 +270,9 @@ export async function runAcceptanceTransaction(
       cohortName: cohort.name,
       discordHandle: app.discordHandle,
       discordMemberId: app.discordMemberId ?? null,
+      // Phase 4 (REF-01): include referral code on first-accept so callers can log it.
+      // Re-accept is a no-op for referral code — skip to avoid confusion.
+      ...(alreadyAccepted ? {} : { referralCode: resolvedReferralCode }),
     };
   });
 }
