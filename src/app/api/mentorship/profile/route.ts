@@ -9,6 +9,8 @@ import {
   DISCORD_MENTEE_ROLE_ID
 } from "@/lib/discord";
 import { syncRoleClaim } from "@/lib/ambassador/roleMutation";
+import { consumeReferral } from "@/lib/ambassador/referral";
+import { REFERRAL_COOKIE_NAME } from "@/lib/ambassador/constants";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -148,7 +150,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(
+    // Phase 4 (REF-03): If a cwa_ref cookie is present, consume it now.
+    // HttpOnly cookie — only readable server-side. Must be synchronous (await) so the
+    // Set-Cookie clear header lands on the outgoing response (RESEARCH Pitfall 1).
+    // consumeReferral never throws (wraps all in try/catch) — signup always completes.
+    const refCode = request.cookies.get(REFERRAL_COOKIE_NAME)?.value;
+    let referralConsumed = false;
+    if (refCode) {
+      const result = await consumeReferral(uid, refCode);
+      if (result.ok) {
+        console.log(
+          `[profile.POST] Referral attribution success: ambassador=${result.ambassadorId} user=${uid} code=${refCode} referralId=${result.referralId}`,
+        );
+      } else {
+        console.log(
+          `[profile.POST] Referral attribution skipped: user=${uid} code=${refCode} reason=${result.reason}`,
+        );
+      }
+      referralConsumed = true; // clear the cookie regardless of outcome — prevents endless retry on the same user
+    }
+
+    const response = NextResponse.json(
       {
         success: true,
         profile: {
@@ -162,6 +184,13 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
+
+    if (referralConsumed) {
+      // Phase 4 (REF-03): clear cookie on the outgoing response — one-time consumption
+      response.cookies.delete(REFERRAL_COOKIE_NAME);
+    }
+
+    return response;
   } catch (error) {
     console.error("Error creating mentorship profile:", error);
     return NextResponse.json(
