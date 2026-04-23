@@ -57,11 +57,11 @@ Source: Rubik font stack confirmed in tailwind.config.js and globals.css. DaisyU
 | Role | Size | Weight | Line Height | DaisyUI Class |
 |------|------|--------|-------------|---------------|
 | Body | 16px | 400 (regular) | 1.5 | base prose or none |
-| Label | 14px | 600 (semibold) | 1.4 | `label-text font-semibold` |
+| Label | 14px | 700 (bold) | 1.4 | `label-text font-bold` |
 | Heading | 20px | 700 (bold) | 1.2 | `card-title` / `text-xl font-bold` |
 | Display | 28px | 700 (bold) | 1.2 | `text-2xl font-bold` (page h1 headings) |
 
-Maximum 2 weights in use per surface: regular (400) for body/help text and bold (700) for headings/card-titles. Labels use semibold (600) as the single exception for form affordance clarity.
+Maximum 2 weights in use per surface: regular (400) for body/help text and bold (700) for labels, headings, and card-titles. Semibold (600) is not used anywhere in Phase 4.
 
 ---
 
@@ -163,12 +163,12 @@ Every interactive element must implement all four states. No exceptions.
 | Form field — link | Event link (optional) |
 | Form field — notes | Notes (optional) |
 | Submit button | Save event |
-| Edit button | Edit |
+| Edit button | Edit event |
 | Delete button | Delete event |
 | Delete confirmation heading | Delete this event? |
 | Delete confirmation body | This will permanently remove the event from your record. This action cannot be undone. |
 | Delete confirm CTA | Yes, delete event |
-| Delete cancel CTA | Cancel |
+| Delete cancel CTA | Keep event |
 | Empty state heading | No events logged yet |
 | Empty state body | Log your first event to start building your activity record. Events you host help the cohort see your impact. |
 | Edit window expired notice | This event can no longer be edited — the 30-day edit window has closed. |
@@ -207,7 +207,8 @@ Every interactive element must implement all four states. No exceptions.
 |---------|------|
 | Members list page heading | Ambassador Members |
 | Members list page subheading | Active ambassadors in the program. Click a member to see their activity and manage strikes. |
-| Empty members list | No active ambassadors found. |
+| Empty members list heading | No active ambassadors found. |
+| Empty members list body | Once an applicant is accepted into the program, they will appear here. |
 | Activity summary heading | Activity Summary |
 | Strike section heading | Strike Management |
 | Strike count label | Confirmed strikes |
@@ -218,13 +219,13 @@ Every interactive element must implement all four states. No exceptions.
 | Strike confirm modal heading | Confirm strike for {displayName}? |
 | Strike confirm modal body | This records a confirmed strike against this ambassador. Strike increments are irreversible from this panel. Review the flagged reports above before confirming. |
 | Strike confirm button | Yes, confirm strike |
-| Strike cancel button | Cancel |
+| Strike cancel button | Go back |
 | 2-strike warning banner | This ambassador has reached 2 confirmed strikes. The offboarding flow will be available in the next phase. |
 | Discord reconciliation flag | Missing Discord Ambassador role — flagged {date}. Use the retry button on the application detail page to re-assign. |
 | Report history heading | Report History |
-| Report history empty | No reports submitted yet. |
+| Report history empty | No reports submitted yet. Reports appear here once an ambassador submits their monthly self-report. |
 | Event history heading | Logged Events |
-| Event history empty | No events logged. |
+| Event history empty | No events logged. Events appear here once an ambassador logs an activity from their report page. |
 
 ### Timezone Setting
 
@@ -233,6 +234,22 @@ Every interactive element must implement all four states. No exceptions.
 | Timezone field label | Your timezone |
 | Timezone field help text | Used to calculate your monthly report deadline and send reminders at the right time. |
 | Timezone default notice | Defaults to UTC if not set. |
+
+---
+
+## Visual Hierarchy Notes
+
+### `/ambassadors/report`
+
+- Focal point: `MonthlyReportForm` is the primary action surface. Position it above `EventList` so the ambassador's attention lands on the report first.
+- `ReportStatusBadge` renders inline beside the page heading to immediately communicate submission state without requiring scroll.
+- `LogEventForm` is subordinate — render it below the report form or behind an expand/add button to avoid visual competition.
+
+### `/admin/ambassadors/members/[uid]`
+
+- Focal point: `ActivitySummaryPanel` stat grid sits at the top of the right column, establishing context before the admin takes action.
+- `StrikePanel` and `CronFlagsPanel` follow below the stat grid — never above. An admin must see the evidence (flags) before the action (strike button).
+- `StrikeConfirmModal` must display `{displayName}` prominently in the heading — prevents confirming the wrong ambassador record.
 
 ---
 
