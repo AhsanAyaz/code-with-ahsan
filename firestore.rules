@@ -227,5 +227,24 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false;
     }
+
+    // ─── Referral Attribution (Phase 4, REF-01..REF-05) ─────
+    //
+    // Both collections are server-only. `referral_codes/{code}` is written during
+    // acceptance (src/lib/ambassador/acceptance.ts) and read by consumeReferral;
+    // `referrals/{id}` is written by consumeReferral (src/lib/ambassador/referral.ts).
+    // No client path — not even admins — should write directly.
+    // Admin SDK (used by Next.js API routes) bypasses security rules, so server-side
+    // writes continue to function. The `if false` rule only blocks direct client-SDK access.
+
+    match /referral_codes/{code} {
+      allow read: if false;      // server-only (Admin SDK bypasses rules)
+      allow write: if false;
+    }
+
+    match /referrals/{referralId} {
+      allow read: if false;      // server-only
+      allow write: if false;
+    }
   }
 }
