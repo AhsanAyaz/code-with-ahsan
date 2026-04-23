@@ -152,7 +152,13 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
   4. A daily GitHub Actions cron evaluates missing reports against each ambassador's stored timezone and flags candidates for admin review — the cron itself never mutates strike counts; all strike increments are an explicit admin action from the admin panel, and the admin panel surfaces a one-click offboarding flow the moment an ambassador reaches 2 confirmed strikes.
   5. A separate weekly reconciliation cron flags any accepted ambassador who is missing the Discord Ambassador role — again, no auto-mutation — so an admin can retry role assignment or follow up manually.
 
-**Plans**: TBD
+**Plans**: 6 plans
+- [ ] 04-01-foundations-types-schemas-PLAN.md — Ambassador/event/report/cron-flag types + Zod schemas + EventType enum + referralCode generator + reportDeadline helpers + collection constants (Wave 1 / REF-01, EVENT-01, REPORT-01, REPORT-02, REPORT-04)
+- [ ] 04-02-referral-attribution-PLAN.md — Edge `src/middleware.ts` `cwa_ref` cookie setter + referral attribution in acceptance flow + Firestore denial for client referral writes (Wave 2 / REF-01..REF-05)
+- [ ] 04-03-event-logging-PLAN.md — `/api/ambassador/events` CRUD + 30-day edit/delete window + admin events panel + per-cohort event flagging (Wave 2 / EVENT-01..EVENT-04)
+- [ ] 04-04-report-and-strike-api-PLAN.md — `/api/ambassador/report` GET/POST (per-month dedupe) + `/api/ambassador/members/[uid]/strike` admin-only PATCH with 2-strike offboarding hint + firestore.rules denials (Wave 2 / REPORT-01, REPORT-02, REPORT-03, REPORT-06, REPORT-07)
+- [ ] 04-05-ui-assembly-PLAN.md — `/ambassadors/report` ambassador dashboard + `/admin/ambassadors/members` list + member detail page with ActivitySummaryPanel / StrikePanel / StrikeConfirmModal / CronFlagsPanel + profile referral card (Wave 3 / REF-01, REPORT-03, REPORT-06, REPORT-07, DISC-04)
+- [ ] 04-06-cron-scripts-PLAN.md — `scripts/ambassador-report-flag.ts` (daily REPORT-04 + REPORT-05 DM reminders) + `scripts/ambassador-discord-reconciliation.ts` (weekly DISC-04 flagger) + GitHub Actions workflow with dry-run dispatch (Wave 2 / REPORT-04, REPORT-05, DISC-04)
 
 ### Phase 5: Dashboard, Leaderboard, Offboarding & Alumni
 **Goal**: An active ambassador can see their own impact at a glance and (after a 4-week grace period) compare against their cohort on a calm, hourly-updated leaderboard that shows raw per-category metrics (no composite score, nobody visibly last); a term-ending ambassador transitions cleanly to alumni with the right badge and retained recognition; a 2-strike offboarding atomically revokes the ambassador role, removes the Discord role, ends cohort membership, and fires the offboarding email.
@@ -175,8 +181,8 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 | v6.0 Phase 1: Foundation — Roles Array Migration | 0/10 | Planned | — |
 | v6.0 Phase 2: Application Subsystem | 0/9 | Planned | — |
 | v6.0 Phase 3: Public Presentation | 0/6 | Planned | — |
-| v6.0 Phase 4: Activity Subsystem | 0/0 | Not started | — |
+| v6.0 Phase 4: Activity Subsystem | 0/6 | Planned | — |
 | v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 0/0 | Not started | — |
 
 ---
-*Last updated: 2026-04-22 — v6.0 Phase 2 planned (9 plans, 4 waves)*
+*Last updated: 2026-04-23 — v6.0 Phase 4 planned (6 plans, 3 waves)*
