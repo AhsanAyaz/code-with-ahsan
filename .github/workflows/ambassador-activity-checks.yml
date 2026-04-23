@@ -1,0 +1,84 @@
+name: Ambassador Activity Checks
+
+on:
+  schedule:
+    # Daily at 08:00 UTC — missing-report flag + REPORT-05 DM reminders
+    - cron: '0 8 * * *'
+    # Weekly Monday at 09:00 UTC — Discord Ambassador role reconciliation (DISC-04)
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Which job to run'
+        required: true
+        default: 'report-flag'
+        type: choice
+        options:
+          - report-flag
+          - discord-reconciliation
+          - both
+      dry_run:
+        description: 'Run with --dry-run (no Firestore writes)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  ambassador-report-flag:
+    name: Daily missing-report flag (REPORT-04 + REPORT-05)
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'schedule' && github.event.schedule == '0 8 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'report-flag' || github.event.inputs.job == 'both'))
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+      - run: npm ci
+      - name: Run report-flag cron
+        env:
+          NODE_ENV: production
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          DISCORD_AMBASSADOR_ROLE_ID: ${{ secrets.DISCORD_AMBASSADOR_ROLE_ID }}
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            npx tsx scripts/ambassador-report-flag.ts --dry-run
+          else
+            npx tsx scripts/ambassador-report-flag.ts
+          fi
+
+  ambassador-discord-reconciliation:
+    name: Weekly Discord role reconciliation (DISC-04)
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'schedule' && github.event.schedule == '0 9 * * 1') ||
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'discord-reconciliation' || github.event.inputs.job == 'both'))
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+      - run: npm ci
+      - name: Run discord-reconciliation cron
+        env:
+          NODE_ENV: production
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          DISCORD_AMBASSADOR_ROLE_ID: ${{ secrets.DISCORD_AMBASSADOR_ROLE_ID }}
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            npx tsx scripts/ambassador-discord-reconciliation.ts --dry-run
+          else
+            npx tsx scripts/ambassador-discord-reconciliation.ts
+          fi
