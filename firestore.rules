@@ -246,5 +246,14 @@ service cloud.firestore {
       allow read: if false;      // server-only
       allow write: if false;
     }
+
+    // Phase 4 (EVENT-01..EVENT-04): Event ledger
+    // All writes are server-side only (Admin SDK bypasses rules). Reads are server-side
+    // only — the ambassador-facing UI calls /api/ambassador/events (server-mediated),
+    // not the client Firestore SDK.
+    match /ambassador_events/{eventId} {
+      allow read: if false;
+      allow write: if false;
+    }
   }
 }
