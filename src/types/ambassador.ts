@@ -85,6 +85,27 @@ const trimmedOptionalVideoUrl = z.preprocess(
 );
 
 /**
+ * D-04: Validate an IANA timezone string.
+ * Uses Intl.supportedValuesOf when available (Node 18+ / modern browsers).
+ * Falls back to attempting a format call — invalid tz throws RangeError.
+ */
+function isValidIanaTimezone(tz: string): boolean {
+  try {
+    const supported =
+      typeof Intl !== "undefined" &&
+      typeof (Intl as unknown as { supportedValuesOf?: (k: string) => string[] }).supportedValuesOf === "function"
+        ? (Intl as unknown as { supportedValuesOf: (k: string) => string[] }).supportedValuesOf("timeZone")
+        : null;
+    if (supported) return supported.includes(tz);
+    // Fallback: attempt to format with this timezone; invalid tz throws a RangeError.
+    new Intl.DateTimeFormat("en-US", { timeZone: tz }).format(new Date());
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * PATCH /api/ambassador/profile body. All fields optional; at least one must be present.
  *
  * Size limits:
@@ -99,6 +120,8 @@ const trimmedOptionalVideoUrl = z.preprocess(
  *
  * The `https://` refine on social fields blocks non-https schemes (ftp:, javascript:,
  * data:, etc.) which would otherwise render as <a href> attack vectors on public cards.
+ *
+ * D-04: `timezone` is an optional IANA tz string validated via Intl.supportedValuesOf().
  */
 export const AmbassadorPublicFieldsSchema = z
   .object({
@@ -109,6 +132,12 @@ export const AmbassadorPublicFieldsSchema = z
     githubUrl: trimmedOptionalUrl,
     personalSiteUrl: trimmedOptionalUrl,
     cohortPresentationVideoUrl: trimmedOptionalVideoUrl,
+    timezone: z
+      .string()
+      .trim()
+      .min(1)
+      .refine(isValidIanaTimezone, { message: "Invalid IANA timezone" })
+      .optional(),
   })
   .refine((d) => Object.keys(d).length > 0, { message: "At least one field required" });
 
