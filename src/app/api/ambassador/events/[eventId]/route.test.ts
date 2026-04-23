@@ -1,15 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Use vi.hoisted() so these are available inside vi.mock() factories (Vitest hoists vi.mock to top)
-const { isEnabledMock, verifyAuthMock, hasRoleClaimMock, eventGet, eventUpdate, eventDelete } =
-  vi.hoisted(() => ({
-    isEnabledMock: vi.fn(() => true),
-    verifyAuthMock: vi.fn(),
-    hasRoleClaimMock: vi.fn(() => true),
-    eventGet: vi.fn(),
-    eventUpdate: vi.fn(),
-    eventDelete: vi.fn(),
-  }));
+// Typed with full function signatures for vitest 4.x (vi.fn<T> takes single function type)
+const {
+  isEnabledMock,
+  verifyAuthMock,
+  hasRoleClaimMock,
+  eventGet,
+  eventUpdate,
+  eventDelete,
+} = vi.hoisted(() => ({
+  isEnabledMock: vi.fn<() => boolean>(() => true),
+  verifyAuthMock: vi.fn<(req: unknown) => Promise<{ uid: string } | null>>(),
+  hasRoleClaimMock: vi.fn<(ctx: unknown, role: string) => boolean>(() => true),
+  eventGet: vi.fn<() => Promise<unknown>>(),
+  eventUpdate: vi.fn<(data: Record<string, unknown>) => Promise<void>>(),
+  eventDelete: vi.fn<() => Promise<void>>(),
+}));
 
 vi.mock("@/lib/features", () => ({
   isAmbassadorProgramEnabled: () => isEnabledMock(),
