@@ -40,3 +40,32 @@ export const DECLINED_APPLICATION_RETENTION_DAYS = 30;
 
 /** Signed-URL expiry for admin Storage reads (REVIEW-02). */
 export const ADMIN_SIGNED_URL_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+
+/** Phase 4: Top-level Firestore collection holding referral code lookup docs.
+ *  Doc id is the referral code itself; value shape is `{ ambassadorId, uid }`.
+ *  Used to avoid a collection-group index on `ambassador.referralCode` (Pitfall 3). */
+export const REFERRAL_CODES_COLLECTION = "referral_codes" as const;
+
+/** Phase 4: Top-level Firestore collection for referral attribution docs (REF-03). */
+export const REFERRALS_COLLECTION = "referrals" as const;
+
+/** Phase 4: Top-level Firestore collection for ambassador-logged events (EVENT-01). */
+export const AMBASSADOR_EVENTS_COLLECTION = "ambassador_events" as const;
+
+/** Phase 4: Top-level Firestore collection for monthly self-reports (REPORT-02).
+ *  Doc id is deterministic: `${ambassadorId}_${YYYY-MM}` — one per ambassador per month. */
+export const MONTHLY_REPORTS_COLLECTION = "monthly_reports" as const;
+
+/** Phase 4: Top-level Firestore collection for cron-generated admin-review flags (REPORT-04 / DISC-04).
+ *  Cron scripts only write; admin updates `resolved: true`. */
+export const AMBASSADOR_CRON_FLAGS_COLLECTION = "ambassador_cron_flags" as const;
+
+/** Phase 4: Name of the first-party referral attribution cookie (REF-02).
+ *  HttpOnly, SameSite=Lax, 30-day expiry, set by src/middleware.ts. */
+export const REFERRAL_COOKIE_NAME = "cwa_ref" as const;
+
+/** Phase 4: Referral cookie max-age in seconds (REF-02). 30 days. */
+export const REFERRAL_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
+
+/** Phase 4: Event edit window in milliseconds (EVENT-02). 30 days after event date. */
+export const EVENT_EDIT_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
