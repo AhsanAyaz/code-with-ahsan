@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: Completed 03-06-profile-ambassador-public-card-section-PLAN.md
-last_updated: "2026-04-22T22:20:51.994Z"
-last_activity: 2026-04-22
+stopped_at: Completed 03-05-public-ambassadors-listing-page-PLAN.md
+last_updated: "2026-04-23T06:32:38.498Z"
+last_activity: 2026-04-23
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 25
-  completed_plans: 23
+  completed_plans: 24
 ---
 
 # Project State
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 ## Current Position
 
 Phase: 03 (public-presentation) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
-Last activity: 2026-04-22
+Last activity: 2026-04-23
 
 ## Performance Metrics
 
@@ -107,6 +107,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 03]: 308 redirect /mentorship/mentors/:username → /u/:username lives in next.config.ts redirects() (D-01) — applies at edge before Next.js routing, natively preserves query strings; existing route files kept as dead code for post-launch cleanup
 - [Phase 03-06]: AmbassadorPublicCardSection uses diff-based payload (initial vs form) — only changed fields sent to PATCH; empty string is meaningful (server treats as FieldValue.delete())
 - [Phase 03-06]: /profile AmbassadorPublicCardSection gated by isAmbassadorProgramEnabled() + profile null-guard + hasRole ambassador|alumni-ambassador (D-05 — alumni keep the edit surface)
+- [Phase 03-05]: getCurrentCohortId fallback: status=active preferred, most-recent startDate as fallback, null if no cohorts
+- [Phase 03-05]: Server component reads db directly on /ambassadors — no internal fetch to /api/ambassadors/public to avoid URL-resolution footgun
+- [Phase 03-05]: Sort updatedAt ASC on public_ambassadors projection (monotonic proxy for acceptance order) — joinedAt lives on subdoc and not duplicated to avoid schema drift
 
 ### Workflow Notes
 
@@ -157,11 +160,12 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 03 P03-03 | 8 | 2 tasks | 1 files |
 | Phase 03 P03-04 | 2min | 3 tasks | 4 files |
 | Phase 03-public-presentation P03-06 | 3min | 3 tasks | 2 files |
+| Phase 03-public-presentation P03-05 | 45 | 4 tasks | 5 files |
 
 ## Session Continuity
 
-Last session: 2026-04-22T22:20:51.991Z
-Stopped at: Completed 03-06-profile-ambassador-public-card-section-PLAN.md
+Last session: 2026-04-23T06:32:38.494Z
+Stopped at: Completed 03-05-public-ambassadors-listing-page-PLAN.md
 Resume file: None
 
 ---
