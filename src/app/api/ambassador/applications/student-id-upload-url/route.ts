@@ -66,6 +66,23 @@ export async function POST(request: NextRequest) {
 
   const expiresAtMs = Date.now() + UPLOAD_URL_EXPIRY_MS;
 
+  // Dev-emulator bypass: admin is initialized without a service-account
+  // private key when pointed at the Storage emulator, so `getSignedUrl`
+  // throws "Cannot sign data without client_email". Return a local proxy
+  // URL that the client PUTs to; the proxy forwards bytes to the Storage
+  // emulator's GCS-style upload endpoint so the file actually lands in
+  // the bucket and is visible in the emulator UI.
+  if (
+    process.env.NODE_ENV === "development" &&
+    !!process.env.FIREBASE_STORAGE_EMULATOR_HOST
+  ) {
+    return NextResponse.json({
+      uploadUrl: `/api/dev/storage-upload?path=${encodeURIComponent(storagePath)}`,
+      storagePath,
+      expiresAtMs,
+    });
+  }
+
   const [url] = await storage.file(storagePath).getSignedUrl({
     version: "v4",
     action: "write",

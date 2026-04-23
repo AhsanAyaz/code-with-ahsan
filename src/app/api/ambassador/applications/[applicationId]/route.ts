@@ -54,20 +54,34 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   // Signed URL for student-ID photo (path B). 1-hour expiry per REVIEW-02 + ADMIN_SIGNED_URL_EXPIRY_MS.
   // storage may be null when GOOGLE_APPLICATION_CREDENTIALS is unset (Pitfall 7).
   let studentIdSignedUrl: string | null = null;
-  if (app.studentIdStoragePath && storage) {
-    try {
-      const [url] = await storage.file(app.studentIdStoragePath).getSignedUrl({
-        version: "v4",
-        action: "read",
-        expires: Date.now() + ADMIN_SIGNED_URL_EXPIRY_MS,
-      });
-      studentIdSignedUrl = url;
-    } catch (e) {
-      logger.warn("signed URL generation failed", {
-        applicationId,
-        path: app.studentIdStoragePath,
-        error: e,
-      });
+  if (app.studentIdStoragePath) {
+    // Dev-emulator fallback: admin is initialized without a service-account
+    // private key when pointed at the Storage emulator, so `getSignedUrl` fails
+    // with "Cannot sign data without client_email". Route through our dev
+    // proxy, which uses the GCS-style download endpoint (bypasses storage.rules)
+    // and streams bytes back to the browser so `<a href>` navigation works
+    // without needing to attach the x-admin-token header.
+    if (
+      process.env.NODE_ENV === "development" &&
+      !!process.env.FIREBASE_STORAGE_EMULATOR_HOST
+    ) {
+      studentIdSignedUrl =
+        `/api/dev/storage-download?path=${encodeURIComponent(app.studentIdStoragePath)}`;
+    } else if (storage) {
+      try {
+        const [url] = await storage.file(app.studentIdStoragePath).getSignedUrl({
+          version: "v4",
+          action: "read",
+          expires: Date.now() + ADMIN_SIGNED_URL_EXPIRY_MS,
+        });
+        studentIdSignedUrl = url;
+      } catch (e) {
+        logger.warn("signed URL generation failed", {
+          applicationId,
+          path: app.studentIdStoragePath,
+          error: e,
+        });
+      }
     }
   }
 

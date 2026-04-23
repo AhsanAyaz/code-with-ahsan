@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { ApplicationSubmitInput } from "@/types/ambassador";
 import { isValidVideoUrl } from "@/lib/ambassador/videoUrl";
 
@@ -66,9 +66,15 @@ const MIN_PROMPT_LENGTH = 50; // mirrors ApplicationSubmitSchema min(50)
 export function useApplyForm() {
   const [values, setValues] = useState<ApplyFormState>(EMPTY);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // Ref mirrors `values` for synchronous reads. Necessary because validateStep
+  // can be called inside the same tick as a setField (e.g. right after the
+  // student-ID upload resolves in ApplicationStep), before React flushes the
+  // state update — the ref has the write immediately.
+  const valuesRef = useRef<ApplyFormState>(EMPTY);
 
   const setField = useCallback(<K extends keyof ApplyFormState>(key: K, value: ApplyFormState[K]) => {
-    setValues((v) => ({ ...v, [key]: value }));
+    valuesRef.current = { ...valuesRef.current, [key]: value };
+    setValues(valuesRef.current);
     setErrors((e) => {
       if (!e[key as string]) return e;
       const { [key as string]: _removed, ...rest } = e;
@@ -78,42 +84,43 @@ export function useApplyForm() {
 
   /** Per-step validation. Returns true if the step passes. */
   const validateStep = useCallback((step: 1 | 2 | 3 | 4): boolean => {
+    const v = valuesRef.current;
     const e: Record<string, string> = {};
     if (step === 2) {
-      if (!values.applicantName || values.applicantName.trim().length < 2)
+      if (!v.applicantName || v.applicantName.trim().length < 2)
         e.applicantName = "Enter your full name (at least 2 characters).";
-      if (!values.targetCohortId) e.targetCohortId = "Select a cohort.";
-      if (!values.university) e.university = "Required.";
-      if (!values.yearOfStudy) e.yearOfStudy = "Required.";
-      if (!values.country) e.country = "Required.";
-      if (!values.city) e.city = "Required.";
+      if (!v.targetCohortId) e.targetCohortId = "Select a cohort.";
+      if (!v.university) e.university = "Required.";
+      if (!v.yearOfStudy) e.yearOfStudy = "Required.";
+      if (!v.country) e.country = "Required.";
+      if (!v.city) e.city = "Required.";
     }
     if (step === 3) {
-      if (values.motivation.trim().length < MIN_PROMPT_LENGTH)
+      if (v.motivation.trim().length < MIN_PROMPT_LENGTH)
         e.motivation = `Please write at least ${MIN_PROMPT_LENGTH} characters.`;
-      if (values.experience.trim().length < MIN_PROMPT_LENGTH)
+      if (v.experience.trim().length < MIN_PROMPT_LENGTH)
         e.experience = `Please write at least ${MIN_PROMPT_LENGTH} characters.`;
-      if (values.pitch.trim().length < MIN_PROMPT_LENGTH)
+      if (v.pitch.trim().length < MIN_PROMPT_LENGTH)
         e.pitch = `Please write at least ${MIN_PROMPT_LENGTH} characters.`;
-      if (!values.discordHandle.trim()) e.discordHandle = "Enter your Discord handle.";
-      if (!values.videoUrl || !isValidVideoUrl(values.videoUrl))
+      if (!v.discordHandle.trim()) e.discordHandle = "Enter your Discord handle.";
+      if (!v.videoUrl || !isValidVideoUrl(v.videoUrl))
         e.videoUrl = "Paste a Loom, YouTube, or Google Drive link.";
-      if (values._academicPath === null)
+      if (v._academicPath === null)
         e._academicPath = "Choose an academic-verification path.";
-      if (values._academicPath === "email") {
-        if (!values.academicEmail) {
+      if (v._academicPath === "email") {
+        if (!v.academicEmail) {
           e.academicEmail = "Enter your academic email.";
         } else {
-          const r = validateAcademicEmailClient(values.academicEmail);
+          const r = validateAcademicEmailClient(v.academicEmail);
           if (!r.syntaxValid) e.academicEmail = "Enter a valid email address.";
         }
       }
-      if (values._academicPath === "studentId" && !values.studentIdStoragePath)
+      if (v._academicPath === "studentId" && !v.studentIdStoragePath)
         e.studentIdStoragePath = "Upload your student ID.";
     }
     setErrors(e);
     return Object.keys(e).length === 0;
-  }, [values]);
+  }, []);
 
   /**
    * Build the submit payload — strip local-only fields (underscore-prefixed)
@@ -126,7 +133,7 @@ export function useApplyForm() {
       _studentIdFile,
       _academicEmailWarning,
       ...submit
-    } = values;
+    } = valuesRef.current;
     if (_academicPath === "email") {
       return {
         ...submit,
@@ -142,7 +149,7 @@ export function useApplyForm() {
       };
     }
     return { ...submit, academicVerificationPath: "email" };
-  }, [values]);
+  }, []);
 
   return { values, errors, setField, validateStep, buildSubmitPayload };
 }

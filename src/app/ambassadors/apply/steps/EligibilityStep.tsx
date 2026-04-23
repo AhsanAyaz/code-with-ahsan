@@ -30,9 +30,12 @@ export default function EligibilityStep({
     const ageDays = Number.isFinite(createdMs)
       ? Math.floor((Date.now() - createdMs) / (24 * 60 * 60 * 1000))
       : 0;
+    // Dev-mode bypass: skip the age gate so local testers can exercise the flow
+    // without waiting 7 days. Mirrored on the server in ensureDiscordAgeEligible.
+    const devBypass = process.env.NODE_ENV === "development";
     setCheck({
       loading: false,
-      eligible: ageDays >= AMBASSADOR_DISCORD_MIN_AGE_DAYS,
+      eligible: devBypass || ageDays >= AMBASSADOR_DISCORD_MIN_AGE_DAYS,
       profileAgeDays: ageDays,
     });
   }, [user, loading]);
@@ -72,8 +75,20 @@ export default function EligibilityStep({
     );
   }
 
+  const devBypassActive =
+    process.env.NODE_ENV === "development" &&
+    check.profileAgeDays < AMBASSADOR_DISCORD_MIN_AGE_DAYS;
+
   return (
     <div className="space-y-4">
+      {devBypassActive && (
+        <div className="alert alert-warning shadow-md">
+          <span>
+            <strong>Dev mode:</strong> 7-day account-age gate bypassed. This
+            will NOT apply in production.
+          </span>
+        </div>
+      )}
       <div className="alert alert-success shadow-md">
         <svg
           xmlns="http://www.w3.org/2000/svg"

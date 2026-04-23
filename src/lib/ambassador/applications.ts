@@ -37,6 +37,15 @@ export interface EligibilityCheck {
  * who onboarded as mentor/mentee, so admin-only or ambassador-only users would 403.
  */
 export async function ensureDiscordAgeEligible(uid: string): Promise<EligibilityCheck> {
+  // Dev-mode bypass: mirrors the client-side bypass in EligibilityStep.tsx so
+  // local testers can submit applications without waiting the real 7 days.
+  if (process.env.NODE_ENV === "development") {
+    return {
+      eligible: true,
+      profileAgeDays: AMBASSADOR_DISCORD_MIN_AGE_DAYS,
+      requiredDays: AMBASSADOR_DISCORD_MIN_AGE_DAYS,
+    };
+  }
   let createdMs: number;
   try {
     const user = await auth.getUser(uid);
@@ -70,6 +79,11 @@ export async function ensureDiscordAgeEligible(uid: string): Promise<Eligibility
 export async function resolveDiscordMemberSoft(
   discordHandle: string,
 ): Promise<{ id: string; username: string } | null> {
+  // Dev-mode bypass: skip the Discord lookup so local testing doesn't need
+  // real bot credentials or a matching guild member.
+  if (process.env.NODE_ENV === "development") {
+    return { id: "dev-stub", username: discordHandle };
+  }
   try {
     return await lookupMemberByUsername(discordHandle);
   } catch {

@@ -31,6 +31,7 @@ export default function ApplicationStep({
   onBack: () => void;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   /** D-15: soft warning fires on blur when TLD is not recognized */
   const handleAcademicEmailBlur = (email: string) => {
@@ -46,9 +47,14 @@ export default function ApplicationStep({
     }
   };
 
-  /** APPLY-05: POST to get signed URL → PUT file bytes directly to GCS */
-  const handleStudentIdUpload = async (file: File) => {
+  /**
+   * APPLY-05: POST to get signed URL → PUT file bytes directly to GCS.
+   * Runs at form-submit time (not on file-change) so a failed upload blocks
+   * the wizard from advancing. Returns true on success, false on any failure.
+   */
+  const uploadStudentId = async (file: File): Promise<boolean> => {
     setUploading(true);
+    setUploadError(null);
     try {
       // Client-generated UUID used only for the storage path; not the Firestore doc id.
       const tempId =
@@ -67,7 +73,13 @@ export default function ApplicationStep({
           }),
         }
       );
-      if (!signedRes.ok) throw new Error("upload-url-failed");
+      if (!signedRes.ok) {
+        throw new Error(
+          signedRes.status === 401
+            ? "You need to be signed in to upload."
+            : "Could not start upload. Please try again."
+        );
+      }
 
       const { uploadUrl, storagePath } = (await signedRes.json()) as {
         uploadUrl: string;
@@ -79,24 +91,38 @@ export default function ApplicationStep({
         headers: { "Content-Type": file.type },
         body: file,
       });
-      if (!putRes.ok) throw new Error("upload-failed");
+      if (!putRes.ok) throw new Error("Upload failed. Please try again.");
 
       form.setField("studentIdStoragePath", storagePath);
-    } catch {
+      return true;
+    } catch (err) {
       form.setField("studentIdStoragePath", "");
+      setUploadError(err instanceof Error ? err.message : "Upload failed.");
+      return false;
     } finally {
       setUploading(false);
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (uploading) return;
+    if (form.values._academicPath === "studentId") {
+      const file = form.values._studentIdFile;
+      if (!file) {
+        setUploadError("Select a student ID photo before continuing.");
+        return;
+      }
+      // Always re-upload on submit so a failed/partial earlier attempt can't
+      // leave a stale path in state.
+      const ok = await uploadStudentId(file);
+      if (!ok) return;
+    }
+    onNext();
+  };
+
   return (
-    <form
-      className="space-y-6"
-      onSubmit={(e) => {
-        e.preventDefault();
-        onNext();
-      }}
-    >
+    <form className="space-y-6" onSubmit={handleSubmit}>
       {/* Three motivation prompts (D-04) using APPLICATION_VIDEO_PROMPTS from constants */}
       {(["motivation", "experience", "pitch"] as const).map((key, i) => (
         <fieldset key={key}>
@@ -222,24 +248,33 @@ export default function ApplicationStep({
               accept="image/jpeg,image/png,image/webp"
               className="file-input file-input-bordered w-full"
               onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) {
-                  form.setField("_studentIdFile", f);
-                  void handleStudentIdUpload(f);
+                const f = e.target.files?.[0] ?? null;
+                form.setField("_studentIdFile", f);
+                // Discard any prior upload path — the new file must upload
+                // on submit before the step is allowed to advance.
+                if (form.values.studentIdStoragePath) {
+                  form.setField("studentIdStoragePath", "");
                 }
+                setUploadError(null);
               }}
               disabled={uploading}
             />
+            {form.values._studentIdFile && !uploading && (
+              <div className="text-sm opacity-70 mt-1">
+                Selected: {form.values._studentIdFile.name} — uploads when
+                you click Continue.
+              </div>
+            )}
             {uploading && (
               <div className="flex items-center gap-2 mt-1 text-sm opacity-60">
                 <span className="loading loading-spinner loading-xs" />
                 Uploading…
               </div>
             )}
-            {!uploading && form.values.studentIdStoragePath && (
-              <div className="text-success text-sm mt-1">Uploaded.</div>
+            {uploadError && (
+              <div className="text-error text-sm mt-1">{uploadError}</div>
             )}
-            {form.errors.studentIdStoragePath && (
+            {form.errors.studentIdStoragePath && !uploadError && (
               <div className="text-error text-sm mt-1">
                 {form.errors.studentIdStoragePath}
               </div>

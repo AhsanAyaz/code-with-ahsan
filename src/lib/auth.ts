@@ -1,4 +1,4 @@
-import * as admin from "firebase-admin";
+import { auth as adminAuth } from "@/lib/firebaseAdmin";
 
 /**
  * Authentication context returned from verifyAuth().
@@ -42,7 +42,7 @@ export async function verifyAuth(request: Request): Promise<AuthContext | null> 
   if (!token) return null;
 
   try {
-    const decoded = await admin.auth().verifyIdToken(token);
+    const decoded = await adminAuth.verifyIdToken(token);
     return {
       uid: decoded.uid,
       email: decoded.email ?? "",
@@ -50,7 +50,16 @@ export async function verifyAuth(request: Request): Promise<AuthContext | null> 
       admin: decoded.admin === true ? true : undefined,
       role: typeof decoded.role === "string" ? decoded.role : undefined,
     };
-  } catch {
+  } catch (err) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("[verifyAuth] verifyIdToken failed:", err instanceof Error ? err.message : err);
+      console.warn("[verifyAuth] env check:", {
+        NODE_ENV: process.env.NODE_ENV,
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        authEmulator: process.env.FIREBASE_AUTH_EMULATOR_HOST,
+        firestoreEmulator: process.env.FIRESTORE_EMULATOR_HOST,
+      });
+    }
     return null;
   }
 }
