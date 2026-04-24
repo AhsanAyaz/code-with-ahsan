@@ -60,6 +60,10 @@ export const MONTHLY_REPORTS_COLLECTION = "monthly_reports" as const;
  *  Cron scripts only write; admin updates `resolved: true`. */
 export const AMBASSADOR_CRON_FLAGS_COLLECTION = "ambassador_cron_flags" as const;
 
+/** Phase 5: Top-level Firestore collection for admin-granted eligibility bypasses.
+ *  Doc id is the applicant UID. Written by admin; checked in ensureDiscordAgeEligible. */
+export const AMBASSADOR_ELIGIBILITY_BYPASSES_COLLECTION = "ambassador_eligibility_bypasses" as const;
+
 /** Phase 4: Name of the first-party referral attribution cookie (REF-02).
  *  HttpOnly, SameSite=Lax, 30-day expiry, set by src/middleware.ts. */
 export const REFERRAL_COOKIE_NAME = "cwa_ref" as const;

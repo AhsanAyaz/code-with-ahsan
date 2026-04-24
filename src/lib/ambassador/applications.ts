@@ -15,6 +15,7 @@ import {
   AMBASSADOR_APPLICATIONS_COLLECTION,
   AMBASSADOR_COHORTS_COLLECTION,
   AMBASSADOR_DISCORD_MIN_AGE_DAYS,
+  AMBASSADOR_ELIGIBILITY_BYPASSES_COLLECTION,
 } from "@/lib/ambassador/constants";
 import { classifyVideoUrl, isValidVideoUrl } from "@/lib/ambassador/videoUrl";
 import { validateAcademicEmail } from "@/lib/ambassador/academicEmail";
@@ -28,6 +29,7 @@ export interface EligibilityCheck {
   reason?: "profile_missing" | "too_new";
   profileAgeDays?: number;
   requiredDays: number;
+  bypassed?: boolean;
 }
 
 /**
@@ -45,6 +47,15 @@ export async function ensureDiscordAgeEligible(uid: string): Promise<Eligibility
       profileAgeDays: AMBASSADOR_DISCORD_MIN_AGE_DAYS,
       requiredDays: AMBASSADOR_DISCORD_MIN_AGE_DAYS,
     };
+  }
+
+  // Admin-granted bypass: checked before the age gate so bypassed users skip it entirely.
+  const bypassSnap = await db
+    .collection(AMBASSADOR_ELIGIBILITY_BYPASSES_COLLECTION)
+    .doc(uid)
+    .get();
+  if (bypassSnap.exists) {
+    return { eligible: true, bypassed: true, requiredDays: AMBASSADOR_DISCORD_MIN_AGE_DAYS };
   }
   let createdMs: number;
   try {

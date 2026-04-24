@@ -1,44 +1,42 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useMentorship } from "@/contexts/MentorshipContext";
+import { authFetch } from "@/lib/apiClient";
 import { AMBASSADOR_DISCORD_MIN_AGE_DAYS } from "@/lib/ambassador/constants";
 
 type Check =
   | { loading: true }
-  | { loading: false; eligible: boolean; profileAgeDays: number };
+  | { loading: false; eligible: boolean; bypassed?: boolean; profileAgeDays: number; requiredDays: number };
 
 export default function EligibilityStep({
   onEligible,
 }: {
   onEligible: () => void;
 }) {
-  const { user, loading } = useMentorship();
+  const { user, loading: userLoading } = useMentorship();
   const [check, setCheck] = useState<Check>({ loading: true });
 
   useEffect(() => {
-    if (loading) return;
+    if (userLoading) return;
     if (!user) {
-      setCheck({ loading: false, eligible: false, profileAgeDays: 0 });
+      setCheck({ loading: false, eligible: false, profileAgeDays: 0, requiredDays: AMBASSADOR_DISCORD_MIN_AGE_DAYS });
       return;
     }
-    // Use Firebase Auth account creation time — persists for the life of
-    // the platform account, unlike mentorship_profiles.createdAt which is
-    // only populated if the user onboarded as mentor/mentee.
-    const createdMs = user.metadata.creationTime
-      ? Date.parse(user.metadata.creationTime)
-      : NaN;
-    const ageDays = Number.isFinite(createdMs)
-      ? Math.floor((Date.now() - createdMs) / (24 * 60 * 60 * 1000))
-      : 0;
-    // Dev-mode bypass: skip the age gate so local testers can exercise the flow
-    // without waiting 7 days. Mirrored on the server in ensureDiscordAgeEligible.
-    const devBypass = process.env.NODE_ENV === "development";
-    setCheck({
-      loading: false,
-      eligible: devBypass || ageDays >= AMBASSADOR_DISCORD_MIN_AGE_DAYS,
-      profileAgeDays: ageDays,
-    });
-  }, [user, loading]);
+    authFetch("/api/ambassador/eligibility")
+      .then((res) => res.json())
+      .then((data) => {
+        setCheck({
+          loading: false,
+          eligible: data.eligible ?? false,
+          bypassed: data.bypassed ?? false,
+          profileAgeDays: data.profileAgeDays ?? 0,
+          requiredDays: data.requiredDays ?? AMBASSADOR_DISCORD_MIN_AGE_DAYS,
+        });
+      })
+      .catch(() => {
+        setCheck({ loading: false, eligible: false, profileAgeDays: 0, requiredDays: AMBASSADOR_DISCORD_MIN_AGE_DAYS });
+      });
+  }, [user, userLoading]);
 
   if (check.loading) {
     return (
@@ -49,7 +47,7 @@ export default function EligibilityStep({
   }
 
   if (!check.eligible) {
-    const wait = AMBASSADOR_DISCORD_MIN_AGE_DAYS - check.profileAgeDays;
+    const wait = check.requiredDays - check.profileAgeDays;
     return (
       <div className="alert alert-warning shadow-md">
         <div>
@@ -57,7 +55,7 @@ export default function EligibilityStep({
           <p className="mt-1">
             The Student Ambassador program requires your Code With Ahsan account
             to be at least{" "}
-            <strong>{AMBASSADOR_DISCORD_MIN_AGE_DAYS} days</strong> old.
+            <strong>{check.requiredDays} days</strong> old.
           </p>
           <p className="mt-2">
             Your account is{" "}
@@ -75,18 +73,11 @@ export default function EligibilityStep({
     );
   }
 
-  const devBypassActive =
-    process.env.NODE_ENV === "development" &&
-    check.profileAgeDays < AMBASSADOR_DISCORD_MIN_AGE_DAYS;
-
   return (
     <div className="space-y-4">
-      {devBypassActive && (
-        <div className="alert alert-warning shadow-md">
-          <span>
-            <strong>Dev mode:</strong> 7-day account-age gate bypassed. This
-            will NOT apply in production.
-          </span>
+      {check.bypassed && (
+        <div className="alert alert-info shadow-md">
+          <span>Eligibility bypass active — you&apos;ve been cleared to apply directly.</span>
         </div>
       )}
       <div className="alert alert-success shadow-md">
@@ -104,9 +95,9 @@ export default function EligibilityStep({
           />
         </svg>
         <span>
-          You&apos;re eligible! Your CWA account is{" "}
-          <strong>{check.profileAgeDays} days</strong> old. Let&apos;s get
-          started.
+          {check.bypassed
+            ? "You're eligible! Let's get started."
+            : <>You&apos;re eligible! Your CWA account is{" "}<strong>{check.profileAgeDays} days</strong> old. Let&apos;s get started.</>}
         </span>
       </div>
       <button type="button" className="btn btn-primary" onClick={onEligible}>
