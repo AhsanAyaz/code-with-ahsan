@@ -173,6 +173,8 @@ export interface AmbassadorSubdoc {
   referralCode?: string;
   /** D-04: IANA timezone string (e.g. "Asia/Karachi"). Default to "UTC" when absent. Read by REPORT-04 cron to compute per-ambassador deadlines. */
   timezone?: string;
+  /** Written by the strike route (REPORT-06) via FieldValue.serverTimestamp(). Not set at acceptance time. */
+  updatedAt?: Date;
 }
 
 /**
