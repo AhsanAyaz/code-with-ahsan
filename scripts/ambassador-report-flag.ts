@@ -164,11 +164,19 @@ async function main() {
       const prevMonthKey = getAmbassadorMonthKey(amb.timezone);
       const hasReport = await hasReportForMonth(amb.uid, prevMonthKey);
       if (!hasReport) {
-        await writeFlag(amb.uid, prevMonthKey);
-        flagsWritten++;
-        console.log(
-          `[flag] ${amb.uid} (${amb.displayName}) missing ${prevMonthKey}`
-        );
+        // Only flag once the deadline for the previous month has actually passed
+        // in the ambassador's timezone. Without this guard, ambassadors in UTC-behind
+        // timezones (e.g. America/Los_Angeles) can be falsely flagged on the first day
+        // of a new month while they still have time to submit (CR-01).
+        const [yearStr, monthStr] = prevMonthKey.split("-");
+        const deadlineMs = getDeadlineUTC(Number(yearStr), Number(monthStr), amb.timezone);
+        if (nowMs > deadlineMs) {
+          await writeFlag(amb.uid, prevMonthKey);
+          flagsWritten++;
+          console.log(
+            `[flag] ${amb.uid} (${amb.displayName}) missing ${prevMonthKey}`
+          );
+        }
       }
 
       // 2. DM reminder for CURRENT month (if within reminder window)
