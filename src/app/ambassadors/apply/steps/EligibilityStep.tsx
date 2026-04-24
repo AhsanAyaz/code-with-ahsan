@@ -104,7 +104,7 @@ export default function EligibilityStep({
           />
         </svg>
         <span>
-          You&apos;re eligible! Your account is{" "}
+          You&apos;re eligible! Your CWA account is{" "}
           <strong>{check.profileAgeDays} days</strong> old. Let&apos;s get
           started.
         </span>

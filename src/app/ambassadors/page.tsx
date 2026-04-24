@@ -2,8 +2,10 @@ import { db } from "@/lib/firebaseAdmin";
 import { getCurrentCohortId } from "@/lib/ambassador/currentCohort";
 import {
   PUBLIC_AMBASSADORS_COLLECTION,
+  type CohortDoc,
   type PublicAmbassadorDoc,
 } from "@/types/ambassador";
+import { AMBASSADOR_COHORTS_COLLECTION } from "@/lib/ambassador/constants";
 import AmbassadorCard from "@/components/ambassador/AmbassadorCard";
 
 export const dynamic = "force-dynamic";
@@ -15,23 +17,34 @@ export const dynamic = "force-dynamic";
  *  which isn't a plain object and can't cross the Server→Client Component boundary. */
 type PublicAmbassadorCardData = Omit<PublicAmbassadorDoc, "updatedAt">;
 
-async function loadCohortAmbassadors(): Promise<{
+async function loadCohortData(): Promise<{
   cohortId: string | null;
+  applicationsOpen: boolean;
   items: PublicAmbassadorCardData[];
 }> {
   const cohortId = await getCurrentCohortId();
-  if (!cohortId) return { cohortId: null, items: [] };
+  if (!cohortId) return { cohortId: null, applicationsOpen: false, items: [] };
 
-  const snap = await db
-    .collection(PUBLIC_AMBASSADORS_COLLECTION)
-    .where("active", "==", true)
-    .where("cohortId", "==", cohortId)
-    .orderBy("updatedAt", "asc")
-    .get();
+  const [cohortSnap, ambassadorsSnap] = await Promise.all([
+    db.collection(AMBASSADOR_COHORTS_COLLECTION).doc(cohortId).get(),
+    db
+      .collection(PUBLIC_AMBASSADORS_COLLECTION)
+      .where("active", "==", true)
+      .where("cohortId", "==", cohortId)
+      .orderBy("updatedAt", "asc")
+      .get(),
+  ]);
+
+  const cohort = cohortSnap.data() as CohortDoc | undefined;
+  const applicationsOpen =
+    !!cohort &&
+    cohort.applicationWindowOpen === true &&
+    cohort.acceptedCount < cohort.maxSize;
 
   return {
     cohortId,
-    items: snap.docs.map((d) => {
+    applicationsOpen,
+    items: ambassadorsSnap.docs.map((d) => {
       const { updatedAt: _updatedAt, ...rest } = d.data() as PublicAmbassadorDoc;
       return rest;
     }),
@@ -39,7 +52,7 @@ async function loadCohortAmbassadors(): Promise<{
 }
 
 export default async function AmbassadorsPage() {
-  const { cohortId, items } = await loadCohortAmbassadors();
+  const { cohortId, applicationsOpen, items } = await loadCohortData();
 
   return (
     <div className="space-y-8">
@@ -52,18 +65,21 @@ export default async function AmbassadorsPage() {
           They are the community builders running events, writing guides,
           and helping new members get started.
         </p>
+        {applicationsOpen && (
+          <div className="pt-2">
+            <a
+              href="/ambassadors/apply"
+              className="btn btn-primary btn-lg"
+            >
+              Apply to become an Ambassador
+            </a>
+          </div>
+        )}
       </div>
 
       {cohortId === null && (
         <div className="alert alert-info">
-          <span>
-            No active cohort right now. Check back when the next cohort
-            starts — or {" "}
-            <a href="/ambassadors/apply" className="link">
-              apply to join the next one
-            </a>
-            .
-          </span>
+          <span>No active cohort right now. Check back when the next cohort starts.</span>
         </div>
       )}
 
