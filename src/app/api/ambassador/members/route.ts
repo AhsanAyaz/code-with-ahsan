@@ -20,10 +20,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: admin.error }, { status: admin.status });
   }
 
-  // Collection-group read of all ambassador subdocs where active === true
+  // Collection-group read of all ambassador subdocs where active === true.
+  // .limit(200) guards against unbounded fan-out: each result triggers 2 extra
+  // Firestore RPCs (profile + flag count), so N ambassadors = 1+2N reads.
+  // Paginate at the call site if the program grows beyond this cap (WR-03).
   const subdocsSnap = await db
     .collectionGroup("ambassador")
     .where("active", "==", true)
+    .limit(200)
     .get();
 
   const members = await Promise.all(
