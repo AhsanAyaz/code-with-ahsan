@@ -49,6 +49,12 @@ export default function EventList({ refreshKey = 0 }: Props) {
     load();
   }, [load, refreshKey]);
 
+  // WR-06: This check uses Date.now() (client clock). A skewed client clock can
+  // cause the button to appear/disappear incorrectly, but this is a UX issue only —
+  // the server enforces the 30-day window independently and will reject out-of-window
+  // edits with a 409 regardless of what the client shows. Intentional: adding a
+  // server-computed `editableUntil` field to the event response would eliminate the
+  // skew risk if this becomes a recurring support issue.
   function canEdit(dateStr: string): boolean {
     return Date.now() - new Date(dateStr).getTime() <= EVENT_EDIT_WINDOW_MS;
   }
