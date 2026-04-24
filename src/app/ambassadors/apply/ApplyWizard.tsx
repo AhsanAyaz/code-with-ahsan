@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import { useToast } from "@/contexts/ToastContext";
+import { AuthContext } from "@/contexts/AuthContext";
 import { authFetch } from "@/lib/apiClient";
 import { useApplyForm } from "./useApplyForm";
 import EligibilityStep from "./steps/EligibilityStep";
@@ -16,6 +17,7 @@ export default function ApplyWizard() {
   const [step, setStep] = useState<Step>(1);
   const [submitting, setSubmitting] = useState(false);
   const { user, loading } = useMentorship();
+  const { setShowLoginPopup } = useContext(AuthContext);
   const toast = useToast();
   const router = useRouter();
   const form = useApplyForm();
@@ -33,9 +35,13 @@ export default function ApplyWizard() {
       <div className="alert alert-info">
         <span>
           Please{" "}
-          <a href="/auth" className="link">
+          <button
+            type="button"
+            className="link"
+            onClick={() => setShowLoginPopup(true)}
+          >
             sign in
-          </a>{" "}
+          </button>{" "}
           to apply.
         </span>
       </div>
