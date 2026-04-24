@@ -11,23 +11,14 @@
  *   - Status badge renders alongside page heading (separate component, Task 5)
  *   - EventList is subordinate — renders below
  */
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { authFetch } from "@/lib/apiClient";
 import { useToast } from "@/contexts/ToastContext";
+import { type ReportCurrent } from "./ReportStatusBadge";
 
-type CurrentResponse =
-  | { submitted: false; month: string; deadlineIso: string }
-  | {
-      submitted: true;
-      month: string;
-      deadlineIso: string;
-      report: {
-        whatWorked: string;
-        whatBlocked: string;
-        whatNeeded: string;
-        submittedAt: string;
-      };
-    };
+// WR-01: CurrentResponse is the same shape as ReportCurrent — use the shared type
+// from ReportStatusBadge to avoid duplication (see also IN-02).
+type CurrentResponse = ReportCurrent;
 
 const MAX_CHARS = 2000;
 
@@ -41,35 +32,23 @@ function formatMonthHuman(monthKey: string): string {
   return date.toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
 }
 
-export function MonthlyReportForm() {
+type Props = {
+  /** WR-01: current report state lifted to ReportPageClient — avoids double-fetching. */
+  current: CurrentResponse | null;
+  /** WR-01: callback so this form can update the shared state after submission. */
+  onCurrentChange: (next: CurrentResponse) => void;
+};
+
+export function MonthlyReportForm({ current, onCurrentChange }: Props) {
   const toast = useToast();
-  const [loading, setLoading] = useState(true);
-  const [current, setCurrent] = useState<CurrentResponse | null>(null);
   const [whatWorked, setWhatWorked] = useState("");
   const [whatBlocked, setWhatBlocked] = useState("");
   const [whatNeeded, setWhatNeeded] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      try {
-        const res = await authFetch("/api/ambassador/report/current");
-        if (!res.ok) throw new Error("Failed to load current status");
-        const json = (await res.json()) as CurrentResponse;
-        if (!cancelled) setCurrent(json);
-      } catch {
-        if (!cancelled) setError("Could not load your report status. Refresh to retry.");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // WR-01: fetch is lifted to ReportPageClient — no useEffect here.
+  // current is null while the parent is loading; render a spinner in that case.
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -87,19 +66,15 @@ export function MonthlyReportForm() {
         }),
       });
       if (res.status === 201) {
-        const json = (await res.json()) as { reportId: string; month: string };
         toast.success("Report submitted — thank you for showing up this month.");
-        setCurrent({
-          submitted: true,
-          month: json.month,
-          deadlineIso: current?.deadlineIso ?? "",
-          report: {
-            whatWorked: whatWorked.trim(),
-            whatBlocked: whatBlocked.trim(),
-            whatNeeded: whatNeeded.trim(),
-            submittedAt: new Date().toISOString(),
-          },
-        });
+        // WR-02: re-fetch from server to hydrate state with the server's stored
+        // representation (correct submittedAt timestamp, deadline, etc.) rather
+        // than constructing an optimistic object from client-side values.
+        const refreshRes = await authFetch("/api/ambassador/report/current");
+        if (refreshRes.ok) {
+          const refreshed = (await refreshRes.json()) as CurrentResponse;
+          onCurrentChange(refreshed);
+        }
         return;
       }
       if (res.status === 409) {
@@ -114,7 +89,8 @@ export function MonthlyReportForm() {
     }
   }
 
-  if (loading) {
+  // Show spinner while parent is still loading the current report status.
+  if (current === null) {
     return (
       <section className="py-12 text-center">
         <span className="loading loading-spinner loading-md" aria-label="Loading report status" />

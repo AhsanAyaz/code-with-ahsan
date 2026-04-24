@@ -35,7 +35,7 @@ export function ReportPageClient() {
         <ReportStatusBadge current={current} />
       </header>
 
-      <MonthlyReportForm />
+      <MonthlyReportForm current={current} onCurrentChange={setCurrent} />
 
       <section className="space-y-4">
         <LogEventForm onCreated={() => setRefreshKey((k) => k + 1)} />
