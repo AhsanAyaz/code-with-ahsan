@@ -167,7 +167,14 @@ export async function POST(request: NextRequest) {
           `[profile.POST] Referral attribution skipped: user=${uid} code=${refCode} reason=${result.reason}`,
         );
       }
-      referralConsumed = true; // clear the cookie regardless of outcome — prevents endless retry on the same user
+      // WR-05: Only clear the cookie on non-retriable outcomes. A transient
+      // Firestore error (reason="error") should NOT permanently delete the cookie
+      // — the next signup attempt should retry attribution. Definitive outcomes
+      // (ok, unknown_code, self_attribution, already_attributed) clear the cookie
+      // so the user isn't retried endlessly on a code that will never succeed.
+      if (result.ok || result.reason !== "error") {
+        referralConsumed = true;
+      }
     }
 
     const response = NextResponse.json(
