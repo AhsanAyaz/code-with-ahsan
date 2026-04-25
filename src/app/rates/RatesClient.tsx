@@ -20,12 +20,12 @@ const STATS = [
 
 const FEATURED_PACKAGES = [
   {
-    name: "Awareness",
+    name: "Instagram Launch",
     price: "$1,850",
     alaCarteValue: "$1,950",
     savings: "Save $100",
     badge: null,
-    description: "Best for product launches.",
+    description: "Best for product launches on Instagram. High-impact visuals and direct community engagement with your largest audience.",
     deliverables: [
       "Instagram Reel (up to 90s)",
       "Story set x3 (with link sticker)",
@@ -35,9 +35,9 @@ const FEATURED_PACKAGES = [
   },
   {
     name: "Growth",
-    price: "$4,600",
+    price: "$4,750",
     alaCarteValue: "$5,000",
-    savings: "Save $400",
+    savings: "Save $250",
     badge: "Most popular",
     description: "Two dedicated YouTube videos with maximum organic reach.",
     deliverables: [
@@ -50,8 +50,8 @@ const FEATURED_PACKAGES = [
   {
     name: "Authority",
     price: "$6,400",
-    alaCarteValue: "$7,500",
-    savings: "Save $1,100",
+    alaCarteValue: "$8,400",
+    savings: "Save $2,000",
     badge: null,
     description: "Maximum reach across video, email, and community.",
     deliverables: [
@@ -151,7 +151,7 @@ export default function RatesClient({ post }: { post: any }) {
           ))}
         </div>
         <p className="text-xs text-gray-500 mt-4 text-center max-w-2xl mx-auto">
-          Channel-level average view percentage is diluted by 878 videos including Shorts and micro-tutorials. Per-video stats for dedicated long-form content are available on request.
+          Per-video analytics for dedicated long-form content available on request.
         </p>
       </section>
 
