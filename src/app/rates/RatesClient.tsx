@@ -12,7 +12,7 @@ const CREDENTIAL_PILLS = [
 ];
 
 const STATS = [
-  { label: "YouTube", value: "34k+", sub: "Subscribers" },
+  { label: "YouTube", value: "35.5k+", sub: "Subscribers" },
   { label: "Instagram", value: "64k+", sub: "Followers" },
   { label: "Discord", value: "4,400+", sub: "Devs" },
   { label: "Newsletter", value: "2,100+", sub: "Subscribers" },
@@ -35,8 +35,8 @@ const FEATURED_PACKAGES = [
   },
   {
     name: "Growth",
-    price: "$4,000",
-    alaCarteValue: "$4,400",
+    price: "$4,600",
+    alaCarteValue: "$5,000",
     savings: "Save $400",
     badge: "Most popular",
     description: "Two dedicated YouTube videos with maximum organic reach.",
@@ -49,8 +49,8 @@ const FEATURED_PACKAGES = [
   },
   {
     name: "Authority",
-    price: "$5,500",
-    alaCarteValue: "$6,600",
+    price: "$6,400",
+    alaCarteValue: "$7,500",
     savings: "Save $1,100",
     badge: null,
     description: "Maximum reach across video, email, and community.",
@@ -128,6 +128,31 @@ export default function RatesClient({ post }: { post: any }) {
             </a>
           ))}
         </div>
+      </section>
+
+      {/* === CHANNEL PERFORMANCE === */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold mb-2 text-center">Why my audience?</h2>
+        <p className="text-center text-gray-400 text-sm mb-6">Channel performance highlights — April 2026</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[
+            { label: "Subscribers", value: "35,500+", sub: "+70% growth in 16 months" },
+            { label: "Total views", value: "2.76M", sub: "878 videos published" },
+            { label: "Avg view duration", value: "8 min 8 sec", sub: "Last 90 days" },
+            { label: "Top video", value: "675,000+ views", sub: "Angular Crash Course — still 50+ views/hr" },
+            { label: "Like rate", value: "2.1–4.55%", sub: "Recent dedicated long-form content" },
+            { label: "Content longevity", value: "12–18+ months", sub: "Top videos keep accruing views" },
+          ].map((item) => (
+            <div key={item.label} className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <div className="text-xl font-bold text-neon-purple">{item.value}</div>
+              <div className="text-sm font-semibold mt-0.5">{item.label}</div>
+              <div className="text-xs text-gray-400 mt-0.5">{item.sub}</div>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-gray-500 mt-4 text-center max-w-2xl mx-auto">
+          Channel-level average view percentage is diluted by 878 videos including Shorts and micro-tutorials. Per-video stats for dedicated long-form content are available on request.
+        </p>
       </section>
 
       {/* === FEATURED PACKAGES === */}
