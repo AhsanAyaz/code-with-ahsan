@@ -100,13 +100,15 @@ async function fetchWithRateLimit(
 export async function lookupMemberByUsername(
   username: string
 ): Promise<DiscordMember | null> {
+  // Normalize: strip leading @ and trailing #discriminator (legacy format)
+  const normalized = username.trim().replace(/^@/, "").replace(/#\d+$/, "");
   const guildId = getGuildId();
-  log.debug(` Looking up member by username: ${username}`);
+  log.debug(` Looking up member by username: ${normalized}`);
 
   try {
     // Search for members matching the username (with rate limit handling)
     const response = await fetchWithRateLimit(
-      `${DISCORD_API}/guilds/${guildId}/members/search?query=${encodeURIComponent(username)}&limit=10`,
+      `${DISCORD_API}/guilds/${guildId}/members/search?query=${encodeURIComponent(normalized)}&limit=10`,
       { headers: getHeaders() }
     );
 
@@ -123,7 +125,7 @@ export async function lookupMemberByUsername(
     // Find exact username match (case-insensitive)
     const match = members.find(
       (m: { user: { username: string } }) =>
-        m.user.username.toLowerCase() === username.toLowerCase()
+        m.user.username.toLowerCase() === normalized.toLowerCase()
     );
 
     if (match) {
@@ -134,7 +136,7 @@ export async function lookupMemberByUsername(
       };
     }
 
-    log.debug(` Member not found: ${username}`);
+    log.debug(` Member not found: ${normalized}`);
     return null;
   } catch (error) {
     log.error("Error looking up Discord member:", error);
@@ -878,28 +880,33 @@ const PROJECT_COLLABORATOR_ROLE_ID = "1447918848203427840";
  * @returns true if role was assigned successfully, false otherwise
  */
 export async function assignDiscordRole(
-  discordUsername: string,
+  discordUsernameOrId: string,
   roleId: string
 ): Promise<boolean> {
-  log.debug(`Assigning role ${roleId} to user ${discordUsername}`);
+  log.debug(`Assigning role ${roleId} to user ${discordUsernameOrId}`);
 
   try {
-    // Look up the member by username
-    const member = await lookupMemberByUsername(discordUsername);
-    if (!member) {
-      log.warn(
-        `[Discord] Cannot assign role - user not found: ${discordUsername}`
-      );
-      return false;
+    let memberId: string;
+
+    // Discord snowflakes are 17–19 digit integers — use directly, skip the search
+    if (/^\d{17,19}$/.test(discordUsernameOrId)) {
+      memberId = discordUsernameOrId;
+    } else {
+      const member = await lookupMemberByUsername(discordUsernameOrId);
+      if (!member) {
+        log.warn(
+          `[Discord] Cannot assign role - user not found: ${discordUsernameOrId}`
+        );
+        return false;
+      }
+      memberId = member.id;
     }
 
     const guildId = getGuildId();
 
-    // Assign the role using Discord API
-    // PUT /guilds/{guild_id}/members/{user_id}/roles/{role_id}
-    // Returns 204 No Content on success
+    // PUT /guilds/{guild_id}/members/{user_id}/roles/{role_id} — 204 on success
     const response = await fetchWithRateLimit(
-      `${DISCORD_API}/guilds/${guildId}/members/${member.id}/roles/${roleId}`,
+      `${DISCORD_API}/guilds/${guildId}/members/${memberId}/roles/${roleId}`,
       {
         method: "PUT",
         headers: getHeaders(),
@@ -908,19 +915,19 @@ export async function assignDiscordRole(
 
     if (response.status === 204) {
       log.debug(
-        `Successfully assigned role ${roleId} to ${discordUsername} (ID: ${member.id})`
+        `Successfully assigned role ${roleId} to ${discordUsernameOrId} (ID: ${memberId})`
       );
       return true;
     } else {
       const errorText = await response.text();
       log.error(
-        `[Discord] Failed to assign role ${roleId} to ${discordUsername}: ${response.status} - ${errorText}`
+        `[Discord] Failed to assign role ${roleId} to ${discordUsernameOrId}: ${response.status} - ${errorText}`
       );
       return false;
     }
   } catch (error) {
     log.error(
-      `[Discord] Error assigning role ${roleId} to ${discordUsername}:`,
+      `[Discord] Error assigning role ${roleId} to ${discordUsernameOrId}:`,
       error
     );
     return false;

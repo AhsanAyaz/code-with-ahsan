@@ -134,6 +134,8 @@ export function useApplyForm() {
       _academicEmailWarning,
       ...submit
     } = valuesRef.current;
+    // Normalize Discord handle: strip leading @ and legacy #discriminator
+    submit.discordHandle = submit.discordHandle.trim().replace(/^@/, "").replace(/#\d+$/, "");
     if (_academicPath === "email") {
       return {
         ...submit,

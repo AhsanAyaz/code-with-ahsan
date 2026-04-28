@@ -56,6 +56,8 @@ export async function POST(request: NextRequest) {
     );
   }
   const input = parsed.data;
+  // Normalize Discord handle server-side: strip leading @ and legacy #discriminator
+  input.discordHandle = input.discordHandle.trim().replace(/^@/, "").replace(/#\d+$/, "");
 
   // Cross-field + regex re-validation (defense-in-depth — D-07, D-15)
   const contentCheck = runServerSideContentChecks(input);
