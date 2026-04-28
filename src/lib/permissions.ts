@@ -131,7 +131,7 @@ export function canEditProject(
   if (isOwner(user, project)) {
     return project.status === "pending" 
         || project.status === "declined" 
-        || project.status === "active";
+        || (project.status === "active" && !project.pendingUpdates);
   }
 
   return false;

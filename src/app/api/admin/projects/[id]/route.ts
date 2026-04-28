@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
+import { Project } from "@/types/mentorship";
 import {
   deleteDiscordChannel,
   getChannel,
@@ -214,7 +215,7 @@ export async function PUT(
         Object.entries(projectData.pendingUpdates).filter(([key]) => allowedFields.includes(key))
       );
 
-      const applyUpdates: Record<string, any> = {
+      const applyUpdates: any = {
         ...safeUpdates,
         status: "active",
         pendingUpdates: FieldValue.delete(),

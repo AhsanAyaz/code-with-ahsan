@@ -713,7 +713,9 @@ export default function AdminProjectsPage() {
                       toast.success("Project updates declined");
                       setProjects(prev =>
                         prev.map(p =>
-                          p.id === reviewTarget.id ? { ...p, status: "active", pendingUpdates: undefined } : p
+                          p.id === reviewTarget.id 
+                            ? { ...p, ...p.pendingUpdates, status: "active", pendingUpdates: undefined } as EnrichedProject
+                            : p
                         )
                       );
                       setReviewTarget(null);
@@ -756,7 +758,9 @@ export default function AdminProjectsPage() {
                       toast.success("Project updates approved successfully");
                       setProjects(prev =>
                         prev.map(p =>
-                          p.id === reviewTarget.id ? { ...p, status: "active", pendingUpdates: undefined } : p
+                          p.id === reviewTarget.id 
+                            ? { ...p, ...p.pendingUpdates, status: "active", pendingUpdates: undefined } as EnrichedProject
+                            : p
                         )
                       );
                       setReviewTarget(null);
