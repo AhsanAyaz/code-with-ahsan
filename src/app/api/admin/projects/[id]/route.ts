@@ -208,9 +208,14 @@ export async function PUT(
         );
       }
 
-      // Apply pending updates
+      // Apply pending updates - only allow explicit fields to prevent injection
+      const allowedFields = ['title', 'description', 'githubRepo', 'techStack', 'difficulty', 'maxTeamSize'];
+      const safeUpdates = Object.fromEntries(
+        Object.entries(projectData.pendingUpdates).filter(([key]) => allowedFields.includes(key))
+      );
+
       const applyUpdates: Record<string, any> = {
-        ...projectData.pendingUpdates,
+        ...safeUpdates,
         status: "active",
         pendingUpdates: FieldValue.delete(),
         updateApprovedAt: FieldValue.serverTimestamp(),
@@ -225,6 +230,27 @@ export async function PUT(
       }
 
       await projectRef.update(applyUpdates);
+
+      // Send Discord DM to creator (non-blocking)
+      if (projectData.creatorId) {
+        try {
+          const creatorDoc = await db
+            .collection("mentorship_profiles")
+            .doc(projectData.creatorId)
+            .get();
+
+          const creatorData = creatorDoc.exists ? creatorDoc.data() : null;
+          const discordUsername = creatorData?.discordUsername;
+
+          if (discordUsername) {
+            const dmMessage =
+              `Your updates for project "${projectData.title}" have been approved and are now live ✅`;
+            await sendDirectMessage(discordUsername, dmMessage);
+          }
+        } catch (error) {
+          console.error("Error sending update approval notification:", error);
+        }
+      }
 
       return NextResponse.json(
         { success: true, message: "Project updates approved and applied" },
