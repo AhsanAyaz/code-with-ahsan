@@ -20,7 +20,7 @@
 export const AMBASSADOR_DISCORD_MIN_AGE_DAYS = 7;
 
 /** Firestore top-level collection name for ambassador applications (APPLY-06). */
-export const AMBASSADOR_APPLICATIONS_COLLECTION = "applications";
+export const AMBASSADOR_APPLICATIONS_COLLECTION = "ambassador_applications";
 
 /** Firestore top-level collection name for cohort docs (COHORT-01). */
 export const AMBASSADOR_COHORTS_COLLECTION = "cohorts";

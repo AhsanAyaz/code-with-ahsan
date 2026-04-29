@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { authFetch } from "@/lib/apiClient";
 import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import { ActivitySummaryPanel } from "./ActivitySummaryPanel";
@@ -43,8 +44,27 @@ function adminHeaders(): HeadersInit {
 }
 
 export function MemberDetailClient({ uid }: { uid: string }) {
+  const router = useRouter();
   const [detail, setDetail] = useState<MemberDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [removing, setRemoving] = useState(false);
+
+  const handleRemove = useCallback(async () => {
+    if (!confirm("Remove this ambassador from the program? This deletes their subdoc, public profile, and strips their role.")) return;
+    setRemoving(true);
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
+      const res = await fetch(`/api/ambassador/members/${uid}`, {
+        method: "DELETE",
+        headers: token ? { "x-admin-token": token } : {},
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      router.push("/admin/ambassadors/members");
+    } catch {
+      setError("Remove failed. Try again.");
+      setRemoving(false);
+    }
+  }, [uid, router]);
 
   const load = useCallback(async () => {
     try {
@@ -83,11 +103,20 @@ export function MemberDetailClient({ uid }: { uid: string }) {
 
   return (
     <div className="space-y-8">
-      <header>
-        <h1 className="text-2xl font-bold">{displayName}</h1>
-        {detail.subdoc.cohortId && (
-          <p className="text-base-content/70">Cohort: {detail.subdoc.cohortId}</p>
-        )}
+      <header className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold">{displayName}</h1>
+          {detail.subdoc.cohortId && (
+            <p className="text-base-content/70">Cohort: {detail.subdoc.cohortId}</p>
+          )}
+        </div>
+        <button
+          className="btn btn-outline btn-error btn-sm"
+          onClick={handleRemove}
+          disabled={removing}
+        >
+          {removing ? "Removing…" : "Remove from program"}
+        </button>
       </header>
 
       <ActivitySummaryPanel

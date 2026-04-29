@@ -32,6 +32,11 @@ import {
   sendAmbassadorApplicationDeclinedEmail,
 } from "@/lib/email";
 import { createLogger } from "@/lib/logger";
+import { FieldValue } from "firebase-admin/firestore";
+import {
+  PUBLIC_AMBASSADORS_COLLECTION,
+} from "@/types/ambassador";
+import { REFERRAL_CODES_COLLECTION } from "@/lib/ambassador/constants";
 
 const logger = createLogger("ambassador/applications/[id]");
 
@@ -212,4 +217,49 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     discordAssigned: discord.ok,
     discordReason: discord.ok ? null : (discord as { ok: false; reason: string }).reason,
   });
+}
+
+/** DELETE — admin hard-deletes an application and all derived ambassador state if accepted. */
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  if (!isAmbassadorProgramEnabled()) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const admin = await requireAdmin(request);
+  if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
+
+  const { applicationId } = await params;
+  const appRef = db.collection(AMBASSADOR_APPLICATIONS_COLLECTION).doc(applicationId);
+  const appSnap = await appRef.get();
+  if (!appSnap.exists) return NextResponse.json({ error: "Application not found" }, { status: 404 });
+  const app = appSnap.data() as ApplicationDoc;
+
+  const batch = db.batch();
+  batch.delete(appRef);
+
+  if (app.status === "accepted") {
+    const profileRef = db.collection("mentorship_profiles").doc(app.applicantUid);
+    const subdocRef = profileRef.collection("ambassador").doc("v1");
+    const subdocSnap = await subdocRef.get();
+
+    batch.update(profileRef, { roles: FieldValue.arrayRemove("ambassador") });
+    batch.delete(subdocRef);
+    batch.delete(db.collection(PUBLIC_AMBASSADORS_COLLECTION).doc(app.applicantUid));
+
+    const referralCode = subdocSnap.exists
+      ? (subdocSnap.data() as { referralCode?: string }).referralCode
+      : undefined;
+    if (referralCode) {
+      batch.delete(db.collection(REFERRAL_CODES_COLLECTION).doc(referralCode));
+    }
+  }
+
+  await batch.commit();
+
+  if (app.status === "accepted") {
+    try {
+      await syncAmbassadorClaim(app.applicantUid);
+    } catch (e) {
+      logger.error("syncAmbassadorClaim after application delete failed", { uid: app.applicantUid, error: e });
+    }
+  }
+
+  return NextResponse.json({ success: true });
 }

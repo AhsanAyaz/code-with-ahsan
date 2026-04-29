@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import type { ApplicationDoc } from "@/types/ambassador";
 import VideoEmbed from "./VideoEmbed";
@@ -28,11 +29,30 @@ export default function ApplicationDetail({
 }: {
   applicationId: string;
 }) {
+  const router = useRouter();
   const [app, setApp] = useState<AppRow | null>(null);
   const [studentIdUrl, setStudentIdUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<"accept" | "decline" | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = useCallback(async () => {
+    if (!confirm("Permanently delete this application and all related ambassador data? This cannot be undone.")) return;
+    setDeleting(true);
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
+      const res = await fetch(`/api/ambassador/applications/${applicationId}`, {
+        method: "DELETE",
+        headers: token ? { "x-admin-token": token } : {},
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      router.push("/admin/ambassadors");
+    } catch {
+      setError("Delete failed. Try again.");
+      setDeleting(false);
+    }
+  }, [applicationId, router]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -119,6 +139,13 @@ export default function ApplicationDetail({
               </button>
             </>
           )}
+          <button
+            className="btn btn-outline btn-error btn-sm"
+            onClick={handleDelete}
+            disabled={deleting}
+          >
+            {deleting ? "Deleting…" : "Delete"}
+          </button>
         </div>
       </header>
 
