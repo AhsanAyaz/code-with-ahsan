@@ -127,9 +127,17 @@ export async function runAcceptanceTransaction(
     const cohort = cohortSnap.data() as CohortDoc;
 
     const profileRef = db.collection("mentorship_profiles").doc(app.applicantUid);
-    const profileSnap = await txn.get(profileRef);
+    const ambassadorRef = profileRef.collection("ambassador").doc("v1");
+    const [profileSnap, ambassadorSnap] = await Promise.all([
+      txn.get(profileRef),
+      txn.get(ambassadorRef),
+    ]);
 
-    const alreadyAccepted = app.status === "accepted";
+    // alreadyAccepted is only true when the application is accepted AND the ambassador
+    // subdoc still exists. If the subdoc was deleted (member removed via admin), treat
+    // this as a fresh accept so the subdoc, public projection, referral code, and email
+    // are all re-created.
+    const alreadyAccepted = app.status === "accepted" && ambassadorSnap.exists;
 
     // ── COHORT-04: enforce maxSize on first accept only ────────────────────
     if (!alreadyAccepted) {
@@ -186,7 +194,6 @@ export async function runAcceptanceTransaction(
     // is a no-op for both: in-life edits flow through PATCH /api/ambassador/profile
     // (plan 03-03), which batches subdoc + projection updates atomically.
     if (!alreadyAccepted) {
-      const ambassadorRef = profileRef.collection("ambassador").doc("v1");
       const subdocPayload: Record<string, unknown> = {
         cohortId: app.targetCohortId,
         joinedAt: now,
