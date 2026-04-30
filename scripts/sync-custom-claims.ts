@@ -85,9 +85,6 @@ function claimsMatchTarget(
   if (currentRoles.length !== targetRoles.length) return false;
   for (const r of targetRoles) if (!currentRoles.includes(r)) return false;
   if ((current.admin === true) !== targetAdmin) return false;
-  // Legacy-role claim: during dual-claim window, the legacy role claim should mirror the first role in targetRoles (or be absent if roles is empty)
-  const expectedLegacyRole = targetRoles[0] ?? undefined;
-  if (current.role !== expectedLegacyRole) return false;
   return true;
 }
 
@@ -143,11 +140,11 @@ async function run(): Promise<void> {
         continue;
       }
 
-      // Merge: preserve any other custom claims we don't own.
+      // Merge: preserve any other custom claims we don't own; drop legacy `role`.
+      const { role: _legacyRole, ...preservedClaims } = (userRecord.customClaims ?? {}) as Record<string, unknown>;
       const merged: Record<string, unknown> = {
-        ...(userRecord.customClaims ?? {}),
+        ...preservedClaims,
         roles,
-        role: roles[0] ?? null, // legacy claim — removed in Deploy #5
         admin: isAdminFlag,
       };
 

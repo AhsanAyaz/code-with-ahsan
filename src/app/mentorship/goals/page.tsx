@@ -40,7 +40,7 @@ export default function GoalsPage() {
 
       try {
         const response = await fetch(
-          `/api/mentorship/all-goals?uid=${user.uid}&role=${profile.roles?.[0] ?? profile.role ?? ""}`,
+          `/api/mentorship/all-goals?uid=${user.uid}&role=${profile.roles?.[0] ?? ""}`,
         );
         if (response.ok) {
           const data = await response.json();

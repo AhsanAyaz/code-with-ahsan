@@ -13,7 +13,6 @@ import { refreshClaimsNow } from "@/lib/hooks/useClaimRefresh";
 
 // Import and re-export types from centralized types file
 export type {
-  MentorshipRole,
   MentorshipProfile,
   MentorshipMatch,
 } from "@/types/mentorship";
@@ -144,7 +143,7 @@ export function MentorshipProvider({ children }: MentorshipProviderProps) {
     }
     try {
       const response = await fetch(
-        `/api/mentorship/match?uid=${user.uid}&role=${profile.roles?.[0] ?? profile.role ?? ""}`,
+        `/api/mentorship/match?uid=${user.uid}&role=${profile.roles?.[0] ?? ""}`,
       );
       if (response.ok) {
         const data = await response.json();

@@ -140,8 +140,7 @@ export async function POST(request: NextRequest) {
     // Check permission: only accepted mentors can create roadmaps
     const permissionUser: PermissionUser = {
       uid: authResult.uid,
-      role: creatorData?.role || null,
-      roles: creatorData?.roles,
+      roles: creatorData?.roles ?? [],
       status: creatorData?.status,
       isAdmin: creatorData?.isAdmin,
     };

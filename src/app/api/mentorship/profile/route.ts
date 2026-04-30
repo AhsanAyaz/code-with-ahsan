@@ -101,8 +101,7 @@ export async function POST(request: NextRequest) {
     const profile = {
       uid,
       username,
-      role,
-      roles: [role], // dual-write: legacy `role` + new `roles` array (per Plan 07)
+      roles: [role],
       status,
       displayName: displayName || "",
       email: email || "",

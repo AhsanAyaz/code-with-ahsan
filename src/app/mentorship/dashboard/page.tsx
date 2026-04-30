@@ -73,7 +73,7 @@ export default function MentorshipDashboardPage() {
       try {
         // Fetch mentorship matches
         const matchesResponse = await fetch(
-          `/api/mentorship/my-matches?uid=${user.uid}&role=${profile?.roles?.[0] ?? profile?.role ?? ""}`,
+          `/api/mentorship/my-matches?uid=${user.uid}&role=${profile?.roles?.[0] ?? ""}`,
         );
         if (matchesResponse.ok) {
           const data = await matchesResponse.json();
@@ -216,7 +216,7 @@ function DashboardContent({
     const fetchMatches = async () => {
       try {
         const response = await fetch(
-          `/api/mentorship/my-matches?uid=${user.uid}&role=${profile.roles?.[0] ?? profile.role ?? ""}`,
+          `/api/mentorship/my-matches?uid=${user.uid}&role=${profile.roles?.[0] ?? ""}`,
         );
         if (response.ok) {
           const data = await response.json();
@@ -229,7 +229,7 @@ function DashboardContent({
       }
     };
     fetchMatches();
-  }, [user.uid, profile.roles, profile.role]);
+  }, [user.uid, profile.roles]);
 
   // Fetch Projects (Owned + Member)
   useEffect(() => {
@@ -289,7 +289,7 @@ function DashboardContent({
       }
     };
     fetchRoadmaps();
-  }, [user.uid, profile.roles, profile.role]);
+  }, [user.uid, profile.roles]);
 
   const handleAction = async (
     type: "request" | "invitation",
@@ -314,7 +314,7 @@ function DashboardContent({
           await refreshMatches();
           // Re-fetch local matches
           const matchesRes = await fetch(
-            `/api/mentorship/my-matches?uid=${user.uid}&role=${profile.roles?.[0] ?? profile.role ?? ""}`,
+            `/api/mentorship/my-matches?uid=${user.uid}&role=${profile.roles?.[0] ?? ""}`,
           );
           if (matchesRes.ok) {
             const data = await matchesRes.json();
@@ -352,7 +352,7 @@ function DashboardContent({
           </p>
         </div>
         <div className="badge badge-primary badge-lg capitalize">
-          {profile.roles?.[0] ?? profile.role}
+          {profile.roles?.[0]}
         </div>
       </div>
 
@@ -364,14 +364,14 @@ function DashboardContent({
           <ActionRequiredWidget
             requests={pendingRequests}
             invitations={[]} // TODO: Fetch invitations
-            role={(profile.roles?.[0] ?? profile.role) as "mentor" | "mentee"}
+            role={(profile.roles?.[0]) as "mentor" | "mentee"}
             onAction={handleAction}
           />
 
           {/* Active Mentorships */}
           <ActiveMatchesWidget
             matches={activeMatches}
-            role={(profile.roles?.[0] ?? profile.role) as "mentor" | "mentee"}
+            role={(profile.roles?.[0]) as "mentor" | "mentee"}
             loading={loadingMatches}
           />
           
@@ -388,12 +388,12 @@ function DashboardContent({
           )}
 
           {/* Guidelines Accordion */}
-           <GuidelinesWidget role={(profile.roles?.[0] ?? profile.role) as "mentor" | "mentee"} />
+           <GuidelinesWidget role={(profile.roles?.[0]) as "mentor" | "mentee"} />
         </div>
 
         {/* Right Column (1/3 width) - Stats & Quick Links */}
         <div className="space-y-6">
-          <StatsWidget stats={stats} role={(profile.roles?.[0] ?? profile.role) as "mentor" | "mentee"} />
+          <StatsWidget stats={stats} role={(profile.roles?.[0]) as "mentor" | "mentee"} />
           <QuickLinksWidget profile={profile} user={user} stats={stats} />
         </div>
       </div>

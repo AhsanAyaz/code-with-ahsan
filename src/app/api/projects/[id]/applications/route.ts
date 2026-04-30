@@ -82,8 +82,7 @@ export async function POST(
     // Check permission: canApplyToProject
     const permissionUser: PermissionUser = {
       uid: userId,
-      role: userData?.role || null,
-      roles: userData?.roles,
+      roles: userData?.roles ?? [],
       status: userData?.status,
       isAdmin: userData?.isAdmin,
     };

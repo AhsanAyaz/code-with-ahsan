@@ -17,8 +17,6 @@ import { z } from "zod";
 export const RoleSchema = z.enum(["mentor", "mentee", "ambassador", "alumni-ambassador"]);
 export type Role = z.infer<typeof RoleSchema>;
 
-export type MentorshipRole = "mentor" | "mentee" | null;
-
 /**
  * Full mentorship profile stored in Firestore
  * Used in context, API routes, and components
@@ -26,8 +24,7 @@ export type MentorshipRole = "mentor" | "mentee" | null;
 export interface MentorshipProfile {
   uid: string;
   username?: string; // Public username for profile URLs
-  role?: MentorshipRole; // LEGACY — removed in Deploy #5 cleanup PR (per D-06 dual-read)
-  roles: Role[]; // Post-migration invariant: always an array (possibly empty). Never undefined/null (per D-04).
+  roles: Role[];
   displayName: string;
   email: string;
   photoURL: string;

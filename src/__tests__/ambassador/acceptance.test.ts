@@ -128,6 +128,7 @@ function setupTransactionMock(docs: {
   app?: Record<string, unknown> | null;
   cohort?: Record<string, unknown> | null;
   profile?: Record<string, unknown> | null;
+  ambassador?: Record<string, unknown> | null;
 }) {
   const snapFor = (data: Record<string, unknown> | null | undefined) => ({
     exists: data != null,
@@ -146,7 +147,7 @@ function setupTransactionMock(docs: {
   dbMock.collection.mockImplementation((name: string) => ({
     doc: vi.fn((_id: string) => ({
       get: vi.fn(async () => {
-        if (name === "applications") return snapFor(docs.app);
+        if (name === "ambassador_applications") return snapFor(docs.app);
         if (name === "mentorship_profiles") return snapFor(docs.profile);
         return snapFor(null);
       }),
@@ -159,10 +160,13 @@ function setupTransactionMock(docs: {
   }));
 
   dbMock.runTransaction.mockImplementation(async (fn: (t: unknown) => unknown) => {
+    // callOrder maps sequential txn.get calls:
+    //   [0] appSnap, [1] cohortSnap, [2] profileSnap, [3] ambassadorSnap
     const callOrder: Array<Record<string, unknown> | null | undefined> = [
       docs.app,
       docs.cohort,
       docs.profile,
+      docs.ambassador ?? null,
     ];
     let callIndex = 0;
 
@@ -240,6 +244,7 @@ describe("runAcceptanceTransaction", () => {
       app: makeAppDoc({ status: "accepted" }),
       cohort: makeCohortDoc({ acceptedCount: 1 }),
       profile: { uid: "uid-1", roles: ["mentor", "ambassador"] },
+      ambassador: { active: true, cohortId: "cohort-1" },
     });
 
     const result = await runAcceptanceTransaction("app-1", "admin:abc123", undefined);

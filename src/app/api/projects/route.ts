@@ -89,8 +89,7 @@ export async function POST(request: NextRequest) {
     // Check permission: only authenticated users can create projects
     const permissionUser: PermissionUser = {
       uid: creatorId,
-      role: creatorData?.role || null,
-      roles: creatorData?.roles,
+      roles: creatorData?.roles ?? [],
       status: creatorData?.status,
       isAdmin: creatorData?.isAdmin,
     };

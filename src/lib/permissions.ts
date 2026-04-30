@@ -12,7 +12,7 @@
  * - PERM-09: Admins can delete any project, creators can delete their own declined projects
  */
 
-import { MentorshipRole, Project, Roadmap } from "@/types/mentorship";
+import { Project, Roadmap } from "@/types/mentorship";
 import type { Role } from "@/types/mentorship";
 
 /**
@@ -21,12 +21,7 @@ import type { Role } from "@/types/mentorship";
  */
 export interface PermissionUser {
   uid: string;
-  // `role` is optional during the roles-array dual-read window (per Plan 01/03/07): MentorshipProfile.role
-  // became optional in Plan 01, and the helpers (`hasRole`, `hasAnyRole`, etc.) gracefully handle absent
-  // legacy role via the `profile.roles?.includes(r) ?? profile.role === r` dual-read. Kept as legacy
-  // field only; Plan 10 removes entirely in Deploy #5.
-  role?: MentorshipRole;
-  roles?: Role[]; // Post-migration: always present. Pre-migration: undefined -> helpers fall back to `role`.
+  roles: Role[];
   status?: "pending" | "accepted" | "declined" | "disabled" | "changes_requested";
   isAdmin?: boolean;
 }
@@ -92,18 +87,10 @@ function canOwnerOrAdminAccess(
   return false;
 }
 
-// ─── Role Helpers (v6.0 roles-array migration) ──────────────────
+// ─── Role Helpers ────────────────────────────────────────────────
 
 /**
- * Returns true if the profile has the given role.
- *
- * Dual-read (per D-06 in 01-CONTEXT.md):
- *   - Prefers profile.roles (the new invariant shape)
- *   - Falls back to profile.role (legacy single-role field) when profile.roles is undefined
- *
- * Null-safe (per D-07): returns false for null/undefined profiles instead of throwing.
- *
- * Three-verb API (per D-05): passing an array to `role` is a TypeScript compile error.
+ * Returns true if the profile has the given role. Null-safe.
  * Use hasAnyRole / hasAllRoles for multi-role semantics.
  */
 export function hasRole(
@@ -111,12 +98,11 @@ export function hasRole(
   role: Role
 ): boolean {
   if (!profile) return false;
-  return profile.roles?.includes(role) ?? profile.role === role;
+  return profile.roles.includes(role);
 }
 
 /**
- * Returns true if the profile has AT LEAST ONE of the given roles.
- * Dual-read + null-safe (same semantics as hasRole).
+ * Returns true if the profile has AT LEAST ONE of the given roles. Null-safe.
  */
 export function hasAnyRole(
   profile: PermissionUser | null | undefined,
@@ -124,72 +110,48 @@ export function hasAnyRole(
 ): boolean {
   if (!profile) return false;
   if (roles.length === 0) return false;
-  if (profile.roles) {
-    return roles.some((r) => profile.roles!.includes(r));
-  }
-  // Legacy fallback: compare against the single role field
-  return profile.role !== null && profile.role !== undefined && roles.includes(profile.role as Role);
+  return roles.some((r) => profile.roles.includes(r));
 }
 
 /**
- * Returns true if the profile has EVERY given role.
- * Dual-read + null-safe. During the legacy fallback window, returns true only if
- * the argument list is exactly one role matching profile.role (a single-role
- * legacy profile cannot satisfy multi-role queries).
+ * Returns true if the profile has EVERY given role. Null-safe.
  */
 export function hasAllRoles(
   profile: PermissionUser | null | undefined,
   roles: Role[]
 ): boolean {
   if (!profile) return false;
-  if (roles.length === 0) return true; // vacuous truth — matches Array.prototype.every
-  if (profile.roles) {
-    return roles.every((r) => profile.roles!.includes(r));
-  }
-  // Legacy fallback: only satisfiable if exactly one role requested matches the legacy field
-  return (
-    roles.length === 1 &&
-    profile.role !== null &&
-    profile.role !== undefined &&
-    roles[0] === profile.role
-  );
+  if (roles.length === 0) return true;
+  return roles.every((r) => profile.roles.includes(r));
 }
 
-// ─── Claim-side Mirrors (decoded Firebase ID tokens, per D-08) ───
+// ─── Claim-side Mirrors (decoded Firebase ID tokens) ─────────────
 
 /**
  * Narrow structural type for decoded Firebase ID tokens with our custom claims.
  * Intentionally decoupled from firebase-admin's DecodedIdToken to keep this
- * helper module dep-free. Callers (e.g., verifyAuth) can pass the full decoded
- * token directly; extra fields are ignored.
+ * helper module dep-free.
  */
 export interface DecodedRoleClaim {
-  role?: string | null;     // legacy single-role claim (dropped in Deploy #5)
-  roles?: string[] | null;  // new array claim (set by sync-custom-claims + roleMutation)
+  roles?: string[] | null;
   admin?: boolean;
   [key: string]: unknown;
 }
 
 /**
- * Returns true if the decoded token carries the given role claim.
- *
- * Dual-claim (per D-06 + D-13): prefers token.roles, falls back to legacy token.role.
- * Null-safe (per D-07): returns false for null/undefined tokens.
- *
- * Use this in API route handlers that already have a decoded token from verifyAuth()
- * and don't want a Firestore round-trip just to authorize.
+ * Returns true if the decoded token carries the given role claim. Null-safe.
+ * Use in API route handlers that have a decoded token and don't want a Firestore round-trip.
  */
 export function hasRoleClaim(
   token: DecodedRoleClaim | null | undefined,
   role: Role
 ): boolean {
   if (!token) return false;
-  return token.roles?.includes(role) ?? token.role === role;
+  return !!token.roles?.includes(role);
 }
 
 /**
- * Returns true if the decoded token carries AT LEAST ONE of the given role claims.
- * Dual-claim + null-safe.
+ * Returns true if the decoded token carries AT LEAST ONE of the given role claims. Null-safe.
  */
 export function hasAnyRoleClaim(
   token: DecodedRoleClaim | null | undefined,
@@ -197,19 +159,11 @@ export function hasAnyRoleClaim(
 ): boolean {
   if (!token) return false;
   if (roles.length === 0) return false;
-  if (token.roles) {
-    return roles.some((r) => token.roles!.includes(r));
-  }
-  // Legacy fallback: compare against the single role claim
-  return token.role !== null && token.role !== undefined && roles.includes(token.role as Role);
+  return roles.some((r) => token.roles?.includes(r));
 }
 
 /**
- * Returns true if the decoded token carries EVERY given role claim.
- * Dual-claim + null-safe. During the legacy fallback window, satisfiable only
- * when the argument list is exactly one role matching token.role.
- *
- * Name matches the D-08 contract in 01-CONTEXT.md: hasAllRoleClaimsClaim.
+ * Returns true if the decoded token carries EVERY given role claim. Null-safe.
  */
 export function hasAllRoleClaimsClaim(
   token: DecodedRoleClaim | null | undefined,
@@ -217,15 +171,7 @@ export function hasAllRoleClaimsClaim(
 ): boolean {
   if (!token) return false;
   if (roles.length === 0) return true;
-  if (token.roles) {
-    return roles.every((r) => token.roles!.includes(r));
-  }
-  return (
-    roles.length === 1 &&
-    token.role !== null &&
-    token.role !== undefined &&
-    roles[0] === token.role
-  );
+  return roles.every((r) => token.roles?.includes(r));
 }
 
 /**

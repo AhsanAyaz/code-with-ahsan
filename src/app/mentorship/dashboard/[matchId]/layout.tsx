@@ -24,7 +24,6 @@ const MOCK_MATCH_DETAILS: MatchDetails = {
   discordChannelUrl: "",
   partner: {
     uid: "test-partner",
-    role: "mentee",
     roles: ["mentee"],
     displayName: "Test Mentee",
     email: "test@example.com",

@@ -69,8 +69,7 @@ export default function EditProjectPage() {
         const permissionUser: PermissionUser | null = user
           ? {
               uid: user.uid,
-              role: profile?.role || "mentee",
-              roles: profile?.roles,
+              roles: profile?.roles ?? [],
               status: profile?.status,
               isAdmin: isAdmin,
             }

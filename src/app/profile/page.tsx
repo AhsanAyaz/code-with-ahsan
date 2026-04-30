@@ -68,7 +68,7 @@ export default function SettingsPage() {
         })
         .catch((err) => console.error("Failed to load availability:", err));
     }
-  }, [profile?.uid, profile?.roles, profile?.role]);
+  }, [profile?.uid, profile?.roles]);
 
   // Check for calendar connection status from URL params (after OAuth redirect)
   useEffect(() => {
@@ -277,7 +277,7 @@ export default function SettingsPage() {
         <div>
           <h2 className="text-2xl font-bold">Profile Settings</h2>
           <p className="text-base-content/70">
-            Update your {profile.roles?.[0] ?? profile.role} profile details
+            Update your {profile.roles?.[0]} profile details
           </p>
         </div>
         <Link href="/mentorship/dashboard" className="btn btn-ghost btn-sm">

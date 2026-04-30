@@ -18,8 +18,6 @@ export interface AuthContext {
   roles?: string[];
   /** from decoded token.admin custom claim */
   admin?: boolean;
-  /** legacy single-role claim — removed in Deploy #5 */
-  role?: string;
 }
 
 /**
@@ -48,7 +46,6 @@ export async function verifyAuth(request: Request): Promise<AuthContext | null> 
       email: decoded.email ?? "",
       roles: Array.isArray(decoded.roles) ? (decoded.roles as string[]) : undefined,
       admin: decoded.admin === true ? true : undefined,
-      role: typeof decoded.role === "string" ? decoded.role : undefined,
     };
   } catch (err) {
     if (process.env.NODE_ENV === "development") {

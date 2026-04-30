@@ -25,7 +25,9 @@
     "migrate-roles:limit-10": "npx tsx scripts/migrate-roles-to-array.ts --limit=10",
     "sync-claims:dry-run": "npx tsx scripts/sync-custom-claims.ts --dry-run",
     "sync-claims": "npx tsx scripts/sync-custom-claims.ts",
-    "sync-claims:limit-10": "npx tsx scripts/sync-custom-claims.ts --limit=10"
+    "sync-claims:limit-10": "npx tsx scripts/sync-custom-claims.ts --limit=10",
+    "drop-legacy-role:dry-run": "npx tsx scripts/drop-legacy-role-field.ts --dry-run",
+    "drop-legacy-role": "npx tsx scripts/drop-legacy-role-field.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",

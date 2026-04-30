@@ -39,7 +39,7 @@ export default function MyMatchesPage() {
 
       try {
         const response = await fetch(
-          `/api/mentorship/my-matches?uid=${user.uid}&role=${profile.roles?.[0] ?? profile.role ?? ""}`,
+          `/api/mentorship/my-matches?uid=${user.uid}&role=${profile.roles?.[0] ?? ""}`,
         );
         if (response.ok) {
           const data = await response.json();
