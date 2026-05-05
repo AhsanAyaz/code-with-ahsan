@@ -45,6 +45,8 @@ export default function AdminProjectsPage() {
   const [declineTarget, setDeclineTarget] = useState<EnrichedProject | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [deletionSummary, setDeletionSummary] = useState<DeletionSummary | null>(null);
+  const [reviewTarget, setReviewTarget] = useState<EnrichedProject | null>(null);
+  const [declineReason, setDeclineReason] = useState("");
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -201,6 +203,8 @@ export default function AdminProjectsPage() {
         return "badge-info";
       case "declined":
         return "badge-error";
+      case "update_pending":
+        return "badge-warning";
       default:
         return "badge-ghost";
     }
@@ -467,34 +471,50 @@ export default function AdminProjectsPage() {
                           Edit Project
                         </Link>
                       </li>
-                      {project.status === "pending" && (
-                        <>
-                          <li className="border-t border-base-300 pt-2">
-                            <button
-                              className="text-success"
-                              onClick={() => handleApprove(project)}
-                              disabled={actionLoading === project.id}
-                            >
-                              {actionLoading === project.id ? (
-                                <>
-                                  <span className="loading loading-spinner loading-xs"></span>
-                                  Approving...
-                                </>
-                              ) : (
-                                "Approve"
-                              )}
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="text-warning"
-                              onClick={() => setDeclineTarget(project)}
-                            >
-                              Decline
-                            </button>
-                          </li>
-                        </>
-                      )}
+                       {project.status === "pending" && (
+                         <>
+                           <li className="border-t border-base-300 pt-2">
+                             <button
+                               className="text-success"
+                               onClick={() => handleApprove(project)}
+                               disabled={actionLoading === project.id}
+                             >
+                               {actionLoading === project.id ? (
+                                 <>
+                                   <span className="loading loading-spinner loading-xs"></span>
+                                   Approving...
+                                 </>
+                               ) : (
+                                 "Approve"
+                               )}
+                             </button>
+                           </li>
+                           <li>
+                             <button
+                               className="text-warning"
+                               onClick={() => setDeclineTarget(project)}
+                             >
+                               Decline
+                             </button>
+                           </li>
+                         </>
+                       )}
+
+                       {project.status === "update_pending" && project.pendingUpdates && (
+                         <>
+                           <li className="border-t border-base-300 pt-2">
+                             <button
+                               className="text-primary font-medium"
+                               onClick={() => {
+                                 setReviewTarget(project);
+                                 setDeclineReason("");
+                               }}
+                             >
+                               📋 Review Changes
+                             </button>
+                           </li>
+                         </>
+                       )}
                       <li className="border-t border-base-300 pt-2">
                         <button
                           className="text-error"
@@ -536,6 +556,238 @@ export default function AdminProjectsPage() {
           summary={deletionSummary}
           onClose={() => setDeletionSummary(null)}
         />
+      )}
+
+      {/* Review Pending Updates Modal */}
+      {reviewTarget && reviewTarget.pendingUpdates && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-2xl">
+            <h3 className="font-bold text-lg">Review Project Updates</h3>
+            <p className="py-2 text-base-content/70">
+              Review changes requested by project creator for <strong>{reviewTarget.title}</strong>
+            </p>
+
+            <div className="divider"></div>
+
+            {/* Changes Diff */}
+            <div className="space-y-4 max-h-[500px] overflow-y-auto">
+              <h4 className="font-semibold text-sm uppercase text-base-content/70">Proposed Changes:</h4>
+
+              {reviewTarget.pendingUpdates.maxTeamSize && (
+                <div className="card bg-base-200 p-4">
+                  <div className="font-medium">Max Team Size</div>
+                  <div className="grid grid-cols-2 gap-4 mt-2">
+                    <div>
+                      <div className="text-xs text-error line-through">
+                        Current: {reviewTarget.maxTeamSize}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-success font-medium">
+                        Requested: {reviewTarget.pendingUpdates.maxTeamSize}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {reviewTarget.pendingUpdates.title && (
+                <div className="card bg-base-200 p-4">
+                  <div className="font-medium">Title</div>
+                  <div className="grid grid-cols-2 gap-4 mt-2">
+                    <div>
+                      <div className="text-sm text-error line-through">{reviewTarget.title}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-success font-medium">{reviewTarget.pendingUpdates.title}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {reviewTarget.pendingUpdates.description && (
+                <div className="card bg-base-200 p-4">
+                  <div className="font-medium">Description</div>
+                  <div className="mt-2">
+                    <div className="text-sm text-error line-through mb-2">{reviewTarget.description}</div>
+                    <div className="text-sm text-success font-medium">{reviewTarget.pendingUpdates.description}</div>
+                  </div>
+                </div>
+              )}
+
+              {reviewTarget.pendingUpdates.techStack && (
+                <div className="card bg-base-200 p-4">
+                  <div className="font-medium">Tech Stack</div>
+                  <div className="grid grid-cols-2 gap-4 mt-2">
+                    <div>
+                      <div className="text-xs text-error line-through">
+                        {reviewTarget.techStack?.join(", ")}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-success font-medium">
+                        {reviewTarget.pendingUpdates.techStack?.join(", ")}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {"githubRepo" in reviewTarget.pendingUpdates && (
+                <div className="card bg-base-200 p-4">
+                  <div className="font-medium">GitHub Repository</div>
+                  <div className="grid grid-cols-2 gap-4 mt-2">
+                    <div>
+                      <div className="text-xs text-error line-through">
+                        {reviewTarget.githubRepo || "Not set"}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-success font-medium">
+                        {reviewTarget.pendingUpdates.githubRepo || "Remove"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {reviewTarget.pendingUpdates.difficulty && (
+                <div className="card bg-base-200 p-4">
+                  <div className="font-medium">Difficulty</div>
+                  <div className="grid grid-cols-2 gap-4 mt-2">
+                    <div>
+                      <div className="text-xs text-error line-through capitalize">
+                        {reviewTarget.difficulty}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-success font-medium capitalize">
+                        {reviewTarget.pendingUpdates.difficulty}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Decline Reason Input */}
+            <div className="form-control mt-6">
+              <label className="label">
+                <span className="label-text font-semibold">Decline Reason (optional)</span>
+              </label>
+              <textarea
+                placeholder="Enter reason for declining these changes... This will be sent to the project creator."
+                className="textarea textarea-bordered w-full"
+                value={declineReason}
+                onChange={(e) => setDeclineReason(e.target.value)}
+                disabled={actionLoading === reviewTarget.id}
+                rows={3}
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="modal-action mt-6 gap-2">
+              <button
+                onClick={() => setReviewTarget(null)}
+                className="btn btn-ghost"
+                disabled={actionLoading === reviewTarget.id}
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={async () => {
+                  setActionLoading(reviewTarget.id);
+                  try {
+                    const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+                    const response = await fetch(`/api/admin/projects/${reviewTarget.id}`, {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                        ...(token ? { "x-admin-token": token } : {}),
+                      },
+                      body: JSON.stringify({ action: "decline_update", declineReason }),
+                    });
+
+                    if (response.ok) {
+                      toast.success("Project updates declined");
+                      setProjects(prev =>
+                        prev.map(p =>
+                          p.id === reviewTarget.id 
+                            ? { ...p, ...p.pendingUpdates, status: "active", pendingUpdates: undefined } as EnrichedProject
+                            : p
+                        )
+                      );
+                      setReviewTarget(null);
+                      setDeclineReason("");
+                    } else {
+                      const data = await response.json();
+                      toast.error(data.error || "Failed to decline updates");
+                    }
+                  } catch (error) {
+                    toast.error("Failed to decline updates");
+                  } finally {
+                    setActionLoading(null);
+                  }
+                }}
+                className="btn btn-warning"
+                disabled={actionLoading === reviewTarget.id}
+              >
+                {actionLoading === reviewTarget.id ? (
+                  <><span className="loading loading-spinner loading-sm"></span> Declining...</>
+                ) : (
+                  "❌ Decline Changes"
+                )}
+              </button>
+
+              <button
+                onClick={async () => {
+                  setActionLoading(reviewTarget.id);
+                  try {
+                    const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+                    const response = await fetch(`/api/admin/projects/${reviewTarget.id}`, {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                        ...(token ? { "x-admin-token": token } : {}),
+                      },
+                      body: JSON.stringify({ action: "approve_update" }),
+                    });
+
+                    if (response.ok) {
+                      toast.success("Project updates approved successfully");
+                      setProjects(prev =>
+                        prev.map(p =>
+                          p.id === reviewTarget.id 
+                            ? { ...p, ...p.pendingUpdates, status: "active", pendingUpdates: undefined } as EnrichedProject
+                            : p
+                        )
+                      );
+                      setReviewTarget(null);
+                      setDeclineReason("");
+                    } else {
+                      const data = await response.json();
+                      toast.error(data.error || "Failed to approve updates");
+                    }
+                  } catch (error) {
+                    toast.error("Failed to approve updates");
+                  } finally {
+                    setActionLoading(null);
+                  }
+                }}
+                className="btn btn-success"
+                disabled={actionLoading === reviewTarget.id}
+              >
+                {actionLoading === reviewTarget.id ? (
+                  <><span className="loading loading-spinner loading-sm"></span> Approving...</>
+                ) : (
+                  "✅ Approve Changes"
+                )}
+              </button>
+            </div>
+          </div>
+          <div className="modal-backdrop" onClick={() => !actionLoading && setReviewTarget(null)}></div>
+        </div>
       )}
     </div>
   );

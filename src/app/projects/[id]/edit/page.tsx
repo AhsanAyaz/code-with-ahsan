@@ -93,6 +93,15 @@ export default function EditProjectPage() {
         setTechStack(projectData.techStack?.join(", ") || "");
         setDifficulty(projectData.difficulty || "intermediate");
         setMaxTeamSize(projectData.maxTeamSize || 4);
+
+        // If project has pending updates, disable editing
+        if (projectData.status === "update_pending" && !isAdmin) {
+          setError("This project has pending updates waiting for admin approval. You cannot make further changes until they are reviewed.");
+          setTimeout(() => {
+            router.push(`/projects/${projectId}`);
+          }, 3000);
+          return;
+        }
       } catch (err: any) {
         console.error("Error loading project:", err);
         setError(err.message || "Failed to load project");

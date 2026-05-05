@@ -60,6 +60,7 @@ export default function ProjectFilters({
           >
             <option value="">All Statuses</option>
             <option value="pending">Pending</option>
+            <option value="update_pending">Update Pending</option>
             <option value="active">Active</option>
             <option value="completed">Completed</option>
             <option value="declined">Declined</option>
