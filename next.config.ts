@@ -30,6 +30,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/how-to-gde-urdu",
+        destination: "https://www.instagram.com/reel/DTQuzaIjgPS/",
+        permanent: true,
+      },
+      {
         source: "/events/cwa-promptathon/2026/sponsorships",
         destination: "/events/cwa-promptathon/2026/sponsorship",
         permanent: true,
