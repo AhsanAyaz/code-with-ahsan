@@ -175,6 +175,18 @@ export interface AmbassadorSubdoc {
   timezone?: string;
   /** Written by the strike route (REPORT-06) via FieldValue.serverTimestamp(). Not set at acceptance time. */
   updatedAt?: Date;
+
+  // ─── Phase 5 fields ────────────────────────────────────────────────
+  /** DASH-08: Onboarding checklist self-mark flags. Only flags requiring explicit
+   *  user action are stored — `loggedFirstEvent` and `uploadedVideo` are derived
+   *  from event count and cohortPresentationVideoUrl at API time (Pitfall 6). */
+  onboarding?: {
+    joinedDiscord?: boolean;
+    sharedReferralLink?: boolean;
+  };
+  /** ALUMNI-01 / Phase 5 offboarding: timestamp of when the ambassador was offboarded
+   *  via the 2-strike flow. Distinct from `endedAt` (term completion) per ALUMNI-02. */
+  offboardedAt?: Date;
 }
 
 /**
@@ -260,6 +272,13 @@ export interface ApplicationDoc {
   discordRetryNeeded: boolean;
 }
 
+/** DASH-09: Ambassador of the Month shape — shared by CohortDoc.ambassadorOfTheMonth
+ *  and CohortPatchSchema.ambassadorOfTheMonth. */
+export interface AmbassadorOfTheMonth {
+  uid: string;
+  displayName: string;
+}
+
 /**
  * Firestore doc: cohorts/{cohortId}
  */
@@ -276,6 +295,10 @@ export interface CohortDoc {
   applicationWindowOpen: boolean;
   createdAt: Date;
   updatedAt: Date;
+  /** DASH-09: Admin-curated "Ambassador of the Month" for the current cohort.
+   *  Stored as AmbassadorOfTheMonth pair so dashboard can render without a second
+   *  Firestore read. Cleared by admin sending null in PATCH body. */
+  ambassadorOfTheMonth?: AmbassadorOfTheMonth | null;
 }
 
 // ─── API boundary Zod schemas ──────────────────────────────────────
@@ -345,6 +368,14 @@ export const CohortPatchSchema = z
     maxSize: z.number().int().min(1).max(500).optional(),
     status: CohortStatusSchema.optional(),
     applicationWindowOpen: z.boolean().optional(),
+    // DASH-09 — admin sets (or clears via null) the Ambassador of the Month.
+    ambassadorOfTheMonth: z
+      .object({
+        uid: z.string().trim().min(1),
+        displayName: z.string().trim().min(1),
+      })
+      .nullable()
+      .optional(),
   })
   .refine((d) => Object.keys(d).length > 0, { message: "At least one field required" });
 

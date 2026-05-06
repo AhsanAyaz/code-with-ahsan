@@ -689,3 +689,29 @@ export async function sendAmbassadorApplicationDeclinedEmail(
   `;
   return sendEmail(applicantEmail, subject, wrapEmailHtml(content, subject));
 }
+
+/**
+ * EMAIL-04 — Phase 5 offboarding email on 2-strike removal.
+ *
+ * Copy taken verbatim from 05-UI-SPEC §"Offboarding Email (EMAIL-04)".
+ * Tone: kind-but-firm, acknowledges contributions, points at future cohorts.
+ */
+export async function sendAmbassadorOffboardingEmail(
+  recipientEmail: string,
+  displayName: string,
+  cohortName: string,
+): Promise<boolean> {
+  const subject = "Your Ambassador Status — Important Update";
+  const siteUrl = getSiteUrlForAmbassadorEmails();
+  const content = `
+    <h2>Ambassador Program Update</h2>
+    <p>Hi ${displayName},</p>
+    <p>After two confirmed accountability checks, your participation in the <strong>${cohortName}</strong> ambassador cohort has ended.</p>
+    <div class="highlight warning">
+      <p>Your Discord Ambassador role has been removed. Your contributions during your time in the program are genuinely appreciated.</p>
+    </div>
+    <p>Future cohorts remain open. We hope to see you again when the timing is better.<br/>— Ahsan</p>
+    <a href="${siteUrl}/ambassadors" class="button">Learn about future cohorts</a>
+  `;
+  return sendEmail(recipientEmail, subject, wrapEmailHtml(content, subject));
+}

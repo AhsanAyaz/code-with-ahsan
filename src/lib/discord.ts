@@ -935,6 +935,58 @@ export async function assignDiscordRole(
 }
 
 /**
+ * DISC-05 — Phase 5 offboarding: remove the Discord Ambassador role.
+ *
+ * Idempotent semantics:
+ *   - 204 (success) → true
+ *   - 404 (member no longer in guild OR already lacks the role) → true (Pitfall 5)
+ *   - any other 4xx/5xx → false (offboard route surfaces a retry banner)
+ *
+ * Mirrors `assignDiscordRole` exactly — same id/username resolution path,
+ * same logger usage, same try/catch envelope.
+ */
+export async function removeDiscordRole(
+  discordMemberIdOrUsername: string,
+  roleId: string,
+): Promise<boolean> {
+  log.debug(`Removing role ${roleId} from user ${discordMemberIdOrUsername}`);
+  try {
+    let memberId: string;
+    if (/^\d{17,19}$/.test(discordMemberIdOrUsername)) {
+      memberId = discordMemberIdOrUsername;
+    } else {
+      const member = await lookupMemberByUsername(discordMemberIdOrUsername);
+      if (!member) {
+        log.warn(`[Discord] Cannot remove role - user not found: ${discordMemberIdOrUsername}`);
+        // Treat as success — the member is already absent from the guild,
+        // which is the desired post-condition.
+        return true;
+      }
+      memberId = member.id;
+    }
+    const guildId = getGuildId();
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/guilds/${guildId}/members/${memberId}/roles/${roleId}`,
+      { method: "DELETE", headers: getHeaders() },
+    );
+    if (response.status === 204 || response.status === 404) {
+      log.debug(
+        `Role ${roleId} removed from ${discordMemberIdOrUsername} (status ${response.status})`,
+      );
+      return true;
+    }
+    const errorText = await response.text();
+    log.error(
+      `[Discord] Failed to remove role ${roleId}: ${response.status} - ${errorText}`,
+    );
+    return false;
+  } catch (error) {
+    log.error(`[Discord] Error removing role ${roleId}:`, error);
+    return false;
+  }
+}
+
+/**
  * Send a completion announcement to the #find-a-mentor channel
  * Celebrates when a mentor-mentee pair completes their mentorship
  *
