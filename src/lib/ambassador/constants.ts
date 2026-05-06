@@ -73,3 +73,11 @@ export const REFERRAL_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
 /** Phase 4: Event edit window in milliseconds (EVENT-02). 30 days after event date. */
 export const EVENT_EDIT_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+
+/** Phase 5: Top-level Firestore collection for hourly leaderboard snapshot docs (DASH-07).
+ *  Doc id is cohortId. Written by scripts/ambassador-leaderboard-snapshot.ts;
+ *  read by GET /api/ambassador/dashboard/leaderboard. */
+export const LEADERBOARD_SNAPSHOTS_COLLECTION = "leaderboard_snapshots" as const;
+
+/** Phase 5 (DASH-06): Leaderboard grace period in milliseconds — first 4 weeks of cohort. */
+export const LEADERBOARD_GRACE_PERIOD_MS = 28 * 24 * 60 * 60 * 1000;
