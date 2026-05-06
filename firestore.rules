@@ -258,5 +258,14 @@ service cloud.firestore {
     match /ambassador_cron_flags/{flagId} {
       allow read, write: if false;
     }
+
+    // Phase 5 (DASH-07): leaderboard snapshot doc — server-only.
+    // ambassadorRanks contains every ambassador's exact rank; clients must NEVER
+    // read this collection directly. Dashboard reads go through the
+    // /api/ambassador/dashboard/leaderboard route, which extracts only the
+    // requesting ambassador's own rank.
+    match /leaderboard_snapshots/{cohortId} {
+      allow read, write: if false;
+    }
   }
 }
