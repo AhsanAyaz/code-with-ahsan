@@ -171,7 +171,12 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
   4. When an ambassador successfully completes the term, their `ambassador.active` flips to `false` with `endedAt` set and their `mentorship_profiles.roles` atomically swaps `"ambassador"` → `"alumni-ambassador"` (via the shared `roleMutation` helper), and the public profile badge re-renders as "Alumni Ambassador" while `/ambassadors` stops listing them.
   5. When an admin triggers the 2-strike offboarding flow, the ambassador role is revoked from `roles`, the Discord Ambassador role is removed (failures surface in the admin panel with a retry button), cohort membership is marked `ended`, the offboarding email fires, and the user does NOT receive the alumni flag (confirmed distinct from the term-completion alumni transition).
 
-**Plans**: TBD
+**Plans**: 5 plans
+  - [ ] 05-01-foundations-PLAN.md — Constants (LEADERBOARD_SNAPSHOTS_COLLECTION + grace ms), AmbassadorSubdoc/CohortDoc/CohortPatchSchema extensions, removeDiscordRole, sendAmbassadorOffboardingEmail, leaderboard.ts skeleton (Wave 1 / DASH-08, DASH-09, DISC-05, EMAIL-04)
+  - [ ] 05-02-leaderboard-pipeline-PLAN.md — buildLeaderboardSnapshot with 1224 ranking + UTC month + grace math + scripts/ambassador-leaderboard-snapshot.ts + GitHub Actions hourly job (Wave 2 / DASH-03, DASH-04, DASH-05, DASH-06, DASH-07)
+  - [ ] 05-03-dashboard-api-PLAN.md — GET /api/ambassador/dashboard/me (parallel reads + Pitfall 6 derivation) + GET /api/ambassador/dashboard/leaderboard (single doc, no ambassadorRanks leak) + firestore.rules update (Wave 2 / DASH-01, DASH-02, DASH-07)
+  - [ ] 05-04-lifecycle-endpoints-PLAN.md — POST /api/ambassador/members/[uid]/offboard + POST /alumni admin endpoints with atomic batch, soft Discord/email/claim post-commit (Wave 2 / ALUMNI-01, ALUMNI-02, ALUMNI-03, DISC-05, EMAIL-04)
+  - [ ] 05-05-ui-assembly-PLAN.md — /ambassadors/dashboard page + DashboardClient + 5 components (PersonalStatsPanel, OnboardingChecklist, LeaderboardPanel, AmbassadorOfMonthBanner) + OffboardConfirmModal + AlumniTransitionButton wired into MemberDetailClient (Wave 3 / DASH-01..06, DASH-08, DASH-09, ALUMNI-03)
 **UI hint**: yes
 
 ## Progress
@@ -182,7 +187,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 | v6.0 Phase 2: Application Subsystem | 0/9 | Planned | — |
 | v6.0 Phase 3: Public Presentation | 0/6 | Planned | — |
 | v6.0 Phase 4: Activity Subsystem | 0/6 | Planned | — |
-| v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 0/0 | Not started | — |
+| v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 0/5 | Planned | — |
 
 ---
-*Last updated: 2026-04-23 — v6.0 Phase 4 planned (6 plans, 3 waves)*
+*Last updated: 2026-05-06 — v6.0 Phase 5 planned (5 plans, 3 waves)*
