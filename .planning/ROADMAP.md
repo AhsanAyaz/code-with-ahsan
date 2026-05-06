@@ -172,7 +172,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
   5. When an admin triggers the 2-strike offboarding flow, the ambassador role is revoked from `roles`, the Discord Ambassador role is removed (failures surface in the admin panel with a retry button), cohort membership is marked `ended`, the offboarding email fires, and the user does NOT receive the alumni flag (confirmed distinct from the term-completion alumni transition).
 
 **Plans**: 5 plans
-  - [ ] 05-01-foundations-PLAN.md — Constants (LEADERBOARD_SNAPSHOTS_COLLECTION + grace ms), AmbassadorSubdoc/CohortDoc/CohortPatchSchema extensions, removeDiscordRole, sendAmbassadorOffboardingEmail, leaderboard.ts skeleton (Wave 1 / DASH-08, DASH-09, DISC-05, EMAIL-04)
+  - [x] 05-01-foundations-PLAN.md — Constants (LEADERBOARD_SNAPSHOTS_COLLECTION + grace ms), AmbassadorSubdoc/CohortDoc/CohortPatchSchema extensions, removeDiscordRole, sendAmbassadorOffboardingEmail, leaderboard.ts skeleton (Wave 1 / DASH-08, DASH-09, DISC-05, EMAIL-04)
   - [ ] 05-02-leaderboard-pipeline-PLAN.md — buildLeaderboardSnapshot with 1224 ranking + UTC month + grace math + scripts/ambassador-leaderboard-snapshot.ts + GitHub Actions hourly job (Wave 2 / DASH-03, DASH-04, DASH-05, DASH-06, DASH-07)
   - [ ] 05-03-dashboard-api-PLAN.md — GET /api/ambassador/dashboard/me (parallel reads + Pitfall 6 derivation) + GET /api/ambassador/dashboard/leaderboard (single doc, no ambassadorRanks leak) + firestore.rules update (Wave 2 / DASH-01, DASH-02, DASH-07)
   - [ ] 05-04-lifecycle-endpoints-PLAN.md — POST /api/ambassador/members/[uid]/offboard + POST /alumni admin endpoints with atomic batch, soft Discord/email/claim post-commit (Wave 2 / ALUMNI-01, ALUMNI-02, ALUMNI-03, DISC-05, EMAIL-04)
