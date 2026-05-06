@@ -64,7 +64,7 @@ export async function POST(
   const cohort = cohortSnap.exists ? (cohortSnap.data() as CohortDoc) : null;
 
   // Atomic Firestore batch — hard failure boundary.
-  // ALUMNI-02 invariant: NO arrayUnion("alumni-ambassador") here.
+  // ALUMNI-02 invariant: this route must NOT add the alumni-ambassador role.
   const batch = db.batch();
   batch.update(profileRef, { roles: FieldValue.arrayRemove("ambassador") });
   batch.update(subdocRef, {

@@ -66,7 +66,7 @@ export async function POST(
   batch.update(profileRef, {
     roles: FieldValue.arrayRemove("ambassador"),
   });
-  // (3) Subdoc — flip active, set endedAt. Note: NO offboardedAt (ALUMNI-02 boundary).
+  // (3) Subdoc — flip active, set endedAt only (ALUMNI-02: no strike-offboard timestamp here).
   batch.update(subdocRef, {
     active: false,
     endedAt: FieldValue.serverTimestamp(),
