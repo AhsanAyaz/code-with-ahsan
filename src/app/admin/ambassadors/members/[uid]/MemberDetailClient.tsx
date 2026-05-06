@@ -1,17 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { authFetch } from "@/lib/apiClient";
 import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
+import { useToast } from "@/contexts/ToastContext";
 import { ActivitySummaryPanel } from "./ActivitySummaryPanel";
 import { CronFlagsPanel } from "./CronFlagsPanel";
 import { StrikePanel } from "./StrikePanel";
+import { OffboardConfirmModal } from "./OffboardConfirmModal";
+import { AlumniTransitionButton } from "./AlumniTransitionButton";
 
 type MemberDetail = {
   profile: { displayName?: string; email?: string };
   subdoc: {
     cohortId?: string;
+    cohortEndDate?: string | null;
     strikes?: number;
     referralCode?: string;
     timezone?: string;
@@ -44,27 +47,14 @@ function adminHeaders(): HeadersInit {
 }
 
 export function MemberDetailClient({ uid }: { uid: string }) {
-  const router = useRouter();
+  const toast = useToast();
   const [detail, setDetail] = useState<MemberDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [removing, setRemoving] = useState(false);
-
-  const handleRemove = useCallback(async () => {
-    if (!confirm("Remove this ambassador from the program? This deletes their subdoc, public profile, and strips their role.")) return;
-    setRemoving(true);
-    try {
-      const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
-      const res = await fetch(`/api/ambassador/members/${uid}`, {
-        method: "DELETE",
-        headers: token ? { "x-admin-token": token } : {},
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      router.push("/admin/ambassadors/members");
-    } catch {
-      setError("Remove failed. Try again.");
-      setRemoving(false);
-    }
-  }, [uid, router]);
+  const [offboardOpen, setOffboardOpen] = useState(false);
+  const [discordRetryNeeded, setDiscordRetryNeeded] = useState<{
+    displayName: string;
+  } | null>(null);
+  const [retryingDiscord, setRetryingDiscord] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -82,6 +72,45 @@ export function MemberDetailClient({ uid }: { uid: string }) {
   useEffect(() => {
     load();
   }, [load]);
+
+  const retryDiscord = useCallback(async () => {
+    setRetryingDiscord(true);
+    try {
+      const res = await fetch(`/api/ambassador/members/${uid}/offboard`, {
+        method: "POST",
+        headers: adminHeaders(),
+      });
+
+      if (res.status === 409) {
+        // Already inactive — treat as retry success (Discord may have been removed)
+        toast.success("Discord role retried.");
+        setDiscordRetryNeeded(null);
+        return;
+      }
+
+      if (!res.ok) {
+        toast.error("Discord role removal failed again. Try again later.");
+        return;
+      }
+
+      const data = (await res.json()) as {
+        success: boolean;
+        discordRemoved: boolean;
+        emailSent: boolean;
+      };
+
+      if (data.discordRemoved) {
+        toast.success("Discord role removed.");
+        setDiscordRetryNeeded(null);
+      } else {
+        toast.error("Discord role removal failed again. Try again later.");
+      }
+    } catch {
+      toast.error("Discord role removal failed again. Try again later.");
+    } finally {
+      setRetryingDiscord(false);
+    }
+  }, [uid, toast]);
 
   if (error) {
     return (
@@ -111,13 +140,31 @@ export function MemberDetailClient({ uid }: { uid: string }) {
           )}
         </div>
         <button
+          type="button"
           className="btn btn-outline btn-error btn-sm"
-          onClick={handleRemove}
-          disabled={removing}
+          onClick={() => setOffboardOpen(true)}
+          disabled={!(detail.subdoc.active ?? true)}
         >
-          {removing ? "Removing…" : "Remove from program"}
+          Offboard ambassador
         </button>
       </header>
+
+      {discordRetryNeeded && (
+        <div role="alert" className="alert alert-error">
+          <div>
+            <h3 className="font-bold">Discord role removal failed</h3>
+            <span>{"Discord role removal failed — retry below. The Firestore record has already been updated."}</span>
+          </div>
+          <button
+            type="button"
+            className="btn btn-outline btn-sm btn-error"
+            onClick={retryDiscord}
+            disabled={retryingDiscord}
+          >
+            {retryingDiscord ? "Retrying…" : "Retry Discord removal"}
+          </button>
+        </div>
+      )}
 
       <ActivitySummaryPanel
         eventsCount={detail.recentEvents.filter((e) => !e.hidden).length}
@@ -133,6 +180,16 @@ export function MemberDetailClient({ uid }: { uid: string }) {
         displayName={displayName}
         strikes={detail.subdoc.strikes ?? 0}
         onStrikeIncremented={load}
+      />
+
+      <div className="divider" />
+
+      <AlumniTransitionButton
+        uid={uid}
+        displayName={displayName}
+        cohortEndDate={detail.subdoc.cohortEndDate ?? null}
+        subdocActive={detail.subdoc.active ?? false}
+        onCompleted={load}
       />
 
       <section className="card bg-base-100 shadow-xl">
@@ -177,6 +234,19 @@ export function MemberDetailClient({ uid }: { uid: string }) {
           )}
         </div>
       </section>
+
+      <OffboardConfirmModal
+        uid={uid}
+        displayName={displayName}
+        isOpen={offboardOpen}
+        onClose={() => setOffboardOpen(false)}
+        onCompleted={(result) => {
+          if (!result.discordRemoved) {
+            setDiscordRetryNeeded({ displayName });
+          }
+          load();
+        }}
+      />
     </div>
   );
 }
