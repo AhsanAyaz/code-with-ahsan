@@ -14,7 +14,7 @@ function getTodayUTC(): string {
  *   { action: "spin" }
  *     → Writes state "spinning", picks random winner, returns { winnerName, docId }
  *   { action: "confirm", winnerName: string, docId: string }
- *     → Writes state "winner", deletes winner doc from pool
+ *     → Writes state "winner", marks winner doc won:true (email preserved)
  *   { action: "reset" }
  *     → Writes state "idle", winnerName null
  */
@@ -49,7 +49,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const entries = snap.docs;
+    // Exclude already-won entries so the same person can't win twice
+    const entries = snap.docs.filter((d) => !d.data().won);
+    if (entries.length === 0) {
+      return NextResponse.json(
+        { error: "All entries have already won today" },
+        { status: 400 },
+      );
+    }
+
     const winner = entries[Math.floor(Math.random() * entries.length)];
     const winnerData = winner.data();
 
@@ -85,12 +93,15 @@ export async function POST(request: NextRequest) {
       updatedAt: FieldValue.serverTimestamp(),
     });
 
-    // Remove winner from the raffle pool
+    // Mark winner so they're excluded from future spins — email is kept
     try {
-      await db.collection("mas-raffle-emails").doc(docId).delete();
+      await db.collection("mas-raffle-emails").doc(docId).update({
+        won: true,
+        wonAt: FieldValue.serverTimestamp(),
+      });
     } catch (err) {
       // Non-fatal: log and continue — winner is already shown
-      console.error("[mas-raffle/spin] Failed to delete winner doc:", err);
+      console.error("[mas-raffle/spin] Failed to mark winner doc:", err);
     }
 
     return NextResponse.json({ ok: true });

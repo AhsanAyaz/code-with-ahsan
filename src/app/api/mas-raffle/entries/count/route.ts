@@ -15,13 +15,16 @@ export async function GET(request: NextRequest) {
 
   try {
     const today = getTodayUTC();
+    // Fetch all today's entries and filter in code so entries without the
+    // won field (submitted before the won flag was introduced) are counted correctly.
     const snap = await db
       .collection("mas-raffle-emails")
       .where("date", "==", today)
-      .count()
       .get();
 
-    return NextResponse.json({ count: snap.data().count });
+    const eligible = snap.docs.filter((d) => !d.data().won).length;
+
+    return NextResponse.json({ count: eligible });
   } catch (error) {
     console.error("[mas-raffle/entries/count] GET error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
