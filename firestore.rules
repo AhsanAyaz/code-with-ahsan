@@ -267,5 +267,24 @@ service cloud.firestore {
     match /leaderboard_snapshots/{cohortId} {
       allow read, write: if false;
     }
+
+    // ─── MAS Raffle Entries (public write, no read) ────────────────────────
+    // Anyone can submit an entry; reads are server-only (Admin SDK bypasses rules).
+    match /mas-raffle-emails/{entryId} {
+      allow create: if request.resource.data.keys().hasAll(["name","email","newsletter","date","submittedAt"])
+                    && request.resource.data.name is string
+                    && request.resource.data.email is string
+                    && request.resource.data.newsletter is bool
+                    && request.resource.data.date is string;
+      allow read, update, delete: if false;
+    }
+
+    // ─── MAS Raffle State (public read current doc, admin write) ──────────
+    // Public viewers subscribe to this doc via onSnapshot for real-time updates.
+    // Only the Admin SDK (server-side spin/reset routes) may write.
+    match /mas-raffle-state/{docId} {
+      allow read: if docId == "current";
+      allow write: if false; // Admin SDK only
+    }
   }
 }
