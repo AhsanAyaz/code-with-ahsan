@@ -144,6 +144,7 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | 260409-lsg | add Re-activate button to cancelled mentorship cards (GH-160) | 2026-04-09 | 852e56d | [260409-lsg-add-button-to-re-activate-mentorship-for](./quick/260409-lsg-add-button-to-re-activate-mentorship-for/) |
 | 260410 | CRO audit and optimize rates page (CTAs, social proof, collapsible a la carte) | 2026-04-09 | d11b30f | [260410-cro-audit-and-optimize-mentorship-rates-](./quick/260410-cro-audit-and-optimize-mentorship-rates-/) |
 | 260411 | update inactivity warning message to @mention mentor and mentee (GH-151) | 2026-04-10 | 3fa2bff | [260411-update-inactivity-warning-message-to-men](./quick/260411-update-inactivity-warning-message-to-men/) |
+| 260507-g81 | /mas-raffle page with entry form, real-time wheel spin, and admin spin control | 2026-05-07 | dc343d6 | [260507-g81-mas-raffle-page-with-entry-form-real-tim](./quick/260507-g81-mas-raffle-page-with-entry-form-real-tim/) |
 | Phase 01 P01 | 2min | 1 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P02 | 3 min | 3 tasks | 6 files |
 | Phase 01-foundation-roles-array-migration P04 | 2 min | 2 tasks | 3 files |
