@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { getFirestore, doc, onSnapshot } from "firebase/firestore";
-import { getApp } from "firebase/app";
 import confetti from "canvas-confetti";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -65,39 +63,40 @@ export function MasRaffleClient() {
       if (localStorage.getItem(getTodayKey())) setUiState("waiting");
     }
 
-    const db = getFirestore(getApp());
-    const unsubscribe = onSnapshot(
-      doc(db, "mas-raffle-state", "current"),
-      (snap) => {
-        if (!snap.exists()) return;
-        const data = snap.data() as RaffleState;
-
-        if (data.state === "spinning") {
-          setUiState("spinning");
-          confettiFired.current = false;
-        } else if (data.state === "winner") {
-          setWinnerName(data.winnerName);
-          setUiState("winner");
-          if (!confettiFired.current) {
-            confettiFired.current = true;
-            confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 }, colors: ["#FBBF24", "#F59E0B", "#ffffff", "#FDE68A"] });
-          }
-        } else if (data.state === "idle") {
-          setUiState((prev) => {
-            if (prev === "winner" || prev === "spinning") {
-              const already = typeof window !== "undefined" ? localStorage.getItem(getTodayKey()) : null;
-              return already ? "waiting" : "form";
-            }
-            return prev;
-          });
+    function applyRaffleState(data: { state: string; winnerName: string | null }) {
+      if (data.state === "spinning") {
+        setUiState("spinning");
+        confettiFired.current = false;
+      } else if (data.state === "winner") {
+        setWinnerName(data.winnerName);
+        setUiState("winner");
+        if (!confettiFired.current) {
+          confettiFired.current = true;
+          confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 }, colors: ["#FBBF24", "#F59E0B", "#ffffff", "#FDE68A"] });
         }
-      },
-      (err) => {
-        console.error("[MasRaffleClient] Firestore onSnapshot error:", err);
-      },
-    );
+      } else if (data.state === "idle") {
+        setUiState((prev) => {
+          if (prev === "winner" || prev === "spinning") {
+            const already = typeof window !== "undefined" ? localStorage.getItem(getTodayKey()) : null;
+            return already ? "waiting" : "form";
+          }
+          return prev;
+        });
+      }
+    }
 
-    return unsubscribe;
+    async function pollState() {
+      try {
+        const res = await fetch("/api/mas-raffle/state");
+        if (res.ok) applyRaffleState(await res.json());
+      } catch {
+        // silent — network blip, next poll will recover
+      }
+    }
+
+    pollState();
+    const interval = setInterval(pollState, 2000);
+    return () => clearInterval(interval);
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {

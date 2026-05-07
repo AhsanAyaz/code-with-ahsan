@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { getFirestore, doc, onSnapshot } from "firebase/firestore";
-import { getApp } from "firebase/app";
 import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -46,30 +44,29 @@ export function AdminRaffleClient() {
     null,
   );
 
-  // ── Subscribe to raffle state + poll entry count ────────────────────────
+  // ── Poll raffle state + entry count ─────────────────────────────────────
   useEffect(() => {
-    const db = getFirestore(getApp());
-    const unsubscribe = onSnapshot(
-      doc(db, "mas-raffle-state", "current"),
-      (snap) => {
-        if (snap.exists()) {
-          setRaffleState(snap.data() as RaffleState);
-        } else {
-          setRaffleState({ state: "idle", winnerName: null, date: "" });
+    async function pollRaffleState() {
+      try {
+        const res = await fetch("/api/mas-raffle/state");
+        if (res.ok) {
+          const data = await res.json();
+          setRaffleState({ state: data.state, winnerName: data.winnerName, date: "" });
         }
-      },
-      (err) => {
-        console.error("[AdminRaffleClient] Firestore onSnapshot error:", err);
-        setRaffleState({ state: "idle", winnerName: null, date: "" });
-      },
-    );
+      } catch {
+        // silent — next poll will recover
+      }
+    }
 
+    pollRaffleState();
     fetchEntryCount();
-    const pollInterval = setInterval(fetchEntryCount, 5000);
+
+    const stateInterval = setInterval(pollRaffleState, 2000);
+    const countInterval = setInterval(fetchEntryCount, 5000);
 
     return () => {
-      unsubscribe();
-      clearInterval(pollInterval);
+      clearInterval(stateInterval);
+      clearInterval(countInterval);
     };
   }, []);
 
