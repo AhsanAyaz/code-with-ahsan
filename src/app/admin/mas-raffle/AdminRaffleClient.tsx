@@ -46,7 +46,7 @@ export function AdminRaffleClient() {
     null,
   );
 
-  // ── Subscribe to raffle state + fetch entry count on mount ───────────────
+  // ── Subscribe to raffle state + poll entry count ────────────────────────
   useEffect(() => {
     const db = getFirestore(getApp());
     const unsubscribe = onSnapshot(
@@ -65,8 +65,12 @@ export function AdminRaffleClient() {
     );
 
     fetchEntryCount();
+    const pollInterval = setInterval(fetchEntryCount, 5000);
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+      clearInterval(pollInterval);
+    };
   }, []);
 
   async function fetchEntryCount() {
