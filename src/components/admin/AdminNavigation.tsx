@@ -17,6 +17,7 @@ export default function AdminNavigation() {
     { label: "Roadmaps", href: "/admin/roadmaps", exact: false },
     { label: "Courses", href: "/admin/courses", exact: false },
     { label: "Events", href: "/admin/events", exact: false },
+    { label: "MAS Raffle", href: "/admin/mas-raffle", exact: false },
   ];
 
   const isActive = (href: string, exact: boolean) => {

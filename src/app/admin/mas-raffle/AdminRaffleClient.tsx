@@ -58,6 +58,10 @@ export function AdminRaffleClient() {
           setRaffleState({ state: "idle", winnerName: null, date: "" });
         }
       },
+      (err) => {
+        console.error("[AdminRaffleClient] Firestore onSnapshot error:", err);
+        setRaffleState({ state: "idle", winnerName: null, date: "" });
+      },
     );
 
     fetchEntryCount();

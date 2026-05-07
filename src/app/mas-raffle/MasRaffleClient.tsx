@@ -92,6 +92,9 @@ export function MasRaffleClient() {
           });
         }
       },
+      (err) => {
+        console.error("[MasRaffleClient] Firestore onSnapshot error:", err);
+      },
     );
 
     return unsubscribe;
