@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: context exhaustion at 90% (2026-05-07)
-last_updated: "2026-05-07T09:52:26.404Z"
+stopped_at: "Completed quick-260508-m0c: add daily GitHub Action to sync Discord stats"
+last_updated: "2026-05-08T13:56:45.635Z"
 last_activity: 2026-05-06 -- Phase --phase execution started
 progress:
   total_phases: 5
@@ -111,6 +111,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 03-05]: getCurrentCohortId fallback: status=active preferred, most-recent startDate as fallback, null if no cohorts
 - [Phase 03-05]: Server component reads db directly on /ambassadors — no internal fetch to /api/ambassadors/public to avoid URL-resolution footgun
 - [Phase 03-05]: Sort updatedAt ASC on public_ambassadors projection (monotonic proxy for acceptance order) — joinedAt lives on subdoc and not duplicated to avoid schema drift
+- Cron at 05:30 UTC (+30 min from mentor-pending-reminders) avoids runner contention; platform_stats fetch isolated with .catch() for graceful /api/stats fallback; discord static fallback bumped 4500->5000
 
 ### Workflow Notes
 
@@ -146,6 +147,7 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | 260411 | update inactivity warning message to @mention mentor and mentee (GH-151) | 2026-04-10 | 3fa2bff | [260411-update-inactivity-warning-message-to-men](./quick/260411-update-inactivity-warning-message-to-men/) |
 | 260507-g81 | /mas-raffle page with entry form, real-time wheel spin, and admin spin control | 2026-05-07 | dc343d6 | [260507-g81-mas-raffle-page-with-entry-form-real-tim](./quick/260507-g81-mas-raffle-page-with-entry-form-real-tim/) |
 | 260508-fvi | Rename mas-raffle → generic raffle with dynamic title field | 2026-05-08 | 2129d64 | [260508-fvi-rename-mas-raffle-to-generic-raffle](./quick/260508-fvi-rename-mas-raffle-to-generic-raffle/) |
+| 260508-m0c | Add daily GitHub Action to sync Discord guild member count to Firestore; surface live count via /api/stats | 2026-05-08 | 2ff5dd2 | [260508-m0c-add-daily-github-action-to-sync-discord-](./quick/260508-m0c-add-daily-github-action-to-sync-discord-/) |
 | Phase 01 P01 | 2min | 1 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P02 | 3 min | 3 tasks | 6 files |
 | Phase 01-foundation-roles-array-migration P04 | 2 min | 2 tasks | 3 files |
@@ -164,11 +166,12 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 03 P03-04 | 2min | 3 tasks | 4 files |
 | Phase 03-public-presentation P03-06 | 3min | 3 tasks | 2 files |
 | Phase 03-public-presentation P03-05 | 45 | 4 tasks | 5 files |
+| Phase quick-260508-m0c P01 | 57402 | 3 tasks | 4 files |
 
 ## Session Continuity
 
-Last session: 2026-05-07T09:52:26.316Z
-Stopped at: context exhaustion at 90% (2026-05-07)
+Last session: 2026-05-08T13:56:33.438Z
+Stopped at: Completed quick-260508-m0c: add daily GitHub Action to sync Discord stats
 Resume file: None
 
 ---
