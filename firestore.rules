@@ -268,6 +268,47 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // ─── Courses: Enrollment ─────────────────────────────────────────────────
+    // Client SDK reads/writes enrollment docs directly (EnrollmentService.js).
+    // Doc ID format: {courseSlug}_{userId}
+    match /enrollment/{docId} {
+      // Any signed-in user can read — needed for own-doc checks AND aggregate
+      // count queries (courseId filter) used to display enrollment counts.
+      allow read: if isSignedIn();
+      // Only the enrolling user can create their own record.
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      // Users can update (mark lessons) and delete (unenroll) their own record.
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // ─── Courses: Assignments ─────────────────────────────────────────────────
+    // Subcollection path: assignments/{courseSlug}/{userId}/{docId}
+    match /assignments/{courseSlug}/{userId}/{docId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ─── Courses: Project Submissions ────────────────────────────────────────
+    // Path: cwa-web/project-submissions/{courseSlug}/{userId}
+    // The submissions page lists ALL submissions for a course (community view),
+    // so reads are open to any signed-in user. Writes are restricted to own doc.
+    match /cwa-web/project-submissions/{courseSlug}/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ─── Events ──────────────────────────────────────────────────────────────
+    // Public event pages (e.g. promptathon winners display) use onSnapshot
+    // on events/{eventId}/winners/data — publicly readable, admin-only writes.
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if isAdmin();
+      match /{document=**} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+
     // ─── Raffle Entries (public write, no read) ────────────────────────────
     // Anyone can submit an entry; reads are server-only (Admin SDK bypasses rules).
     match /raffle-entries/{entryId} {
