@@ -7,16 +7,10 @@ import confetti from "canvas-confetti";
 
 type UiState = "form" | "waiting" | "spinning" | "winner";
 
-interface RaffleState {
-  state: "idle" | "spinning" | "winner";
-  winnerName: string | null;
-  date: string;
-}
-
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 function getTodayKey(): string {
-  return `mas-raffle-submitted-${new Date().toISOString().slice(0, 10)}`;
+  return `raffle-submitted-${new Date().toISOString().slice(0, 10)}`;
 }
 
 // ── Shared card wrapper ────────────────────────────────────────────────────
@@ -48,9 +42,10 @@ function GoldCard({
 
 // ── Component ──────────────────────────────────────────────────────────────
 
-export function MasRaffleClient() {
+export function RaffleClient() {
   const [uiState, setUiState] = useState<UiState>("form");
   const [winnerName, setWinnerName] = useState<string | null>(null);
+  const [title, setTitle] = useState<string>("Raffle");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [newsletter, setNewsletter] = useState(true);
@@ -63,7 +58,8 @@ export function MasRaffleClient() {
       if (localStorage.getItem(getTodayKey())) setUiState("waiting");
     }
 
-    function applyRaffleState(data: { state: string; winnerName: string | null }) {
+    function applyRaffleState(data: { state: string; winnerName: string | null; title?: string }) {
+      setTitle(data.title ?? "Raffle");
       if (data.state === "spinning") {
         setUiState("spinning");
         confettiFired.current = false;
@@ -87,7 +83,7 @@ export function MasRaffleClient() {
 
     async function pollState() {
       try {
-        const res = await fetch("/api/mas-raffle/state");
+        const res = await fetch("/api/raffle/state");
         if (res.ok) applyRaffleState(await res.json());
       } catch {
         // silent — network blip, next poll will recover
@@ -104,7 +100,7 @@ export function MasRaffleClient() {
     setSubmitting(true);
     setSubmitError("");
     try {
-      const res = await fetch("/api/mas-raffle/entries", {
+      const res = await fetch("/api/raffle/entries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), email: email.trim(), newsletter }),
@@ -174,10 +170,10 @@ export function MasRaffleClient() {
                 className="text-3xl font-black mb-2 tracking-tight"
                 style={{ color: "#FBBF24" }}
               >
-                MAS Raffle
+                {title}
               </h1>
               <p className="text-sm" style={{ color: "rgba(241,245,249,0.5)" }}>
-                Code With Ahsan · Conference Draw
+                Code With Ahsan
               </p>
             </div>
 
@@ -278,6 +274,9 @@ export function MasRaffleClient() {
         `}</style>
         <GoldCard>
           <div style={{ animation: "fadeUp 0.5s ease both" }} className="flex flex-col items-center gap-6 text-center w-full">
+            <p className="text-xs font-bold uppercase tracking-[0.25em]" style={{ color: "rgba(251,191,36,0.6)" }}>
+              {title}
+            </p>
             <div
               className="w-24 h-24 rounded-full flex items-center justify-center text-4xl"
               style={{
@@ -331,6 +330,9 @@ export function MasRaffleClient() {
           aria-live="polite"
           aria-atomic="true"
         >
+          <p className="text-xs font-bold uppercase tracking-[0.25em]" style={{ color: "rgba(251,191,36,0.6)" }}>
+            {title}
+          </p>
           {/* Triple-ring wheel */}
           <div className="relative flex items-center justify-center" style={{ width: 200, height: 200 }}>
             <div
@@ -450,7 +452,7 @@ export function MasRaffleClient() {
           />
 
           <p className="text-xs" style={{ color: "rgba(241,245,249,0.3)" }}>
-            Code With Ahsan · MAS Raffle
+            {`Code With Ahsan · ${title}`}
           </p>
         </div>
       </div>

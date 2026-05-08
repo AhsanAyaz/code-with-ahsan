@@ -9,6 +9,7 @@ interface RaffleState {
   state: "idle" | "spinning" | "winner";
   winnerName: string | null;
   date: string;
+  title: string;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -39,6 +40,7 @@ export function AdminRaffleClient() {
   const [raffleState, setRaffleState] = useState<RaffleState | null>(null);
   const [entryCount, setEntryCount] = useState<number | null>(null);
   const [spinning, setSpinning] = useState(false);
+  const [title, setTitle] = useState<string>("Raffle");
   const [error, setError] = useState("");
   const pendingWinner = useRef<{ winnerName: string; docId: string } | null>(
     null,
@@ -48,10 +50,11 @@ export function AdminRaffleClient() {
   useEffect(() => {
     async function pollRaffleState() {
       try {
-        const res = await fetch("/api/mas-raffle/state");
+        const res = await fetch("/api/raffle/state");
         if (res.ok) {
           const data = await res.json();
-          setRaffleState({ state: data.state, winnerName: data.winnerName, date: "" });
+          setRaffleState({ state: data.state, winnerName: data.winnerName, date: "", title: data.title ?? "Raffle" });
+          setTitle(data.title ?? "Raffle");
         }
       } catch {
         // silent — next poll will recover
@@ -72,7 +75,7 @@ export function AdminRaffleClient() {
 
   async function fetchEntryCount() {
     try {
-      const res = await fetch("/api/mas-raffle/entries/count", {
+      const res = await fetch("/api/raffle/entries/count", {
         headers: adminHeaders(),
       });
       if (res.ok) {
@@ -91,10 +94,10 @@ export function AdminRaffleClient() {
 
     try {
       // Step 1: Pick winner + write "spinning" state
-      const res = await fetch("/api/mas-raffle/spin", {
+      const res = await fetch("/api/raffle/spin", {
         method: "POST",
         headers: { ...adminHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "spin" }),
+        body: JSON.stringify({ action: "spin", title: title.trim() || "Raffle" }),
       });
 
       if (!res.ok) {
@@ -116,7 +119,7 @@ export function AdminRaffleClient() {
         if (!winner) return;
 
         try {
-          const confirmRes = await fetch("/api/mas-raffle/spin", {
+          const confirmRes = await fetch("/api/raffle/spin", {
             method: "POST",
             headers: { ...adminHeaders(), "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -152,7 +155,7 @@ export function AdminRaffleClient() {
   async function handleReset() {
     setError("");
     try {
-      const res = await fetch("/api/mas-raffle/spin", {
+      const res = await fetch("/api/raffle/spin", {
         method: "POST",
         headers: { ...adminHeaders(), "Content-Type": "application/json" },
         body: JSON.stringify({ action: "reset" }),
@@ -172,8 +175,7 @@ export function AdminRaffleClient() {
 
   const currentState = raffleState?.state ?? "idle";
   const isWinner = currentState === "winner";
-  const canSpin =
-    !spinning && currentState !== "winner" && (entryCount ?? 0) > 0;
+  const canSpin = !spinning && currentState === "idle" && (entryCount ?? 0) > 0;
 
   return (
     <div className="min-h-screen bg-base-200 flex items-center justify-center p-6">
@@ -182,13 +184,35 @@ export function AdminRaffleClient() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <h1 className="card-title text-2xl font-bold">
-              MAS Raffle — Admin
+              Raffle — Admin
             </h1>
             {raffleState && (
               <span className={`badge badge-lg ${STATE_BADGE[currentState]}`}>
                 {STATE_LABEL[currentState]}
               </span>
             )}
+          </div>
+
+          {/* Raffle Title input */}
+          <div className="form-control">
+            <label className="label" htmlFor="raffle-title">
+              <span className="label-text font-semibold">Raffle Title</span>
+            </label>
+            <input
+              id="raffle-title"
+              type="text"
+              className="input input-bordered"
+              placeholder="e.g., MAS Raffle, AI Summit Draw"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled={spinning || currentState !== "idle"}
+              maxLength={80}
+            />
+            <label className="label">
+              <span className="label-text-alt opacity-60">
+                Shown to the audience. Defaults to &quot;Raffle&quot; if left empty.
+              </span>
+            </label>
           </div>
 
           {/* Entry count stat */}

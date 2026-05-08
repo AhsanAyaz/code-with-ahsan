@@ -6,7 +6,7 @@ function getTodayUTC(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-// GET /api/mas-raffle/entries/count — admin-gated
+// GET /api/raffle/entries/count — admin-gated
 export async function GET(request: NextRequest) {
   const admin = await requireAdmin(request);
   if (!admin.ok) {
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     // Fetch all today's entries and filter in code so entries without the
     // won field (submitted before the won flag was introduced) are counted correctly.
     const snap = await db
-      .collection("mas-raffle-emails")
+      .collection("raffle-entries")
       .where("date", "==", today)
       .get();
 
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ count: eligible });
   } catch (error) {
-    console.error("[mas-raffle/entries/count] GET error:", error);
+    console.error("[raffle/entries/count] GET error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

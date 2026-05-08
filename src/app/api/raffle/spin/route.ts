@@ -8,15 +8,15 @@ function getTodayUTC(): string {
 }
 
 /**
- * POST /api/mas-raffle/spin
+ * POST /api/raffle/spin
  *
  * Body shapes (all admin-gated):
- *   { action: "spin" }
- *     → Writes state "spinning", picks random winner, returns { winnerName, docId }
+ *   { action: "spin", title: string }
+ *     → Writes state "spinning" with title, picks random winner, returns { winnerName, docId }
  *   { action: "confirm", winnerName: string, docId: string }
- *     → Writes state "winner", marks winner doc won:true (email preserved)
+ *     → Writes state "winner" (preserves existing title), marks winner doc won:true (email preserved)
  *   { action: "reset" }
- *     → Writes state "idle", winnerName null
+ *     → Writes state "idle" (preserves existing title), winnerName null
  */
 export async function POST(request: NextRequest) {
   const admin = await requireAdmin(request);
@@ -33,12 +33,12 @@ export async function POST(request: NextRequest) {
 
   const { action } = body;
   const today = getTodayUTC();
-  const stateRef = db.collection("mas-raffle-state").doc("current");
+  const stateRef = db.collection("raffle-state").doc("current");
 
   // ── SPIN ──────────────────────────────────────────────────────────────────
   if (action === "spin") {
     const snap = await db
-      .collection("mas-raffle-emails")
+      .collection("raffle-entries")
       .where("date", "==", today)
       .get();
 
@@ -61,12 +61,15 @@ export async function POST(request: NextRequest) {
     const winner = entries[Math.floor(Math.random() * entries.length)];
     const winnerData = winner.data();
 
+    const spinTitle = (typeof body.title === "string" && body.title.trim()) ? body.title.trim() : "Raffle";
+
     // Write "spinning" state so all public viewers see the animation
     await stateRef.set({
       state: "spinning",
       winnerName: winnerData.name as string,
       date: today,
       updatedAt: FieldValue.serverTimestamp(),
+      title: spinTitle,
     });
 
     return NextResponse.json({
@@ -85,23 +88,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Preserve existing title from raffle-state/current
+    const existing = await stateRef.get();
+    const existingTitle = (existing.exists && (existing.data()?.title as string | undefined)) ?? "Raffle";
+
     // Write "winner" state — all viewers see the winner reveal
     await stateRef.set({
       state: "winner",
       winnerName,
       date: today,
       updatedAt: FieldValue.serverTimestamp(),
+      title: existingTitle,
     });
 
     // Mark winner so they're excluded from future spins — email is kept
     try {
-      await db.collection("mas-raffle-emails").doc(docId).update({
+      await db.collection("raffle-entries").doc(docId).update({
         won: true,
         wonAt: FieldValue.serverTimestamp(),
       });
     } catch (err) {
       // Non-fatal: log and continue — winner is already shown
-      console.error("[mas-raffle/spin] Failed to mark winner doc:", err);
+      console.error("[raffle/spin] Failed to mark winner doc:", err);
     }
 
     return NextResponse.json({ ok: true });
@@ -109,11 +117,16 @@ export async function POST(request: NextRequest) {
 
   // ── RESET ─────────────────────────────────────────────────────────────────
   if (action === "reset") {
+    // Preserve existing title so admin can spin again with same event branding
+    const existing = await stateRef.get();
+    const existingTitle = (existing.exists && (existing.data()?.title as string | undefined)) ?? "Raffle";
+
     await stateRef.set({
       state: "idle",
       winnerName: null,
       date: today,
       updatedAt: FieldValue.serverTimestamp(),
+      title: existingTitle,
     });
 
     return NextResponse.json({ ok: true });
