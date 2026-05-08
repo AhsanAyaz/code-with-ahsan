@@ -50,3 +50,9 @@ codewithahsan-revamp*
 # Logs
 logs/
 scripts/output/
+firebase-debug.log
+firestore-debug.log
+
+# Claude Code internals
+.claude/scheduled_tasks.lock
+.claude/worktrees/
