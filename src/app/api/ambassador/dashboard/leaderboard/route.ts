@@ -3,29 +3,23 @@
  *
  * GET /api/ambassador/dashboard/leaderboard?view=cumulative|this_month
  *   Default view = "cumulative".
- *   Reads: leaderboard_snapshots/{currentCohortId} (single doc; written hourly by Plan 02 cron)
+ *   Computes live via buildLeaderboardSnapshot with a 5-minute in-memory cache.
+ *   (Snapshot cron removed — cohort is small enough that live computation is cheap.)
  *
  * CRITICAL (RESEARCH §"Anti-Patterns to Avoid"):
  *   - The full ambassadorRanks map MUST NOT leak to the client.
  *   - Return only `top3` per category + ownRank for the requesting ambassador.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/firebaseAdmin";
 import { verifyAuth } from "@/lib/auth";
 import { hasRoleClaim, type DecodedRoleClaim } from "@/lib/permissions";
 import { isAmbassadorProgramEnabled } from "@/lib/features";
-import { LEADERBOARD_SNAPSHOTS_COLLECTION } from "@/lib/ambassador/constants";
 import { getCurrentCohortId } from "@/lib/ambassador/currentCohort";
-import type { LeaderboardSnapshot } from "@/lib/ambassador/leaderboard";
+import { buildLeaderboardSnapshot, type LeaderboardSnapshot } from "@/lib/ambassador/leaderboard";
 
-function isoOrNull(v: unknown): string | null {
-  if (!v) return null;
-  const t = v as { toDate?: () => Date };
-  if (typeof t.toDate === "function") return t.toDate().toISOString();
-  if (v instanceof Date) return v.toISOString();
-  if (typeof v === "string") return v;
-  return null;
-}
+// 5-minute in-memory cache keyed by cohortId
+const cache = new Map<string, { snapshot: LeaderboardSnapshot; expiresAt: number }>();
+const CACHE_TTL_MS = 5 * 60 * 1000;
 
 export async function GET(request: NextRequest) {
   if (!isAmbassadorProgramEnabled()) {
@@ -47,18 +41,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ snapshot: null }, { status: 200 });
   }
 
-  const snap = await db
-    .collection(LEADERBOARD_SNAPSHOTS_COLLECTION)
-    .doc(cohortId)
-    .get();
+  const now = Date.now();
+  const cached = cache.get(cohortId);
+  let data: LeaderboardSnapshot;
 
-  if (!snap.exists) {
-    return NextResponse.json({ snapshot: null }, { status: 200 });
+  if (cached && now < cached.expiresAt) {
+    data = cached.snapshot;
+  } else {
+    data = await buildLeaderboardSnapshot(cohortId);
+    cache.set(cohortId, { snapshot: data, expiresAt: now + CACHE_TTL_MS });
   }
 
-  const data = snap.data() as LeaderboardSnapshot & {
-    updatedAt?: { toDate?: () => Date } | string;
-  };
   const window = view === "this_month" ? data.thisMonth : data.cumulative;
 
   // Anti-pattern guard: extract own rank only — never spread ambassadorRanks.
@@ -73,7 +66,7 @@ export async function GET(request: NextRequest) {
       reportsOnTime: window.reportsOnTime,
     },
     ownRank,
-    updatedAt: isoOrNull(data.updatedAt),
+    updatedAt: data.updatedAt,
     graceEndDate: data.graceEndDate ?? null,
     month: view === "this_month" ? data.thisMonth.month : null,
   });
