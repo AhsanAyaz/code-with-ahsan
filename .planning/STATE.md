@@ -4,8 +4,8 @@ milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
 stopped_at: context exhaustion at 90% (2026-05-07)
-last_updated: "2026-05-07T09:52:26.404Z"
-last_activity: 2026-05-06 -- Phase --phase execution started
+last_updated: "2026-05-08T17:26:46.384Z"
+last_activity: 2026-05-08 - Completed quick task 260508-r0b: Markdown-based events system with MDX files, build script, EventCard component, dynamic listing with filters, and auto-generated detail pages
 progress:
   total_phases: 5
   completed_phases: 4
@@ -147,6 +147,7 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | 260507-g81 | /mas-raffle page with entry form, real-time wheel spin, and admin spin control | 2026-05-07 | dc343d6 | [260507-g81-mas-raffle-page-with-entry-form-real-tim](./quick/260507-g81-mas-raffle-page-with-entry-form-real-tim/) |
 | 260508-fvi | Rename mas-raffle → generic raffle with dynamic title field | 2026-05-08 | 2129d64 | [260508-fvi-rename-mas-raffle-to-generic-raffle](./quick/260508-fvi-rename-mas-raffle-to-generic-raffle/) |
 | 260508-m0c | Add daily GitHub Action to sync Discord member count to Firestore and surface it in /api/stats | 2026-05-08 | b6cb528 | [260508-m0c-add-daily-github-action-to-sync-discord-](./quick/260508-m0c-add-daily-github-action-to-sync-discord-/) |
+| 260508-r0b | Markdown-based events system with MDX files, build script, EventCard component, dynamic listing with filters, and auto-generated detail pages | 2026-05-08 | 3681407 | [260508-r0b-markdown-based-events-system-with-mdx-fi](./quick/260508-r0b-markdown-based-events-system-with-mdx-fi/) |
 | Phase 01 P01 | 2min | 1 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P02 | 3 min | 3 tasks | 6 files |
 | Phase 01-foundation-roles-array-migration P04 | 2 min | 2 tasks | 3 files |
