@@ -2,6 +2,7 @@ import qs from "qs";
 import type {
   BannerContent,
   CourseContent,
+  EventContent,
   PostContent,
   RateCardContent,
 } from "@/types/content";
@@ -9,6 +10,8 @@ import {
   getLocalBanners,
   getLocalCourseBySlug,
   getLocalCourses,
+  getLocalEventBySlug,
+  getLocalEvents,
   getLocalPostBySlug,
   getLocalRateCard,
 } from "@/lib/content/localContent";
@@ -239,4 +242,12 @@ export async function getRateCard(): Promise<RateCardContent | null> {
   }
 
   return local;
+}
+
+export async function getEvents(): Promise<EventContent[]> {
+  return getLocalEvents();
+}
+
+export async function getEventBySlug(slug: string): Promise<EventContent | null> {
+  return getLocalEventBySlug(slug);
 }
