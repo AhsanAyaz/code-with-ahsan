@@ -34,7 +34,14 @@ export async function GET() {
     }
 
     // Query Firestore in parallel
-    const [mentorsSnapshot, menteesSnapshot, sessionsSnapshot, ratingsSnapshot] = await Promise.all([
+    // platform_stats/discord fetch is isolated so its failure degrades to static fallback
+    const platformStatsPromise = db.collection('platform_stats').doc('discord').get()
+      .catch((err) => {
+        console.error('platform_stats/discord fetch failed, using static fallback:', err);
+        return null;
+      });
+
+    const [mentorsSnapshot, menteesSnapshot, sessionsSnapshot, ratingsSnapshot, discordStatsSnap] = await Promise.all([
       db.collection('mentorship_profiles')
         .where('role', '==', 'mentor')
         .where('status', '==', 'accepted')
@@ -44,6 +51,7 @@ export async function GET() {
         .get(),
       db.collection('mentorship_sessions').get(),
       db.collection('mentor_ratings').get(),
+      platformStatsPromise,
     ]);
 
     const mentors = mentorsSnapshot.size;
@@ -63,6 +71,23 @@ export async function GET() {
     const totalRatings = ratingsSnapshot.size;
     const averageRating = totalRatings > 0 ? Math.round((ratingsSum / totalRatings) * 10) / 10 : 0;
 
+    // Merge live Discord count if available, fall back to static socialReach value
+    let mergedSocial: typeof socialReach = socialReach;
+    try {
+      if (discordStatsSnap && discordStatsSnap.exists) {
+        const data = discordStatsSnap.data();
+        const liveCount = data?.memberCount;
+        if (typeof liveCount === 'number' && Number.isFinite(liveCount) && liveCount > 0) {
+          mergedSocial = {
+            ...socialReach,
+            discord: { ...socialReach.discord, count: liveCount },
+          };
+        }
+      }
+    } catch (e) {
+      console.error('platform_stats/discord merge failed, using static fallback:', e);
+    }
+
     const cachedAt = new Date().toISOString();
 
     statsCache = {
@@ -73,7 +98,7 @@ export async function GET() {
         completedMentorships,
         averageRating,
       },
-      social: socialReach,
+      social: mergedSocial,
       cachedAt,
     };
     cacheTimestamp = now;
