@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { EventContent } from "@/types/content";
+import { getEventDisplayStatus, getStatusDisplay } from "./eventUtils";
 
 interface EventCardProps {
   event: EventContent;
@@ -22,7 +23,7 @@ function formatDate(iso: string): string {
 
 export default function EventCard({ event }: EventCardProps) {
   const typeBadge = TYPE_BADGE_CLASS[event.type] ?? "badge-neutral";
-  const statusBadge = event.status === "upcoming" ? "badge-primary" : event.status === "cancelled" ? "badge-error" : "badge-ghost";
+  const { label: statusLabel, badgeClass: statusBadge } = getStatusDisplay(getEventDisplayStatus(event));
   const detailHref = `/events/${event.slug}`;
 
   return (
@@ -30,7 +31,7 @@ export default function EventCard({ event }: EventCardProps) {
       <div className="card-body">
         <div className="flex flex-wrap gap-2 mb-2">
           <span className={`badge ${typeBadge} capitalize`}>{event.type.replace("-", " ")}</span>
-          <span className={`badge ${statusBadge} capitalize`}>{event.status}</span>
+          <span className={`badge ${statusBadge}`}>{statusLabel}</span>
         </div>
         <h2 className="card-title text-base-content">{event.title}</h2>
         <p className="text-sm text-base-content/60">

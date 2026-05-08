@@ -21,32 +21,26 @@ export default function EventsListClient({ events }: { events: EventContent[] })
 
   return (
     <>
-      <div className="flex flex-wrap gap-4 mb-8 items-end">
-        <label className="form-control">
-          <span className="label-text mb-1 block">Filter by type</span>
-          <select
-            className="select select-bordered select-sm"
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value as EventType | "all")}
-          >
-            {TYPE_OPTIONS.map((opt) => (
-              <option key={opt} value={opt} className="capitalize">
-                {opt === "all" ? "All types" : opt.replace("-", " ")}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="form-control">
-          <span className="label-text mb-1 block">Sort by date</span>
-          <select
-            className="select select-bordered select-sm"
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value as "newest" | "oldest")}
-          >
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-          </select>
-        </label>
+      <div className="flex flex-wrap items-center gap-3 mb-8">
+        <select
+          className="select select-bordered"
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value as EventType | "all")}
+        >
+          {TYPE_OPTIONS.map((opt) => (
+            <option key={opt} value={opt}>
+              {opt === "all" ? "All types" : opt.charAt(0).toUpperCase() + opt.slice(1).replace("-", " ")}
+            </option>
+          ))}
+        </select>
+        <select
+          className="select select-bordered"
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value as "newest" | "oldest")}
+        >
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+        </select>
         <p className="text-sm text-base-content/60 ml-auto">
           {filtered.length} {filtered.length === 1 ? "event" : "events"}
         </p>

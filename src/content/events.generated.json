@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-08T17:32:38.623Z",
+  "generatedAt": "2026-05-08T22:38:48.870Z",
   "source": "mdx",
   "count": 2,
   "events": [
@@ -11,7 +11,7 @@
       "date": "2026-03-28",
       "endDate": "2026-04-10",
       "location": "Online",
-      "speaker": "Ahsan Ayaz",
+      "speaker": null,
       "bannerImage": null,
       "dedicatedRoute": "/events/cwa-promptathon/2026",
       "isVisible": true,
@@ -27,7 +27,7 @@
       "date": "2023-10-01",
       "endDate": null,
       "location": "Karachi, Pakistan (Hybrid)",
-      "speaker": "Ahsan Ayaz",
+      "speaker": null,
       "bannerImage": null,
       "dedicatedRoute": "/events/hackstack/2023",
       "isVisible": true,

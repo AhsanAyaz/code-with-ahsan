@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getEventBySlug } from "@/lib/content/contentProvider";
 import LegitMarkdown from "@/components/LegitMarkdown";
+import { getEventDisplayStatus, getStatusDisplay } from "@/components/events/eventUtils";
 
 interface PageProps {
   params: Promise<{ "event-slug": string }>;
@@ -32,15 +33,15 @@ export default async function EventDetailPage({ params }: PageProps) {
     redirect(event.dedicatedRoute);
   }
 
+  const { label: statusLabel, badgeClass: statusBadge } = getStatusDisplay(getEventDisplayStatus(event));
+
   return (
     <div>
       <section className="bg-base-200 page-padding py-12">
         <div className="max-w-3xl mx-auto">
           <div className="flex flex-wrap gap-2 mb-4">
             <span className="badge badge-secondary capitalize">{event.type.replace("-", " ")}</span>
-            <span className={`badge capitalize ${event.status === "upcoming" ? "badge-primary" : event.status === "cancelled" ? "badge-error" : "badge-ghost"}`}>
-              {event.status}
-            </span>
+            <span className={`badge ${statusBadge}`}>{statusLabel}</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold mb-3 text-base-content">{event.title}</h1>
           <p className="text-base-content/70 mb-2">{event.description}</p>
