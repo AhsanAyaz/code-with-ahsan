@@ -9,7 +9,7 @@ function getTodayUTC(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-// POST /api/mas-raffle/entries — public, no auth
+// POST /api/raffle/entries — public, no auth
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     const date = getTodayUTC();
 
-    await db.collection("mas-raffle-emails").add({
+    await db.collection("raffle-entries").add({
       name: name.trim(),
       email: email.trim().toLowerCase(),
       newsletter,
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("[mas-raffle/entries] POST error:", error);
+    console.error("[raffle/entries] POST error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
