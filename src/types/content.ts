@@ -86,3 +86,23 @@ export interface RateCardContent {
   article?: string;
   resources?: ContentResource[];
 }
+
+export type EventType = "workshop" | "hackathon" | "tech-talk" | "webinar" | "conference" | "other";
+export type EventStatus = "upcoming" | "completed" | "cancelled";
+
+export interface EventContent {
+  slug: string;
+  title: string;
+  description: string;
+  type: EventType;
+  date: string;                  // ISO date string
+  endDate?: string | null;
+  location?: string | null;
+  speaker?: string | null;
+  bannerImage?: string | null;
+  dedicatedRoute?: string | null;
+  isVisible?: boolean;
+  status: EventStatus;
+  visibilityOrder?: number;
+  body: string;                  // MDX content (markdown only)
+}

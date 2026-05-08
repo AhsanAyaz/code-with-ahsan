@@ -1,9 +1,11 @@
 import coursesData from "@/content/courses.generated.json";
 import bannersData from "@/content/banners.json";
 import ratesData from "@/content/rates.json";
+import eventsData from "@/content/events.generated.json";
 import type {
   BannerContent,
   CourseContent,
+  EventContent,
   PostContent,
   RateCardContent,
 } from "@/types/content";
@@ -46,4 +48,15 @@ export function getLocalBanners(): BannerContent[] {
 
 export function getLocalRateCard(): RateCardContent | null {
   return (ratesData?.rateCard || null) as RateCardContent | null;
+}
+
+export function getLocalEvents(): EventContent[] {
+  const events = (eventsData?.events || []) as EventContent[];
+  return events.filter((event) => event.isVisible !== false);
+}
+
+export function getLocalEventBySlug(slug: string): EventContent | null {
+  // Search ALL events including hidden ones — direct slug visit should still work for previews
+  const all = (eventsData?.events || []) as EventContent[];
+  return all.find((event) => event.slug === slug) || null;
 }

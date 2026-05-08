@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-05-08T17:32:38.623Z",
+  "source": "mdx",
+  "count": 2,
+  "events": [
+    {
+      "slug": "cwa-promptathon-2026",
+      "title": "CWA Prompt-a-thon 2026",
+      "description": "A Generative AI & #BuildWithAI Hackathon. Collaborate, build, and showcase innovative solutions using Generative AI.",
+      "type": "hackathon",
+      "date": "2026-03-28",
+      "endDate": "2026-04-10",
+      "location": "Online",
+      "speaker": "Ahsan Ayaz",
+      "bannerImage": null,
+      "dedicatedRoute": "/events/cwa-promptathon/2026",
+      "isVisible": true,
+      "status": "upcoming",
+      "visibilityOrder": 100,
+      "body": "\n# CWA Prompt-a-thon 2026\n\nA Generative AI & #BuildWithAI Hackathon hosted by CodeWithAhsan. Collaborate with fellow developers to build innovative AI-powered solutions.\n\n> Note: This event has a dedicated landing page. You'll be redirected to it automatically.\n"
+    },
+    {
+      "slug": "hackstack-2023",
+      "title": "HackStack Pakistan 2023",
+      "description": "Pakistan's premier 2-week hybrid hackathon focused on Full Stack Development. Organized with GDG Kolachi.",
+      "type": "hackathon",
+      "date": "2023-10-01",
+      "endDate": null,
+      "location": "Karachi, Pakistan (Hybrid)",
+      "speaker": "Ahsan Ayaz",
+      "bannerImage": null,
+      "dedicatedRoute": "/events/hackstack/2023",
+      "isVisible": true,
+      "status": "completed",
+      "visibilityOrder": 50,
+      "body": "\n# HackStack Pakistan 2023\n\nPakistan's premier 2-week hybrid hackathon focused on Full Stack Development, organized with GDG Kolachi.\n\n> Note: This event has a dedicated landing page. You'll be redirected to it automatically.\n"
+    }
+  ]
+}
