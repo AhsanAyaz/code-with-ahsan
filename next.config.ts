@@ -116,6 +116,9 @@ const nextConfig: NextConfig = {
         destination: "/u/:username",
         permanent: true,
       },
+      { source: "/mas-raffle", destination: "/raffle", permanent: true },
+      { source: "/admin/mas-raffle", destination: "/admin/raffle", permanent: true },
+      { source: "/api/mas-raffle/:path*", destination: "/api/raffle/:path*", permanent: true },
     ];
   },
   turbopack: {

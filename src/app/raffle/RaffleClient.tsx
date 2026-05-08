@@ -7,13 +7,6 @@ import confetti from "canvas-confetti";
 
 type UiState = "form" | "waiting" | "spinning" | "winner";
 
-interface RaffleState {
-  state: "idle" | "spinning" | "winner";
-  winnerName: string | null;
-  date: string;
-  title: string;
-}
-
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 function getTodayKey(): string {

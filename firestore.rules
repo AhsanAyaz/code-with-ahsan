@@ -268,9 +268,9 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    // ─── MAS Raffle Entries (public write, no read) ────────────────────────
+    // ─── Raffle Entries (public write, no read) ────────────────────────────
     // Anyone can submit an entry; reads are server-only (Admin SDK bypasses rules).
-    match /mas-raffle-emails/{entryId} {
+    match /raffle-entries/{entryId} {
       allow create: if request.resource.data.keys().hasAll(["name","email","newsletter","date","submittedAt"])
                     && request.resource.data.name is string
                     && request.resource.data.email is string
@@ -279,10 +279,10 @@ service cloud.firestore {
       allow read, update, delete: if false;
     }
 
-    // ─── MAS Raffle State (public read current doc, admin write) ──────────
+    // ─── Raffle State (public read current doc, admin write) ──────────────
     // Public viewers subscribe to this doc via onSnapshot for real-time updates.
     // Only the Admin SDK (server-side spin/reset routes) may write.
-    match /mas-raffle-state/{docId} {
+    match /raffle-state/{docId} {
       allow read: if docId == "current";
       allow write: if false; // Admin SDK only
     }
