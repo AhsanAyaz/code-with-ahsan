@@ -11,6 +11,7 @@ export default function LoupeFeedback() {
       init({
         apiKey,
         position: "bottom-right",
+        showDelayMs: 3000,
       });
       return () => destroy();
     }
