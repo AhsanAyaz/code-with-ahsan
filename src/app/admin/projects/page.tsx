@@ -41,11 +41,18 @@ export default function AdminProjectsPage() {
     techStack: "",
     creator: "",
   });
-  const [deleteTarget, setDeleteTarget] = useState<EnrichedProject | null>(null);
-  const [declineTarget, setDeclineTarget] = useState<EnrichedProject | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<EnrichedProject | null>(
+    null,
+  );
+  const [declineTarget, setDeclineTarget] = useState<EnrichedProject | null>(
+    null,
+  );
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [deletionSummary, setDeletionSummary] = useState<DeletionSummary | null>(null);
-  const [reviewTarget, setReviewTarget] = useState<EnrichedProject | null>(null);
+  const [deletionSummary, setDeletionSummary] =
+    useState<DeletionSummary | null>(null);
+  const [reviewTarget, setReviewTarget] = useState<EnrichedProject | null>(
+    null,
+  );
   const [declineReason, setDeclineReason] = useState("");
 
   useEffect(() => {
@@ -61,9 +68,12 @@ export default function AdminProjectsPage() {
         if (filters.techStack) params.set("techStack", filters.techStack);
         if (filters.creator) params.set("creator", filters.creator);
 
-        const response = await fetch(`/api/admin/projects?${params.toString()}`, {
-          headers: token ? { "x-admin-token": token } : {},
-        });
+        const response = await fetch(
+          `/api/admin/projects?${params.toString()}`,
+          {
+            headers: token ? { "x-admin-token": token } : {},
+          },
+        );
 
         if (response.ok) {
           const data = await response.json();
@@ -87,7 +97,14 @@ export default function AdminProjectsPage() {
   };
 
   const handleClearFilters = () => {
-    setFilters({ status: "", search: "", fromDate: "", toDate: "", techStack: "", creator: "" });
+    setFilters({
+      status: "",
+      search: "",
+      fromDate: "",
+      toDate: "",
+      techStack: "",
+      creator: "",
+    });
   };
 
   const handleApprove = async (project: EnrichedProject) => {
@@ -109,8 +126,8 @@ export default function AdminProjectsPage() {
         // Update project status in list
         setProjects((prev) =>
           prev.map((p) =>
-            p.id === project.id ? { ...p, status: "active" } : p
-          )
+            p.id === project.id ? { ...p, status: "active" } : p,
+          ),
         );
       } else {
         const data = await response.json();
@@ -143,8 +160,8 @@ export default function AdminProjectsPage() {
         // Update project status in list
         setProjects((prev) =>
           prev.map((p) =>
-            p.id === declineTarget.id ? { ...p, status: "declined" } : p
-          )
+            p.id === declineTarget.id ? { ...p, status: "declined" } : p,
+          ),
         );
         // Close dialog
         setDeclineTarget(null);
@@ -191,7 +208,6 @@ export default function AdminProjectsPage() {
       throw error; // Re-throw so dialog can show error
     }
   };
-
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -301,7 +317,9 @@ export default function AdminProjectsPage() {
                 {/* Header row: Title + Status */}
                 <div className="flex items-start justify-between gap-4">
                   <h3 className="card-title text-xl">{project.title}</h3>
-                  <span className={`badge ${getStatusBadgeClass(project.status)}`}>
+                  <span
+                    className={`badge ${getStatusBadgeClass(project.status)}`}
+                  >
                     {project.status}
                   </span>
                 </div>
@@ -350,21 +368,29 @@ export default function AdminProjectsPage() {
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xs text-base-content/60">Applications</div>
+                    <div className="text-xs text-base-content/60">
+                      Applications
+                    </div>
                     <div className="text-sm font-semibold">
                       {project.applicationCount}
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xs text-base-content/60">Invitations</div>
+                    <div className="text-xs text-base-content/60">
+                      Invitations
+                    </div>
                     <div className="text-sm font-semibold">
                       {project.invitationCount}
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xs text-base-content/60">Difficulty</div>
+                    <div className="text-xs text-base-content/60">
+                      Difficulty
+                    </div>
                     <div>
-                      <span className={`badge badge-sm ${getDifficultyBadgeClass(project.difficulty)}`}>
+                      <span
+                        className={`badge badge-sm ${getDifficultyBadgeClass(project.difficulty)}`}
+                      >
                         {project.difficulty}
                       </span>
                     </div>
@@ -467,54 +493,58 @@ export default function AdminProjectsPage() {
                         </Link>
                       </li>
                       <li>
-                        <Link href={`/projects/${project.id}/edit`} target="_blank">
+                        <Link
+                          href={`/projects/${project.id}/edit`}
+                          target="_blank"
+                        >
                           Edit Project
                         </Link>
                       </li>
-                       {project.status === "pending" && (
-                         <>
-                           <li className="border-t border-base-300 pt-2">
-                             <button
-                               className="text-success"
-                               onClick={() => handleApprove(project)}
-                               disabled={actionLoading === project.id}
-                             >
-                               {actionLoading === project.id ? (
-                                 <>
-                                   <span className="loading loading-spinner loading-xs"></span>
-                                   Approving...
-                                 </>
-                               ) : (
-                                 "Approve"
-                               )}
-                             </button>
-                           </li>
-                           <li>
-                             <button
-                               className="text-warning"
-                               onClick={() => setDeclineTarget(project)}
-                             >
-                               Decline
-                             </button>
-                           </li>
-                         </>
-                       )}
+                      {project.status === "pending" && (
+                        <>
+                          <li className="border-t border-base-300 pt-2">
+                            <button
+                              className="text-success"
+                              onClick={() => handleApprove(project)}
+                              disabled={actionLoading === project.id}
+                            >
+                              {actionLoading === project.id ? (
+                                <>
+                                  <span className="loading loading-spinner loading-xs"></span>
+                                  Approving...
+                                </>
+                              ) : (
+                                "Approve"
+                              )}
+                            </button>
+                          </li>
+                          <li>
+                            <button
+                              className="text-warning"
+                              onClick={() => setDeclineTarget(project)}
+                            >
+                              Decline
+                            </button>
+                          </li>
+                        </>
+                      )}
 
-                       {project.status === "update_pending" && project.pendingUpdates && (
-                         <>
-                           <li className="border-t border-base-300 pt-2">
-                             <button
-                               className="text-primary font-medium"
-                               onClick={() => {
-                                 setReviewTarget(project);
-                                 setDeclineReason("");
-                               }}
-                             >
-                               📋 Review Changes
-                             </button>
-                           </li>
-                         </>
-                       )}
+                      {project.status === "update_pending" &&
+                        project.pendingUpdates && (
+                          <>
+                            <li className="border-t border-base-300 pt-2">
+                              <button
+                                className="text-primary font-medium"
+                                onClick={() => {
+                                  setReviewTarget(project);
+                                  setDeclineReason("");
+                                }}
+                              >
+                                📋 Review Changes
+                              </button>
+                            </li>
+                          </>
+                        )}
                       <li className="border-t border-base-300 pt-2">
                         <button
                           className="text-error"
@@ -564,14 +594,17 @@ export default function AdminProjectsPage() {
           <div className="modal-box max-w-2xl">
             <h3 className="font-bold text-lg">Review Project Updates</h3>
             <p className="py-2 text-base-content/70">
-              Review changes requested by project creator for <strong>{reviewTarget.title}</strong>
+              Review changes requested by project creator for{" "}
+              <strong>{reviewTarget.title}</strong>
             </p>
 
             <div className="divider"></div>
 
             {/* Changes Diff */}
             <div className="space-y-4 max-h-[500px] overflow-y-auto">
-              <h4 className="font-semibold text-sm uppercase text-base-content/70">Proposed Changes:</h4>
+              <h4 className="font-semibold text-sm uppercase text-base-content/70">
+                Proposed Changes:
+              </h4>
 
               {reviewTarget.pendingUpdates.maxTeamSize && (
                 <div className="card bg-base-200 p-4">
@@ -596,10 +629,14 @@ export default function AdminProjectsPage() {
                   <div className="font-medium">Title</div>
                   <div className="grid grid-cols-2 gap-4 mt-2">
                     <div>
-                      <div className="text-sm text-error line-through">{reviewTarget.title}</div>
+                      <div className="text-sm text-error line-through">
+                        {reviewTarget.title}
+                      </div>
                     </div>
                     <div>
-                      <div className="text-sm text-success font-medium">{reviewTarget.pendingUpdates.title}</div>
+                      <div className="text-sm text-success font-medium">
+                        {reviewTarget.pendingUpdates.title}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -609,8 +646,12 @@ export default function AdminProjectsPage() {
                 <div className="card bg-base-200 p-4">
                   <div className="font-medium">Description</div>
                   <div className="mt-2">
-                    <div className="text-sm text-error line-through mb-2">{reviewTarget.description}</div>
-                    <div className="text-sm text-success font-medium">{reviewTarget.pendingUpdates.description}</div>
+                    <div className="text-sm text-error line-through mb-2">
+                      {reviewTarget.description}
+                    </div>
+                    <div className="text-sm text-success font-medium">
+                      {reviewTarget.pendingUpdates.description}
+                    </div>
                   </div>
                 </div>
               )}
@@ -673,7 +714,9 @@ export default function AdminProjectsPage() {
             {/* Decline Reason Input */}
             <div className="form-control mt-6">
               <label className="label">
-                <span className="label-text font-semibold">Decline Reason (optional)</span>
+                <span className="label-text font-semibold">
+                  Decline Reason (optional)
+                </span>
               </label>
               <textarea
                 placeholder="Enter reason for declining these changes... This will be sent to the project creator."
@@ -700,23 +743,34 @@ export default function AdminProjectsPage() {
                   setActionLoading(reviewTarget.id);
                   try {
                     const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-                    const response = await fetch(`/api/admin/projects/${reviewTarget.id}`, {
-                      method: "PUT",
-                      headers: {
-                        "Content-Type": "application/json",
-                        ...(token ? { "x-admin-token": token } : {}),
+                    const response = await fetch(
+                      `/api/admin/projects/${reviewTarget.id}`,
+                      {
+                        method: "PUT",
+                        headers: {
+                          "Content-Type": "application/json",
+                          ...(token ? { "x-admin-token": token } : {}),
+                        },
+                        body: JSON.stringify({
+                          action: "decline_update",
+                          declineReason,
+                        }),
                       },
-                      body: JSON.stringify({ action: "decline_update", declineReason }),
-                    });
+                    );
 
                     if (response.ok) {
                       toast.success("Project updates declined");
-                      setProjects(prev =>
-                        prev.map(p =>
-                          p.id === reviewTarget.id 
-                            ? { ...p, ...p.pendingUpdates, status: "active", pendingUpdates: undefined } as EnrichedProject
-                            : p
-                        )
+                      // FIXED: Do NOT spread pendingUpdates when declining
+                      setProjects((prev) =>
+                        prev.map((p) =>
+                          p.id === reviewTarget.id
+                            ? ({
+                                ...p,
+                                status: "active",
+                                pendingUpdates: undefined,
+                              } as EnrichedProject)
+                            : p,
+                        ),
                       );
                       setReviewTarget(null);
                       setDeclineReason("");
@@ -734,7 +788,10 @@ export default function AdminProjectsPage() {
                 disabled={actionLoading === reviewTarget.id}
               >
                 {actionLoading === reviewTarget.id ? (
-                  <><span className="loading loading-spinner loading-sm"></span> Declining...</>
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>{" "}
+                    Declining...
+                  </>
                 ) : (
                   "❌ Decline Changes"
                 )}
@@ -745,23 +802,32 @@ export default function AdminProjectsPage() {
                   setActionLoading(reviewTarget.id);
                   try {
                     const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-                    const response = await fetch(`/api/admin/projects/${reviewTarget.id}`, {
-                      method: "PUT",
-                      headers: {
-                        "Content-Type": "application/json",
-                        ...(token ? { "x-admin-token": token } : {}),
+                    const response = await fetch(
+                      `/api/admin/projects/${reviewTarget.id}`,
+                      {
+                        method: "PUT",
+                        headers: {
+                          "Content-Type": "application/json",
+                          ...(token ? { "x-admin-token": token } : {}),
+                        },
+                        body: JSON.stringify({ action: "approve_update" }),
                       },
-                      body: JSON.stringify({ action: "approve_update" }),
-                    });
+                    );
 
                     if (response.ok) {
                       toast.success("Project updates approved successfully");
-                      setProjects(prev =>
-                        prev.map(p =>
-                          p.id === reviewTarget.id 
-                            ? { ...p, ...p.pendingUpdates, status: "active", pendingUpdates: undefined } as EnrichedProject
-                            : p
-                        )
+                      // This is correct - approve SHOULD apply pending changes
+                      setProjects((prev) =>
+                        prev.map((p) =>
+                          p.id === reviewTarget.id
+                            ? ({
+                                ...p,
+                                ...p.pendingUpdates,
+                                status: "active",
+                                pendingUpdates: undefined,
+                              } as EnrichedProject)
+                            : p,
+                        ),
                       );
                       setReviewTarget(null);
                       setDeclineReason("");
@@ -779,14 +845,20 @@ export default function AdminProjectsPage() {
                 disabled={actionLoading === reviewTarget.id}
               >
                 {actionLoading === reviewTarget.id ? (
-                  <><span className="loading loading-spinner loading-sm"></span> Approving...</>
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>{" "}
+                    Approving...
+                  </>
                 ) : (
                   "✅ Approve Changes"
                 )}
               </button>
             </div>
           </div>
-          <div className="modal-backdrop" onClick={() => !actionLoading && setReviewTarget(null)}></div>
+          <div
+            className="modal-backdrop"
+            onClick={() => !actionLoading && setReviewTarget(null)}
+          ></div>
         </div>
       )}
     </div>
