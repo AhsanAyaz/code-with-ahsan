@@ -9,7 +9,9 @@ import asyncio
 import logging
 import os
 import sys
+import threading
 import uuid
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import Iterable
 
@@ -191,6 +193,21 @@ def _wire_bot():
     return client, BOT_TOKEN
 
 
+class _HealthHandler(BaseHTTPRequestHandler):
+    """Minimal HTTP handler so Cloud Run's health-check probe gets a 200."""
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"ok")
+
+    def log_message(self, *_):
+        pass  # suppress per-request noise from Cloud Run probes
+
+
+def _start_health_server(port: int) -> None:
+    HTTPServer(("", port), _HealthHandler).serve_forever()
+
+
 def main():
     logging.basicConfig(
         level=logging.INFO,
@@ -201,6 +218,10 @@ def main():
         load_dotenv(Path(__file__).parent / ".env")
     except ImportError:
         pass  # python-dotenv is optional in production where env vars come from Cloud Run secrets
+
+    port = int(os.environ.get("PORT", "8080"))
+    threading.Thread(target=_start_health_server, args=(port,), daemon=True).start()
+    logger.info("Health check server listening on port %d", port)
 
     client, token = _wire_bot()
     client.run(token)
