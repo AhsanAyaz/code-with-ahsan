@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     try {
       const vectorQuery = db
         .collection("mentorship_profiles")
-        .where("role", "==", "mentor")
+        .where("roles", "array-contains", "mentor")
         .where("status", "==", "accepted")
         .findNearest({
           vectorField: "bioEmbedding",
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
         // Fallback: pre-filter by role only, post-filter status in JS
         const fallbackQuery = db
           .collection("mentorship_profiles")
-          .where("role", "==", "mentor")
+          .where("roles", "array-contains", "mentor")
           .findNearest({
             vectorField: "bioEmbedding",
             queryVector: FieldValue.vector(queryVector),

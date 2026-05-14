@@ -15,7 +15,7 @@ async function main() {
 
   const snapshot = await db
     .collection("mentorship_profiles")
-    .where("role", "==", "mentor")
+    .where("roles", "array-contains", "mentor")
     .where("status", "==", "accepted")
     .get();
 
