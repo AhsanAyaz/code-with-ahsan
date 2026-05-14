@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
+import { FieldValue } from "firebase-admin/firestore";
 import { sendAdminMentorPendingEmail } from "@/lib/email";
+import { embedBio, extractBioText } from "@/lib/mentorship/embedBio";
 import {
   lookupMemberByUsername,
   isDiscordConfigured,
@@ -310,6 +312,36 @@ export async function PUT(request: NextRequest) {
     // Non-fatal: a claim-sync failure is logged but does not reject the request.
     const existingData = profileDoc.data() ?? {};
     const postUpdate = { ...existingData, ...updatePayload };
+
+    // Auto-embed mentor bio when status flips to accepted or bio text changes.
+    // Fire-and-forget — never blocks the response.
+    const isMentor =
+      Array.isArray(postUpdate.roles)
+        ? (postUpdate.roles as string[]).includes("mentor")
+        : postUpdate.role === "mentor";
+    const wasAccepted = existingData.status === "accepted";
+    const isNowAccepted =
+      (updatePayload.status as string | undefined) === "accepted" ||
+      (updatePayload.status === undefined && wasAccepted);
+    const oldBio = extractBioText(existingData);
+    const newBio = extractBioText(postUpdate);
+    if (
+      isMentor &&
+      isNowAccepted &&
+      newBio.length > 0 &&
+      (!wasAccepted || newBio !== oldBio)
+    ) {
+      embedBio(newBio)
+        .then((embedding) =>
+          profileRef.update({
+            bioEmbedding: FieldValue.vector(embedding),
+            bioEmbeddingGeneratedAt: FieldValue.serverTimestamp(),
+          })
+        )
+        .catch((err) =>
+          console.error(`[profile.PUT] bio embedding failed for ${uid}:`, err)
+        );
+    }
     const profile = {
       roles: Array.isArray(postUpdate.roles) ? (postUpdate.roles as string[]) : [],
       isAdmin: postUpdate.isAdmin === true,
