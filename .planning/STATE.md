@@ -57,6 +57,17 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: TwistRevealSection owns its countdown internally via setInterval in useRef — parent HostPanel only flips twistPhase state
 - [Phase 01]: WinnersSection uses prevRevealedCount ref to detect 2->3 transition for confetti (prevents double-fire)
 - [Phase quick-260410]: Used text-based social proof strip and single DaisyUI collapse for a la carte markdown
+- [Phase 02-adk]: pytest-asyncio asyncio_mode=auto chosen so async tests need no decorator
+- [Phase 02-adk]: mock_platform_client uses monkeypatch.setattr on _get — decouples tests from transport layer
+- [Phase 02-adk]: outputDimensionality:768 hard-coded in embed script and route — matches Firestore COSINE flat vector index
+- [Phase 02-adk]: BASE_URL default changed to https://codewithahsan.dev — production is opt-out via PLATFORM_API_BASE_URL env var, not opt-in
+- [Phase 02-adk]: url fields are Python None (not string 'None') when id/username missing — prevents broken /mentors/None links in Discord replies
+- [Phase 02-adk]: semantic_search_mentors count capped at _SEMANTIC_LIMIT=5 (reports sliced length, not raw API count)
+- [Phase 02-adk]: Route Handler uses new URL(request.url).searchParams (synchronous) — async searchParams only applies to page.tsx/layout.tsx
+- [Phase 02-adk]: bot.py uses lazy _wire_bot() — discord.py and google-adk out of module-level imports so tests run without those deps
+- [Phase 02-adk]: runner.run_async() enforced in on_message handler — sync runner.run() causes RuntimeError in discord.py asyncio event loop
+- [Phase 02-adk]: Cloud Run needs --no-cpu-throttling so Discord event loop isn't frozen between health-check probes
+- [Phase 02-adk]: Health-check HTTP server runs in daemon thread on $PORT so Cloud Run TCP probe succeeds alongside Discord gateway
 - [v6.0 roadmap]: Phase structure mirrors research consensus — Phase 1 Foundation (roles migration, 5-deploy sequence) → Phase 2 Application (seeds real ambassadors) → Phase 3 Public Presentation || Phase 4 Activity (parallel; independent subsystems) → Phase 5 Dashboard/Leaderboard/Offboarding/Alumni (aggregates over Activity outputs).
 - [v6.0 roadmap]: Offboarding (DISC-05, EMAIL-04) is landed in Phase 5 alongside the strike-triggered flow because the strike counter and admin offboarding UI both live in Phase 4's strike system but the atomic roles-array mutation + Discord removal is tightly coupled to the alumni-flag transition mechanics in ALUMNI-01..03.
 - [v6.0 roadmap]: Reconciliation cron for missing Discord roles (DISC-04) lives in Phase 4 because it's cron infrastructure paired with the strike-check cron; role assignment at acceptance (DISC-01..03) stays in Phase 2.
@@ -166,6 +177,7 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 03 P03-04 | 2min | 3 tasks | 4 files |
 | Phase 03-public-presentation P03-06 | 3min | 3 tasks | 2 files |
 | Phase 03-public-presentation P03-05 | 45 | 4 tasks | 5 files |
+| Phase 02-adk-community-assistant P00–P03 | ~4h | 4 waves, 41 pytest cases | agent/ + src/app/api/mentorship/mentors/semantic-search |
 
 ## Session Continuity
 
