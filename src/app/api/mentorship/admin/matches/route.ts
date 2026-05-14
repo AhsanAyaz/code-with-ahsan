@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
 
       // Fetch ALL mentor profiles to include those with no matches
       const allMentorsSnapshot = await db.collection('mentorship_profiles')
-        .where('role', '==', 'mentor')
+        .where('roles', 'array-contains', 'mentor')
         .get()
 
       allMentorsSnapshot.docs.forEach(doc => {
@@ -173,7 +173,7 @@ export async function GET(request: NextRequest) {
 
       // Fetch ALL mentee profiles to include those with no matches
       const allMenteesSnapshot = await db.collection('mentorship_profiles')
-        .where('role', '==', 'mentee')
+        .where('roles', 'array-contains', 'mentee')
         .get()
 
       allMenteesSnapshot.docs.forEach(doc => {
@@ -201,8 +201,8 @@ export async function GET(request: NextRequest) {
     // Fetch actual total counts for both mentors and mentees (not based on the filtered grouped array)
     // This ensures the stats stay consistent regardless of which tab is active
     const [mentorCountSnapshot, menteeCountSnapshot] = await Promise.all([
-      db.collection('mentorship_profiles').where('role', '==', 'mentor').count().get(),
-      db.collection('mentorship_profiles').where('role', '==', 'mentee').count().get()
+      db.collection('mentorship_profiles').where('roles', 'array-contains', 'mentor').count().get(),
+      db.collection('mentorship_profiles').where('roles', 'array-contains', 'mentee').count().get()
     ])
     
     const totalMentors = mentorCountSnapshot.data().count

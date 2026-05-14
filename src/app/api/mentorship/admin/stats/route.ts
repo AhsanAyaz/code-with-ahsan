@@ -5,13 +5,13 @@ export async function GET() {
   try {
     // Get mentor count
     const mentorsSnapshot = await db.collection('mentorship_profiles')
-      .where('role', '==', 'mentor')
+      .where('roles', 'array-contains', 'mentor')
       .get()
     const totalMentors = mentorsSnapshot.size
 
     // Get mentee count
     const menteesSnapshot = await db.collection('mentorship_profiles')
-      .where('role', '==', 'mentee')
+      .where('roles', 'array-contains', 'mentee')
       .get()
     const totalMentees = menteesSnapshot.size
 

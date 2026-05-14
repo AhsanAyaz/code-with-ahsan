@@ -94,22 +94,23 @@ export async function PUT(request: NextRequest) {
       unavailableDates?: UnavailableDate[];
     };
 
-    // Find the mentor's profile
-    const profilesSnapshot = await db
+    // Find the mentor's profile (doc id == uid)
+    const profileDoc = await db
       .collection("mentorship_profiles")
-      .where("uid", "==", auth.uid)
-      .where("role", "==", "mentor")
-      .limit(1)
+      .doc(auth.uid)
       .get();
 
-    if (profilesSnapshot.empty) {
+    const profileData = profileDoc.exists ? profileDoc.data() : null;
+    if (
+      !profileDoc.exists ||
+      !Array.isArray(profileData?.roles) ||
+      !profileData!.roles.includes("mentor")
+    ) {
       return NextResponse.json(
         { error: "Forbidden - only mentors can set availability" },
         { status: 403 }
       );
     }
-
-    const profileDoc = profilesSnapshot.docs[0];
 
     // Validate availability if provided
     if (availability) {

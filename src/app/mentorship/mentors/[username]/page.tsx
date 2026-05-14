@@ -14,7 +14,6 @@ async function getMentorData(username: string) {
     const profilesSnapshot = await db
       .collection("mentorship_profiles")
       .where("username", "==", username.toLowerCase())
-      .where("role", "==", "mentor")
       .limit(1)
       .get();
 
@@ -25,6 +24,11 @@ async function getMentorData(username: string) {
     const profileDoc = profilesSnapshot.docs[0];
     const profileData = profileDoc.data();
     const uid = profileDoc.id;
+
+    // Verify mentor role (array-based; legacy `role` field removed)
+    if (!Array.isArray(profileData?.roles) || !profileData.roles.includes("mentor")) {
+      return null;
+    }
 
     // Verify this is a public, accepted mentor
     if (profileData?.status !== "accepted" || profileData?.isPublic === false) {

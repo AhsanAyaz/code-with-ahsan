@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   try {
     const query = db
       .collection("mentorship_profiles")
-      .where("role", "==", "mentor");
+      .where("roles", "array-contains", "mentor");
 
     const snapshot = await query.get();
 

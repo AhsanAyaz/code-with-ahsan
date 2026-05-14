@@ -43,18 +43,19 @@ export async function GET() {
 
     const [mentorsSnapshot, menteesSnapshot, sessionsSnapshot, ratingsSnapshot, discordStatsSnap] = await Promise.all([
       db.collection('mentorship_profiles')
-        .where('role', '==', 'mentor')
-        .where('status', '==', 'accepted')
+        .where('roles', 'array-contains', 'mentor')
         .get(),
       db.collection('mentorship_profiles')
-        .where('role', '==', 'mentee')
+        .where('roles', 'array-contains', 'mentee')
         .get(),
       db.collection('mentorship_sessions').get(),
       db.collection('mentor_ratings').get(),
       platformStatsPromise,
     ]);
 
-    const mentors = mentorsSnapshot.size;
+    const mentors = mentorsSnapshot.docs.filter(
+      (d) => d.data().status === 'accepted'
+    ).length;
     const mentees = menteesSnapshot.size;
 
     const activeMentorships = sessionsSnapshot.docs.filter(

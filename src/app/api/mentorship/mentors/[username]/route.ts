@@ -37,7 +37,6 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const profilesSnapshot = await db
       .collection("mentorship_profiles")
       .where("username", "==", username.toLowerCase())
-      .where("role", "==", "mentor")
       .limit(1)
       .get();
 
@@ -48,6 +47,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const profileDoc = profilesSnapshot.docs[0];
     const profileData = profileDoc.data();
     const uid = profileDoc.id;
+
+    // Verify mentor role (array-based; legacy `role` field removed)
+    if (!Array.isArray(profileData?.roles) || !profileData.roles.includes("mentor")) {
+      return NextResponse.json({ error: "Mentor not found" }, { status: 404 });
+    }
 
     // Verify this is a public, accepted mentor (bypass for admin)
     if (profileData?.status !== "accepted" && !isAdminRequest) {

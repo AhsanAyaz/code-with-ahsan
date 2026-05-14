@@ -11,22 +11,26 @@ export async function GET(request: NextRequest) {
   const status = searchParams.get('status') // 'pending' | 'accepted' | 'declined' | 'disabled' | null for all
 
   try {
+    // Use roles array-contains in query; filter status in-memory to avoid
+    // requiring a composite index for every (role, status) combination.
     let query: FirebaseFirestore.Query = db.collection('mentorship_profiles')
-    
+
     if (role) {
-      query = query.where('role', '==', role)
-    }
-    
-    if (status) {
+      query = query.where('roles', 'array-contains', role)
+    } else if (status) {
       query = query.where('status', '==', status)
     }
-    
+
     // Also fetch disabled sessions count and ratings for each profile
     const [snapshot, sessionsSnapshot, ratingsSnapshot] = await Promise.all([
       query.get(),
       db.collection('mentorship_sessions').where('status', '==', 'disabled').get(),
       db.collection('mentor_ratings').get()
     ])
+
+    const filteredDocs = role && status
+      ? snapshot.docs.filter(d => d.data().status === status)
+      : snapshot.docs
 
     // Count disabled sessions per user
     const disabledSessionsMap: Record<string, number> = {}
@@ -52,7 +56,7 @@ export async function GET(request: NextRequest) {
       mentorRatings[mentorId].count += 1
     })
 
-    const profiles = snapshot.docs.map(doc => {
+    const profiles = filteredDocs.map(doc => {
       const data = doc.data()
       const ratings = mentorRatings[doc.id]
       const avgRating = ratings ? Math.round((ratings.total / ratings.count) * 10) / 10 : 0
