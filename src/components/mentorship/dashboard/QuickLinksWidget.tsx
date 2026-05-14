@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MentorshipProfile } from "@/types/mentorship";
 import type { User } from "firebase/auth";
+import { hasRole } from "@/lib/permissions";
 
 interface QuickLinksWidgetProps {
   profile: MentorshipProfile;
@@ -23,7 +24,7 @@ export default function QuickLinksWidget({
           <span className="text-2xl">🔗</span> Quick Links
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {profile.role === "mentee" && (
+          {hasRole(profile, "mentee") && (
             <Link
               href="/mentorship/browse"
               className="btn btn-outline btn-block h-auto py-4 flex flex-col gap-2"
@@ -33,7 +34,7 @@ export default function QuickLinksWidget({
             </Link>
           )}
 
-          {profile.role === "mentor" && (
+          {hasRole(profile, "mentor") && (
             <Link
               href={`/mentorship/mentors/${profile.username || user.uid}`}
               target="_blank"
@@ -45,7 +46,7 @@ export default function QuickLinksWidget({
             </Link>
           )}
 
-          {profile.role === "mentor" && profile.status === "accepted" && (
+          {hasRole(profile, "mentor") && profile.status === "accepted" && (
             <Link
               href="/projects/new"
               className="btn btn-outline btn-primary btn-block h-auto py-4 flex flex-col gap-2"
@@ -87,7 +88,7 @@ export default function QuickLinksWidget({
             <span className="text-xs">Roadmaps</span>
           </Link>
 
-          {profile.role === "mentor" && profile.status === "accepted" && (
+          {hasRole(profile, "mentor") && profile.status === "accepted" && (
             <Link
               href="/roadmaps/new"
               className="btn btn-outline btn-info btn-block h-auto py-4 flex flex-col gap-2"
@@ -97,7 +98,7 @@ export default function QuickLinksWidget({
             </Link>
           )}
 
-          {profile.role === "mentor" && stats.myRoadmaps && stats.myRoadmaps > 0 && (
+          {hasRole(profile, "mentor") && stats.myRoadmaps && stats.myRoadmaps > 0 && (
             <Link
               href="/roadmaps/my"
               className="btn btn-outline btn-info btn-block h-auto py-4 flex flex-col gap-2"

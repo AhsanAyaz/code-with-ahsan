@@ -9,6 +9,7 @@ import Link from "next/link";
 import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 import ContactInfo from "@/components/mentorship/ContactInfo";
 import ProfileAvatar from "@/components/ProfileAvatar";
+import { hasRole } from "@/lib/permissions";
 
 interface RequestWithProfile extends MentorshipMatch {
   menteeProfile?: {
@@ -46,7 +47,7 @@ export default function MentorRequestsPage() {
   }, [loading, profileLoading, user, setShowLoginPopup]);
 
   useEffect(() => {
-    if (!loading && !profileLoading && profile && profile.role !== "mentor") {
+    if (!loading && !profileLoading && profile && !hasRole(profile, "mentor")) {
       router.push("/mentorship");
     }
   }, [loading, profileLoading, profile, router]);
@@ -70,7 +71,7 @@ export default function MentorRequestsPage() {
       }
     };
 
-    if (user && profile?.role === "mentor") {
+    if (user && hasRole(profile, "mentor")) {
       fetchRequests();
     }
   }, [user, profile]);

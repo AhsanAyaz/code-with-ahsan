@@ -8,6 +8,9 @@ import {
   DISCORD_MENTOR_ROLE_ID,
   DISCORD_MENTEE_ROLE_ID
 } from "@/lib/discord";
+import { syncRoleClaim } from "@/lib/ambassador/roleMutation";
+import { consumeReferral } from "@/lib/ambassador/referral";
+import { REFERRAL_COOKIE_NAME } from "@/lib/ambassador/constants";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -98,7 +101,7 @@ export async function POST(request: NextRequest) {
     const profile = {
       uid,
       username,
-      role,
+      roles: [role],
       status,
       displayName: displayName || "",
       email: email || "",
@@ -109,6 +112,18 @@ export async function POST(request: NextRequest) {
     };
 
     await db.collection("mentorship_profiles").doc(uid).set(profile);
+
+    // Sync Firebase Auth custom claims so the user's next ID token carries the
+    // updated roles within seconds (per D-14 — no >1hr stale-claim window).
+    // Non-fatal: a claim-sync failure is logged but does not reject the request.
+    // scripts/sync-custom-claims.ts cleans up any drift on its next run.
+    const claimSync = await syncRoleClaim(uid, {
+      roles: profile.roles ?? [],
+      admin: profile.isAdmin === true,
+    });
+    if (!claimSync.ok) {
+      console.warn(`[profile.POST] claim sync failed for ${uid}:`, claimSync.error);
+    }
 
     // Assign Discord role (fire-and-forget)
     if (isDiscordConfigured() && profileData.discordUsername) {
@@ -134,7 +149,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(
+    // Phase 4 (REF-03): If a cwa_ref cookie is present, consume it now.
+    // HttpOnly cookie — only readable server-side. Must be synchronous (await) so the
+    // Set-Cookie clear header lands on the outgoing response (RESEARCH Pitfall 1).
+    // consumeReferral never throws (wraps all in try/catch) — signup always completes.
+    const refCode = request.cookies.get(REFERRAL_COOKIE_NAME)?.value;
+    let referralConsumed = false;
+    if (refCode) {
+      const result = await consumeReferral(uid, refCode);
+      if (result.ok) {
+        console.log(
+          `[profile.POST] Referral attribution success: ambassador=${result.ambassadorId} user=${uid} code=${refCode} referralId=${result.referralId}`,
+        );
+      } else {
+        console.log(
+          `[profile.POST] Referral attribution skipped: user=${uid} code=${refCode} reason=${result.reason}`,
+        );
+      }
+      // WR-05: Only clear the cookie on non-retriable outcomes. A transient
+      // Firestore error (reason="error") should NOT permanently delete the cookie
+      // — the next signup attempt should retry attribution. Definitive outcomes
+      // (ok, unknown_code, self_attribution, already_attributed) clear the cookie
+      // so the user isn't retried endlessly on a code that will never succeed.
+      if (result.ok || result.reason !== "error") {
+        referralConsumed = true;
+      }
+    }
+
+    const response = NextResponse.json(
       {
         success: true,
         profile: {
@@ -142,9 +184,19 @@ export async function POST(request: NextRequest) {
           createdAt: profile.createdAt.toISOString(),
           updatedAt: profile.updatedAt.toISOString(),
         },
+        _claimSync: claimSync.ok
+          ? { refreshed: true }
+          : { refreshed: false, error: claimSync.error },
       },
       { status: 201 }
     );
+
+    if (referralConsumed) {
+      // Phase 4 (REF-03): clear cookie on the outgoing response — one-time consumption
+      response.cookies.delete(REFERRAL_COOKIE_NAME);
+    }
+
+    return response;
   } catch (error) {
     console.error("Error creating mentorship profile:", error);
     return NextResponse.json(
@@ -251,10 +303,32 @@ export async function PUT(request: NextRequest) {
 
     await profileRef.update(updatePayload);
 
+    // Sync Firebase Auth custom claims on every profile update — even if this
+    // particular PUT doesn't touch roles/isAdmin (per D-14, keeping claims in
+    // lock-step with Firestore is cheap insurance and costs ~1 Admin SDK RPC).
+    // Post-update state = existing doc data overlaid with updatePayload.
+    // Non-fatal: a claim-sync failure is logged but does not reject the request.
+    const existingData = profileDoc.data() ?? {};
+    const postUpdate = { ...existingData, ...updatePayload };
+    const profile = {
+      roles: Array.isArray(postUpdate.roles) ? (postUpdate.roles as string[]) : [],
+      isAdmin: postUpdate.isAdmin === true,
+    };
+    const claimSync = await syncRoleClaim(uid, {
+      roles: profile.roles ?? [],
+      admin: profile.isAdmin === true,
+    });
+    if (!claimSync.ok) {
+      console.warn(`[profile.PUT] claim sync failed for ${uid}:`, claimSync.error);
+    }
+
     return NextResponse.json(
       {
         success: true,
         discordUsernameValidated: updates.discordUsernameValidated,
+        _claimSync: claimSync.ok
+          ? { refreshed: true }
+          : { refreshed: false, error: claimSync.error },
       },
       { status: 200 }
     );

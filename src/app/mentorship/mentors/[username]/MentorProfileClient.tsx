@@ -7,6 +7,7 @@ import { useMentorship } from "@/contexts/MentorshipContext";
 import { useToast } from "@/contexts/ToastContext";
 import { AuthContext } from "@/contexts/AuthContext";
 import ProfileAvatar from "@/components/ProfileAvatar";
+import { hasRole } from "@/lib/permissions";
 
 const DAYS_OF_WEEK = [
   "monday",
@@ -135,7 +136,7 @@ export default function MentorProfileClient({
       }
     };
 
-    if (user && profile?.role === "mentee" && mentor) {
+    if (user && hasRole(profile, "mentee") && mentor) {
       fetchRequestStatus();
     }
   }, [user, profile, mentor]);
@@ -265,7 +266,7 @@ export default function MentorProfileClient({
     }
 
     // User is not a mentee
-    if (profile?.role !== "mentee") {
+    if (!hasRole(profile, "mentee")) {
       return (
         <Link href="/mentorship" className="btn btn-primary">
           <svg
@@ -282,7 +283,7 @@ export default function MentorProfileClient({
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          {profile?.role === "mentor"
+          {hasRole(profile, "mentor")
             ? "You are a mentor"
             : "Register as mentee to request"}
         </Link>
@@ -847,7 +848,7 @@ export default function MentorProfileClient({
       <div className="card bg-gradient-to-r from-primary to-secondary text-primary-content">
         <div className="card-body text-center">
           <h3 className="card-title justify-center text-2xl">
-            {user && profile?.role === "mentee"
+            {user && hasRole(profile, "mentee")
               ? requestStatus === "active"
                 ? `You're matched with ${mentor.displayName}!`
                 : requestStatus === "completed"
@@ -860,7 +861,7 @@ export default function MentorProfileClient({
           <p className="opacity-90 mb-4">
             {!user
               ? "Sign in to request a mentorship match with this mentor."
-              : profile?.role !== "mentee"
+              : !hasRole(profile, "mentee")
                 ? "Register as a mentee to request mentorship."
                 : requestStatus === "active"
                   ? "Continue your mentorship journey together."

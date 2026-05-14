@@ -24,7 +24,7 @@ const firebaseConfig = {
 if (typeof window !== "undefined" && getApps().length === 0) {
   try {
     const app = initializeApp(firebaseConfig);
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === "true") {
       connectFirestoreEmulator(getFirestore(app), "localhost", 8080);
       // Use initializeAuth so the emulator URL is set before any token refresh fires
       const auth = initializeAuth(app, {

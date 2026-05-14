@@ -472,6 +472,7 @@ export async function DELETE(
     const permissionUser = {
       uid: authResult.uid,
       role: userData?.role || null,
+      roles: userData?.roles,
       isAdmin: userData?.isAdmin === true,
     };
 

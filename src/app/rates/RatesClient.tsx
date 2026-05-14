@@ -12,7 +12,7 @@ const CREDENTIAL_PILLS = [
 ];
 
 const STATS = [
-  { label: "YouTube", value: "34k+", sub: "Subscribers" },
+  { label: "YouTube", value: "35.5k+", sub: "Subscribers" },
   { label: "Instagram", value: "64k+", sub: "Followers" },
   { label: "Discord", value: "4,400+", sub: "Devs" },
   { label: "Newsletter", value: "2,100+", sub: "Subscribers" },
@@ -20,12 +20,12 @@ const STATS = [
 
 const FEATURED_PACKAGES = [
   {
-    name: "Awareness",
+    name: "Instagram Launch",
     price: "$1,850",
     alaCarteValue: "$1,950",
     savings: "Save $100",
     badge: null,
-    description: "Best for product launches.",
+    description: "Best for product launches on Instagram. High-impact visuals and direct community engagement with your largest audience.",
     deliverables: [
       "Instagram Reel (up to 90s)",
       "Story set x3 (with link sticker)",
@@ -35,9 +35,9 @@ const FEATURED_PACKAGES = [
   },
   {
     name: "Growth",
-    price: "$4,000",
-    alaCarteValue: "$4,400",
-    savings: "Save $400",
+    price: "$4,750",
+    alaCarteValue: "$5,000",
+    savings: "Save $250",
     badge: "Most popular",
     description: "Two dedicated YouTube videos with maximum organic reach.",
     deliverables: [
@@ -49,9 +49,9 @@ const FEATURED_PACKAGES = [
   },
   {
     name: "Authority",
-    price: "$5,500",
-    alaCarteValue: "$6,600",
-    savings: "Save $1,100",
+    price: "$6,400",
+    alaCarteValue: "$8,400",
+    savings: "Save $2,000",
     badge: null,
     description: "Maximum reach across video, email, and community.",
     deliverables: [
@@ -128,6 +128,31 @@ export default function RatesClient({ post }: { post: any }) {
             </a>
           ))}
         </div>
+      </section>
+
+      {/* === CHANNEL PERFORMANCE === */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold mb-2 text-center">Why my audience?</h2>
+        <p className="text-center text-gray-400 text-sm mb-6">Channel performance highlights — April 2026</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[
+            { label: "Subscribers", value: "35,500+", sub: "+70% growth in 16 months" },
+            { label: "Total views", value: "2.76M", sub: "878 videos published" },
+            { label: "Avg view duration", value: "8 min 8 sec", sub: "Last 90 days" },
+            { label: "Top video", value: "675,000+ views", sub: "Angular Crash Course — still 50+ views/hr" },
+            { label: "Like rate", value: "2.1–4.55%", sub: "Recent dedicated long-form content" },
+            { label: "Content longevity", value: "12–18+ months", sub: "Top videos keep accruing views" },
+          ].map((item) => (
+            <div key={item.label} className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <div className="text-xl font-bold text-neon-purple">{item.value}</div>
+              <div className="text-sm font-semibold mt-0.5">{item.label}</div>
+              <div className="text-xs text-gray-400 mt-0.5">{item.sub}</div>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-gray-500 mt-4 text-center max-w-2xl mx-auto">
+          Per-video analytics for dedicated long-form content available on request.
+        </p>
       </section>
 
       {/* === FEATURED PACKAGES === */}
@@ -210,7 +235,7 @@ export default function RatesClient({ post }: { post: any }) {
           <h2 className="text-2xl font-bold mb-4 text-center">A la carte options</h2>
           <p className="text-center text-gray-400 mb-6 text-sm">Individual placements if you prefer to build your own package.</p>
           <div className="collapse collapse-arrow border border-white/10 bg-white/5 rounded-2xl">
-            <input type="checkbox" />
+            <input type="checkbox" defaultChecked />
             <div className="collapse-title text-lg font-semibold">
               View all platform pricing
             </div>

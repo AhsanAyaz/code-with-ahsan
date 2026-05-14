@@ -100,13 +100,15 @@ async function fetchWithRateLimit(
 export async function lookupMemberByUsername(
   username: string
 ): Promise<DiscordMember | null> {
+  // Normalize: strip leading @ and trailing #discriminator (legacy format)
+  const normalized = username.trim().replace(/^@/, "").replace(/#\d+$/, "");
   const guildId = getGuildId();
-  log.debug(` Looking up member by username: ${username}`);
+  log.debug(` Looking up member by username: ${normalized}`);
 
   try {
     // Search for members matching the username (with rate limit handling)
     const response = await fetchWithRateLimit(
-      `${DISCORD_API}/guilds/${guildId}/members/search?query=${encodeURIComponent(username)}&limit=10`,
+      `${DISCORD_API}/guilds/${guildId}/members/search?query=${encodeURIComponent(normalized)}&limit=10`,
       { headers: getHeaders() }
     );
 
@@ -123,7 +125,7 @@ export async function lookupMemberByUsername(
     // Find exact username match (case-insensitive)
     const match = members.find(
       (m: { user: { username: string } }) =>
-        m.user.username.toLowerCase() === username.toLowerCase()
+        m.user.username.toLowerCase() === normalized.toLowerCase()
     );
 
     if (match) {
@@ -134,7 +136,7 @@ export async function lookupMemberByUsername(
       };
     }
 
-    log.debug(` Member not found: ${username}`);
+    log.debug(` Member not found: ${normalized}`);
     return null;
   } catch (error) {
     log.error("Error looking up Discord member:", error);
@@ -791,6 +793,49 @@ export async function getLastChannelActivityDate(
 }
 
 /**
+ * Fetch a guild member by their Discord user ID (immutable snowflake).
+ * Returns the full member object including `roles` array, or null if not found.
+ *
+ * Used by the DISC-04 weekly reconciliation cron to check role assignments without
+ * mutating any state. Safe for cron use: catches all errors, never throws.
+ *
+ * @param memberId - Immutable Discord user snowflake ID (not username)
+ */
+export async function getGuildMemberById(
+  memberId: string
+): Promise<{ id: string; username: string; roles: string[] } | null> {
+  try {
+    const guildId = getGuildId();
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/guilds/${guildId}/members/${memberId}`,
+      { headers: getHeaders() }
+    );
+
+    if (response.status === 404) {
+      log.debug(`[Discord] Guild member ${memberId} not found (404)`);
+      return null;
+    }
+    if (!response.ok) {
+      const errorText = await response.text();
+      log.error(
+        `[Discord] Failed to fetch guild member ${memberId}: ${response.status} - ${errorText}`
+      );
+      return null;
+    }
+
+    const data = await response.json();
+    return {
+      id: data.user?.id ?? memberId,
+      username: data.user?.username ?? "",
+      roles: Array.isArray(data.roles) ? data.roles : [],
+    };
+  } catch (error) {
+    log.error(`[Discord] Error fetching guild member ${memberId}:`, error);
+    return null;
+  }
+}
+
+/**
  * Check if Discord integration is properly configured
  */
 export function isDiscordConfigured(): boolean {
@@ -806,6 +851,14 @@ export function isDiscordConfigured(): boolean {
 // Discord role IDs for automatic assignment
 export const DISCORD_MENTOR_ROLE_ID = "1422193153397493893";
 export const DISCORD_MENTEE_ROLE_ID = "1445734846730338386";
+/**
+ * Student Ambassador role ID. Assigned by two-stage acceptance flow (DISC-02).
+ *
+ * Set to the real Discord role ID in the CWA server (created 2026-04-22 as part of
+ * Plan 02-09 pre-flight checkpoint). If the role is ever recreated or renamed,
+ * update this constant to the new numeric ID — all acceptance flows import from here.
+ */
+export const DISCORD_AMBASSADOR_ROLE_ID = "1496485291228139641";
 
 // The #find-a-mentor channel ID for completion announcements
 const FIND_A_MENTOR_CHANNEL_ID = "1419645845258768385";
@@ -827,28 +880,33 @@ const PROJECT_COLLABORATOR_ROLE_ID = "1447918848203427840";
  * @returns true if role was assigned successfully, false otherwise
  */
 export async function assignDiscordRole(
-  discordUsername: string,
+  discordUsernameOrId: string,
   roleId: string
 ): Promise<boolean> {
-  log.debug(`Assigning role ${roleId} to user ${discordUsername}`);
+  log.debug(`Assigning role ${roleId} to user ${discordUsernameOrId}`);
 
   try {
-    // Look up the member by username
-    const member = await lookupMemberByUsername(discordUsername);
-    if (!member) {
-      log.warn(
-        `[Discord] Cannot assign role - user not found: ${discordUsername}`
-      );
-      return false;
+    let memberId: string;
+
+    // Discord snowflakes are 17–19 digit integers — use directly, skip the search
+    if (/^\d{17,19}$/.test(discordUsernameOrId)) {
+      memberId = discordUsernameOrId;
+    } else {
+      const member = await lookupMemberByUsername(discordUsernameOrId);
+      if (!member) {
+        log.warn(
+          `[Discord] Cannot assign role - user not found: ${discordUsernameOrId}`
+        );
+        return false;
+      }
+      memberId = member.id;
     }
 
     const guildId = getGuildId();
 
-    // Assign the role using Discord API
-    // PUT /guilds/{guild_id}/members/{user_id}/roles/{role_id}
-    // Returns 204 No Content on success
+    // PUT /guilds/{guild_id}/members/{user_id}/roles/{role_id} — 204 on success
     const response = await fetchWithRateLimit(
-      `${DISCORD_API}/guilds/${guildId}/members/${member.id}/roles/${roleId}`,
+      `${DISCORD_API}/guilds/${guildId}/members/${memberId}/roles/${roleId}`,
       {
         method: "PUT",
         headers: getHeaders(),
@@ -857,21 +915,73 @@ export async function assignDiscordRole(
 
     if (response.status === 204) {
       log.debug(
-        `Successfully assigned role ${roleId} to ${discordUsername} (ID: ${member.id})`
+        `Successfully assigned role ${roleId} to ${discordUsernameOrId} (ID: ${memberId})`
       );
       return true;
     } else {
       const errorText = await response.text();
       log.error(
-        `[Discord] Failed to assign role ${roleId} to ${discordUsername}: ${response.status} - ${errorText}`
+        `[Discord] Failed to assign role ${roleId} to ${discordUsernameOrId}: ${response.status} - ${errorText}`
       );
       return false;
     }
   } catch (error) {
     log.error(
-      `[Discord] Error assigning role ${roleId} to ${discordUsername}:`,
+      `[Discord] Error assigning role ${roleId} to ${discordUsernameOrId}:`,
       error
     );
+    return false;
+  }
+}
+
+/**
+ * DISC-05 — Phase 5 offboarding: remove the Discord Ambassador role.
+ *
+ * Idempotent semantics:
+ *   - 204 (success) → true
+ *   - 404 (member no longer in guild OR already lacks the role) → true (Pitfall 5)
+ *   - any other 4xx/5xx → false (offboard route surfaces a retry banner)
+ *
+ * Mirrors `assignDiscordRole` exactly — same id/username resolution path,
+ * same logger usage, same try/catch envelope.
+ */
+export async function removeDiscordRole(
+  discordMemberIdOrUsername: string,
+  roleId: string,
+): Promise<boolean> {
+  log.debug(`Removing role ${roleId} from user ${discordMemberIdOrUsername}`);
+  try {
+    let memberId: string;
+    if (/^\d{17,19}$/.test(discordMemberIdOrUsername)) {
+      memberId = discordMemberIdOrUsername;
+    } else {
+      const member = await lookupMemberByUsername(discordMemberIdOrUsername);
+      if (!member) {
+        log.warn(`[Discord] Cannot remove role - user not found: ${discordMemberIdOrUsername}`);
+        // Treat as success — the member is already absent from the guild,
+        // which is the desired post-condition.
+        return true;
+      }
+      memberId = member.id;
+    }
+    const guildId = getGuildId();
+    const response = await fetchWithRateLimit(
+      `${DISCORD_API}/guilds/${guildId}/members/${memberId}/roles/${roleId}`,
+      { method: "DELETE", headers: getHeaders() },
+    );
+    if (response.status === 204 || response.status === 404) {
+      log.debug(
+        `Role ${roleId} removed from ${discordMemberIdOrUsername} (status ${response.status})`,
+      );
+      return true;
+    }
+    const errorText = await response.text();
+    log.error(
+      `[Discord] Failed to remove role ${roleId}: ${response.status} - ${errorText}`,
+    );
+    return false;
+  } catch (error) {
+    log.error(`[Discord] Error removing role ${roleId}:`, error);
     return false;
   }
 }

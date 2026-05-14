@@ -38,6 +38,9 @@ interface MentorshipProfile {
   email: string;
   photoURL?: string;
   role: "mentor" | "mentee";
+  // Dual-read field added during roles-array migration (Plan 07). Legacy `role` kept
+  // during the dual-write window; removed in Deploy #5 (Plan 10).
+  roles?: ("mentor" | "mentee")[];
   expertise?: string[];
   currentRole?: string;
   bio?: string;
@@ -577,4 +580,138 @@ export async function sendProjectApplicationEmail(
     <a href="${getSiteUrl()}/projects/${project.id}" class="button">Review Application</a>
   `;
   return sendEmail(creator.email, subject, wrapEmailHtml(content, subject));
+}
+
+// ============================================
+// Ambassador Application Emails (Phase 2)
+// ============================================
+
+/**
+ * Get absolute site URL (internal helper — mirrors getSiteUrl used above).
+ * Not exported; copy-paste of existing pattern already present at top of file.
+ */
+function getSiteUrlForAmbassadorEmails(): string {
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "https://codewithahsan.dev";
+}
+
+/**
+ * EMAIL-01 — Confirmation sent on application submission.
+ *
+ * @param applicantEmail - recipient email (applicant)
+ * @param applicantName - recipient display name
+ * @param cohortName - e.g. "Cohort 1 — Spring 2026"
+ * @returns true on success, false on Mailgun failure (non-blocking per RESEARCH.md)
+ */
+export async function sendAmbassadorApplicationSubmittedEmail(
+  applicantEmail: string,
+  applicantName: string,
+  cohortName: string,
+): Promise<boolean> {
+  const subject = "Your Ambassador Application Has Been Received";
+  const siteUrl = getSiteUrlForAmbassadorEmails();
+  const content = `
+    <h2>Application Received!</h2>
+    <p>Hi ${applicantName},</p>
+    <p>We've received your application for the <strong>${cohortName}</strong> cohort of the Code With Ahsan Student Ambassador Program.</p>
+    <div class="highlight">
+      <p>We'll review your application and get back to you within 2–3 weeks. Please keep an eye on your inbox.</p>
+    </div>
+    <p>You can check your application status from your profile page at any time.</p>
+    <a href="${siteUrl}/profile" class="button">View Application Status</a>
+    <p>Thanks for wanting to grow this community with us.<br/>— Ahsan</p>
+  `;
+  return sendEmail(applicantEmail, subject, wrapEmailHtml(content, subject));
+}
+
+/**
+ * EMAIL-02 — Acceptance email with onboarding steps.
+ *
+ * @param applicantEmail - recipient email
+ * @param applicantName - recipient display name
+ * @param cohortName - e.g. "Cohort 1 — Spring 2026"
+ * @param discordInviteUrl - #ambassadors channel deep link (falls back to server invite)
+ */
+export async function sendAmbassadorApplicationAcceptedEmail(
+  applicantEmail: string,
+  applicantName: string,
+  cohortName: string,
+  discordInviteUrl: string,
+): Promise<boolean> {
+  const subject = `Welcome to the ${cohortName} Ambassador Cohort!`;
+  const siteUrl = getSiteUrlForAmbassadorEmails();
+  const content = `
+    <h2>You're in!</h2>
+    <p>Hi ${applicantName},</p>
+    <p>Congratulations — you've been accepted into the <strong>${cohortName}</strong> cohort of the Code With Ahsan Student Ambassador Program.</p>
+    <div class="highlight success">
+      <p><strong>Next steps:</strong></p>
+      <ol>
+        <li>Join the <a href="${discordInviteUrl}">#ambassadors Discord channel</a> — your new role should already be live.</li>
+        <li>Visit your <a href="${siteUrl}/ambassadors/dashboard">ambassador dashboard</a> to see your onboarding checklist.</li>
+        <li>Grab your referral code and start sharing.</li>
+        <li>Log your first event when you host one.</li>
+      </ol>
+    </div>
+    <p>Excited to build this with you.<br/>— Ahsan</p>
+  `;
+  return sendEmail(applicantEmail, subject, wrapEmailHtml(content, subject));
+}
+
+/**
+ * EMAIL-03 — Decline email (kind-but-firm, encourages reapply).
+ *
+ * @param applicantEmail - recipient email
+ * @param applicantName - recipient display name
+ * @param cohortName - e.g. "Cohort 1 — Spring 2026"
+ * @param reviewerNotes - optional admin notes (sanitized — displayed as-is; admin-entered text)
+ */
+export async function sendAmbassadorApplicationDeclinedEmail(
+  applicantEmail: string,
+  applicantName: string,
+  cohortName: string,
+  reviewerNotes?: string,
+): Promise<boolean> {
+  const subject = "Your Ambassador Application — Update";
+  const siteUrl = getSiteUrlForAmbassadorEmails();
+  const notesBlock = reviewerNotes
+    ? `<div class="info-box"><p><strong>Notes from the reviewer:</strong></p><p>${reviewerNotes}</p></div>`
+    : "";
+  const content = `
+    <h2>Thank you for applying</h2>
+    <p>Hi ${applicantName},</p>
+    <p>Thank you for applying to the <strong>${cohortName}</strong> cohort of the Code With Ahsan Student Ambassador Program. After careful review, we're not able to offer you a spot in this cohort.</p>
+    ${notesBlock}
+    <div class="highlight">
+      <p>This is <strong>not</strong> a no-forever. Future cohorts open regularly — please reapply. The community side of what you submitted mattered, and we'd love to see your next application.</p>
+    </div>
+    <a href="${siteUrl}/ambassadors" class="button">Learn more about the program</a>
+    <p>Grateful you put yourself forward.<br/>— Ahsan</p>
+  `;
+  return sendEmail(applicantEmail, subject, wrapEmailHtml(content, subject));
+}
+
+/**
+ * EMAIL-04 — Phase 5 offboarding email on 2-strike removal.
+ *
+ * Copy taken verbatim from 05-UI-SPEC §"Offboarding Email (EMAIL-04)".
+ * Tone: kind-but-firm, acknowledges contributions, points at future cohorts.
+ */
+export async function sendAmbassadorOffboardingEmail(
+  recipientEmail: string,
+  displayName: string,
+  cohortName: string,
+): Promise<boolean> {
+  const subject = "Your Ambassador Status — Important Update";
+  const siteUrl = getSiteUrlForAmbassadorEmails();
+  const content = `
+    <h2>Ambassador Program Update</h2>
+    <p>Hi ${displayName},</p>
+    <p>After two confirmed accountability checks, your participation in the <strong>${cohortName}</strong> ambassador cohort has ended.</p>
+    <div class="highlight warning">
+      <p>Your Discord Ambassador role has been removed. Your contributions during your time in the program are genuinely appreciated.</p>
+    </div>
+    <p>Future cohorts remain open. We hope to see you again when the timing is better.<br/>— Ahsan</p>
+    <a href="${siteUrl}/ambassadors" class="button">Learn about future cohorts</a>
+  `;
+  return sendEmail(recipientEmail, subject, wrapEmailHtml(content, subject));
 }

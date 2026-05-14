@@ -21,6 +21,11 @@ export default function Footer() {
         </div>
       </nav>
       <nav className="grid grid-flow-col gap-4">
+        {process.env.NEXT_PUBLIC_FEATURE_AMBASSADOR_PROGRAM === "true" && (
+          <Link href="/ambassadors" className="link link-hover text-sm">
+            Ambassadors
+          </Link>
+        )}
         <Link href="/rates" className="link link-hover text-sm">
           Rates
         </Link>

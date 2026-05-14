@@ -2,8 +2,21 @@
 
 import Link from "next/link";
 import { ArrowRight, Users } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function CommunityHero() {
+  const [discordCount, setDiscordCount] = useState(5000);
+
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        const count = data?.social?.discord?.count;
+        if (typeof count === "number" && count > 0) setDiscordCount(count);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden border-b border-base-300">
       {/* Background Grid & Effects */}
@@ -28,7 +41,7 @@ export default function CommunityHero() {
         <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight text-base-content max-w-4xl">
           Join{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-base-content to-secondary">
-            4,500+ Developers
+            {discordCount.toLocaleString()}+ Developers
           </span>{" "}
           Learning Together
         </h1>

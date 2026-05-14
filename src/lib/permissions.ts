@@ -12,7 +12,8 @@
  * - PERM-09: Admins can delete any project, creators can delete their own declined projects
  */
 
-import { MentorshipRole, Project, Roadmap } from "@/types/mentorship";
+import { Project, Roadmap } from "@/types/mentorship";
+import type { Role } from "@/types/mentorship";
 
 /**
  * User context for permission checks
@@ -20,7 +21,7 @@ import { MentorshipRole, Project, Roadmap } from "@/types/mentorship";
  */
 export interface PermissionUser {
   uid: string;
-  role: MentorshipRole;
+  roles: Role[];
   status?: "pending" | "accepted" | "declined" | "disabled" | "changes_requested";
   isAdmin?: boolean;
 }
@@ -46,14 +47,6 @@ export enum RoadmapAction {
 }
 
 // ─── Helper Functions ───────────────────────────────────────────
-
-/**
- * Check if user is an accepted mentor
- */
-function isAcceptedMentor(user: PermissionUser | null): boolean {
-  if (!user) return false;
-  return user.role === "mentor" && user.status === "accepted";
-}
 
 /**
  * Check if user is an admin
@@ -92,6 +85,101 @@ function canOwnerOrAdminAccess(
   if (isAdminUser(user)) return true;
   if (isAuthenticated(user) && isOwner(user, resource)) return true;
   return false;
+}
+
+// ─── Role Helpers ────────────────────────────────────────────────
+
+/**
+ * Returns true if the profile has the given role. Null-safe.
+ * Use hasAnyRole / hasAllRoles for multi-role semantics.
+ */
+export function hasRole(
+  profile: PermissionUser | null | undefined,
+  role: Role
+): boolean {
+  if (!profile) return false;
+  return profile.roles.includes(role);
+}
+
+/**
+ * Returns true if the profile has AT LEAST ONE of the given roles. Null-safe.
+ */
+export function hasAnyRole(
+  profile: PermissionUser | null | undefined,
+  roles: Role[]
+): boolean {
+  if (!profile) return false;
+  if (roles.length === 0) return false;
+  return roles.some((r) => profile.roles.includes(r));
+}
+
+/**
+ * Returns true if the profile has EVERY given role. Null-safe.
+ */
+export function hasAllRoles(
+  profile: PermissionUser | null | undefined,
+  roles: Role[]
+): boolean {
+  if (!profile) return false;
+  if (roles.length === 0) return true;
+  return roles.every((r) => profile.roles.includes(r));
+}
+
+// ─── Claim-side Mirrors (decoded Firebase ID tokens) ─────────────
+
+/**
+ * Narrow structural type for decoded Firebase ID tokens with our custom claims.
+ * Intentionally decoupled from firebase-admin's DecodedIdToken to keep this
+ * helper module dep-free.
+ */
+export interface DecodedRoleClaim {
+  roles?: string[] | null;
+  admin?: boolean;
+  [key: string]: unknown;
+}
+
+/**
+ * Returns true if the decoded token carries the given role claim. Null-safe.
+ * Use in API route handlers that have a decoded token and don't want a Firestore round-trip.
+ */
+export function hasRoleClaim(
+  token: DecodedRoleClaim | null | undefined,
+  role: Role
+): boolean {
+  if (!token) return false;
+  return !!token.roles?.includes(role);
+}
+
+/**
+ * Returns true if the decoded token carries AT LEAST ONE of the given role claims. Null-safe.
+ */
+export function hasAnyRoleClaim(
+  token: DecodedRoleClaim | null | undefined,
+  roles: Role[]
+): boolean {
+  if (!token) return false;
+  if (roles.length === 0) return false;
+  return roles.some((r) => token.roles?.includes(r));
+}
+
+/**
+ * Returns true if the decoded token carries EVERY given role claim. Null-safe.
+ */
+export function hasAllRoleClaimsClaim(
+  token: DecodedRoleClaim | null | undefined,
+  roles: Role[]
+): boolean {
+  if (!token) return false;
+  if (roles.length === 0) return true;
+  return roles.every((r) => token.roles?.includes(r));
+}
+
+/**
+ * Check if user is an accepted mentor.
+ * Refactored onto hasRole (DRY + dual-read benefit for free).
+ */
+export function isAcceptedMentor(user: PermissionUser | null): boolean {
+  return hasRole(user, "mentor") && user?.status === "accepted";
 }
 
 // ─── Project Permissions ────────────────────────────────────────

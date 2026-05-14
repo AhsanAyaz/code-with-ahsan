@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyAuth } from "@/lib/auth";
 import { db } from "@/lib/firebaseAdmin";
 import { getAuthUrl, isCalendarConfigured } from "@/lib/google-calendar";
+import { hasRole } from "@/lib/permissions";
 
 export async function GET(request: NextRequest) {
   try {
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
 
     const profile = profileQuery.docs[0].data();
-    if (profile.role !== "mentor") {
+    if (!hasRole(profile as Parameters<typeof hasRole>[0], "mentor")) {
       return NextResponse.json(
         { error: "Only mentors can connect Google Calendar" },
         { status: 403 }

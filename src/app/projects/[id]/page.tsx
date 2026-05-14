@@ -18,7 +18,6 @@ import {
   ProjectApplication,
   ProjectInvitation,
   ProjectDifficulty,
-  MentorshipRole,
 } from "@/types/mentorship";
 import RecommendedRoadmapsWidget from "@/components/projects/RecommendedRoadmapsWidget";
 import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";

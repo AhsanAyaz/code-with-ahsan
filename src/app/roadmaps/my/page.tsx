@@ -7,6 +7,7 @@ import { useMentorship } from "@/contexts/MentorshipContext";
 import { useToast } from "@/contexts/ToastContext";
 import { authFetch } from "@/lib/apiClient";
 import { Roadmap } from "@/types/mentorship";
+import { hasRole } from "@/lib/permissions";
 import RoadmapActionsDropdown from "@/components/roadmaps/RoadmapActionsDropdown";
 
 export const dynamic = "force-dynamic";
@@ -76,7 +77,7 @@ export default function MyRoadmapsPage() {
     );
   }
 
-  if (profile?.role !== "mentor") {
+  if (!hasRole(profile, "mentor")) {
     return (
       <div className="max-w-4xl mx-auto p-8">
         <div className="alert alert-error">

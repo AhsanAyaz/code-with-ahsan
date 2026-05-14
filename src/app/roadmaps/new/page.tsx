@@ -8,6 +8,7 @@ import Link from "next/link";
 import { authFetch } from "@/lib/apiClient";
 import dynamicImport from "next/dynamic";
 import type { RoadmapDomain, ProjectDifficulty } from "@/types/mentorship";
+import { hasRole } from "@/lib/permissions";
 
 // Force dynamic rendering to prevent prerender errors with client-side context
 export const dynamic = 'force-dynamic';
@@ -223,7 +224,7 @@ Where to go after completing this roadmap.
   }
 
   // Check if user is an accepted mentor
-  if (profile?.role !== "mentor" || profile?.status !== "accepted") {
+  if (!hasRole(profile, "mentor") || profile?.status !== "accepted") {
     return (
       <div className="max-w-4xl mx-auto p-4 sm:p-6">
         <div className="alert alert-error">

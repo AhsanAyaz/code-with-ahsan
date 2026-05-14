@@ -3,9 +3,8 @@ export const LINKS = {
   DISCORD: "https://discord.gg/KSPpuxD8SG",
 };
 
-// Primary flat nav items — shown directly in the top bar
-// Order: community sections first (promoted), then content, then about
-const headerNavLinks = [
+// Base nav items — always visible
+const baseNavLinks = [
   { href: "/mentorship", title: "Mentorship" },
   { href: "/projects", title: "Projects" },
   { href: "/roadmaps", title: "Roadmaps" },
@@ -14,6 +13,18 @@ const headerNavLinks = [
   { href: "https://blog.codewithahsan.dev/", title: "Blog", external: true },
   { href: "/about", title: "About" },
 ];
+
+// Feature-flag-gated insertions (per D-11 in .planning/phases/01-foundation-roles-array-migration/01-CONTEXT.md).
+// NEXT_PUBLIC_* is inlined by Next.js at build time, so this evaluates at bundle time.
+const AMBASSADORS_ENABLED = process.env.NEXT_PUBLIC_FEATURE_AMBASSADOR_PROGRAM === "true";
+
+const headerNavLinks = AMBASSADORS_ENABLED
+  ? [
+      ...baseNavLinks.slice(0, 3), // Mentorship, Projects, Roadmaps
+      { href: "/ambassadors", title: "Ambassadors" },
+      ...baseNavLinks.slice(3),    // Courses, Books, Blog, About
+    ]
+  : baseNavLinks;
 
 // Secondary items — accessible via "More" dropdown or footer
 export const MORE_LINKS = [

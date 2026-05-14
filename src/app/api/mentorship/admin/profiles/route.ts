@@ -151,6 +151,9 @@ export async function PUT(request: NextRequest) {
       updateData.acceptedAt = new Date()
     }
 
+    // Admin profile mutation: status/discordUsername/adminNotes/feedback only.
+    // No claim sync needed (per D-14, only roles / isAdmin mutations trigger claim refresh).
+    // If future edits add roles or isAdmin to this handler, ALSO add a syncRoleClaim call here.
     await profileRef.update(updateData)
 
     // If disabling a profile, also deactivate their mentorship sessions
@@ -208,6 +211,7 @@ export async function PUT(request: NextRequest) {
         displayName: profileData.displayName || '',
         email: profileData.email,
         role: profileData.role,
+        roles: profileData.roles ?? (profileData.role ? [profileData.role] : []),
       }
       
       // Registration approval/decline emails (only for pending -> accepted/declined)

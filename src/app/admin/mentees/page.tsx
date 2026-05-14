@@ -20,6 +20,7 @@ import Link from "next/link";
 import { useDebouncedCallback } from "use-debounce";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { format } from "date-fns";
+import { hasRole } from "@/lib/permissions";
 
 export default function AllMentorsPage() {
   const toast = useToast();
@@ -593,7 +594,7 @@ export default function AllMentorsPage() {
                           </h3>
                           {getStatusBadge(p.status)}
                           <span className="badge badge-outline">
-                            {p.role === "mentee" ? "🎯 Mentor" : "🚀 Mentee"}
+                            {hasRole(p, "mentee") ? "🎯 Mentor" : "🚀 Mentee"}
                           </span>
                           <span
                             className={`badge ${

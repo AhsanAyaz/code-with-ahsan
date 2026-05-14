@@ -111,6 +111,44 @@
 
 ---
 
+## Milestone: v5.0 — CWA Promptathon 2026
+
+**Shipped:** 2026-04-21
+**Phases:** 1 | **Plans:** 3
+**Timeline:** 2 days (2026-03-27 research → 2026-03-28 final polish)
+
+### What Was Built
+- Firestore winners API (public GET, admin PUT/DELETE) backing all display surfaces
+- Fullscreen presenter panel with 10 keyboard-navigable sections and Framer Motion transitions
+- Token-only `HostAuthGate` decoupled from Firebase user (reused `ADMIN_TOKEN_KEY` only)
+- Real-time winners reveal with confetti triggered on 2→3 transition via `prevRevealedCount` ref
+- Admin winner form with `PLACEMENTS` config array DRY-ing up 3 placement sections
+- Public `WinnersDisplay` podium with `announcedAt` gating
+
+### What Worked
+- Event-shaped deadline discipline: phase scoped narrowly to what was needed for a specific live event, resisted scope creep
+- Section-per-component architecture made keyboard navigation simple (parent state machine + section components)
+- Live-event polish commits (judges list, sponsor copy, wrap-up slide) kept out of phase plans — handled as ad-hoc fixes
+- Public GET on winners API simplified the public display page (no auth plumbing needed)
+
+### What Was Inefficient
+- Phase directory cleanup from prior milestone (v4.0 admin course creator dir) was never done when v4.0 shipped — caused cross-contamination during v5.0 archival (CLI included v4.0 SUMMARY.md files in v5.0 accomplishments)
+- Fix: added phase archival to the milestone-complete flow (moved to `v4.0-phases/` and `v5.0-phases/` retroactively)
+- ROADMAP.md Promptathon phase checkboxes stayed `[ ]` throughout the phase — never auto-updated on summary creation
+
+### Patterns Established
+- `PLACEMENTS`-style config arrays for form sections that share structure (gold/silver/bronze etc.)
+- `prevValueRef` pattern for detecting state transitions in effects (prevents double-fire on derived animations)
+- Event-scoped feature subtrees: `/events/[slug]/[year]/` as a colocation pattern for event-specific components + data
+
+### Key Lessons
+1. Always archive phase directories to `milestones/v{X.Y}-phases/` during milestone completion — leftover phase dirs in `.planning/phases/` get absorbed into the next milestone's stats by the gsd-tools CLI
+2. Event-specific milestones are fine to ship as v{N}.0 with a single phase — don't force minor versioning
+3. Token-only auth (decoupled from Firebase user) works well for live-stream operator tools — avoids the auth gate flashing Firebase loading states during presentations
+4. Small, time-boxed milestones benefit from `yolo` mode — less ceremony, more shipping
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution

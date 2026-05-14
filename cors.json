@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://codewithahsan.dev", "https://www.codewithahsan.dev"],
+    "method": ["PUT"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]
