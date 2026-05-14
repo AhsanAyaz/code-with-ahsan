@@ -63,6 +63,12 @@ gcloud run deploy cwa-assistant-bot \
 - `--timeout=3600` is the Cloud Run max; discord.py handles reconnection within the connection lifecycle
 - `--no-allow-unauthenticated` because the bot has no inbound HTTP — it doesn't need public ingress
 
+**After first deploy, also run:**
+```bash
+gcloud run services update cwa-assistant-bot --region=us-central1 --no-cpu-throttling
+```
+Without this, Cloud Run throttles CPU when no HTTP requests are active, which freezes the Discord event loop.
+
 ### Secret Manager setup (one-time, before first deploy)
 
 ```bash
