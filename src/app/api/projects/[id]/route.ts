@@ -471,8 +471,7 @@ export async function DELETE(
     // Check permission using canDeleteProject
     const permissionUser = {
       uid: authResult.uid,
-      role: userData?.role || null,
-      roles: userData?.roles,
+      roles: userData?.roles ?? [],
       isAdmin: userData?.isAdmin === true,
     };
 

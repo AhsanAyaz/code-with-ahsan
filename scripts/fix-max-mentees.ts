@@ -22,7 +22,7 @@ async function fixMaxMentees() {
   const profilesRef = db.collection("mentorship_profiles");
   
   // Get all mentor profiles
-  const snapshot = await profilesRef.where("role", "==", "mentor").get();
+  const snapshot = await profilesRef.where("roles", "array-contains", "mentor").get();
 
   if (snapshot.empty) {
     console.log("No mentor profiles found.");

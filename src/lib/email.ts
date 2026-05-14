@@ -37,10 +37,7 @@ interface MentorshipProfile {
   displayName: string;
   email: string;
   photoURL?: string;
-  role: "mentor" | "mentee";
-  // Dual-read field added during roles-array migration (Plan 07). Legacy `role` kept
-  // during the dual-write window; removed in Deploy #5 (Plan 10).
-  roles?: ("mentor" | "mentee")[];
+  roles: ("mentor" | "mentee")[];
   expertise?: string[];
   currentRole?: string;
   bio?: string;

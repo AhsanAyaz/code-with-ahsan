@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
         uid,
         displayName: displayName || "",
         email: email || "",
-        role: "mentor",
+        roles: ["mentor"],
         expertise: profileData.expertise,
         currentRole: profileData.currentRole,
         bio: profileData.bio,

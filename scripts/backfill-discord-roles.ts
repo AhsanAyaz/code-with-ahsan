@@ -37,20 +37,22 @@ async function main() {
   // Fetch approved mentors
   const mentorSnap = await db
     .collection("mentorship_profiles")
-    .where("role", "==", "mentor")
-    .where("status", "==", "accepted")
+    .where("roles", "array-contains", "mentor")
     .get();
 
   // Fetch all mentees (mentees don't have an approval flow)
   const menteeSnap = await db
     .collection("mentorship_profiles")
-    .where("role", "==", "mentee")
+    .where("roles", "array-contains", "mentee")
     .get();
 
-  const mentors: ProfileDoc[] = mentorSnap.docs.map((doc) => ({
-    uid: doc.id,
-    ...doc.data(),
-  })) as ProfileDoc[];
+  // Filter to accepted mentors in-memory (avoids array-contains + equality composite index)
+  const mentors: ProfileDoc[] = mentorSnap.docs
+    .filter((doc) => doc.data().status === "accepted")
+    .map((doc) => ({
+      uid: doc.id,
+      ...doc.data(),
+    })) as ProfileDoc[];
 
   const mentees: ProfileDoc[] = menteeSnap.docs.map((doc) => ({
     uid: doc.id,

@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
           uid: mentorId,
           displayName: mentorData?.displayName || '',
           email: mentorData?.email || '',
-          role: 'mentor',
+          roles: ['mentor'],
         },
         { rating, feedback: feedback || undefined }
       ).catch(err => console.error('Failed to send rating email:', err))

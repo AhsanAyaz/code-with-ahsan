@@ -183,13 +183,13 @@ export async function DELETE(request: NextRequest) {
             uid: sessionData.mentorId,
             displayName: mentorData.displayName || '',
             email: mentorData.email || '',
-            role: 'mentor',
+            roles: ['mentor'],
           },
           {
             uid: sessionData.menteeId,
             displayName: menteeData.displayName || '',
             email: menteeData.email || '',
-            role: 'mentee',
+            roles: ['mentee'],
           }
         ).catch((err) => console.error('Failed to send end email:', err))
       )

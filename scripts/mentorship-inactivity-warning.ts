@@ -75,7 +75,7 @@ interface MentorshipProfile {
   uid: string;
   displayName: string;
   email: string;
-  role: "mentor" | "mentee";
+  roles: ("mentor" | "mentee")[];
 }
 
 async function main() {

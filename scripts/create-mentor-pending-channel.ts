@@ -101,7 +101,7 @@ async function findMentorByName(name: string): Promise<MentorshipProfile | null>
 
   const snapshot = await db
     .collection("mentorship_profiles")
-    .where("role", "==", "mentor")
+    .where("roles", "array-contains", "mentor")
     .get();
 
   for (const doc of snapshot.docs) {
@@ -260,7 +260,7 @@ async function main() {
     console.log("\nAvailable mentors:");
     const mentorsSnapshot = await db
       .collection("mentorship_profiles")
-      .where("role", "==", "mentor")
+      .where("roles", "array-contains", "mentor")
       .get();
     mentorsSnapshot.docs.forEach((doc) => {
       const data = doc.data();

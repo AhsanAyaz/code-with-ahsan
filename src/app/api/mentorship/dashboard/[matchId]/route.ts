@@ -229,14 +229,12 @@ export async function PUT(
               uid: matchData.mentorId,
               displayName: mentorData?.displayName || "",
               email: mentorData?.email || "",
-              role: "mentor",
               roles: ["mentor"],
             },
             {
               uid: matchData.menteeId,
               displayName: menteeData?.displayName || "",
               email: menteeData?.email || "",
-              role: "mentee",
               roles: ["mentee"],
             }
           ).catch((err) =>
@@ -332,14 +330,12 @@ export async function PUT(
               uid: matchData.menteeId,
               displayName: menteeData.displayName || "",
               email: menteeData.email || "",
-              role: "mentee",
               roles: ["mentee"],
             },
             {
               uid: matchData.mentorId,
               displayName: mentorData.displayName || "",
               email: mentorData.email || "",
-              role: "mentor",
               roles: ["mentor"],
             }
           ).catch((err) => console.error("Failed to send removal email:", err))
@@ -432,14 +428,12 @@ export async function PUT(
               uid: matchData.mentorId,
               displayName: mentorData.displayName || "",
               email: mentorData.email || "",
-              role: "mentor",
               roles: ["mentor"],
             },
             {
               uid: matchData.menteeId,
               displayName: menteeData.displayName || "",
               email: menteeData.email || "",
-              role: "mentee",
               roles: ["mentee"],
             }
           ).catch((err) => console.error("Failed to send end email:", err))
