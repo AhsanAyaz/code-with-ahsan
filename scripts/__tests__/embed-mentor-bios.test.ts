@@ -3,7 +3,7 @@ import {
   extractBioText,
   shouldEmbedMentor,
   EMBEDDING_DIM,
-} from "../embed-mentor-bios";
+} from "@/lib/mentorship/embedBio";
 
 describe("extractBioText", () => {
   it("prefers bio over about", () => {
