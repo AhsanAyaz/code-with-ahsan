@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: context exhaustion at 90% (2026-05-07)
-last_updated: "2026-05-08T17:26:46.384Z"
-last_activity: 2026-05-08 - Completed quick task 260508-r0b: Markdown-based events system with MDX files, build script, EventCard component, dynamic listing with filters, and auto-generated detail pages
+stopped_at: context exhaustion at 75% (2026-05-14)
+last_updated: "2026-05-14T11:32:48.648Z"
+last_activity: 2026-05-06 -- Phase --phase execution started
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 36
   completed_plans: 37
-  percent: 100
+  percent: 80
 ---
 
 # Project State
@@ -181,8 +181,8 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 
 ## Session Continuity
 
-Last session: 2026-05-07T09:52:26.316Z
-Stopped at: context exhaustion at 90% (2026-05-07)
+Last session: 2026-05-14T11:32:48.644Z
+Stopped at: context exhaustion at 75% (2026-05-14)
 Resume file: None
 
 ---
