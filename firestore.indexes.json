@@ -446,28 +446,6 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "role",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "bioEmbedding",
-          "vectorConfig": {
-            "dimension": 768,
-            "flat": {}
-          }
-        }
-      ],
-      "density": "SPARSE_ALL"
-    },
-    {
-      "collectionGroup": "mentorship_profiles",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
           "fieldPath": "roles",
           "arrayConfig": "CONTAINS"
         },
