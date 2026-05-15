@@ -9,7 +9,7 @@ def test_shape_roadmap_url_and_author():
     shaped = _shape_roadmap(raw)
     assert shaped["url"] == "https://codewithahsan.dev/roadmaps/rm-ai"
     assert shaped["author"] == "Ahsan"
-    assert shaped["author_url"] == "https://codewithahsan.dev/mentors/ahsan"
+    assert shaped["author_url"] == "https://codewithahsan.dev/u/ahsan"
 
 
 def test_shape_roadmap_null_author():

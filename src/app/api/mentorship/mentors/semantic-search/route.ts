@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
         return {
           name: (d.displayName as string) || username || "Unknown",
           username: username || null,
-          url: username ? `${PUBLIC_BASE_URL}/mentors/${username}` : null,
+          url: username ? `${PUBLIC_BASE_URL}/mentorship/mentors/${username}` : null,
           expertise: (d.expertise as string[]) || [],
           availability: isAtCapacity
             ? "At capacity"

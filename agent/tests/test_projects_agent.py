@@ -9,7 +9,7 @@ def test_shape_project_url_and_creator():
     shaped = _shape_project(raw)
     assert shaped["url"] == "https://codewithahsan.dev/projects/proj-1"
     assert shaped["creator"] == "Alice"
-    assert shaped["creator_url"] == "https://codewithahsan.dev/mentors/alice"
+    assert shaped["creator_url"] == "https://codewithahsan.dev/u/alice"
 
 
 def test_shape_project_no_id_no_url():

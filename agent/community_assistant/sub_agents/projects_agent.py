@@ -21,7 +21,7 @@ def _shape_project(raw: dict) -> dict:
         "max_team_size": raw.get("maxTeamSize"),
         "github": raw.get("githubRepo"),
         "creator": creator.get("displayName") or creator_username,
-        "creator_url": f"{BASE_URL}/mentors/{creator_username}" if creator_username else None,
+        "creator_url": f"{BASE_URL}/u/{creator_username}" if creator_username else None,
     }
 
 

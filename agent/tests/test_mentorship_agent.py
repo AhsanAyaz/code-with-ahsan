@@ -8,7 +8,7 @@ from community_assistant.sub_agents.mentorship_agent import (
 def test_shape_mentor_includes_url():
     raw = {"username": "muhammad-ali", "displayName": "Muhammad Ali", "expertise": ["Web Development"]}
     shaped = _shape_mentor(raw)
-    assert shaped["url"] == "https://codewithahsan.dev/mentors/muhammad-ali"
+    assert shaped["url"] == "https://codewithahsan.dev/mentorship/mentors/muhammad-ali"
     assert shaped["name"] == "Muhammad Ali"
 
 
@@ -33,7 +33,7 @@ def test_search_mentors_returns_url(mock_platform_client, mentors_payload):
     # Every returned mentor either has a real url or None — never a bare "None" string
     for m in result["mentors"]:
         if m["username"]:
-            assert m["url"] == f"https://codewithahsan.dev/mentors/{m['username']}"
+            assert m["url"] == f"https://codewithahsan.dev/mentorship/mentors/{m['username']}"
         else:
             assert m["url"] is None
 
@@ -50,4 +50,4 @@ def test_search_mentors_error_path(monkeypatch):
 def test_mentor_url_shape(mock_platform_client, mentors_payload):
     mock_platform_client("/api/mentorship/mentors", mentors_payload)
     result = search_mentors("Web Development")
-    assert any("/mentors/" in (m["url"] or "") for m in result["mentors"])
+    assert any("/mentorship/mentors/" in (m["url"] or "") for m in result["mentors"])

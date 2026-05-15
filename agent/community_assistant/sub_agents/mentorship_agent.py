@@ -22,7 +22,7 @@ def _shape_mentor(raw: dict) -> dict:
     return {
         "name": raw.get("displayName") or username or "Unknown",
         "username": username,
-        "url": f"{BASE_URL}/mentors/{username}" if username else None,
+        "url": f"{BASE_URL}/mentorship/mentors/{username}" if username else None,
         "expertise": raw.get("expertise", []),
         "availability": availability,
         "rating": raw.get("avgRating") or None,

@@ -20,7 +20,7 @@ def _shape_roadmap(raw: dict) -> dict:
         "difficulty": raw.get("difficulty"),
         "estimated_hours": raw.get("estimatedHours"),
         "author": creator.get("displayName") or author_username,
-        "author_url": f"{BASE_URL}/mentors/{author_username}" if author_username else None,
+        "author_url": f"{BASE_URL}/u/{author_username}" if author_username else None,
         "content_url": raw.get("contentUrl"),
     }
 

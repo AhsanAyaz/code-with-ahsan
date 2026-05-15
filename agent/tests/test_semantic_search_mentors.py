@@ -29,7 +29,7 @@ def test_semantic_success_shape(mock_platform_client, semantic_mentors_payload):
     assert "bio_excerpt" in top
     assert "match_score" in top
     assert "url" in top
-    assert top["url"].startswith("https://codewithahsan.dev/mentors/")
+    assert top["url"].startswith("https://codewithahsan.dev/mentorship/mentors/")
 
 
 def test_semantic_error_propagation(monkeypatch):
@@ -51,7 +51,7 @@ def test_semantic_respects_limit(mock_platform_client):
                 "username": f"m{i}",
                 "bio_excerpt": "x",
                 "match_score": i * 0.1,
-                "url": f"https://codewithahsan.dev/mentors/m{i}",
+                "url": f"https://codewithahsan.dev/mentorship/mentors/m{i}",
             }
             for i in range(10)
         ]

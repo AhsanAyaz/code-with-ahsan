@@ -84,7 +84,7 @@ describe("GET /api/mentorship/mentors/semantic-search", () => {
     expect(body.mentors[0]).toMatchObject({
       name: "Muhammad Ali",
       username: "muhammad-ali",
-      url: "https://codewithahsan.dev/mentors/muhammad-ali",
+      url: "https://codewithahsan.dev/mentorship/mentors/muhammad-ali",
       match_score: 0.18,
     });
     expect(body.mentors[0].bio_excerpt).toContain("Angular");
