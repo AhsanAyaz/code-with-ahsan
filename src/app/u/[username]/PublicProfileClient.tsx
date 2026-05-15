@@ -105,17 +105,13 @@ export default function PublicProfileClient({ profile }: Props) {
             </div>
           )}
 
-          {/* Mentor section — for v1, link to the legacy mentor detail UI.
-             NOTE: /mentorship/mentors/[username] 308-redirects back here (Task 3),
-             so this link is a v2-scaffold placeholder. Keeping the mentor deep-profile
-             inlined is deferred. The badges + public fields above cover PRESENT-02. */}
           {isMentor && (
             <div className="mt-6 pt-6 border-t border-base-200">
               <p className="text-sm text-base-content/70">
                 {profile.displayName} is a Code With Ahsan mentor.
               </p>
               <Link
-                href={`/mentorship/mentors?search=${encodeURIComponent(profile.displayName)}`}
+                href={`/mentorship/mentors/${profile.username}`}
                 className="btn btn-primary btn-sm mt-2"
               >
                 See mentor profile
