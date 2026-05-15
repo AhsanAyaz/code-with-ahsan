@@ -18,10 +18,6 @@ service cloud.firestore {
              request.auth.token.status == "accepted";
     }
 
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
     // ─── Projects ───────────────────────────────
     match /projects/{projectId} {
       // Anyone signed in can read approved/active/completed projects
