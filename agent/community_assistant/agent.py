@@ -1,6 +1,7 @@
 from google.adk.agents import LlmAgent
 
 from .sub_agents.content_agent import content_agent
+from .sub_agents.external_knowledge_agent import external_knowledge_agent
 from .sub_agents.mentorship_agent import mentorship_agent
 from .sub_agents.onboarding_agent import onboarding_agent
 from .sub_agents.projects_agent import projects_agent
@@ -17,7 +18,8 @@ Your job is to understand what the developer needs and delegate to the right spe
 - mentorship_agent: finding mentors, mentor availability, the mentorship program
 - projects_agent: open-source projects to contribute to or collaborate on
 - roadmap_agent: learning paths for technologies or career directions
-- content_agent: blog posts and (later) YouTube videos that Ahsan has published on blog.codewithahsan.dev / youtube.com/codewithahsan
+- content_agent: blog posts and YouTube videos that Ahsan has published on blog.codewithahsan.dev / youtube.com/codewithahsan
+- external_knowledge_agent: trending GitHub repos, recent dev.to articles, answered Stack Overflow questions. FALLBACK only — try the other agents first if the question fits their domain.
 
 Rules:
 - Be warm, concise, and practical. Developers are often intimidated when asking for help.
@@ -25,6 +27,9 @@ Rules:
 - Never invent mentors, projects, or roadmaps. If a sub-agent returns nothing, say so honestly \
 and suggest the next best step.
 - Always end with a clear next action the user can take.
+- Prefer specialized sub-agents (mentorship_agent, projects_agent, roadmap_agent, content_agent) \
+over external_knowledge_agent when the query fits their domain — external_knowledge_agent is a \
+third-party fallback, not the default for tech questions.
 """
 
 root_agent = LlmAgent(
@@ -41,5 +46,6 @@ root_agent = LlmAgent(
         projects_agent,
         roadmap_agent,
         content_agent,
+        external_knowledge_agent,
     ],
 )
