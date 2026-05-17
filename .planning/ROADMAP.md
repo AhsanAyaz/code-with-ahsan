@@ -204,9 +204,12 @@ Plans:
 **Goal:** Extend the ADK community assistant with specialized sub-agents that surface Code With Ahsan's owned content (blog.codewithahsan.dev, YouTube channel) and third-party developer knowledge (GitHub, dev.to, Stack Overflow), so the assistant answers "what's trending", "do you have a video on X", and "any article on Y" without leaving the Discord channel — without exceeding API quotas via an ISR-cached Next.js proxy layer.
 **Requirements**: External-content surface for ADK assistant. Community feedback (2026-05-15) flagged that the agent is sandboxed to Firestore-only data and can't reach owned (blog/YT) or third-party (GH/dev.to/SO) knowledge. Caching is a hard constraint — YouTube Data API v3 daily quota is 10k units; Ghost Content API is rate-limited per key.
 **Depends on:** Phase 2 (ADK base assistant must exist)
+**Plans:** 3 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 2.1 to break down)
+- [ ] 02.1-01-PLAN.md — Ghost blog ISR proxy + content_agent skeleton with search_blog_posts + root agent wiring + Vitest + pytest (Wave 1 / EXT-CONTENT-BLOG)
+- [ ] 02.1-02-PLAN.md — YouTube ISR proxy (channelId-scoped, reuses YT_API_KEY) + content_agent.search_youtube_videos + Vitest + pytest (Wave 2 / EXT-CONTENT-YOUTUBE)
+- [ ] 02.1-03-PLAN.md — external_knowledge_agent with GitHub/dev.to/Stack Overflow direct httpx tools + root agent wiring + local adk web smoke + Cloud Run redeploy of cwa-assistant-bot (Wave 3 / EXT-KNOWLEDGE-GITHUB, EXT-KNOWLEDGE-DEVTO, EXT-KNOWLEDGE-STACKOVERFLOW, EXT-ADK-REDEPLOY)
 
 ---
-*Last updated: 2026-05-17 — Phase 2.1 ADK content/external-knowledge sub-phase added*
+*Last updated: 2026-05-17 — Phase 2.1 broken down into 3 plans (Ghost blog ISR / YouTube ISR / external_knowledge + redeploy)*
