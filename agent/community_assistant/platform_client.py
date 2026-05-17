@@ -69,3 +69,8 @@ def fetch_roadmaps(domain: str | None = None, difficulty: str | None = None) -> 
     if difficulty:
         params["difficulty"] = difficulty
     return _get("/api/roadmaps", params)
+
+
+def fetch_blog_posts(query: str) -> dict:
+    """Fetch Ghost blog posts matching a query from the ISR-cached /api/content/blog/search proxy."""
+    return _get("/api/content/blog/search", {"q": query})
