@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from community_assistant.sub_agents.content_agent import get_featured_resource
 from community_assistant.sub_agents.featured_resources import (
     FEATURED_RESOURCES,
     lookup_featured_resource,
@@ -58,25 +57,3 @@ def test_lookup_deduplicates_per_resource():
     hits = lookup_featured_resource("developer ai guide ai guide")
     ids = [h["id"] for h in hits]
     assert ids.count("ai-guide") == 1
-
-
-def test_get_featured_resource_tool_success():
-    out = get_featured_resource("AI guide")
-    assert out["status"] == "success"
-    assert out["topic"] == "AI guide"
-    assert out["count"] == 1
-    assert out["resources"][0]["url"] == AI_GUIDE_URL
-
-
-def test_get_featured_resource_tool_no_match():
-    out = get_featured_resource("kafka rebalance")
-    assert out["status"] == "success"
-    assert out["count"] == 0
-    assert out["resources"] == []
-
-
-def test_get_featured_resource_tool_empty_topic():
-    out = get_featured_resource("")
-    assert out["status"] == "success"
-    assert out["count"] == 0
-    assert out["resources"] == []

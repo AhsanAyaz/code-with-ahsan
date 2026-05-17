@@ -38,54 +38,44 @@ def _shape_youtube_video(raw: dict) -> dict:
     }
 
 
-def get_featured_resource(topic: str) -> dict:
-    """Returns curated flagship resources hand-picked for known topics.
-
-    Call this FIRST before search_blog_posts / search_youtube_videos. Surfaces
-    deterministic URLs for flagship content (e.g., the AI Guide) without relying
-    on Ghost NQL substring matching.
-
-    Args:
-        topic: User's topic or keyword (e.g., "AI guide", "developer AI guide").
-
-    Returns:
-        A dict with status, topic, count, and resources (id, title, url, description).
-        count=0 means no curated match — fall through to search_blog_posts /
-        search_youtube_videos.
-    """
-    t = (topic or "").strip()
-    if not t:
-        return {"status": "success", "topic": t, "count": 0, "resources": []}
-    hits = lookup_featured_resource(t)
-    return {
-        "status": "success",
-        "topic": t,
-        "count": len(hits),
-        "resources": hits,
-    }
-
-
 def search_blog_posts(query: str) -> dict:
     """Searches Ahsan's blog at blog.codewithahsan.dev for posts matching a query.
 
     Calls the ISR-cached /api/content/blog/search proxy (3600s cache) so repeated queries
     do not hit the Ghost Content API on every Discord message.
 
+    A deterministic curated-resource lookup runs first: if the query matches a flagship
+    resource (e.g., the AI Guide), the response includes a `featured` list with hand-picked
+    URLs that ALWAYS take precedence over Ghost search hits. Surface featured items first
+    in any user-facing reply.
+
     Args:
-        query: Topic or keyword to search for (e.g., "angular signals", "rxjs", "ngrx").
+        query: Topic or keyword to search for (e.g., "angular signals", "AI guide", "rxjs").
 
     Returns:
-        A dict with status, query, count, and a list of posts (title, slug, url,
-        excerpt, published_at, reading_time). Always include the url in your reply.
-        On error, returns status="error", message, and posts=[].
+        A dict with status, query, count, posts (title, slug, url, excerpt, published_at,
+        reading_time), and `featured` (curated flagship hits — list of {id, title, url,
+        description}). The featured list may be non-empty even when posts is empty.
     """
     q = (query or "").strip()
+    featured = lookup_featured_resource(q) if q else []
+
     if not q:
-        return {"status": "error", "message": "Query is empty", "posts": []}
+        return {
+            "status": "error",
+            "message": "Query is empty",
+            "posts": [],
+            "featured": [],
+        }
 
     result = fetch_blog_posts(q)
     if not result["ok"]:
-        return {"status": "error", "message": result["error"], "posts": []}
+        return {
+            "status": "partial" if featured else "error",
+            "message": result["error"],
+            "posts": [],
+            "featured": featured,
+        }
 
     all_posts = (result["data"] or {}).get("posts", [])
     sliced = all_posts[:_BLOG_LIMIT]
@@ -94,6 +84,7 @@ def search_blog_posts(query: str) -> dict:
         "query": q,
         "count": len(sliced),
         "posts": [_shape_blog_post(p) for p in sliced],
+        "featured": featured,
     }
 
 
@@ -140,32 +131,35 @@ content_agent = LlmAgent(
     instruction="""You help community members discover content Ahsan has published.
 
 TOOLS:
-- get_featured_resource(topic): returns curated flagship URLs for known topics \
-(e.g., the AI Guide). Deterministic — call FIRST before any search tool.
 - search_blog_posts(query): searches blog.codewithahsan.dev for articles and tutorials \
-matching the query (ISR-cached, 3600s). Returns post titles, URLs, and excerpts.
+matching the query (ISR-cached, 3600s). Response contains TWO lists:
+    * `featured`: curated flagship URLs hand-picked for this topic (e.g., the AI Guide). \
+ALWAYS surface these FIRST and prominently — they are the canonical answer.
+    * `posts`: additional Ghost search hits. Surface only after featured items, and only \
+if they add genuine value.
 - search_youtube_videos(query): searches Code With Ahsan's YouTube channel for videos \
 matching the query (ISR-cached, 3600s). Returns video titles, youtube.com/watch?v= URLs, \
 and thumbnails. Results are scoped to Ahsan's channel only.
 
 SEARCH STRATEGY:
-1. ALWAYS call get_featured_resource(topic) FIRST with the user's topic. \
-If count > 0, surface those curated URLs in your reply (they take precedence over search hits).
-2. Then choose the search tool based on intent:
-   - "VIDEO / YouTube / watch a tutorial on X" → search_youtube_videos(X).
-   - "BLOG / ARTICLE / WRITTEN on X" / "read about Y" → search_blog_posts(X).
-   - Ambiguous ("anything on X" / "any content on Y") → call BOTH in parallel \
-and merge top results.
-3. If get_featured_resource returned a hit AND the search tools return additional hits, \
-list the curated one(s) first, then "Other related content:" with the search hits.
+- "VIDEO / YouTube / watch a tutorial on X" → search_youtube_videos(X).
+- "BLOG / ARTICLE / WRITTEN on X" / "read about Y" / "do you have a guide on Z" → \
+search_blog_posts(X).
+- Ambiguous ("anything on X" / "any content on Y") → call BOTH in parallel and merge.
+
+REPLY FORMAT:
+- If search_blog_posts returned `featured` items: lead with them. Example: \
+"Yes — here's Ahsan's AI Guide: <title> — <url>". Then optionally add "Other related posts:" \
+with the top one or two from `posts`.
+- If only `posts` (no featured): surface those normally.
+- If both featured and posts are empty: say so honestly, link \
+https://blog.codewithahsan.dev directly.
 
 GUIDELINES:
 - ALWAYS cite the URL in your reply — community trust is non-negotiable. \
 Never fabricate a URL.
-- If both featured and search count are 0 for blog, say so honestly and suggest \
-https://blog.codewithahsan.dev directly.
 - If count is 0 for YouTube, say so honestly and suggest https://youtube.com/codewithahsan directly.
 - If a tool returns status="error", tell the user the platform is temporarily unreachable.
 - End every reply with a single concrete next action the user can take.""",
-    tools=[get_featured_resource, search_blog_posts, search_youtube_videos],
+    tools=[search_blog_posts, search_youtube_videos],
 )
