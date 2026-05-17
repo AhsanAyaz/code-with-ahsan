@@ -208,7 +208,7 @@ Plans:
 
 Plans:
 - [x] 02.1-01-PLAN.md — Ghost blog ISR proxy + content_agent skeleton with search_blog_posts + root agent wiring + Vitest + pytest (Wave 1 / EXT-CONTENT-BLOG)
-- [ ] 02.1-02-PLAN.md — YouTube ISR proxy (channelId-scoped, reuses YT_API_KEY) + content_agent.search_youtube_videos + Vitest + pytest (Wave 2 / EXT-CONTENT-YOUTUBE)
+- [x] 02.1-02-PLAN.md — YouTube ISR proxy (channelId-scoped, reuses YT_API_KEY) + content_agent.search_youtube_videos + Vitest + pytest (Wave 2 / EXT-CONTENT-YOUTUBE)
 - [ ] 02.1-03-PLAN.md — external_knowledge_agent with GitHub/dev.to/Stack Overflow direct httpx tools + root agent wiring + local adk web smoke + Cloud Run redeploy of cwa-assistant-bot (Wave 3 / EXT-KNOWLEDGE-GITHUB, EXT-KNOWLEDGE-DEVTO, EXT-KNOWLEDGE-STACKOVERFLOW, EXT-ADK-REDEPLOY)
 
 ---
