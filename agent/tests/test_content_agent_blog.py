@@ -78,3 +78,48 @@ def test_search_blog_posts_error_path(monkeypatch):
     result = search_blog_posts("anything")
     assert result["status"] == "error"
     assert result["posts"] == []
+    assert result["featured"] == []
+
+
+# ---------------------------------------------------------------------------
+# Featured-resource injection — deterministic curated layer
+# ---------------------------------------------------------------------------
+
+AI_GUIDE_URL = (
+    "https://blog.codewithahsan.dev/"
+    "build-smarter-the-developers-guide-to-staying-relevant-in-the-ai-era/"
+)
+
+
+def test_search_blog_posts_includes_featured_on_match(
+    mock_platform_client, content_blog_payload
+):
+    mock_platform_client("/api/content/blog/search", content_blog_payload)
+    result = search_blog_posts("AI guide")
+    assert result["status"] == "success"
+    assert len(result["featured"]) == 1
+    assert result["featured"][0]["url"] == AI_GUIDE_URL
+
+
+def test_search_blog_posts_empty_featured_on_no_match(
+    mock_platform_client, content_blog_payload
+):
+    mock_platform_client("/api/content/blog/search", content_blog_payload)
+    result = search_blog_posts("angular signals")
+    assert result["featured"] == []
+
+
+def test_search_blog_posts_featured_still_returned_on_ghost_error(monkeypatch):
+    monkeypatch.setattr(
+        "community_assistant.platform_client._get",
+        lambda path, params=None: {
+            "ok": False,
+            "error": "ghost down",
+            "path": "/api/content/blog/search",
+        },
+    )
+    result = search_blog_posts("AI guide")
+    assert result["status"] == "partial"
+    assert result["posts"] == []
+    assert len(result["featured"]) == 1
+    assert result["featured"][0]["url"] == AI_GUIDE_URL

@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "title": "Why does &quot;await&quot; inside a lock cause a deadlock in C#?",
+      "link": "https://stackoverflow.com/questions/12345/await-inside-lock-deadlock",
+      "score": 523,
+      "answer_count": 5,
+      "is_answered": true,
+      "tags": ["c#", "async-await", "deadlock", "locking"],
+      "creation_date": 1672531200,
+      "owner": {
+        "display_name": "JohnDoeDevExpert"
+      }
+    },
+    {
+      "title": "TypeScript: How to infer return type from generic function?",
+      "link": "https://stackoverflow.com/questions/67890/typescript-infer-return-type",
+      "score": 312,
+      "answer_count": 3,
+      "is_answered": true,
+      "tags": ["typescript", "generics", "type-inference"],
+      "creation_date": 1673000000,
+      "owner": {
+        "display_name": "TSWizard42"
+      }
+    }
+  ],
+  "has_more": true,
+  "quota_max": 10000,
+  "quota_remaining": 9875
+}
