@@ -1,0 +1,23 @@
+{
+  "posts": [
+    {
+      "title": "Angular Signals Deep Dive",
+      "slug": "angular-signals-deep-dive",
+      "url": "https://blog.codewithahsan.dev/angular-signals-deep-dive/",
+      "excerpt": "A comprehensive guide to Angular Signals — from the basics of signal primitives to computed values and effects in real-world applications.",
+      "published_at": "2025-03-15",
+      "feature_image": "https://blog.codewithahsan.dev/content/images/angular-signals.png",
+      "reading_time": 8
+    },
+    {
+      "title": "Getting Started with RxJS",
+      "slug": "getting-started-with-rxjs",
+      "url": "https://blog.codewithahsan.dev/getting-started-with-rxjs/",
+      "excerpt": "Learn the fundamentals of reactive programming with RxJS: observables, operators, and practical examples.",
+      "published_at": "2024-11-20",
+      "feature_image": null,
+      "reading_time": 6
+    }
+  ],
+  "count": 2
+}

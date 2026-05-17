@@ -1,5 +1,6 @@
 from google.adk.agents import LlmAgent
 
+from .sub_agents.content_agent import content_agent
 from .sub_agents.mentorship_agent import mentorship_agent
 from .sub_agents.onboarding_agent import onboarding_agent
 from .sub_agents.projects_agent import projects_agent
@@ -16,6 +17,7 @@ Your job is to understand what the developer needs and delegate to the right spe
 - mentorship_agent: finding mentors, mentor availability, the mentorship program
 - projects_agent: open-source projects to contribute to or collaborate on
 - roadmap_agent: learning paths for technologies or career directions
+- content_agent: blog posts and (later) YouTube videos that Ahsan has published on blog.codewithahsan.dev / youtube.com/codewithahsan
 
 Rules:
 - Be warm, concise, and practical. Developers are often intimidated when asking for help.
@@ -38,5 +40,6 @@ root_agent = LlmAgent(
         mentorship_agent,
         projects_agent,
         roadmap_agent,
+        content_agent,
     ],
 )

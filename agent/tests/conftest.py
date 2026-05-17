@@ -35,6 +35,11 @@ def semantic_mentors_payload() -> dict:
 
 
 @pytest.fixture
+def content_blog_payload() -> dict:
+    return _load("content_blog.json")
+
+
+@pytest.fixture
 def mock_platform_client(monkeypatch) -> Callable[[str, dict], None]:
     """Patch community_assistant.platform_client._get to return a fixed payload by path prefix."""
     routes: dict[str, dict] = {}
