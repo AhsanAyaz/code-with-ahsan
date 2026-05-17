@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const filter = encodeURIComponent(`title:~'${q}'`);
+    const escaped = q.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    const filter = encodeURIComponent(`title:~'${escaped}'`);
     const url =
       `https://blog.codewithahsan.dev/ghost/api/content/posts/` +
       `?key=${process.env.GHOST_CONTENT_API_KEY}` +

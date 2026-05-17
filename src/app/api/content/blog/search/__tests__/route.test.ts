@@ -58,6 +58,27 @@ describe("GET /api/content/blog/search", () => {
     expect(calledOptions?.next?.revalidate).toBe(3600);
   });
 
+  it("escapes single quotes and backslashes in NQL filter", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ posts: [] }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const req = new NextRequest(
+      "http://test.local/api/content/blog/search?q=" +
+        encodeURIComponent("Developer's \\guide")
+    );
+    const res = await GET(req);
+    expect(res.status).toBe(200);
+
+    const [calledUrl] = mockFetch.mock.calls[0];
+    // Ghost NQL requires backslash-escaped single quotes inside filter strings.
+    // The double-escape \\\\' represents the literal sequence \' after URL decoding.
+    expect(calledUrl).toContain("filter=" + encodeURIComponent("title:~'Developer\\'s \\\\guide'"));
+  });
+
   it("returns 502 on Ghost upstream non-2xx", async () => {
     vi.stubGlobal(
       "fetch",
