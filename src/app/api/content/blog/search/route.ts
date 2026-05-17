@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const filter = encodeURIComponent(`title:~'${q}',excerpt:~'${q}'`);
+    const filter = encodeURIComponent(`title:~'${q}'`);
     const url =
       `https://blog.codewithahsan.dev/ghost/api/content/posts/` +
       `?key=${process.env.GHOST_CONTENT_API_KEY}` +
