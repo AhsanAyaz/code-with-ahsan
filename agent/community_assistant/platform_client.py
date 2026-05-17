@@ -74,3 +74,8 @@ def fetch_roadmaps(domain: str | None = None, difficulty: str | None = None) -> 
 def fetch_blog_posts(query: str) -> dict:
     """Fetch Ghost blog posts matching a query from the ISR-cached /api/content/blog/search proxy."""
     return _get("/api/content/blog/search", {"q": query})
+
+
+def fetch_youtube_videos(query: str) -> dict:
+    """Fetch YouTube videos from Code With Ahsan's channel via the ISR-cached /api/content/youtube/search proxy."""
+    return _get("/api/content/youtube/search", {"q": query})

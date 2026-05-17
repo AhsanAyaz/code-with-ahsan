@@ -40,6 +40,11 @@ def content_blog_payload() -> dict:
 
 
 @pytest.fixture
+def content_youtube_payload() -> dict:
+    return _load("content_youtube.json")
+
+
+@pytest.fixture
 def mock_platform_client(monkeypatch) -> Callable[[str, dict], None]:
     """Patch community_assistant.platform_client._get to return a fixed payload by path prefix."""
     routes: dict[str, dict] = {}

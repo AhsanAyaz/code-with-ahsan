@@ -1,0 +1,32 @@
+{
+  "videos": [
+    {
+      "videoId": "dQw4w9WgXcQ",
+      "title": "Angular Signals: Complete Guide",
+      "description": "In this video, we explore Angular signals from basics to advanced patterns. We cover signal creation, computed signals, and effects with real-world examples.",
+      "url": "https://youtube.com/watch?v=dQw4w9WgXcQ",
+      "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+      "published_at": "2025-01-15T10:00:00Z",
+      "channel_title": "Code With Ahsan"
+    },
+    {
+      "videoId": "abc123def456",
+      "title": "RxJS Operators Deep Dive",
+      "description": "Mastering RxJS operators: switchMap, mergeMap, exhaustMap, and concatMap explained with practical Angular examples.",
+      "url": "https://youtube.com/watch?v=abc123def456",
+      "thumbnail": "https://i.ytimg.com/vi/abc123def456/hqdefault.jpg",
+      "published_at": "2024-11-20T09:00:00Z",
+      "channel_title": "Code With Ahsan"
+    },
+    {
+      "videoId": "xyz789uvw012",
+      "title": "NgRx State Management Tutorial",
+      "description": "Full NgRx tutorial covering actions, reducers, selectors, and effects. Learn how to manage complex application state in Angular.",
+      "url": "https://youtube.com/watch?v=xyz789uvw012",
+      "thumbnail": "https://i.ytimg.com/vi/xyz789uvw012/hqdefault.jpg",
+      "published_at": "2024-09-05T08:00:00Z",
+      "channel_title": "Code With Ahsan"
+    }
+  ],
+  "count": 3
+}
