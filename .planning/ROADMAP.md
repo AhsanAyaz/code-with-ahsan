@@ -199,5 +199,14 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 Plans:
 - [ ] TBD (run /gsd:plan-phase 2 to break down)
 
+### Phase 2.1: ADK Content & External Knowledge Sub-Agents
+
+**Goal:** Extend the ADK community assistant with specialized sub-agents that surface Code With Ahsan's owned content (blog.codewithahsan.dev, YouTube channel) and third-party developer knowledge (GitHub, dev.to, Stack Overflow), so the assistant answers "what's trending", "do you have a video on X", and "any article on Y" without leaving the Discord channel — without exceeding API quotas via an ISR-cached Next.js proxy layer.
+**Requirements**: External-content surface for ADK assistant. Community feedback (2026-05-15) flagged that the agent is sandboxed to Firestore-only data and can't reach owned (blog/YT) or third-party (GH/dev.to/SO) knowledge. Caching is a hard constraint — YouTube Data API v3 daily quota is 10k units; Ghost Content API is rate-limited per key.
+**Depends on:** Phase 2 (ADK base assistant must exist)
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 2.1 to break down)
+
 ---
-*Last updated: 2026-05-06 — v6.0 Phase 5 planned (5 plans, 3 waves)*
+*Last updated: 2026-05-17 — Phase 2.1 ADK content/external-knowledge sub-phase added*
