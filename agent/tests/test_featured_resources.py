@@ -41,6 +41,18 @@ def test_lookup_staying_relevant_phrase():
     assert any(h["id"] == "ai-guide" for h in hits)
 
 
+def test_lookup_developer_guide_phrase():
+    # "developer guide" alone (no AI) should still map to the AI Guide since the post
+    # title literally is "The Developer's Guide to Staying Relevant in the AI Era".
+    hits = lookup_featured_resource("do you have a developer guide")
+    assert any(h["id"] == "ai-guide" for h in hits)
+
+
+def test_lookup_devs_guide_phrase():
+    hits = lookup_featured_resource("Ahsan's developer's guide")
+    assert any(h["id"] == "ai-guide" for h in hits)
+
+
 def test_lookup_empty_returns_empty():
     assert lookup_featured_resource("") == []
     assert lookup_featured_resource("   ") == []

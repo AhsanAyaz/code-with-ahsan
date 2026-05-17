@@ -89,3 +89,80 @@ def test_search_youtube_videos_error_path(monkeypatch):
     result = search_youtube_videos("signals")
     assert result["status"] == "error"
     assert result["videos"] == []
+
+
+# ---------------------------------------------------------------------------
+# Relevance filter — drop tangential search hits
+# ---------------------------------------------------------------------------
+
+def test_search_youtube_videos_drops_irrelevant_titles(mock_platform_client):
+    payload = {
+        "videos": [
+            {
+                "videoId": "good1",
+                "title": "Mastering Angular Signals: What Every Developer Needs to Know",
+                "description": "x",
+                "url": "https://youtube.com/watch?v=good1",
+                "thumbnail": None,
+                "published_at": "2025-01-01",
+                "channel_title": "Code With Ahsan",
+            },
+            {
+                "videoId": "bad1",
+                "title": "How to Connect MCP Servers to Gemini CLI",
+                "description": "y",
+                "url": "https://youtube.com/watch?v=bad1",
+                "thumbnail": None,
+                "published_at": "2025-01-02",
+                "channel_title": "Code With Ahsan",
+            },
+            {
+                "videoId": "bad2",
+                "title": "How to become a sole developer to code without the internet",
+                "description": "z",
+                "url": "https://youtube.com/watch?v=bad2",
+                "thumbnail": None,
+                "published_at": "2025-01-03",
+                "channel_title": "Code With Ahsan",
+            },
+        ],
+        "count": 3,
+    }
+    mock_platform_client("/api/content/youtube/search", payload)
+    result = search_youtube_videos("angular signals")
+    ids = [v["video_id"] for v in result["videos"]]
+    assert ids == ["good1"]
+
+
+def test_search_youtube_videos_developer_guide_returns_empty_when_no_real_match(
+    mock_platform_client,
+):
+    payload = {
+        "videos": [
+            {
+                "videoId": "v1",
+                "title": "So you're a senior JavaScript developer ?!!",
+                "description": "x",
+                "url": "https://youtube.com/watch?v=v1",
+                "thumbnail": None,
+                "published_at": "2025-01-01",
+                "channel_title": "Code With Ahsan",
+            },
+            {
+                "videoId": "v2",
+                "title": "Mastering Angular Signals",
+                "description": "y",
+                "url": "https://youtube.com/watch?v=v2",
+                "thumbnail": None,
+                "published_at": "2025-01-02",
+                "channel_title": "Code With Ahsan",
+            },
+        ],
+        "count": 2,
+    }
+    mock_platform_client("/api/content/youtube/search", payload)
+    # "developer guide" needs BOTH tokens in title — none of these match.
+    result = search_youtube_videos("do you have a developer guide?")
+    assert result["status"] == "success"
+    assert result["videos"] == []
+    assert result["count"] == 0

@@ -1,6 +1,7 @@
 from google.adk.agents import LlmAgent
 
 from ..platform_client import BASE_URL, fetch_blog_posts, fetch_youtube_videos
+from ._relevance import is_relevant, query_tokens
 from .featured_resources import lookup_featured_resource
 
 _BLOG_LIMIT = 5
@@ -112,7 +113,13 @@ def search_youtube_videos(query: str) -> dict:
         return {"status": "error", "message": result["error"], "videos": []}
 
     all_videos = (result["data"] or {}).get("videos", [])
-    sliced = all_videos[:_YOUTUBE_LIMIT]
+
+    # Deterministic relevance gate: every meaningful query token must appear in title.
+    # Drops tangential YouTube results that share no real keywords with the query.
+    tokens = query_tokens(q)
+    relevant = [v for v in all_videos if is_relevant(tokens, v.get("title"))]
+
+    sliced = relevant[:_YOUTUBE_LIMIT]
     return {
         "status": "success",
         "query": q,
@@ -154,6 +161,13 @@ with the top one or two from `posts`.
 - If only `posts` (no featured): surface those normally.
 - If both featured and posts are empty: say so honestly, link \
 https://blog.codewithahsan.dev directly.
+
+RELEVANCE RULE (CRITICAL — community trust):
+- The search tools already drop low-relevance results. Trust them.
+- If the returned `posts` or `videos` list is EMPTY, do NOT pad your reply with \
+tangentially related results from a different query. Say "I couldn't find a match" honestly.
+- NEVER list YouTube videos whose titles do not clearly relate to the user's topic, \
+even if the tool returns them. When unsure, drop the result.
 
 GUIDELINES:
 - ALWAYS cite the URL in your reply — community trust is non-negotiable. \
