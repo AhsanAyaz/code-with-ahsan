@@ -1,6 +1,7 @@
 from google.adk.agents import LlmAgent
 
 from ..platform_client import BASE_URL, fetch_blog_posts, fetch_youtube_videos
+from .featured_resources import lookup_featured_resource
 
 _BLOG_LIMIT = 5
 _YOUTUBE_LIMIT = 5
@@ -34,6 +35,33 @@ def _shape_youtube_video(raw: dict) -> dict:
         "description": (raw.get("description") or "")[:300],
         "thumbnail": raw.get("thumbnail"),
         "published_at": raw.get("published_at"),
+    }
+
+
+def get_featured_resource(topic: str) -> dict:
+    """Returns curated flagship resources hand-picked for known topics.
+
+    Call this FIRST before search_blog_posts / search_youtube_videos. Surfaces
+    deterministic URLs for flagship content (e.g., the AI Guide) without relying
+    on Ghost NQL substring matching.
+
+    Args:
+        topic: User's topic or keyword (e.g., "AI guide", "developer AI guide").
+
+    Returns:
+        A dict with status, topic, count, and resources (id, title, url, description).
+        count=0 means no curated match — fall through to search_blog_posts /
+        search_youtube_videos.
+    """
+    t = (topic or "").strip()
+    if not t:
+        return {"status": "success", "topic": t, "count": 0, "resources": []}
+    hits = lookup_featured_resource(t)
+    return {
+        "status": "success",
+        "topic": t,
+        "count": len(hits),
+        "resources": hits,
     }
 
 
@@ -112,6 +140,8 @@ content_agent = LlmAgent(
     instruction="""You help community members discover content Ahsan has published.
 
 TOOLS:
+- get_featured_resource(topic): returns curated flagship URLs for known topics \
+(e.g., the AI Guide). Deterministic — call FIRST before any search tool.
 - search_blog_posts(query): searches blog.codewithahsan.dev for articles and tutorials \
 matching the query (ISR-cached, 3600s). Returns post titles, URLs, and excerpts.
 - search_youtube_videos(query): searches Code With Ahsan's YouTube channel for videos \
@@ -119,18 +149,23 @@ matching the query (ISR-cached, 3600s). Returns video titles, youtube.com/watch?
 and thumbnails. Results are scoped to Ahsan's channel only.
 
 SEARCH STRATEGY:
-- If the user asks "do you have a VIDEO on X" / "YouTube on Y" / "watch a tutorial on Z" \
-→ call search_youtube_videos(X).
-- If the user asks "BLOG / ARTICLE / WRITTEN ON X" / "read about Y" → call search_blog_posts(X).
-- If ambiguous ("do you have anything on X" / "any content on Y") → call BOTH in parallel \
-and merge the top results into a single reply.
+1. ALWAYS call get_featured_resource(topic) FIRST with the user's topic. \
+If count > 0, surface those curated URLs in your reply (they take precedence over search hits).
+2. Then choose the search tool based on intent:
+   - "VIDEO / YouTube / watch a tutorial on X" → search_youtube_videos(X).
+   - "BLOG / ARTICLE / WRITTEN on X" / "read about Y" → search_blog_posts(X).
+   - Ambiguous ("anything on X" / "any content on Y") → call BOTH in parallel \
+and merge top results.
+3. If get_featured_resource returned a hit AND the search tools return additional hits, \
+list the curated one(s) first, then "Other related content:" with the search hits.
 
 GUIDELINES:
 - ALWAYS cite the URL in your reply — community trust is non-negotiable. \
 Never fabricate a URL.
-- If count is 0 for blog, say so honestly and suggest https://blog.codewithahsan.dev directly.
+- If both featured and search count are 0 for blog, say so honestly and suggest \
+https://blog.codewithahsan.dev directly.
 - If count is 0 for YouTube, say so honestly and suggest https://youtube.com/codewithahsan directly.
 - If a tool returns status="error", tell the user the platform is temporarily unreachable.
 - End every reply with a single concrete next action the user can take.""",
-    tools=[search_blog_posts, search_youtube_videos],
+    tools=[get_featured_resource, search_blog_posts, search_youtube_videos],
 )
