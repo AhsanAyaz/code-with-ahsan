@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 
 ## Current Position
 
-Phase: 02.1 (adk-content-external-knowledge-sub-agents) — VERIFIED, Cloud Run deploy deferred (human-action gate)
-Plan: 3 of 3 complete (Task 4 of plan 03 — `gcloud run deploy cwa-assistant-bot` — awaiting user approval)
-Status: Phase 02.1 implementation, smoke, and verification complete
-Last activity: 2026-05-18 -- Wave 3 verification + post-smoke hardening complete
+Phase: 02.1 (adk-content-external-knowledge-sub-agents) — SHIPPED
+Plan: 3 of 3 complete (all tasks including Cloud Run deploy)
+Status: Production Discord bot serving content_agent + external_knowledge_agent at revision `cwa-assistant-bot-00008-v9v`
+Last activity: 2026-05-18 -- Cloud Run deploy complete; phase 02.1 fully shipped
 
 ## Performance Metrics
 
