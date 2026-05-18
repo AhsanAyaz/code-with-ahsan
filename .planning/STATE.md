@@ -130,6 +130,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02.1]: external_knowledge_agent is PRIMARY (not fallback) for GitHub-at-large / dev.to / Stack Overflow — projects_agent is scoped to "Ahsan's OWN repos" and content_agent is scoped to "blog.codewithahsan.dev / Ahsan's YouTube channel" only; routing precedence lives in ROOT_INSTRUCTION disambiguation block
 - [Phase 02.1]: external_knowledge_agent calls upstream APIs directly via three dedicated `httpx.Client` instances (one per upstream) — no Next.js wrapper for GH/dev.to/SO because their quotas are generous and ISR caching adds no value for third-party reads
 - [Phase 02.1]: dev.to fallback (top=7 after empty tag search) logs at WARNING and degrades to empty rather than flipping status to error — the primary tag call already proved dev.to is reachable, so a fallback blip is non-fatal
+- [Phase 02.1]: Discord bot usage tracking uses structured stdout JSON → Cloud Logging → log-based metrics (NO Firestore writes, NO BigQuery streaming insert) — Cloud Run scrapes stdout as jsonPayload for free, log-based metrics power Cloud Monitoring dashboards, and a BigQuery log sink can be added later for analytics-grade aggregation. Privacy: HMAC-SHA256 hash of Discord user_id keyed by `USAGE_HASH_SECRET` (16 hex chars), raw query text NEVER emitted (`query_len` + derived `query_topic` only)
 
 ### Workflow Notes
 

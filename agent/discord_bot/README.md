@@ -97,6 +97,106 @@ gcloud run services update cwa-assistant-bot \
   --update-env-vars="ASSISTANT_CHANNEL_ID=<new channel id>"
 ```
 
+## Usage tracking (Cloud Logging log-based metrics)
+
+Every handled message emits one structured JSON line to stdout. Cloud Run captures stdout into Cloud Logging as `jsonPayload`. No new infra. Privacy: raw user IDs are HMAC-hashed; raw query text is never emitted.
+
+Event shape (see `usage_metrics.py`):
+
+```json
+{"severity":"INFO","event_type":"bot_message","user_id_hash":"abc123def4567890",
+ "guild_id":"987...","channel_id":"1504...","routed_agents":["root_agent","content_agent"],
+ "tool_calls":["search_blog_posts"],"cited_urls":["https://blog.codewithahsan.dev/x"],
+ "response_chars":512,"latency_ms":1234,"status":"ok","query_len":42,"query_topic":"content_agent"}
+```
+
+### One-time secret setup
+
+Generate a 32-byte secret and store it in Secret Manager so user_id_hash is stable across deploys:
+
+```bash
+python -c "import secrets; print(secrets.token_hex(32))" | tr -d '\n' \
+  | gcloud secrets create usage-hash-secret --data-file=- --replication-policy=automatic
+```
+
+Add the secret to the service (extend the existing `--set-secrets` list):
+
+```bash
+gcloud run services update cwa-assistant-bot --region=us-central1 \
+  --update-secrets="USAGE_HASH_SECRET=usage-hash-secret:latest"
+```
+
+### Create log-based metrics
+
+Filter all five on `jsonPayload.event_type="bot_message"`. Run from anywhere with `gcloud` configured:
+
+```bash
+PROJECT=$(gcloud config get-value project)
+FILTER='resource.type="cloud_run_revision" AND resource.labels.service_name="cwa-assistant-bot" AND jsonPayload.event_type="bot_message"'
+
+# 1. Total questions answered (status=ok)
+gcloud logging metrics create cwa_bot_questions_answered \
+  --description="Count of successfully answered bot messages" \
+  --log-filter="${FILTER} AND jsonPayload.status=\"ok\""
+
+# 2. Errors
+gcloud logging metrics create cwa_bot_errors \
+  --description="Count of bot message handler errors" \
+  --log-filter="${FILTER} AND jsonPayload.status=\"error\""
+
+# 3. Latency distribution (P50/P95 visible in Cloud Monitoring)
+gcloud logging metrics create cwa_bot_latency_ms \
+  --description="Bot response latency in milliseconds" \
+  --log-filter="${FILTER}" \
+  --value-extractor="EXTRACT(jsonPayload.latency_ms)" \
+  --metric-descriptor='{"metricKind":"DELTA","valueType":"DISTRIBUTION","unit":"ms"}'
+
+# 4. Counts split by sub-agent (query_topic label)
+gcloud logging metrics create cwa_bot_by_topic \
+  --description="Bot messages by routed sub-agent" \
+  --log-filter="${FILTER}" \
+  --label-extractors="topic=EXTRACT(jsonPayload.query_topic)" \
+  --metric-descriptor='{"metricKind":"DELTA","valueType":"INT64","labels":[{"key":"topic","valueType":"STRING"}]}'
+
+# 5. Unique users (rough — based on user_id_hash cardinality)
+gcloud logging metrics create cwa_bot_unique_users \
+  --description="Distinct user_id_hash values per window" \
+  --log-filter="${FILTER}" \
+  --label-extractors="user_hash=EXTRACT(jsonPayload.user_id_hash)" \
+  --metric-descriptor='{"metricKind":"DELTA","valueType":"INT64","labels":[{"key":"user_hash","valueType":"STRING"}]}'
+```
+
+### Ad-hoc queries (Logs Explorer)
+
+Last 7 days, just the bot events:
+
+```
+resource.type="cloud_run_revision"
+resource.labels.service_name="cwa-assistant-bot"
+jsonPayload.event_type="bot_message"
+```
+
+Top topics this week (Logs Explorer → CREATE METRIC → or in BigQuery after sink):
+
+```sql
+SELECT jsonPayload.query_topic, COUNT(*) AS n
+FROM `PROJECT.LOG_DATASET.run_googleapis_com_stdout_*`
+WHERE jsonPayload.event_type = "bot_message"
+  AND _TABLE_SUFFIX BETWEEN FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY))
+                        AND FORMAT_DATE('%Y%m%d', CURRENT_DATE())
+GROUP BY 1 ORDER BY n DESC;
+```
+
+### Optional: BigQuery sink (when volume justifies it)
+
+```bash
+bq --location=US mk --dataset $PROJECT:cwa_bot_logs
+gcloud logging sinks create cwa-bot-bq-sink \
+  bigquery.googleapis.com/projects/$PROJECT/datasets/cwa_bot_logs \
+  --log-filter="${FILTER}"
+# Then grant the sink's writer service account BigQuery Data Editor on the dataset (gcloud prints the SA).
+```
+
 ## Manual smoke test (local)
 
 1. Run the bot locally with a test Discord server.

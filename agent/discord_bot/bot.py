@@ -15,6 +15,29 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import Iterable
 
+# usage_metrics lives next to bot.py — works under `python bot.py` (script dir
+# auto-added to sys.path) and under pytest (conftest adds agent/ root).
+try:
+    from discord_bot.usage_metrics import (
+        build_usage_event,
+        collect_event_signals,
+        derive_query_topic,
+        emit_usage_event,
+        extract_cited_urls,
+        hash_user_id,
+        now_ms,
+    )
+except ImportError:
+    from usage_metrics import (  # type: ignore[no-redef]
+        build_usage_event,
+        collect_event_signals,
+        derive_query_topic,
+        emit_usage_event,
+        extract_cited_urls,
+        hash_user_id,
+        now_ms,
+    )
+
 # ---- Pure helpers (importable & testable without discord.py side effects) ----
 
 logger = logging.getLogger("cwa_assistant_bot")
@@ -118,6 +141,12 @@ def _wire_bot():
     APP_NAME = "CWAAssistant"
     BOT_TOKEN = os.environ.get("CWA_ASSISTANT_DISCORD_BOT_TOKEN")
     CHANNEL_ID_RAW = os.environ.get("ASSISTANT_CHANNEL_ID", "0")
+    USAGE_HASH_SECRET = os.environ.get("USAGE_HASH_SECRET", "")
+    if not USAGE_HASH_SECRET:
+        logger.warning(
+            "USAGE_HASH_SECRET is not set — usage events will emit with empty user_id_hash "
+            "(uniqueness metric disabled, counts still work)."
+        )
     try:
         ASSISTANT_CHANNEL_ID = int(CHANNEL_ID_RAW)
     except ValueError:
@@ -158,6 +187,12 @@ def _wire_bot():
             await message.channel.send("Hi! Ask me about mentors, projects, or roadmaps.")
             return
 
+        guild_id = message.guild.id if message.guild else None
+        started_ms = now_ms()
+        events_seen: list = []
+        status = "ok"
+        response_text = ""
+
         try:
             session_id = await get_or_create_session(
                 user_id=user_id,
@@ -167,7 +202,6 @@ def _wire_bot():
             )
             new_message = types.Content(role="user", parts=[types.Part(text=user_text)])
 
-            response_text = ""
             async with message.channel.typing():
                 # CRITICAL: run_async, not run() — research §Pitfall 6
                 async for event in runner.run_async(
@@ -175,20 +209,41 @@ def _wire_bot():
                     session_id=session_id,
                     new_message=new_message,
                 ):
+                    events_seen.append(event)
                     if event.is_final_response() and event.content:
                         response_text = event.content.parts[0].text or ""
                         break
 
             if not response_text:
                 response_text = "I couldn't generate a response. Please try again."
+                status = "empty_response"
 
             for chunk in chunk_reply(response_text):
                 await message.channel.send(chunk)
         except Exception as exc:  # graceful, never crash the bot
+            status = "error"
             try:
                 await message.channel.send(format_error_reply(exc))
             except Exception:
                 logger.exception("failed to send error reply")
+        finally:
+            try:
+                signals = collect_event_signals(events_seen)
+                emit_usage_event(build_usage_event(
+                    user_id_hash=hash_user_id(user_id, USAGE_HASH_SECRET),
+                    guild_id=guild_id,
+                    channel_id=message.channel.id,
+                    routed_agents=signals["agents"],
+                    tool_calls=signals["tool_calls"],
+                    cited_urls=extract_cited_urls(response_text),
+                    response_chars=len(response_text),
+                    latency_ms=now_ms() - started_ms,
+                    status=status,
+                    query_len=len(user_text),
+                    query_topic=derive_query_topic(signals["agents"]),
+                ))
+            except Exception:
+                logger.exception("failed to emit usage event")
 
     return client, BOT_TOKEN
 
