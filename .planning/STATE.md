@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
-stopped_at: context exhaustion at 75% (2026-05-14)
-last_updated: "2026-05-17T18:06:32.381Z"
-last_activity: 2026-05-17 -- Phase 02.1 execution started
+stopped_at: null
+last_updated: "2026-05-18T06:25:00.000Z"
+last_activity: 2026-05-18 -- Phase 02.1 wave 3 verification + post-smoke hardening complete; Cloud Run deploy deferred to human-action gate
 progress:
-  total_phases: 7
+  total_phases: 6
   completed_phases: 5
-  total_plans: 43
-  completed_plans: 41
-  percent: 95
+  total_plans: 34
+  completed_plans: 38
+  percent: 90
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 
 ## Current Position
 
-Phase: 02.1 (adk-content-external-knowledge-sub-agents) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 02.1
-Last activity: 2026-05-17 -- Phase 02.1 execution started
+Phase: 02.1 (adk-content-external-knowledge-sub-agents) — VERIFIED, Cloud Run deploy deferred (human-action gate)
+Plan: 3 of 3 complete (Task 4 of plan 03 — `gcloud run deploy cwa-assistant-bot` — awaiting user approval)
+Status: Phase 02.1 implementation, smoke, and verification complete
+Last activity: 2026-05-18 -- Wave 3 verification + post-smoke hardening complete
 
 ## Performance Metrics
 
@@ -122,6 +122,14 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 03-05]: getCurrentCohortId fallback: status=active preferred, most-recent startDate as fallback, null if no cohorts
 - [Phase 03-05]: Server component reads db directly on /ambassadors — no internal fetch to /api/ambassadors/public to avoid URL-resolution footgun
 - [Phase 03-05]: Sort updatedAt ASC on public_ambassadors projection (monotonic proxy for acceptance order) — joinedAt lives on subdoc and not duplicated to avoid schema drift
+- [Phase 02.1]: Ghost Content API NQL only supports filtering on `title:~`, not `excerpt:~` — `excerpt:~` returns `ER_BAD_FIELD_ERROR`. Title-only substring search is the only viable Content-API search path
+- [Phase 02.1]: Ghost NQL filter strings require backslash escaping for both `\\` and `'` before URL encoding — `Developer's guide` would otherwise terminate the filter literal prematurely
+- [Phase 02.1]: Curated featured-resource layer lives in a Python dict (`featured_resources.py`), not a vector DB — flagship content like the AI Guide is keyword-matched deterministically and PREPENDED into `search_blog_posts.posts` with `"featured": True` so Gemini Flash cannot drop it
+- [Phase 02.1]: YouTube Data API `search.list` does not expose duration — Shorts filtering needs a second `videos.list?part=contentDetails` call to parse ISO 8601 duration and drop ≤60s
+- [Phase 02.1]: YouTube tool runs a Python title-overlap relevance gate (`_relevance.py`) over upstream results because `search.list` ranks loosely — every meaningful query token must appear as substring of title or the result is dropped
+- [Phase 02.1]: external_knowledge_agent is PRIMARY (not fallback) for GitHub-at-large / dev.to / Stack Overflow — projects_agent is scoped to "Ahsan's OWN repos" and content_agent is scoped to "blog.codewithahsan.dev / Ahsan's YouTube channel" only; routing precedence lives in ROOT_INSTRUCTION disambiguation block
+- [Phase 02.1]: external_knowledge_agent calls upstream APIs directly via three dedicated `httpx.Client` instances (one per upstream) — no Next.js wrapper for GH/dev.to/SO because their quotas are generous and ISR caching adds no value for third-party reads
+- [Phase 02.1]: dev.to fallback (top=7 after empty tag search) logs at WARNING and degrades to empty rather than flipping status to error — the primary tag call already proved dev.to is reachable, so a fallback blip is non-fatal
 
 ### Workflow Notes
 
@@ -178,11 +186,12 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 03-public-presentation P03-06 | 3min | 3 tasks | 2 files |
 | Phase 03-public-presentation P03-05 | 45 | 4 tasks | 5 files |
 | Phase 02-adk-community-assistant P00–P03 | ~4h | 4 waves, 41 pytest cases | agent/ + src/app/api/mentorship/mentors/semantic-search |
+| Phase 02.1-adk-content-external-knowledge-sub-agents P01–P03 | ~6h (incl. post-smoke hardening) | 3 plans, 93 pytest + 15 vitest cases, 7 post-smoke bug fixes | agent/community_assistant/sub_agents/{content_agent,external_knowledge_agent,featured_resources,_relevance}.py + src/app/api/content/{blog,youtube}/search/ |
 
 ## Session Continuity
 
-Last session: 2026-05-14T14:21:38.940Z
-Stopped at: context exhaustion at 75% (2026-05-14)
+Last session: 2026-05-17T19:31:22.807Z
+Stopped at: context exhaustion at 75% (2026-05-17)
 Resume file: None
 
 ---
