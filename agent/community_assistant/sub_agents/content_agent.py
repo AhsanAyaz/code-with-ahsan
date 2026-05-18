@@ -39,6 +39,18 @@ def _shape_youtube_video(raw: dict) -> dict:
     }
 
 
+def _featured_as_post(item: dict) -> dict:
+    return {
+        "title": item["title"],
+        "slug": None,
+        "url": item["url"],
+        "excerpt": item["description"],
+        "published_at": None,
+        "reading_time": None,
+        "featured": True,
+    }
+
+
 def search_blog_posts(query: str) -> dict:
     """Searches Ahsan's blog at blog.codewithahsan.dev for posts matching a query.
 
@@ -46,46 +58,44 @@ def search_blog_posts(query: str) -> dict:
     do not hit the Ghost Content API on every Discord message.
 
     A deterministic curated-resource lookup runs first: if the query matches a flagship
-    resource (e.g., the AI Guide), the response includes a `featured` list with hand-picked
-    URLs that ALWAYS take precedence over Ghost search hits. Surface featured items first
-    in any user-facing reply.
+    resource (e.g., the AI Guide), it is PREPENDED to the posts list and tagged
+    {"featured": true}. Featured items are part of `posts` so the agent cannot omit them.
 
     Args:
         query: Topic or keyword to search for (e.g., "angular signals", "AI guide", "rxjs").
 
     Returns:
-        A dict with status, query, count, posts (title, slug, url, excerpt, published_at,
-        reading_time), and `featured` (curated flagship hits — list of {id, title, url,
-        description}). The featured list may be non-empty even when posts is empty.
+        A dict with status, query, count, and posts (title, slug, url, excerpt,
+        published_at, reading_time, featured). Featured posts appear FIRST in the list.
+        On Ghost upstream failure but with a curated match, still returns the curated
+        post (status="partial").
     """
     q = (query or "").strip()
-    featured = lookup_featured_resource(q) if q else []
 
     if not q:
-        return {
-            "status": "error",
-            "message": "Query is empty",
-            "posts": [],
-            "featured": [],
-        }
+        return {"status": "error", "message": "Query is empty", "posts": []}
+
+    featured = [_featured_as_post(f) for f in lookup_featured_resource(q)]
+    featured_urls = {p["url"] for p in featured}
 
     result = fetch_blog_posts(q)
-    if not result["ok"]:
-        return {
-            "status": "partial" if featured else "error",
-            "message": result["error"],
-            "posts": [],
-            "featured": featured,
-        }
+    ghost_ok = bool(result["ok"])
+    ghost_posts: list[dict] = []
+    if ghost_ok:
+        all_posts = (result["data"] or {}).get("posts", [])
+        ghost_posts = [_shape_blog_post(p) for p in all_posts[:_BLOG_LIMIT]]
 
-    all_posts = (result["data"] or {}).get("posts", [])
-    sliced = all_posts[:_BLOG_LIMIT]
+    deduped_ghost = [p for p in ghost_posts if p.get("url") not in featured_urls]
+    merged = (featured + deduped_ghost)[:_BLOG_LIMIT]
+
+    if not ghost_ok and not featured:
+        return {"status": "error", "message": result["error"], "posts": []}
+
     return {
-        "status": "success",
+        "status": "success" if ghost_ok else "partial",
         "query": q,
-        "count": len(sliced),
-        "posts": [_shape_blog_post(p) for p in sliced],
-        "featured": featured,
+        "count": len(merged),
+        "posts": merged,
     }
 
 
@@ -139,11 +149,10 @@ content_agent = LlmAgent(
 
 TOOLS:
 - search_blog_posts(query): searches blog.codewithahsan.dev for articles and tutorials \
-matching the query (ISR-cached, 3600s). Response contains TWO lists:
-    * `featured`: curated flagship URLs hand-picked for this topic (e.g., the AI Guide). \
-ALWAYS surface these FIRST and prominently — they are the canonical answer.
-    * `posts`: additional Ghost search hits. Surface only after featured items, and only \
-if they add genuine value.
+matching the query (ISR-cached, 3600s). Returns a `posts` list. Each post may carry a \
+`featured: true` flag — those are hand-picked flagship resources and MUST be surfaced \
+FIRST in your reply. Featured posts appear at the top of the list and you must never \
+omit them.
 - search_youtube_videos(query): searches Code With Ahsan's YouTube channel for videos \
 matching the query (ISR-cached, 3600s). Returns video titles, youtube.com/watch?v= URLs, \
 and thumbnails. Results are scoped to Ahsan's channel only.
@@ -155,17 +164,16 @@ search_blog_posts(X).
 - Ambiguous ("anything on X" / "any content on Y") → call BOTH in parallel and merge.
 
 REPLY FORMAT:
-- If search_blog_posts returned `featured` items: lead with them. Example: \
-"Yes — here's Ahsan's AI Guide: <title> — <url>". Then optionally add "Other related posts:" \
-with the top one or two from `posts`.
-- If only `posts` (no featured): surface those normally.
-- If both featured and posts are empty: say so honestly, link \
-https://blog.codewithahsan.dev directly.
+- If any post has `featured: true`: lead with it. Example: "Yes — here's Ahsan's AI Guide: \
+<title> — <url>". Then optionally add the next 1–2 non-featured posts.
+- If only non-featured posts: surface them normally.
+- If `posts` is empty: say so honestly and link https://blog.codewithahsan.dev directly. \
+Do NOT pad with unrelated YouTube hits.
 
 RELEVANCE RULE (CRITICAL — community trust):
 - The search tools already drop low-relevance results. Trust them.
-- If the returned `posts` or `videos` list is EMPTY, do NOT pad your reply with \
-tangentially related results from a different query. Say "I couldn't find a match" honestly.
+- If a returned list is EMPTY, do NOT pad your reply with tangentially related results \
+from a different query. Say "I couldn't find a match" honestly.
 - NEVER list YouTube videos whose titles do not clearly relate to the user's topic, \
 even if the tool returns them. When unsure, drop the result.
 
