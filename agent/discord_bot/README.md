@@ -187,6 +187,23 @@ WHERE jsonPayload.event_type = "bot_message"
 GROUP BY 1 ORDER BY n DESC;
 ```
 
+### Marketing dashboard
+
+Pre-built Cloud Monitoring dashboard with 7 widgets (questions answered, unique members helped, errors, P95 latency, hourly answered chart, sub-agent pie chart, P50/P95 latency lines):
+
+```bash
+gcloud monitoring dashboards create \
+  --config-from-file=agent/discord_bot/monitoring/cwa-bot-dashboard.json
+```
+
+View at: https://console.cloud.google.com/monitoring/dashboards (filter by name "CWA Assistant Bot")
+
+To update an existing dashboard, find its ID then:
+```bash
+gcloud monitoring dashboards list --filter='displayName:"CWA Assistant Bot"' --format="value(name)"
+gcloud monitoring dashboards update <DASHBOARD_ID> --config-from-file=agent/discord_bot/monitoring/cwa-bot-dashboard.json
+```
+
 ### Optional: BigQuery sink (when volume justifies it)
 
 ```bash

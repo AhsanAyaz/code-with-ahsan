@@ -1,0 +1,251 @@
+{
+  "displayName": "CWA Assistant Bot — Usage",
+  "mosaicLayout": {
+    "columns": 12,
+    "tiles": [
+      {
+        "xPos": 0,
+        "yPos": 0,
+        "width": 3,
+        "height": 4,
+        "widget": {
+          "title": "Questions answered (7d)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "timeSeriesFilter": {
+                "filter": "metric.type=\"logging.googleapis.com/user/cwa_bot_questions_answered\" resource.type=\"cloud_run_revision\"",
+                "aggregation": {
+                  "alignmentPeriod": "604800s",
+                  "perSeriesAligner": "ALIGN_SUM",
+                  "crossSeriesReducer": "REDUCE_SUM"
+                }
+              }
+            },
+            "sparkChartView": {
+              "sparkChartType": "SPARK_LINE"
+            },
+            "thresholds": []
+          }
+        }
+      },
+      {
+        "xPos": 3,
+        "yPos": 0,
+        "width": 3,
+        "height": 4,
+        "widget": {
+          "title": "Unique members helped (7d)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "timeSeriesFilter": {
+                "filter": "metric.type=\"logging.googleapis.com/user/cwa_bot_unique_users\" resource.type=\"cloud_run_revision\"",
+                "aggregation": {
+                  "alignmentPeriod": "604800s",
+                  "perSeriesAligner": "ALIGN_SUM",
+                  "crossSeriesReducer": "REDUCE_COUNT",
+                  "groupByFields": ["metric.label.user_hash"]
+                }
+              }
+            },
+            "sparkChartView": {
+              "sparkChartType": "SPARK_LINE"
+            },
+            "thresholds": []
+          }
+        }
+      },
+      {
+        "xPos": 6,
+        "yPos": 0,
+        "width": 3,
+        "height": 4,
+        "widget": {
+          "title": "Errors (7d)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "timeSeriesFilter": {
+                "filter": "metric.type=\"logging.googleapis.com/user/cwa_bot_errors\" resource.type=\"cloud_run_revision\"",
+                "aggregation": {
+                  "alignmentPeriod": "604800s",
+                  "perSeriesAligner": "ALIGN_SUM",
+                  "crossSeriesReducer": "REDUCE_SUM"
+                }
+              }
+            },
+            "sparkChartView": {
+              "sparkChartType": "SPARK_LINE"
+            },
+            "thresholds": [
+              {
+                "value": 10,
+                "color": "YELLOW",
+                "direction": "ABOVE"
+              },
+              {
+                "value": 50,
+                "color": "RED",
+                "direction": "ABOVE"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 9,
+        "yPos": 0,
+        "width": 3,
+        "height": 4,
+        "widget": {
+          "title": "P95 latency (ms)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "timeSeriesFilter": {
+                "filter": "metric.type=\"logging.googleapis.com/user/cwa_bot_latency_ms\" resource.type=\"cloud_run_revision\"",
+                "aggregation": {
+                  "alignmentPeriod": "3600s",
+                  "perSeriesAligner": "ALIGN_PERCENTILE_95",
+                  "crossSeriesReducer": "REDUCE_MEAN"
+                }
+              }
+            },
+            "sparkChartView": {
+              "sparkChartType": "SPARK_LINE"
+            },
+            "thresholds": [
+              {
+                "value": 5000,
+                "color": "YELLOW",
+                "direction": "ABOVE"
+              },
+              {
+                "value": 10000,
+                "color": "RED",
+                "direction": "ABOVE"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 0,
+        "yPos": 4,
+        "width": 6,
+        "height": 4,
+        "widget": {
+          "title": "Questions answered over time",
+          "xyChart": {
+            "chartOptions": {
+              "mode": "COLOR"
+            },
+            "dataSets": [
+              {
+                "legendTemplate": "answered",
+                "minAlignmentPeriod": "3600s",
+                "plotType": "STACKED_AREA",
+                "targetAxis": "Y1",
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "aggregation": {
+                      "alignmentPeriod": "3600s",
+                      "perSeriesAligner": "ALIGN_SUM",
+                      "crossSeriesReducer": "REDUCE_SUM"
+                    },
+                    "filter": "metric.type=\"logging.googleapis.com/user/cwa_bot_questions_answered\" resource.type=\"cloud_run_revision\""
+                  }
+                }
+              }
+            ],
+            "thresholds": [],
+            "timeshiftDuration": "0s",
+            "yAxis": {
+              "label": "messages/hour",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 6,
+        "yPos": 4,
+        "width": 6,
+        "height": 4,
+        "widget": {
+          "title": "What the community asks about (by sub-agent)",
+          "pieChart": {
+            "chartType": "DONUT",
+            "dataSets": [
+              {
+                "minAlignmentPeriod": "604800s",
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "aggregation": {
+                      "alignmentPeriod": "604800s",
+                      "perSeriesAligner": "ALIGN_SUM",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": ["metric.label.topic"]
+                    },
+                    "filter": "metric.type=\"logging.googleapis.com/user/cwa_bot_by_topic\" resource.type=\"cloud_run_revision\""
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 0,
+        "yPos": 8,
+        "width": 12,
+        "height": 4,
+        "widget": {
+          "title": "Latency distribution (P50 / P95)",
+          "xyChart": {
+            "chartOptions": {
+              "mode": "COLOR"
+            },
+            "dataSets": [
+              {
+                "legendTemplate": "p50",
+                "minAlignmentPeriod": "3600s",
+                "plotType": "LINE",
+                "targetAxis": "Y1",
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "aggregation": {
+                      "alignmentPeriod": "3600s",
+                      "perSeriesAligner": "ALIGN_PERCENTILE_50",
+                      "crossSeriesReducer": "REDUCE_MEAN"
+                    },
+                    "filter": "metric.type=\"logging.googleapis.com/user/cwa_bot_latency_ms\" resource.type=\"cloud_run_revision\""
+                  }
+                }
+              },
+              {
+                "legendTemplate": "p95",
+                "minAlignmentPeriod": "3600s",
+                "plotType": "LINE",
+                "targetAxis": "Y1",
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "aggregation": {
+                      "alignmentPeriod": "3600s",
+                      "perSeriesAligner": "ALIGN_PERCENTILE_95",
+                      "crossSeriesReducer": "REDUCE_MEAN"
+                    },
+                    "filter": "metric.type=\"logging.googleapis.com/user/cwa_bot_latency_ms\" resource.type=\"cloud_run_revision\""
+                  }
+                }
+              }
+            ],
+            "thresholds": [],
+            "timeshiftDuration": "0s",
+            "yAxis": {
+              "label": "milliseconds",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
