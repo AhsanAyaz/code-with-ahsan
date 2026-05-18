@@ -188,3 +188,72 @@ def test_empty_query_returns_error_for_all_tools():
     result_so = search_stackoverflow_questions("")
     assert result_so["status"] == "error"
     assert result_so["questions"] == []
+
+
+# ---------------------------------------------------------------------------
+# dev.to fallback path — primary tag search returns empty + query has space
+# ---------------------------------------------------------------------------
+
+
+def test_search_devto_articles_fallback_filters_top_articles(monkeypatch):
+    """Multi-word query with no tag hits triggers top=7 fallback + client-side filter."""
+    fixture = _load("external_devto.json")  # 2 articles, both with "angular" in title/tags
+    call_log: list[dict] = []
+
+    def _mock_get(url, **kwargs):
+        params = kwargs.get("params", {})
+        call_log.append(dict(params))
+        # First call (tag=...): return empty array
+        if "tag" in params:
+            return _ok_response([], "https://dev.to/api/articles")
+        # Second call (top=7): return fixture so substring filter has data to match
+        return _ok_response(fixture, "https://dev.to/api/articles")
+
+    monkeypatch.setattr(mod._DEVTO_CLIENT, "get", _mock_get)
+    result = search_devto_articles("angular signals")
+
+    assert len(call_log) == 2, f"Expected primary + fallback call, got {len(call_log)}"
+    assert call_log[0].get("tag") == "angular signals"
+    assert call_log[1].get("top") == "7"
+    assert result["status"] == "success"
+    # Fixture title #1 is "Angular Signals: A Complete Guide" — substring filter matches it.
+    # Title #2 is "TypeScript Inference Deep Dive" — no match. Filter correctly kept 1/2.
+    assert result["count"] == 1
+    assert "angular-signals" in result["articles"][0]["url"]
+
+
+def test_search_devto_articles_fallback_errors_degrades_to_empty(monkeypatch, caplog):
+    """If fallback errors, primary succeeded so degrade to empty (don't flip status to error)."""
+    call_count = {"n": 0}
+
+    def _mock_get(url, **kwargs):
+        call_count["n"] += 1
+        if call_count["n"] == 1:
+            return _ok_response([], "https://dev.to/api/articles")
+        raise httpx.ConnectError("fallback dns failed")
+
+    monkeypatch.setattr(mod._DEVTO_CLIENT, "get", _mock_get)
+    with caplog.at_level("WARNING"):
+        result = search_devto_articles("angular signals")
+
+    assert result["status"] == "success"
+    assert result["count"] == 0
+    assert result["articles"] == []
+    # Reviewer fix: silent swallow replaced with a warning log so Cloud Run debugging works.
+    assert any("dev.to top=7 fallback failed" in rec.message for rec in caplog.records)
+
+
+def test_search_devto_articles_skips_fallback_for_single_word_query(monkeypatch):
+    """Single-word query with empty primary result should NOT trigger fallback."""
+    call_count = {"n": 0}
+
+    def _mock_get(url, **kwargs):
+        call_count["n"] += 1
+        return _ok_response([], "https://dev.to/api/articles")
+
+    monkeypatch.setattr(mod._DEVTO_CLIENT, "get", _mock_get)
+    result = search_devto_articles("angular")  # no space
+
+    assert call_count["n"] == 1, "Fallback should not run for single-word queries"
+    assert result["status"] == "success"
+    assert result["count"] == 0

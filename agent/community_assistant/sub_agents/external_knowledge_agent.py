@@ -8,10 +8,13 @@ GitHub unauth 60/hr (5000/hr with token), dev.to ~1000/hr, SO ~10k/day.
 from __future__ import annotations
 
 import html
+import logging
 import os
 
 import httpx
 from google.adk.agents import LlmAgent
+
+_logger = logging.getLogger(__name__)
 
 _GITHUB_CLIENT = httpx.Client(base_url="https://api.github.com", timeout=10.0)
 _DEVTO_CLIENT = httpx.Client(base_url="https://dev.to", timeout=10.0)
@@ -168,8 +171,16 @@ def search_devto_articles(query: str) -> dict:
                 if needle in (a.get("title") or "").lower()
                 or any(needle in tag.lower() for tag in (a.get("tag_list") or []))
             ]
-        except (httpx.HTTPStatusError, httpx.RequestError):
-            arr = []  # silently fallback to empty list
+        except (httpx.HTTPStatusError, httpx.RequestError) as fallback_exc:
+            # Primary tag search succeeded with 0 results, so dev.to is reachable.
+            # Fallback blip is non-fatal: degrade to empty rather than turning a
+            # successful zero-result query into an error. Log so it surfaces in Cloud Run.
+            _logger.warning(
+                "dev.to top=7 fallback failed for q=%r: %s",
+                q,
+                fallback_exc,
+            )
+            arr = []
 
     sliced = arr[:_RESULT_LIMIT]
     return {
