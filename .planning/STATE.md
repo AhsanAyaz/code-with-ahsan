@@ -4,8 +4,8 @@ milestone: v6.0
 milestone_name: Student Ambassador Program
 status: executing
 stopped_at: null
-last_updated: "2026-05-18T06:25:00.000Z"
-last_activity: 2026-05-18 -- Phase 02.1 wave 3 verification + post-smoke hardening complete; Cloud Run deploy deferred to human-action gate
+last_updated: "2026-05-20T00:00:00.000Z"
+last_activity: 2026-05-20 -- Bot usage tracking instrumentation + Cloud Monitoring dashboard shipped; derive_query_topic bug fix redeployed to revision cwa-assistant-bot-00011-rdg
 progress:
   total_phases: 6
   completed_phases: 5
@@ -27,8 +27,15 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 
 Phase: 02.1 (adk-content-external-knowledge-sub-agents) — SHIPPED
 Plan: 3 of 3 complete (all tasks including Cloud Run deploy)
-Status: Production Discord bot serving content_agent + external_knowledge_agent at revision `cwa-assistant-bot-00008-v9v`
-Last activity: 2026-05-18 -- Cloud Run deploy complete; phase 02.1 fully shipped
+Status: Production Discord bot at revision `cwa-assistant-bot-00011-rdg` — content_agent + external_knowledge_agent + structured usage tracking via Cloud Logging → 5 log-based metrics → 7-widget marketing dashboard (id `7693a12d-d6b7-4d35-9793-429e9832a5a6`)
+Last activity: 2026-05-20 -- usage tracking + dashboard shipped; derive_query_topic bug fixed (commit 545aebb) and redeployed
+
+## Next Moves (queued, not in flight)
+
+1. **v6.0 Phase 01 Plan 10 — Deploy #5 final cleanup** (autonomous=false): drop legacy `MentorshipRole` type + `role` field + dual-claim arms in firestore.rules + run `drop-legacy-role-field.ts`. Gated on 5 manual verifications — the 2-week dual-claim window (Deploy #3 shipped 2026-04-21) is satisfied as of 2026-05-05, but the other 4 gates need human spot-checks (Vercel permission-denied logs, 100% `roles` field populated in profile docs, 100% Auth users have `roles` claim, no remaining legacy reads outside permissions.ts/mentorship.ts).
+2. **Bot iteration roadmap** (from drafted article): (a) Firestore-backed sessions to survive redeploys, (b) proactive surfacing in non-bot channels with opt-in via reaction, (c) BigQuery sink for log-based metrics → SQL-grade analytics. None planned yet.
+3. **Article distribution**: `articles/drafts/cwa-assistant-multi-agent-bot.md` ready for Ghost paste; LinkedIn short version drafted; Twitter thread + OG image not done.
+4. **Latency investigation**: first real prod event had `latency_ms=18933` (~19s) for a 3-source external_knowledge fan-out. Acceptable for that workload but worth a P95 baseline once dashboard accumulates data.
 
 ## Performance Metrics
 
