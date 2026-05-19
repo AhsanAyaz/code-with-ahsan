@@ -56,3 +56,6 @@ firestore-debug.log
 # Claude Code internals
 .claude/scheduled_tasks.lock
 .claude/worktrees/
+
+# local article drafts (publish directly to Ghost, not committed)
+/articles/drafts/

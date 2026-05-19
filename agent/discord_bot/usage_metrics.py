@@ -78,10 +78,22 @@ def collect_event_signals(events: Iterable[Any]) -> dict:
     return {"tool_calls": tool_calls, "agents": agents}
 
 
-def derive_query_topic(agents: list[str]) -> str | None:
-    """Pick the first non-root agent as a marketing-friendly topic label."""
-    for a in agents:
-        if a and a != "root_agent":
+_ORCHESTRATOR_AGENT_NAMES = frozenset({"root_agent", "community_assistant"})
+
+
+def derive_query_topic(
+    agents: list[str], orchestrators: frozenset[str] | set[str] | None = None
+) -> str | None:
+    """Pick the last non-orchestrator agent in the routing chain.
+
+    ADK appends agent authors in execution order, so the LAST specialist that
+    acted is the leaf that produced the final response — that's the topic the
+    user actually got served. Picking the first one would bucket every event as
+    "community_assistant" (the orchestrator), wasting the topic dimension.
+    """
+    skip = orchestrators if orchestrators is not None else _ORCHESTRATOR_AGENT_NAMES
+    for a in reversed(agents):
+        if a and a not in skip:
             return a
     return None
 

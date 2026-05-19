@@ -123,16 +123,41 @@ def test_collect_event_signals_dedupes_agents():
 # ---------------------------------------------------------------------------
 
 
-def test_derive_query_topic_picks_first_non_root():
+def test_derive_query_topic_picks_leaf_specialist():
     assert derive_query_topic(["root_agent", "content_agent"]) == "content_agent"
+
+
+def test_derive_query_topic_skips_community_assistant_orchestrator():
+    # community_assistant is the orchestrator name (see agent/community_assistant/agent.py).
+    # The leaf specialist must win, not the orchestrator.
+    assert (
+        derive_query_topic(["community_assistant", "external_knowledge_agent"])
+        == "external_knowledge_agent"
+    )
+
+
+def test_derive_query_topic_picks_last_when_multi_hop():
+    # Multi-hop routing — pick the specialist that actually produced the final response.
+    assert (
+        derive_query_topic(["community_assistant", "content_agent", "external_knowledge_agent"])
+        == "external_knowledge_agent"
+    )
 
 
 def test_derive_query_topic_returns_none_when_only_root():
     assert derive_query_topic(["root_agent"]) is None
 
 
+def test_derive_query_topic_returns_none_when_only_orchestrators():
+    assert derive_query_topic(["community_assistant", "root_agent"]) is None
+
+
 def test_derive_query_topic_empty_list():
     assert derive_query_topic([]) is None
+
+
+def test_derive_query_topic_accepts_custom_orchestrators():
+    assert derive_query_topic(["my_router", "leaf"], orchestrators={"my_router"}) == "leaf"
 
 
 # ---------------------------------------------------------------------------
