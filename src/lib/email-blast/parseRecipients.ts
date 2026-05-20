@@ -128,10 +128,22 @@ export function parseRecipients(input: string): ParseResult {
     let nameCell: string | undefined;
 
     if (cells.length === 1) {
-      // Single column: must be an email
       const cell = cells[0];
       if (EMAIL_RE.test(cell)) {
+        // Pure email address
         emailCell = cell;
+      } else if (cell.includes("@")) {
+        // Space-delimited: "Full Name user@example.com" — scan tokens
+        const tokens = cell.split(/\s+/);
+        const emailToken = tokens.find((t) => EMAIL_RE.test(t));
+        if (emailToken) {
+          emailCell = emailToken;
+          const nameParts = tokens.filter((t) => t !== emailToken).join(" ").trim();
+          if (nameParts) nameCell = nameParts;
+        } else {
+          skipped.push({ line: lineNum, raw, reason: "no valid email" });
+          continue;
+        }
       } else {
         skipped.push({ line: lineNum, raw, reason: "no valid email" });
         continue;

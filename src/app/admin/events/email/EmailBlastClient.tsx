@@ -444,14 +444,16 @@ export function EmailBlastClient() {
 
             <div className="divider my-0" />
 
-            <div className="form-control">
-              <label className="label pb-1" htmlFor="recipients-textarea">
-                <span className="label-text font-semibold text-sm">Paste from Google Sheets</span>
-                <span className="label-text-alt text-base-content/40">TSV or CSV, with header row</span>
-              </label>
+            <div className="flex flex-col gap-1.5 w-full">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold" htmlFor="recipients-textarea">
+                  Paste from Google Sheets
+                </label>
+                <span className="text-xs text-base-content/40">TSV, CSV, or space-separated</span>
+              </div>
               <textarea
                 id="recipients-textarea"
-                className="textarea textarea-bordered font-mono text-sm leading-relaxed"
+                className="textarea textarea-bordered font-mono text-sm leading-relaxed w-full"
                 rows={8}
                 placeholder={"Full Name\tEmail\nJohn Doe\tjohn@example.com\nJane Smith\tjane@example.com"}
                 value={recipientsRaw}
