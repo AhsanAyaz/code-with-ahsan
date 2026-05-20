@@ -45,6 +45,7 @@ const NAV: NavSection[] = [
     title: "Tools",
     items: [
       { label: "Raffle", href: "/admin/raffle" },
+      { label: "Email Blasts", href: "/admin/events/email" },
     ],
   },
 ];
