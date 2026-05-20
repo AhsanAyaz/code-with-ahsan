@@ -69,7 +69,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 ### v6.0 Student Ambassador Program (Phases 1-5) — IN PROGRESS
 
 - [ ] **Phase 1: Foundation — Roles Array Migration** — Migrate `mentorship_profiles.role: string` → `roles: string[]` across app, rules, claims, and tests via the staged 5-deploy sequence without regressing any v1.0–v5.0 mentor/mentee/admin capability
-- [ ] **Phase 2: Application Subsystem** — `/ambassadors/apply` intake, admin review panel, cohort management, two-stage Discord-accept, and the three applicant emails (confirmation, acceptance, decline)
+- [x] **Phase 2: Application Subsystem** — `/ambassadors/apply` intake, admin review panel, cohort management, two-stage Discord-accept, and the three applicant emails (confirmation, acceptance, decline) (completed 2026-05-20)
 - [ ] **Phase 3: Public Presentation** — Public `/ambassadors` cohort page, ambassador / alumni-ambassador profile badge, and optional post-acceptance public cohort-presentation video (read-only surface over the roles array)
 - [ ] **Phase 4: Activity Subsystem** — Referral attribution (click → cookie → signup), ambassador-owned event tracker, monthly self-report with per-ambassador-timezone reminder cron, human-in-the-loop strike flagging, and weekly Discord-role reconciliation
 - [ ] **Phase 5: Dashboard, Leaderboard, Offboarding & Alumni** — Gated `/ambassadors/dashboard` with hourly-snapshot leaderboard (4-week grace), onboarding checklist, Ambassador-of-the-Month, admin-confirmed offboarding flow with Discord role removal + email, and the alumni-flag term-end transition
@@ -194,7 +194,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 **Goal:** [To be planned]
 **Requirements**: TBD
 **Depends on:** Phase 1
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 - [ ] TBD (run /gsd:plan-phase 2 to break down)
