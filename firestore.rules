@@ -323,5 +323,12 @@ service cloud.firestore {
       allow read: if docId == "current";
       allow write: if false; // Admin SDK only
     }
+
+    // ─── Email Blast Audit Log ────────────────────────────────────────────
+    // Server writes via Admin SDK bypass these rules. Lock down client-side
+    // reads — future audit UI will use an Admin SDK proxy route.
+    match /email-blasts/{blastId} {
+      allow read, write: if false;
+    }
   }
 }

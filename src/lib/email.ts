@@ -100,7 +100,7 @@ function wrapEmailHtml(content: string, title: string): string {
 }
 
 // Core send function
-async function sendEmail(
+export async function sendEmail(
   to: string,
   subject: string,
   html: string,
