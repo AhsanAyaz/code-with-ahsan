@@ -41,6 +41,12 @@ const NAV: NavSection[] = [
       { label: "Eligibility Bypasses", href: "/admin/ambassadors/eligibility-bypasses" },
     ],
   },
+  {
+    title: "Tools",
+    items: [
+      { label: "Raffle", href: "/admin/raffle" },
+    ],
+  },
 ];
 
 function isActive(pathname: string, href: string, exact?: boolean) {

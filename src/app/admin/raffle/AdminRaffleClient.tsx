@@ -45,6 +45,9 @@ export function AdminRaffleClient() {
   const pendingWinner = useRef<{ winnerName: string; docId: string } | null>(
     null,
   );
+  // Hydrate title from server ONCE on mount; subsequent polls must not clobber
+  // the admin's in-progress edits to the title input.
+  const titleHydratedRef = useRef(false);
 
   // ── Poll raffle state + entry count ─────────────────────────────────────
   useEffect(() => {
@@ -54,7 +57,10 @@ export function AdminRaffleClient() {
         if (res.ok) {
           const data = await res.json();
           setRaffleState({ state: data.state, winnerName: data.winnerName, date: "", title: data.title ?? "Raffle" });
-          setTitle(data.title ?? "Raffle");
+          if (!titleHydratedRef.current) {
+            setTitle(data.title ?? "Raffle");
+            titleHydratedRef.current = true;
+          }
         }
       } catch {
         // silent — next poll will recover
@@ -209,7 +215,7 @@ export function AdminRaffleClient() {
               maxLength={80}
             />
             <label className="label">
-              <span className="label-text-alt opacity-60">
+              <span className="label-text-alt opacity-80">
                 Shown to the audience. Defaults to &quot;Raffle&quot; if left empty.
               </span>
             </label>
@@ -245,10 +251,12 @@ export function AdminRaffleClient() {
             </div>
           )}
 
-          {/* Winner reveal card */}
+          {/* Winner reveal card — solid bg-success so success-content (designed
+              for bg-success contrast) is readable; bg-success/10 made the name
+              invisible because success-content is a dark tone on dark theme. */}
           {isWinner && raffleState?.winnerName && (
             <div
-              className="card bg-success/10 border border-success/30"
+              className="card bg-success border border-success"
               aria-live="assertive"
               aria-atomic="true"
             >
@@ -256,7 +264,7 @@ export function AdminRaffleClient() {
                 <span className="text-4xl" role="img" aria-label="Trophy">
                   🏆
                 </span>
-                <p className="text-success font-semibold uppercase tracking-wide text-sm">
+                <p className="text-success-content font-semibold uppercase tracking-wide text-sm opacity-80">
                   Winner
                 </p>
                 <p className="text-3xl font-extrabold text-success-content">
@@ -296,7 +304,7 @@ export function AdminRaffleClient() {
 
           {/* Helper text */}
           {!canSpin && !spinning && !isWinner && (
-            <p className="text-sm text-base-content/60 text-center">
+            <p className="text-sm text-base-content/80 text-center">
               {(entryCount ?? 0) === 0
                 ? "No entries yet for today — share the raffle link!"
                 : ""}

@@ -132,16 +132,16 @@ export function RaffleClient() {
           }
           .raffle-field {
             width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(251,191,36,0.25);
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(251,191,36,0.4);
             border-radius: 10px;
             padding: 12px 16px;
-            color: #f1f5f9;
+            color: #f8fafc;
             font-size: 15px;
             outline: none;
             transition: border-color 0.2s;
           }
-          .raffle-field::placeholder { color: rgba(241,245,249,0.3); }
+          .raffle-field::placeholder { color: rgba(241,245,249,0.55); }
           .raffle-field:focus { border-color: rgba(251,191,36,0.7); }
           .raffle-btn {
             width: 100%;
@@ -172,7 +172,7 @@ export function RaffleClient() {
               >
                 {title}
               </h1>
-              <p className="text-sm" style={{ color: "rgba(241,245,249,0.5)" }}>
+              <p className="text-sm" style={{ color: "rgba(241,245,249,0.75)" }}>
                 Code With Ahsan
               </p>
             </div>
@@ -231,9 +231,9 @@ export function RaffleClient() {
                   onChange={(e) => setNewsletter(e.target.checked)}
                   disabled={submitting}
                 />
-                <span className="text-xs leading-relaxed" style={{ color: "rgba(241,245,249,0.5)" }}>
+                <span className="text-xs leading-relaxed" style={{ color: "rgba(241,245,249,0.78)" }}>
                   I agree to receive AI, Web Dev, and Community Updates from{" "}
-                  <span style={{ color: "rgba(251,191,36,0.8)" }}>Code With Ahsan</span>{" "}
+                  <span style={{ color: "rgba(251,191,36,0.95)" }}>Code With Ahsan</span>{" "}
                   (blog.codewithahsan.dev)
                 </span>
               </label>
@@ -292,7 +292,7 @@ export function RaffleClient() {
               <h2 className="text-2xl font-black mb-2" style={{ color: "#FBBF24" }}>
                 You&apos;re in!
               </h2>
-              <p style={{ color: "rgba(241,245,249,0.55)" }} aria-live="polite" aria-atomic="true">
+              <p style={{ color: "rgba(241,245,249,0.8)" }} aria-live="polite" aria-atomic="true">
                 Waiting for the raffle to begin…
               </p>
             </div>
@@ -375,7 +375,7 @@ export function RaffleClient() {
             >
               Spinning…
             </p>
-            <p className="text-sm mt-2" style={{ color: "rgba(241,245,249,0.45)" }}>
+            <p className="text-sm mt-2" style={{ color: "rgba(241,245,249,0.75)" }}>
               Get ready — a winner is being chosen!
             </p>
           </div>
@@ -451,7 +451,7 @@ export function RaffleClient() {
             style={{ background: "linear-gradient(90deg, transparent, rgba(251,191,36,0.5), transparent)" }}
           />
 
-          <p className="text-xs" style={{ color: "rgba(241,245,249,0.3)" }}>
+          <p className="text-xs" style={{ color: "rgba(241,245,249,0.6)" }}>
             {`Code With Ahsan · ${title}`}
           </p>
         </div>
