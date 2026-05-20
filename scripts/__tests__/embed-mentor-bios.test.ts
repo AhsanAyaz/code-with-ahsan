@@ -23,27 +23,27 @@ describe("extractBioText", () => {
 describe("shouldEmbedMentor", () => {
   it("accepts mentor with bio", () => {
     expect(
-      shouldEmbedMentor({ role: "mentor", status: "accepted", bio: "x" })
+      shouldEmbedMentor({ roles: ["mentor"], status: "accepted", bio: "x" })
     ).toBe(true);
   });
   it("rejects pending mentors", () => {
     expect(
-      shouldEmbedMentor({ role: "mentor", status: "pending", bio: "x" })
+      shouldEmbedMentor({ roles: ["mentor"], status: "pending", bio: "x" })
     ).toBe(false);
   });
   it("rejects mentors with empty bio", () => {
     expect(
-      shouldEmbedMentor({ role: "mentor", status: "accepted", bio: "" })
+      shouldEmbedMentor({ roles: ["mentor"], status: "accepted", bio: "" })
     ).toBe(false);
   });
   it("rejects mentees", () => {
     expect(
-      shouldEmbedMentor({ role: "mentee", status: "accepted", bio: "x" })
+      shouldEmbedMentor({ roles: ["mentee"], status: "accepted", bio: "x" })
     ).toBe(false);
   });
   it("accepts mentor with about field when bio missing", () => {
     expect(
-      shouldEmbedMentor({ role: "mentor", status: "accepted", about: "some about" })
+      shouldEmbedMentor({ roles: ["mentor"], status: "accepted", about: "some about" })
     ).toBe(true);
   });
 });
