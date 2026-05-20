@@ -315,10 +315,7 @@ export async function PUT(request: NextRequest) {
 
     // Auto-embed mentor bio when status flips to accepted or bio text changes.
     // Fire-and-forget — never blocks the response.
-    const isMentor =
-      Array.isArray(postUpdate.roles)
-        ? (postUpdate.roles as string[]).includes("mentor")
-        : postUpdate.role === "mentor";
+    const isMentor = (postUpdate.roles as string[] | undefined ?? []).includes("mentor");
     const wasAccepted = existingData.status === "accepted";
     const isNowAccepted =
       (updatePayload.status as string | undefined) === "accepted" ||

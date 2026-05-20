@@ -20,9 +20,7 @@ export function extractBioText(profile: Record<string, unknown>): string {
 }
 
 export function shouldEmbedMentor(profile: Record<string, unknown>): boolean {
-  const isMentor = Array.isArray(profile.roles)
-    ? (profile.roles as string[]).includes("mentor")
-    : profile.role === "mentor";
+  const isMentor = (profile.roles as string[] | undefined ?? []).includes("mentor");
   return (
     isMentor &&
     profile.status === "accepted" &&
