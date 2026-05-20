@@ -1,5 +1,4 @@
-import Mailgun from "mailgun.js";
-import formData from "form-data";
+import { Resend } from "resend";
 import { createLogger } from "./logger";
 
 // Create Email-specific logger
@@ -14,21 +13,22 @@ function getAdminEmail() {
   return process.env.ADMIN_EMAIL || "ahsan.ubitian@gmail.com";
 }
 
-// Initialize Mailgun client - lazy loaded
-let mg: ReturnType<Mailgun["client"]> | null = null;
+// Initialize Resend client - lazy loaded
+let resendClient: Resend | null = null;
 let initialized = false;
 
-function getMailgunClient() {
-  if (initialized) return mg;
+function getResendClient(): Resend | null {
+  if (initialized) return resendClient;
 
-  const apiKey = process.env.MAILGUN_API_KEY;
+  const apiKey = process.env.RESEND_API_KEY;
   if (apiKey) {
-    const mailgun = new Mailgun(formData);
-    mg = mailgun.client({ username: "api", key: apiKey });
+    resendClient = new Resend(apiKey);
+  } else {
+    log.warn("RESEND_API_KEY not configured");
   }
 
   initialized = true;
-  return mg;
+  return resendClient;
 }
 
 // Types
@@ -112,26 +112,32 @@ async function sendEmail(
     return true;
   }
 
-  const client = getMailgunClient();
+  const client = getResendClient();
 
   if (!client) {
-    log.warn("Mailgun API key not configured, skipping email");
+    log.warn("Resend API key not configured, skipping email");
     return false;
   }
 
-  const domain = process.env.MAILGUN_DOMAIN || "codewithahsan.dev";
-  const fromName = process.env.EMAIL_FROM_NAME || "Code with Ahsan Mentorship";
-  const fromEmail =
-    process.env.EMAIL_FROM_ADDRESS || "noreply@codewithahsan.dev";
+  const from =
+    process.env.RESEND_FROM_EMAIL ??
+    "Code With Ahsan <notifications@codewithahsan.dev>";
+  const replyTo =
+    process.env.RESEND_REPLY_TO ?? "no-reply@codewithahsan.dev";
 
   try {
-    await client.messages.create(domain, {
-      from: `${fromName} <${fromEmail}>`,
+    const result = await client.emails.send({
+      from,
       to: [to],
       cc: cc ? [cc] : undefined,
+      replyTo,
       subject,
       html,
     });
+    if (result.error) {
+      log.error("Failed to send email:", { error: result.error });
+      return false;
+    }
     log.info(`Sent "${subject}" to ${to}`);
     return true;
   } catch (error) {
