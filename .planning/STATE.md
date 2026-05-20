@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: Student Ambassador Program
-status: executing
+status: phase-01-complete
 stopped_at: null
-last_updated: "2026-05-20T00:00:00.000Z"
-last_activity: 2026-05-20 -- Bot usage tracking instrumentation + Cloud Monitoring dashboard shipped; derive_query_topic bug fix redeployed to revision cwa-assistant-bot-00011-rdg
+last_updated: "2026-05-20T16:30:00.000Z"
+last_activity: 2026-05-20 -- Phase 01 Plan 10 Deploy #5 final cleanup merged
 progress:
-  total_phases: 6
-  completed_phases: 5
-  total_plans: 34
-  completed_plans: 38
-  percent: 90
+  total_phases: 7
+  completed_phases: 7
+  total_plans: 43
+  completed_plans: 45
+  percent: 100
 ---
 
 # Project State
@@ -21,21 +21,26 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-21)
 
 **Core value:** Community members can find mentors, collaborate on real projects with structured support, and follow clear learning roadmaps—all within a mentor-led, quality-focused environment.
-**Current focus:** Phase 02.1 — adk-content-external-knowledge-sub-agents
+**Current focus:** Phase 01 — foundation-roles-array-migration
 
 ## Current Position
 
-Phase: 02.1 (adk-content-external-knowledge-sub-agents) — SHIPPED
-Plan: 3 of 3 complete (all tasks including Cloud Run deploy)
-Status: Production Discord bot at revision `cwa-assistant-bot-00011-rdg` — content_agent + external_knowledge_agent + structured usage tracking via Cloud Logging → 5 log-based metrics → 7-widget marketing dashboard (id `7693a12d-d6b7-4d35-9793-429e9832a5a6`)
-Last activity: 2026-05-20 -- usage tracking + dashboard shipped; derive_query_topic bug fixed (commit 545aebb) and redeployed
+Phase: 01 (foundation-roles-array-migration) — COMPLETE (10/10 plans)
+Plan: 10 of 10 (Plan 10 merged to main, post-merge ops pending)
+Status: Phase 01 closed; awaiting post-merge prod ops (manual)
+Last activity: 2026-05-20 -- Phase 01 Plan 10 Deploy #5 final cleanup merged
 
 ## Next Moves (queued, not in flight)
 
-1. **v6.0 Phase 01 Plan 10 — Deploy #5 final cleanup** (autonomous=false): drop legacy `MentorshipRole` type + `role` field + dual-claim arms in firestore.rules + run `drop-legacy-role-field.ts`. Gated on 5 manual verifications — the 2-week dual-claim window (Deploy #3 shipped 2026-04-21) is satisfied as of 2026-05-05, but the other 4 gates need human spot-checks (Vercel permission-denied logs, 100% `roles` field populated in profile docs, 100% Auth users have `roles` claim, no remaining legacy reads outside permissions.ts/mentorship.ts).
-2. **Bot iteration roadmap** (from drafted article): (a) Firestore-backed sessions to survive redeploys, (b) proactive surfacing in non-bot channels with opt-in via reaction, (c) BigQuery sink for log-based metrics → SQL-grade analytics. None planned yet.
-3. **Article distribution**: `articles/drafts/cwa-assistant-multi-agent-bot.md` ready for Ghost paste; LinkedIn short version drafted; Twitter thread + OG image not done.
-4. **Latency investigation**: first real prod event had `latency_ms=18933` (~19s) for a 3-source external_knowledge fan-out. Acceptable for that workload but worth a P95 baseline once dashboard accumulates data.
+1. **Post-merge prod ops for Plan 10 (manual, gated on user)**:
+   - `firebase deploy --only firestore:rules` — flip rules from dual-claim to roles-only
+   - `npm run drop-legacy-role:dry-run` then `npm run drop-legacy-role` — wipe legacy `role` field from 412 profile docs (production write — confirm dry-run report first)
+   - See `.planning/phases/01-foundation-roles-array-migration/01-10-SUMMARY.md` for full runbook
+2. **Event participant email feature** (new user request 2026-05-20): send emails to event participants. Not yet scoped/planned.
+
+3. **Bot iteration roadmap** (from drafted article): (a) Firestore-backed sessions to survive redeploys, (b) proactive surfacing in non-bot channels with opt-in via reaction, (c) BigQuery sink for log-based metrics → SQL-grade analytics. None planned yet.
+4. **Article distribution**: `articles/drafts/cwa-assistant-multi-agent-bot.md` ready for Ghost paste; LinkedIn short version drafted; Twitter thread + OG image not done.
+5. **Latency investigation**: first real prod event had `latency_ms=18933` (~19s) for a 3-source external_knowledge fan-out. Acceptable for that workload but worth a P95 baseline once dashboard accumulates data.
 
 ## Performance Metrics
 
@@ -184,6 +189,7 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 01 P07 | 32min | 2 tasks | 30 files |
 | Phase 01-foundation-roles-array-migration P09 | ~3min | 2 tasks | 2 files |
 | Phase 01 P08 | ~6min | 1 tasks | 3 files |
+| Phase 01-foundation-roles-array-migration P10 | ~12min | 3 tasks | 6 files | Deploy #5 final cleanup — dual-read fallbacks stripped, drop-legacy-role hardened. Post-merge ops gated on user. |
 | Phase 02-application-subsystem P01 | 3 | 3 tasks | 4 files |
 | Phase 02-application-subsystem P04 | 6min | 3 tasks | 4 files |
 | Phase 02-application-subsystem P05 | 17min | 3 tasks | 5 files |
