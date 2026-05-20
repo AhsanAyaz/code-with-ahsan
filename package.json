@@ -28,7 +28,8 @@
     "sync-claims": "npx tsx scripts/sync-custom-claims.ts",
     "sync-claims:limit-10": "npx tsx scripts/sync-custom-claims.ts --limit=10",
     "drop-legacy-role:dry-run": "npx tsx scripts/drop-legacy-role-field.ts --dry-run",
-    "drop-legacy-role": "npx tsx scripts/drop-legacy-role-field.ts"
+    "drop-legacy-role": "npx tsx scripts/drop-legacy-role-field.ts",
+    "drop-legacy-role:limit-10": "npx tsx scripts/drop-legacy-role-field.ts --limit=10"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",

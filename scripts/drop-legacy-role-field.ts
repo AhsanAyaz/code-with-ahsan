@@ -91,7 +91,7 @@ async function run(): Promise<void> {
       if (limit !== null && totalScanned > limit) break;
 
       const data = doc.data();
-      const hasLegacyField = "role" in data;
+      const hasLegacyField = Object.prototype.hasOwnProperty.call(data, "role");
 
       // ── Firestore: drop `role` field ─────────────────────────────────────
       if (hasLegacyField) {
