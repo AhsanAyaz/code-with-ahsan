@@ -29,7 +29,7 @@ const NAV: NavSection[] = [
       { label: "Projects", href: "/admin/projects" },
       { label: "Roadmaps", href: "/admin/roadmaps" },
       { label: "Courses", href: "/admin/courses" },
-      { label: "Events", href: "/admin/events" },
+      { label: "Events", href: "/admin/events", exact: true },
     ],
   },
   {

@@ -48,6 +48,22 @@ function relativeTime(isoString: string): string {
   }
 }
 
+// ── Step badge ─────────────────────────────────────────────────────────────
+
+function StepBadge({ n, done }: { n: number; done?: boolean }) {
+  return (
+    <span
+      className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold shrink-0 ${
+        done
+          ? "bg-success text-success-content"
+          : "bg-primary text-primary-content"
+      }`}
+    >
+      {done ? "✓" : n}
+    </span>
+  );
+}
+
 // ── Component ──────────────────────────────────────────────────────────────
 
 export function EmailBlastClient() {
@@ -63,8 +79,7 @@ export function EmailBlastClient() {
   const [results, setResults] = useState<SendResult[] | null>(null);
   const [sendError, setSendError] = useState("");
 
-  // Track whether user manually edited subject — prevents draft selection
-  // from overwriting deliberate user input (same pattern as raffle titleHydratedRef)
+  // Track whether user manually edited subject
   const subjectTouchedRef = useRef(false);
 
   // Debounce timer for recipient parsing
@@ -107,9 +122,7 @@ export function EmailBlastClient() {
     setSelectedDraftId(id);
     if (!subjectTouchedRef.current && id) {
       const draft = drafts.find((d) => d.id === id);
-      if (draft) {
-        setSubject(draft.title);
-      }
+      if (draft) setSubject(draft.title);
     }
   }
 
@@ -123,7 +136,6 @@ export function EmailBlastClient() {
     }, 150);
   }
 
-  // Initial parse on unmount cleanup
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -181,7 +193,6 @@ export function EmailBlastClient() {
 
   const selectedDraft = drafts.find((d) => d.id === selectedDraftId) ?? null;
 
-  // Substitute {{name}} with first recipient's name for preview
   const previewHtml = selectedDraft
     ? selectedDraft.html.replace(
         /\{\{name\}\}/g,
@@ -205,66 +216,84 @@ export function EmailBlastClient() {
     const sent = results.filter((r) => r.ok).length;
     const failed = results.filter((r) => !r.ok).length;
     return (
-      <div className="min-h-screen bg-base-200 p-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body gap-6">
-              <h1 className="card-title text-2xl font-bold">Blast Results</h1>
+      <div className="p-6">
+        <div className="max-w-3xl mx-auto space-y-6">
+          {/* Header */}
+          <div>
+            <h1 className="text-2xl font-bold">Blast Results</h1>
+            <p className="text-base-content/60 text-sm mt-1">
+              Email delivery summary
+            </p>
+          </div>
 
-              {/* Summary stats */}
-              <div className="stats bg-base-200 shadow-sm w-full">
-                <div className="stat">
-                  <div className="stat-title">Sent</div>
-                  <div className="stat-value text-success">{sent}</div>
-                </div>
-                <div className="stat">
-                  <div className="stat-title">Failed</div>
-                  <div className="stat-value text-error">{failed}</div>
-                </div>
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="card bg-success/10 border border-success/30">
+              <div className="card-body py-4 px-5">
+                <p className="text-xs font-semibold uppercase tracking-wider text-success/80">
+                  Delivered
+                </p>
+                <p className="text-4xl font-bold text-success">{sent}</p>
               </div>
+            </div>
+            <div className={`card border ${failed > 0 ? "bg-error/10 border-error/30" : "bg-base-200 border-base-300"}`}>
+              <div className="card-body py-4 px-5">
+                <p className={`text-xs font-semibold uppercase tracking-wider ${failed > 0 ? "text-error/80" : "text-base-content/40"}`}>
+                  Failed
+                </p>
+                <p className={`text-4xl font-bold ${failed > 0 ? "text-error" : "text-base-content/30"}`}>
+                  {failed}
+                </p>
+              </div>
+            </div>
+          </div>
 
-              {/* Results table */}
-              <div className="overflow-x-auto">
+          {/* Results table */}
+          <div className="card bg-base-100 shadow-md">
+            <div className="card-body p-0">
+              <div className="overflow-x-auto rounded-box">
                 <table className="table table-sm w-full">
                   <thead>
-                    <tr>
-                      <th>Status</th>
+                    <tr className="text-xs uppercase tracking-wider text-base-content/50">
+                      <th className="w-10"></th>
                       <th>Name</th>
                       <th>Email</th>
-                      <th>Error</th>
+                      <th>Note</th>
                     </tr>
                   </thead>
                   <tbody>
                     {results.map((r, i) => (
-                      <tr
-                        key={i}
-                        className={r.ok ? "text-success" : "text-error"}
-                      >
-                        <td className="font-mono font-bold">
-                          {r.ok ? "✓" : "✗"}
+                      <tr key={i} className="hover">
+                        <td>
+                          <span
+                            className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold ${
+                              r.ok
+                                ? "bg-success/20 text-success"
+                                : "bg-error/20 text-error"
+                            }`}
+                          >
+                            {r.ok ? "✓" : "✗"}
+                          </span>
                         </td>
-                        <td>{r.name}</td>
-                        <td>{r.email}</td>
-                        <td className="text-sm opacity-80">{r.error ?? ""}</td>
+                        <td className="font-medium">{r.name}</td>
+                        <td className="font-mono text-sm text-base-content/70">
+                          {r.email}
+                        </td>
+                        <td className="text-sm text-base-content/50">
+                          {r.error ?? ""}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-
-              {/* Actions */}
-              <div className="flex gap-3 flex-wrap">
-                <button className="btn btn-primary" onClick={handleReset}>
-                  Start new blast
-                </button>
-                <a
-                  href="/admin/events/email/history"
-                  className="btn btn-ghost btn-sm self-center"
-                >
-                  View audit log
-                </a>
-              </div>
             </div>
+          </div>
+
+          <div className="flex gap-3">
+            <button className="btn btn-primary" onClick={handleReset}>
+              Send another blast
+            </button>
           </div>
         </div>
       </div>
@@ -274,33 +303,43 @@ export function EmailBlastClient() {
   // ── Composer view ─────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-base-200 p-6">
-      <div className="max-w-3xl mx-auto flex flex-col gap-6">
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body gap-6">
-            <h1 className="card-title text-2xl font-bold">
-              Email Blast Composer
-            </h1>
+    <div className="p-6">
+      <div className="max-w-3xl mx-auto space-y-6">
+        {/* Page header */}
+        <div>
+          <h1 className="text-2xl font-bold">Email Blast Composer</h1>
+          <p className="text-base-content/60 text-sm mt-1">
+            Pick a Ghost draft, paste recipients, send.
+          </p>
+        </div>
 
-            {/* Error alerts */}
-            {draftsError && (
-              <div role="alert" className="alert alert-error text-sm py-2">
-                {draftsError}
-              </div>
-            )}
-            {sendError && (
-              <div role="alert" className="alert alert-error text-sm py-2">
-                {sendError}
-              </div>
-            )}
+        {/* Global errors */}
+        {sendError && (
+          <div role="alert" className="alert alert-error text-sm py-2.5">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            {sendError}
+          </div>
+        )}
+
+        {/* ── Step 1: Compose ────────────────────────────────────────────── */}
+        <div className="card bg-base-100 shadow-md">
+          <div className="card-body gap-5">
+            <div className="flex items-center gap-2.5">
+              <StepBadge n={1} done={!!selectedDraftId && subject.trim().length > 0} />
+              <h2 className="font-bold text-base">Compose</h2>
+            </div>
+
+            <div className="divider my-0" />
 
             {/* Draft picker */}
             <div className="form-control">
-              <label className="label" htmlFor="draft-select">
-                <span className="label-text font-semibold">Ghost Draft</span>
+              <label className="label pb-1" htmlFor="draft-select">
+                <span className="label-text font-semibold text-sm">Ghost Draft</span>
                 <button
                   type="button"
-                  className="btn btn-xs btn-ghost"
+                  className="btn btn-xs btn-ghost gap-1.5"
                   onClick={fetchDrafts}
                   disabled={draftsLoading}
                   aria-label="Refresh drafts"
@@ -308,10 +347,20 @@ export function EmailBlastClient() {
                   {draftsLoading ? (
                     <span className="loading loading-spinner loading-xs" />
                   ) : (
-                    "Refresh"
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
                   )}
+                  Refresh
                 </button>
               </label>
+
+              {draftsError && (
+                <div role="alert" className="alert alert-warning text-xs py-2 mb-2">
+                  {draftsError}
+                </div>
+              )}
+
               <select
                 id="draft-select"
                 className="select select-bordered w-full"
@@ -321,24 +370,29 @@ export function EmailBlastClient() {
               >
                 <option value="">
                   {draftsLoading
-                    ? "Loading drafts..."
+                    ? "Loading…"
                     : drafts.length === 0
-                    ? "No drafts found"
-                    : "Select a draft"}
+                    ? "No drafts found — tag a Ghost page with #email-blast"
+                    : "Select a draft…"}
                 </option>
                 {drafts.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.title}
-                    {d.updatedAt ? ` (updated ${relativeTime(d.updatedAt)})` : ""}
+                    {d.updatedAt ? `  ·  updated ${relativeTime(d.updatedAt)}` : ""}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Subject input */}
+            {/* Subject */}
             <div className="form-control">
-              <label className="label" htmlFor="subject-input">
-                <span className="label-text font-semibold">Subject</span>
+              <label className="label pb-1" htmlFor="subject-input">
+                <span className="label-text font-semibold text-sm">Subject line</span>
+                {selectedDraftId && !subjectTouchedRef.current && (
+                  <span className="label-text-alt text-base-content/40">
+                    auto-filled from draft title
+                  </span>
+                )}
               </label>
               <input
                 id="subject-input"
@@ -354,99 +408,132 @@ export function EmailBlastClient() {
                 maxLength={200}
               />
             </div>
+          </div>
+        </div>
 
-            {/* Recipient textarea */}
-            <div className="form-control">
-              <label className="label" htmlFor="recipients-textarea">
-                <span className="label-text font-semibold">Recipients</span>
-                <span className="label-text-alt opacity-80">
-                  Paste TSV or CSV from Google Sheets
-                </span>
-              </label>
-              <textarea
-                id="recipients-textarea"
-                className="textarea textarea-bordered font-mono text-sm"
-                rows={8}
-                placeholder={"name\temail\nJohn Doe\tjohn@example.com\n..."}
-                value={recipientsRaw}
-                onChange={(e) => handleRecipientsChange(e.target.value)}
-                disabled={sending}
-              />
+        {/* ── Step 2: Recipients ─────────────────────────────────────────── */}
+        <div className="card bg-base-100 shadow-md">
+          <div className="card-body gap-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <StepBadge n={2} done={recipientCount > 0} />
+                <h2 className="font-bold text-base">Recipients</h2>
+              </div>
 
-              {/* Live count */}
+              {/* Recipient count badge */}
               {parseResult && (
-                <div
-                  className="label flex-col items-start gap-1"
-                  aria-live="polite"
-                >
-                  <span
-                    className={`label-text-alt ${
-                      skippedCount > 0 ? "text-warning" : "text-success"
-                    }`}
-                  >
-                    {recipientCount} recipient{recipientCount !== 1 ? "s" : ""}
-                    {dupCount > 0 && ` · ${dupCount} duplicate${dupCount !== 1 ? "s" : ""} removed`}
-                    {skippedCount > 0 && ` · ${skippedCount} skipped`}
-                  </span>
-
-                  {/* Collapsible skipped rows */}
+                <div className="flex items-center gap-2" aria-live="polite">
+                  {recipientCount > 0 && (
+                    <span className="badge badge-success badge-sm gap-1 font-semibold">
+                      {recipientCount} recipient{recipientCount !== 1 ? "s" : ""}
+                    </span>
+                  )}
+                  {dupCount > 0 && (
+                    <span className="badge badge-ghost badge-sm text-base-content/50">
+                      {dupCount} dup{dupCount !== 1 ? "s" : ""} removed
+                    </span>
+                  )}
                   {skippedCount > 0 && (
-                    <details className="w-full mt-1">
-                      <summary className="cursor-pointer text-xs text-warning opacity-90">
-                        Show skipped rows
-                      </summary>
-                      <ul className="mt-1 text-xs font-mono text-base-content/70 space-y-0.5 max-h-32 overflow-y-auto">
-                        {parseResult.skipped.map((s) => (
-                          <li key={s.line}>
-                            Line {s.line}: {s.reason} — <span className="opacity-70">{s.raw.slice(0, 60)}{s.raw.length > 60 ? "…" : ""}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
+                    <span className="badge badge-warning badge-sm">
+                      {skippedCount} skipped
+                    </span>
                   )}
                 </div>
               )}
             </div>
 
-            {/* Send button */}
-            <div className="card-actions justify-end">
+            <div className="divider my-0" />
+
+            <div className="form-control">
+              <label className="label pb-1" htmlFor="recipients-textarea">
+                <span className="label-text font-semibold text-sm">Paste from Google Sheets</span>
+                <span className="label-text-alt text-base-content/40">TSV or CSV, with header row</span>
+              </label>
+              <textarea
+                id="recipients-textarea"
+                className="textarea textarea-bordered font-mono text-sm leading-relaxed"
+                rows={8}
+                placeholder={"Full Name\tEmail\nJohn Doe\tjohn@example.com\nJane Smith\tjane@example.com"}
+                value={recipientsRaw}
+                onChange={(e) => handleRecipientsChange(e.target.value)}
+                disabled={sending}
+              />
+            </div>
+
+            {/* Skipped rows detail */}
+            {skippedCount > 0 && parseResult && (
+              <details className="bg-warning/10 rounded-lg px-3 py-2">
+                <summary className="cursor-pointer text-xs font-semibold text-warning select-none">
+                  {skippedCount} row{skippedCount !== 1 ? "s" : ""} skipped — show details
+                </summary>
+                <ul className="mt-2 text-xs font-mono text-base-content/60 space-y-1 max-h-32 overflow-y-auto">
+                  {parseResult.skipped.map((s) => (
+                    <li key={s.line} className="flex gap-2">
+                      <span className="text-warning/70 shrink-0">L{s.line}</span>
+                      <span className="text-base-content/50 shrink-0">{s.reason}</span>
+                      <span className="truncate">{s.raw.slice(0, 60)}{s.raw.length > 60 ? "…" : ""}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </div>
+        </div>
+
+        {/* ── Step 3: Preview + Send ─────────────────────────────────────── */}
+        <div className="card bg-base-100 shadow-md">
+          <div className="card-body gap-5">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-2.5">
+                <StepBadge n={3} />
+                <h2 className="font-bold text-base">Preview &amp; Send</h2>
+                {selectedDraft && (
+                  <span className="badge badge-ghost badge-sm font-normal text-base-content/50">
+                    {"{{"+"name"+"}}"} substituted
+                  </span>
+                )}
+              </div>
+
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btn btn-primary btn-sm gap-2"
                 disabled={!canSend}
                 aria-busy={sending}
                 onClick={() => setShowConfirm(true)}
               >
                 {sending ? (
                   <>
-                    <span className="loading loading-spinner loading-sm" />
-                    Sending...
+                    <span className="loading loading-spinner loading-xs" />
+                    Sending…
                   </>
                 ) : (
-                  `Send to ${recipientCount} recipient${recipientCount !== 1 ? "s" : ""}`
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    Send to {recipientCount || "…"} recipient{recipientCount !== 1 ? "s" : ""}
+                  </>
                 )}
               </button>
             </div>
+
+            <div className="divider my-0" />
+
+            {selectedDraft ? (
+              <PreviewIframe html={previewHtml} />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-base-content/30 gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <p className="text-sm">Select a draft to see the preview</p>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Preview panel */}
-        {selectedDraft && (
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body gap-4">
-              <h2 className="card-title text-lg font-semibold">
-                Preview
-                <span className="badge badge-ghost badge-sm font-normal">
-                  {"{{"+"name"+"}}"} substituted
-                </span>
-              </h2>
-              <PreviewIframe html={previewHtml} />
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Confirm modal */}
+      {/* ── Confirm modal ───────────────────────────────────────────────── */}
       {showConfirm && parseResult && (
         <dialog
           className="modal modal-open"
@@ -456,35 +543,63 @@ export function EmailBlastClient() {
             if (e.key === "Escape") setShowConfirm(false);
           }}
         >
-          <div className="modal-box max-w-lg">
-            <h3 id="confirm-modal-title" className="font-bold text-lg mb-4">
-              Confirm Email Blast
-            </h3>
+          <div className="modal-box max-w-md">
+            {/* Modal header */}
+            <div className="flex items-start justify-between mb-5">
+              <div>
+                <h3 id="confirm-modal-title" className="font-bold text-lg">
+                  Ready to send?
+                </h3>
+                <p className="text-sm text-base-content/50 mt-0.5">
+                  This cannot be undone.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="btn btn-sm btn-circle btn-ghost"
+                onClick={() => setShowConfirm(false)}
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
 
-            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm mb-4">
-              <dt className="font-semibold text-base-content/70">Subject</dt>
-              <dd className="break-words">{subject.trim()}</dd>
-              <dt className="font-semibold text-base-content/70">Recipients</dt>
-              <dd>{recipientCount}</dd>
-            </dl>
+            {/* Summary */}
+            <div className="bg-base-200 rounded-lg p-4 space-y-2 text-sm mb-4">
+              <div className="flex gap-3">
+                <span className="text-base-content/50 w-24 shrink-0">Subject</span>
+                <span className="font-medium break-words">{subject.trim()}</span>
+              </div>
+              <div className="flex gap-3">
+                <span className="text-base-content/50 w-24 shrink-0">Recipients</span>
+                <span className="font-bold text-primary">{recipientCount}</span>
+              </div>
+            </div>
 
-            {/* First 5 recipients */}
-            <ul className="text-sm space-y-1 mb-2">
+            {/* Preview recipients */}
+            <p className="text-xs font-semibold uppercase tracking-wider text-base-content/40 mb-2">
+              First {Math.min(5, parseResult.recipients.length)} recipients
+            </p>
+            <ul className="space-y-1.5 mb-2">
               {parseResult.recipients.slice(0, 5).map((r, i) => (
-                <li key={i} className="flex gap-2">
+                <li key={i} className="flex items-center gap-2 text-sm">
+                  <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0">
+                    {r.name[0]?.toUpperCase() ?? "?"}
+                  </span>
                   <span className="font-medium">{r.name}</span>
-                  <span className="text-base-content/70">&lt;{r.email}&gt;</span>
+                  <span className="text-base-content/50 font-mono text-xs truncate">
+                    {r.email}
+                  </span>
                 </li>
               ))}
             </ul>
 
-            {/* Full list in collapsible */}
             {parseResult.recipients.length > 5 && (
               <details className="mb-4">
-                <summary className="cursor-pointer text-xs text-base-content/70">
-                  +{parseResult.recipients.length - 5} more
+                <summary className="cursor-pointer text-xs text-base-content/40 select-none">
+                  +{parseResult.recipients.length - 5} more recipients
                 </summary>
-                <ul className="mt-1 text-xs font-mono space-y-0.5 max-h-40 overflow-y-auto text-base-content/70">
+                <ul className="mt-2 text-xs font-mono space-y-1 max-h-36 overflow-y-auto text-base-content/60 pl-1">
                   {parseResult.recipients.slice(5).map((r, i) => (
                     <li key={i}>
                       {r.name} &lt;{r.email}&gt;
@@ -494,10 +609,10 @@ export function EmailBlastClient() {
               </details>
             )}
 
-            <div className="modal-action mt-4">
+            <div className="modal-action gap-2 mt-5">
               <button
                 type="button"
-                className="btn btn-ghost"
+                className="btn btn-ghost flex-1"
                 onClick={() => setShowConfirm(false)}
                 autoFocus
               >
@@ -505,14 +620,16 @@ export function EmailBlastClient() {
               </button>
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btn btn-primary flex-1 gap-2"
                 onClick={handleSendConfirm}
               >
-                Send now
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+                Send {recipientCount} emails
               </button>
             </div>
           </div>
-          {/* Backdrop closes modal */}
           <form method="dialog" className="modal-backdrop">
             <button type="button" onClick={() => setShowConfirm(false)}>
               close
