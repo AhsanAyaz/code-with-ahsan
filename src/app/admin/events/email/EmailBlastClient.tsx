@@ -189,6 +189,14 @@ export function EmailBlastClient() {
     setSendError("");
   }
 
+  function handleRetryFailed(failed: SendResult[]) {
+    const raw = failed.map((r) => `${r.name}\t${r.email}`).join("\n");
+    setRecipientsRaw(raw);
+    setParseResult(parseRecipients(raw));
+    setResults(null);
+    setSendError("");
+  }
+
   // ── Derived values ────────────────────────────────────────────────────────
 
   const selectedDraft = drafts.find((d) => d.id === selectedDraftId) ?? null;
@@ -214,7 +222,8 @@ export function EmailBlastClient() {
 
   if (results !== null) {
     const sent = results.filter((r) => r.ok).length;
-    const failed = results.filter((r) => !r.ok).length;
+    const failedResults = results.filter((r) => !r.ok);
+    const failed = failedResults.length;
     return (
       <div className="p-6">
         <div className="max-w-3xl mx-auto space-y-6">
@@ -291,7 +300,15 @@ export function EmailBlastClient() {
           </div>
 
           <div className="flex gap-3">
-            <button className="btn btn-primary" onClick={handleReset}>
+            {failedResults.length > 0 && (
+              <button
+                className="btn btn-error"
+                onClick={() => handleRetryFailed(failedResults)}
+              >
+                Retry {failedResults.length} failed
+              </button>
+            )}
+            <button className="btn btn-ghost" onClick={handleReset}>
               Send another blast
             </button>
           </div>
