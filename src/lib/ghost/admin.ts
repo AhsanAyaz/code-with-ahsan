@@ -37,34 +37,65 @@ export function getGhostAdmin(): GhostAdminAPI | null {
  * List Ghost draft posts tagged with the internal tag #email-blast.
  * Returns an empty array if the API key is missing or the request fails.
  */
+function mapDraft(item: {
+  id: string;
+  title: string;
+  html?: string | null;
+  status: string;
+  updated_at: string;
+  url?: string | null;
+}): EmailBlastDraft {
+  return {
+    id: item.id,
+    title: item.title,
+    html: item.html ?? "",
+    status: item.status as EmailBlastDraft["status"],
+    updatedAt: item.updated_at,
+    url: item.url ?? null,
+  };
+}
+
+/**
+ * List Ghost draft posts AND pages tagged with the internal tag #email-blast.
+ * Ghost pages (type=page) and posts are separate resources — both are queried
+ * so authors can use either in Ghost when composing blast copy.
+ * Returns an empty array if the API key is missing or all requests fail.
+ */
 export async function listEmailBlastDrafts(): Promise<EmailBlastDraft[]> {
   const admin = getGhostAdmin();
   if (!admin) return [];
 
-  try {
-    const posts = await admin.posts.browse({
-      filter: "tag:hash-email-blast+status:draft",
-      limit: 50,
-      formats: ["html"],
-    });
+  const filter = "tag:hash-email-blast+status:draft";
+  const opts = { filter, limit: 50, formats: ["html"] };
 
-    return posts.map((post) => ({
-      id: post.id,
-      title: post.title,
-      html: post.html ?? "",
-      status: post.status,
-      updatedAt: post.updated_at,
-      url: post.url,
-    }));
-  } catch (err) {
-    console.error("[ghost/admin] listEmailBlastDrafts failed:", err);
-    return [];
+  const [postsResult, pagesResult] = await Promise.allSettled([
+    admin.posts.browse(opts),
+    admin.pages.browse(opts),
+  ]);
+
+  const posts =
+    postsResult.status === "fulfilled" ? postsResult.value.map(mapDraft) : [];
+  const pages =
+    pagesResult.status === "fulfilled" ? pagesResult.value.map(mapDraft) : [];
+
+  if (postsResult.status === "rejected") {
+    console.error("[ghost/admin] posts.browse failed:", postsResult.reason);
   }
+  if (pagesResult.status === "rejected") {
+    console.error("[ghost/admin] pages.browse failed:", pagesResult.reason);
+  }
+
+  return [...posts, ...pages];
 }
 
 /**
  * Fetch a single Ghost post by ID and return its rendered HTML.
  * Returns null if the API key is missing, the post is not found, or the request fails.
+ */
+/**
+ * Fetch a single Ghost post or page by ID and return its rendered HTML.
+ * Tries posts first, falls back to pages (so both content types work).
+ * Returns null if not found in either or on error.
  */
 export async function getDraftHtml(
   postId: string
@@ -72,17 +103,19 @@ export async function getDraftHtml(
   const admin = getGhostAdmin();
   if (!admin) return null;
 
-  try {
-    const post = await admin.posts.read({ id: postId }, { formats: ["html"] });
+  const readOpts = { formats: ["html"] };
 
-    return {
-      id: post.id,
-      title: post.title,
-      html: post.html ?? "",
-      status: post.status,
-      updatedAt: post.updated_at,
-      url: post.url,
-    };
+  // Try post first
+  try {
+    const post = await admin.posts.read({ id: postId }, readOpts);
+    return mapDraft(post);
+  } catch {
+    // Not a post — try page
+  }
+
+  try {
+    const page = await admin.pages.read({ id: postId }, readOpts);
+    return mapDraft(page);
   } catch (err) {
     console.error(`[ghost/admin] getDraftHtml(${postId}) failed:`, err);
     return null;

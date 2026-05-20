@@ -23,6 +23,13 @@ declare module "@tryghost/admin-api" {
         options?: { formats?: string[] }
       ): Promise<GhostPost>;
     };
+    pages: {
+      browse(query: Record<string, unknown>): Promise<GhostPost[]>;
+      read(
+        query: { id: string },
+        options?: { formats?: string[] }
+      ): Promise<GhostPost>;
+    };
   }
 
   export default GhostAdminAPI;

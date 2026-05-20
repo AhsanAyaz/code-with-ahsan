@@ -3,15 +3,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // ---------------------------------------------------------------------------
 // Mock @tryghost/admin-api with a proper class constructor
 // ---------------------------------------------------------------------------
-const mockBrowse = vi.fn();
-const mockRead = vi.fn();
+const mockPostsBrowse = vi.fn();
+const mockPostsRead = vi.fn();
+const mockPagesBrowse = vi.fn();
+const mockPagesRead = vi.fn();
+
+// Alias for tests that don't care which resource was called
+const mockBrowse = mockPostsBrowse;
+const mockRead = mockPostsRead;
 
 vi.mock("@tryghost/admin-api", () => {
   class MockGhostAdminAPI {
-    posts = {
-      browse: mockBrowse,
-      read: mockRead,
-    };
+    posts = { browse: mockPostsBrowse, read: mockPostsRead };
+    pages = { browse: mockPagesBrowse, read: mockPagesRead };
   }
   return { default: MockGhostAdminAPI };
 });
@@ -45,8 +49,10 @@ const MAPPED_DRAFT = {
 // ---------------------------------------------------------------------------
 describe("Ghost Admin API client", () => {
   beforeEach(() => {
-    mockBrowse.mockReset();
-    mockRead.mockReset();
+    mockPostsBrowse.mockReset();
+    mockPostsRead.mockReset();
+    mockPagesBrowse.mockReset().mockResolvedValue([]);
+    mockPagesRead.mockReset();
   });
 
   afterEach(() => {
@@ -70,7 +76,8 @@ describe("Ghost Admin API client", () => {
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining("GHOST_ADMIN_API_KEY is not set")
       );
-      expect(mockBrowse).not.toHaveBeenCalled();
+      expect(mockPostsBrowse).not.toHaveBeenCalled();
+      expect(mockPagesBrowse).not.toHaveBeenCalled();
 
       if (originalKey !== undefined) {
         process.env.GHOST_ADMIN_API_KEY = originalKey;
@@ -123,9 +130,10 @@ describe("Ghost Admin API client", () => {
       );
     });
 
-    it("returns null (no throw) when SDK rejects (e.g. 404)", async () => {
+    it("returns null (no throw) when both posts and pages reject (e.g. 404)", async () => {
       process.env.GHOST_ADMIN_API_KEY = "fake-id:fake-secret";
-      mockRead.mockRejectedValueOnce(new Error("Not found"));
+      mockPostsRead.mockRejectedValueOnce(new Error("Not found"));
+      mockPagesRead.mockRejectedValueOnce(new Error("Not found"));
 
       const errorSpy = vi
         .spyOn(console, "error")
