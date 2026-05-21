@@ -29,7 +29,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://codewithahsan.dev"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.codewithahsan.dev"
+  ),
   title: siteMetadata.title,
   description: siteMetadata.description,
   alternates: {
@@ -39,7 +41,8 @@ export const metadata: Metadata = {
     siteName: "Code with Ahsan",
     type: "website",
     locale: "en_US",
-    url: "https://codewithahsan.dev",
+    url:
+      process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.codewithahsan.dev",
   },
   robots: {
     index: true,

@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getCourses, getEvents } from "@/lib/content/contentProvider";
 
-const BASE_URL = "https://codewithahsan.dev";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.codewithahsan.dev";
 
 // Public static routes verified to exist under src/app/.
 // Excludes all 18 auth-gated paths listed in public/robots.txt
