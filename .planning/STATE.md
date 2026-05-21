@@ -25,19 +25,15 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 
 ## Current Position
 
-Phase: 01 (foundation-roles-array-migration) — COMPLETE (10/10 plans)
-Plan: 10 of 10 (Plan 10 merged to main, post-merge ops pending)
-Status: Phase complete — ready for verification
-Last activity: 2026-05-21 - Completed quick task 260521-jsd: SEO indexability fixes (5 tracks)
+Phase: 01 (foundation-roles-array-migration) — CLOSED (10/10 plans + Deploy #5 prod ops done)
+Plan: 10 of 10 (Plan 10 merged to main; Deploy #5 prod ops complete 2026-05-21)
+Status: Phase fully closed — roles-array migration sole source of truth
+Last activity: 2026-05-21 - Phase 01 Deploy #5 close-out: firestore.rules deployed array-only, drop-legacy-role applied (412 scanned, 0 errors, claims already clean)
 
 ## Next Moves (queued, not in flight)
 
-1. **Post-merge prod ops for Plan 10 (manual, gated on user)**:
-   - `firebase deploy --only firestore:rules` — flip rules from dual-claim to roles-only
-   - `npm run drop-legacy-role:dry-run` then `npm run drop-legacy-role` — wipe legacy `role` field from 412 profile docs (production write — confirm dry-run report first)
-   - See `.planning/phases/01-foundation-roles-array-migration/01-10-SUMMARY.md` for full runbook
-2. **Event participant email feature** (new user request 2026-05-20): send emails to event participants. Not yet scoped/planned.
-
+1. **Event participant email feature** (new user request 2026-05-20): send emails to event participants. Not yet scoped/planned.
+2. **v6.0 Phase 5 (Dashboard, Leaderboard, Offboarding, Alumni)** — 5 plans queued, not in flight.
 3. **Bot iteration roadmap** (from drafted article): (a) Firestore-backed sessions to survive redeploys, (b) proactive surfacing in non-bot channels with opt-in via reaction, (c) BigQuery sink for log-based metrics → SQL-grade analytics. None planned yet.
 4. **Article distribution**: `articles/drafts/cwa-assistant-multi-agent-bot.md` ready for Ghost paste; LinkedIn short version drafted; Twitter thread + OG image not done.
 5. **Latency investigation**: first real prod event had `latency_ms=18933` (~19s) for a 3-source external_knowledge fan-out. Acceptable for that workload but worth a P95 baseline once dashboard accumulates data.
@@ -211,6 +207,6 @@ Stopped at: context exhaustion at 75% (2026-05-17)
 Resume file: None
 
 ---
-*Last activity: 2026-05-21 - Completed quick task 260521-jsd: SEO indexability fixes (5 tracks bundled, 26-of-27 404s redirected, all 5 5xx pages now 200, course routes SSG)*
+*Last activity: 2026-05-21 - Phase 01 Deploy #5 close-out: firestore.rules deployed array-only (`firebase deploy --only firestore:rules` ✔), drop-legacy-role applied to prod (412 scanned, 0 errors, 412 claims already clean). Roles-array migration fully closed.*
 
 **Planned Phase:** 5 (Dashboard, Leaderboard, Offboarding & Alumni) — 5 plans — 2026-05-06T10:30:35.607Z
