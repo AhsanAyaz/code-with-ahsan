@@ -25,15 +25,20 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 
 ## Current Position
 
-Phase: 01 (foundation-roles-array-migration) — CLOSED (10/10 plans + Deploy #5 prod ops done)
-Plan: 10 of 10 (Plan 10 merged to main; Deploy #5 prod ops complete 2026-05-21)
-Status: Phase fully closed — roles-array migration sole source of truth
-Last activity: 2026-05-21 - Phase 01 Deploy #5 close-out: firestore.rules deployed array-only, drop-legacy-role applied (412 scanned, 0 errors, claims already clean)
+Phase: 05 (dashboard-leaderboard-offboarding-alumni) — VERIFYING (5/5 plans executed; verifier returned gaps_found 2026-05-21)
+Plan: 5 of 5 executed; Plan 05-05 still pending human verification (Task 3 deferred)
+Status: Phase 5 implementation gaps surfaced — 1 PASS, 3 PARTIAL, 1 FAIL across 5 invariants. Gap-close planning needed.
+Last activity: 2026-05-21 - Phase 5 verification complete: 05-VERIFICATION.md written. Phase 01 fully closed earlier today (Deploy #5 prod ops done, firestore.rules array-only, drop-legacy-role applied 412/0/0).
 
 ## Next Moves (queued, not in flight)
 
-1. **Event participant email feature** (new user request 2026-05-20): send emails to event participants. Not yet scoped/planned.
-2. **v6.0 Phase 5 (Dashboard, Leaderboard, Offboarding, Alumni)** — 5 plans queued, not in flight.
+1. **Phase 5 gap-close** (HIGH — phase verification surfaced 4 actionable gaps; see `.planning/phases/05-dashboard-leaderboard-offboarding-alumni/05-VERIFICATION.md`):
+   - **Leaderboard API ↔ UI shape mismatch (FAIL)**: `/api/ambassador/dashboard/leaderboard` does not return `graceActive` flag, per-entry `rank`, or correct `ownRank` keys (`referrals`/`events`/`reportsOnTime`); UI reads all of those. Hourly cron orphaned — route refactored to live 5-min cache (commit `76ad6f7`); SUMMARYs 05-02/05-03 incorrectly claim hourly wiring.
+   - **Onboarding checklist persistence dead (PARTIAL)**: `OnboardingChecklist.tsx` PATCHes `/api/ambassador/profile` with `{ onboarding: {...} }`, but `AmbassadorPublicFieldsSchema` rejects unknown keys.
+   - **Dashboard `reportsOnTime` undefined (PARTIAL)**: `/me` returns `reportsCount` only; UI renders `reportsOnTime` as `undefined`.
+   - **Alumni button dead UI (PARTIAL)**: `GET /api/ambassador/members/[uid]` doesn't join `cohorts/{cohortId}.endDate`; `AlumniTransitionButton` visibility gate hides it permanently. Admin cannot trigger alumni transition from UI.
+   - 2-strike offboarding (Invariant 5): VERIFIED PASS.
+2. **Event participant email feature** (new user request 2026-05-20): send emails to event participants. Not yet scoped/planned.
 3. **Bot iteration roadmap** (from drafted article): (a) Firestore-backed sessions to survive redeploys, (b) proactive surfacing in non-bot channels with opt-in via reaction, (c) BigQuery sink for log-based metrics → SQL-grade analytics. None planned yet.
 4. **Article distribution**: `articles/drafts/cwa-assistant-multi-agent-bot.md` ready for Ghost paste; LinkedIn short version drafted; Twitter thread + OG image not done.
 5. **Latency investigation**: first real prod event had `latency_ms=18933` (~19s) for a 3-source external_knowledge fan-out. Acceptable for that workload but worth a P95 baseline once dashboard accumulates data.
@@ -207,6 +212,6 @@ Stopped at: context exhaustion at 75% (2026-05-17)
 Resume file: None
 
 ---
-*Last activity: 2026-05-21 - Phase 01 Deploy #5 close-out: firestore.rules deployed array-only (`firebase deploy --only firestore:rules` ✔), drop-legacy-role applied to prod (412 scanned, 0 errors, 412 claims already clean). Roles-array migration fully closed.*
+*Last activity: 2026-05-21 - Phase 5 goal-backward verification: 5/5 plans shipped but verifier returned gaps_found (1 PASS / 3 PARTIAL / 1 FAIL). Gap-close planning queued. Earlier today: Phase 01 Deploy #5 prod ops complete.*
 
 **Planned Phase:** 5 (Dashboard, Leaderboard, Offboarding & Alumni) — 5 plans — 2026-05-06T10:30:35.607Z

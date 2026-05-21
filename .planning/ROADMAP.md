@@ -183,11 +183,11 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| v6.0 Phase 1: Foundation — Roles Array Migration | 0/10 | Planned | — |
-| v6.0 Phase 2: Application Subsystem | 0/9 | Planned | — |
-| v6.0 Phase 3: Public Presentation | 0/6 | Planned | — |
-| v6.0 Phase 4: Activity Subsystem | 0/6 | Planned | — |
-| v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 0/5 | Planned | — |
+| v6.0 Phase 1: Foundation — Roles Array Migration | 10/10 | Closed (Deploy #5 prod ops done) | 2026-05-21 |
+| v6.0 Phase 2: Application Subsystem | 9/9 | Shipped | 2026-05-07 |
+| v6.0 Phase 3: Public Presentation | 6/6 | Shipped | 2026-05-08 |
+| v6.0 Phase 4: Activity Subsystem | 7/7 | Shipped | 2026-05-10 |
+| v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 5/5 | Verifying — gaps_found (1 PASS / 3 PARTIAL / 1 FAIL) | — |
 
 ### Phase 2: ADK Community Assistant for Discord (Google Cloud Next 2026 demo)
 
