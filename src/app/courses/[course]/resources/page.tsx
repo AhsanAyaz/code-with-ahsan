@@ -1,6 +1,41 @@
 import Course from "@/classes/Course.class";
 import ResourcesLinks from "@/components/ResourcesLinks";
-import { getCourseBySlug } from "@/lib/content/contentProvider";
+import { getCourseBySlug, getCourses } from "@/lib/content/contentProvider";
+
+const BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.codewithahsan.dev";
+
+export async function generateStaticParams() {
+  const courses = await getCourses();
+  return courses
+    .filter((c) => !!c?.slug)
+    .map((c) => ({ course: c.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ course: string }>;
+}) {
+  const { course: slug } = await params;
+  const courseData = await getCourseBySlug(slug);
+
+  if (!courseData) {
+    return {
+      title: "Resources - Course Not Found",
+      alternates: {
+        canonical: `${BASE_URL}/courses`,
+      },
+    };
+  }
+
+  return {
+    title: `Resources - ${courseData.name}`,
+    alternates: {
+      canonical: `${BASE_URL}/courses/${slug}/resources`,
+    },
+  };
+}
 
 export default async function ResourcesPage({
   params,

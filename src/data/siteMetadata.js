@@ -18,7 +18,8 @@ const siteMetadata = {
   youtube: "https://youtube.com/c/CodeWithAhsan",
   linkedin: "https://www.linkedin.com/in/ahsanayaz",
   gde: "https://g.dev/ahsanayaz",
-  ngBook: "https://codewithahsan.dev/ng-book",
+  ngBook:
+    "https://www.amazon.com/Angular-Cookbook-actionable-recipes-developers-ebook/dp/B0C3MG5X99",
   socials: "https://bio.link/codewithahsan",
   locale: "en-US",
   analytics: {

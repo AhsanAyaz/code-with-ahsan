@@ -20,12 +20,11 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    return [
-      {
-        source: "/blog/:path*",
-        destination: "https://blog.codewithahsan.dev/:path*",
-      },
-    ];
+    // Track 4 (Quick 260521-jsd): the previous /blog/:path* rewrite is intentionally
+    // removed and replaced by a 301 redirect in redirects() below. Rewrites mask the
+    // URL so Google keeps the www-indexed copy alive; a 301 lets Google migrate the
+    // index entry to the blog subdomain (the desired behaviour).
+    return [];
   },
   async redirects() {
     return [
@@ -111,6 +110,66 @@ const nextConfig: NextConfig = {
       { source: "/mas-raffle", destination: "/raffle", permanent: true },
       { source: "/admin/mas-raffle", destination: "/admin/raffle", permanent: true },
       { source: "/api/mas-raffle/:path*", destination: "/api/raffle/:path*", permanent: true },
+
+      // === Track 4 (Quick 260521-jsd): GSC 404 cleanup, 26 of 27 rows from secure/gsc_404_may_2026/Table.csv.
+      // The 27th row — https://blog.codewithahsan.dev/how-to-pre-render-dynamic-routes-in-angular-a-practical-guide/ —
+      // is on the blog subdomain (different deploy target), out of scope for this app's redirects. Documented in SUMMARY. ===
+
+      // Group A — 11 explicit per-slug rules for ahsync-bytes-weekly-digest-* → /community (newsletter content lives there now).
+      // Per-slug (no :rest* catch-all) to avoid path-to-regexp within-segment matching fragility.
+      // CSV row: /ahsync-bytes-weekly-digest-18th-may-2026/
+      { source: "/ahsync-bytes-weekly-digest-18th-may-2026", destination: "/community", permanent: true },
+      // CSV row: /ahsync-bytes-weekly-digest-23rd-feb-2026/
+      { source: "/ahsync-bytes-weekly-digest-23rd-feb-2026", destination: "/community", permanent: true },
+      // CSV row: /ahsync-bytes-weekly-digest-16th-feb-2026/
+      { source: "/ahsync-bytes-weekly-digest-16th-feb-2026", destination: "/community", permanent: true },
+      // CSV row: /ahsync-bytes-weekly-digest-13th-oct-2025/
+      { source: "/ahsync-bytes-weekly-digest-13th-oct-2025", destination: "/community", permanent: true },
+      // CSV row: /ahsync-bytes-weekly-digest-1st-dec-2025/
+      { source: "/ahsync-bytes-weekly-digest-1st-dec-2025", destination: "/community", permanent: true },
+      // CSV row: /ahsync-bytes-weekly-digest-5th-jan-2026/
+      { source: "/ahsync-bytes-weekly-digest-5th-jan-2026", destination: "/community", permanent: true },
+      // CSV row: /ahsync-bytes-weekly-digest-8th-dec-2025/
+      { source: "/ahsync-bytes-weekly-digest-8th-dec-2025", destination: "/community", permanent: true },
+      // CSV row: /ahsync-bytes-weekly-digest-15th-sep-2025/
+      { source: "/ahsync-bytes-weekly-digest-15th-sep-2025", destination: "/community", permanent: true },
+      // CSV row: /ahsync-bytes-weekly-digest-22nd-sep-2025/
+      { source: "/ahsync-bytes-weekly-digest-22nd-sep-2025", destination: "/community", permanent: true },
+      // CSV row: /ahsync-bytes-weekly-digest-29th-dec-2025/
+      { source: "/ahsync-bytes-weekly-digest-29th-dec-2025", destination: "/community", permanent: true },
+      // CSV row: /ahsync-bytes-weekly-digest-7th-july-2025/
+      { source: "/ahsync-bytes-weekly-digest-7th-july-2025", destination: "/community", permanent: true },
+
+      // Group B — /tags/* → / (legacy tag system gone)
+      // CSV row: /tags/github
+      { source: "/tags/:rest*", destination: "/", permanent: true },
+
+      // Group C — /home → / (CSV row: /home)
+      { source: "/home", destination: "/", permanent: true },
+
+      // Group D — typo / standalone paths
+      // CSV rows: /preDid, /logic-
+      { source: "/preDid", destination: "/", permanent: true },
+      { source: "/logic-", destination: "/", permanent: true },
+
+      // Group D-bis — /ng-book (both apex + www variants in CSV) → Angular Cookbook 2E Amazon page.
+      // siteMetadata.ngBook (used by AboutContent.tsx) is repointed to the SAME URL in src/data/siteMetadata.js,
+      // so the internal CTA + external 301 converge on the live destination.
+      // CSV rows: https://codewithahsan.dev/ng-book, https://www.codewithahsan.dev/ng-book
+      { source: "/ng-book", destination: "https://www.amazon.com/Angular-Cookbook-actionable-recipes-developers-ebook/dp/B0C3MG5X99", permanent: true },
+
+      // Group E — Legacy /blog/* → blog subdomain (REPLACES the previous rewrite for SEO 301 migration)
+      // CSV rows: /blog/css-box-model, /blog/angular-unit-tests-constructor-not-compatible-with-angular-dependency-injection,
+      //          /blog/extend-angular-built-in-pipes, /blog/the-most-easy-way-to-add-update-and-delete-contacts-in-flutter,
+      //          /blog/flutter-marketplace-app-with-stripe/part-1
+      { source: "/blog/:path*", destination: "https://blog.codewithahsan.dev/:path*", permanent: true },
+
+      // Group F — Deep blog slugs that were never under /blog/ (top-level legacy posts) → blog subdomain at same slug
+      // CSV rows: how-i-made-contributing-..., zero-to-3d-..., 10-mind-blowing-ways-..., how-to-pre-render-dynamic-routes-...
+      { source: "/how-i-made-contributing-to-an-open-source-firebase-app-10x-easier-and-what-ai-got-wrong-along-the-way", destination: "https://blog.codewithahsan.dev/how-i-made-contributing-to-an-open-source-firebase-app-10x-easier-and-what-ai-got-wrong-along-the-way", permanent: true },
+      { source: "/zero-to-3d-building-a-gesture-controlled-particle-system-with-one-prompt", destination: "https://blog.codewithahsan.dev/zero-to-3d-building-a-gesture-controlled-particle-system-with-one-prompt", permanent: true },
+      { source: "/10-mind-blowing-ways-to-use-gemini-cli-that-arent-just-write-code", destination: "https://blog.codewithahsan.dev/10-mind-blowing-ways-to-use-gemini-cli-that-arent-just-write-code", permanent: true },
+      { source: "/how-to-pre-render-dynamic-routes-in-angular-a-practical-guide", destination: "https://blog.codewithahsan.dev/how-to-pre-render-dynamic-routes-in-angular-a-practical-guide", permanent: true },
     ];
   },
   turbopack: {
