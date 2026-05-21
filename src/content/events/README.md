@@ -10,13 +10,31 @@ The build script reads all `event.mdx` files and generates `events.generated.jso
 2. Add an `event.mdx` file using the template below
 3. Run `npm run build:events` to regenerate the index (or just `npm run build`)
 
+## SEO Guidelines
+
+Good SEO on event pages helps Google surface them for searches like "AI workshop May 2026" or "Code with Ahsan event".
+
+**Slug** — use full descriptive keywords, lowercase, hyphenated. Never use acronyms or internal codes.
+- ✅ `build-ai-travel-agent-adk-gemini-cli-may-2026`
+- ❌ `BWAI-May2026`
+
+**Title** — include the community name and date. Pattern: `"<Event Topic> – Code with Ahsan (<Month Year>)"`.
+- ✅ `"Build an AI Travel Agent with Google ADK & Gemini CLI – Code with Ahsan (May 2026)"`
+- ❌ `"Build with AI: Building an AI Travel Agent with ADK and Gemini CLI"`
+
+**Description** — 150–160 characters. Must include: event date, "Code with Ahsan", 2–3 topic keywords, and location/format (online/in-person).
+- ✅ `"Free online workshop by Code with Ahsan – May 21, 2026. Build a production-ready AI Travel Agent using Google's ADK and Gemini CLI. Join via Google Meet."`
+- ❌ `"Join us live to learn how to build an intelligent, production-ready AI Travel Agent using Google's Agent Development Kit (ADK) and Gemini CLI!"`
+
+**Speaker** — use the exact public name. Watch for typos (`Aahsan` → `Ahsan`).
+
 ## Template
 
 ```mdx
 ---
-slug: my-event-2027
-title: "My Event 2027"
-description: "A short description shown on the events listing page (1–2 sentences)."
+slug: my-event-topic-keywords-month-year
+title: "My Event Full Title – Code with Ahsan (Month Year)"
+description: "Free online/in-person event by Code with Ahsan – Month DD, YYYY. 1–2 sentences covering topic keywords and location."
 type: workshop
 date: "2027-06-15"
 endDate: "2027-06-16"
