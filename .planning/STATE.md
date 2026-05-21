@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 Phase: 01 (foundation-roles-array-migration) — COMPLETE (10/10 plans)
 Plan: 10 of 10 (Plan 10 merged to main, post-merge ops pending)
 Status: Phase complete — ready for verification
-Last activity: 2026-05-21 - Completed quick task 260521-h86: Sitemap SEO cleanup
+Last activity: 2026-05-21 - Completed quick task 260521-jsd: SEO indexability fixes (5 tracks)
 
 ## Next Moves (queued, not in flight)
 
@@ -181,6 +181,7 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | 260508-m0c | Add daily GitHub Action to sync Discord member count to Firestore and surface it in /api/stats | 2026-05-08 | b6cb528 | [260508-m0c-add-daily-github-action-to-sync-discord-](./quick/260508-m0c-add-daily-github-action-to-sync-discord-/) |
 | 260508-r0b | Markdown-based events system with MDX files, build script, EventCard component, dynamic listing with filters, and auto-generated detail pages | 2026-05-08 | 3681407 | [260508-r0b-markdown-based-events-system-with-mdx-fi](./quick/260508-r0b-markdown-based-events-system-with-mdx-fi/) |
 | 260521-h86 | Sitemap SEO cleanup — migrate static public/sitemap.xml → dynamic src/app/sitemap.ts, strip 18 auth-gated URLs disallowed by robots.txt | 2026-05-21 | 853b826 | [260521-h86-sitemap-seo-cleanup](./quick/260521-h86-sitemap-seo-cleanup/) |
+| 260521-jsd | SEO indexability fixes — generateStaticParams (216 course posts + 9 detail + 9 resources + 3 events SSG), per-page canonicals, Article+Course JSON-LD, 26-of-27 GSC-404 → 308 redirects, ngBook→Amazon convergence | 2026-05-21 | 370fcf8 | [260521-jsd-seo-indexability-fixes-generatestaticpar](./quick/260521-jsd-seo-indexability-fixes-generatestaticpar/) |
 | Phase 01 P01 | 2min | 1 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P02 | 3 min | 3 tasks | 6 files |
 | Phase 01-foundation-roles-array-migration P04 | 2 min | 2 tasks | 3 files |
@@ -210,6 +211,6 @@ Stopped at: context exhaustion at 75% (2026-05-17)
 Resume file: None
 
 ---
-*Last activity: 2026-04-22 - Phase 03 discuss-phase complete; 4 gray areas resolved, 13 decisions locked*
+*Last activity: 2026-05-21 - Completed quick task 260521-jsd: SEO indexability fixes (5 tracks bundled, 26-of-27 404s redirected, all 5 5xx pages now 200, course routes SSG)*
 
 **Planned Phase:** 5 (Dashboard, Leaderboard, Offboarding & Alumni) — 5 plans — 2026-05-06T10:30:35.607Z
