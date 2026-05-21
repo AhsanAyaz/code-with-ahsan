@@ -105,8 +105,42 @@ export default async function Page({
 
   const { course, post, nextPost, previousPost } = data;
 
+  const articleLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.description ?? siteMetadata.description,
+    url: `${BASE_URL}/courses/${courseSlug}/${postSlug}`,
+    ...(post.publishedAt
+      ? { datePublished: post.publishedAt, dateModified: post.publishedAt }
+      : {}),
+    ...(post.thumbnail || course.banner
+      ? { image: post.thumbnail || course.banner }
+      : {}),
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${BASE_URL}/courses/${courseSlug}/${postSlug}`,
+    },
+    author: {
+      "@type": "Person",
+      name: course.authors?.[0]?.name ?? "Muhammad Ahsan Ayaz",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Code with Ahsan",
+      logo: {
+        "@type": "ImageObject",
+        url: `${BASE_URL}/static/images/logo.png`,
+      },
+    },
+  };
+
   return (
     <div className="page-padding">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }}
+      />
       <PostDetail
         course={JSON.parse(JSON.stringify(course))}
         post={JSON.parse(JSON.stringify(post))}

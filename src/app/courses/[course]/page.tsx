@@ -72,8 +72,29 @@ export default async function Page({
 
   const coursePlain = JSON.parse(JSON.stringify(course));
 
+  const courseLd = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: course.name,
+    description: course.description ?? siteMetadata.description,
+    url: `${BASE_URL}/courses/${slug}`,
+    ...(course.banner ? { image: course.banner } : {}),
+    provider: {
+      "@type": "Organization",
+      name: "Code with Ahsan",
+      sameAs: BASE_URL,
+    },
+    ...(course.authors?.[0]?.name
+      ? { author: { "@type": "Person", name: course.authors[0].name } }
+      : {}),
+  };
+
   return (
     <div className="page-padding">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseLd) }}
+      />
       <CourseDetail course={coursePlain} />
     </div>
   );
