@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 Phase: 01 (foundation-roles-array-migration) — COMPLETE (10/10 plans)
 Plan: 10 of 10 (Plan 10 merged to main, post-merge ops pending)
 Status: Phase complete — ready for verification
-Last activity: 2026-05-20
+Last activity: 2026-05-21 - Completed quick task 260521-h86: Sitemap SEO cleanup
 
 ## Next Moves (queued, not in flight)
 
@@ -180,6 +180,7 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | 260508-fvi | Rename mas-raffle → generic raffle with dynamic title field | 2026-05-08 | 2129d64 | [260508-fvi-rename-mas-raffle-to-generic-raffle](./quick/260508-fvi-rename-mas-raffle-to-generic-raffle/) |
 | 260508-m0c | Add daily GitHub Action to sync Discord member count to Firestore and surface it in /api/stats | 2026-05-08 | b6cb528 | [260508-m0c-add-daily-github-action-to-sync-discord-](./quick/260508-m0c-add-daily-github-action-to-sync-discord-/) |
 | 260508-r0b | Markdown-based events system with MDX files, build script, EventCard component, dynamic listing with filters, and auto-generated detail pages | 2026-05-08 | 3681407 | [260508-r0b-markdown-based-events-system-with-mdx-fi](./quick/260508-r0b-markdown-based-events-system-with-mdx-fi/) |
+| 260521-h86 | Sitemap SEO cleanup — migrate static public/sitemap.xml → dynamic src/app/sitemap.ts, strip 18 auth-gated URLs disallowed by robots.txt | 2026-05-21 | 853b826 | [260521-h86-sitemap-seo-cleanup](./quick/260521-h86-sitemap-seo-cleanup/) |
 | Phase 01 P01 | 2min | 1 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P02 | 3 min | 3 tasks | 6 files |
 | Phase 01-foundation-roles-array-migration P04 | 2 min | 2 tasks | 3 files |
