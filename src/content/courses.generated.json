@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-25T22:02:09.841Z",
+  "generatedAt": "2026-05-22T18:08:21.551Z",
   "source": "mdx",
   "count": 11,
   "courses": [
@@ -66,7 +66,7 @@
                 "name": "Introduction"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4806,
@@ -83,7 +83,7 @@
                 "name": "Introduction"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4659,
@@ -100,7 +100,7 @@
                 "name": "Introduction"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4808,
@@ -117,7 +117,7 @@
                 "name": "Introduction"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         },
@@ -143,7 +143,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4810,
@@ -160,7 +160,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4811,
@@ -177,7 +177,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4812,
@@ -194,7 +194,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4813,
@@ -211,7 +211,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4815,
@@ -228,7 +228,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4814,
@@ -245,7 +245,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4816,
@@ -262,7 +262,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4851,
@@ -279,7 +279,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4852,
@@ -296,7 +296,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4853,
@@ -313,7 +313,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4854,
@@ -330,7 +330,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4804,
@@ -347,7 +347,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4805,
@@ -364,7 +364,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4855,
@@ -381,7 +381,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4856,
@@ -398,7 +398,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4857,
@@ -415,7 +415,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4858,
@@ -432,7 +432,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4859,
@@ -449,7 +449,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4860,
@@ -466,7 +466,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4861,
@@ -483,7 +483,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4862,
@@ -500,7 +500,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4643,
@@ -517,7 +517,7 @@
                 "name": "HTML5"
               },
               "resources": [],
-              "article": "Create a new project and create the following business card using HTML and CSS.  \nYou're supposed to have the following things as per mock:\n- Heading saying \"Business Card\"\n- Profile Image\n- Name & Email\n- Skills (put any random skills)\n- Interests (put any random interests)\n- Social links at the bottom with images\n  - Clicking on the image should navigate to the corresponding link in a new tab\n\n![Assignment](https://github.com/AhsanAyaz/slides/raw/main/talks/assets/images/web-dev-basics/assignments/basic-business-card.png)\n"
+              "article": "Create a new project and create the following business card using HTML and CSS.  \r\nYou're supposed to have the following things as per mock:\r\n- Heading saying \"Business Card\"\r\n- Profile Image\r\n- Name & Email\r\n- Skills (put any random skills)\r\n- Interests (put any random interests)\r\n- Social links at the bottom with images\r\n  - Clicking on the image should navigate to the corresponding link in a new tab\r\n\r\n![Assignment](https://github.com/AhsanAyaz/slides/raw/main/talks/assets/images/web-dev-basics/assignments/basic-business-card.png)\r\n"
             }
           ]
         },
@@ -543,7 +543,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4840,
@@ -560,7 +560,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4839,
@@ -577,7 +577,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4838,
@@ -594,7 +594,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4837,
@@ -611,7 +611,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4836,
@@ -628,7 +628,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4835,
@@ -645,7 +645,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4834,
@@ -662,7 +662,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4833,
@@ -679,7 +679,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4832,
@@ -696,7 +696,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4831,
@@ -713,7 +713,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4830,
@@ -730,7 +730,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4829,
@@ -747,7 +747,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4828,
@@ -764,7 +764,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4827,
@@ -781,7 +781,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4826,
@@ -798,7 +798,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4825,
@@ -815,7 +815,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4824,
@@ -832,7 +832,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4823,
@@ -849,7 +849,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4820,
@@ -866,7 +866,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4821,
@@ -883,7 +883,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4822,
@@ -900,7 +900,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4819,
@@ -917,7 +917,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4818,
@@ -934,7 +934,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4817,
@@ -951,7 +951,7 @@
                 "name": "CSS3"
               },
               "resources": [],
-              "article": "### Assignment\n\nCreate a new project and create the following portfolio site using HTML and CSS (without flexbox)\nYou're supposed to have the following things as per mock:\n\n#### Mockup\n\n![Assignment](https://raw.githubusercontent.com/AhsanAyaz/slides/main/talks/assets/images/web-dev-basics/assignments/portfolio-without-css.png)\n"
+              "article": "### Assignment\r\n\r\nCreate a new project and create the following portfolio site using HTML and CSS (without flexbox)\r\nYou're supposed to have the following things as per mock:\r\n\r\n#### Mockup\r\n\r\n![Assignment](https://raw.githubusercontent.com/AhsanAyaz/slides/main/talks/assets/images/web-dev-basics/assignments/portfolio-without-css.png)\r\n"
             }
           ]
         },
@@ -977,7 +977,7 @@
                 "name": "CSS Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4849,
@@ -994,7 +994,7 @@
                 "name": "CSS Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4848,
@@ -1011,7 +1011,7 @@
                 "name": "CSS Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4847,
@@ -1028,7 +1028,7 @@
                 "name": "CSS Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4845,
@@ -1045,7 +1045,7 @@
                 "name": "CSS Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4846,
@@ -1062,7 +1062,7 @@
                 "name": "CSS Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4844,
@@ -1079,7 +1079,7 @@
                 "name": "CSS Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4843,
@@ -1096,7 +1096,7 @@
                 "name": "CSS Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4602,
@@ -1113,7 +1113,7 @@
                 "name": "CSS Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4842,
@@ -1130,7 +1130,7 @@
                 "name": "CSS Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         },
@@ -1156,7 +1156,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4863,
@@ -1173,7 +1173,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4701,
@@ -1190,7 +1190,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4702,
@@ -1207,7 +1207,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4703,
@@ -1224,7 +1224,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4704,
@@ -1241,7 +1241,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4737,
@@ -1258,7 +1258,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4736,
@@ -1275,7 +1275,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4735,
@@ -1292,7 +1292,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4734,
@@ -1309,7 +1309,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4733,
@@ -1326,7 +1326,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4732,
@@ -1343,7 +1343,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4731,
@@ -1360,7 +1360,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4730,
@@ -1377,7 +1377,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4729,
@@ -1394,7 +1394,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4728,
@@ -1411,7 +1411,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4727,
@@ -1428,7 +1428,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4726,
@@ -1445,7 +1445,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4725,
@@ -1462,7 +1462,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4724,
@@ -1479,7 +1479,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4723,
@@ -1496,7 +1496,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4722,
@@ -1513,7 +1513,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4721,
@@ -1530,7 +1530,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4720,
@@ -1547,7 +1547,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4719,
@@ -1564,7 +1564,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4718,
@@ -1581,7 +1581,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4717,
@@ -1598,7 +1598,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4716,
@@ -1615,7 +1615,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4715,
@@ -1632,7 +1632,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4714,
@@ -1649,7 +1649,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4713,
@@ -1666,7 +1666,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4712,
@@ -1683,7 +1683,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4711,
@@ -1700,7 +1700,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4710,
@@ -1717,7 +1717,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4709,
@@ -1734,7 +1734,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4708,
@@ -1751,7 +1751,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4707,
@@ -1768,7 +1768,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4706,
@@ -1785,7 +1785,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4705,
@@ -1802,7 +1802,7 @@
                 "name": "JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         },
@@ -1828,7 +1828,7 @@
                 "name": "JavaScript Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4695,
@@ -1845,7 +1845,7 @@
                 "name": "JavaScript Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4696,
@@ -1862,7 +1862,7 @@
                 "name": "JavaScript Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4697,
@@ -1879,7 +1879,7 @@
                 "name": "JavaScript Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4698,
@@ -1896,7 +1896,7 @@
                 "name": "JavaScript Advanced"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         },
@@ -1922,7 +1922,7 @@
                 "name": "Conclusion"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         }
@@ -2003,7 +2003,7 @@
                 "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4888,
@@ -2020,7 +2020,7 @@
                 "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4889,
@@ -2037,7 +2037,7 @@
                 "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4890,
@@ -2054,7 +2054,7 @@
                 "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4891,
@@ -2071,7 +2071,7 @@
                 "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4892,
@@ -2088,7 +2088,7 @@
                 "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4893,
@@ -2105,7 +2105,7 @@
                 "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4894,
@@ -2122,7 +2122,7 @@
                 "name": "Building your first AI Agent - Google Agent Development Kit for Beginners (Part 1)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         }
@@ -2176,7 +2176,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4672,
@@ -2193,7 +2193,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4677,
@@ -2210,7 +2210,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4663,
@@ -2227,7 +2227,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4662,
@@ -2244,7 +2244,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4665,
@@ -2261,7 +2261,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4675,
@@ -2278,7 +2278,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4676,
@@ -2295,7 +2295,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4667,
@@ -2312,7 +2312,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4673,
@@ -2329,7 +2329,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4671,
@@ -2346,7 +2346,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4666,
@@ -2363,7 +2363,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4670,
@@ -2380,7 +2380,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4668,
@@ -2397,7 +2397,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4681,
@@ -2414,7 +2414,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4664,
@@ -2431,7 +2431,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4674,
@@ -2448,7 +2448,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4669,
@@ -2465,7 +2465,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4679,
@@ -2482,7 +2482,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4678,
@@ -2499,7 +2499,7 @@
                 "name": "Angular in 90ish minutes"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         }
@@ -2553,7 +2553,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4865,
@@ -2570,7 +2570,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4866,
@@ -2587,7 +2587,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4867,
@@ -2604,7 +2604,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4868,
@@ -2621,7 +2621,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4869,
@@ -2638,7 +2638,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4870,
@@ -2655,7 +2655,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4871,
@@ -2672,7 +2672,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4872,
@@ -2689,7 +2689,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4873,
@@ -2706,7 +2706,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4874,
@@ -2723,7 +2723,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4875,
@@ -2740,7 +2740,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4876,
@@ -2757,7 +2757,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4877,
@@ -2774,7 +2774,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4878,
@@ -2791,7 +2791,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4879,
@@ -2808,7 +2808,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4880,
@@ -2825,7 +2825,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4881,
@@ -2842,7 +2842,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4882,
@@ -2859,7 +2859,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4883,
@@ -2876,7 +2876,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4884,
@@ -2893,7 +2893,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4885,
@@ -2910,7 +2910,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4886,
@@ -2927,7 +2927,7 @@
                 "name": "React 19 Crash Course for Beginners 2026 (Learn in 90 Minutes)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         }
@@ -2975,7 +2975,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4803,
@@ -2992,7 +2992,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4792,
@@ -3009,7 +3009,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4794,
@@ -3026,7 +3026,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4800,
@@ -3043,7 +3043,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4789,
@@ -3060,7 +3060,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4791,
@@ -3077,7 +3077,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4802,
@@ -3094,7 +3094,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4795,
@@ -3111,7 +3111,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4798,
@@ -3128,7 +3128,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4797,
@@ -3145,7 +3145,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4801,
@@ -3162,7 +3162,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4790,
@@ -3179,7 +3179,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4796,
@@ -3196,7 +3196,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4799,
@@ -3213,7 +3213,7 @@
                 "name": "React Redux Toolkit tutorial for beginners"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         }
@@ -3261,7 +3261,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4762,
@@ -3278,7 +3278,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4763,
@@ -3295,7 +3295,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4764,
@@ -3312,7 +3312,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4765,
@@ -3329,7 +3329,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4766,
@@ -3346,7 +3346,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4767,
@@ -3363,7 +3363,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4768,
@@ -3380,7 +3380,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4769,
@@ -3397,7 +3397,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4770,
@@ -3414,7 +3414,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4771,
@@ -3431,7 +3431,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4772,
@@ -3448,7 +3448,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4773,
@@ -3465,7 +3465,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4774,
@@ -3482,7 +3482,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4776,
@@ -3499,7 +3499,7 @@
                 "name": "MERN Stack Crash Course Default Chapter"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         }
@@ -3547,7 +3547,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4779,
@@ -3564,7 +3564,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4688,
@@ -3581,7 +3581,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4785,
@@ -3598,7 +3598,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4782,
@@ -3615,7 +3615,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4686,
@@ -3632,7 +3632,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4781,
@@ -3649,7 +3649,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4777,
@@ -3666,7 +3666,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4784,
@@ -3683,7 +3683,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4685,
@@ -3700,7 +3700,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4687,
@@ -3717,7 +3717,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4786,
@@ -3734,7 +3734,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4780,
@@ -3751,7 +3751,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4684,
@@ -3768,7 +3768,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4778,
@@ -3785,7 +3785,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4682,
@@ -3802,7 +3802,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4690,
@@ -3819,7 +3819,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4787,
@@ -3836,7 +3836,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4691,
@@ -3853,7 +3853,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4683,
@@ -3870,7 +3870,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4788,
@@ -3887,7 +3887,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4689,
@@ -3904,7 +3904,7 @@
                 "name": "Angular NestJS FullStack Course"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         }
@@ -3978,7 +3978,7 @@
                 "name": "Web Development Bootcamp (Figma Design to HTML and CSS)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4756,
@@ -3995,7 +3995,7 @@
                 "name": "Web Development Bootcamp (Figma Design to HTML and CSS)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4757,
@@ -4012,7 +4012,7 @@
                 "name": "Web Development Bootcamp (Figma Design to HTML and CSS)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4758,
@@ -4029,7 +4029,7 @@
                 "name": "Web Development Bootcamp (Figma Design to HTML and CSS)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4759,
@@ -4046,7 +4046,7 @@
                 "name": "Web Development Bootcamp (Figma Design to HTML and CSS)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4760,
@@ -4063,7 +4063,7 @@
                 "name": "Web Development Bootcamp (Figma Design to HTML and CSS)"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         }
@@ -4109,7 +4109,7 @@
                 "name": "Design Patterns in JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4751,
@@ -4126,7 +4126,7 @@
                 "name": "Design Patterns in JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4753,
@@ -4143,7 +4143,7 @@
                 "name": "Design Patterns in JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4752,
@@ -4160,7 +4160,7 @@
                 "name": "Design Patterns in JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4750,
@@ -4177,7 +4177,7 @@
                 "name": "Design Patterns in JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4754,
@@ -4194,7 +4194,7 @@
                 "name": "Design Patterns in JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4755,
@@ -4211,7 +4211,7 @@
                 "name": "Design Patterns in JavaScript"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         }
@@ -4257,7 +4257,7 @@
                 "name": "JavaScript Beginners Series"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4740,
@@ -4274,7 +4274,7 @@
                 "name": "JavaScript Beginners Series"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4741,
@@ -4291,7 +4291,7 @@
                 "name": "JavaScript Beginners Series"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4742,
@@ -4308,7 +4308,7 @@
                 "name": "JavaScript Beginners Series"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4743,
@@ -4325,7 +4325,7 @@
                 "name": "JavaScript Beginners Series"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4744,
@@ -4342,7 +4342,7 @@
                 "name": "JavaScript Beginners Series"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4745,
@@ -4359,7 +4359,7 @@
                 "name": "JavaScript Beginners Series"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4746,
@@ -4376,7 +4376,7 @@
                 "name": "JavaScript Beginners Series"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4747,
@@ -4393,7 +4393,7 @@
                 "name": "JavaScript Beginners Series"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             },
             {
               "id": 4748,
@@ -4410,7 +4410,7 @@
                 "name": "JavaScript Beginners Series"
               },
               "resources": [],
-              "article": "\n"
+              "article": "\r\n"
             }
           ]
         }
