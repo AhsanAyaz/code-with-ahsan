@@ -38,6 +38,29 @@ vi.mock("@/lib/firebaseAdmin", () => {
     where: vi.fn().mockReturnThis(),
     count: () => ({ get: () => Promise.resolve({ data: () => ({ count: n }) }) }),
   });
+  // monthly_reports needs BOTH .where().count().get() AND .where().get() returning docs
+  // (INV-1: reportsOnTime derivation reads full docs to compare submittedAt vs deadline).
+  // Doc 1: month "2026-01", submittedAt = Jan 31 23:59:58 UTC → on time in UTC tz
+  // Doc 2: month "2026-02", submittedAt = Mar 5 → late for Feb (deadline = end-of-Feb in UTC)
+  const monthlyReportsDocs = [
+    {
+      data: () => ({
+        month: "2026-01",
+        submittedAt: { toMillis: () => Date.UTC(2026, 1, 1) - 1000 }, // Jan 31 23:59:59 UTC
+      }),
+    },
+    {
+      data: () => ({
+        month: "2026-02",
+        submittedAt: { toMillis: () => Date.UTC(2026, 2, 5) }, // Mar 5
+      }),
+    },
+  ];
+  const monthlyReportsQuery = {
+    where: vi.fn().mockReturnThis(),
+    count: () => ({ get: () => Promise.resolve({ data: () => ({ count: monthlyReportsDocs.length }) }) }),
+    get: () => Promise.resolve({ docs: monthlyReportsDocs, size: monthlyReportsDocs.length }),
+  };
   return {
     db: {
       collection: vi.fn((name: string) => {
@@ -45,7 +68,7 @@ vi.mock("@/lib/firebaseAdmin", () => {
         if (name === "cohorts") return { doc: vi.fn().mockReturnValue(cohortDoc) };
         if (name === "referrals") return countQuery(7);
         if (name === "ambassador_events") return countQuery(3);
-        if (name === "monthly_reports") return countQuery(2);
+        if (name === "monthly_reports") return monthlyReportsQuery;
         return { where: vi.fn().mockReturnThis(), count: () => ({ get: () => Promise.resolve({ data: () => ({ count: 0 }) }) }) };
       }),
     },
@@ -108,5 +131,15 @@ describe("GET /api/ambassador/dashboard/me (DASH-02)", () => {
     const res = await GET(makeReq());
     const body = (await res.json()) as { onboarding: { uploadedVideo: boolean } };
     expect(body.onboarding.uploadedVideo).toBe(false);
+  });
+
+  it("derives stats.reportsOnTime from monthly_reports docs vs deadline (INV-1)", async () => {
+    const res = await GET(makeReq());
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { stats: { reportsOnTime: number; reportsCount: number } };
+    expect(typeof body.stats.reportsOnTime).toBe("number");
+    expect(body.stats.reportsOnTime).toBe(1); // only Doc 1 is on time in UTC tz
+    // Additive: reportsCount must still be present (do not remove)
+    expect(typeof body.stats.reportsCount).toBe("number");
   });
 });

@@ -168,6 +168,18 @@ export async function PATCH(request: NextRequest) {
   applyStringField("githubUrl", "githubUrl");
   applyStringField("personalSiteUrl", "personalSiteUrl");
 
+  // INV-2: Onboarding flags — write via Firestore dot-paths so a later PATCH
+  // setting another flag does not clobber existing siblings. Only known keys
+  // are accepted (schema enforces this); only boolean values are persisted.
+  // NEVER do `subdocUpdate.onboarding = ...` (full-object replace would clobber
+  // sibling keys — T-260522-a2f-02 in the threat model).
+  if (input.onboarding && typeof input.onboarding === "object") {
+    for (const [flagKey, flagValue] of Object.entries(input.onboarding)) {
+      if (typeof flagValue !== "boolean") continue;
+      subdocUpdate[`onboarding.${flagKey}`] = flagValue;
+    }
+  }
+
   // Video URL + embed type — tied together. Either both set, both cleared, or neither touched.
   if (clearVideo) {
     subdocUpdate.cohortPresentationVideoUrl = FieldValue.delete();
@@ -183,6 +195,14 @@ export async function PATCH(request: NextRequest) {
       { status: 400 }
     );
   }
+
+  // INV-2: Detect whether the input touched any public-card field (i.e. anything
+  // other than onboarding dot-paths). When false, we skip the public projection
+  // write so an onboarding-only PATCH doesn't bump public_ambassadors.updatedAt
+  // for fields the user didn't change.
+  const hasPublicFieldUpdate = Object.keys(subdocUpdate).some(
+    (k) => !k.startsWith("onboarding."),
+  );
 
   // 8. Compute the post-write subdoc shape for the projection.
   //    Apply the same input diff to a local copy so the projection stays exactly in sync.
@@ -237,10 +257,14 @@ export async function PATCH(request: NextRequest) {
   });
 
   // 9. Single batched write — atomic between subdoc + projection (D-08 path 2).
+  //    Skip the projection set when the PATCH only touched onboarding flags
+  //    (INV-2 — onboarding is private and never appears on the public card).
   try {
     const batch = db.batch();
     batch.update(ambassadorRef, subdocUpdate);
-    batch.set(publicRef, projection, { merge: false });
+    if (hasPublicFieldUpdate) {
+      batch.set(publicRef, projection, { merge: false });
+    }
     await batch.commit();
   } catch (e) {
     logger.error("PATCH batched write failed", { uid: ctx.uid, error: e });
