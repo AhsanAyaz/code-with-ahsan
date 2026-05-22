@@ -138,6 +138,17 @@ export const AmbassadorPublicFieldsSchema = z
       .min(1)
       .refine(isValidIanaTimezone, { message: "Invalid IANA timezone" })
       .optional(),
+    // DASH-08 / INV-2: self-mark onboarding flags. Keys MUST match
+    // AmbassadorSubdoc.onboarding exactly (joinedDiscord, sharedReferralLink).
+    // Auto-derived flags (setBio, uploadedVideo, loggedFirstEvent) are NOT
+    // stored here — they are computed in GET /api/ambassador/dashboard/me.
+    onboarding: z
+      .object({
+        joinedDiscord: z.boolean().optional(),
+        sharedReferralLink: z.boolean().optional(),
+      })
+      .partial()
+      .optional(),
   })
   .refine((d) => Object.keys(d).length > 0, { message: "At least one field required" });
 
