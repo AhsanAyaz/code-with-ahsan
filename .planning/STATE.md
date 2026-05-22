@@ -25,14 +25,14 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 
 ## Current Position
 
-Milestone: v7.0 Agentic Orchestra Upgrade — planning kickoff
-Phase: 06 (agent-workflow-refactor-state-wiring) — TO PLAN
-Status: v6.0 Phase 5 verified PASS (all 4 actionable invariants closed). v7.0 scoped 2026-05-22 — 3 phases (06 workflow refactor → 07 callbacks → 08 loops + sessions). CFP framing locked at `slides/talks/zero-to-agentic-orchestra/cfp-framing.md`.
-Last activity: 2026-05-22 - v7.0 ROADMAP written, root ROADMAP.md updated, phase dirs scaffolded. Next: `/gsd-plan-phase 6 --research`.
+Milestone: v7.0 Agentic Orchestra Upgrade — Phase 06 PLANNED
+Phase: 06 (agent-workflow-refactor-state-wiring) — READY TO EXECUTE
+Status: v6.0 Phase 5 verified PASS. v7.0 Phase 06 planning complete 2026-05-22 — CONTEXT + RESEARCH + 4 PLAN files (06-01 ParallelAgent fan-out / 06-02 output_key whiteboard / 06-03 AgentTool wrap / 06-04 smoke + deploy + 24h soak). Plan-check PASS round 2 (all 6 round-1 blockers resolved). RESEARCH Open Questions marked RESOLVED. CFP framing locked at `slides/talks/zero-to-agentic-orchestra/cfp-framing.md`.
+Last activity: 2026-05-22 - Phase 06 plans landed. Next: `/gsd-execute-phase 6` (per-plan TDD execution).
 
 ## Next Moves (queued, not in flight)
 
-1. **v7.0 Phase 6 planning (immediate)**: `/gsd-plan-phase 6 --research` against `.planning/phases/06-agent-workflow-refactor-state-wiring/`. Workstreams: ParallelAgent fan-out for `external_knowledge_agent`, `output_key` whiteboard across sub-agents, `AgentTool`-wrap `featured_resources`. Latency target: ≥40% P95 drop on 3-source queries (current baseline ~19s).
+1. **v7.0 Phase 6 execution (immediate)**: Phase 06 plans landed. Execute per-plan via `/gsd-execute-phase 6` or per-PLAN executor invocations. Order: 06-01 (ParallelAgent fan-out) + 06-02 (output_key whiteboard) + 06-03 (AgentTool wrap) in parallel (no file overlap) → 06-04 (adk web smoke + deploy + 24h soak). Latency gate: ≥40% P95 drop on 3-source queries (baseline ~19s). PARTIAL-SHIP path requires STATE.md handoff entry for Phase 7/8 latency investigation.
 2. **v7.0 Phase 7 planning (blocked on 6)**: callbacks — `before_model_callback` PII redaction, `before_/after_tool_callback` cache, `before_/after_agent_callback` structured lifecycle logging.
 3. **v7.0 Phase 8 planning (blocked on 7)**: LoopAgent critic for mentor/project quality, LoopAgent clarifier for mentor/project intake, `DatabaseSessionService` (Firestore-backed, HMAC-keyed), daily session pruning cron.
 4. **Phase 5 Plan 05-05 human verification (optional, deferred)**: browser smoke test — onboarding tick persists, leaderboard renders, AlumniTransitionButton on past-cohort. Server-side already PASS so this is UX-only.
