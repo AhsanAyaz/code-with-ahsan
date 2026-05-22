@@ -14,12 +14,19 @@ type MemberDetail = {
   profile: { displayName?: string; email?: string };
   subdoc: {
     cohortId?: string;
+    // INV-4: kept for backward compatibility (test fixtures may still set it),
+    // but the API no longer emits this. The new source of truth is
+    // `detail.cohort.endDate` (see below) which joins cohorts/{cohortId} server-side.
     cohortEndDate?: string | null;
     strikes?: number;
     referralCode?: string;
     timezone?: string;
     active?: boolean;
   };
+  // INV-4: top-level cohort projection. endDate is the cohort's end date in ISO
+  // form, or null when cohort doc is missing/has no endDate. AlumniTransitionButton
+  // reads this for its visibility gate.
+  cohort?: { endDate: string | null };
   recentEvents: Array<{
     id: string;
     date: string;
@@ -187,7 +194,7 @@ export function MemberDetailClient({ uid }: { uid: string }) {
       <AlumniTransitionButton
         uid={uid}
         displayName={displayName}
-        cohortEndDate={detail.subdoc.cohortEndDate ?? null}
+        cohortEndDate={detail.cohort?.endDate ?? null}
         subdocActive={detail.subdoc.active ?? false}
         onCompleted={load}
       />
