@@ -4,8 +4,8 @@ milestone: v6.0
 milestone_name: Student Ambassador Program
 status: verifying
 stopped_at: context exhaustion at 75% (2026-05-17)
-last_updated: "2026-05-20T20:14:17.004Z"
-last_activity: 2026-05-20
+last_updated: "2026-05-22T05:45:00.000Z"
+last_activity: 2026-05-22
 progress:
   total_phases: 7
   completed_phases: 7
@@ -25,19 +25,14 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 
 ## Current Position
 
-Phase: 05 (dashboard-leaderboard-offboarding-alumni) — VERIFYING (5/5 plans executed; verifier returned gaps_found 2026-05-21)
+Phase: 05 (dashboard-leaderboard-offboarding-alumni) — VERIFYING (5/5 plans executed; 3/4 gaps closed 2026-05-22; INV-3 leaderboard still open)
 Plan: 5 of 5 executed; Plan 05-05 still pending human verification (Task 3 deferred)
-Status: Phase 5 implementation gaps surfaced — 1 PASS, 3 PARTIAL, 1 FAIL across 5 invariants. Gap-close planning needed.
-Last activity: 2026-05-21 - Phase 5 verification complete: 05-VERIFICATION.md written. Phase 01 fully closed earlier today (Deploy #5 prod ops done, firestore.rules array-only, drop-legacy-role applied 412/0/0).
+Status: INV-1 (reportsOnTime), INV-2 (onboarding persistence), INV-4 (cohort.endDate) closed via quick 260522-a2f. INV-3 (leaderboard) pending architectural decision.
+Last activity: 2026-05-22 - Quick 260522-a2f: phase 5 gap-close (INV-1/2/4) shipped — 4 commits, 35/35 ambassador tests pass, tsc clean. Verifier 8/8 PASS.
 
 ## Next Moves (queued, not in flight)
 
-1. **Phase 5 gap-close** (HIGH — phase verification surfaced 4 actionable gaps; see `.planning/phases/05-dashboard-leaderboard-offboarding-alumni/05-VERIFICATION.md`):
-   - **Leaderboard API ↔ UI shape mismatch (FAIL)**: `/api/ambassador/dashboard/leaderboard` does not return `graceActive` flag, per-entry `rank`, or correct `ownRank` keys (`referrals`/`events`/`reportsOnTime`); UI reads all of those. Hourly cron orphaned — route refactored to live 5-min cache (commit `76ad6f7`); SUMMARYs 05-02/05-03 incorrectly claim hourly wiring.
-   - **Onboarding checklist persistence dead (PARTIAL)**: `OnboardingChecklist.tsx` PATCHes `/api/ambassador/profile` with `{ onboarding: {...} }`, but `AmbassadorPublicFieldsSchema` rejects unknown keys.
-   - **Dashboard `reportsOnTime` undefined (PARTIAL)**: `/me` returns `reportsCount` only; UI renders `reportsOnTime` as `undefined`.
-   - **Alumni button dead UI (PARTIAL)**: `GET /api/ambassador/members/[uid]` doesn't join `cohorts/{cohortId}.endDate`; `AlumniTransitionButton` visibility gate hides it permanently. Admin cannot trigger alumni transition from UI.
-   - 2-strike offboarding (Invariant 5): VERIFIED PASS.
+1. **Phase 5 INV-3 leaderboard (FAIL — only remaining gap)**: `/api/ambassador/dashboard/leaderboard` does not return `graceActive` flag, per-entry `rank`, or correct `ownRank` keys (`referrals`/`events`/`reportsOnTime`); UI reads all of those. Hourly cron orphaned — route refactored to live 5-min cache (commit `76ad6f7`); SUMMARYs 05-02/05-03 incorrectly claim hourly wiring. **Architectural decision pending**: (a) revive hourly cron (re-add job to `.github/workflows/ambassador-activity-checks.yml`, switch route to read `leaderboard_snapshots/{cohortId}`) OR (b) accept live 5-min cache deviation (remove `scripts/ambassador-leaderboard-snapshot.ts`, update SUMMARYs, fix API↔UI shape mismatches in-place). INV-1/2/4 already closed via quick 260522-a2f. INV-5 PASS.
 2. **Event participant email feature** (new user request 2026-05-20): send emails to event participants. Not yet scoped/planned.
 3. **Bot iteration roadmap** (from drafted article): (a) Firestore-backed sessions to survive redeploys, (b) proactive surfacing in non-bot channels with opt-in via reaction, (c) BigQuery sink for log-based metrics → SQL-grade analytics. None planned yet.
 4. **Article distribution**: `articles/drafts/cwa-assistant-multi-agent-bot.md` ready for Ghost paste; LinkedIn short version drafted; Twitter thread + OG image not done.
@@ -183,6 +178,7 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | 260508-r0b | Markdown-based events system with MDX files, build script, EventCard component, dynamic listing with filters, and auto-generated detail pages | 2026-05-08 | 3681407 | [260508-r0b-markdown-based-events-system-with-mdx-fi](./quick/260508-r0b-markdown-based-events-system-with-mdx-fi/) |
 | 260521-h86 | Sitemap SEO cleanup — migrate static public/sitemap.xml → dynamic src/app/sitemap.ts, strip 18 auth-gated URLs disallowed by robots.txt | 2026-05-21 | 853b826 | [260521-h86-sitemap-seo-cleanup](./quick/260521-h86-sitemap-seo-cleanup/) |
 | 260521-jsd | SEO indexability fixes — generateStaticParams (216 course posts + 9 detail + 9 resources + 3 events SSG), per-page canonicals, Article+Course JSON-LD, 26-of-27 GSC-404 → 308 redirects, ngBook→Amazon convergence | 2026-05-21 | 370fcf8 | [260521-jsd-seo-indexability-fixes-generatestaticpar](./quick/260521-jsd-seo-indexability-fixes-generatestaticpar/) |
+| 260522-a2f | Phase 5 gap-close — INV-1 (reportsOnTime derived on /me), INV-2 (onboarding checklist persistence via schema extension + Firestore dot-path merge), INV-4 (cohort.endDate parallel-read on admin member GET). 4 commits, 35/35 tests pass, verifier 8/8 PASS. | 2026-05-22 | aada493 | [260522-a2f-phase-5-verification-gap-close-invariant](./quick/260522-a2f-phase-5-verification-gap-close-invariant/) |
 | Phase 01 P01 | 2min | 1 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P02 | 3 min | 3 tasks | 6 files |
 | Phase 01-foundation-roles-array-migration P04 | 2 min | 2 tasks | 3 files |
@@ -212,6 +208,6 @@ Stopped at: context exhaustion at 75% (2026-05-17)
 Resume file: None
 
 ---
-*Last activity: 2026-05-21 - Phase 5 goal-backward verification: 5/5 plans shipped but verifier returned gaps_found (1 PASS / 3 PARTIAL / 1 FAIL). Gap-close planning queued. Earlier today: Phase 01 Deploy #5 prod ops complete.*
+*Last activity: 2026-05-22 - Quick 260522-a2f closed Phase 5 INV-1/2/4 (reportsOnTime + onboarding persistence + cohort.endDate). 4 commits on main, 35/35 ambassador tests pass, verifier 8/8 PASS. Only INV-3 leaderboard remains — pending architectural decision (revive hourly cron vs accept live 5-min cache).*
 
 **Planned Phase:** 5 (Dashboard, Leaderboard, Offboarding & Alumni) — 5 plans — 2026-05-06T10:30:35.607Z
