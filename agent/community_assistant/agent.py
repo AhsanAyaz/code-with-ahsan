@@ -1,7 +1,7 @@
 from google.adk.agents import LlmAgent
 
 from .sub_agents.content_agent import content_agent
-from .sub_agents.external_knowledge_agent import external_knowledge_agent
+from .sub_agents.external_knowledge import external_knowledge_agent
 from .sub_agents.mentorship_agent import mentorship_agent
 from .sub_agents.onboarding_agent import onboarding_agent
 from .sub_agents.projects_agent import projects_agent
