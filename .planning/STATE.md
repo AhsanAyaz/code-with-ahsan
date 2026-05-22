@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: Agentic Orchestra Upgrade
-status: executing
-stopped_at: context exhaustion at 75% (2026-05-17)
-last_updated: "2026-05-23T00:00:00Z"
+status: Phase 6 deployed to Cloud Run (revision `cwa-assistant-bot-00012-8x6`); AGENT-PAR-02 P95 gate DEFERRED — user override accepted, carry-over to Phase 7/8 logged in Next Moves
+stopped_at: context exhaustion at 76% (2026-05-22)
+last_updated: "2026-05-22T23:16:34.920Z"
 last_activity: 2026-05-23
 progress:
-  total_phases: 3
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_phases: 9
+  completed_phases: 7
+  total_plans: 38
+  completed_plans: 40
+  percent: 78
 ---
 
 # Project State
@@ -226,8 +226,8 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 
 ## Session Continuity
 
-Last session: 2026-05-23T00:00:00Z
-Stopped at: Phase 6 PARTIAL-SHIP — deploy landed (cwa-assistant-bot-00012-8x6); AGENT-PAR-02 P95 gate DEFERRED to Phase 7/8 per user override
+Last session: 2026-05-22T23:16:34.916Z
+Stopped at: context exhaustion at 76% (2026-05-22)
 Resume file: None
 
 ---
