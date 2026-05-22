@@ -4,14 +4,14 @@ milestone: v7.0
 milestone_name: Agentic Orchestra Upgrade
 status: executing
 stopped_at: context exhaustion at 75% (2026-05-17)
-last_updated: "2026-05-22T16:13:50.900Z"
+last_updated: "2026-05-22T16:24:00Z"
 last_activity: 2026-05-22
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
-  percent: 50
+  completed_plans: 3
+  percent: 75
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 
 ## Current Position
 
-Milestone: v7.0 Agentic Orchestra Upgrade — Phase 06 PLANNED
+Milestone: v7.0 Agentic Orchestra Upgrade — Phase 06 EXECUTING
 Phase: 06 (agent-workflow-refactor-state-wiring) — EXECUTING
-Plan: 3 of 4
-Status: Ready to execute
+Plan: 4 of 4 (06-01 ✅ 06-02 ✅ 06-03 ✅ — 06-04 adk web smoke + deploy + 24h soak NEXT)
+Status: Ready to execute 06-04
 Last activity: 2026-05-22
 
 ## Next Moves (queued, not in flight)
@@ -154,6 +154,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 06-03]: content_agent.tools[0] is featured_resources_tool (FIRST position) — pinned by T-06-10 threat mitigation test 4
 - [Phase 06-03]: search_blog_posts no longer prepends curated resources; status='partial' branch removed (was 'ghost down BUT featured matched' — that hybrid path is impossible now that featured is fetched via AgentTool)
 - [Phase 06-03]: Task 2 and Task 3 landed as separate commits — Task 2 = RED tests (new file + trimmed test_content_agent_blog.py); Task 3 = GREEN production code; trimming the obsolete tests in Task 2 didn't break greenness because their assertions targeted code-paths still present in unchanged content_agent.py
+- [Phase 06-02]: onboarding_agent refactored to SequentialAgent[skill_level_extractor, goals_extractor, welcome_agent] — welcome LAST so the SequentialAgent's user-visible reply IS the warm welcome (RESEARCH §Open Question 2 RESOLVED via Task 4 `adk web` smoke). RESEARCH §Open Question 3 ALSO answered YES — transfer_to_agent successfully routes to a SequentialAgent target, unblocks Plan 06-01's external_knowledge_agent same routing pattern with zero ripple.
+- [Phase 06-02]: output_key namespace LOCKED for Phase 7/8 cross-phase contract — `user_skill_level` (scalar from {beginner, intermediate, advanced, unknown}) + `user_goals` (≤40 word string). Phase 8's mentor_intake_clarifier will extend with `user_timezone`, `user_focus_area`, `next_clarifying_question`. Downstream mentorship/projects/roadmap instructions PREPEND a USER CONTEXT block reading `{user_skill_level?}` + `{user_goals?}` (silent-empty form mandatory — non-`?` form would crash first-turn; test 10 regex-asserts no non-`?` form leaks).
+- [Phase 06-02]: welcome_agent has NO output_key (its text IS the user-facing reply, not a state value); routable outer name `onboarding_agent` preserved so root_agent.sub_agents routing is bit-identical (no coordinator-LLM change). Task 5 Branch A NO-OP fired as documented — welcome-LAST verified, no reorder needed.
 
 ### Workflow Notes
 
@@ -218,14 +221,15 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 02.1-adk-content-external-knowledge-sub-agents P01–P03 | ~6h (incl. post-smoke hardening) | 3 plans, 93 pytest + 15 vitest cases, 7 post-smoke bug fixes | agent/community_assistant/sub_agents/{content_agent,external_knowledge_agent,featured_resources,_relevance}.py + src/app/api/content/{blog,youtube}/search/ |
 | Phase 06-agent-workflow-refactor-state-wiring P01 | 6.5 min | 3 tasks | 10 files |
 | Phase 06-agent-workflow-refactor-state-wiring P03 | 13min | 3 tasks | 6 files |
+| Phase 06-agent-workflow-refactor-state-wiring P02 | 2min (+Task 4 user `adk web` smoke) | 5 tasks (1-3 auto, 4 human-verify PASS, 5 SKIPPED Branch A) | 5 files |
 
 ## Session Continuity
 
-Last session: 2026-05-22T16:13:50.895Z
-Stopped at: context exhaustion at 75% (2026-05-17)
+Last session: 2026-05-22T16:24:00Z
+Stopped at: Completed Phase 06 Plan 02 (output_key whiteboard wired; AGENT-STATE-01 + AGENT-STATE-02 closed; RESEARCH Open Questions 2 + 3 resolved)
 Resume file: None
 
 ---
-*Last activity: 2026-05-22 - Quick 260522-a2f closed Phase 5 INV-1/2/4 (reportsOnTime + onboarding persistence + cohort.endDate). 4 commits on main, 35/35 ambassador tests pass, verifier 8/8 PASS. Only INV-3 leaderboard remains — pending architectural decision (revive hourly cron vs accept live 5-min cache).*
+*Last activity: 2026-05-22 - Phase 06 Plan 02 complete. onboarding_agent is now a SequentialAgent surfacing welcome LAST; user_skill_level / user_goals flow into mentorship/projects/roadmap via `{key?}` templating. 3 atomic commits (0ca4807 test → 72dc8ff refactor → a5d2864 feat). Task 4 `adk web` smoke PASS (welcome-last + transfer_to_agent→SequentialAgent both work). Task 5 SKIPPED Branch A. 10/10 tests green. Next: Plan 06-04 adk web smoke + Cloud Run redeploy + 24h soak.*
 
 **Planned Phase:** 5 (Dashboard, Leaderboard, Offboarding & Alumni) — 5 plans — 2026-05-06T10:30:35.607Z

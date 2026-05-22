@@ -189,7 +189,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 | v6.0 Phase 3: Public Presentation | 6/6 | Shipped | 2026-05-08 |
 | v6.0 Phase 4: Activity Subsystem | 7/7 | Shipped | 2026-05-10 |
 | v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 5/5 | Verifying — gaps_found (1 PASS / 3 PARTIAL / 1 FAIL) | — |
-| v7.0 Phase 6: Agent Workflow Refactor + State Wiring | 2/4 | In Progress | — |
+| v7.0 Phase 6: Agent Workflow Refactor + State Wiring | 3/4 | In Progress (06-04 adk web smoke + Cloud Run deploy + 24h soak NEXT) | — |
 
 ### Phase 2: ADK Community Assistant for Discord (Google Cloud Next 2026 demo)
 
@@ -261,4 +261,4 @@ Production `community_assistant` Discord bot self-audit (2026-05-22) measured ~3
 **UI hint**: no
 
 ---
-*Last updated: 2026-05-22 — v7.0 Agentic Orchestra Upgrade scoped (3 phases). Phase 5 of v6.0 verified PASS earlier the same day; v7.0 planning kicks off after Phase 6 dir is scaffolded.*
+*Last updated: 2026-05-22 — v7.0 Phase 6 plans 01/02/03 complete (3/4). Plan 06-02 closed AGENT-STATE-01 + AGENT-STATE-02 via SequentialAgent onboarding + output_key whiteboard + `{user_skill_level?}` / `{user_goals?}` templating in downstream agents. RESEARCH Open Questions 2 (welcome-LAST surfaces) + 3 (transfer_to_agent → SequentialAgent routes) both resolved. Next: 06-04 adk web smoke + Cloud Run redeploy + 24h soak.*
