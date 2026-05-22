@@ -4,14 +4,14 @@ milestone: v7.0
 milestone_name: Agentic Orchestra Upgrade
 status: executing
 stopped_at: context exhaustion at 75% (2026-05-17)
-last_updated: "2026-05-22T16:24:00Z"
-last_activity: 2026-05-22
+last_updated: "2026-05-23T00:00:00Z"
+last_activity: 2026-05-23
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
-  percent: 75
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -25,16 +25,16 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 
 ## Current Position
 
-Milestone: v7.0 Agentic Orchestra Upgrade — Phase 06 EXECUTING
-Phase: 06 (agent-workflow-refactor-state-wiring) — EXECUTING
-Plan: 4 of 4 (06-01 ✅ 06-02 ✅ 06-03 ✅ — 06-04 adk web smoke + deploy + 24h soak NEXT)
-Status: Ready to execute 06-04
-Last activity: 2026-05-22
+Milestone: v7.0 Agentic Orchestra Upgrade — Phase 06 PARTIAL-SHIP (carry-over to Phase 7/8 for soak)
+Phase: 06 (agent-workflow-refactor-state-wiring) — PARTIAL-SHIP
+Plan: 4 of 4 (06-01 ✅ 06-02 ✅ 06-03 ✅ 06-04 ✅ deploy / 24h soak DEFERRED per user override)
+Status: Phase 6 deployed to Cloud Run (revision `cwa-assistant-bot-00012-8x6`); AGENT-PAR-02 P95 gate DEFERRED — user override accepted, carry-over to Phase 7/8 logged in Next Moves
+Last activity: 2026-05-23
 
 ## Next Moves (queued, not in flight)
 
-1. **v7.0 Phase 6 execution (immediate)**: Phase 06 plans landed. Execute per-plan via `/gsd-execute-phase 6` or per-PLAN executor invocations. Order: 06-01 (ParallelAgent fan-out) + 06-02 (output_key whiteboard) + 06-03 (AgentTool wrap) in parallel (no file overlap) → 06-04 (adk web smoke + deploy + 24h soak). Latency gate: ≥40% P95 drop on 3-source queries (baseline ~19s). PARTIAL-SHIP path requires STATE.md handoff entry for Phase 7/8 latency investigation.
-2. **v7.0 Phase 7 planning (blocked on 6)**: callbacks — `before_model_callback` PII redaction, `before_/after_tool_callback` cache, `before_/after_agent_callback` structured lifecycle logging.
+1. **Phase 6 deferred — 24h soak + AGENT-PAR-02 P95 gate (carry-over from 06-04)**: AGENT-PAR-02 (≥40% P95 latency drop on 3-source external_knowledge queries vs ~19s baseline) is **DEFERRED, NOT GREEN**. User override resume-signal verbatim: *"go with option a. but proceed with the rest of the stuff? we can always come back if something goes wrong."* Deploy landed (revision `cwa-assistant-bot-00012-8x6`, 2026-05-23) but baseline P95 not pulled + 24h soak observations not collected. To close the gate: (a) pull baseline P95 from Cloud Logging over last 7 days on `query_topic=external_knowledge` (procedure in `.planning/phases/06-agent-workflow-refactor-state-wiring/06-04-PLAN.md` Task 2 Part A); (b) observe T+1h / T+6h / T+24h post-deploy P95 + error rate vs. baseline; (c) record SHIP / ROLLBACK decision in `06-04-SOAK-LOG.md`. Best paired with Phase 7 (lifecycle callbacks) since per-leaf timing instrumentation lands there. If post-deploy P95 falls <40% drop, open a Plan 06-05 gap-closure stub (e.g., `skip_summarization=True` on featured_resources_tool per RESEARCH Assumption A6, or investigate per-branch tail latency).
+2. **v7.0 Phase 7 planning (unblocked, ready)**: callbacks — `before_model_callback` PII redaction, `before_/after_tool_callback` cache, `before_/after_agent_callback` structured lifecycle logging. Attaches to the Phase-6 tree (per leaf researcher + per onboarding child + per synthesizer + content_agent + wrapped featured_resources_agent — see `06-CONTEXT.md` cross-phase handoff). Lifecycle logging will provide the per-leaf timing data needed for the deferred AGENT-PAR-02 soak in Next Move #1.
 3. **v7.0 Phase 8 planning (blocked on 7)**: LoopAgent critic for mentor/project quality, LoopAgent clarifier for mentor/project intake, `DatabaseSessionService` (Firestore-backed, HMAC-keyed), daily session pruning cron.
 4. **Phase 5 Plan 05-05 human verification (optional, deferred)**: browser smoke test — onboarding tick persists, leaderboard renders, AlumniTransitionButton on past-cohort. Server-side already PASS so this is UX-only.
 5. **Event participant email feature** (request 2026-05-20): orthogonal to v7.0. Quick-task candidate once v7.0 phase 6 lands.
@@ -222,14 +222,15 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 06-agent-workflow-refactor-state-wiring P01 | 6.5 min | 3 tasks | 10 files |
 | Phase 06-agent-workflow-refactor-state-wiring P03 | 13min | 3 tasks | 6 files |
 | Phase 06-agent-workflow-refactor-state-wiring P02 | 2min (+Task 4 user `adk web` smoke) | 5 tasks (1-3 auto, 4 human-verify PASS, 5 SKIPPED Branch A) | 5 files |
+| Phase 06-agent-workflow-refactor-state-wiring P04 | ~30min (5-turn `adk web` smoke + Cloud Run deploy; 24h soak DEFERRED) | 3 tasks (1 human-verify PASS smoke green, 2 human-action DEPLOYED revision 00012-8x6, 3 DEFERRED soak — user override) | 2 files (06-04-SOAK-LOG.md + STATE.md handoff) |
 
 ## Session Continuity
 
-Last session: 2026-05-22T16:24:00Z
-Stopped at: Completed Phase 06 Plan 02 (output_key whiteboard wired; AGENT-STATE-01 + AGENT-STATE-02 closed; RESEARCH Open Questions 2 + 3 resolved)
+Last session: 2026-05-23T00:00:00Z
+Stopped at: Phase 6 PARTIAL-SHIP — deploy landed (cwa-assistant-bot-00012-8x6); AGENT-PAR-02 P95 gate DEFERRED to Phase 7/8 per user override
 Resume file: None
 
 ---
-*Last activity: 2026-05-22 - Phase 06 Plan 02 complete. onboarding_agent is now a SequentialAgent surfacing welcome LAST; user_skill_level / user_goals flow into mentorship/projects/roadmap via `{key?}` templating. 3 atomic commits (0ca4807 test → 72dc8ff refactor → a5d2864 feat). Task 4 `adk web` smoke PASS (welcome-last + transfer_to_agent→SequentialAgent both work). Task 5 SKIPPED Branch A. 10/10 tests green. Next: Plan 06-04 adk web smoke + Cloud Run redeploy + 24h soak.*
+*Last activity: 2026-05-23 - Phase 06 Plan 04 PARTIAL-SHIP. 5-turn `adk web` smoke PASS (Open Questions 2+3 resolved YES; §5.4 fan-out visibility + Plan 03 AgentTool wrap verified live; AGENT-PAR-01 fail-fast guard verified LIVE on devto error). Cloud Run revision `cwa-assistant-bot-00012-8x6` deployed (us-central1, --cpu-throttling preserved). 24h soak + baseline P95 DEFERRED per user override — carry-over logged in Next Moves #1. Next: phase close-out (code review, regression gate, verify_phase_goal, SUMMARY, ROADMAP tick).*
 
 **Planned Phase:** 5 (Dashboard, Leaderboard, Offboarding & Alumni) — 5 plans — 2026-05-06T10:30:35.607Z

@@ -189,7 +189,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 | v6.0 Phase 3: Public Presentation | 6/6 | Shipped | 2026-05-08 |
 | v6.0 Phase 4: Activity Subsystem | 7/7 | Shipped | 2026-05-10 |
 | v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 5/5 | Verifying — gaps_found (1 PASS / 3 PARTIAL / 1 FAIL) | — |
-| v7.0 Phase 6: Agent Workflow Refactor + State Wiring | 3/4 | In Progress (06-04 adk web smoke + Cloud Run deploy + 24h soak NEXT) | — |
+| v7.0 Phase 6: Agent Workflow Refactor + State Wiring | 4/4 | PARTIAL-SHIP (deploy landed cwa-assistant-bot-00012-8x6; AGENT-PAR-02 P95 gate DEFERRED — see STATE.md Next Moves #1) | 2026-05-23 |
 
 ### Phase 2: ADK Community Assistant for Discord (Google Cloud Next 2026 demo)
 
@@ -261,4 +261,4 @@ Production `community_assistant` Discord bot self-audit (2026-05-22) measured ~3
 **UI hint**: no
 
 ---
-*Last updated: 2026-05-22 — v7.0 Phase 6 plans 01/02/03 complete (3/4). Plan 06-02 closed AGENT-STATE-01 + AGENT-STATE-02 via SequentialAgent onboarding + output_key whiteboard + `{user_skill_level?}` / `{user_goals?}` templating in downstream agents. RESEARCH Open Questions 2 (welcome-LAST surfaces) + 3 (transfer_to_agent → SequentialAgent routes) both resolved. Next: 06-04 adk web smoke + Cloud Run redeploy + 24h soak.*
+*Last updated: 2026-05-23 — v7.0 Phase 6 PARTIAL-SHIP (4/4 plans landed). 06-04 deployed `cwa-assistant-bot-00012-8x6` to Cloud Run (us-central1) after 5-turn `adk web` smoke PASS (Open Questions 2+3 resolved YES; §5.4 fan-out visibility + Plan 03 AgentTool wrap verified live; AGENT-PAR-01 fail-fast guard verified LIVE on devto error). AGENT-PAR-02 P95 latency gate DEFERRED — user override accepted, carry-over to Phase 7/8 logged in `.planning/STATE.md` Next Moves #1. Phase 7 unblocked.*
