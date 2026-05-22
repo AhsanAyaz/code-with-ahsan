@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: Agentic Orchestra Upgrade
-status: planning
-stopped_at: kickoff (2026-05-22)
-last_updated: "2026-05-22T07:00:00.000Z"
+status: executing
+stopped_at: context exhaustion at 75% (2026-05-17)
+last_updated: "2026-05-22T15:59:54.186Z"
 last_activity: 2026-05-22
 progress:
   total_phases: 3
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 4
+  completed_plans: 1
+  percent: 25
 ---
 
 # Project State
@@ -21,14 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-21)
 
 **Core value:** Community members can find mentors, collaborate on real projects with structured support, and follow clear learning roadmaps—all within a mentor-led, quality-focused environment.
-**Current focus:** Phase 01 — foundation-roles-array-migration
+**Current focus:** Phase 06 — agent-workflow-refactor-state-wiring
 
 ## Current Position
 
 Milestone: v7.0 Agentic Orchestra Upgrade — Phase 06 PLANNED
-Phase: 06 (agent-workflow-refactor-state-wiring) — READY TO EXECUTE
-Status: v6.0 Phase 5 verified PASS. v7.0 Phase 06 planning complete 2026-05-22 — CONTEXT + RESEARCH + 4 PLAN files (06-01 ParallelAgent fan-out / 06-02 output_key whiteboard / 06-03 AgentTool wrap / 06-04 smoke + deploy + 24h soak). Plan-check PASS round 2 (all 6 round-1 blockers resolved). RESEARCH Open Questions marked RESOLVED. CFP framing locked at `slides/talks/zero-to-agentic-orchestra/cfp-framing.md`.
-Last activity: 2026-05-22 - Phase 06 plans landed. Next: `/gsd-execute-phase 6` (per-plan TDD execution).
+Phase: 06 (agent-workflow-refactor-state-wiring) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-05-22
 
 ## Next Moves (queued, not in flight)
 
@@ -141,6 +142,11 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02.1]: external_knowledge_agent calls upstream APIs directly via three dedicated `httpx.Client` instances (one per upstream) — no Next.js wrapper for GH/dev.to/SO because their quotas are generous and ISR caching adds no value for third-party reads
 - [Phase 02.1]: dev.to fallback (top=7 after empty tag search) logs at WARNING and degrades to empty rather than flipping status to error — the primary tag call already proved dev.to is reachable, so a fallback blip is non-fatal
 - [Phase 02.1]: Discord bot usage tracking uses structured stdout JSON → Cloud Logging → log-based metrics (NO Firestore writes, NO BigQuery streaming insert) — Cloud Run scrapes stdout as jsonPayload for free, log-based metrics power Cloud Monitoring dashboards, and a BigQuery log sink can be added later for analytics-grade aggregation. Privacy: HMAC-SHA256 hash of Discord user_id keyed by `USAGE_HASH_SECRET` (16 hex chars), raw query text NEVER emitted (`query_len` + derived `query_topic` only)
+- [Phase 06-01]: external_knowledge package layout chosen over flat — 5 modules + __init__.py co-located for one logical capability (RESEARCH §Code Examples recommendation)
+- [Phase 06-01]: Synthesizer is an explicit LlmAgent (not a SequentialAgent wrapper) — debuggable in adk web Events tab
+- [Phase 06-01]: Concurrent-dispatch test threshold relaxed 100ms → 2000ms because each leaf is an LlmAgent (LLM-call ➜ tool-call) so tool timestamps reflect LLM-completion variance, not branch-start variance; observed spread ~228ms
+- [Phase 06-01]: Outer SequentialAgent name preserved as external_knowledge_agent so root_agent ROOT_INSTRUCTION and sub_agents=[...] list need no coordinator-LLM-routing change
+- [Phase 06-01]: output_key namespace LOCKED for Phase 7/8 — gh_researcher→gh_result, devto_researcher→devto_result, so_researcher→so_result; synthesizer reads via {key?} optional templating
 
 ### Workflow Notes
 
@@ -203,10 +209,11 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | Phase 03-public-presentation P03-05 | 45 | 4 tasks | 5 files |
 | Phase 02-adk-community-assistant P00–P03 | ~4h | 4 waves, 41 pytest cases | agent/ + src/app/api/mentorship/mentors/semantic-search |
 | Phase 02.1-adk-content-external-knowledge-sub-agents P01–P03 | ~6h (incl. post-smoke hardening) | 3 plans, 93 pytest + 15 vitest cases, 7 post-smoke bug fixes | agent/community_assistant/sub_agents/{content_agent,external_knowledge_agent,featured_resources,_relevance}.py + src/app/api/content/{blog,youtube}/search/ |
+| Phase 06-agent-workflow-refactor-state-wiring P01 | 6.5 min | 3 tasks | 10 files |
 
 ## Session Continuity
 
-Last session: 2026-05-20T20:14:16.879Z
+Last session: 2026-05-22T15:59:00.856Z
 Stopped at: context exhaustion at 75% (2026-05-17)
 Resume file: None
 
