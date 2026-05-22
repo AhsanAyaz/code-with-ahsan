@@ -1,4 +1,4 @@
-from google.adk.agents import LlmAgent
+from google.adk.agents import LlmAgent, SequentialAgent
 
 
 def get_community_overview() -> dict:
@@ -45,8 +45,40 @@ def get_channel_guide() -> dict:
     }
 
 
-onboarding_agent = LlmAgent(
-    name="onboarding_agent",
+# --- onboarding sub-agents (RESEARCH §2.3, Plan 06-02) ---------------------
+#
+# `output_key` is scalar (one LlmAgent writes one key). To get BOTH
+# `user_skill_level` AND `user_goals` into session.state, onboarding is split
+# into a SequentialAgent of two silent extractors plus a user-facing welcome.
+# Child order is [skill_level, goals, welcome] — welcome runs LAST so the
+# SequentialAgent's final response is the warm welcome (RESEARCH Open
+# Question 2 recommendation). Plan 06-02 Task 4's `adk web` smoke test
+# verifies the surfacing behavior; if welcome-first is required, Task 5
+# Branch B flips the order atomically.
+
+skill_level_extractor = LlmAgent(
+    name="onboarding_skill_level",
+    model="gemini-2.5-flash",
+    description="Asks/identifies the user's current skill level.",
+    instruction="""From the conversation so far, identify the user's developer skill level \
+("beginner" / "intermediate" / "advanced" / "unknown"). Reply with JUST that single word. \
+If you cannot tell, reply "unknown".""",
+    output_key="user_skill_level",
+)
+
+
+goals_extractor = LlmAgent(
+    name="onboarding_goals",
+    model="gemini-2.5-flash",
+    description="Asks/identifies the user's stated goals.",
+    instruction="""From the conversation so far, summarize the user's stated goals in <40 words. \
+If no goals are clear, reply "unknown".""",
+    output_key="user_goals",
+)
+
+
+welcome_agent = LlmAgent(
+    name="onboarding_welcome",
     model="gemini-2.5-flash",
     description=(
         "Welcomes new members to the Code with Ahsan community and helps them navigate channels, "
@@ -61,4 +93,14 @@ Be warm and genuinely welcoming. Many new members feel intimidated — reassure 
 community is for all levels. Always end with one clear next step (e.g., "Start by introducing \
 yourself in #introductions").""",
     tools=[get_community_overview, get_channel_guide],
+)
+
+
+onboarding_agent = SequentialAgent(
+    name="onboarding_agent",  # PRESERVED routable name — root_agent.sub_agents references this string.
+    description=(
+        "Welcomes new members and captures their skill level + goals into session state "
+        "for downstream agents to consume."
+    ),
+    sub_agents=[skill_level_extractor, goals_extractor, welcome_agent],
 )
