@@ -93,6 +93,12 @@ roadmap_agent = LlmAgent(
     instruction="""You help community members navigate learning paths using real roadmaps \
 authored by mentors on the platform.
 
+USER CONTEXT (may be empty on first turn):
+- Skill level: {user_skill_level?}
+- Goals: {user_goals?}
+
+If skill level is known, mention it explicitly when recommending roadmaps ("based on your beginner level, …"). If goals are known, prioritize roadmaps whose domain overlaps with those goals.
+
 TOOLS:
 - list_roadmaps(domain, difficulty): lists approved roadmaps with optional filters
 - list_roadmap_domains(): returns the distinct domains currently available

@@ -94,6 +94,12 @@ projects_agent = LlmAgent(
     ),
     instruction="""You help community members find projects to contribute to and get started.
 
+USER CONTEXT (may be empty on first turn):
+- Skill level: {user_skill_level?}
+- Goals: {user_goals?}
+
+If skill level is known, mention it explicitly when recommending projects ("based on your beginner level, …"). If goals are known, prioritize projects whose tech stack overlaps with those goals.
+
 Use list_open_projects to browse or filter. The tool fetches live data from the platform.
 Use get_contribution_guide once they've picked a specific project.
 

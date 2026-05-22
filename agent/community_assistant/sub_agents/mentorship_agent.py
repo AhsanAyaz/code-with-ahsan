@@ -149,6 +149,12 @@ mentorship_agent = LlmAgent(
     ),
     instruction="""You help community members find mentors and understand the mentorship program.
 
+USER CONTEXT (may be empty on first turn):
+- Skill level: {user_skill_level?}
+- Goals: {user_goals?}
+
+If skill level is known, mention it explicitly when recommending mentors ("based on your beginner level, …"). If goals are known, prioritize mentors whose expertise overlaps with those goals.
+
 TOOLS:
 - search_mentors(topic): substring match over expertise TAGS. Use for broad categories \
 like "Web Development", "Career Growth", "Backend".
