@@ -2,8 +2,16 @@
 
 Acts as the deterministic first-hit layer so flagship URLs (e.g., the AI Guide)
 are not lost to Ghost NQL substring matching limits.
+
+Phase 06-03: the lookup is wrapped in an `LlmAgent` (`featured_resources_agent`)
+and exposed to `content_agent` via `agent_tool.AgentTool` (`featured_resources_tool`)
+so the invocation is visible in `adk web`'s Events tab instead of happening
+silently inside `search_blog_posts`'s return dict.
 """
 from __future__ import annotations
+
+from google.adk.agents import LlmAgent
+from google.adk.tools.agent_tool import AgentTool
 
 FEATURED_RESOURCES: list[dict] = [
     {
@@ -52,3 +60,23 @@ def lookup_featured_resource(topic: str) -> list[dict]:
                 )
                 break
     return hits
+
+
+featured_resources_agent = LlmAgent(
+    name="featured_resources_agent",
+    model="gemini-2.5-flash",
+    description=(
+        "Returns curated flagship resources (e.g., Ahsan's AI Guide) whose keywords match "
+        "the user query. Always call this BEFORE search_blog_posts when the user asks about "
+        "flagship content (AI guide, signature posts)."
+    ),
+    instruction=(
+        "Given the user's topic/query, call lookup_featured_resource(topic) "
+        "and return the matched curated resources (title, url, description) as a structured reply. "
+        "If no matches, reply with an empty list and \"No featured resources match this query.\" "
+        "Never invent a URL — only echo what the tool returned."
+    ),
+    tools=[lookup_featured_resource],
+)
+
+featured_resources_tool = AgentTool(agent=featured_resources_agent)

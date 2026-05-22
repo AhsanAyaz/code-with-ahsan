@@ -2,7 +2,7 @@ from google.adk.agents import LlmAgent
 
 from ..platform_client import BASE_URL, fetch_blog_posts, fetch_youtube_videos
 from ._relevance import is_relevant, query_tokens
-from .featured_resources import lookup_featured_resource
+from .featured_resources import featured_resources_tool
 
 _BLOG_LIMIT = 5
 _YOUTUBE_LIMIT = 5
@@ -39,63 +39,36 @@ def _shape_youtube_video(raw: dict) -> dict:
     }
 
 
-def _featured_as_post(item: dict) -> dict:
-    return {
-        "title": item["title"],
-        "slug": None,
-        "url": item["url"],
-        "excerpt": item["description"],
-        "published_at": None,
-        "reading_time": None,
-        "featured": True,
-    }
-
-
 def search_blog_posts(query: str) -> dict:
     """Searches Ahsan's blog at blog.codewithahsan.dev for posts matching a query.
 
     Calls the ISR-cached /api/content/blog/search proxy (3600s cache) so repeated queries
     do not hit the Ghost Content API on every Discord message.
 
-    A deterministic curated-resource lookup runs first: if the query matches a flagship
-    resource (e.g., the AI Guide), it is PREPENDED to the posts list and tagged
-    {"featured": true}. Featured items are part of `posts` so the agent cannot omit them.
-
     Args:
-        query: Topic or keyword to search for (e.g., "angular signals", "AI guide", "rxjs").
+        query: Topic or keyword to search for (e.g., "angular signals", "rxjs").
 
     Returns:
         A dict with status, query, count, and posts (title, slug, url, excerpt,
-        published_at, reading_time, featured). Featured posts appear FIRST in the list.
-        On Ghost upstream failure but with a curated match, still returns the curated
-        post (status="partial").
+        published_at, reading_time). On Ghost upstream failure, returns
+        status="error" and posts=[].
     """
     q = (query or "").strip()
-
     if not q:
         return {"status": "error", "message": "Query is empty", "posts": []}
 
-    featured = [_featured_as_post(f) for f in lookup_featured_resource(q)]
-    featured_urls = {p["url"] for p in featured}
-
     result = fetch_blog_posts(q)
-    ghost_ok = bool(result["ok"])
-    ghost_posts: list[dict] = []
-    if ghost_ok:
-        all_posts = (result["data"] or {}).get("posts", [])
-        ghost_posts = [_shape_blog_post(p) for p in all_posts[:_BLOG_LIMIT]]
-
-    deduped_ghost = [p for p in ghost_posts if p.get("url") not in featured_urls]
-    merged = (featured + deduped_ghost)[:_BLOG_LIMIT]
-
-    if not ghost_ok and not featured:
+    if not result["ok"]:
         return {"status": "error", "message": result["error"], "posts": []}
 
+    all_posts = (result["data"] or {}).get("posts", [])
+    posts = [_shape_blog_post(p) for p in all_posts[:_BLOG_LIMIT]]
+
     return {
-        "status": "success" if ghost_ok else "partial",
+        "status": "success",
         "query": q,
-        "count": len(merged),
-        "posts": merged,
+        "count": len(posts),
+        "posts": posts,
     }
 
 
@@ -148,27 +121,32 @@ content_agent = LlmAgent(
     instruction="""You help community members discover content Ahsan has published.
 
 TOOLS:
+- featured_resources_agent(request): call FIRST when the user asks about flagship \
+content (AI guide, signature posts, "the developer guide"). Returns curated \
+resources by topic match.
 - search_blog_posts(query): searches blog.codewithahsan.dev for articles and tutorials \
-matching the query (ISR-cached, 3600s). Returns a `posts` list. Each post may carry a \
-`featured: true` flag — those are hand-picked flagship resources and MUST be surfaced \
-FIRST in your reply. Featured posts appear at the top of the list and you must never \
-omit them.
+matching the query (ISR-cached, 3600s). Returns a `posts` list.
 - search_youtube_videos(query): searches Code With Ahsan's YouTube channel for videos \
 matching the query (ISR-cached, 3600s). Returns video titles, youtube.com/watch?v= URLs, \
 and thumbnails. Results are scoped to Ahsan's channel only.
 
 SEARCH STRATEGY:
+- "AI guide" / "developer guide" / any flagship keyword → call featured_resources_agent \
+FIRST. If it returns matches, lead with them. Then optionally augment with search_blog_posts.
 - "VIDEO / YouTube / watch a tutorial on X" → search_youtube_videos(X).
-- "BLOG / ARTICLE / WRITTEN on X" / "read about Y" / "do you have a guide on Z" → \
+- Generic "BLOG / ARTICLE / WRITTEN on X" / "read about Y" / "do you have a guide on Z" → \
 search_blog_posts(X).
-- Ambiguous ("anything on X" / "any content on Y") → call BOTH in parallel and merge.
+- Ambiguous ("anything on X" / "any content on Y") → call search_blog_posts AND \
+search_youtube_videos in parallel and merge.
 
 REPLY FORMAT:
-- If any post has `featured: true`: lead with it. Example: "Yes — here's Ahsan's AI Guide: \
-<title> — <url>". Then optionally add the next 1–2 non-featured posts.
-- If only non-featured posts: surface them normally.
-- If `posts` is empty: say so honestly and link https://blog.codewithahsan.dev directly. \
-Do NOT pad with unrelated YouTube hits.
+- When featured_resources_agent returns matches, lead with the featured resource: \
+"Yes — here's Ahsan's AI Guide: <title> — <url>". Then optionally add 1–2 non-featured \
+blog posts.
+- If featured_resources_agent returns empty AND search_blog_posts returns posts, surface \
+those normally.
+- If both come back empty, say so honestly and link https://blog.codewithahsan.dev \
+directly. Do NOT pad with unrelated YouTube hits.
 
 RELEVANCE RULE (CRITICAL — community trust):
 - The search tools already drop low-relevance results. Trust them.
@@ -183,5 +161,5 @@ Never fabricate a URL.
 - If count is 0 for YouTube, say so honestly and suggest https://youtube.com/codewithahsan directly.
 - If a tool returns status="error", tell the user the platform is temporarily unreachable.
 - End every reply with a single concrete next action the user can take.""",
-    tools=[search_blog_posts, search_youtube_videos],
+    tools=[featured_resources_tool, search_blog_posts, search_youtube_videos],
 )
