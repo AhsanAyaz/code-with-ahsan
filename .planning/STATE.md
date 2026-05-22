@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v6.0
-milestone_name: Student Ambassador Program
-status: verifying
-stopped_at: context exhaustion at 75% (2026-05-17)
-last_updated: "2026-05-22T06:30:00.000Z"
+milestone: v7.0
+milestone_name: Agentic Orchestra Upgrade
+status: planning
+stopped_at: kickoff (2026-05-22)
+last_updated: "2026-05-22T07:00:00.000Z"
 last_activity: 2026-05-22
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 43
-  completed_plans: 45
-  percent: 100
+  total_phases: 3
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,18 +25,20 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 
 ## Current Position
 
-Phase: 05 (dashboard-leaderboard-offboarding-alumni) — VERIFIED (5/5 plans executed; all 4 actionable invariants closed 2026-05-22)
-Plan: 5 of 5 executed; Plan 05-05 still pending human verification (Task 3 deferred — browser smoke tests)
-Status: INV-1 (reportsOnTime), INV-2 (onboarding persistence), INV-3 (leaderboard daily snapshot + rank + graceActive + ownRank shape), INV-4 (cohort.endDate), INV-5 (offboard) all PASS.
-Last activity: 2026-05-22 - Quick 260522-b08: phase 5 INV-3 leaderboard daily-snapshot close-out shipped — 7 commits, library 54/54 + API 44/44 tests pass, tsc clean. Verifier 8/8 PASS.
+Milestone: v7.0 Agentic Orchestra Upgrade — planning kickoff
+Phase: 06 (agent-workflow-refactor-state-wiring) — TO PLAN
+Status: v6.0 Phase 5 verified PASS (all 4 actionable invariants closed). v7.0 scoped 2026-05-22 — 3 phases (06 workflow refactor → 07 callbacks → 08 loops + sessions). CFP framing locked at `slides/talks/zero-to-agentic-orchestra/cfp-framing.md`.
+Last activity: 2026-05-22 - v7.0 ROADMAP written, root ROADMAP.md updated, phase dirs scaffolded. Next: `/gsd-plan-phase 6 --research`.
 
 ## Next Moves (queued, not in flight)
 
-1. **Phase 5 Plan 05-05 human verification (deferred from Task 3)**: browser smoke test — open `/ambassadors/dashboard` as ambassador, confirm onboarding tick persists across reload, confirm leaderboard panel renders top3 + grace banner correctly; open admin `/admin/ambassadors/members/{uid}` for a past-cohort ambassador, confirm AlumniTransitionButton renders. Optional — server-side verification already PASS.
-2. **Event participant email feature** (new user request 2026-05-20): send emails to event participants. Not yet scoped/planned.
-3. **Bot iteration roadmap** (from drafted article): (a) Firestore-backed sessions to survive redeploys, (b) proactive surfacing in non-bot channels with opt-in via reaction, (c) BigQuery sink for log-based metrics → SQL-grade analytics. None planned yet.
-4. **Article distribution**: `articles/drafts/cwa-assistant-multi-agent-bot.md` ready for Ghost paste; LinkedIn short version drafted; Twitter thread + OG image not done.
-5. **Latency investigation**: first real prod event had `latency_ms=18933` (~19s) for a 3-source external_knowledge fan-out. Acceptable for that workload but worth a P95 baseline once dashboard accumulates data.
+1. **v7.0 Phase 6 planning (immediate)**: `/gsd-plan-phase 6 --research` against `.planning/phases/06-agent-workflow-refactor-state-wiring/`. Workstreams: ParallelAgent fan-out for `external_knowledge_agent`, `output_key` whiteboard across sub-agents, `AgentTool`-wrap `featured_resources`. Latency target: ≥40% P95 drop on 3-source queries (current baseline ~19s).
+2. **v7.0 Phase 7 planning (blocked on 6)**: callbacks — `before_model_callback` PII redaction, `before_/after_tool_callback` cache, `before_/after_agent_callback` structured lifecycle logging.
+3. **v7.0 Phase 8 planning (blocked on 7)**: LoopAgent critic for mentor/project quality, LoopAgent clarifier for mentor/project intake, `DatabaseSessionService` (Firestore-backed, HMAC-keyed), daily session pruning cron.
+4. **Phase 5 Plan 05-05 human verification (optional, deferred)**: browser smoke test — onboarding tick persists, leaderboard renders, AlumniTransitionButton on past-cohort. Server-side already PASS so this is UX-only.
+5. **Event participant email feature** (request 2026-05-20): orthogonal to v7.0. Quick-task candidate once v7.0 phase 6 lands.
+6. **Bot iteration items folded into v7.0**: Firestore-backed sessions (phase 8). BigQuery sink + proactive surfacing remain out-of-scope for v7.0.
+7. **Article distribution**: `articles/drafts/cwa-assistant-multi-agent-bot.md` — orthogonal, post-v7.0.
 
 ## Performance Metrics
 
