@@ -32,6 +32,28 @@ type LeaderboardData = {
 
 type LeaderboardResponse = LeaderboardData | { snapshot: null };
 
+/**
+ * Format an ISO-8601 string into a human-readable "Updated N {min|h|d} ago" label.
+ *
+ * Quick 260522-b08 replaced the prior "Updated N minutes ago" label (which broke at
+ * 60min boundary and could render absurd values like "Updated 1440 minutes ago" after
+ * a full day). New cadence is daily 07:00 UTC, so the label MUST gracefully handle
+ * 24h+ gaps. Module-scope (not inside the component) to avoid re-allocation per render.
+ */
+function formatUpdatedAgo(updatedAt: string | null): string {
+  if (!updatedAt) return "Updated just now";
+  const parsed = Date.parse(updatedAt);
+  if (Number.isNaN(parsed)) return "Updated just now";
+  const diffMs = Math.max(0, Date.now() - parsed);
+  const mins = Math.round(diffMs / 60_000);
+  if (mins < 1) return "Updated just now";
+  if (mins < 60) return `Updated ${mins} min ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `Updated ${hours} h ago`;
+  const days = Math.round(hours / 24);
+  return `Updated ${days} d ago`;
+}
+
 export function LeaderboardPanel({ cohortId }: { cohortId: string | null }) {
   const [view, setView] = useState<"cumulative" | "this_month">("cumulative");
   const [data, setData] = useState<LeaderboardResponse | null>(null);
@@ -168,9 +190,7 @@ export function LeaderboardPanel({ cohortId }: { cohortId: string | null }) {
 
   const { top3, ownRank, updatedAt } = leaderboard;
 
-  const minutesAgo = updatedAt
-    ? Math.max(0, Math.round((Date.now() - Date.parse(updatedAt)) / 60000))
-    : 0;
+  const updatedLabel = formatUpdatedAgo(updatedAt);
 
   const maxRows = Math.max(
     top3.referrals.length,
@@ -275,7 +295,7 @@ export function LeaderboardPanel({ cohortId }: { cohortId: string | null }) {
 
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <p aria-live="polite" className="text-sm text-base-content/60">
-            Updated {minutesAgo} minutes ago
+            {updatedLabel}
           </p>
           <button
             type="button"

@@ -127,4 +127,8 @@ No new threat surface beyond what the plan's threat model covers.
 - 463e169 — feat(05-03): add GET /api/ambassador/dashboard/me
 - 20f3d5a — feat(05-03): add GET /api/ambassador/dashboard/leaderboard + firestore.rules deny
 
+## Post-Hoc Correction (2026-05-22, quick 260522-b08)
+
+This SUMMARY described the route as reading `leaderboard_snapshots/{cohortId}` (the as-designed contract). Commit `76ad6f7` (subsequent to Plan 03) refactored the route to live computation + a 5-min in-memory cache, orphaning the snapshot pipeline and introducing UI↔API contract drift (UI consumed `graceActive`, `entry.rank`, `ownRank.{referrals,events,reportsOnTime}` — API emitted none). Phase 5 verification flagged this as INV-3 FAIL. Quick 260522-b08 restored the snapshot read with a **daily** cron (07:00 UTC) and added a live-compute fallback for cold-start days (snapshot doc missing). The route now also emits `graceActive` server-side and uses the renamed `LeaderboardCategoryRanks` shape.
+
 ## Self-Check: PASSED
