@@ -13,6 +13,8 @@ Public exports:
   - CACHE_TTL_SECONDS  int             (Plan 07-02)
   - before_tool_cache  async before_tool_callback for content_agent (Plan 07-02)
   - after_tool_cache   async after_tool_callback for content_agent (Plan 07-02)
+  - lifecycle_before_agent  before_agent_callback for 12 LlmAgents (Plan 07-03)
+  - lifecycle_after_agent   after_agent_callback for 12 LlmAgents (Plan 07-03)
 
 Private helpers:
   - _hmac_session_id   INLINE HMAC helper (NOT imported from discord_bot.usage_metrics
@@ -34,6 +36,7 @@ from google.adk.agents.callback_context import CallbackContext
 from google.adk.models import LlmRequest, LlmResponse
 from google.adk.tools import BaseTool
 from google.adk.tools.tool_context import ToolContext
+from google.genai import types
 
 # ---------------------------------------------------------------------------
 # Module-level constants
@@ -295,4 +298,91 @@ async def after_tool_cache(
         return None
 
 
-# Plan 07-03 (lifecycle) will extend this module.
+# ---------------------------------------------------------------------------
+# Plan 07-03 — Lifecycle logging (before_agent_callback + after_agent_callback)
+#
+# Attaches to ALL 12 LlmAgents in the post-Phase-6 tree (RESEARCH §7 attachment
+# topology). SequentialAgent + ParallelAgent wrappers are SKIPPED (wrapper-skip
+# rule — RESEARCH §7 + §9 Pitfall 5) to prevent double-logging.
+#
+# Public exports: lifecycle_before_agent, lifecycle_after_agent
+# ---------------------------------------------------------------------------
+
+
+def lifecycle_before_agent(
+    callback_context: CallbackContext,
+) -> Optional[types.Content]:
+    """before_agent_callback — emit agent.enter structured JSON to stdout.
+
+    Writes `_cb_enter_{agent_name}` to state (epoch ms) for duration tracking.
+    Emits RESEARCH §6 agent.enter JSON event (6 fields: severity, event_type,
+    agent, invocation_id, session_id_hash, enter_ts_ms).
+
+    Always returns None — lifecycle is observation-only, never short-circuits
+    the agent body. Exceptions swallowed + WARNING logged (RESEARCH §9 Pitfall 1).
+
+    Attachment topology: 12 LlmAgents per RESEARCH §7.
+    USAGE_HASH_SECRET read at call-time (A1 direct-env-read, RESEARCH §15 A4).
+    _hmac_session_id reused from Plan 07-01 (no redefinition, RESEARCH §11).
+    """
+    try:
+        agent_name = callback_context.agent_name
+        now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+        callback_context.state[f"_cb_enter_{agent_name}"] = now_ms
+        session_id_hash = _hmac_session_id(
+            getattr(getattr(callback_context, "session", None), "id", "") or ""
+        )
+        sys.stdout.write(
+            json.dumps({
+                "severity": "INFO",
+                "event_type": "agent.enter",
+                "agent": agent_name,
+                "invocation_id": callback_context.invocation_id,
+                "session_id_hash": session_id_hash,
+                "enter_ts_ms": now_ms,
+            })
+            + "\n"
+        )
+        sys.stdout.flush()
+    except Exception:
+        _logger.warning("lifecycle_before_agent error", exc_info=True)
+    return None
+
+
+def lifecycle_after_agent(
+    callback_context: CallbackContext,
+) -> Optional[types.Content]:
+    """after_agent_callback — emit agent.exit structured JSON with duration_ms.
+
+    Reads `_cb_enter_{agent_name}` from state (written by lifecycle_before_agent).
+    Emits RESEARCH §6 agent.exit JSON event (6 fields: severity, event_type,
+    agent, invocation_id, session_id_hash, duration_ms).
+
+    duration_ms defaults to 0 when enter key is absent (lifecycle_before_agent
+    was not called or exception swallowed the write — Test 7 asserts this).
+
+    Always returns None. Exceptions swallowed + WARNING logged.
+    """
+    try:
+        agent_name = callback_context.agent_name
+        now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+        enter_ms = callback_context.state.get(f"_cb_enter_{agent_name}", now_ms)
+        duration_ms = now_ms - enter_ms
+        session_id_hash = _hmac_session_id(
+            getattr(getattr(callback_context, "session", None), "id", "") or ""
+        )
+        sys.stdout.write(
+            json.dumps({
+                "severity": "INFO",
+                "event_type": "agent.exit",
+                "agent": agent_name,
+                "invocation_id": callback_context.invocation_id,
+                "session_id_hash": session_id_hash,
+                "duration_ms": duration_ms,
+            })
+            + "\n"
+        )
+        sys.stdout.flush()
+    except Exception:
+        _logger.warning("lifecycle_after_agent error", exc_info=True)
+    return None
