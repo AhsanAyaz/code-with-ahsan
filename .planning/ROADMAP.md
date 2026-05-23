@@ -243,9 +243,9 @@ Production `community_assistant` Discord bot self-audit (2026-05-22) measured ~3
   4. v6.0 HMAC privacy story preserved end-to-end (no raw user_id, no raw query text).
   5. Talk can pause on stage to show `before_model_callback` debug pane (redaction) and `before_tool_callback` debug pane (cache hit timestamp).
 **Plans**: 4 plans
-- [ ] 07-01-PLAN.md — PII redaction callback on root_agent (Wave 1 / AGENT-CB-MODEL-01)
-- [ ] 07-02-PLAN.md — Tool-result cache callbacks on content_agent (Wave 2 / AGENT-CB-TOOL-01, AGENT-CB-TOOL-02)
-- [ ] 07-03-PLAN.md — Structured lifecycle logging on 12 leaf LlmAgents (Wave 3 / AGENT-CB-AGENT-01, AGENT-CB-AGENT-02)
+- [x] 07-01-PLAN.md — PII redaction callback on root_agent (Wave 1 / AGENT-CB-MODEL-01)
+- [x] 07-02-PLAN.md — Tool-result cache callbacks on content_agent (Wave 2 / AGENT-CB-TOOL-01, AGENT-CB-TOOL-02)
+- [x] 07-03-PLAN.md — Structured lifecycle logging on 12 leaf LlmAgents (Wave 3 / AGENT-CB-AGENT-01, AGENT-CB-AGENT-02)
 - [ ] 07-04-PLAN.md — adk web smoke + Cloud Run redeploy + 24h soak + AGENT-PAR-02 closure (Wave 4 / AGENT-TEST-02)
 **UI hint**: no
 
