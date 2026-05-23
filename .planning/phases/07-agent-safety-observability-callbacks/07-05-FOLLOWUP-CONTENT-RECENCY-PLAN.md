@@ -2,7 +2,7 @@
 plan: 07-05
 phase: 07-agent-safety-observability-callbacks
 title: Follow-up — Inject current date into agent context to fix content-recency drift
-status: SHIPPED-LOCAL
+status: SHIPPED
 owner: ahsan
 created: 2026-05-23
 type: follow-up
@@ -138,7 +138,7 @@ Append one line to root_agent + external_knowledge synthesizer instructions:
 
 ## Status
 
-SHIPPED-LOCAL (2026-05-23) — code merged, 180/180 tests pass, local `adk web` smoke passed.
+SHIPPED (2026-05-23) — Cloud Run revision **cwa-assistant-bot-00014-l5k** serving 100% traffic; bot ready on channel 1504452473056792668; zero ERROR logs on startup. Code merged (commit `0175dbb`), 180/180 tests pass, local `adk web` smoke passed.
 
 **Smoke result (Turn: "Any GitHub repos, dev.to articles, or Stack Overflow questions about Google's Antigravity CLI?"):**
 - All 5 surfaced GitHub repos dated 2026-05-22 or 2026-05-23 (zero pre-2025 drift). Antigravity CLI was announced ~2 days ago, so recency steering visibly worked.
@@ -149,4 +149,4 @@ SHIPPED-LOCAL (2026-05-23) — code merged, 180/180 tests pass, local `adk web` 
 1. Wired to root + every LlmAgent (12 total: root + content + 3× onboarding + mentorship + projects + roadmap + featured_resources + gh + devto + so + synthesizer). Per-leaf wiring needed because AgentTool sub-runners don't inherit root callbacks.
 2. `before_model_callback` accepts a list (per `LlmAgent.canonical_before_model_callbacks` source); root wired as `[pii_sanitizer, inject_current_date]`. Leaves wired with single callable.
 
-Awaiting Cloud Run redeploy to flip to SHIPPED.
+**Production smoke (post-deploy) — Discord verification:** PENDING — owner @ahsan to repeat antigravity CLI / recency query in Discord and confirm 2026-dated content.
