@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from google.adk.agents import LlmAgent
 
+from ...callbacks import lifecycle_after_agent, lifecycle_before_agent
+
 external_knowledge_synthesizer = LlmAgent(
     name="external_knowledge_synthesizer",
     model="gemini-2.5-flash",
@@ -29,4 +31,6 @@ RULES:
 - Rank ~3-5 best items overall. Prefer items with higher engagement signals (stars, reactions, score).
 - Never invent a URL. Only echo what the upstream branches provided.
 - End with ONE concrete next action.""",
+    before_agent_callback=lifecycle_before_agent,
+    after_agent_callback=lifecycle_after_agent,
 )

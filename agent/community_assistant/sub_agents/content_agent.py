@@ -1,6 +1,6 @@
 from google.adk.agents import LlmAgent
 
-from ..callbacks import after_tool_cache, before_tool_cache
+from ..callbacks import after_tool_cache, before_tool_cache, lifecycle_after_agent, lifecycle_before_agent
 from ..platform_client import BASE_URL, fetch_blog_posts, fetch_youtube_videos
 from ._relevance import is_relevant, query_tokens
 from .featured_resources import featured_resources_tool
@@ -164,5 +164,7 @@ Never fabricate a URL.
 - End every reply with a single concrete next action the user can take.""",
     before_tool_callback=before_tool_cache,
     after_tool_callback=after_tool_cache,
+    before_agent_callback=lifecycle_before_agent,
+    after_agent_callback=lifecycle_after_agent,
     tools=[featured_resources_tool, search_blog_posts, search_youtube_videos],
 )

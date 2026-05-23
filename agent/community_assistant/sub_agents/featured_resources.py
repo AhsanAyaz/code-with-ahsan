@@ -13,6 +13,8 @@ from __future__ import annotations
 from google.adk.agents import LlmAgent
 from google.adk.tools.agent_tool import AgentTool
 
+from ..callbacks import lifecycle_after_agent, lifecycle_before_agent
+
 FEATURED_RESOURCES: list[dict] = [
     {
         "id": "ai-guide",
@@ -77,6 +79,8 @@ featured_resources_agent = LlmAgent(
         "Never invent a URL — only echo what the tool returned."
     ),
     tools=[lookup_featured_resource],
+    before_agent_callback=lifecycle_before_agent,
+    after_agent_callback=lifecycle_after_agent,
 )
 
 featured_resources_tool = AgentTool(agent=featured_resources_agent)
