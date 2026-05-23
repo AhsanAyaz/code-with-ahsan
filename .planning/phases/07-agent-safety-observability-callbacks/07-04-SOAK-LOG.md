@@ -194,13 +194,22 @@ gcloud run services update-traffic cwa-assistant-bot --region=us-central1 \
 
 ### Deploy status
 
-**Status:** _PENDING_
-**Date:** _TBD_
-**New revision name:** _TBD_
+**Status:** ✅ DEPLOYED
+**Date:** 2026-05-23T14:05Z
+**New revision name:** `cwa-assistant-bot-00013-h6v`
 **Previous revision:** `cwa-assistant-bot-00012-8x6`
-**Traffic:** _TBD_
-**Startup verification:** _TBD_
-**Annotations preserved:** _TBD — verify `cpu-throttling=false`, `minScale=1`, `maxScale=1`, `startup-cpu-boost=true`._
+**Traffic:** 100 % to 00013-h6v
+**Service URL:** https://cwa-assistant-bot-205504954450.us-central1.run.app
+**Startup verification:**
+- Health check server on port 8080 ✅
+- Default STARTUP TCP probe succeeded after 1 attempt
+- Discord gateway connected (Session ID `3911a02a356f13a01105c151554964ab`)
+- `Bot ready as CWA Assistant#9755; listening on channel 1504452473056792668`
+- Total startup: instance-start → bot ready ≈ 10 s
+- WARNING/ERROR logs in first revision window: **0** (zero callback exceptions, zero import failures)
+**Annotations preserved:** ✅ `cpu-throttling=false`, `minScale=1`, `maxScale=1`, `startup-cpu-boost=true`.
+**Secrets in Cloud Run Secret Manager (verified present):** `cwa-assistant-discord-bot-token`, `google-api-key`, `platform-api-base-url`, `usage-hash-secret`.
+**Cleanup performed:** temp `Dockerfile` + `.gcloudignore` removed from repo root post-deploy. `.gcloudignore` explicitly excluded `agent/.env*` to prevent local dev secret marker leaking into build context.
 
 ---
 
