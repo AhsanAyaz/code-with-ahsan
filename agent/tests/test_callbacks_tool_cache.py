@@ -47,6 +47,32 @@ class _FakeTool:
         self.name = name
 
 
+class _StateProxy:
+    """Lightweight dict-like state proxy.
+
+    A plain class (not a MagicMock) is the only reliable way to override
+    dunder methods (__getitem__ / __setitem__ / __contains__) on a mock —
+    assigning lambdas to those attributes on a MagicMock causes the bound-
+    method auto-`self` injection to clash with the lambda's signature
+    (TypeError: lambda takes 2 positional args but 3 were given).
+    """
+
+    def __init__(self, backing: dict):
+        self._backing = backing
+
+    def get(self, key, default=None):
+        return self._backing.get(key, default)
+
+    def __getitem__(self, key):
+        return self._backing[key]
+
+    def __setitem__(self, key, value):
+        self._backing[key] = value
+
+    def __contains__(self, key):
+        return key in self._backing
+
+
 def _make_tool_context(initial_state=None):
     """Build a MagicMock that mimics ToolContext + a backing state dict.
 
@@ -55,10 +81,7 @@ def _make_tool_context(initial_state=None):
     state = dict(initial_state or {})
 
     ctx = MagicMock()
-    ctx.state.get = lambda k, default=None: state.get(k, default)
-    ctx.state.__getitem__ = lambda k: state[k]
-    ctx.state.__setitem__ = lambda k, v: state.__setitem__(k, v)
-    ctx.state.__contains__ = lambda k: k in state
+    ctx.state = _StateProxy(state)
     ctx.agent_name = "content_agent"
     ctx.invocation_id = "test-inv-002"
     ctx.session.id = "test-session-uuid-002"  # raw UUID — MUST NOT leak to events

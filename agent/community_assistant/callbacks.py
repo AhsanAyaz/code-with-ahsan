@@ -2,17 +2,24 @@
 callbacks.py — Single home for all Phase 7 callback layers.
 
 Plan 07-01 creates this file with the PII layer ONLY.
-Plans 07-02 (tool cache) and 07-03 (lifecycle) extend this same module.
+Plan 07-02 extends it with the tool-cache layer (before_tool_cache / after_tool_cache).
+Plan 07-03 (lifecycle) extends this same module.
 
 Public exports:
   - PII_PATTERNS       dict[str, re.Pattern]
   - REDACTION_PLACEHOLDER  str
   - pii_sanitizer      before_model_callback for root_agent
+  - CACHEABLE_TOOLS    frozenset[str]  (Plan 07-02)
+  - CACHE_TTL_SECONDS  int             (Plan 07-02)
+  - before_tool_cache  async before_tool_callback for content_agent (Plan 07-02)
+  - after_tool_cache   async after_tool_callback for content_agent (Plan 07-02)
 
 Private helpers:
   - _hmac_session_id   INLINE HMAC helper (NOT imported from discord_bot.usage_metrics
                        — avoids circular-import risk, RESEARCH §11)
+  - _derive_cache_key  tool_name + normalized query → cache key (Plan 07-02)
 """
+import copy
 import hashlib as _hashlib
 import hmac as _hmac
 import json
@@ -20,10 +27,13 @@ import logging
 import os as _os
 import re
 import sys
-from typing import Optional
+from datetime import datetime, timezone
+from typing import Any, Optional
 
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models import LlmRequest, LlmResponse
+from google.adk.tools import BaseTool
+from google.adk.tools.tool_context import ToolContext
 
 # ---------------------------------------------------------------------------
 # Module-level constants
@@ -136,4 +146,153 @@ def pii_sanitizer(
         return None
 
 
-# Plans 07-02 (tool cache) + 07-03 (lifecycle) extend this module.
+# ---------------------------------------------------------------------------
+# Plan 07-02 — Tool-result cache (before_tool_callback + after_tool_callback)
+#
+# Attaches to content_agent ONLY (RESEARCH §7) — caches ISR-adjacent search tools
+# so a repeat "do you have blog posts about Angular?" within 10 minutes is served
+# from session state without an upstream Ghost / YouTube round-trip.
+#
+# Plan 07-03 (lifecycle) will extend this module further.
+# ---------------------------------------------------------------------------
+
+CACHEABLE_TOOLS = frozenset({"search_blog_posts", "search_youtube_videos"})
+CACHE_TTL_SECONDS = 600  # 10 minutes — RESEARCH §5
+
+
+def _derive_cache_key(tool_name: str, args: dict) -> str:
+    """Compose a normalized cache key from tool_name + args["query"].
+
+    Format: f"{tool_name}__{normalized_query}".
+
+    Normalization (RESEARCH §5 + §9 Pitfall 3):
+      - Lowercase
+      - Strip leading/trailing whitespace
+      - Remove all punctuation (keep \\w + \\s only)
+
+    The `tool_name` prefix prevents search_blog_posts(query='angular') and
+    search_youtube_videos(query='angular') from sharing a cache entry (T-07-08).
+    """
+    q = str(args.get("query", "")).lower().strip()
+    q_norm = re.sub(r"[^\w\s]", "", q).strip()
+    return f"{tool_name}__{q_norm}"
+
+
+async def before_tool_cache(
+    tool: BaseTool,
+    args: dict[str, Any],
+    tool_context: ToolContext,
+) -> Optional[dict]:
+    """before_tool_callback — short-circuit on warm cache hit.
+
+    Returns a dict → ADK skips the actual tool call and uses that dict as the result.
+    Returns None → ADK invokes the tool normally.
+
+    Behavior (RESEARCH §11):
+      1. If tool.name not in CACHEABLE_TOOLS → return None silently (no event).
+      2. Look up state['app_cache'][cache_key].
+      3. If absent OR malformed timestamp OR age >= TTL → emit tool_cache_miss, return None.
+      4. Otherwise → emit tool_cache_hit{age_s}, return deepcopy(cached_result).
+
+    Exceptions are swallowed (logged WARNING) — RESEARCH §9 Pitfall 1.
+    """
+    try:
+        if tool.name not in CACHEABLE_TOOLS:
+            return None
+
+        cache_key = _derive_cache_key(tool.name, args)
+        app_cache = tool_context.state.get("app_cache", {}) or {}
+        entry = app_cache.get(cache_key)
+
+        session_id_hash = _hmac_session_id(
+            getattr(getattr(tool_context, "session", None), "id", "") or ""
+        )
+
+        cached_at: Optional[datetime] = None
+        cached_result: Optional[dict] = None
+        if entry is not None:
+            try:
+                ts_str, cached_result = entry
+                cached_at = datetime.fromisoformat(ts_str)
+            except (ValueError, TypeError):
+                cached_at = None  # malformed → treat as miss
+
+        if cached_at is not None and cached_result is not None:
+            age_s = int((datetime.now(timezone.utc) - cached_at).total_seconds())
+            if age_s < CACHE_TTL_SECONDS:
+                sys.stdout.write(
+                    json.dumps({
+                        "severity": "INFO",
+                        "event_type": "tool_cache_hit",
+                        "agent": tool_context.agent_name,
+                        "invocation_id": tool_context.invocation_id,
+                        "session_id_hash": session_id_hash,
+                        "tool": tool.name,
+                        "age_s": age_s,
+                    })
+                    + "\n"
+                )
+                sys.stdout.flush()
+                return copy.deepcopy(cached_result)
+
+        # Cache miss path (no entry, expired, or malformed)
+        sys.stdout.write(
+            json.dumps({
+                "severity": "INFO",
+                "event_type": "tool_cache_miss",
+                "agent": tool_context.agent_name,
+                "invocation_id": tool_context.invocation_id,
+                "session_id_hash": session_id_hash,
+                "tool": tool.name,
+            })
+            + "\n"
+        )
+        sys.stdout.flush()
+        return None
+
+    except Exception:
+        _logger.warning("before_tool_cache error", exc_info=True)
+        return None
+
+
+async def after_tool_cache(
+    tool: BaseTool,
+    args: dict[str, Any],
+    tool_context: ToolContext,
+    tool_response: dict,
+) -> Optional[dict]:
+    """after_tool_callback — write-back on successful tool result.
+
+    Returns None → ADK passes the original tool_response through unchanged.
+
+    Behavior (RESEARCH §11):
+      1. If tool.name not in CACHEABLE_TOOLS → return None silently.
+      2. If tool_response.get("status") == "error" → return None (do NOT cache errors;
+         T-07-10 — prevents transient upstream failure from poisoning the cache).
+      3. Otherwise → write (iso_timestamp, deepcopy(tool_response)) into
+         state['app_cache'][cache_key]; return None.
+
+    Exceptions are swallowed (logged WARNING).
+    """
+    try:
+        if tool.name not in CACHEABLE_TOOLS:
+            return None
+
+        if isinstance(tool_response, dict) and tool_response.get("status") == "error":
+            return None
+
+        cache_key = _derive_cache_key(tool.name, args)
+        app_cache = dict(tool_context.state.get("app_cache", {}) or {})  # copy-on-write
+        app_cache[cache_key] = (
+            datetime.now(timezone.utc).isoformat(),
+            copy.deepcopy(tool_response),
+        )
+        tool_context.state["app_cache"] = app_cache
+        return None
+
+    except Exception:
+        _logger.warning("after_tool_cache error", exc_info=True)
+        return None
+
+
+# Plan 07-03 (lifecycle) will extend this module.
