@@ -54,38 +54,68 @@ print(f"lifecycle pair p99: {statistics.quantiles(t, n=100)[98] / 1000:.1f} µs"
 PY
 ```
 
-**Captured:**
-- `pii_sanitizer` no-match p99: _TODO µs_
-- lifecycle pair p99: _TODO µs_
-- 12 agents × lifecycle pair + 1× pii_sanitizer + 2× tool cache = _TODO µs_ per turn ≪ 50ms p99 bound (RESEARCH §1).
+**Captured (2026-05-23, local M-series mac, agent/.venv py3.12):**
+- `pii_sanitizer` no-match p99: **2.0 µs**
+- lifecycle pair p99: **26.2 µs**
+- Per-turn worst case: 12 × 26.2 + 2 + ~60 (2× tool cache est.) ≈ **0.38 ms** per turn ≪ 50 ms p99 bound (RESEARCH §1). **OQ3 RESOLVED GREEN.**
 
 ---
 
 ## Task 1 — Local `adk web` 5-turn smoke verdict
 
-**Date:** _TBD_
-**Verdict:** _PENDING_
+**Date:** 2026-05-23
+**Verdict:** ✅ **PASS** — all 5 turns green; OQ1 resolved YES; OQ3 resolved GREEN.
+**Session ID (local):** `02b0fee6-c7f6-46ee-ba32-cdab07888a24`
+**session_id_hash (content_agent / root):** `46a979742bffd4af`
+**session_id_hash (featured_resources_agent AgentTool sub-runner):** `aff208f5fd5cc592` — see Anomaly below.
 
-Procedure: `cd agent && .venv/bin/adk web` → open `http://localhost:8000` → exercise 5 turns covering each callback layer.
+Procedure: `cd agent && .venv/bin/adk web` → open `http://localhost:8000` → exercised 5 turns covering each callback layer.
 
 ### Turn-by-turn results
 
-| Turn | Query | Routed agent | Callback layer exercised | Expected event(s) | Verdict | Evidence |
-|------|-------|--------------|--------------------------|-------------------|---------|----------|
-| 1 | "my card is 4111-1111-1111-1111, what tutorials cover payment processing?" | `root_agent` then routes | PII (Plan 07-01) | `pii_redacted` event with `pii_types=["CREDIT_CARD"]`; user-visible reply must NOT echo back `4111-1111-1111-1111` | _PENDING_ | _stdout JSON capture_ |
-| 2 | "any Angular blog posts?" | `content_agent` → `search_blog_posts` | Tool cache MISS (Plan 07-02) | `tool_cache_miss` with `tool=search_blog_posts`; Ghost upstream HIT | _PENDING_ | _Events tab screenshot_ |
-| 3 | "any Angular blog posts?" (repeat) | `content_agent` → `search_blog_posts` | Tool cache HIT (Plan 07-02) | `tool_cache_hit` with `tool=search_blog_posts`, `age_s≈5`; NO Ghost upstream call | _PENDING_ | _Events tab screenshot_ |
-| 4 | "GitHub trending for Angular, dev.to articles, Stack Overflow Qs" | `external_knowledge_agent` (Seq[ParallelAgent[gh,devto,so] → synthesizer]) | Lifecycle (Plan 07-03) — fan-out leaves | `agent.enter` + `agent.exit` for `gh_researcher`, `devto_researcher`, `so_researcher`, `external_knowledge_synthesizer`; **NO** lifecycle events for `external_knowledge_agent` (SequentialAgent wrapper) or `ExternalFanOut` (ParallelAgent wrapper) | _PENDING_ | _stdout JSON capture; verify wrapper-skip rule_ |
-| 5 | "show me featured blog posts about AI" | `content_agent` → `featured_resources_agent` (AgentTool) | Lifecycle inside AgentTool (Plan 07-03, Open Question 1) | `agent.enter` + `agent.exit` for `featured_resources_agent` (RESEARCH §14 Open Question 1 — DOES the callback fire under AgentTool execution?) | _PENDING_ | _If events fire: OQ1 RESOLVED YES. If not: OQ1 RESOLVED NO — escalate to follow-up plan_ |
+| Turn | Query | Routed agent | Callback layer | Verdict | Evidence |
+|------|-------|--------------|-----------------|---------|----------|
+| 1 | "my card is 4111-1111-1111-1111, what tutorials cover payment processing?" | root → content_agent | PII (Plan 07-01) | ✅ PASS | `pii_redacted` event: `redacted_count=1, pii_types=["CREDIT_CARD"]`. UI invocation header showed `[REDACTED PII]`. Reply text contained no card digits. |
+| 2 | "any Angular blog posts?" | content_agent → `search_blog_posts` | Tool cache MISS (Plan 07-02) | ✅ PASS | `tool_cache_miss` event for `search_blog_posts`; Ghost upstream call: `GET localhost:3000/api/content/blog/search?q=Angular` 200 OK. |
+| 3 | "any Angular blog posts?" (repeat ×2) | content_agent → `search_blog_posts` | Tool cache HIT (Plan 07-02) | ✅ PASS | Two `tool_cache_hit` events captured — age_s=103, age_s=46. **NO Ghost GET** lines for either. |
+| 4 | "GitHub trending for Angular, dev.to articles, Stack Overflow Qs" | content_agent → external_knowledge_agent (Seq[ParallelAgent[gh,devto,so] → synthesizer]) | Lifecycle (Plan 07-03) — fan-out | ✅ PASS | 4 leaves fired enter+exit: `gh_researcher` (4570ms), `devto_researcher` (4463ms), `so_researcher` (5251ms), `external_knowledge_synthesizer` (10878ms). **NO** events for wrapper agents `external_knowledge_agent` or `ExternalFanOut`. 3 leaves share `enter_ts_ms=1779544243172` confirming concurrent dispatch. content_agent total: 17638ms. |
+| 5 | "show me featured blog posts about AI" | content_agent → `featured_resources_agent` (AgentTool) | Lifecycle inside AgentTool (Plan 07-03, OQ1) | ✅ PASS — **OQ1 RESOLVED YES** | `featured_resources_agent` fires `agent.enter`/`agent.exit` under AgentTool execution path. duration_ms=2103. |
 
 ### RESEARCH Open Questions — resolution
 
-- **Open Question 1 (AgentTool callback firing):** _PENDING_ Turn 5 verdict.
-- **Open Question 3 (callback overhead p99):** _PENDING_ pre-deploy microbench.
+- **Open Question 1 (AgentTool callback firing):** **RESOLVED YES** — Turn 5 confirms `before_agent_callback`/`after_agent_callback` fire when an LlmAgent is invoked as an AgentTool. No follow-up plan needed for AgentTool wrapping.
+- **Open Question 3 (callback overhead p99):** **RESOLVED GREEN** — see Pre-deploy microbench above. Per-turn worst case ~0.38 ms ≪ 50 ms p99 bound.
+
+### Anomaly noted (non-blocking, follow-up candidate)
+
+**AgentTool sub-runner has its own invocation_id + session context:**
+
+| Agent | invocation_id | session_id_hash |
+|-------|---------------|------------------|
+| content_agent (parent) | `e-62716a06-5bb9-4f71-a0cc-bd687bc104bb` | `46a979742bffd4af` |
+| featured_resources_agent (AgentTool child) | `e-8b16944a-0aca-437c-a325-163781b4dd2a` | `aff208f5fd5cc592` |
+
+ADK's AgentTool execution spawns a sub-runner with a separate session, so child + parent lifecycle events do **not** share `invocation_id` and the HMAC over `ctx.session.id` produces a different hash. Cloud Logging trace correlation between AgentTool parent and child currently relies on timestamp adjacency; a bridging field (`parent_invocation_id` or similar) would be a follow-up enhancement.
+
+### AGENT-PAR-02 preview (single Turn-4 sample, real soak required for P95)
+
+| Leaf | duration_ms |
+|------|-------------|
+| devto_researcher | 4463 |
+| gh_researcher | 4570 |
+| so_researcher | 5251 |
+| external_knowledge_synthesizer | 10878 |
+| content_agent (total turn) | 17638 |
+
+- Parallel max-leaf 5251ms vs serial sum 14284ms → **63 % fan-out time saved** by ParallelAgent.
+- End-to-end 17.6 s vs Phase 6 anecdotal baseline ~19 s → ~7 % drop end-to-end this single sample. Synthesizer (10.9 s) now dominates; AGENT-PAR-02 ≥40 % gate to be re-evaluated against multi-sample post-deploy P95.
 
 ### Smoke-blocking issues encountered
 
-_TBD._
+None. Two non-blocking observations:
+
+1. **`USAGE_HASH_SECRET` missing from local `agent/.env`** initially → `session_id_hash` emitted as empty string on Turns 1-2. Added local-only marker value (`local-dev-only-not-prod-do-not-reuse`) → ADK auto-reloaded → Turns 3-5 populated correctly. Cloud Run secret already wired since Phase 02.1.
+2. **Content-recency drift** (off-scope for Phase 7): Turn 4 fan-out surfaced a 2020 dev.to article because agents have no current-date awareness. Follow-up plan filed at `.planning/phases/07-agent-safety-observability-callbacks/07-05-FOLLOWUP-CONTENT-RECENCY-PLAN.md`.
 
 ---
 
