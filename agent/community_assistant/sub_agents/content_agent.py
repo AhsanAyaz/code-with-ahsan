@@ -1,6 +1,12 @@
 from google.adk.agents import LlmAgent
 
-from ..callbacks import after_tool_cache, before_tool_cache, lifecycle_after_agent, lifecycle_before_agent
+from ..callbacks import (
+    after_tool_cache,
+    before_tool_cache,
+    inject_current_date,
+    lifecycle_after_agent,
+    lifecycle_before_agent,
+)
 from ..platform_client import BASE_URL, fetch_blog_posts, fetch_youtube_videos
 from ._relevance import is_relevant, query_tokens
 from .featured_resources import featured_resources_tool
@@ -162,6 +168,7 @@ Never fabricate a URL.
 - If count is 0 for YouTube, say so honestly and suggest https://youtube.com/codewithahsan directly.
 - If a tool returns status="error", tell the user the platform is temporarily unreachable.
 - End every reply with a single concrete next action the user can take.""",
+    before_model_callback=inject_current_date,
     before_tool_callback=before_tool_cache,
     after_tool_callback=after_tool_cache,
     before_agent_callback=lifecycle_before_agent,

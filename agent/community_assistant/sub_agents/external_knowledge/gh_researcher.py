@@ -12,7 +12,7 @@ import os
 import httpx
 from google.adk.agents import LlmAgent
 
-from ...callbacks import lifecycle_after_agent, lifecycle_before_agent
+from ...callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 from ._shapes import _shape_github_repo
 
 _GITHUB_CLIENT = httpx.Client(base_url="https://api.github.com", timeout=10.0)
@@ -82,6 +82,7 @@ ALWAYS cite the html_url of each repo.
 If the tool returns status='error', return a brief 'GitHub temporarily unavailable' acknowledgement so the synthesizer can narrate the partial result.""",
     tools=[search_github_repos],
     output_key="gh_result",
+    before_model_callback=inject_current_date,
     before_agent_callback=lifecycle_before_agent,
     after_agent_callback=lifecycle_after_agent,
 )

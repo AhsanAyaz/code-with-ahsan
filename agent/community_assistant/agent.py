@@ -1,6 +1,11 @@
 from google.adk.agents import LlmAgent
 
-from .callbacks import lifecycle_after_agent, lifecycle_before_agent, pii_sanitizer
+from .callbacks import (
+    inject_current_date,
+    lifecycle_after_agent,
+    lifecycle_before_agent,
+    pii_sanitizer,
+)
 from .sub_agents.content_agent import content_agent
 from .sub_agents.external_knowledge import external_knowledge_agent
 from .sub_agents.mentorship_agent import mentorship_agent
@@ -59,7 +64,7 @@ root_agent = LlmAgent(
         "sub-agents for onboarding, mentorship, projects, and learning roadmaps."
     ),
     instruction=ROOT_INSTRUCTION,
-    before_model_callback=pii_sanitizer,
+    before_model_callback=[pii_sanitizer, inject_current_date],
     before_agent_callback=lifecycle_before_agent,
     after_agent_callback=lifecycle_after_agent,
     sub_agents=[

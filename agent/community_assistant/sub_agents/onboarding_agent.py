@@ -1,6 +1,6 @@
 from google.adk.agents import LlmAgent, SequentialAgent
 
-from ..callbacks import lifecycle_after_agent, lifecycle_before_agent
+from ..callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 
 
 def get_community_overview() -> dict:
@@ -66,6 +66,7 @@ skill_level_extractor = LlmAgent(
 ("beginner" / "intermediate" / "advanced" / "unknown"). Reply with JUST that single word. \
 If you cannot tell, reply "unknown".""",
     output_key="user_skill_level",
+    before_model_callback=inject_current_date,
     before_agent_callback=lifecycle_before_agent,
     after_agent_callback=lifecycle_after_agent,
 )
@@ -78,6 +79,7 @@ goals_extractor = LlmAgent(
     instruction="""From the conversation so far, summarize the user's stated goals in <40 words. \
 If no goals are clear, reply "unknown".""",
     output_key="user_goals",
+    before_model_callback=inject_current_date,
     before_agent_callback=lifecycle_before_agent,
     after_agent_callback=lifecycle_after_agent,
 )
@@ -99,6 +101,7 @@ Be warm and genuinely welcoming. Many new members feel intimidated — reassure 
 community is for all levels. Always end with one clear next step (e.g., "Start by introducing \
 yourself in #introductions").""",
     tools=[get_community_overview, get_channel_guide],
+    before_model_callback=inject_current_date,
     before_agent_callback=lifecycle_before_agent,
     after_agent_callback=lifecycle_after_agent,
 )

@@ -2,7 +2,7 @@ from collections import Counter
 
 from google.adk.agents import LlmAgent
 
-from ..callbacks import lifecycle_after_agent, lifecycle_before_agent
+from ..callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 from ..platform_client import BASE_URL, fetch_mentors, fetch_mentors_semantic
 
 _MENTOR_LIMIT = 10
@@ -183,6 +183,7 @@ GUIDELINES:
 suggest they visit https://codewithahsan.dev/mentorship directly.
 - Always end with a clear next action.""",
     tools=[search_mentors, semantic_search_mentors, list_expertise_categories, get_mentorship_process],
+    before_model_callback=inject_current_date,
     before_agent_callback=lifecycle_before_agent,
     after_agent_callback=lifecycle_after_agent,
 )

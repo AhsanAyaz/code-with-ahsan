@@ -1,6 +1,6 @@
 from google.adk.agents import LlmAgent
 
-from ..callbacks import lifecycle_after_agent, lifecycle_before_agent
+from ..callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 from ..platform_client import BASE_URL, fetch_projects
 
 _PROJECT_LIMIT = 15
@@ -108,6 +108,7 @@ Match project difficulty to the user's stated skill level. If they're a beginner
 advanced projects without a clear warning. If no projects match, suggest they broaden the filter \
 or visit https://codewithahsan.dev/projects. Always end with a single concrete next action.""",
     tools=[list_open_projects, get_contribution_guide],
+    before_model_callback=inject_current_date,
     before_agent_callback=lifecycle_before_agent,
     after_agent_callback=lifecycle_after_agent,
 )

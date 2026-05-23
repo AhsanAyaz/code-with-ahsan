@@ -2,7 +2,7 @@ from collections import Counter
 
 from google.adk.agents import LlmAgent
 
-from ..callbacks import lifecycle_after_agent, lifecycle_before_agent
+from ..callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 from ..platform_client import BASE_URL, fetch_roadmaps
 
 _ROADMAP_LIMIT = 10
@@ -120,6 +120,7 @@ GUIDELINES:
 https://codewithahsan.dev/roadmaps.
 - Always end with a clear next action (e.g., "Want me to pull up the full content URL?").""",
     tools=[list_roadmaps, list_roadmap_domains],
+    before_model_callback=inject_current_date,
     before_agent_callback=lifecycle_before_agent,
     after_agent_callback=lifecycle_after_agent,
 )

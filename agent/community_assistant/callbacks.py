@@ -386,3 +386,47 @@ def lifecycle_after_agent(
     except Exception:
         _logger.warning("lifecycle_after_agent error", exc_info=True)
     return None
+
+
+# ---------------------------------------------------------------------------
+# Plan 07-05 — Current-date injection (before_model_callback)
+#
+# Inserts a single-line UTC date note into every LLM call's system instruction
+# so agents can reason about content recency (e.g., "prefer the most recent
+# article" or "this tool was announced 2 days ago"). Off-scope for Phase 7
+# safety/observability, but the cheapest fix lives naturally as a callback.
+# ---------------------------------------------------------------------------
+
+def inject_current_date(
+    callback_context: CallbackContext,
+    llm_request: LlmRequest,
+) -> Optional[LlmResponse]:
+    """before_model_callback — append `Today is YYYY-MM-DD (UTC).` to system instruction.
+
+    Uses ADK's `LlmRequest.append_instructions([str])` so the date lands in the
+    Gemini API `system_instruction` field (not in user `contents`). Avoids
+    user-role pollution and survives ADK content rewriting.
+
+    Wire BEFORE date-sensitive agents make their LLM calls — recommended on
+    root_agent + content_agent + featured_resources_agent + every
+    external_knowledge leaf + synthesizer.
+
+    Ordering with pii_sanitizer: when both run, register pii_sanitizer FIRST
+    in the callback list. PII redaction operates on user contents, not on the
+    system instruction, so order is functionally independent — but registering
+    PII first matches the safety-first mental model.
+
+    Always returns None (proceed semantics). Exceptions swallowed + WARNING
+    logged (RESEARCH §9 Pitfall 1 / Phase 7 callback safety convention).
+    """
+    try:
+        today = datetime.now(timezone.utc).date().isoformat()
+        llm_request.append_instructions([
+            f"Today is {today} (UTC). When surfacing third-party content "
+            f"(repos, articles, posts) with publish or update timestamps, "
+            f"prefer the most recent items unless the user explicitly asks "
+            f"for historical or classic material."
+        ])
+    except Exception:
+        _logger.warning("inject_current_date error", exc_info=True)
+    return None
