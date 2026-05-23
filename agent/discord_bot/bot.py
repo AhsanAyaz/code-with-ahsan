@@ -204,15 +204,22 @@ def _wire_bot():
 
             async with message.channel.typing():
                 # CRITICAL: run_async, not run() — research §Pitfall 6
+                # Drain the FULL event stream. ADK's `is_final_response()` returns True
+                # for EACH participating agent (per ADK Event.is_final_response docstring),
+                # so breaking on the first hit surfaces a leaf's intermediate reply (e.g.,
+                # devto_researcher's "dev.to temporarily unavailable") instead of the
+                # synthesizer's merged answer — and the early break cancels the
+                # ParallelAgent TaskGroup mid-flight (OpenTelemetry GeneratorExit cascade).
                 async for event in runner.run_async(
                     user_id=user_id,
                     session_id=session_id,
                     new_message=new_message,
                 ):
                     events_seen.append(event)
-                    if event.is_final_response() and event.content:
-                        response_text = event.content.parts[0].text or ""
-                        break
+                    if event.is_final_response() and event.content and event.content.parts:
+                        text = event.content.parts[0].text or ""
+                        if text:
+                            response_text = text  # keep latest; orchestrator/synthesizer wins
 
             if not response_text:
                 response_text = "I couldn't generate a response. Please try again."
