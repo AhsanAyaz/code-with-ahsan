@@ -14,7 +14,10 @@ import {
   REFERRALS_COLLECTION,
   PUBLIC_AMBASSADORS_COLLECTION,
 } from "@/types/ambassador";
-import { REFERRAL_CODES_COLLECTION } from "@/lib/ambassador/constants";
+import {
+  REFERRAL_CODES_COLLECTION,
+  AMBASSADOR_COHORTS_COLLECTION,
+} from "@/lib/ambassador/constants";
 import { syncAmbassadorClaim } from "@/lib/ambassador/acceptance";
 import { createLogger } from "@/lib/logger";
 
@@ -60,36 +63,66 @@ export async function GET(
     return NextResponse.json({ error: "Ambassador not found" }, { status: 404 });
   }
 
-  const [eventsSnap, reportsSnap, flagsSnap, referralsCountSnap] = await Promise.all([
-    db
-      .collection(AMBASSADOR_EVENTS_COLLECTION)
-      .where("ambassadorId", "==", uid)
-      .orderBy("date", "desc")
-      .limit(20)
-      .get(),
-    db
-      .collection(MONTHLY_REPORTS_COLLECTION)
-      .where("ambassadorId", "==", uid)
-      .orderBy("month", "desc")
-      .limit(12)
-      .get(),
-    db
-      .collection(AMBASSADOR_CRON_FLAGS_COLLECTION)
-      .where("ambassadorId", "==", uid)
-      .where("resolved", "==", false)
-      .orderBy("flaggedAt", "desc")
-      .get(),
-    db
-      .collection(REFERRALS_COLLECTION)
-      .where("ambassadorId", "==", uid)
-      .count()
-      .get(),
-  ]);
+  // INV-4: read the cohort doc in parallel with the existing 4 queries so the
+  // AlumniTransitionButton can evaluate its visibility gate from a real value.
+  // Only read when cohortId is present — Promise.resolve(null) avoids a wasted
+  // Firestore read for ambassadors without a cohort attached.
+  const subdocData = subdocSnap.data() as { cohortId?: string } | undefined;
+  const cohortId = subdocData?.cohortId;
+
+  const [eventsSnap, reportsSnap, flagsSnap, referralsCountSnap, cohortSnap] =
+    await Promise.all([
+      db
+        .collection(AMBASSADOR_EVENTS_COLLECTION)
+        .where("ambassadorId", "==", uid)
+        .orderBy("date", "desc")
+        .limit(20)
+        .get(),
+      db
+        .collection(MONTHLY_REPORTS_COLLECTION)
+        .where("ambassadorId", "==", uid)
+        .orderBy("month", "desc")
+        .limit(12)
+        .get(),
+      db
+        .collection(AMBASSADOR_CRON_FLAGS_COLLECTION)
+        .where("ambassadorId", "==", uid)
+        .where("resolved", "==", false)
+        .orderBy("flaggedAt", "desc")
+        .get(),
+      db
+        .collection(REFERRALS_COLLECTION)
+        .where("ambassadorId", "==", uid)
+        .count()
+        .get(),
+      cohortId
+        ? db.collection(AMBASSADOR_COHORTS_COLLECTION).doc(cohortId).get()
+        : Promise.resolve(null),
+    ]);
+
+  // INV-4: derive cohort.endDate. Firestore Timestamp → ISO string; Date → ISO;
+  // already-string passthrough. Missing/falsy → null (UI's visibility gate
+  // already handles null by hiding the AlumniTransitionButton).
+  let cohortEndDate: string | null = null;
+  if (cohortSnap && cohortSnap.exists) {
+    const c = cohortSnap.data() as {
+      endDate?: { toDate?: () => Date } | string | Date | undefined;
+    };
+    const raw = c?.endDate;
+    if (raw && typeof (raw as { toDate?: () => Date }).toDate === "function") {
+      cohortEndDate = (raw as { toDate: () => Date }).toDate().toISOString();
+    } else if (raw instanceof Date) {
+      cohortEndDate = raw.toISOString();
+    } else if (typeof raw === "string") {
+      cohortEndDate = raw;
+    }
+  }
 
   return NextResponse.json(
     {
       profile: normalizeTimestamps(profileSnap.data() ?? {}),
       subdoc: normalizeTimestamps(subdocSnap.data() ?? {}),
+      cohort: { endDate: cohortEndDate },
       recentEvents: eventsSnap.docs.map((d) =>
         normalizeTimestamps({ id: d.id, ...d.data() }),
       ),

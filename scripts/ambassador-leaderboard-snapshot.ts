@@ -1,9 +1,14 @@
 #!/usr/bin/env npx tsx
 /**
- * Phase 5 (DASH-07): Hourly leaderboard snapshot writer.
+ * Phase 5 (DASH-07): Daily leaderboard snapshot writer.
  *
  * Triggered by .github/workflows/ambassador-activity-checks.yml
- * (cron '0 * * * *' or workflow_dispatch).
+ * (cron '0 7 * * *' daily or workflow_dispatch).
+ *
+ * Cadence history: originally specified as hourly ('0 * * * *') in Plan 02; restored
+ * at DAILY cadence (07:00 UTC, before the 08:00 report-flag job) per architectural
+ * decision 2026-05-22 (quick 260522-b08 — "small ambassador cohort; daily cadence
+ * is sufficient. Hourly was over-engineered for current scale.").
  *
  * Reads:  cohorts (current), public_ambassadors (active==true), referrals,
  *         ambassador_events (hidden==false), monthly_reports

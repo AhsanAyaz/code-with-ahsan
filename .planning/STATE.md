@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v6.0
-milestone_name: Student Ambassador Program
-status: verifying
-stopped_at: context exhaustion at 75% (2026-05-17)
-last_updated: "2026-05-20T20:14:17.004Z"
-last_activity: 2026-05-20
+milestone: v7.0
+milestone_name: Agentic Orchestra Upgrade
+status: planning
+stopped_at: kickoff (2026-05-22)
+last_updated: "2026-05-22T07:00:00.000Z"
+last_activity: 2026-05-22
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 43
-  completed_plans: 45
-  percent: 100
+  total_phases: 3
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,22 +25,20 @@ See: .planning/PROJECT.md (updated 2026-04-21)
 
 ## Current Position
 
-Phase: 01 (foundation-roles-array-migration) — COMPLETE (10/10 plans)
-Plan: 10 of 10 (Plan 10 merged to main, post-merge ops pending)
-Status: Phase complete — ready for verification
-Last activity: 2026-05-20
+Milestone: v7.0 Agentic Orchestra Upgrade — Phase 06 PLANNED
+Phase: 06 (agent-workflow-refactor-state-wiring) — READY TO EXECUTE
+Status: v6.0 Phase 5 verified PASS. v7.0 Phase 06 planning complete 2026-05-22 — CONTEXT + RESEARCH + 4 PLAN files (06-01 ParallelAgent fan-out / 06-02 output_key whiteboard / 06-03 AgentTool wrap / 06-04 smoke + deploy + 24h soak). Plan-check PASS round 2 (all 6 round-1 blockers resolved). RESEARCH Open Questions marked RESOLVED. CFP framing locked at `slides/talks/zero-to-agentic-orchestra/cfp-framing.md`.
+Last activity: 2026-05-22 - Phase 06 plans landed. Next: `/gsd-execute-phase 6` (per-plan TDD execution).
 
 ## Next Moves (queued, not in flight)
 
-1. **Post-merge prod ops for Plan 10 (manual, gated on user)**:
-   - `firebase deploy --only firestore:rules` — flip rules from dual-claim to roles-only
-   - `npm run drop-legacy-role:dry-run` then `npm run drop-legacy-role` — wipe legacy `role` field from 412 profile docs (production write — confirm dry-run report first)
-   - See `.planning/phases/01-foundation-roles-array-migration/01-10-SUMMARY.md` for full runbook
-2. **Event participant email feature** (new user request 2026-05-20): send emails to event participants. Not yet scoped/planned.
-
-3. **Bot iteration roadmap** (from drafted article): (a) Firestore-backed sessions to survive redeploys, (b) proactive surfacing in non-bot channels with opt-in via reaction, (c) BigQuery sink for log-based metrics → SQL-grade analytics. None planned yet.
-4. **Article distribution**: `articles/drafts/cwa-assistant-multi-agent-bot.md` ready for Ghost paste; LinkedIn short version drafted; Twitter thread + OG image not done.
-5. **Latency investigation**: first real prod event had `latency_ms=18933` (~19s) for a 3-source external_knowledge fan-out. Acceptable for that workload but worth a P95 baseline once dashboard accumulates data.
+1. **v7.0 Phase 6 execution (immediate)**: Phase 06 plans landed. Execute per-plan via `/gsd-execute-phase 6` or per-PLAN executor invocations. Order: 06-01 (ParallelAgent fan-out) + 06-02 (output_key whiteboard) + 06-03 (AgentTool wrap) in parallel (no file overlap) → 06-04 (adk web smoke + deploy + 24h soak). Latency gate: ≥40% P95 drop on 3-source queries (baseline ~19s). PARTIAL-SHIP path requires STATE.md handoff entry for Phase 7/8 latency investigation.
+2. **v7.0 Phase 7 planning (blocked on 6)**: callbacks — `before_model_callback` PII redaction, `before_/after_tool_callback` cache, `before_/after_agent_callback` structured lifecycle logging.
+3. **v7.0 Phase 8 planning (blocked on 7)**: LoopAgent critic for mentor/project quality, LoopAgent clarifier for mentor/project intake, `DatabaseSessionService` (Firestore-backed, HMAC-keyed), daily session pruning cron.
+4. **Phase 5 Plan 05-05 human verification (optional, deferred)**: browser smoke test — onboarding tick persists, leaderboard renders, AlumniTransitionButton on past-cohort. Server-side already PASS so this is UX-only.
+5. **Event participant email feature** (request 2026-05-20): orthogonal to v7.0. Quick-task candidate once v7.0 phase 6 lands.
+6. **Bot iteration items folded into v7.0**: Firestore-backed sessions (phase 8). BigQuery sink + proactive surfacing remain out-of-scope for v7.0.
+7. **Article distribution**: `articles/drafts/cwa-assistant-multi-agent-bot.md` — orthogonal, post-v7.0.
 
 ## Performance Metrics
 
@@ -180,6 +178,10 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | 260508-fvi | Rename mas-raffle → generic raffle with dynamic title field | 2026-05-08 | 2129d64 | [260508-fvi-rename-mas-raffle-to-generic-raffle](./quick/260508-fvi-rename-mas-raffle-to-generic-raffle/) |
 | 260508-m0c | Add daily GitHub Action to sync Discord member count to Firestore and surface it in /api/stats | 2026-05-08 | b6cb528 | [260508-m0c-add-daily-github-action-to-sync-discord-](./quick/260508-m0c-add-daily-github-action-to-sync-discord-/) |
 | 260508-r0b | Markdown-based events system with MDX files, build script, EventCard component, dynamic listing with filters, and auto-generated detail pages | 2026-05-08 | 3681407 | [260508-r0b-markdown-based-events-system-with-mdx-fi](./quick/260508-r0b-markdown-based-events-system-with-mdx-fi/) |
+| 260521-h86 | Sitemap SEO cleanup — migrate static public/sitemap.xml → dynamic src/app/sitemap.ts, strip 18 auth-gated URLs disallowed by robots.txt | 2026-05-21 | 853b826 | [260521-h86-sitemap-seo-cleanup](./quick/260521-h86-sitemap-seo-cleanup/) |
+| 260521-jsd | SEO indexability fixes — generateStaticParams (216 course posts + 9 detail + 9 resources + 3 events SSG), per-page canonicals, Article+Course JSON-LD, 26-of-27 GSC-404 → 308 redirects, ngBook→Amazon convergence | 2026-05-21 | 370fcf8 | [260521-jsd-seo-indexability-fixes-generatestaticpar](./quick/260521-jsd-seo-indexability-fixes-generatestaticpar/) |
+| 260522-a2f | Phase 5 gap-close — INV-1 (reportsOnTime derived on /me), INV-2 (onboarding checklist persistence via schema extension + Firestore dot-path merge), INV-4 (cohort.endDate parallel-read on admin member GET). 4 commits, 35/35 tests pass, verifier 8/8 PASS. | 2026-05-22 | aada493 | [260522-a2f-phase-5-verification-gap-close-invariant](./quick/260522-a2f-phase-5-verification-gap-close-invariant/) |
+| 260522-b08 | Phase 5 INV-3 leaderboard close-out — daily snapshot pipeline restored (07:00 UTC GH Actions cron writes `leaderboard_snapshots/{cohortId}`; route reads doc with live-compute fallback); `rank` attached to top3 entries; `ownRank` shape renamed to `{ referrals, events, reportsOnTime }`; `graceActive` computed server-side; humanized "Updated N ago" label; SUMMARYs 05-02/05-03 corrected. 7 commits, library 54/54 + API 44/44 tests pass, tsc clean, verifier 8/8 PASS. | 2026-05-22 | 8a890ab | [260522-b08-phase-5-inv-3-leaderboard-daily-snapshot](./quick/260522-b08-phase-5-inv-3-leaderboard-daily-snapshot/) |
 | Phase 01 P01 | 2min | 1 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P02 | 3 min | 3 tasks | 6 files |
 | Phase 01-foundation-roles-array-migration P04 | 2 min | 2 tasks | 3 files |
@@ -209,6 +211,6 @@ Stopped at: context exhaustion at 75% (2026-05-17)
 Resume file: None
 
 ---
-*Last activity: 2026-04-22 - Phase 03 discuss-phase complete; 4 gray areas resolved, 13 decisions locked*
+*Last activity: 2026-05-22 - Quick 260522-a2f closed Phase 5 INV-1/2/4 (reportsOnTime + onboarding persistence + cohort.endDate). 4 commits on main, 35/35 ambassador tests pass, verifier 8/8 PASS. Only INV-3 leaderboard remains — pending architectural decision (revive hourly cron vs accept live 5-min cache).*
 
 **Planned Phase:** 5 (Dashboard, Leaderboard, Offboarding & Alumni) — 5 plans — 2026-05-06T10:30:35.607Z

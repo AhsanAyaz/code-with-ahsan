@@ -26,12 +26,22 @@ export interface LeaderboardEntry {
   displayName: string;
   photoURL: string;
   count: number;
+  /**
+   * Standard competition rank in the parent category (1, 2, 3 with ties — e.g., 1,2,2).
+   * Populated by `buildWindowCategory` for each top-3 entry. The UI renders `#${rank}`.
+   * Quick 260522-b08 — closes Phase 5 INV-3 (UI↔API contract drift).
+   */
+  rank: number;
 }
 
 export interface LeaderboardCategoryRanks {
-  referralsRank: number;
-  eventsRank: number;
-  reportsRank: number;
+  /** Renamed (quick 260522-b08) from `referralsRank` — UI consumes this name verbatim. */
+  referrals: number;
+  /** Renamed (quick 260522-b08) from `eventsRank`. */
+  events: number;
+  /** Renamed (quick 260522-b08) from `reportsRank`. NB: the underlying category counts
+   *  ALL monthly_reports for now (no on-time filter — out of scope per quick brief). */
+  reportsOnTime: number;
 }
 
 export interface LeaderboardWindow {
@@ -161,15 +171,21 @@ export async function computeAmbassadorCounts(
   };
 }
 
-/** Build top-3 entries + complete rank map for one category. */
-function buildWindowCategory(
+/**
+ * Build top-3 entries (with `rank` attached) + complete rank map for one category.
+ *
+ * Exported (quick 260522-b08) so tests can exercise rank-attachment in isolation;
+ * has no I/O so the widened surface is safe.
+ */
+export function buildWindowCategory(
   entries: Array<{ uid: string; displayName: string; photoURL: string; count: number }>,
 ): { top3: LeaderboardEntry[]; ranks: Map<string, number> } {
   const ranks = rankByCount(entries);
-  const top3 = [...entries]
+  const top3: LeaderboardEntry[] = [...entries]
     .sort((a, b) => b.count - a.count)
     .filter((e) => e.count > 0)
-    .slice(0, 3);
+    .slice(0, 3)
+    .map((e) => ({ ...e, rank: ranks.get(e.uid) ?? 0 }));
   return { top3, ranks };
 }
 
@@ -268,14 +284,14 @@ export async function buildLeaderboardSnapshot(
   const thisMonthRanks: Record<string, LeaderboardCategoryRanks> = {};
   for (const a of ambassadors) {
     cumulativeRanks[a.uid] = {
-      referralsRank: cumRefBuilt.ranks.get(a.uid) ?? 0,
-      eventsRank: cumEvtBuilt.ranks.get(a.uid) ?? 0,
-      reportsRank: cumRptBuilt.ranks.get(a.uid) ?? 0,
+      referrals: cumRefBuilt.ranks.get(a.uid) ?? 0,
+      events: cumEvtBuilt.ranks.get(a.uid) ?? 0,
+      reportsOnTime: cumRptBuilt.ranks.get(a.uid) ?? 0,
     };
     thisMonthRanks[a.uid] = {
-      referralsRank: tmRefBuilt.ranks.get(a.uid) ?? 0,
-      eventsRank: tmEvtBuilt.ranks.get(a.uid) ?? 0,
-      reportsRank: tmRptBuilt.ranks.get(a.uid) ?? 0,
+      referrals: tmRefBuilt.ranks.get(a.uid) ?? 0,
+      events: tmEvtBuilt.ranks.get(a.uid) ?? 0,
+      reportsOnTime: tmRptBuilt.ranks.get(a.uid) ?? 0,
     };
   }
 

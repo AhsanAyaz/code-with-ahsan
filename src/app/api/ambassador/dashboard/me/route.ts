@@ -27,6 +27,7 @@ import {
   REFERRALS_COLLECTION,
   AMBASSADOR_COHORTS_COLLECTION,
 } from "@/lib/ambassador/constants";
+import { getDeadlineUTC } from "@/lib/ambassador/reportDeadline";
 import type { AmbassadorSubdoc, CohortDoc, AmbassadorOfTheMonth } from "@/types/ambassador";
 
 function isoOrNull(v: unknown): string | null {
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
   const subdoc = subdocSnap.data() as AmbassadorSubdoc;
   const profile = (profileSnap.data() ?? {}) as { bio?: string };
 
-  const [referralsAgg, eventsAgg, reportsAgg, cohortSnap] = await Promise.all([
+  const [referralsAgg, eventsAgg, reportsSnap, cohortSnap] = await Promise.all([
     db.collection(REFERRALS_COLLECTION).where("ambassadorId", "==", uid).count().get(),
     db
       .collection(AMBASSADOR_EVENTS_COLLECTION)
@@ -75,13 +76,42 @@ export async function GET(request: NextRequest) {
       .where("hidden", "==", false)
       .count()
       .get(),
-    db.collection(MONTHLY_REPORTS_COLLECTION).where("ambassadorId", "==", uid).count().get(),
+    // INV-1: read full monthly_reports docs (not just count) so we can derive
+    // reportsOnTime by comparing each doc's submittedAt vs its month's deadline
+    // in the ambassador's local timezone. Reports cap at ~12 per ambassador per
+    // cohort year — full `.get()` is acceptable.
+    db.collection(MONTHLY_REPORTS_COLLECTION).where("ambassadorId", "==", uid).get(),
     db.collection(AMBASSADOR_COHORTS_COLLECTION).doc(subdoc.cohortId).get(),
   ]);
 
   const referralsCount = referralsAgg.data().count ?? 0;
   const eventsCount = eventsAgg.data().count ?? 0;
-  const reportsCount = reportsAgg.data().count ?? 0;
+  // Derive reportsCount from the same snap (avoid a second round-trip aggregation).
+  const reportsCount = reportsSnap.size;
+
+  // INV-1: derive reportsOnTime server-side. The monthly_reports schema (see
+  // src/app/api/ambassador/report/route.ts) does NOT store an `onTime` field —
+  // we recompute by comparing submittedAt.toMillis() vs getDeadlineUTC(year,
+  // month, timezone). Inclusive `<= deadline` per getDeadlineUTC contract
+  // ("final millisecond of the month, 23:59:59.999 local time").
+  const tz =
+    typeof subdoc.timezone === "string" && subdoc.timezone.length > 0
+      ? subdoc.timezone
+      : "UTC";
+  let reportsOnTime = 0;
+  for (const doc of reportsSnap.docs) {
+    const d = doc.data() as { month?: unknown; submittedAt?: { toMillis?: () => number } };
+    if (typeof d.month !== "string" || !/^\d{4}-\d{2}$/.test(d.month)) continue;
+    const submittedMs =
+      typeof d.submittedAt?.toMillis === "function" ? d.submittedAt.toMillis() : NaN;
+    if (!Number.isFinite(submittedMs)) continue;
+    const [yearStr, monthStr] = d.month.split("-");
+    const year = Number(yearStr);
+    const month = Number(monthStr); // 1-indexed — matches getDeadlineUTC contract
+    if (!Number.isFinite(year) || !Number.isFinite(month)) continue;
+    const deadline = getDeadlineUTC(year, month, tz);
+    if (submittedMs <= deadline) reportsOnTime += 1;
+  }
 
   const cohort = cohortSnap.exists
     ? (() => {
@@ -116,6 +146,7 @@ export async function GET(request: NextRequest) {
       referralsCount,
       eventsCount,
       reportsCount,
+      reportsOnTime,
       strikes: subdoc.strikes ?? 0,
       nextReportDue: nextReportDue(),
     },

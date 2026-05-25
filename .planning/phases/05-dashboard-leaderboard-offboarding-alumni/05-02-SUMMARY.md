@@ -94,7 +94,7 @@ metrics:
 
 **`.github/workflows/ambassador-activity-checks.yml`** (extended)
 
-- Added third schedule entry: `cron: '0 * * * *'` (hourly)
+- Added third schedule entry: `cron: '0 7 * * *'` (daily 07:00 UTC — see Post-Hoc Correction block below; this SUMMARY originally claimed hourly `'0 * * * *'`, which was later orphaned and then restored at daily cadence per architectural decision 2026-05-22 via quick 260522-b08)
 - Added `leaderboard-snapshot` to `workflow_dispatch.inputs.job.options`
 - Added `ambassador-leaderboard-snapshot` job: Firebase-only env (no Discord secrets), dry-run flag support, schedule + workflow_dispatch triggers
 
@@ -138,5 +138,9 @@ The T-05-02-01 threat (leaderboard_snapshots must deny client reads via Firestor
 ### Commits Exist
 - adfbda4 — feat(05-02): implement buildLeaderboardSnapshot + unit tests
 - 9f99813 — feat(05-02): add leaderboard-snapshot cron + GitHub Actions wiring
+
+## Post-Hoc Correction (2026-05-22, quick 260522-b08)
+
+This SUMMARY originally claimed an hourly cron `'0 * * * *'` was wired. That was inaccurate even at the time of writing — commit `76ad6f7` (post-Plan-02) refactored the route to live computation with a 5-min in-memory cache, orphaning `scripts/ambassador-leaderboard-snapshot.ts`. Phase 5 verification (`05-VERIFICATION.md`, INV-3 FAIL) caught this. Quick 260522-b08 closed the gap with a **daily** snapshot at `'0 7 * * *'` (07:00 UTC, before the 08:00 report-flag job) — a deliberate cadence change (hourly → daily) given current ambassador count. The script's logic remains unchanged; only the GitHub Actions wiring + the script's header comment were updated to reflect the daily cadence.
 
 ## Self-Check: PASSED

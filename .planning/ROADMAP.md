@@ -11,7 +11,8 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 - [x] **v3.0 Brand Identity & Site Restructure** — Phases 15-18 (shipped 2026-03-10)
 - [x] **v4.0 Admin Course Creator with YouTube Integration** — Phase 1 (shipped 2026-03-11)
 - [x] **v5.0 CWA Promptathon 2026** — Phase 1 (shipped 2026-04-21)
-- [ ] **v6.0 Student Ambassador Program** — Phases 1-5 (in progress, started 2026-04-21)
+- [ ] **v6.0 Student Ambassador Program** — Phases 1-5 (Phase 5 verified 2026-05-22; all 4 actionable invariants closed; awaiting final ship snapshot)
+- [ ] **v7.0 Agentic Orchestra Upgrade** — Phases 6-8 (in planning, started 2026-05-22 — see `.planning/milestones/v7.0-ROADMAP.md`)
 
 ## Phases
 
@@ -183,11 +184,11 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| v6.0 Phase 1: Foundation — Roles Array Migration | 0/10 | Planned | — |
-| v6.0 Phase 2: Application Subsystem | 0/9 | Planned | — |
-| v6.0 Phase 3: Public Presentation | 0/6 | Planned | — |
-| v6.0 Phase 4: Activity Subsystem | 0/6 | Planned | — |
-| v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 0/5 | Planned | — |
+| v6.0 Phase 1: Foundation — Roles Array Migration | 10/10 | Closed (Deploy #5 prod ops done) | 2026-05-21 |
+| v6.0 Phase 2: Application Subsystem | 9/9 | Shipped | 2026-05-07 |
+| v6.0 Phase 3: Public Presentation | 6/6 | Shipped | 2026-05-08 |
+| v6.0 Phase 4: Activity Subsystem | 7/7 | Shipped | 2026-05-10 |
+| v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 5/5 | Verifying — gaps_found (1 PASS / 3 PARTIAL / 1 FAIL) | — |
 
 ### Phase 2: ADK Community Assistant for Discord (Google Cloud Next 2026 demo)
 
@@ -211,5 +212,52 @@ Plans:
 - [x] 02.1-02-PLAN.md — YouTube ISR proxy (channelId-scoped, reuses YT_API_KEY) + content_agent.search_youtube_videos + Vitest + pytest (Wave 2 / EXT-CONTENT-YOUTUBE)
 - [ ] 02.1-03-PLAN.md — external_knowledge_agent with GitHub/dev.to/Stack Overflow direct httpx tools + root agent wiring + local adk web smoke + Cloud Run redeploy of cwa-assistant-bot (Wave 3 / EXT-KNOWLEDGE-GITHUB, EXT-KNOWLEDGE-DEVTO, EXT-KNOWLEDGE-STACKOVERFLOW, EXT-ADK-REDEPLOY)
 
+## v7.0 Agentic Orchestra Upgrade (Phases 6-8)
+
+Production `community_assistant` Discord bot self-audit (2026-05-22) measured ~3/10 against the "Zero to Agentic Orchestra with Google ADK" talk patterns. This milestone closes the 10-pattern scorecard across 3 structural phases and produces the live-demo backbone for the CFP. See `.planning/milestones/v7.0-ROADMAP.md` for full scoping and `slides/talks/zero-to-agentic-orchestra/cfp-framing.md` for the audit + talk angle.
+
+### Phase 6: Agent Workflow Refactor + State Wiring
+
+**Goal**: Transform `community_assistant` from a flat coordinator-of-6 into a topology using ADK workflow primitives — `ParallelAgent` for `external_knowledge` fan-out, `output_key` whiteboard for cross-agent context, `AgentTool` wrap for `featured_resources` — without touching callbacks or session services yet.
+**Depends on**: Phase 02 (community_assistant base), Phase 02.1 (content + external sub-agents)
+**Requirements**: AGENT-PAR-01, AGENT-PAR-02, AGENT-STATE-01, AGENT-STATE-02, AGENT-TOOL-01, AGENT-TEST-01
+**Success Criteria** (what must be TRUE):
+  1. `external_knowledge` queries fire 3 branches interleaved in adk web Events tab (not stacked sequentially); P95 on 3-source queries drops ≥40% from ~19s baseline.
+  2. State tab populates `user_skill_level` / `user_goals` after onboarding; downstream mentor/project/roadmap agents read those keys.
+  3. Featured-resource items appear via `AgentTool` call (visible in Events tab) — not via Python list-prepend.
+  4. 24h prod soak passes — no regression on Discord HMAC-hashed usage metrics dashboard.
+  5. Talk demo `parallel_research` slide can be live-swapped to production `external_knowledge` running the same pattern.
+**Plans**: TBD (run /gsd-plan-phase 6)
+**UI hint**: no
+
+### Phase 7: Agent Safety + Observability Callbacks
+
+**Goal**: Add the three callback layers the talk teaches but production lacks — PII redaction at model layer, tool-result caching at tool layer, structured lifecycle logging at agent layer — replacing ad-hoc `print` and Next.js-only ISR.
+**Depends on**: Phase 6 (callbacks attach to the refactored tree)
+**Requirements**: AGENT-CB-MODEL-01, AGENT-CB-TOOL-01, AGENT-CB-TOOL-02, AGENT-CB-AGENT-01, AGENT-CB-AGENT-02, AGENT-TEST-02
+**Success Criteria** (what must be TRUE):
+  1. Credit-card / Discord-ID patterns in user content are `[REDACTED PII]` before the LLM sees them — raw values never appear in any log.
+  2. Repeat blog/youtube queries within 600s served from `tool_context.state` cache; Cloud Logging emits `tool_cache_hit` event.
+  3. Per-sub-agent `agent.enter` / `agent.exit` events with `duration_ms` emitted for every Discord turn — usable for P95-per-agent dashboards.
+  4. v6.0 HMAC privacy story preserved end-to-end (no raw user_id, no raw query text).
+  5. Talk can pause on stage to show `before_model_callback` debug pane (redaction) and `before_tool_callback` debug pane (cache hit timestamp).
+**Plans**: TBD (run /gsd-plan-phase 7)
+**UI hint**: no
+
+### Phase 8: Agent Quality + Memory (LoopAgent + Sessions)
+
+**Goal**: Add `LoopAgent` quality + interaction primitives and Firestore-backed persistent sessions — critic loop for mentor/project recommendation quality, clarifier loop for intake-before-recommend, `DatabaseSessionService` so the bot remembers across redeploys.
+**Depends on**: Phase 7 (lifecycle callbacks needed to instrument loop iterations)
+**Requirements**: AGENT-LOOP-CRITIC-01, AGENT-LOOP-CRITIC-02, AGENT-LOOP-CLARIFY-01, AGENT-LOOP-CLARIFY-02, AGENT-SESSION-01, AGENT-SESSION-02, AGENT-SESSION-03, AGENT-TEST-03
+**Success Criteria** (what must be TRUE):
+  1. User asking "find me a mentor" with empty state triggers `mentor_intake_clarifier` to ask ≥1 clarifying question, pause, resume on next turn until intake complete.
+  2. Critic loop runs after mentorship_agent / projects_agent recommendations — `Critic → exit_loop` visible in Events tab within ≤2 iterations.
+  3. Bot remembers user goals across Cloud Run redeploy (verified via `gcloud run services update --revision-suffix=...`).
+  4. `agent_sessions/{hmac}/turns/{turn_id}` Firestore docs populated; raw Discord user_id absent everywhere.
+  5. Daily cron (GitHub Actions + `scripts/agent-session-prune.ts`) prunes turns >30d old — idempotent, no active-session drops.
+  6. Talk demo `content_orchestra` LoopAgent slide live-swaps to `mentor_clarifier` running real intake.
+**Plans**: TBD (run /gsd-plan-phase 8)
+**UI hint**: no
+
 ---
-*Last updated: 2026-05-17 — Phase 2.1 broken down into 3 plans (Ghost blog ISR / YouTube ISR / external_knowledge + redeploy)*
+*Last updated: 2026-05-22 — v7.0 Agentic Orchestra Upgrade scoped (3 phases). Phase 5 of v6.0 verified PASS earlier the same day; v7.0 planning kicks off after Phase 6 dir is scaffolded.*
