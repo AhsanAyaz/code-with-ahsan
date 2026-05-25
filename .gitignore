@@ -57,5 +57,5 @@ firestore-debug.log
 .claude/scheduled_tasks.lock
 .claude/worktrees/
 
-# local article drafts (publish directly to Ghost, not committed)
-/articles/drafts/
+# local articles (publish directly to Ghost, not committed)
+/articles/
