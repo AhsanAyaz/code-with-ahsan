@@ -26,6 +26,7 @@ export async function generateMetadata({
       alternates: {
         canonical: `${BASE_URL}/courses`,
       },
+      robots: { index: false, follow: true },
     };
   }
 
@@ -34,6 +35,7 @@ export async function generateMetadata({
     alternates: {
       canonical: `${BASE_URL}/courses/${slug}/resources`,
     },
+    robots: { index: false, follow: true },
   };
 }
 
