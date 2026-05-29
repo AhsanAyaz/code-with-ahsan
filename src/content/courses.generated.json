@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-29T14:08:49.101Z",
+  "generatedAt": "2026-05-29T15:25:46.768Z",
   "source": "mdx",
   "count": 11,
   "courses": [
@@ -4083,7 +4083,9 @@
       "externalCourseUrl": null,
       "externalStudentsCount": null,
       "isVisible": false,
-      "banner": null,
+      "banner": {
+        "url": "https://img.youtube.com/vi/uFyj0_n1uD8/maxresdefault.jpg"
+      },
       "resources": [],
       "authors": [],
       "chapters": [
@@ -4231,7 +4233,9 @@
       "externalCourseUrl": null,
       "externalStudentsCount": null,
       "isVisible": false,
-      "banner": null,
+      "banner": {
+        "url": "https://img.youtube.com/vi/e8CKjkwpadA/maxresdefault.jpg"
+      },
       "resources": [],
       "authors": [],
       "chapters": [
