@@ -7,6 +7,8 @@
     "content:mdx:from-json": "node scripts/migrate/convert-course-json-to-mdx.js",
     "content:build": "node scripts/content/build-courses-index.js",
     "build:events": "node scripts/content/build-events-index.js",
+    "audit:seo": "npm run content:build && node scripts/content/audit-seo.js",
+    "audit:seo:json": "npm run content:build && node scripts/content/audit-seo.js --json",
     "prebuild": "npm run content:build && npm run build:events",
     "build": "next build",
     "content:export:strapi": "node scripts/migrate/export-strapi-content.js",
