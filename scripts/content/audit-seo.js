@@ -156,17 +156,30 @@ function checkBody(courseSlug, post) {
 }
 
 function checkSchema(post) {
-  // Page currently emits Article schema on /courses/[slug]/[post]/page.tsx for
-  // every post regardless of type. Video posts should emit VideoObject (or both)
-  // so Google can show video rich results in SERP.
-  if (post.type === "video") {
+  // Page emits Article + VideoObject JSON-LD on video posts (see
+  // src/lib/seo/videoSchema.ts). Article-only posts get Article JSON-LD.
+  // VideoObject requires non-empty description + a recoverable YouTube ID;
+  // both conditions are validated in buildVideoObjectLd() at render time, so
+  // here we predict the same outcome to keep the audit honest.
+  if (post.type !== "video") return { status: "pass", value: "Article" };
+
+  const desc = (post.description || "").trim();
+  const url = (post.videoUrl || "").trim();
+  if (!desc) {
     return {
       status: "warn",
       value: "Article-only",
-      note: "video post emits Article schema only — add VideoObject schema for video rich results",
+      note: "video post: VideoObject suppressed — empty description blocks emit",
     };
   }
-  return { status: "pass", value: "Article" };
+  if (!url || !/youtu\.be|youtube\.com/.test(url)) {
+    return {
+      status: "warn",
+      value: "Article-only",
+      note: "video post: VideoObject suppressed — videoUrl missing or not YouTube",
+    };
+  }
+  return { status: "pass", value: "Article+VideoObject" };
 }
 
 // ---- Audit runners --------------------------------------------------------
