@@ -68,6 +68,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  // Resources + submissions intentionally excluded:
+  // - /resources is thin SSR (heading + links list) — Google flags as low-quality.
+  // - /submissions is a client-only Firestore shell with no SSR content — empty to crawlers.
+  // Both routes also carry `robots: { index: false }` metadata so any rediscovery via
+  // internal links does not pollute the index. See GSC report 2026-05-28.
   const courseEntries: MetadataRoute.Sitemap = courses.flatMap((course) => {
     const courseLastModified = toDate(course.publishedAt, now);
 
@@ -76,20 +81,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: courseLastModified,
       changeFrequency: "weekly" as const,
       priority: 0.8,
-    };
-
-    const resources = {
-      url: `${BASE_URL}/courses/${course.slug}/resources`,
-      lastModified: courseLastModified,
-      changeFrequency: "weekly" as const,
-      priority: 0.3,
-    };
-
-    const submissions = {
-      url: `${BASE_URL}/courses/${course.slug}/submissions`,
-      lastModified: courseLastModified,
-      changeFrequency: "weekly" as const,
-      priority: 0.3,
     };
 
     const posts = (course.chapters ?? []).flatMap((chapter) =>
@@ -103,7 +94,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }))
     );
 
-    return [detail, resources, submissions, ...posts];
+    return [detail, ...posts];
   });
 
   return [...homepage, ...staticEntries, ...eventEntries, ...courseEntries];
