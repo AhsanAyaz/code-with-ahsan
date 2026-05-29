@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "npm run content:build && npm run build:events",
     "dev": "next dev --turbo",
     "content:mdx:from-json": "node scripts/migrate/convert-course-json-to-mdx.js",
     "content:build": "node scripts/content/build-courses-index.js",
