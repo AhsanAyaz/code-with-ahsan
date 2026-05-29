@@ -60,12 +60,16 @@ function checkLength(value, passAt, warnAt, label) {
 }
 
 function checkTitle(title, courseName) {
-  // Effective SERP title is "<post title> - <course name>" (set in page metadata).
-  // Score on the effective string so short post titles like "Introduction" don't
-  // false-fail when the course suffix already brings the SERP title above 30 chars.
-  const effective = courseName
-    ? `${(title || "").trim()} - ${(courseName || "").trim()}`
-    : (title || "").trim();
+  // Mirror src/lib/seo/serpTitle.ts: append course name only when the
+  // combined string fits POST_TITLE_MAX, else fall back to post title alone.
+  // Keeps the audit aligned with what page metadata actually emits.
+  const t = (title || "").trim();
+  const c = (courseName || "").trim();
+  let effective = t;
+  if (c) {
+    const combined = `${t} - ${c}`;
+    effective = combined.length <= POST_TITLE_MAX ? combined : t;
+  }
   const len = effective.length;
   if (len >= POST_TITLE_MIN && len <= POST_TITLE_MAX)
     return { status: "pass", value: len };
