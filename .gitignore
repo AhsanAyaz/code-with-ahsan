@@ -62,3 +62,6 @@ firestore-debug.log
 
 # LLM scratch / inputs
 /for_llm/
+
+# SEO audit reports (local, regenerable via `npm run audit:seo`)
+/.seo-audit/
