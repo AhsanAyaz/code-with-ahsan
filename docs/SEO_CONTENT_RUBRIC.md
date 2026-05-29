@@ -35,7 +35,7 @@ The script reads `src/content/courses.generated.json` and the underlying `.mdx` 
 | body word count *(article posts only)* | ≥ 150 | ≥ 50 | < 50 |
 | body for video posts | ≥ 50 word summary/transcript | empty | (never fails) |
 | media | thumbnail set | videoUrl only | neither |
-| schema (page output) | `Article` (article) | `Article` only on `type: video` post | — |
+| schema (page output) | `Article` (article) OR `Article + VideoObject` (video w/ description + YouTube URL) | video w/ empty description or non-YouTube videoUrl (VideoObject suppressed) | — |
 | `publishedAt` | present | — | missing |
 
 Score = pass(2) + warn(1) + fail(0). 6 checks × 2 = max 12 per post.
@@ -71,7 +71,7 @@ For a course (`course.mdx`), fill:
 ## Known systemic gaps (2026-05-29 snapshot)
 
 - **126 / 233 posts have empty `description`** — biggest indexing lever.
-- **232 / 233 posts are `type: video`** but page emits `Article` JSON-LD only — should emit `VideoObject` for video rich results.
+- ~~**232 / 233 posts are `type: video`** but page emits `Article` JSON-LD only — should emit `VideoObject` for video rich results.~~ ✅ **Closed by Plan 01 (2026-05-29)** — `/courses/[slug]/[post]` now emits `VideoObject` alongside `Article` whenever post type is video, videoUrl is a YouTube URL, and description is non-empty. Posts with empty description still suppress VideoObject until Plan 04 fills them.
 - **8 Google ADK posts** carry full course suffix in the post title (`... - Google Agent Development Kit for Beginners Part N`), then the page metadata appends ` - <course name>` again → 160+ char SERP title. Strip the redundant suffix from `title:` in the mdx frontmatter.
 - **2 courses missing `banner.url`** (`design-patterns-javascript`, `js-beginners-series`).
 - **3 courses missing/short `description`** (`angular-in-90ish-minutes`, `react-redux-toolkit`, `angular-nestjs-fullstack-course`).

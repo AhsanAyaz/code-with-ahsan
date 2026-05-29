@@ -9,6 +9,8 @@ import {
   getCourses,
   getPostBySlug,
 } from "@/lib/content/contentProvider";
+import { buildVideoObjectLd } from "@/lib/seo/videoSchema";
+import { buildBreadcrumbLd } from "@/lib/seo/breadcrumbSchema";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.codewithahsan.dev";
@@ -135,11 +137,40 @@ export default async function Page({
     },
   };
 
+  const pageUrl = `${BASE_URL}/courses/${courseSlug}/${postSlug}`;
+  const videoLd =
+    post.type === "video" && post.videoUrl
+      ? buildVideoObjectLd({
+          name: post.title,
+          description: post.description ?? siteMetadata.description,
+          uploadDate: post.publishedAt ?? new Date().toISOString(),
+          videoUrl: post.videoUrl,
+          thumbnailOverride: post.thumbnail || course.banner,
+          pageUrl,
+        })
+      : null;
+  const breadcrumbLd = buildBreadcrumbLd([
+    { name: "Home", url: `${BASE_URL}/` },
+    { name: "Courses", url: `${BASE_URL}/courses` },
+    { name: course.name, url: `${BASE_URL}/courses/${courseSlug}` },
+    { name: post.title, url: pageUrl },
+  ]);
+
   return (
     <div className="page-padding">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }}
+      />
+      {videoLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(videoLd) }}
+        />
+      )}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       <PostDetail
         course={JSON.parse(JSON.stringify(course))}

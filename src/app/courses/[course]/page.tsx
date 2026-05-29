@@ -3,6 +3,8 @@ import Course from "@/classes/Course.class";
 import CourseDetail from "./CourseDetail";
 import siteMetadata from "@/data/siteMetadata";
 import { getCourseBySlug, getCourses } from "@/lib/content/contentProvider";
+import { buildCourseLd } from "@/lib/seo/courseSchema";
+import { buildBreadcrumbLd } from "@/lib/seo/breadcrumbSchema";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.codewithahsan.dev";
@@ -72,28 +74,32 @@ export default async function Page({
 
   const coursePlain = JSON.parse(JSON.stringify(course));
 
-  const courseLd = {
-    "@context": "https://schema.org",
-    "@type": "Course",
+  const courseUrl = `${BASE_URL}/courses/${slug}`;
+  const courseLd = buildCourseLd({
     name: course.name,
     description: course.description ?? siteMetadata.description,
-    url: `${BASE_URL}/courses/${slug}`,
-    ...(course.banner ? { image: course.banner } : {}),
-    provider: {
-      "@type": "Organization",
-      name: "Code with Ahsan",
-      sameAs: BASE_URL,
-    },
-    ...(course.authors?.[0]?.name
-      ? { author: { "@type": "Person", name: course.authors[0].name } }
-      : {}),
-  };
+    url: courseUrl,
+    baseUrl: BASE_URL,
+    imageUrl: course.banner || undefined,
+    authorName: course.authors?.[0]?.name,
+  });
+  const breadcrumbLd = buildBreadcrumbLd([
+    { name: "Home", url: `${BASE_URL}/` },
+    { name: "Courses", url: `${BASE_URL}/courses` },
+    { name: course.name, url: courseUrl },
+  ]);
 
   return (
     <div className="page-padding">
+      {courseLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(courseLd) }}
+        />
+      )}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       <CourseDetail course={coursePlain} />
     </div>
