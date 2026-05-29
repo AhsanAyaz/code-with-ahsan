@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-29T15:25:46.768Z",
+  "generatedAt": "2026-05-29T16:00:34.981Z",
   "source": "mdx",
   "count": 11,
   "courses": [
@@ -3983,7 +3983,7 @@
             {
               "id": 4756,
               "slug": "web-development-bootcamp-day-2-5",
-              "title": "2. HTML Basics",
+              "title": "2. HTML Basics: Tags, Headings & Structure",
               "description": "Day 2: HTML basics — document structure, headings, paragraphs, lists, images, and links — the building blocks for the portfolio site you'll style with CSS in later days.",
               "type": "video",
               "videoUrl": "https://www.youtube.com/watch?v=NqDEt2FbvCA&t=2622s&index=2",

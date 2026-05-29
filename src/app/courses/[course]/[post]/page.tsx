@@ -11,6 +11,7 @@ import {
 } from "@/lib/content/contentProvider";
 import { buildVideoObjectLd } from "@/lib/seo/videoSchema";
 import { buildBreadcrumbLd } from "@/lib/seo/breadcrumbSchema";
+import { buildSerpTitle } from "@/lib/seo/serpTitle";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.codewithahsan.dev";
@@ -76,14 +77,16 @@ export async function generateMetadata({
 
   const { post, course } = data;
 
+  const serpTitle = buildSerpTitle(post.title, course.name);
+
   return {
-    title: `${post.title} - ${course.name}`,
+    title: serpTitle,
     description: post.description || siteMetadata.description,
     alternates: {
       canonical: `${BASE_URL}/courses/${courseSlug}/${postSlug}`,
     },
     openGraph: {
-      title: `${post.title} - ${course.name}`,
+      title: serpTitle,
       description: post.description || siteMetadata.description,
       images:
         post.thumbnail || course.banner
