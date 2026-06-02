@@ -170,6 +170,38 @@ const nextConfig: NextConfig = {
       { source: "/zero-to-3d-building-a-gesture-controlled-particle-system-with-one-prompt", destination: "https://blog.codewithahsan.dev/zero-to-3d-building-a-gesture-controlled-particle-system-with-one-prompt", permanent: true },
       { source: "/10-mind-blowing-ways-to-use-gemini-cli-that-arent-just-write-code", destination: "https://blog.codewithahsan.dev/10-mind-blowing-ways-to-use-gemini-cli-that-arent-just-write-code", permanent: true },
       { source: "/how-to-pre-render-dynamic-routes-in-angular-a-practical-guide", destination: "https://blog.codewithahsan.dev/how-to-pre-render-dynamic-routes-in-angular-a-practical-guide", permanent: true },
+
+      // === GSC 404 cleanup batch 2 (from for_llm/gsc_coverage 2026-06-01, 17 of 18 actionable rows). ===
+      // 18th row /& excluded — special char causes path-to-regexp fragility, single URL, leave 404.
+
+      // Group G — Event slug typos (dash variant → canonical slash form)
+      { source: "/events/cwa-promptathon-2026", destination: "/events/cwa-promptathon/2026", permanent: true },
+      { source: "/events/hackstack-2023", destination: "/events/hackstack/2023", permanent: true },
+
+      // Group H — Legacy top-level slugs verified live on blog subdomain (curl 200)
+      { source: "/zero-to-website-100-founding-legends", destination: "https://blog.codewithahsan.dev/zero-to-website-100-founding-legends", permanent: true },
+      { source: "/standardizing-ai-design-the-evolution-of-design-md-2", destination: "https://blog.codewithahsan.dev/standardizing-ai-design-the-evolution-of-design-md-2", permanent: true },
+
+      // Group H-bis — Legacy slugs absent from blog subdomain (curl 404) → /community
+      { source: "/cloud-bootcamp-free-online-event-by-cloudways-mar-10-11", destination: "/community", permanent: true },
+      { source: "/duty-free-cc", destination: "/community", permanent: true },
+      { source: "/how-i-turned-my-ai-into-a-sovereign-business-partner-my-openclaw-setup", destination: "/community", permanent: true },
+
+      // Group I — Additional ahsync-bytes-weekly-digest-* → /community (extends Group A)
+      { source: "/ahsync-bytes-weekly-digest-9th-mar-2026", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-16th-mar-2026", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-22nd-dec-2025", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-23rd-mar-2026", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-30th-mar-2026", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-4th-may-2026", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-20th-april-2025", destination: "/community", permanent: true },
+
+      // Group J — weekly-digest-* (no ahsync-bytes prefix) → /community
+      { source: "/weekly-digest-1st-dec-2025", destination: "/community", permanent: true },
+      { source: "/weekly-digest-23rd-mar-2026", destination: "/community", permanent: true },
+
+      // Group K — Truncated course slug → /courses
+      { source: "/courses/web-", destination: "/courses", permanent: true },
     ];
   },
   turbopack: {
