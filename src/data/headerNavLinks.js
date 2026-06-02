@@ -28,6 +28,7 @@ const headerNavLinks = AMBASSADORS_ENABLED
 
 // Secondary items — accessible via "More" dropdown or footer
 export const MORE_LINKS = [
+  { href: "/challenges", title: "Challenges" },
   { href: "/events", title: "Events" },
   { href: "/logic-buddy", title: "Logic Buddy" },
   { href: "/community", title: "Community Hub" },

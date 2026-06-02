@@ -166,6 +166,35 @@ service cloud.firestore {
       }
     }
 
+    // ─── Challenges ──────────────────────────────
+    match /challenges/{challengeId} {
+      // Anyone can read challenges
+      allow read: if true;
+      // Only admins can create, update, delete
+      allow write: if isAdmin();
+    }
+
+    // ─── Submissions ─────────────────────────────
+    match /submissions/{submissionId} {
+      // Anyone can read submissions
+      allow read: if true;
+      // Authenticated users can create submissions for themselves
+      allow create: if isSignedIn() &&
+                       request.resource.data.userId == request.auth.uid &&
+                       request.resource.data.score == 10 &&
+                       request.resource.data.status == "approved";
+      // Admins can update/delete
+      allow update, delete: if isAdmin();
+    }
+
+    // ─── Leaderboard ─────────────────────────────
+    match /leaderboard/{userId} {
+      // Anyone can read leaderboard
+      allow read: if true;
+      // Only admins or backend can write (backend bypasses rules)
+      allow write: if isAdmin();
+    }
+
     // ─── Existing collections (passthrough) ─────
     // Existing mentorship collections use Admin SDK (server-side),
     // so client-side rules can be restrictive.
