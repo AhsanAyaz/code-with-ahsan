@@ -12,17 +12,19 @@ const baseNavLinks = [
   { href: "/books", title: "Books" },
   { href: "https://blog.codewithahsan.dev/", title: "Blog", external: true },
   { href: "/about", title: "About" },
+  { href: "/challenges ", title: "Challenges" },
 ];
 
 // Feature-flag-gated insertions (per D-11 in .planning/phases/01-foundation-roles-array-migration/01-CONTEXT.md).
 // NEXT_PUBLIC_* is inlined by Next.js at build time, so this evaluates at bundle time.
-const AMBASSADORS_ENABLED = process.env.NEXT_PUBLIC_FEATURE_AMBASSADOR_PROGRAM === "true";
+const AMBASSADORS_ENABLED =
+  process.env.NEXT_PUBLIC_FEATURE_AMBASSADOR_PROGRAM === "true";
 
 const headerNavLinks = AMBASSADORS_ENABLED
   ? [
       ...baseNavLinks.slice(0, 3), // Mentorship, Projects, Roadmaps
       { href: "/ambassadors", title: "Ambassadors" },
-      ...baseNavLinks.slice(3),    // Courses, Books, Blog, About
+      ...baseNavLinks.slice(3), // Courses, Books, Blog, About
     ]
   : baseNavLinks;
 

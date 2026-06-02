@@ -30,6 +30,7 @@ const NAV: NavSection[] = [
       { label: "Roadmaps", href: "/admin/roadmaps" },
       { label: "Courses", href: "/admin/courses" },
       { label: "Events", href: "/admin/events", exact: true },
+      { label: "Challenges ", href: "/admin/challenges" },
     ],
   },
   {
@@ -38,7 +39,10 @@ const NAV: NavSection[] = [
       { label: "Applications", href: "/admin/ambassadors" },
       { label: "Members", href: "/admin/ambassadors/members" },
       { label: "Cohorts", href: "/admin/ambassadors/cohorts" },
-      { label: "Eligibility Bypasses", href: "/admin/ambassadors/eligibility-bypasses" },
+      {
+        label: "Eligibility Bypasses",
+        href: "/admin/ambassadors/eligibility-bypasses",
+      },
     ],
   },
   {
@@ -53,7 +57,8 @@ const NAV: NavSection[] = [
 function isActive(pathname: string, href: string, exact?: boolean) {
   if (exact) return pathname === href;
   // Avoid /admin/ambassadors matching /admin/ambassadors/members etc. for the top entry
-  if (href === "/admin/ambassadors") return pathname === href || pathname === "/admin/ambassadors/";
+  if (href === "/admin/ambassadors")
+    return pathname === href || pathname === "/admin/ambassadors/";
   return pathname.startsWith(href);
 }
 
@@ -128,7 +133,12 @@ export function AdminDrawerToggle() {
         viewBox="0 0 24 24"
         stroke="currentColor"
       >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 6h16M4 12h16M4 18h16"
+        />
       </svg>
     </label>
   );
