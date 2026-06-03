@@ -422,7 +422,7 @@ export async function updateLeaderboardEntry(
       const newEntry: LeaderboardEntry = {
         userId,
         username,
-        userAvatar,
+        ...(userAvatar !== undefined ? { userAvatar } : {}),
         totalPoints: pointsToAdd,
         challengesCompleted: 1,
       };
@@ -432,7 +432,7 @@ export async function updateLeaderboardEntry(
         totalPoints: FieldValue.increment(pointsToAdd),
         challengesCompleted: FieldValue.increment(1),
         username,
-        userAvatar: userAvatar || FieldValue.delete(),
+        ...(userAvatar !== undefined ? { userAvatar } : { userAvatar: FieldValue.delete() }),
       });
     }
   });
