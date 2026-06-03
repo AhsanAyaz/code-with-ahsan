@@ -4,6 +4,7 @@ import {
   getChallengeParticipantsCount,
   isChallengeParticipant,
   joinChallenge,
+  AlreadyJoinedChallengeError,
 } from "@/services/ChallengeService";
 import { verifyAuth } from "@/lib/auth";
 import { getChallengeParticipantProfile } from "@/lib/challengeProfiles";
@@ -93,6 +94,10 @@ export async function POST(
 
     return NextResponse.json({ success: true, participant }, { status: 201 });
   } catch (error) {
+    if (error instanceof AlreadyJoinedChallengeError) {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
+
     console.error("Error joining challenge:", error);
     return NextResponse.json(
       { error: "Failed to join challenge" },

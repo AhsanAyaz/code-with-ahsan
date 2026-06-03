@@ -47,6 +47,17 @@ export class NotJoinedChallengeError extends Error {
   }
 }
 
+/**
+ * Error thrown when a user attempts to join a challenge they
+ * have already joined.
+ */
+export class AlreadyJoinedChallengeError extends Error {
+  constructor() {
+    super("You have already joined this challenge.");
+    this.name = "AlreadyJoinedChallengeError";
+  }
+}
+
 function toIsoString(value: FirestoreDateValue): string {
   if (!value) return new Date(0).toISOString();
   if (typeof value === "string") return value;
@@ -137,7 +148,7 @@ export async function joinChallenge(
   await db.runTransaction(async (transaction) => {
     const existingDoc = await transaction.get(docRef);
     if (existingDoc.exists) {
-      return;
+      throw new AlreadyJoinedChallengeError();
     }
 
     transaction.set(docRef, participantToWrite as ChallengeParticipant);
