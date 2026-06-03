@@ -178,13 +178,9 @@ service cloud.firestore {
     match /submissions/{submissionId} {
       // Anyone can read submissions
       allow read: if true;
-      // Authenticated users can create submissions for themselves
-      allow create: if isSignedIn() &&
-                       request.resource.data.userId == request.auth.uid &&
-                       request.resource.data.score == 10 &&
-                       request.resource.data.status == "approved";
-      // Admins can update/delete
-      allow update, delete: if isAdmin();
+      // Client-side submissions creation is disabled. All submissions
+      // must go through the /api/challenges/[id]/submissions route (Admin SDK).
+      allow write: if isAdmin();
     }
 
     // ─── Leaderboard ─────────────────────────────

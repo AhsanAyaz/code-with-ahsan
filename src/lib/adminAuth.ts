@@ -11,7 +11,7 @@ export async function verifyAdminRequest(request: Request): Promise<boolean> {
   const session = sessionDoc.data();
   const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
 
-  if (expiresAt < new Date()) {
+  if (expiresAt <= new Date()) {
     await db.collection("admin_sessions").doc(token).delete();
     return false;
   }

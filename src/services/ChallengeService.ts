@@ -342,7 +342,7 @@ export async function createSubmission(
       const newEntry: LeaderboardEntry = {
         userId: submission.userId,
         username: submission.userName,
-        ...(submission.userAvatar ? { userAvatar: submission.userAvatar } : {}),
+        ...(submission.userAvatar !== undefined ? { userAvatar: submission.userAvatar } : {}),
         totalPoints: CHALLENGE_SUBMISSION_SCORE,
         challengesCompleted: 1,
       };
@@ -352,7 +352,7 @@ export async function createSubmission(
         totalPoints: FieldValue.increment(CHALLENGE_SUBMISSION_SCORE),
         challengesCompleted: FieldValue.increment(1),
         username: submission.userName,
-        userAvatar: submission.userAvatar || FieldValue.delete(),
+        ...(submission.userAvatar !== undefined ? { userAvatar: submission.userAvatar } : { userAvatar: FieldValue.delete() }),
       });
     }
   });

@@ -294,11 +294,13 @@ export default function SubmitChallengePage() {
           onSubmit={handleSubmit}
           className="bg-base-100 border border-base-300 rounded-lg p-6 space-y-5"
         >
-          <label className="form-control">
-            <span className="label-text font-semibold mb-2 flex items-center gap-2">
-              <Github className="w-4 h-4" aria-hidden="true" />
-              GitHub Repository URL
-            </span>
+          <label className="form-control w-full inline-block">
+            <div className="label">
+              <span className="label-text font-semibold flex items-center gap-2">
+                <Github className="w-4 h-4" aria-hidden="true" />
+                GitHub Repository URL
+              </span>
+            </div>
             <input
               type="url"
               required
@@ -310,11 +312,16 @@ export default function SubmitChallengePage() {
             />
           </label>
 
-          <label className="form-control">
-            <span className="label-text font-semibold mb-2 flex items-center gap-2">
-              <ExternalLink className="w-4 h-4" aria-hidden="true" />
-              Demo URL
-            </span>
+          <label className="form-control w-full inline-block">
+            <div className="label">
+              <span className="label-text font-semibold flex items-center gap-2">
+                <ExternalLink className="w-4 h-4" aria-hidden="true" />
+                Demo URL
+              </span>
+              <span className="label-text-alt text-base-content/60">
+                Optional
+              </span>
+            </div>
             <input
               type="url"
               className="input input-bordered w-full"
@@ -323,24 +330,23 @@ export default function SubmitChallengePage() {
               onChange={(event) => setDemoUrl(event.target.value)}
               disabled={submitting || !user}
             />
-            <span className="label-text-alt mt-2">Optional</span>
           </label>
 
-          <label className="form-control">
-            <span className="label-text font-semibold mb-2">
-              Project Summary
-            </span>
+          <label className="form-control w-full inline-block">
+            <div className="label">
+              <span className="label-text font-semibold">Project Summary</span>
+              <span className="label-text-alt text-base-content/60">
+                Optional &bull; {description.length}/1000 characters
+              </span>
+            </div>
             <textarea
-              className="textarea textarea-bordered min-h-36"
+              className="textarea textarea-bordered min-h-36 w-full"
               placeholder="What did you build, what did you learn, and what should viewers try?"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
               maxLength={1000}
               disabled={submitting || !user}
             />
-            <span className="label-text-alt mt-2">
-              {description.length}/1000 characters
-            </span>
           </label>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
