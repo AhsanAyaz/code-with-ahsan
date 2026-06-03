@@ -244,6 +244,16 @@ export async function updateChallenge(
 }
 
 /**
+ * Deletes a Challenge from Firestore.
+ * 
+ * @param id The ID of the challenge to delete.
+ */
+export async function deleteChallenge(id: string): Promise<void> {
+  const docRef = db.collection(CHALLENGES_COLLECTION).doc(id);
+  await docRef.delete();
+}
+
+/**
  * Retrieves a single Challenge by its ID.
  * 
  * @param id The ID of the challenge.

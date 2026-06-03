@@ -172,7 +172,7 @@ export default async function ChallengeDetailPage({
             </Link>
             <Link href="/challenges/archive" className="btn btn-ghost">
               <Archive className="w-4 h-4" aria-hidden="true" />
-              Archive
+              Past Challenges
             </Link>
           </div>
         </section>

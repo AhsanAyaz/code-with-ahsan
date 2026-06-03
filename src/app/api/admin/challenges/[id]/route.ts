@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getChallenge, updateChallenge } from "@/services/ChallengeService";
+import { getChallenge, updateChallenge, deleteChallenge } from "@/services/ChallengeService";
 import { verifyAdminRequest } from "@/lib/adminAuth";
 import { parseChallengeUpdatePayload } from "@/lib/challenges";
 import { announceChallenge, isDiscordConfigured } from "@/lib/discord";
@@ -84,6 +84,41 @@ export async function PUT(
     console.error("Error updating challenge:", error);
     return NextResponse.json(
       { error: "Failed to update challenge" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * DELETE /api/admin/challenges/[id]
+ * Deletes a challenge.
+ * Requires admin authentication.
+ */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    if (!(await verifyAdminRequest(request))) {
+      return NextResponse.json(
+        { error: "Admin authentication required" },
+        { status: 401 }
+      );
+    }
+
+    const { id } = await params;
+    const existingChallenge = await getChallenge(id);
+    if (!existingChallenge) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    await deleteChallenge(id);
+
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error) {
+    console.error("Error deleting challenge:", error);
+    return NextResponse.json(
+      { error: "Failed to delete challenge" },
       { status: 500 }
     );
   }

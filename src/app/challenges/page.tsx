@@ -87,7 +87,7 @@ export default function ChallengesPage() {
               </Link>
               <Link href="/challenges/archive" className="btn btn-outline">
                 <Archive className="w-4 h-4" aria-hidden="true" />
-                Archive
+                Past Challenges
               </Link>
             </div>
           </div>
