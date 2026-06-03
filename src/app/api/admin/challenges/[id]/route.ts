@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getChallenge, updateChallenge } from "@/services/ChallengeService";
 import { verifyAdminRequest } from "@/lib/adminAuth";
 import { parseChallengeUpdatePayload } from "@/lib/challenges";
+import { announceChallenge, isDiscordConfigured } from "@/lib/discord";
 
 /**
  * GET /api/admin/challenges/[id]
@@ -58,7 +59,25 @@ export async function PUT(
       );
     }
 
+    const existingChallenge = await getChallenge(id);
+    if (!existingChallenge) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
     await updateChallenge(id, parsed.data);
+
+    if (
+      existingChallenge.status !== "active" &&
+      parsed.data.status === "active" &&
+      isDiscordConfigured()
+    ) {
+      try {
+        const updatedChallenge = { ...existingChallenge, ...parsed.data };
+        await announceChallenge(updatedChallenge);
+      } catch (err) {
+        console.error("Failed to send Discord challenge announcement:", err);
+      }
+    }
     
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {

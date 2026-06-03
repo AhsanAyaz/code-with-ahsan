@@ -871,6 +871,9 @@ const MODERATOR_ROLE_ID = "874774318779887656";
 const PROJECT_COLLABORATION_CHANNEL_ID = "1419645803751805111";
 const PROJECT_COLLABORATOR_ROLE_ID = "1447918848203427840";
 
+// #monthly-learning-challengers channel ID for monthly challenge announcements
+const MONTHLY_LEARNING_CHALLENGES_CHANNEL_ID = "1498942172488007780";
+
 /**
  * Assign a Discord role to a user
  * This is a fire-and-forget operation - failures are logged but do not throw
@@ -1044,6 +1047,71 @@ export async function sendMentorshipCompletionAnnouncement(
     return success;
   } catch (error) {
     log.error("[Discord] Error sending completion announcement:", error);
+    return false;
+  }
+}
+
+/**
+ * Announce a new challenge to the monthly learning challengers channel.
+ * Tags @everyone as requested.
+ *
+ * @param challenge The challenge that was published.
+ */
+export async function announceChallenge(
+  challenge: {
+    id: string;
+    title: string;
+    topic: string;
+    difficulty: string;
+    startDate: string;
+    endDate: string;
+  }
+): Promise<boolean> {
+  log.debug(`Sending monthly challenge announcement for: ${challenge.title}`);
+
+  try {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://codewithahsan.dev";
+    const challengeUrl = `${siteUrl}/challenges/${challenge.id}`;
+
+    const formatDate = (dateStr: string) => {
+      try {
+        return new Date(dateStr).toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        });
+      } catch {
+        return dateStr;
+      }
+    };
+
+    const formattedStart = formatDate(challenge.startDate);
+    const formattedEnd = formatDate(challenge.endDate);
+
+    const message =
+      `📢 **New Monthly Challenge Published!** 🚀\n\n` +
+      `@everyone, a new challenge has just been posted: **${challenge.title}**!\n\n` +
+      `• **Topic:** ${challenge.topic}\n` +
+      `• **Difficulty:** ${challenge.difficulty.toUpperCase()}\n` +
+      `• **Duration:** ${formattedStart} to ${formattedEnd}\n\n` +
+      `Check out the details, deliverables, resources, and submit your project here:\n` +
+      `👉 ${challengeUrl}\n\n` +
+      `Good luck! 💻✨`;
+
+    const success = await sendChannelMessage(
+      MONTHLY_LEARNING_CHALLENGES_CHANNEL_ID,
+      message
+    );
+
+    if (success) {
+      log.debug(`Monthly challenge announcement sent successfully`);
+    } else {
+      log.error(`[Discord] Failed to send monthly challenge announcement`);
+    }
+
+    return success;
+  } catch (error) {
+    log.error("[Discord] Error sending monthly challenge announcement:", error);
     return false;
   }
 }
