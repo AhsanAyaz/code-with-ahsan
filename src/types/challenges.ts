@@ -77,4 +77,21 @@ export interface ChallengeParticipant {
   userName: string;
   userAvatar?: string;
   joinedAt: string;
+  // Captured at join for later certificate sharing. Admin-only — never exposed
+  // on public participant listings.
+  email?: string;
+  discordUsername?: string;
+}
+
+/**
+ * Public-safe view of a participant for the challenge detail page.
+ * Omits contact info (email/discord) and adds submission status.
+ */
+export interface ChallengeParticipantStatus {
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  joinedAt: string;
+  submitted: boolean;
+  submittedAt?: string;
 }

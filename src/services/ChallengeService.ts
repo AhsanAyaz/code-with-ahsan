@@ -3,6 +3,7 @@ import {
   Challenge,
   ChallengeStatus,
   ChallengeParticipant,
+  ChallengeParticipantStatus,
   LeaderboardEntry,
   Submission,
 } from "@/types/challenges";
@@ -108,6 +109,8 @@ function normalizeParticipant(
     userName: data.userName || ANONYMOUS_CHALLENGE_PARTICIPANT,
     userAvatar: data.userAvatar,
     joinedAt: toIsoString(data.joinedAt as FirestoreDateValue),
+    email: data.email,
+    discordUsername: data.discordUsername,
   };
 }
 
@@ -130,8 +133,15 @@ export async function joinChallenge(
   };
 
   const participantToWrite: Partial<ChallengeParticipant> = { ...participant };
+  // Firestore Admin SDK rejects undefined values — strip optional fields when absent.
   if (participantToWrite.userAvatar === undefined) {
     delete participantToWrite.userAvatar;
+  }
+  if (participantToWrite.email === undefined) {
+    delete participantToWrite.email;
+  }
+  if (participantToWrite.discordUsername === undefined) {
+    delete participantToWrite.discordUsername;
   }
 
   await db.runTransaction(async (transaction) => {
@@ -181,6 +191,46 @@ export async function isChallengeParticipant(
 
   const doc = await docRef.get();
   return doc.exists;
+}
+
+/**
+ * Lists all participants of a challenge alongside whether they have submitted a
+ * project. Returns a public-safe shape (no email/discord). Submitted participants
+ * are listed first, then by join time.
+ *
+ * @param challengeId The ID of the challenge.
+ * @returns Participants with their submission status.
+ */
+export async function getChallengeParticipantsWithStatus(
+  challengeId: string,
+): Promise<ChallengeParticipantStatus[]> {
+  const [participantsSnap, submissions] = await Promise.all([
+    db
+      .collection(CHALLENGE_PARTICIPANTS_COLLECTION)
+      .where("challengeId", "==", challengeId)
+      .get(),
+    getSubmissionsForChallenge(challengeId),
+  ]);
+
+  const submissionByUser = new Map(submissions.map((s) => [s.userId, s]));
+
+  const participants = participantsSnap.docs.map((doc) => {
+    const participant = normalizeParticipant(doc);
+    const submission = submissionByUser.get(participant.userId);
+    return {
+      userId: participant.userId,
+      userName: participant.userName,
+      userAvatar: participant.userAvatar,
+      joinedAt: participant.joinedAt,
+      submitted: Boolean(submission),
+      submittedAt: submission?.submittedAt,
+    };
+  });
+
+  return participants.sort((a, b) => {
+    if (a.submitted !== b.submitted) return a.submitted ? -1 : 1;
+    return a.joinedAt.localeCompare(b.joinedAt);
+  });
 }
 
 function monthRange(yearMonth?: string) {

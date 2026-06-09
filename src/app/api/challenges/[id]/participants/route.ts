@@ -81,7 +81,7 @@ export async function POST(
       );
     }
 
-    const { userName, userAvatar } =
+    const { userName, userAvatar, email, discordUsername } =
       await getChallengeParticipantProfile(userId);
 
     const participant = await joinChallenge({
@@ -89,6 +89,8 @@ export async function POST(
       userId,
       userName,
       userAvatar,
+      email,
+      discordUsername,
     });
 
     return NextResponse.json({ success: true, participant }, { status: 201 });
