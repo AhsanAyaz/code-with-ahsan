@@ -11,6 +11,8 @@ export default function LoupeFeedback() {
       init({
         apiKey,
         position: "bottom-right",
+        // Lift the button above the bottom-right toast stack so they don't overlap.
+        offset: { x: 16, y: 90 },
         showDelayMs: 3000,
       });
       return () => destroy();
