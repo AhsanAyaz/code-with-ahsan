@@ -292,6 +292,7 @@ export function formatChallengeDateRange(
     month: variant === "long" ? "long" : "short",
     day: "numeric",
     year: "numeric",
+    timeZone: "UTC",
   });
 
   return `${formatter.format(new Date(startDate))} - ${formatter.format(new Date(endDate))}`;

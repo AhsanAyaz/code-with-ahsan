@@ -111,10 +111,10 @@ export default function AdminChallengesPage() {
                   <td>{challenge.difficulty}</td>
                   <td>
                      <div className="text-sm">
-                       Start: {new Date(challenge.startDate).toLocaleDateString()}
+                       Start: {new Date(challenge.startDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}
                      </div>
                      <div className="text-sm">
-                       End: {new Date(challenge.endDate).toLocaleDateString()}
+                       End: {new Date(challenge.endDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}
                      </div>
                   </td>
                   <td>

@@ -28,7 +28,10 @@ interface ChallengeFormProps {
  * Optional parameter to set the time to the end of the day.
  */
 function dateInputToIso(value: string, endOfDay = false) {
-  const time = endOfDay ? "T23:59:59.999" : "T00:00:00.000";
+  // Append "Z" so the date input is interpreted as UTC midnight, not the admin's
+  // local timezone. Otherwise admins ahead of UTC see the stored calendar day
+  // shift backward by one (e.g. Jun 1 -> May 31).
+  const time = endOfDay ? "T23:59:59.999Z" : "T00:00:00.000Z";
   return new Date(`${value}${time}`).toISOString();
 }
 
