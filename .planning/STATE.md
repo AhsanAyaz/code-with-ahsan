@@ -29,7 +29,7 @@ Milestone: v7.0 Agentic Orchestra Upgrade — Phase 07 executing (Wave 1 done)
 Phase: 07 (agent-safety-observability-callbacks) — EXECUTING
 Plan: 3 of 4 ✅ (07-01 PII ✅, 07-02 tool-cache ✅, 07-03 lifecycle logging ✅) — 07-04 pending (HUMAN-GATED)
 Status: 07-03 GREEN (13 lifecycle tests + 14 cache + 16 PII = 175 total pass; 12 LlmAgent attachments; wrapper-skip verified for SequentialAgent + ParallelAgent)
-Last activity: 2026-05-23 — Phase 07 Wave 3 (07-03) complete
+Last activity: 2026-06-09 — Completed quick task 260609-ep2: fix monthly challenge bugs (submission, participate button, dates)
 
 ## Next Moves (queued, not in flight)
 
@@ -198,6 +198,7 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | 260521-jsd | SEO indexability fixes — generateStaticParams (216 course posts + 9 detail + 9 resources + 3 events SSG), per-page canonicals, Article+Course JSON-LD, 26-of-27 GSC-404 → 308 redirects, ngBook→Amazon convergence | 2026-05-21 | 370fcf8 | [260521-jsd-seo-indexability-fixes-generatestaticpar](./quick/260521-jsd-seo-indexability-fixes-generatestaticpar/) |
 | 260522-a2f | Phase 5 gap-close — INV-1 (reportsOnTime derived on /me), INV-2 (onboarding checklist persistence via schema extension + Firestore dot-path merge), INV-4 (cohort.endDate parallel-read on admin member GET). 4 commits, 35/35 tests pass, verifier 8/8 PASS. | 2026-05-22 | aada493 | [260522-a2f-phase-5-verification-gap-close-invariant](./quick/260522-a2f-phase-5-verification-gap-close-invariant/) |
 | 260522-b08 | Phase 5 INV-3 leaderboard close-out — daily snapshot pipeline restored (07:00 UTC GH Actions cron writes `leaderboard_snapshots/{cohortId}`; route reads doc with live-compute fallback); `rank` attached to top3 entries; `ownRank` shape renamed to `{ referrals, events, reportsOnTime }`; `graceActive` computed server-side; humanized "Updated N ago" label; SUMMARYs 05-02/05-03 corrected. 7 commits, library 54/54 + API 44/44 tests pass, tsc clean, verifier 8/8 PASS. | 2026-05-22 | 8a890ab | [260522-b08-phase-5-inv-3-leaderboard-daily-snapshot](./quick/260522-b08-phase-5-inv-3-leaderboard-daily-snapshot/) |
+| 260609-ep2 | Fix monthly challenge bugs — submission 500 (undefined demoUrl rejected by Firestore Admin), Participate button now disables + shows "Joined", and challenge dates stored/displayed as UTC to stop Jun 1 → May 31 off-by-one. 3 commits, tsc + lint clean, verified E2E against emulators. | 2026-06-09 | 3a96467 | [260609-ep2-fix-monthly-challenge-bugs-project-submi](./quick/260609-ep2-fix-monthly-challenge-bugs-project-submi/) |
 | Phase 01 P01 | 2min | 1 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P02 | 3 min | 3 tasks | 6 files |
 | Phase 01-foundation-roles-array-migration P04 | 2 min | 2 tasks | 3 files |
