@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import { authFetch } from "@/lib/apiClient";
@@ -20,6 +20,31 @@ export default function ParticipateButton({
   const { user } = useMentorship();
   const toast = useToast();
   const [joining, setJoining] = useState(false);
+  const [joined, setJoined] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    let cancelled = false;
+    const fetchJoinStatus = async () => {
+      try {
+        const res = await authFetch(
+          `/api/challenges/${challengeId}/participants`,
+          { method: "GET" },
+        );
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled) setJoined(Boolean(data.joined));
+      } catch (err) {
+        console.error("Error fetching join status:", err);
+      }
+    };
+
+    fetchJoinStatus();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, challengeId]);
 
   const handleJoin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -40,6 +65,7 @@ export default function ParticipateButton({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to join challenge");
 
+      setJoined(true);
       toast.success(
         "You joined the challenge — you can now submit your project.",
       );
@@ -57,9 +83,9 @@ export default function ParticipateButton({
       type="button"
       className="btn btn-sm btn-primary"
       onClick={handleJoin}
-      disabled={joining}
+      disabled={joining || joined}
     >
-      {joining ? "Joining..." : "Participate"}
+      {joined ? "Joined" : joining ? "Joining..." : "Participate"}
     </button>
   );
 }

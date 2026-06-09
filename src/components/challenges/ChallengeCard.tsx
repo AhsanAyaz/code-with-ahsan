@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { CalendarDays, Trophy } from 'lucide-react';
 import { AuthContext } from '@/contexts/AuthContext';
@@ -24,6 +24,31 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
   const { user } = useMentorship();
   const toast = useToast();
   const [joining, setJoining] = useState(false);
+  const [joined, setJoined] = useState(false);
+
+  useEffect(() => {
+    if (!user || challenge.status !== 'active') return;
+
+    let cancelled = false;
+    const fetchJoinStatus = async () => {
+      try {
+        const response = await authFetch(
+          `/api/challenges/${challenge.id}/participants`,
+          { method: 'GET' },
+        );
+        if (!response.ok) return;
+        const data = await response.json();
+        if (!cancelled) setJoined(Boolean(data.joined));
+      } catch (error) {
+        console.error('Error fetching join status:', error);
+      }
+    };
+
+    fetchJoinStatus();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, challenge.id, challenge.status]);
 
   const handleJoin = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -46,6 +71,7 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
         throw new Error(data.error || 'Unable to join challenge');
       }
 
+      setJoined(true);
       toast.success('You joined the challenge! You can now submit your project.');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to join challenge';
@@ -95,9 +121,9 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
               type="button"
               className="btn btn-sm btn-primary"
               onClick={handleJoin}
-              disabled={joining}
+              disabled={joining || joined}
             >
-              {joining ? 'Joining...' : 'Participate'}
+              {joined ? 'Joined' : joining ? 'Joining...' : 'Participate'}
             </button>
           </div>
         )}
