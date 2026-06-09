@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Archive, Medal, Send, Trophy } from "lucide-react";
+import { Archive, Medal, Send, Trophy, Users } from "lucide-react";
 import SubmissionGallery from "@/components/challenges/SubmissionGallery";
 import MarkdownRenderer from "@/components/roadmaps/MarkdownRenderer";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import {
   getChallenge,
   getChallengeParticipantsCount,
+  getChallengeParticipantsWithStatus,
   getLeaderboard,
   getSubmissionsForChallenge,
 } from "@/services/ChallengeService";
@@ -15,7 +16,10 @@ import {
   CHALLENGE_STATUS_BADGE_CLASSES,
   formatChallengeDateRange,
 } from "@/lib/challenges";
-import type { LeaderboardEntry } from "@/types/challenges";
+import type {
+  ChallengeParticipantStatus,
+  LeaderboardEntry,
+} from "@/types/challenges";
 
 export const dynamic = "force-dynamic";
 
@@ -75,6 +79,57 @@ function MiniLeaderboard({ entries }: { entries: LeaderboardEntry[] }) {
 }
 
 /**
+ * Lists everyone who joined the challenge with their submission status.
+ */
+function ParticipantsList({
+  participants,
+}: {
+  participants: ChallengeParticipantStatus[];
+}) {
+  if (participants.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-base-300 bg-base-200 p-6 text-center">
+        <Users
+          className="w-8 h-8 mx-auto text-base-content/30 mb-2"
+          aria-hidden="true"
+        />
+        <p className="font-semibold text-sm">No participants yet</p>
+        <p className="text-xs text-base-content/60 mt-1">
+          Be the first to join this challenge!
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+      {participants.map((participant) => (
+        <div
+          key={participant.userId}
+          className="flex items-center gap-3 p-3 rounded-lg bg-base-200 border border-base-300"
+        >
+          <ProfileAvatar
+            photoURL={participant.userAvatar}
+            displayName={participant.userName}
+            size="sm"
+          />
+          <p className="font-semibold text-sm truncate min-w-0 flex-1">
+            {participant.userName}
+          </p>
+          <span
+            className={`badge badge-sm shrink-0 ${
+              participant.submitted ? "badge-success" : "badge-ghost"
+            }`}
+          >
+            {participant.submitted ? "Submitted" : "Not submitted"}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
  * Individual Challenge Detail Page.
  * Displays the full brief, timeline, deliverables, a mini leaderboard,
  * and a gallery of user submissions. Uses SSR to fetch data.
@@ -91,11 +146,13 @@ export default async function ChallengeDetailPage({
     notFound();
   }
 
-  const [submissions, leaderboard, participantCount] = await Promise.all([
-    getSubmissionsForChallenge(challenge.id),
-    getLeaderboard(10),
-    getChallengeParticipantsCount(challenge.id),
-  ]);
+  const [submissions, leaderboard, participantCount, participants] =
+    await Promise.all([
+      getSubmissionsForChallenge(challenge.id),
+      getLeaderboard(10),
+      getChallengeParticipantsCount(challenge.id),
+      getChallengeParticipantsWithStatus(challenge.id),
+    ]);
 
   const statusBadgeClass = CHALLENGE_STATUS_BADGE_CLASSES[challenge.status];
 
@@ -216,6 +273,18 @@ export default async function ChallengeDetailPage({
                 </Link>
               </div>
               <MiniLeaderboard entries={leaderboard} />
+            </div>
+
+            {/* Participants */}
+            <div className="bg-base-200 border border-base-300 rounded-xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-bold text-lg flex items-center gap-2">
+                  <Users className="w-5 h-5 text-primary" aria-hidden="true" />
+                  Participants
+                </h2>
+                <span className="badge badge-lg">{participantCount}</span>
+              </div>
+              <ParticipantsList participants={participants} />
             </div>
 
             {/* Deliverables */}
