@@ -326,6 +326,9 @@ export async function createSubmission(
   if (submissionToWrite.userAvatar === undefined) {
     delete submissionToWrite.userAvatar;
   }
+  if (submissionToWrite.demoUrl === undefined) {
+    delete submissionToWrite.demoUrl;
+  }
 
   const participantRef = db
     .collection(CHALLENGE_PARTICIPANTS_COLLECTION)
