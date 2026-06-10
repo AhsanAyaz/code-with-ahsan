@@ -2,128 +2,296 @@ import { Metadata } from "next";
 // @ts-ignore
 import siteMetadata from "@/data/siteMetadata";
 import Image from "next/image";
+import { buildBookLd, buildFaqLd, FaqItem } from "@/lib/seo/bookSchema";
+
+const BOOK_TITLE = "Mastering Angular Signals";
+const BOOK_SUBTITLE =
+  "A Practical Guide to Modern Reactivity, Performance, and Migration";
+const AUTHOR_NAME = "Muhammad Ahsan Ayaz";
+const AUTHOR_CREDS =
+  "Google Developer Expert (GDE) in AI & Angular, Speaker, Software Architect, author of four books";
+const AUTHOR_URL = "https://codewithahsan.dev";
+const GITHUB_REPO = "https://github.com/AhsanAyaz/modern-angular-signals-book";
+const AMAZON_LINK = "https://www.amazon.com/dp/B0FF9LSHJN/";
+const LEANPUB_LINK = "https://leanpub.com/mastering-angular-signals/c/GO2026";
+const BOOK_IMAGE = "/static/images/books/mastering-angular-signals-3d.png";
+const PAGE_PATH = "/books/mastering-angular-signals";
+
+const SITE_URL: string = siteMetadata.siteUrl || "https://codewithahsan.dev";
+const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
+const PAGE_DESCRIPTION =
+  "Mastering Angular Signals by Muhammad Ahsan Ayaz — the definitive, hands-on guide to Angular v22 Signals: signal/computed/effect, linkedSignal, resource & httpResource, Signal Forms, zoneless change detection, testing, and migrating RxJS/NgRx codebases.";
+
+const FAQ_ITEMS: FaqItem[] = [
+  {
+    question: "Which version of Angular does the book cover?",
+    answer:
+      "The book is updated for Angular v22 and covers the now-stable Signals APIs — including signal(), computed(), effect(), linkedSignal(), resource()/rxResource()/httpResource(), and Signal Forms — along with zoneless change detection and OnPush-by-default.",
+  },
+  {
+    question: "Is this book good for migrating from RxJS or NgRx?",
+    answer:
+      "Yes. Migration is a core focus. A dedicated chapter walks through interoperability (toSignal/toObservable, takeUntilDestroyed) and a practical, step-by-step plan for moving RxJS- and NgRx-heavy applications to a signal-based architecture.",
+  },
+  {
+    question: "Do I need prior experience with Angular Signals?",
+    answer:
+      "No. The book starts from the fundamentals (signal, computed, effect) and progressively builds to advanced patterns, testing strategies, and performance optimization, so it works for both newcomers to Signals and experienced Angular developers.",
+  },
+  {
+    question: "What formats are available and where can I buy it?",
+    answer:
+      "It is available as a Kindle eBook and paperback on Amazon, and as a DRM-free PDF/EPUB on Leanpub. Both editions are kept up to date for Angular v22.",
+  },
+  {
+    question: "Is the example code available?",
+    answer:
+      "Yes. A complete, runnable code repository accompanies the book on GitHub, with one app per chapter so you can follow along and experiment.",
+  },
+];
+
+const REVIEWS: { name: string; quote: string }[] = [
+  {
+    name: "Gary Brock",
+    quote:
+      "A transformative resource for Angular developers, demystifying Signals with clear, practical explanations and real-world examples — plus a comprehensive migration roadmap that saves invaluable time.",
+  },
+  {
+    name: "Quincy",
+    quote:
+      "I finally understand how to replace my messy RxJS code with simpler, cleaner logic. The migration roadmap alone saved me hours.",
+  },
+  {
+    name: "duncan faulkner",
+    quote:
+      "A really great book on Angular Signals — really good explanations of what the methods and properties do, with great code examples. If you want to learn signals, this is a must-read.",
+  },
+];
 
 export const metadata: Metadata = {
-  title: `Mastering Angular Signals by Muhammad Ahsan Ayaz - ${siteMetadata.author}`,
-  description:
-    "Unlock the power of Angular Signals! A comprehensive guide by Muhammad Ahsan Ayaz covering core concepts, advanced patterns, testing, and migration strategies for building performant and reactive Angular applications.",
+  title: `Mastering Angular Signals (Angular v22) by ${AUTHOR_NAME}`,
+  description: PAGE_DESCRIPTION,
+  keywords: [
+    "Angular Signals",
+    "Angular Signals book",
+    "Angular v22",
+    "RxJS to Signals migration",
+    "Angular zoneless",
+    "Signal Forms",
+    "Angular resource API",
+    "Muhammad Ahsan Ayaz",
+  ],
+  alternates: { canonical: PAGE_URL },
+  openGraph: {
+    title: `Mastering Angular Signals — ${BOOK_SUBTITLE}`,
+    description: PAGE_DESCRIPTION,
+    url: PAGE_URL,
+    type: "book",
+    images: [{ url: BOOK_IMAGE, width: 250, height: 350, alt: BOOK_TITLE }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Mastering Angular Signals (Angular v22)`,
+    description: PAGE_DESCRIPTION,
+    images: [BOOK_IMAGE],
+  },
 };
 
-export default function ModernAngularSignalsBookPage() {
-  const bookTitle = "Mastering Angular Signals";
-  const authorName = "Muhammad Ahsan Ayaz";
-  const authorCreds =
-    "GDE in Angular, Speaker, Software Architect, Author of Angular Cookbook";
-  const githubRepo = "https://github.com/AhsanAyaz/modern-angular-signals-book";
-  const ctaLink = "https://www.amazon.com/dp/B0FF9LSHJN/";
-  const ctaText = "Get your copy";
+export default function MasteringAngularSignalsBookPage() {
+  const bookLd = buildBookLd({
+    name: `${BOOK_TITLE}: ${BOOK_SUBTITLE}`,
+    description: PAGE_DESCRIPTION,
+    url: PAGE_URL,
+    baseUrl: SITE_URL,
+    imageUrl: `${SITE_URL}${BOOK_IMAGE}`,
+    authorName: AUTHOR_NAME,
+    authorUrl: AUTHOR_URL,
+    isbn: "9798289015785",
+    datePublished: "2025-06-20",
+    inLanguage: "en",
+    ratingValue: 4.6,
+    reviewCount: 15,
+    offers: [
+      {
+        name: "Paperback",
+        price: "29.99",
+        priceCurrency: "USD",
+        url: AMAZON_LINK,
+      },
+      {
+        name: "Kindle",
+        price: "10.59",
+        priceCurrency: "USD",
+        url: AMAZON_LINK,
+      },
+      { name: "Leanpub (PDF/EPUB)", url: LEANPUB_LINK },
+    ],
+  });
+  const faqLd = buildFaqLd(FAQ_ITEMS);
 
-  const ctaButton = () => (
-    <div className="not-prose">
+  const ctaButtons = () => (
+    <div className="not-prose flex flex-col sm:flex-row gap-3 justify-center">
       <a
-        href={ctaLink}
+        href={AMAZON_LINK}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center justify-center px-6 py-3 border border-transparent !font-medium rounded-md shadow !text-white bg-primary hover:brightness-90 dark:bg-primary dark:hover:brightness-90"
+        className="inline-flex items-center justify-center px-6 py-3 border border-transparent !font-medium rounded-md shadow !text-white bg-primary hover:brightness-90"
       >
-        {ctaText}
+        Get it on Amazon
+      </a>
+      <a
+        href={LEANPUB_LINK}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center justify-center px-6 py-3 !font-medium rounded-md border border-primary !text-primary hover:bg-primary hover:!text-white"
+      >
+        Get it on Leanpub
       </a>
     </div>
   );
 
   return (
     <div className="page-padding">
+      {bookLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(bookLd) }}
+        />
+      ) : null}
+      {faqLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      ) : null}
+
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
         <div className="pt-6 pb-8 space-y-2 md:space-y-5">
+          <p className="text-center text-sm font-semibold uppercase tracking-wide text-primary">
+            Updated for Angular v22
+          </p>
           <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-base-content sm:text-4xl sm:leading-10 md:text-6xl md:leading-14 text-center">
-            {bookTitle}
+            {BOOK_TITLE}
           </h1>
           <p className="text-center text-lg leading-7 text-gray-500 dark:text-gray-400">
-            A Practical Guide to Modern Reactivity, Performance, and Migration
+            {BOOK_SUBTITLE}
           </p>
           <p className="text-center text-sm leading-5 text-gray-500 dark:text-gray-400">
-            By {authorName} - {authorCreds}
+            By {AUTHOR_NAME} — {AUTHOR_CREDS}. Foreword by Mark Thompson
+            (Angular team, Google). Edited by Sonu Kapoor (GDE).
           </p>
-          <div className="flex justify-center mt-6">{ctaButton()}</div>
+          <p className="text-center text-sm leading-5 text-gray-500 dark:text-gray-400">
+            ★ 4.6 average rating on Amazon
+          </p>
+          <div className="flex justify-center mt-6">{ctaButtons()}</div>
         </div>
 
         <div className="prose dark:prose-invert max-w-none pt-8 pb-8">
           <div className="flex flex-col items-center md:flex-row md:items-start md:space-x-8">
             <div className="flex-shrink-0 mb-4 md:mb-0">
               <Image
-                src={"/static/images/books/mastering-angular-signals-3d.png"}
-                alt={bookTitle}
+                src={BOOK_IMAGE}
+                alt={BOOK_TITLE}
                 width={250}
                 height={350}
                 className="rounded-md shadow-lg"
               />
             </div>
             <div className="flex-grow">
-              <h2>About This Book</h2>
+              <h2>End state-management headaches in Angular</h2>
               <p>
-                Angular Signals represent a fundamental shift in how we build
-                reactive applications. This book is your comprehensive guide to
-                mastering this powerful new reactivity model, enabling you to
-                build more efficient, maintainable, and performant Angular
-                applications.
+                Tired of wrestling with{" "}
+                <code>ExpressionChangedAfterItHasBeenChecked</code>, tangled
+                RxJS chains, and slow, unpredictable change detection? Angular
+                Signals are the fix — and this book is your complete, practical
+                path to mastering them.
               </p>
               <p>
-                Authored by Muhammad Ahsan Ayaz, a Google Developer Expert in
-                Angular and seasoned Software Architect,{" "}
-                <em>Mastering Angular Signals</em> distills practical knowledge
-                from years of experience working with Angular.
+                Authored by <strong>{AUTHOR_NAME}</strong>, a Google Developer
+                Expert in AI &amp; Angular and seasoned Software Architect,{" "}
+                <em>Mastering Angular Signals</em> distills years of real-world
+                experience into a hands-on guide — with a foreword from the
+                Angular team at Google.
               </p>
 
-              <h3>What You Will Learn</h3>
-              <p>
-                Journey from the foundational building blocks to advanced
-                techniques. This book covers:
-              </p>
+              <h3>This book is for you if you:</h3>
               <ul>
                 <li>
-                  The core concepts: <code>signal()</code>,{" "}
-                  <code>computed()</code>, and <code>effect()</code>
+                  Are struggling to understand when and how to use Angular
+                  Signals effectively.
                 </li>
                 <li>
-                  Managing asynchronous operations with <code>resource()</code>{" "}
-                  and <code>rxResource()</code>
+                  Want to build modern, <strong>zoneless applications</strong>{" "}
+                  but don&apos;t know where to start.
                 </li>
                 <li>
-                  Seamless component communication using signal-based{" "}
-                  <code>input()</code>, <code>output()</code>, and{" "}
-                  <code>model()</code> APIs
-                </li>
-                <li>Effective strategies for testing your Signal-based code</li>
-                <li>
-                  Practical techniques for migrating existing RxJS-heavy
-                  applications
+                  Need a clear, practical plan to{" "}
+                  <strong>migrate an existing RxJS or NgRx codebase</strong>.
                 </li>
                 <li>
-                  Performance considerations and architectural best practices
+                  Are ready to write simpler, cleaner, and dramatically more
+                  performant Angular code.
                 </li>
               </ul>
 
-              <div className="flex justify-center my-6"> {ctaButton()} </div>
+              <div className="flex justify-center my-6">{ctaButtons()}</div>
 
-              <h3>Dive into Practical Examples</h3>
-              <p>
-                Build confidence with hands-on examples demonstrating real-world
-                scenarios, including:
-              </p>
+              <h3>What you will learn</h3>
               <ul>
-                <li>Managing component state and user input</li>
-                <li>Handling data fetching from APIs</li>
-                <li>Building interactive lists with DOM interaction</li>
-                <li>Implementing notification panels and shopping carts</li>
+                <li>
+                  The core building blocks: <code>signal()</code>,{" "}
+                  <code>computed()</code>, and <code>effect()</code>.
+                </li>
+                <li>
+                  Writable derived state with <code>linkedSignal()</code> and
+                  async data with <code>resource()</code>,{" "}
+                  <code>rxResource()</code>, and <code>httpResource()</code>.
+                </li>
+                <li>
+                  Signal-based components with <code>input()</code>,{" "}
+                  <code>output()</code>, <code>model()</code>, and signal
+                  queries — plus Signal Forms and Angular Aria.
+                </li>
+                <li>
+                  Interop and a step-by-step strategy for migrating RxJS/NgRx
+                  code to Signals.
+                </li>
+                <li>
+                  Testing Signal-based code, plus performance and zoneless
+                  best practices.
+                </li>
               </ul>
-              <p>A dedicated code repository is available on GitHub:</p>
+
+              <h3>What readers are saying</h3>
+              {REVIEWS.map((r) => (
+                <blockquote key={r.name}>
+                  <p>“{r.quote}”</p>
+                  <p>
+                    <strong>— {r.name}</strong> (Amazon review)
+                  </p>
+                </blockquote>
+              ))}
+
+              <h3>Follow along with real code</h3>
               <p>
-                <a href={githubRepo} target="_blank" rel="noopener noreferrer">
-                  {githubRepo}
+                Every example is backed by a complete, runnable repository, with
+                one app per chapter:
+              </p>
+              <p>
+                <a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer">
+                  {GITHUB_REPO}
                 </a>
               </p>
 
-              <div className="flex justify-center my-6"> {ctaButton()}</div>
+              <h3>Frequently asked questions</h3>
+              {FAQ_ITEMS.map((f) => (
+                <div key={f.question}>
+                  <h4>{f.question}</h4>
+                  <p>{f.answer}</p>
+                </div>
+              ))}
+
+              <div className="flex justify-center my-6">{ctaButtons()}</div>
             </div>
           </div>
         </div>
