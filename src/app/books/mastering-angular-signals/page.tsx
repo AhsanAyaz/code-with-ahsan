@@ -13,7 +13,9 @@ const AUTHOR_CREDS =
 const AUTHOR_URL = "https://codewithahsan.dev";
 const GITHUB_REPO = "https://github.com/AhsanAyaz/modern-angular-signals-book";
 const AMAZON_LINK = "https://www.amazon.com/dp/B0FF9LSHJN/";
-const LEANPUB_LINK = "https://leanpub.com/mastering-angular-signals/c/GO2026";
+// Default to the clean Leanpub URL (suggested price). For a time-boxed launch,
+// temporarily swap to a coupon link, e.g. `.../mastering-angular-signals/c/V22LAUNCH`.
+const LEANPUB_LINK = "https://leanpub.com/mastering-angular-signals";
 const BOOK_IMAGE = "/static/images/books/mastering-angular-signals-3d.png";
 const PAGE_PATH = "/books/mastering-angular-signals";
 
@@ -121,7 +123,7 @@ export default function MasteringAngularSignalsBookPage() {
       },
       {
         name: "Kindle",
-        price: "10.59",
+        price: "9.99",
         priceCurrency: "USD",
         url: AMAZON_LINK,
       },
@@ -177,12 +179,23 @@ export default function MasteringAngularSignalsBookPage() {
             {BOOK_SUBTITLE}
           </p>
           <p className="text-center text-sm leading-5 text-gray-500 dark:text-gray-400">
-            By {AUTHOR_NAME} — {AUTHOR_CREDS}. Foreword by Mark Thompson
-            (Angular team, Google). Edited by Sonu Kapoor (GDE).
+            By {AUTHOR_NAME} — {AUTHOR_CREDS}.
           </p>
-          <p className="text-center text-sm leading-5 text-gray-500 dark:text-gray-400">
-            ★ 4.6 average rating on Amazon
-          </p>
+          <div className="not-prose flex flex-wrap justify-center gap-2 pt-1">
+            {[
+              "Foreword by the Angular team at Google",
+              "Edited by GDE Sonu Kapoor",
+              "★ 4.6 on Amazon",
+              "12M+ install library author",
+            ].map((badge) => (
+              <span
+                key={badge}
+                className="inline-flex items-center rounded-full border border-primary/40 bg-primary/5 px-3 py-1 text-xs font-medium text-primary"
+              >
+                {badge}
+              </span>
+            ))}
+          </div>
           <div className="flex justify-center mt-6">{ctaButtons()}</div>
         </div>
 
@@ -236,29 +249,67 @@ export default function MasteringAngularSignalsBookPage() {
 
               <div className="flex justify-center my-6">{ctaButtons()}</div>
 
+              <h3>New &amp; stable in Angular v22 — and covered in depth</h3>
+              <p>
+                The APIs that make Angular v22 different aren&apos;t previews
+                here — they&apos;re taught with runnable examples:
+              </p>
+              <div className="not-prose flex flex-wrap gap-2 my-4">
+                {[
+                  "Signal Forms (no ControlValueAccessor)",
+                  "Angular Aria (headless a11y)",
+                  "@Service() decorator",
+                  "injectAsync()",
+                  "stable resource() / httpResource()",
+                  "linkedSignal()",
+                ].map((chip) => (
+                  <span
+                    key={chip}
+                    className="inline-flex items-center rounded-md bg-base-200 px-3 py-1 text-sm font-medium text-base-content"
+                  >
+                    {chip}
+                  </span>
+                ))}
+              </div>
+
               <h3>What you will learn</h3>
               <ul>
                 <li>
                   The core building blocks: <code>signal()</code>,{" "}
-                  <code>computed()</code>, and <code>effect()</code>.
+                  <code>computed()</code>, and <code>effect()</code> — with the
+                  mental model that makes them click.
                 </li>
                 <li>
                   Writable derived state with <code>linkedSignal()</code> and
-                  async data with <code>resource()</code>,{" "}
-                  <code>rxResource()</code>, and <code>httpResource()</code>.
+                  async data — <code>resource()</code>, <code>rxResource()</code>,
+                  and <code>httpResource()</code> — for loading, errors, and
+                  refetch, without RxJS boilerplate.
                 </li>
                 <li>
-                  Signal-based components with <code>input()</code>,{" "}
-                  <code>output()</code>, <code>model()</code>, and signal
-                  queries — plus Signal Forms and Angular Aria.
+                  Signal-driven components: <code>input()</code>,{" "}
+                  <code>output()</code>, <code>model()</code>, and signal queries
+                  (<code>viewChild</code>/<code>viewChildren</code>).
                 </li>
                 <li>
-                  Interop and a step-by-step strategy for migrating RxJS/NgRx
-                  code to Signals.
+                  <strong>Signal Forms &amp; Angular Aria</strong> (new and
+                  stable in v22) — type-safe, declarative forms with no{" "}
+                  <code>ControlValueAccessor</code>, plus headless, accessible UI
+                  primitives.
                 </li>
                 <li>
-                  Testing Signal-based code, plus performance and zoneless
-                  best practices.
+                  The new v22 dependency injection — the <code>@Service()</code>{" "}
+                  decorator and <code>injectAsync()</code> for code-split, lazy
+                  services.
+                </li>
+                <li>
+                  A step-by-step strategy for migrating{" "}
+                  <strong>RxJS/NgRx</strong> code to Signals (
+                  <code>toSignal</code>/<code>toObservable</code>,{" "}
+                  <code>takeUntilDestroyed</code>).
+                </li>
+                <li>
+                  Testing Signal-based code, plus zoneless and OnPush
+                  performance best practices.
                 </li>
               </ul>
 
