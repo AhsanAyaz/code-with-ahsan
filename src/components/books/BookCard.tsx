@@ -2,6 +2,8 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Button from "../Button";
 
 import BookInterestModal from "./BookInterestModal";
@@ -15,6 +17,7 @@ export interface Book {
   description: string;
   link?: string | null;
   amazonLink?: string | null;
+  pageUrl?: string | null;
   btnText?: string;
   actionType?: "link" | "interest-form";
 }
@@ -25,10 +28,13 @@ interface BookCardProps {
 
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
 
   const handleClick = () => {
     if (book.actionType === "interest-form") {
       setIsModalOpen(true);
+    } else if (book.pageUrl) {
+      router.push(book.pageUrl);
     } else {
       window.open(book.link || book.amazonLink || "", "_blank");
     }
@@ -59,7 +65,13 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
             )}
           </div>
           <h5 className="text-lg sm:text-xl mb-1 sm:mb-2 line-clamp-1 text-center font-bold text-base-content">
-            {book.title}
+            {book.pageUrl ? (
+              <Link href={book.pageUrl} className="hover:text-primary">
+                {book.title}
+              </Link>
+            ) : (
+              book.title
+            )}
           </h5>
           <h6 className="text-sm sm:text-base mb-3 text-center text-base-content/70">
             {book.edition}

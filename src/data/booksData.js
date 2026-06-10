@@ -16,11 +16,12 @@ const booksData = [
     title: "Mastering Angular Signals",
     description:
       "A Practical Guide to Modern Reactivity, Performance, and Migration.",
-    amazonLink: null,
+    amazonLink: "https://www.amazon.com/dp/B0FF9LSHJN/",
     imageUrl: "/static/images/books/mastering-angular-signals-3d.png",
     author: "Ahsan Ayaz",
     link: "https://leanpub.com/mastering-angular-signals/c/GO2026",
-    btnText: "Get your copy",
+    pageUrl: "/books/mastering-angular-signals",
+    btnText: "Learn more",
     actionType: "link",
   },
   {
