@@ -41,7 +41,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: "What formats are available and where can I buy it?",
     answer:
-      "It is available as a Kindle eBook and paperback on Amazon, and as a DRM-free PDF/EPUB on Leanpub. Both editions are kept up to date for Angular v22.",
+      "It is available as a DRM-free PDF/EPUB on Leanpub, and as a Kindle eBook and paperback on Amazon. Both editions are kept up to date for Angular v22.",
   },
   {
     question: "Is the example code available?",
@@ -112,6 +112,7 @@ export default function MasteringAngularSignalsBookPage() {
     ratingValue: 4.6,
     reviewCount: 15,
     offers: [
+      { name: "Leanpub (PDF/EPUB)", url: LEANPUB_LINK },
       {
         name: "Paperback",
         price: "29.99",
@@ -124,28 +125,27 @@ export default function MasteringAngularSignalsBookPage() {
         priceCurrency: "USD",
         url: AMAZON_LINK,
       },
-      { name: "Leanpub (PDF/EPUB)", url: LEANPUB_LINK },
     ],
   });
   const faqLd = buildFaqLd(FAQ_ITEMS);
 
   const ctaButtons = () => (
-    <div className="not-prose flex flex-col sm:flex-row gap-3 justify-center">
-      <a
-        href={AMAZON_LINK}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center justify-center px-6 py-3 border border-transparent !font-medium rounded-md shadow !text-white bg-primary hover:brightness-90"
-      >
-        Get it on Amazon
-      </a>
+    <div className="not-prose flex flex-col sm:flex-row gap-3 justify-center items-center">
       <a
         href={LEANPUB_LINK}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center justify-center px-6 py-3 !font-medium rounded-md border border-primary !text-primary hover:bg-primary hover:!text-white"
+        className="inline-flex items-center justify-center px-6 py-3 border border-transparent !font-medium rounded-md shadow !text-white bg-primary hover:brightness-90"
       >
         Get it on Leanpub
+      </a>
+      <a
+        href={AMAZON_LINK}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center justify-center px-6 py-3 !font-medium rounded-md border border-primary !text-primary hover:bg-primary hover:!text-white"
+      >
+        Also on Amazon
       </a>
     </div>
   );
