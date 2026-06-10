@@ -186,7 +186,7 @@ export default function MasteringAngularSignalsBookPage() {
               "Foreword by the Angular team at Google",
               "Edited by GDE Sonu Kapoor",
               "★ 4.6 on Amazon",
-              "12M+ install library author",
+              "14M+ install library author",
             ].map((badge) => (
               <span
                 key={badge}
