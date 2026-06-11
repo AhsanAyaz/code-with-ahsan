@@ -5,7 +5,7 @@ milestone_name: Agentic Orchestra Upgrade
 status: verifying
 stopped_at: context exhaustion at 81% (2026-06-01)
 last_updated: "2026-06-01T10:10:20.282Z"
-last_activity: 2026-05-23 — Phase 07 Wave 3 (07-03) complete
+last_activity: 2026-06-11 - Completed quick task 260611-n3r: Add LinkedIn profile link to mentor profile page (GitHub issue #195)
 progress:
   total_phases: 9
   completed_phases: 7
@@ -200,6 +200,7 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | 260522-b08 | Phase 5 INV-3 leaderboard close-out — daily snapshot pipeline restored (07:00 UTC GH Actions cron writes `leaderboard_snapshots/{cohortId}`; route reads doc with live-compute fallback); `rank` attached to top3 entries; `ownRank` shape renamed to `{ referrals, events, reportsOnTime }`; `graceActive` computed server-side; humanized "Updated N ago" label; SUMMARYs 05-02/05-03 corrected. 7 commits, library 54/54 + API 44/44 tests pass, tsc clean, verifier 8/8 PASS. | 2026-05-22 | 8a890ab | [260522-b08-phase-5-inv-3-leaderboard-daily-snapshot](./quick/260522-b08-phase-5-inv-3-leaderboard-daily-snapshot/) |
 | 260609-ep2 | Fix monthly challenge bugs — submission 500 (undefined demoUrl rejected by Firestore Admin), Participate button now disables + shows "Joined", and challenge dates stored/displayed as UTC to stop Jun 1 → May 31 off-by-one. 3 commits, tsc + lint clean, verified E2E against emulators. | 2026-06-09 | 3a96467 | [260609-ep2-fix-monthly-challenge-bugs-project-submi](./quick/260609-ep2-fix-monthly-challenge-bugs-project-submi/) |
 | 260609-f6n | Challenge participants list with submission status on detail page + snapshot email/discord at join for certificates (no form; public list hides contact info). 2 commits, tsc + lint clean, verified E2E against emulators. | 2026-06-09 | 98fd5bf | [260609-f6n-show-challenge-participants-with-submiss](./quick/260609-f6n-show-challenge-participants-with-submiss/) |
+| 260611-n3r | Add LinkedIn profile link to mentor profile page (GitHub issue #195) — self-view backfill nudge + LinkedIn field promoted to Recommended near Current Role in edit form. Feature pre-existed (quick-058); this closes the adoption/discoverability gap. | 2026-06-11 | b7f9966 | [260611-n3r-add-linkedin-profile-link-to-mentor-prof](./quick/260611-n3r-add-linkedin-profile-link-to-mentor-prof/) |
 | Phase 01 P01 | 2min | 1 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P02 | 3 min | 3 tasks | 6 files |
 | Phase 01-foundation-roles-array-migration P04 | 2 min | 2 tasks | 3 files |
