@@ -42,7 +42,7 @@ jobs:
         with:
           node-version: '22.x'
           cache: 'npm'
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - name: Run report-flag cron
         env:
           NODE_ENV: production
@@ -70,7 +70,7 @@ jobs:
         with:
           node-version: '22.x'
           cache: 'npm'
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - name: Run discord-reconciliation cron
         env:
           NODE_ENV: production
@@ -98,7 +98,7 @@ jobs:
         with:
           node-version: '22.x'
           cache: 'npm'
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - name: Run leaderboard-snapshot cron
         env:
           NODE_ENV: production
