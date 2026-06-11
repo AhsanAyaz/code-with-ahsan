@@ -459,6 +459,25 @@ export default function MentorRegistrationForm({
           </label>
         </div>
 
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text font-semibold">LinkedIn Profile URL</span>
+            <span className="label-text-alt text-base-content/60">Recommended</span>
+          </label>
+          <input
+            type="url"
+            placeholder="https://linkedin.com/in/your-profile"
+            className="input input-bordered w-full"
+            value={linkedinUrl}
+            onChange={(e) => setLinkedinUrl(e.target.value)}
+          />
+          <label className="label">
+            <span className="label-text-alt text-base-content/60">
+              Shown publicly on your mentor profile so mentees can verify your experience.
+            </span>
+          </label>
+        </div>
+
         {/* Discord Username */}
         <div className="form-control">
           <label className="label">
@@ -756,26 +775,6 @@ export default function MentorRegistrationForm({
             <span>10</span>
           </div>
         </div>
-      </div>
-
-      {/* LinkedIn Profile URL */}
-      <div className="form-control">
-        <label className="label">
-          <span className="label-text font-semibold">LinkedIn Profile URL</span>
-          <span className="label-text-alt text-base-content/60">Optional</span>
-        </label>
-        <input
-          type="url"
-          placeholder="https://linkedin.com/in/your-profile"
-          className="input input-bordered w-full"
-          value={linkedinUrl}
-          onChange={(e) => setLinkedinUrl(e.target.value)}
-        />
-        <label className="label">
-          <span className="label-text-alt text-base-content/60">
-            Shown publicly on your mentor profile
-          </span>
-        </label>
       </div>
 
       {/* Availability */}

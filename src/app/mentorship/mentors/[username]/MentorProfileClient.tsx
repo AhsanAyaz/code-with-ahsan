@@ -572,6 +572,14 @@ export default function MentorProfileClient({
                   LinkedIn Profile
                 </a>
               )}
+              {!mentor.linkedinUrl && user?.uid === mentor.uid && (
+                <p className="mt-2 text-sm text-base-content/60">
+                  Add your LinkedIn profile so mentees can verify your experience.{" "}
+                  <Link href="/profile" className="link link-primary">
+                    Add LinkedIn
+                  </Link>
+                </p>
+              )}
 
               {/* Stats */}
               <div className="flex flex-wrap gap-4 mt-4">
