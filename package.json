@@ -53,6 +53,7 @@
     "firebase": "^12.6.0",
     "firebase-admin": "^13.6.0",
     "framer-motion": "^12.34.3",
+    "gcp-metadata": "^7.0.1",
     "github-slugger": "^2.0.0",
     "googleapis": "^169.0.0",
     "gray-matter": "^4.0.3",
