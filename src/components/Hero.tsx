@@ -19,7 +19,7 @@ export default function Hero() {
         {/* Text Content */}
         <div className="space-y-8">
           <a
-            href="https://leanpub.com/mastering-angular-signals/c/GO2026"
+            href="https://leanpub.com/mastering-angular-signals"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/30 bg-accent/10 text-accent text-xs font-mono"
@@ -28,7 +28,7 @@ export default function Hero() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
             </span>
-            Featured: Mastering Angular Signals (book)
+            New: Mastering Angular Signals — Angular v22 Edition
           </a>
 
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight text-base-content">

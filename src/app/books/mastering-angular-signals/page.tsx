@@ -117,7 +117,7 @@ export default function MasteringAngularSignalsBookPage() {
       { name: "Leanpub (PDF/EPUB)", url: LEANPUB_LINK },
       {
         name: "Paperback",
-        price: "29.99",
+        price: "24.99",
         priceCurrency: "USD",
         url: AMAZON_LINK,
       },
