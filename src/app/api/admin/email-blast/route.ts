@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { requireAdmin } from "@/lib/ambassador/adminAuth";
 import { getDraftHtml } from "@/lib/ghost/admin";
-import { sendEmail } from "@/lib/email";
+import { sendEmailBatch } from "@/lib/email";
 import { db } from "@/lib/firebaseAdmin";
 import { htmlEscape } from "@/lib/email-blast/escapeHtml";
 
@@ -117,29 +117,22 @@ export async function POST(request: NextRequest) {
   const results: SendResult[] = [];
 
   try {
+    const batchPayload = validatedRecipients.map((recipient) => ({
+      to: recipient.email,
+      subject: subject.trim(),
+      html: draft.html.split("{{name}}").join(htmlEscape(recipient.name)),
+    }));
+
+    const batchResults = await sendEmailBatch(batchPayload);
+
     for (let i = 0; i < validatedRecipients.length; i++) {
-      const recipient = validatedRecipients[i];
-      const safeName = htmlEscape(recipient.name);
-      const personalizedHtml = draft.html.split("{{name}}").join(safeName);
-
-      let ok = false;
-      let error: string | undefined;
-      try {
-        ok = await sendEmail(recipient.email, subject.trim(), personalizedHtml);
-        if (!ok) {
-          error = "sendEmail returned false";
-        }
-      } catch (sendErr) {
-        ok = false;
-        error = sendErr instanceof Error ? sendErr.message : String(sendErr);
-      }
-
-      results.push({ name: recipient.name, email: recipient.email, ok, ...(error ? { error } : {}) });
-
-      // 250ms gap between sends — skip after last recipient
-      if (i < validatedRecipients.length - 1) {
-        await new Promise((r) => setTimeout(r, 250));
-      }
+      const { ok, error } = batchResults[i];
+      results.push({
+        name: validatedRecipients[i].name,
+        email: validatedRecipients[i].email,
+        ok,
+        ...(error ? { error } : {}),
+      });
     }
 
     const sentCount = results.filter((r) => r.ok).length;

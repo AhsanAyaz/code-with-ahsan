@@ -99,6 +99,63 @@ function wrapEmailHtml(content: string, title: string): string {
   `;
 }
 
+export interface BatchEmailPayload {
+  to: string;
+  subject: string;
+  html: string;
+}
+
+export interface BatchEmailResult {
+  to: string;
+  ok: boolean;
+  error?: string;
+}
+
+/**
+ * Send multiple emails via Resend batch API (100 per call).
+ * Avoids per-email round-trips that would timeout for large recipient lists.
+ */
+export async function sendEmailBatch(
+  emails: BatchEmailPayload[],
+): Promise<BatchEmailResult[]> {
+  if (process.env.DISABLE_EMAILS === "true") {
+    log.info(`Emails disabled. Would have sent batch of ${emails.length}`);
+    return emails.map((e) => ({ to: e.to, ok: true }));
+  }
+
+  const client = getResendClient();
+  if (!client) {
+    log.warn("Resend API key not configured, skipping batch email");
+    return emails.map((e) => ({ to: e.to, ok: false, error: "Resend not configured" }));
+  }
+
+  const from = process.env.RESEND_FROM_EMAIL ?? "Code With Ahsan <notifications@codewithahsan.dev>";
+  const replyTo = process.env.RESEND_REPLY_TO ?? "no-reply@codewithahsan.dev";
+  const CHUNK = 100;
+  const results: BatchEmailResult[] = [];
+
+  for (let i = 0; i < emails.length; i += CHUNK) {
+    const chunk = emails.slice(i, i + CHUNK);
+    try {
+      const result = await client.batch.send(
+        chunk.map((e) => ({ from, to: [e.to], replyTo, subject: e.subject, html: e.html })),
+      );
+      if (result.error) {
+        log.error("Batch send error:", { error: result.error });
+        chunk.forEach((e) => results.push({ to: e.to, ok: false, error: String(result.error) }));
+      } else {
+        chunk.forEach((e) => results.push({ to: e.to, ok: true }));
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      log.error("Batch send exception:", { error: msg });
+      chunk.forEach((e) => results.push({ to: e.to, ok: false, error: msg }));
+    }
+  }
+
+  return results;
+}
+
 // Core send function
 export async function sendEmail(
   to: string,
