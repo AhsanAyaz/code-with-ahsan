@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/firebaseAdmin'
 import { sendRegistrationStatusEmail, sendAccountStatusEmail } from '@/lib/email'
 import { sendMentorChangesRequestedNotification } from '@/lib/discord'
+import { syncRoleClaim } from '@/lib/ambassador/roleMutation'
 
 
 // GET: Fetch all profiles with optional filters
@@ -155,10 +156,32 @@ export async function PUT(request: NextRequest) {
       updateData.acceptedAt = new Date()
     }
 
-    // Admin profile mutation: status/discordUsername/adminNotes/feedback only.
-    // No claim sync needed (per D-14, only roles / isAdmin mutations trigger claim refresh).
-    // If future edits add roles or isAdmin to this handler, ALSO add a syncRoleClaim call here.
+    const currentRoles: string[] = profileDoc.data()?.roles ?? []
+
+    // On disable: remove mentor role and snapshot current roles for restoration
+    if (status === 'disabled') {
+      updateData.disabledRoles = currentRoles
+      updateData.roles = currentRoles.filter((r: string) => r !== 'mentor')
+    }
+
+    // On re-enable from disabled: restore previously held roles
+    if (status === 'accepted' && previousStatus === 'disabled') {
+      const savedRoles: string[] = profileDoc.data()?.disabledRoles ?? currentRoles
+      const merged = Array.from(new Set([...currentRoles, ...savedRoles]))
+      updateData.roles = merged
+      updateData.disabledRoles = null
+    }
+
     await profileRef.update(updateData)
+
+    // Sync Firebase custom claims when roles changed
+    const rolesChanged = status === 'disabled' || (status === 'accepted' && previousStatus === 'disabled')
+    if (rolesChanged) {
+      const finalRoles = updateData.roles as string[] ?? currentRoles
+      const isAdmin = profileDoc.data()?.isAdmin ?? false
+      syncRoleClaim(uid, { roles: finalRoles, admin: isAdmin })
+        .catch(err => console.error('Failed to sync role claims:', err))
+    }
 
     // If disabling a profile, also deactivate their mentorship sessions
     if (status === 'disabled') {
@@ -171,14 +194,14 @@ export async function PUT(request: NextRequest) {
         const data = doc.data()
         // Check if this user is involved in the session
         if (data.mentorId === uid || data.menteeId === uid) {
-          batch.update(doc.ref, { 
+          batch.update(doc.ref, {
             status: 'disabled',
             disabledAt: new Date(),
             disabledReason: 'Profile disabled by admin'
           })
         }
       })
-      
+
       await batch.commit()
     }
 
@@ -194,7 +217,7 @@ export async function PUT(request: NextRequest) {
         const data = doc.data()
         // Check if this user is involved in the session and it was disabled by admin
         if ((data.mentorId === uid || data.menteeId === uid) && data.disabledReason === 'Profile disabled by admin') {
-          batch.update(doc.ref, { 
+          batch.update(doc.ref, {
             status: 'active',
             reactivatedAt: new Date(),
             disabledAt: null,
@@ -203,7 +226,7 @@ export async function PUT(request: NextRequest) {
           reactivatedCount++
         }
       })
-      
+
       await batch.commit()
     }
 

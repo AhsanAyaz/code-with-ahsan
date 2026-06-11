@@ -339,6 +339,12 @@ export default function AllMentorsPage() {
               ? {
                   ...p,
                   status: newStatus,
+                  // Remove mentor role locally when disabling
+                  roles: newStatus === "disabled"
+                    ? p.roles.filter((r) => r !== "mentor")
+                    : newStatus === "accepted" && p.status === "disabled"
+                    ? Array.from(new Set([...p.roles, "mentor"]))
+                    : p.roles,
                   disabledSessionsCount: reactivateSessions
                     ? 0
                     : p.disabledSessionsCount,
@@ -347,15 +353,19 @@ export default function AllMentorsPage() {
           )
         );
 
-        // Show success message if sessions were reactivated
-        if (data.reactivatedSessions > 0) {
+        if (newStatus === "disabled") {
+          toast.success("Mentor account disabled. Active mentorships ended and mentor role removed.");
+        } else if (newStatus === "accepted" && data.reactivatedSessions > 0) {
           toast.success(
-            `${data.reactivatedSessions} mentorship session(s) have been reactivated.`
+            `Mentor re-enabled. ${data.reactivatedSessions} mentorship session(s) reactivated.`
           );
+        } else if (newStatus === "accepted") {
+          toast.success("Mentor account re-enabled.");
         }
       }
     } catch (error) {
       console.error("Error updating status:", error);
+      toast.error("Failed to update mentor status.");
     } finally {
       setActionLoading(null);
     }
@@ -651,6 +661,38 @@ export default function AllMentorsPage() {
                                 <span className="loading loading-spinner loading-xs"></span>
                               ) : (
                                 "Restore"
+                              )}
+                            </button>
+                          )}
+                          {/* Disable button for accepted mentors */}
+                          {p.status === "accepted" && (
+                            <button
+                              className="btn btn-error btn-sm"
+                              disabled={actionLoading === p.uid}
+                              onClick={() => {
+                                if (window.confirm(`Disable ${p.displayName}'s account? This will end all active mentorships and remove their mentor role.`)) {
+                                  handleStatusChange(p.uid, "disabled");
+                                }
+                              }}
+                            >
+                              {actionLoading === p.uid ? (
+                                <span className="loading loading-spinner loading-xs"></span>
+                              ) : (
+                                "Disable"
+                              )}
+                            </button>
+                          )}
+                          {/* Re-enable button for disabled mentors */}
+                          {p.status === "disabled" && (
+                            <button
+                              className="btn btn-success btn-sm"
+                              disabled={actionLoading === p.uid}
+                              onClick={() => handleStatusChange(p.uid, "accepted", true)}
+                            >
+                              {actionLoading === p.uid ? (
+                                <span className="loading loading-spinner loading-xs"></span>
+                              ) : (
+                                "Re-enable"
                               )}
                             </button>
                           )}
