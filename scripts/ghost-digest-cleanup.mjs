@@ -48,6 +48,8 @@ const YES = flag("--yes");
 const LIST_ALL = flag("--all");
 const NOINDEX = flag("--noindex");
 const DUPES = flag("--dupes"); // find/unpublish same-title duplicates instead of digests
+const DELETE = flag("--delete"); // DELETE (permanent) draft digests instead of unpublishing
+const STATUS = DELETE ? "draft" : "published"; // delete mode operates on drafts
 
 const normTitle = (t) => (t || "").toLowerCase().replace(/\s+/g, " ").trim();
 // keeper = the canonical original: prefer a slug NOT ending in -<n>, then earliest published
@@ -81,7 +83,7 @@ async function browseAll() {
   let page = 1;
   for (;;) {
     const res = await api.posts.browse({
-      filter: "status:published",
+      filter: `status:${STATUS}`,
       limit: 100,
       page,
       include: "tags",
@@ -96,7 +98,8 @@ async function browseAll() {
 }
 
 async function main() {
-  console.log(`Ghost: ${url}  (${APPLY ? (NOINDEX ? "APPLY noindex" : "APPLY unpublish") : "DRY RUN"})\n`);
+  const action = DELETE ? "APPLY DELETE (permanent)" : NOINDEX ? "APPLY noindex" : "APPLY unpublish";
+  console.log(`Ghost: ${url}  (${APPLY ? action : "DRY RUN"})  status:${STATUS}\n`);
   const posts = await browseAll();
   console.log(`Published posts total: ${posts.length}`);
 
@@ -140,6 +143,12 @@ async function main() {
   let ok = 0, fail = 0;
   for (const p of candidates) {
     try {
+      if (DELETE) {
+        await api.posts.delete({ id: p.id });
+        ok++;
+        console.log(`  ✓ deleted: ${p.title}`);
+        continue;
+      }
       const full = await api.posts.read({ id: p.id }, { formats: ["html"] });
       if (NOINDEX) {
         const head = full.codeinjection_head || "";
