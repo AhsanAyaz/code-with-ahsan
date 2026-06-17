@@ -47,6 +47,18 @@ const APPLY = flag("--apply");
 const YES = flag("--yes");
 const LIST_ALL = flag("--all");
 const NOINDEX = flag("--noindex");
+const DUPES = flag("--dupes"); // find/unpublish same-title duplicates instead of digests
+
+const normTitle = (t) => (t || "").toLowerCase().replace(/\s+/g, " ").trim();
+// keeper = the canonical original: prefer a slug NOT ending in -<n>, then earliest published
+function pickKeeper(group) {
+  return [...group].sort((a, b) => {
+    const aDup = /-\d+$/.test(a.slug) ? 1 : 0;
+    const bDup = /-\d+$/.test(b.slug) ? 1 : 0;
+    if (aDup !== bDup) return aDup - bDup;
+    return new Date(a.published_at) - new Date(b.published_at);
+  })[0];
+}
 const TAG = opt("--tag"); // match by tag slug, e.g. "digest"
 // title patterns that mark a weekly digest — tune after a dry run
 const TITLE_RE = /weekly digest/i;
@@ -86,14 +98,33 @@ async function browseAll() {
 async function main() {
   console.log(`Ghost: ${url}  (${APPLY ? (NOINDEX ? "APPLY noindex" : "APPLY unpublish") : "DRY RUN"})\n`);
   const posts = await browseAll();
-  const candidates = LIST_ALL ? posts : posts.filter(isDigest);
-
   console.log(`Published posts total: ${posts.length}`);
-  console.log(`${LIST_ALL ? "Listing ALL" : "Digest matches"}: ${candidates.length}\n`);
-  for (const p of candidates) {
-    const tags = (p.tags || []).map((t) => t.slug).join(",");
-    console.log(`  ${p.published_at?.slice(0, 10)}  ${p.title}`);
-    console.log(`      ${p.url}   [tags: ${tags || "-"}]`);
+
+  let candidates;
+  if (DUPES) {
+    const groups = {};
+    for (const p of posts) (groups[normTitle(p.title)] ||= []).push(p);
+    const dupeGroups = Object.values(groups).filter((g) => g.length > 1);
+    candidates = [];
+    console.log(`Duplicate title groups: ${dupeGroups.length}\n`);
+    for (const g of dupeGroups) {
+      const keep = pickKeeper(g);
+      console.log(`  "${g[0].title}"`);
+      for (const p of g) {
+        const role = p.id === keep.id ? "KEEP " : "UNPUB";
+        console.log(`      ${role}  ${p.published_at?.slice(0, 10)}  ${p.slug}`);
+        if (p.id !== keep.id) candidates.push(p);
+      }
+    }
+    console.log(`\nTo unpublish: ${candidates.length}`);
+  } else {
+    candidates = LIST_ALL ? posts : posts.filter(isDigest);
+    console.log(`${LIST_ALL ? "Listing ALL" : "Digest matches"}: ${candidates.length}\n`);
+    for (const p of candidates) {
+      const tags = (p.tags || []).map((t) => t.slug).join(",");
+      console.log(`  ${p.published_at?.slice(0, 10)}  ${p.title}`);
+      console.log(`      ${p.url}   [tags: ${tags || "-"}]`);
+    }
   }
 
   if (!APPLY) {
