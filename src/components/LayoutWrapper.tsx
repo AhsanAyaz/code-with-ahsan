@@ -34,7 +34,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="navbar bg-base-100 px-4 sm:px-8 md:px-12 lg:px-16 z-50">
+      <header className="navbar bg-base-100 px-4 sm:px-8 md:px-12 lg:px-16 z-50 sticky top-0">
         <div className="navbar-start md:shrink-0 md:w-auto">
           <Link
             href="/"
