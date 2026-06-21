@@ -32,16 +32,17 @@ const faqs = [
 
 export default function HomeFAQ() {
   return (
-    <section className="py-16 page-padding bg-base-200 border-t border-base-300">
+    <section
+      id="faq"
+      className="py-16 page-padding bg-base-200 border-t border-base-300"
+    >
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-bold text-base-content mb-2">
             Got Questions?
           </h2>
           <p className="text-base-content/60 text-sm">
-            <Link href="/community#faq" className="link link-hover">
-              See all FAQs on the Community page →
-            </Link>
+            Everything you need to know about the CodeWithAhsan community.
           </p>
         </div>
         <div className="join join-vertical w-full">
@@ -61,7 +62,10 @@ export default function HomeFAQ() {
           ))}
         </div>
         <div className="text-center mt-8">
-          <Link href="/community" className="btn btn-primary">
+          <Link
+            href="https://discord.gg/KSPpuxD8SG"
+            className="btn btn-primary"
+          >
             Explore the Community
           </Link>
         </div>

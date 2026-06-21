@@ -28,6 +28,10 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // VIS-66 [GH#215]: consolidate to one community page. /community ("Community Hub")
+      // is folded into the homepage (the canonical community landing). All legacy slugs
+      // below that previously targeted /community now point at / directly (no redirect chain).
+      { source: "/community", destination: "/", permanent: true },
       {
         source: "/how-to-gde-urdu",
         destination: "https://www.instagram.com/reel/DTQuzaIjgPS/",
@@ -115,30 +119,30 @@ const nextConfig: NextConfig = {
       // The 27th row — https://blog.codewithahsan.dev/how-to-pre-render-dynamic-routes-in-angular-a-practical-guide/ —
       // is on the blog subdomain (different deploy target), out of scope for this app's redirects. Documented in SUMMARY. ===
 
-      // Group A — 11 explicit per-slug rules for ahsync-bytes-weekly-digest-* → /community (newsletter content lives there now).
+      // Group A — 11 explicit per-slug rules for ahsync-bytes-weekly-digest-* → / (newsletter/community content folded into homepage, VIS-66).
       // Per-slug (no :rest* catch-all) to avoid path-to-regexp within-segment matching fragility.
       // CSV row: /ahsync-bytes-weekly-digest-18th-may-2026/
-      { source: "/ahsync-bytes-weekly-digest-18th-may-2026", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-18th-may-2026", destination: "/", permanent: true },
       // CSV row: /ahsync-bytes-weekly-digest-23rd-feb-2026/
-      { source: "/ahsync-bytes-weekly-digest-23rd-feb-2026", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-23rd-feb-2026", destination: "/", permanent: true },
       // CSV row: /ahsync-bytes-weekly-digest-16th-feb-2026/
-      { source: "/ahsync-bytes-weekly-digest-16th-feb-2026", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-16th-feb-2026", destination: "/", permanent: true },
       // CSV row: /ahsync-bytes-weekly-digest-13th-oct-2025/
-      { source: "/ahsync-bytes-weekly-digest-13th-oct-2025", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-13th-oct-2025", destination: "/", permanent: true },
       // CSV row: /ahsync-bytes-weekly-digest-1st-dec-2025/
-      { source: "/ahsync-bytes-weekly-digest-1st-dec-2025", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-1st-dec-2025", destination: "/", permanent: true },
       // CSV row: /ahsync-bytes-weekly-digest-5th-jan-2026/
-      { source: "/ahsync-bytes-weekly-digest-5th-jan-2026", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-5th-jan-2026", destination: "/", permanent: true },
       // CSV row: /ahsync-bytes-weekly-digest-8th-dec-2025/
-      { source: "/ahsync-bytes-weekly-digest-8th-dec-2025", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-8th-dec-2025", destination: "/", permanent: true },
       // CSV row: /ahsync-bytes-weekly-digest-15th-sep-2025/
-      { source: "/ahsync-bytes-weekly-digest-15th-sep-2025", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-15th-sep-2025", destination: "/", permanent: true },
       // CSV row: /ahsync-bytes-weekly-digest-22nd-sep-2025/
-      { source: "/ahsync-bytes-weekly-digest-22nd-sep-2025", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-22nd-sep-2025", destination: "/", permanent: true },
       // CSV row: /ahsync-bytes-weekly-digest-29th-dec-2025/
-      { source: "/ahsync-bytes-weekly-digest-29th-dec-2025", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-29th-dec-2025", destination: "/", permanent: true },
       // CSV row: /ahsync-bytes-weekly-digest-7th-july-2025/
-      { source: "/ahsync-bytes-weekly-digest-7th-july-2025", destination: "/community", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-7th-july-2025", destination: "/", permanent: true },
 
       // Group B — /tags/* → / (legacy tag system gone)
       // CSV row: /tags/github
@@ -182,23 +186,23 @@ const nextConfig: NextConfig = {
       { source: "/zero-to-website-100-founding-legends", destination: "https://blog.codewithahsan.dev/zero-to-website-100-founding-legends", permanent: true },
       { source: "/standardizing-ai-design-the-evolution-of-design-md-2", destination: "https://blog.codewithahsan.dev/standardizing-ai-design-the-evolution-of-design-md-2", permanent: true },
 
-      // Group H-bis — Legacy slugs absent from blog subdomain (curl 404) → /community
-      { source: "/cloud-bootcamp-free-online-event-by-cloudways-mar-10-11", destination: "/community", permanent: true },
-      { source: "/duty-free-cc", destination: "/community", permanent: true },
-      { source: "/how-i-turned-my-ai-into-a-sovereign-business-partner-my-openclaw-setup", destination: "/community", permanent: true },
+      // Group H-bis — Legacy slugs absent from blog subdomain (curl 404) → / (community folded into homepage, VIS-66)
+      { source: "/cloud-bootcamp-free-online-event-by-cloudways-mar-10-11", destination: "/", permanent: true },
+      { source: "/duty-free-cc", destination: "/", permanent: true },
+      { source: "/how-i-turned-my-ai-into-a-sovereign-business-partner-my-openclaw-setup", destination: "/", permanent: true },
 
-      // Group I — Additional ahsync-bytes-weekly-digest-* → /community (extends Group A)
-      { source: "/ahsync-bytes-weekly-digest-9th-mar-2026", destination: "/community", permanent: true },
-      { source: "/ahsync-bytes-weekly-digest-16th-mar-2026", destination: "/community", permanent: true },
-      { source: "/ahsync-bytes-weekly-digest-22nd-dec-2025", destination: "/community", permanent: true },
-      { source: "/ahsync-bytes-weekly-digest-23rd-mar-2026", destination: "/community", permanent: true },
-      { source: "/ahsync-bytes-weekly-digest-30th-mar-2026", destination: "/community", permanent: true },
-      { source: "/ahsync-bytes-weekly-digest-4th-may-2026", destination: "/community", permanent: true },
-      { source: "/ahsync-bytes-weekly-digest-20th-april-2025", destination: "/community", permanent: true },
+      // Group I — Additional ahsync-bytes-weekly-digest-* → / (community folded into homepage, VIS-66) (extends Group A)
+      { source: "/ahsync-bytes-weekly-digest-9th-mar-2026", destination: "/", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-16th-mar-2026", destination: "/", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-22nd-dec-2025", destination: "/", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-23rd-mar-2026", destination: "/", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-30th-mar-2026", destination: "/", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-4th-may-2026", destination: "/", permanent: true },
+      { source: "/ahsync-bytes-weekly-digest-20th-april-2025", destination: "/", permanent: true },
 
-      // Group J — weekly-digest-* (no ahsync-bytes prefix) → /community
-      { source: "/weekly-digest-1st-dec-2025", destination: "/community", permanent: true },
-      { source: "/weekly-digest-23rd-mar-2026", destination: "/community", permanent: true },
+      // Group J — weekly-digest-* (no ahsync-bytes prefix) → / (community folded into homepage, VIS-66)
+      { source: "/weekly-digest-1st-dec-2025", destination: "/", permanent: true },
+      { source: "/weekly-digest-23rd-mar-2026", destination: "/", permanent: true },
 
       // Group K — Truncated course slug → /courses
       { source: "/courses/web-", destination: "/courses", permanent: true },

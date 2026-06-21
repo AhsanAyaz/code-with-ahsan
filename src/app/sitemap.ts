@@ -14,7 +14,6 @@ const STATIC_PATHS = [
   "/ambassadors/apply",
   "/books",
   "/books/mastering-angular-signals",
-  "/community",
   "/courses",
   "/events",
   "/events/cwa-promptathon/2026",
