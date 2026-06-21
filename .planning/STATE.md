@@ -29,7 +29,7 @@ Milestone: v7.0 Agentic Orchestra Upgrade — Phase 07 executing (Wave 1 done)
 Phase: 07 (agent-safety-observability-callbacks) — EXECUTING
 Plan: 3 of 4 ✅ (07-01 PII ✅, 07-02 tool-cache ✅, 07-03 lifecycle logging ✅) — 07-04 pending (HUMAN-GATED)
 Status: 07-03 GREEN (13 lifecycle tests + 14 cache + 16 PII = 175 total pass; 12 LlmAgent attachments; wrapper-skip verified for SequentialAgent + ParallelAgent)
-Last activity: 2026-06-09 — Completed quick task 260609-f6n: challenge participants list with submission status + cert contact snapshot
+Last activity: 2026-06-21 — Completed quick task 260621-u1m: make global navbar sticky on all pages (VIS-64 / GH#211)
 
 ## Next Moves (queued, not in flight)
 
@@ -201,6 +201,7 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 | 260609-ep2 | Fix monthly challenge bugs — submission 500 (undefined demoUrl rejected by Firestore Admin), Participate button now disables + shows "Joined", and challenge dates stored/displayed as UTC to stop Jun 1 → May 31 off-by-one. 3 commits, tsc + lint clean, verified E2E against emulators. | 2026-06-09 | 3a96467 | [260609-ep2-fix-monthly-challenge-bugs-project-submi](./quick/260609-ep2-fix-monthly-challenge-bugs-project-submi/) |
 | 260609-f6n | Challenge participants list with submission status on detail page + snapshot email/discord at join for certificates (no form; public list hides contact info). 2 commits, tsc + lint clean, verified E2E against emulators. | 2026-06-09 | 98fd5bf | [260609-f6n-show-challenge-participants-with-submiss](./quick/260609-f6n-show-challenge-participants-with-submiss/) |
 | 260611-n3r | Add LinkedIn profile link to mentor profile page (GitHub issue #195) — self-view backfill nudge + LinkedIn field promoted to Recommended near Current Role in edit form. Feature pre-existed (quick-058); this closes the adoption/discoverability gap. | 2026-06-11 | b7f9966 | [260611-n3r-add-linkedin-profile-link-to-mentor-prof](./quick/260611-n3r-add-linkedin-profile-link-to-mentor-prof/) |
+| 260621-u1m | VIS-64 [GH#211] — make global navbar sticky on all pages. Appended `sticky top-0` to the header in LayoutWrapper.tsx (single global wrapper, z-50 preserved, dropdown z-[100] still layers above). `sticky` keeps header in flow so `<main>` needs no padding — no layout regression. eslint clean. | 2026-06-21 | 0bb4705 | [260621-u1m-make-navbar-sticky](./quick/260621-u1m-make-navbar-sticky/) |
 | Phase 01 P01 | 2min | 1 tasks | 1 files |
 | Phase 01-foundation-roles-array-migration P02 | 3 min | 3 tasks | 6 files |
 | Phase 01-foundation-roles-array-migration P04 | 2 min | 2 tasks | 3 files |
