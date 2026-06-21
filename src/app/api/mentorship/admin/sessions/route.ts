@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { FieldValue } from 'firebase-admin/firestore'
 import { db } from '@/lib/firebaseAdmin'
 import {
   sendChannelMessage,
+  sendChannelMessageWithComponents,
   sendDirectMessage,
   isDiscordConfigured,
   archiveMentorshipChannel,
+  unarchiveMentorshipChannel,
 } from '@/lib/discord'
 import { sendMentorshipRemovedEmail } from '@/lib/email'
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://codewithahsan.dev'
 
 // Allowed status transitions state machine
 const ALLOWED_TRANSITIONS: Record<string, string[]> = {
@@ -40,7 +45,8 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
 
-    const currentStatus = sessionDoc.data()?.status
+    const sessionData = sessionDoc.data()!
+    const currentStatus = sessionData.status
 
     // Validate state machine transition
     const allowedTargets = ALLOWED_TRANSITIONS[currentStatus] || []
@@ -67,11 +73,58 @@ export async function PUT(request: NextRequest) {
     }
 
     // Add reactivatedAt timestamp when re-activating from cancelled to active
-    if (currentStatus === 'cancelled' && status === 'active') {
+    const isReactivation = currentStatus === 'cancelled' && status === 'active'
+    if (isReactivation) {
       updateData.reactivatedAt = new Date()
+      // Clear stale cancellation metadata so the session reads as a clean active match
+      updateData.cancellationReason = FieldValue.delete()
+      updateData.cancelledAt = FieldValue.delete()
+      updateData.cancelledBy = FieldValue.delete()
     }
 
     await sessionRef.update(updateData)
+
+    // On admin reactivation, restore the Discord channel and post the same
+    // notification mentor/mentee receive when a mentorship is auto-reactivated.
+    if (isReactivation && isDiscordConfigured() && sessionData.discordChannelId) {
+      try {
+        const [mentorProfile, menteeProfile] = await Promise.all([
+          db.collection('mentorship_profiles').doc(sessionData.mentorId).get(),
+          db.collection('mentorship_profiles').doc(sessionData.menteeId).get(),
+        ])
+        const mentorData = mentorProfile.exists ? mentorProfile.data() : null
+        const menteeData = menteeProfile.exists ? menteeProfile.data() : null
+
+        // Unarchive the channel (renames, restores topic and member permissions)
+        await unarchiveMentorshipChannel(
+          sessionData.discordChannelId,
+          mentorData?.discordUsername,
+          menteeData?.discordUsername
+        ).catch((err) => console.error('Discord channel unarchive failed:', err))
+
+        // Post reactivation notification with a dashboard link button
+        const dashboardUrl = `${SITE_URL}/mentorship/dashboard/${sessionId}`
+        await sendChannelMessageWithComponents(
+          sessionData.discordChannelId,
+          `♻️ **This mentorship has been reactivated by an administrator!**\n\n@here Your mentorship session has been restored. Welcome back!`,
+          [
+            {
+              type: 1,
+              components: [
+                {
+                  type: 2,
+                  style: 5,
+                  label: 'View Dashboard',
+                  url: dashboardUrl,
+                },
+              ],
+            },
+          ]
+        ).catch((err) => console.error('Reactivation channel message failed:', err))
+      } catch (err) {
+        console.error('Reactivation Discord notification failed:', err)
+      }
+    }
 
     return NextResponse.json({
       success: true,
