@@ -10,6 +10,7 @@ import MenteeRegistrationForm from "@/components/mentorship/MenteeRegistrationFo
 import Link from "next/link";
 import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 import MentorAnnouncementCard from "@/components/mentorship/MentorAnnouncementCard";
+import CurrentMenteesSection from "@/components/mentorship/CurrentMenteesSection";
 import AvailabilityManager from "@/components/mentorship/AvailabilityManager";
 import BookingsList from "@/components/mentorship/BookingsList";
 import { authFetch } from "@/lib/apiClient";
@@ -314,6 +315,9 @@ export default function SettingsPage() {
           hasRole(profile, "alumni-ambassador")) && (
           <AmbassadorPublicCardSection />
         )}
+
+      {/* Current Mentees Section - Mentors Only (VIS-50) */}
+      {hasRole(profile, "mentor") && <CurrentMenteesSection userId={profile.uid} />}
 
       {/* Skill Level Card */}
       <div className="card bg-base-100 shadow-xl">
