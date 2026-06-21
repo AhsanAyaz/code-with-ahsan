@@ -414,7 +414,7 @@ export async function PUT(
         notificationTasks.push(
           sendDirectMessage(
             mentorData.discordUsername,
-            `📢 **${menteeData.displayName || "Your mentee"}** has ended the mentorship.\n\n` +
+            `📢 Your mentorship with **${menteeData.displayName || "your mentee"}** has been ended by your mentee.\n\n` +
               `You now have an open slot for a new mentee.`
           ).catch((err) => console.error("Mentor end DM failed:", err))
         );
