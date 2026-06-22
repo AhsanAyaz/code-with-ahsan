@@ -11,6 +11,7 @@ import {
 import { verifyAuth } from "@/lib/auth";
 import { canDeleteProject } from "@/lib/permissions";
 import { auth } from "@/lib/firebaseAdmin";
+import { Project } from "@/types/mentorship";
 
 export async function GET(
   request: NextRequest,
@@ -120,7 +121,7 @@ export async function PUT(
       // Field update flow: edit project fields
       // Phase 2: Authorization check
       if (!isAdmin) {
-        // Non-admin: must be creator and project must be pending or declined
+        // Non-admin: must be creator
         if (projectData?.creatorId !== userId) {
           return NextResponse.json(
             { error: "You can only edit your own projects" },
@@ -128,9 +129,10 @@ export async function PUT(
           );
         }
 
-        if (projectData?.status !== "pending" && projectData?.status !== "declined") {
+        // Cannot edit if there is already a pending update
+        if (projectData?.status === "update_pending") {
           return NextResponse.json(
-            { error: "You can only edit pending or declined projects" },
+            { error: "This project already has pending updates waiting for approval" },
             { status: 403 }
           );
         }
@@ -199,15 +201,30 @@ export async function PUT(
         lastActivityAt: FieldValue.serverTimestamp(),
       };
 
-      if (title !== undefined) updateData.title = title;
-      if (description !== undefined) updateData.description = description;
+      const proposedChanges: Partial<Project> = {};
+
+      if (title !== undefined) proposedChanges.title = title;
+      if (description !== undefined) proposedChanges.description = description;
       if (githubRepo !== undefined) {
         // Allow clearing GitHub repo by passing empty string
-        updateData.githubRepo = githubRepo || FieldValue.delete();
+        proposedChanges.githubRepo = githubRepo || null;
       }
-      if (techStack !== undefined) updateData.techStack = techStack;
-      if (difficulty !== undefined) updateData.difficulty = difficulty;
-      if (maxTeamSize !== undefined) updateData.maxTeamSize = maxTeamSize;
+      if (techStack !== undefined) proposedChanges.techStack = techStack;
+      if (difficulty !== undefined) proposedChanges.difficulty = difficulty;
+      if (maxTeamSize !== undefined) proposedChanges.maxTeamSize = maxTeamSize;
+
+      // Phase 5: Handle update based on project status and user role
+      if (isAdmin || projectData?.status === "pending" || projectData?.status === "declined") {
+        // Admin can always edit directly
+        // Creators can edit directly when project is pending or declined
+        Object.assign(updateData, proposedChanges);
+      } else {
+        // Creator is updating an active project - create pending update
+        updateData.pendingUpdates = proposedChanges;
+        updateData.status = "update_pending";
+        updateData.updateRequestedAt = FieldValue.serverTimestamp();
+        updateData.updateRequestedBy = userId;
+      }
 
       // Phase 5: Update project
       await projectRef.update(updateData);

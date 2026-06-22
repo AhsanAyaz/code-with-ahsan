@@ -8,10 +8,11 @@ import {
   createProjectChannel,
   sendProjectDetailsMessage,
 } from "@/lib/discord";
+import { Project } from "next/dist/build/swc/types";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Phase 1: Authentication
@@ -20,7 +21,7 @@ export async function PUT(
     if (!token) {
       return NextResponse.json(
         { error: "Admin authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -30,11 +31,11 @@ export async function PUT(
     if (!sessionDoc.exists) {
       return NextResponse.json(
         { error: "Admin authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
-    const session = sessionDoc.data();
+    const session = sessionDoc.data()!;
     const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
 
     if (expiresAt < new Date()) {
@@ -42,7 +43,7 @@ export async function PUT(
       await db.collection("admin_sessions").doc(token).delete();
       return NextResponse.json(
         { error: "Admin authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -56,10 +57,7 @@ export async function PUT(
     const projectDoc = await projectRef.get();
 
     if (!projectDoc.exists) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
     const projectData = projectDoc.data()!;
@@ -70,7 +68,7 @@ export async function PUT(
       if (projectData.status !== "pending") {
         return NextResponse.json(
           { error: "Only pending projects can be approved" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -99,7 +97,7 @@ export async function PUT(
           projectData.title || "Untitled Project",
           projectData.creatorProfile?.displayName || "Creator",
           projectId,
-          creatorData?.discordUsername
+          creatorData?.discordUsername,
         );
 
         if (channelResult) {
@@ -133,21 +131,21 @@ export async function PUT(
           discordChannelId,
           discordChannelUrl,
         },
-        { status: 200 }
+        { status: 200 },
       );
     } else if (action === "decline") {
       // Validate decline reason
       if (!declineReason || typeof declineReason !== "string") {
         return NextResponse.json(
           { error: "Decline reason is required" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
       if (declineReason.length < 10) {
         return NextResponse.json(
           { error: "Decline reason must be at least 10 characters" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -155,7 +153,7 @@ export async function PUT(
       if (projectData.status !== "pending") {
         return NextResponse.json(
           { error: "Only pending projects can be declined" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -197,7 +195,124 @@ export async function PUT(
 
       return NextResponse.json(
         { success: true, message: "Project declined" },
-        { status: 200 }
+        { status: 200 },
+      );
+    } else if (action === "approve_update") {
+      // Approve pending updates
+      if (
+        projectData.status !== "update_pending" ||
+        !projectData.pendingUpdates
+      ) {
+        return NextResponse.json(
+          { error: "No pending updates to approve" },
+          { status: 400 },
+        );
+      }
+
+      // Apply pending updates - only allow explicit fields to prevent injection
+      const allowedFields = [
+        "title",
+        "description",
+        "githubRepo",
+        "techStack",
+        "difficulty",
+        "maxTeamSize",
+      ];
+      const safeUpdates = Object.fromEntries(
+        Object.entries(projectData.pendingUpdates).filter(([key]) =>
+          allowedFields.includes(key),
+        ),
+      );
+
+      const applyUpdates: Partial<Project> & Record<string, unknown> = {
+        ...safeUpdates,
+        status: "active",
+        pendingUpdates: FieldValue.delete(),
+        updateApprovedAt: FieldValue.serverTimestamp(),
+        updateApprovedBy: session.adminId || "admin",
+        updatedAt: FieldValue.serverTimestamp(),
+        lastActivityAt: FieldValue.serverTimestamp(),
+      };
+
+      // Handle null githubRepo properly by deleting the field instead of storing null
+      if (applyUpdates.githubRepo === null) {
+        applyUpdates.githubRepo = FieldValue.delete();
+      }
+
+      await projectRef.update(applyUpdates);
+
+      // Send Discord DM to creator (non-blocking)
+      if (projectData.creatorId) {
+        try {
+          const creatorDoc = await db
+            .collection("mentorship_profiles")
+            .doc(projectData.creatorId)
+            .get();
+
+          const creatorData = creatorDoc.exists ? creatorDoc.data() : null;
+          const discordUsername = creatorData?.discordUsername;
+
+          if (discordUsername) {
+            const dmMessage = `Your updates for project "${projectData.title}" have been approved and are now live ✅`;
+            await sendDirectMessage(discordUsername, dmMessage);
+          }
+        } catch (error) {
+          console.error("Error sending update approval notification:", error);
+        }
+      }
+
+      return NextResponse.json(
+        { success: true, message: "Project updates approved and applied" },
+        { status: 200 },
+      );
+    } else if (action === "decline_update") {
+      // Decline pending updates
+      if (
+        projectData.status !== "update_pending" ||
+        !projectData.pendingUpdates
+      ) {
+        return NextResponse.json(
+          { error: "No pending updates to decline" },
+          { status: 400 },
+        );
+      }
+
+      // Clear pending updates
+      await projectRef.update({
+        status: "active",
+        pendingUpdates: FieldValue.delete(),
+        updateDeclinedAt: FieldValue.serverTimestamp(),
+        updateDeclinedBy: session.adminId || "admin",
+        updateDeclineReason: declineReason || null,
+        updatedAt: FieldValue.serverTimestamp(),
+        lastActivityAt: FieldValue.serverTimestamp(),
+      });
+
+      // Send notification to creator
+      if (projectData.creatorId) {
+        try {
+          const creatorDoc = await db
+            .collection("mentorship_profiles")
+            .doc(projectData.creatorId)
+            .get();
+
+          const creatorData = creatorDoc.exists ? creatorDoc.data() : null;
+          const discordUsername = creatorData?.discordUsername;
+
+          if (discordUsername && declineReason) {
+            const dmMessage =
+              `Your update request for project "${projectData.title}" was not approved.\n\n` +
+              `**Reason:** ${declineReason}`;
+            await sendDirectMessage(discordUsername, dmMessage);
+          }
+        } catch (error) {
+          console.error("Error sending update decline notification:", error);
+        }
+      }
+
+      return NextResponse.json(
+        { success: true, message: "Project updates declined" },
+        { status: 200 },
       );
     } else {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
@@ -206,14 +321,14 @@ export async function PUT(
     console.error("Error updating project:", error);
     return NextResponse.json(
       { error: "Failed to update project" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Phase 1: Authentication and Validation
@@ -222,7 +337,7 @@ export async function DELETE(
     if (!token) {
       return NextResponse.json(
         { error: "Admin authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -232,7 +347,7 @@ export async function DELETE(
     if (!sessionDoc.exists) {
       return NextResponse.json(
         { error: "Admin authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -244,7 +359,7 @@ export async function DELETE(
       await db.collection("admin_sessions").doc(token).delete();
       return NextResponse.json(
         { error: "Admin authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -255,14 +370,14 @@ export async function DELETE(
     if (!reason || typeof reason !== "string") {
       return NextResponse.json(
         { error: "Deletion reason is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (reason.length < 10) {
       return NextResponse.json(
         { error: "Deletion reason must be at least 10 characters" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -271,19 +386,25 @@ export async function DELETE(
     const projectDoc = await db.collection("projects").doc(projectId).get();
 
     if (!projectDoc.exists) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
     const projectData = projectDoc.data()!;
 
     // Phase 2: Gather Related Data
     const [membersSnap, applicationsSnap, invitationsSnap] = await Promise.all([
-      db.collection("project_members").where("projectId", "==", projectId).get(),
-      db.collection("project_applications").where("projectId", "==", projectId).get(),
-      db.collection("project_invitations").where("projectId", "==", projectId).get(),
+      db
+        .collection("project_members")
+        .where("projectId", "==", projectId)
+        .get(),
+      db
+        .collection("project_applications")
+        .where("projectId", "==", projectId)
+        .get(),
+      db
+        .collection("project_invitations")
+        .where("projectId", "==", projectId)
+        .get(),
     ]);
 
     // Collect Discord usernames for notifications
@@ -311,7 +432,7 @@ export async function DELETE(
         // Channel exists, try to delete it
         const deleted = await deleteDiscordChannel(
           projectData.discordChannelId,
-          `Admin deletion: ${reason}`
+          `Admin deletion: ${reason}`,
         );
 
         if (!deleted) {
@@ -320,7 +441,7 @@ export async function DELETE(
               error:
                 "Failed to delete Discord channel. Cannot proceed with atomic deletion.",
             },
-            { status: 500 }
+            { status: 500 },
           );
         }
       }
@@ -353,12 +474,12 @@ export async function DELETE(
 
     const notificationResults = await Promise.allSettled(
       Array.from(discordUsernames).map((username) =>
-        sendDirectMessage(username, notificationMessage)
-      )
+        sendDirectMessage(username, notificationMessage),
+      ),
     );
 
     const notificationSuccess = notificationResults.filter(
-      (r) => r.status === "fulfilled" && r.value === true
+      (r) => r.status === "fulfilled" && r.value === true,
     ).length;
     const notificationFailed = notificationResults.length - notificationSuccess;
 
@@ -377,20 +498,20 @@ export async function DELETE(
           notificationsFailed: notificationFailed,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error deleting project:", error);
     return NextResponse.json(
       { error: "Failed to delete project" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Phase 1: Authentication
@@ -399,7 +520,7 @@ export async function PATCH(
     if (!token) {
       return NextResponse.json(
         { error: "Admin authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -409,7 +530,7 @@ export async function PATCH(
     if (!sessionDoc.exists) {
       return NextResponse.json(
         { error: "Admin authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -421,7 +542,7 @@ export async function PATCH(
       await db.collection("admin_sessions").doc(token).delete();
       return NextResponse.json(
         { error: "Admin authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -430,23 +551,34 @@ export async function PATCH(
     const body = await request.json();
 
     // Allowed editable fields
-    const { title, description, githubRepo, techStack, difficulty, maxTeamSize } = body;
+    const {
+      title,
+      description,
+      githubRepo,
+      techStack,
+      difficulty,
+      maxTeamSize,
+    } = body;
 
     // Validation
     if (title !== undefined) {
       if (typeof title !== "string" || title.length < 3 || title.length > 100) {
         return NextResponse.json(
           { error: "Title must be between 3 and 100 characters" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
 
     if (description !== undefined) {
-      if (typeof description !== "string" || description.length < 10 || description.length > 2000) {
+      if (
+        typeof description !== "string" ||
+        description.length < 10 ||
+        description.length > 2000
+      ) {
         return NextResponse.json(
           { error: "Description must be between 10 and 2000 characters" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -456,7 +588,7 @@ export async function PATCH(
       if (!githubRepo.startsWith("https://github.com/")) {
         return NextResponse.json(
           { error: "GitHub URL must start with https://github.com/" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -464,7 +596,7 @@ export async function PATCH(
     if (techStack !== undefined && !Array.isArray(techStack)) {
       return NextResponse.json(
         { error: "techStack must be an array" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -472,16 +604,20 @@ export async function PATCH(
       if (!["beginner", "intermediate", "advanced"].includes(difficulty)) {
         return NextResponse.json(
           { error: "Invalid difficulty level" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
 
     if (maxTeamSize !== undefined) {
-      if (typeof maxTeamSize !== "number" || maxTeamSize < 1 || maxTeamSize > 20) {
+      if (
+        typeof maxTeamSize !== "number" ||
+        maxTeamSize < 1 ||
+        maxTeamSize > 20
+      ) {
         return NextResponse.json(
           { error: "maxTeamSize must be between 1 and 20" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -491,14 +627,11 @@ export async function PATCH(
     const projectDoc = await projectRef.get();
 
     if (!projectDoc.exists) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
     // Phase 4: Build update object with only provided fields
-    const updateData: Record<string, any> = {
+    const updateData: Partial<Project> & Record<string, unknown> = {
       updatedAt: FieldValue.serverTimestamp(),
       lastActivityAt: FieldValue.serverTimestamp(),
     };
@@ -526,19 +659,17 @@ export async function PATCH(
       createdAt: updatedData?.createdAt?.toDate?.()?.toISOString() || null,
       updatedAt: updatedData?.updatedAt?.toDate?.()?.toISOString() || null,
       approvedAt: updatedData?.approvedAt?.toDate?.()?.toISOString() || null,
-      lastActivityAt: updatedData?.lastActivityAt?.toDate?.()?.toISOString() || null,
+      lastActivityAt:
+        updatedData?.lastActivityAt?.toDate?.()?.toISOString() || null,
       completedAt: updatedData?.completedAt?.toDate?.()?.toISOString() || null,
     };
 
-    return NextResponse.json(
-      { success: true, project },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true, project }, { status: 200 });
   } catch (error) {
     console.error("Error updating project:", error);
     return NextResponse.json(
       { error: "Failed to update project" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
