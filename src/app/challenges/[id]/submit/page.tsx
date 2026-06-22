@@ -3,7 +3,7 @@
 import { useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ExternalLink, Github, Send } from "lucide-react";
+import { ExternalLink, Github, Linkedin, Send } from "lucide-react";
 import { AuthContext } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useMentorship } from "@/contexts/MentorshipContext";
@@ -32,6 +32,7 @@ export default function SubmitChallengePage() {
   const [error, setError] = useState<string | null>(null);
   const [repoUrl, setRepoUrl] = useState("");
   const [demoUrl, setDemoUrl] = useState("");
+  const [linkedinUrl, setLinkedinUrl] = useState("");
   const [description, setDescription] = useState("");
   const [joined, setJoined] = useState(false);
   const [participantCount, setParticipantCount] = useState<number | null>(null);
@@ -151,6 +152,7 @@ export default function SubmitChallengePage() {
           body: JSON.stringify({
             repoUrl: repoUrl.trim(),
             demoUrl: demoUrl.trim() || undefined,
+            linkedinUrl: linkedinUrl.trim(),
             description: description.trim(),
           }),
         },
@@ -330,6 +332,31 @@ export default function SubmitChallengePage() {
               onChange={(event) => setDemoUrl(event.target.value)}
               disabled={submitting || !user}
             />
+          </label>
+
+          <label className="form-control w-full inline-block">
+            <div className="label">
+              <span className="label-text font-semibold flex items-center gap-2">
+                <Linkedin className="w-4 h-4" aria-hidden="true" />
+                LinkedIn Post URL
+              </span>
+            </div>
+            <input
+              type="url"
+              required
+              pattern="https://([\w-]+\.)?linkedin\.com/.+"
+              title="Enter a valid LinkedIn post URL (https://www.linkedin.com/...)"
+              className="input input-bordered w-full"
+              placeholder="https://www.linkedin.com/posts/your-post"
+              value={linkedinUrl}
+              onChange={(event) => setLinkedinUrl(event.target.value)}
+              disabled={submitting || !user}
+            />
+            <div className="label">
+              <span className="label-text-alt text-base-content/60">
+                Share your project on LinkedIn, then paste the post link here.
+              </span>
+            </div>
           </label>
 
           <label className="form-control w-full inline-block">

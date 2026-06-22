@@ -1,4 +1,4 @@
-import { ExternalLink, Github } from "lucide-react";
+import { ExternalLink, Github, Linkedin } from "lucide-react";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import type { Submission } from "@/types/challenges";
 
@@ -77,6 +77,17 @@ export default function SubmissionGallery({
                 >
                   <ExternalLink className="w-4 h-4" aria-hidden="true" />
                   Demo
+                </a>
+              )}
+              {submission.linkedinUrl && (
+                <a
+                  href={submission.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-sm btn-outline"
+                >
+                  <Linkedin className="w-4 h-4" aria-hidden="true" />
+                  LinkedIn
                 </a>
               )}
             </div>
