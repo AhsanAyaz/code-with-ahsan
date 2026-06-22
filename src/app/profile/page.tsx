@@ -12,6 +12,7 @@ import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 import MentorAnnouncementCard from "@/components/mentorship/MentorAnnouncementCard";
 import AvailabilityManager from "@/components/mentorship/AvailabilityManager";
 import BookingsList from "@/components/mentorship/BookingsList";
+import CurrentMenteesCard from "@/components/mentorship/CurrentMenteesCard";
 import { authFetch } from "@/lib/apiClient";
 import { TimeSlotAvailability, UnavailableDate } from "@/types/mentorship";
 import { hasRole } from "@/lib/permissions";
@@ -415,6 +416,11 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
+
+      {/* Current Mentees Section - Mentors Only */}
+      {hasRole(profile, "mentor") && (
+        <CurrentMenteesCard userId={profile.uid} />
+      )}
 
       {/* Availability Management Section - Mentors Only */}
       {hasRole(profile, "mentor") && (
