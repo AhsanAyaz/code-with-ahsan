@@ -8,7 +8,7 @@ import {
 } from "@/services/ChallengeService";
 import { verifyAuth } from "@/lib/auth";
 import { getChallengeParticipantProfile } from "@/lib/challengeProfiles";
-import { validateGitHubUrl } from "@/lib/validation/urls";
+import { validateGitHubUrl, isValidLinkedInUrl } from "@/lib/validation/urls";
 
 function isValidHttpUrl(url: string) {
   try {
@@ -78,7 +78,7 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { repoUrl, demoUrl, description } = body;
+    const { repoUrl, demoUrl, linkedinUrl, description } = body;
 
     if (!repoUrl || typeof repoUrl !== "string") {
       return NextResponse.json(
@@ -92,6 +92,20 @@ export async function POST(
     } catch {
       return NextResponse.json(
         { error: "Repository URL must be a valid GitHub repository URL" },
+        { status: 400 },
+      );
+    }
+
+    if (!linkedinUrl || typeof linkedinUrl !== "string") {
+      return NextResponse.json(
+        { error: "LinkedIn post URL is required" },
+        { status: 400 },
+      );
+    }
+
+    if (!isValidLinkedInUrl(linkedinUrl)) {
+      return NextResponse.json(
+        { error: "LinkedIn post URL must be a valid LinkedIn URL" },
         { status: 400 },
       );
     }
@@ -123,6 +137,7 @@ export async function POST(
       userAvatar,
       repoUrl,
       demoUrl: demoUrl || undefined,
+      linkedinUrl: linkedinUrl.trim(),
       description: description || "",
     });
 

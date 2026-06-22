@@ -90,6 +90,7 @@ function normalizeSubmission(
     userAvatar: data.userAvatar,
     repoUrl: data.repoUrl || "",
     demoUrl: data.demoUrl,
+    linkedinUrl: data.linkedinUrl || "",
     description: data.description || "",
     submittedAt: toIsoString(data.submittedAt as FirestoreDateValue),
     status: data.status || "approved",
