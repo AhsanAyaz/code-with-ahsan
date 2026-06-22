@@ -500,6 +500,12 @@ export default function MentorProfileClient({
       )
     : [];
 
+  // Only active mentees of this mentor can book a session.
+  // requestStatus === "active" means the viewer has an active mentorship_sessions doc with this mentor.
+  const canBook = requestStatus === "active";
+  const bookGateTooltip =
+    "Only active mentees of this mentor can book a session. Request mentorship first.";
+
   return (
     <div className="space-y-6">
       {/* Admin Preview Banner */}
@@ -790,26 +796,52 @@ export default function MentorProfileClient({
             </p>
             {mentor.hasTimeSlots && (
               <div className="mt-4">
-                <Link
-                  href={`/mentorship/book/${mentor.uid}`}
-                  className="btn btn-primary btn-sm"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 mr-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                {canBook ? (
+                  <Link
+                    href={`/mentorship/book/${mentor.uid}`}
+                    className="btn btn-primary btn-sm"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  Book a Session
-                </Link>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    Book a Session
+                  </Link>
+                ) : (
+                  <span className="tooltip" data-tip={bookGateTooltip}>
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm btn-disabled"
+                      disabled
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      Book a Session
+                    </button>
+                  </span>
+                )}
               </div>
             )}
           </div>
@@ -841,12 +873,24 @@ export default function MentorProfileClient({
               This mentor offers 30-minute mentoring sessions. Browse available time slots and book a session.
             </p>
             <div className="card-actions mt-2">
-              <Link
-                href={`/mentorship/book/${mentor.uid}`}
-                className="btn btn-primary btn-sm"
-              >
-                View Available Slots
-              </Link>
+              {canBook ? (
+                <Link
+                  href={`/mentorship/book/${mentor.uid}`}
+                  className="btn btn-primary btn-sm"
+                >
+                  View Available Slots
+                </Link>
+              ) : (
+                <span className="tooltip" data-tip={bookGateTooltip}>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm btn-disabled"
+                    disabled
+                  >
+                    View Available Slots
+                  </button>
+                </span>
+              )}
             </div>
           </div>
         </div>
