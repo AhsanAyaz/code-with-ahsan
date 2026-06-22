@@ -18,6 +18,8 @@ export default function BookMentorPage({
   const [mentor, setMentor] = useState<any>(null);
   const [mentorLoading, setMentorLoading] = useState(true);
   const [bookingComplete, setBookingComplete] = useState(false);
+  const [isActiveMentee, setIsActiveMentee] = useState(false);
+  const [menteeCheckLoading, setMenteeCheckLoading] = useState(true);
 
   // Fetch mentor profile using existing GET /api/mentorship/profile?uid={uid} endpoint
   // This endpoint exists at src/app/api/mentorship/profile/route.ts and returns
@@ -33,7 +35,28 @@ export default function BookMentorPage({
       .finally(() => setMentorLoading(false));
   }, [mentorId]);
 
-  if (loading || mentorLoading) {
+  // Verify the viewer is an active mentee of this mentor before allowing booking.
+  // Reuses the same endpoint the mentor profile uses for requestStatus.
+  useEffect(() => {
+    if (!user) {
+      setMenteeCheckLoading(false);
+      return;
+    }
+    setMenteeCheckLoading(true);
+    fetch(`/api/mentorship/mentee-requests?menteeId=${user.uid}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const active = (data?.requests || []).some(
+          (r: { mentorId: string; status: string }) =>
+            r.mentorId === mentorId && r.status === "active"
+        );
+        setIsActiveMentee(active);
+      })
+      .catch(console.error)
+      .finally(() => setMenteeCheckLoading(false));
+  }, [user, mentorId]);
+
+  if (loading || mentorLoading || menteeCheckLoading) {
     return (
       <div className="flex justify-center py-20">
         <span className="loading loading-spinner loading-lg"></span>
@@ -71,6 +94,33 @@ export default function BookMentorPage({
         <Link href="/profile" className="btn btn-primary mt-4">
           Manage Your Availability
         </Link>
+      </div>
+    );
+  }
+
+  if (!isActiveMentee) {
+    return (
+      <div className="text-center py-20 max-w-lg mx-auto space-y-4">
+        <h2 className="text-xl font-semibold">
+          You&apos;re not an active mentee of this mentor
+        </h2>
+        <p className="text-base-content/70">
+          Only active mentees can book a session. Request mentorship from this
+          mentor first, and once they accept you can book sessions here.
+        </p>
+        <div className="flex justify-center gap-3 flex-wrap">
+          {mentor.username && (
+            <Link
+              href={`/mentorship/mentors/${mentor.username}`}
+              className="btn btn-primary"
+            >
+              View Mentor Profile
+            </Link>
+          )}
+          <Link href="/mentorship/browse" className="btn btn-ghost">
+            Browse Mentors
+          </Link>
+        </div>
       </div>
     );
   }

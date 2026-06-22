@@ -32,6 +32,20 @@ async function findMentorshipSessionInfo(mentorId: string, menteeId: string): Pr
 }
 
 /**
+ * Returns true if an active mentorship session exists between the mentor and mentee.
+ * An "active mentee of a mentor" = a mentorship_sessions doc with matching ids and status "active".
+ */
+async function hasActiveMentorshipSession(mentorId: string, menteeId: string): Promise<boolean> {
+  const snapshot = await db.collection("mentorship_sessions")
+    .where("mentorId", "==", mentorId)
+    .where("menteeId", "==", menteeId)
+    .where("status", "==", "active")
+    .limit(1)
+    .get();
+  return !snapshot.empty;
+}
+
+/**
  * Get Monday-Sunday bounds for the calendar week containing the given date.
  */
 function getCalendarWeekBounds(date: Date): { weekStart: Date; weekEnd: Date } {
@@ -247,6 +261,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Mentee profile data not found" },
         { status: 404 }
+      );
+    }
+
+    // Enforce: only active mentees of this mentor can book a session.
+    const isActiveMentee = await hasActiveMentorshipSession(mentorId, auth.uid);
+    if (!isActiveMentee) {
+      return NextResponse.json(
+        { error: "You must be an active mentee of this mentor to book a session." },
+        { status: 403 }
       );
     }
 
