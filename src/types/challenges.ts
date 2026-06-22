@@ -48,6 +48,7 @@ export interface Submission {
   userAvatar?: string;
   repoUrl: string;
   demoUrl?: string;
+  linkedinUrl: string;
   description: string;
   submittedAt: string; // ISO date string
   status: SubmissionStatus;
