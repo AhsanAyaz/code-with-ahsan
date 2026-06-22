@@ -642,6 +642,72 @@ export async function sendProjectApplicationEmail(
   return sendEmail(creator.email, subject, wrapEmailHtml(content, subject));
 }
 
+/**
+ * Send email to the mentor when a mentee books a session (confirmed or pending approval).
+ *
+ * Non-blocking by convention — callers should `.catch(...)` so a Resend failure never
+ * breaks the booking response.
+ */
+export async function sendBookingConfirmationEmail(params: {
+  mentor: { displayName: string; email: string };
+  menteeName: string;
+  formattedDate: string;
+  formattedTime: string;
+  tzAbbr: string;
+  durationMinutes?: number;
+  sessionTypeLabel?: string;
+  pendingApproval: boolean;
+}): Promise<boolean> {
+  const {
+    mentor,
+    menteeName,
+    formattedDate,
+    formattedTime,
+    tzAbbr,
+    durationMinutes = 30,
+    sessionTypeLabel,
+    pendingApproval,
+  } = params;
+
+  const subject = pendingApproval
+    ? `📋 Booking Approval Requested by ${menteeName}`
+    : `📅 New Session Booked by ${menteeName}`;
+
+  const sessionTypeLine = sessionTypeLabel
+    ? `<p><strong>📝 Session Type:</strong> ${sessionTypeLabel}</p>`
+    : "";
+
+  const detailsBox = `
+    <div class="info-box">
+      <p><strong>👤 With:</strong> ${menteeName}</p>
+      <p><strong>📅 Date:</strong> ${formattedDate}</p>
+      <p><strong>🕐 Time:</strong> ${formattedTime} (${tzAbbr})</p>
+      <p><strong>⏱️ Duration:</strong> ${durationMinutes} minutes</p>
+      ${sessionTypeLine}
+    </div>
+  `;
+
+  const content = pendingApproval
+    ? `
+      <h2>Booking Approval Requested</h2>
+      <p>Hi ${mentor.displayName}, <strong>${menteeName}</strong> wants to book an additional session this week.</p>
+      ${detailsBox}
+      <div class="highlight">
+        <p>Please review and approve or decline this request from your dashboard.</p>
+      </div>
+      <a href="${getSiteUrl()}/mentorship/dashboard" class="button">Review in Dashboard</a>
+    `
+    : `
+      <h2>New Session Booked!</h2>
+      <p>Hi ${mentor.displayName}, <strong>${menteeName}</strong> has booked a session with you.</p>
+      ${detailsBox}
+      <p>Make sure to prepare anything you'd like to cover. See you there! 🎉</p>
+      <a href="${getSiteUrl()}/mentorship/dashboard" class="button">View in Dashboard</a>
+    `;
+
+  return sendEmail(mentor.email, subject, wrapEmailHtml(content, subject));
+}
+
 // ============================================
 // Ambassador Application Emails (Phase 2)
 // ============================================

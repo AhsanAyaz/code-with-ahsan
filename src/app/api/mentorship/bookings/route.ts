@@ -6,6 +6,7 @@ import { createCalendarEvent, deleteCalendarEvent, isCalendarConfigured } from "
 import { FieldValue } from "firebase-admin/firestore";
 import { format, startOfWeek, endOfWeek } from "date-fns";
 import { SESSION_TEMPLATES } from "@/lib/mentorship-templates";
+import { sendBookingConfirmationEmail } from "@/lib/email";
 import type { MentorBooking } from "@/types/mentorship";
 
 /**
@@ -465,6 +466,42 @@ export async function POST(request: NextRequest) {
           ).catch((err) => console.error("Failed to send pending booking Discord notification:", err));
         }
       }
+    }
+
+    // Send mentor email notification (non-blocking — a Resend failure must not break booking)
+    if (mentorData.email) {
+      // Compute the same recipient-aware (mentor timezone) values used by the Discord block.
+      const emailMentorTimezone = mentorData.timeSlotAvailability?.timezone || "UTC";
+      const emailFormattedDate = format(startTimeDate, "EEEE, MMMM d, yyyy");
+      const emailFormattedTime = startTimeDate.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        timeZone: emailMentorTimezone,
+        hour12: true,
+      });
+      const emailTzAbbr = new Intl.DateTimeFormat("en-US", {
+        timeZone: emailMentorTimezone,
+        timeZoneName: "short",
+      }).formatToParts(startTimeDate)
+        .find((part) => part.type === "timeZoneName")?.value || emailMentorTimezone;
+
+      const emailTemplateLabel = templateId
+        ? SESSION_TEMPLATES.find((t) => t.id === templateId)
+        : null;
+      const emailSessionTypeLabel = emailTemplateLabel
+        ? `${emailTemplateLabel.icon} ${emailTemplateLabel.title}`
+        : undefined;
+
+      sendBookingConfirmationEmail({
+        mentor: { displayName: mentorProfile.displayName, email: mentorData.email },
+        menteeName: menteeProfile.displayName,
+        formattedDate: emailFormattedDate,
+        formattedTime: emailFormattedTime,
+        tzAbbr: emailTzAbbr,
+        durationMinutes: 30,
+        sessionTypeLabel: emailSessionTypeLabel,
+        pendingApproval: bookingStatus === "pending_approval",
+      }).catch((err) => console.error("Failed to send booking confirmation email:", err));
     }
 
     return NextResponse.json(

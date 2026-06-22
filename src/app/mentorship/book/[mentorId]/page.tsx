@@ -20,6 +20,7 @@ export default function BookMentorPage({
   const [bookingComplete, setBookingComplete] = useState(false);
   const [isActiveMentee, setIsActiveMentee] = useState(false);
   const [menteeCheckLoading, setMenteeCheckLoading] = useState(true);
+  const userUid = user?.uid;
 
   // Fetch mentor profile using existing GET /api/mentorship/profile?uid={uid} endpoint
   // This endpoint exists at src/app/api/mentorship/profile/route.ts and returns
@@ -37,13 +38,17 @@ export default function BookMentorPage({
 
   // Verify the viewer is an active mentee of this mentor before allowing booking.
   // Reuses the same endpoint the mentor profile uses for requestStatus.
+  // Auth resolution is gated on the outer `loading` flag, so once that settles a
+  // missing userUid means an unauthenticated viewer — clear the check loading via
+  // the async finally rather than a synchronous setState in the effect body.
   useEffect(() => {
-    if (!user) {
-      setMenteeCheckLoading(false);
+    if (loading) return;
+    if (!userUid) {
+      // Resolve asynchronously to avoid a synchronous setState within the effect body.
+      Promise.resolve().then(() => setMenteeCheckLoading(false));
       return;
     }
-    setMenteeCheckLoading(true);
-    fetch(`/api/mentorship/mentee-requests?menteeId=${user.uid}`)
+    fetch(`/api/mentorship/mentee-requests?menteeId=${userUid}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         const active = (data?.requests || []).some(
@@ -54,7 +59,7 @@ export default function BookMentorPage({
       })
       .catch(console.error)
       .finally(() => setMenteeCheckLoading(false));
-  }, [user, mentorId]);
+  }, [loading, userUid, mentorId]);
 
   if (loading || mentorLoading || menteeCheckLoading) {
     return (
