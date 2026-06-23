@@ -59,7 +59,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
               <Link
                 key={link.title}
                 href={link.href}
-                className={`btn btn-ghost${isActive(link.href) ? " btn-active" : ""}`}
+                className={`btn btn-ghost text-base${isActive(link.href) ? " btn-active" : ""}`}
                 {...(link.external
                   ? { target: "_blank", rel: "noopener noreferrer" }
                   : {})}
@@ -70,7 +70,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
             {/* More Dropdown */}
             <div className="relative" ref={moreRef}>
               <button
-                className="btn btn-ghost"
+                className="btn btn-ghost text-base"
                 onClick={() => setMoreOpen(!moreOpen)}
               >
                 More
