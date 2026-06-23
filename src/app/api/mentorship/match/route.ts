@@ -426,10 +426,16 @@ export async function PUT(request: NextRequest) {
             if (menteeData?.discordUsername && mentorProfileData) {
               // We CAN fire-and-forget this one as it's less critical,
               // BUT for Vercel reliability it's safer to await or Promise.all if we had multiple
+              const menteeName =
+                menteeData.displayName ||
+                menteeData.email?.split("@")[0] ||
+                "there";
               await sendDirectMessage(
                 menteeData.discordUsername,
                 `🎉 Great news! **${mentorProfileData.displayName}** has accepted your mentorship request!\n\n` +
-                  `Your private channel is ready: ${result.channelUrl}`
+                  `Hi ${menteeName},\n\n` +
+                  `You recently requested mentorship from **${mentorProfileData.displayName}** on CodeWithAhsan. ` +
+                  `Your private channel is ready — click here and start asking your queries: ${result.channelUrl}`
               ).catch((err) => console.error("Discord DM failed:", err));
             }
           }
