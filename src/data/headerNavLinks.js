@@ -12,7 +12,6 @@ const baseNavLinks = [
   { href: "/books", title: "Books" },
   { href: "https://blog.codewithahsan.dev/", title: "Blog", external: true },
   { href: "/about", title: "About" },
-  { href: "/challenges ", title: "Challenges" },
 ];
 
 // Feature-flag-gated insertions (per D-11 in .planning/phases/01-foundation-roles-array-migration/01-CONTEXT.md).
