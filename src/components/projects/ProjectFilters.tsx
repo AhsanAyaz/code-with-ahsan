@@ -51,7 +51,7 @@ export default function ProjectFilters({
           <span className="label-text font-semibold">Difficulty Level</span>
         </label>
         <select
-          className="select select-bordered w-full"
+          className="select select-bordered w-full bg-base-200"
           value={difficultyFilter}
           onChange={(e) =>
             setDifficultyFilter(e.target.value as ProjectDifficulty | "all")
