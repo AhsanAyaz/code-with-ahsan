@@ -169,7 +169,7 @@ export async function PUT(
         notificationTasks.push(
           sendChannelMessage(
             matchData.discordChannelId,
-            `🎓 **Congratulations! This mentorship has been completed!** 🎉\n\n` +
+            `🎓 **Congratulations! This mentorship has been marked as completed by ${mentorData?.displayName || "the mentor"}!** 🎉\n\n` +
               `Thank you both for your dedication to learning and growth.\n\n` +
               `**${mentorData?.displayName || "Mentor"}**, thank you for sharing your knowledge!\n` +
               `**${menteeData?.displayName || "Mentee"}**, we hope you learned a lot!\n\n` +
