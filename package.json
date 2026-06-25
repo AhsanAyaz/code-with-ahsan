@@ -31,7 +31,8 @@
     "sync-claims:limit-10": "npx tsx scripts/sync-custom-claims.ts --limit=10",
     "drop-legacy-role:dry-run": "npx tsx scripts/drop-legacy-role-field.ts --dry-run",
     "drop-legacy-role": "npx tsx scripts/drop-legacy-role-field.ts",
-    "drop-legacy-role:limit-10": "npx tsx scripts/drop-legacy-role-field.ts --limit=10"
+    "drop-legacy-role:limit-10": "npx tsx scripts/drop-legacy-role-field.ts --limit=10",
+    "prepare": "husky"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
@@ -112,9 +113,20 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
     "globby": "^11.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
     "prettier": "^3.7.4",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.0.18"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
   }
 }
