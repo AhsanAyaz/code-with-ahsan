@@ -84,22 +84,57 @@ export async function PUT(request: NextRequest) {
 
     await sessionRef.update(updateData)
 
-    // On admin reactivation, restore the Discord channel and post the same
-    // notification mentor/mentee receive when a mentorship is auto-reactivated.
-    if (isReactivation && isDiscordConfigured() && sessionData.discordChannelId) {
+    // Fetch profiles once for notification paths that need them
+    const needsProfiles = (status === 'completed' || (currentStatus === 'completed' && status === 'active') || isReactivation)
+    let mentorData: Record<string, unknown> | null = null
+    let menteeData: Record<string, unknown> | null = null
+    if (needsProfiles && isDiscordConfigured()) {
       try {
         const [mentorProfile, menteeProfile] = await Promise.all([
           db.collection('mentorship_profiles').doc(sessionData.mentorId).get(),
           db.collection('mentorship_profiles').doc(sessionData.menteeId).get(),
         ])
-        const mentorData = mentorProfile.exists ? mentorProfile.data() : null
-        const menteeData = menteeProfile.exists ? menteeProfile.data() : null
+        mentorData = mentorProfile.exists ? (mentorProfile.data() as Record<string, unknown>) : null
+        menteeData = menteeProfile.exists ? (menteeProfile.data() as Record<string, unknown>) : null
+      } catch (err) {
+        console.error('Admin sessions: profile fetch failed:', err)
+      }
+    }
 
+    // On admin completion, mirror the mentor-path completion notifications
+    if (status === 'completed' && isDiscordConfigured() && sessionData.discordChannelId) {
+      sendChannelMessage(
+        sessionData.discordChannelId,
+        `🎓 **Congratulations! This mentorship has been marked as completed by an administrator!** 🎉\n\n` +
+          `Thank you both for your dedication to learning and growth.\n\n` +
+          `**${(mentorData?.displayName as string) || 'Mentor'}**, thank you for sharing your knowledge!\n` +
+          `**${(menteeData?.displayName as string) || 'Mentee'}**, we hope you learned a lot!\n\n` +
+          `Best of luck on your continued journey! 🚀`
+      ).catch((err) => console.error('Admin completion channel message failed:', err))
+
+      archiveMentorshipChannel(
+        sessionData.discordChannelId,
+        `📦 **This mentorship session has been completed by an administrator.**\n\nThis channel is now archived. Thank you for being part of the mentorship program!`
+      ).catch((err) => console.error('Admin completion channel archive failed:', err))
+    }
+
+    // On admin revert (completed → active): notify channel the mentorship was restored
+    if (currentStatus === 'completed' && status === 'active' && isDiscordConfigured() && sessionData.discordChannelId) {
+      sendChannelMessage(
+        sessionData.discordChannelId,
+        `↩️ **This mentorship has been reverted to active by an administrator.**\n\n@here Your mentorship session has been restored. Welcome back!`
+      ).catch((err) => console.error('Admin revert channel message failed:', err))
+    }
+
+    // On admin reactivation, restore the Discord channel and post the same
+    // notification mentor/mentee receive when a mentorship is auto-reactivated.
+    if (isReactivation && isDiscordConfigured() && sessionData.discordChannelId) {
+      try {
         // Unarchive the channel (renames, restores topic and member permissions)
         await unarchiveMentorshipChannel(
           sessionData.discordChannelId,
-          mentorData?.discordUsername,
-          menteeData?.discordUsername
+          mentorData?.discordUsername as string | undefined,
+          menteeData?.discordUsername as string | undefined
         ).catch((err) => console.error('Discord channel unarchive failed:', err))
 
         // Post reactivation notification with a dashboard link button
