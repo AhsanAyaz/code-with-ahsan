@@ -10,7 +10,7 @@ const siteMetadata = {
   siteLogo: "/static/images/logo.png",
   image: "/static/images/avatar.jpeg",
   socialBanner: "/images/home-og.png",
-  email: "muhd.ahsanayaz@gmail.com",
+  email: "ahsan.ubitian@gmail.com",
   github: "https://github.com/ahsanayaz",
   twitter: "https://twitter.com/codewith_ahsan",
   twitch: "https://twitch.tv/codewithahsan",
@@ -67,7 +67,7 @@ const siteMetadata = {
       // theme example: github-light, github-dark, preferred-color-scheme
       // github-dark-orange, icy-dark, dark-blue, photon-dark, boxy-light
       theme: "github-light",
-      // theme when dark mode
+      // thefalseme when dark mode
       darkTheme: "github-dark",
     },
     disqusConfig: {
