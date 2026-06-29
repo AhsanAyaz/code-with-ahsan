@@ -354,6 +354,12 @@ export async function GET(request: NextRequest) {
   ) {
     body.cohortPresentationVideoEmbedType = subdoc.cohortPresentationVideoEmbedType;
   }
+  // REF-01 / D-04: the client reads `referralCode` and `timezone` off this
+  // response (AmbassadorPublicCardSection). They were omitted from the
+  // projection, so accepted ambassadors never saw their referral code (GH#238)
+  // and the timezone select fell back to UTC. Surface both (self-scoped read).
+  copyString("referralCode", "referralCode");
+  copyString("timezone", "timezone");
 
   return NextResponse.json(body);
 }
