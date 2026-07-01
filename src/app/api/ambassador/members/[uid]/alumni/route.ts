@@ -7,6 +7,7 @@
  *   (2) profile.roles arrayRemove("ambassador")
  *   (3) subdoc { active: false, endedAt: serverTimestamp }
  *   (4) public_ambassadors/{uid} update { active: false }   <- NOT deleted (ALUMNI-03)
+ *   (5) cohorts/{cohortId} acceptedCount decrement(-1)      <- keeps count in sync (GH#253)
  *
  * Pitfall 1: arrayUnion + arrayRemove on the same field require two
  * sequential batch.update calls — Firestore disallows both transforms
@@ -17,10 +18,8 @@ import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { isAmbassadorProgramEnabled } from "@/lib/features";
 import { requireAdmin } from "@/lib/ambassador/adminAuth";
-import {
-  PUBLIC_AMBASSADORS_COLLECTION,
-  type AmbassadorSubdoc,
-} from "@/types/ambassador";
+import { PUBLIC_AMBASSADORS_COLLECTION, type AmbassadorSubdoc } from "@/types/ambassador";
+import { AMBASSADOR_COHORTS_COLLECTION } from "@/lib/ambassador/constants";
 import { syncAmbassadorClaim } from "@/lib/ambassador/acceptance";
 import { createLogger } from "@/lib/logger";
 
@@ -28,7 +27,7 @@ const logger = createLogger("ambassador/members/[uid]/alumni");
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { uid: string } | Promise<{ uid: string }> },
+  { params }: { params: { uid: string } | Promise<{ uid: string }> }
 ) {
   if (!isAmbassadorProgramEnabled()) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -51,7 +50,7 @@ export async function POST(
   if (subdoc.active === false) {
     return NextResponse.json(
       { error: "Ambassador already transitioned out of active state" },
-      { status: 409 },
+      { status: 409 }
     );
   }
 
@@ -75,6 +74,10 @@ export async function POST(
   // (4) Public projection — flip to inactive but DO NOT delete (ALUMNI-03).
   batch.update(db.collection(PUBLIC_AMBASSADORS_COLLECTION).doc(uid), {
     active: false,
+  });
+  // (5) Decrement cohort acceptedCount to keep it in sync (GH#253).
+  batch.update(db.collection(AMBASSADOR_COHORTS_COLLECTION).doc(subdoc.cohortId), {
+    acceptedCount: FieldValue.increment(-1),
   });
   await batch.commit();
 
