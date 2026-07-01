@@ -3,7 +3,8 @@
  * POST /api/ambassador/members/[uid]/offboard
  *
  * Admin-triggered 2-strike removal. Atomic Firestore batch first
- * (roles strip + subdoc active:false + offboardedAt + delete public projection),
+ * (roles strip + subdoc active:false + offboardedAt + delete public projection +
+ * cohort acceptedCount decrement (GH#253)),
  * then Discord role removal + offboarding email as soft post-commit steps.
  *
  * INVARIANT (ALUMNI-02): does NOT add "alumni-ambassador" to roles.
@@ -28,7 +29,7 @@ const logger = createLogger("ambassador/members/[uid]/offboard");
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { uid: string } | Promise<{ uid: string }> },
+  { params }: { params: { uid: string } | Promise<{ uid: string }> }
 ) {
   if (!isAmbassadorProgramEnabled()) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -50,17 +51,11 @@ export async function POST(
   }
   const subdoc = subdocSnap.data() as AmbassadorSubdoc;
   if (subdoc.active === false) {
-    return NextResponse.json(
-      { error: "Ambassador is already inactive" },
-      { status: 409 },
-    );
+    return NextResponse.json({ error: "Ambassador is already inactive" }, { status: 409 });
   }
 
   const profile = (profileSnap.data() ?? {}) as { displayName?: string; email?: string };
-  const cohortSnap = await db
-    .collection(AMBASSADOR_COHORTS_COLLECTION)
-    .doc(subdoc.cohortId)
-    .get();
+  const cohortSnap = await db.collection(AMBASSADOR_COHORTS_COLLECTION).doc(subdoc.cohortId).get();
   const cohort = cohortSnap.exists ? (cohortSnap.data() as CohortDoc) : null;
 
   // Atomic Firestore batch — hard failure boundary.
@@ -74,16 +69,17 @@ export async function POST(
     updatedAt: FieldValue.serverTimestamp(),
   });
   batch.delete(db.collection(PUBLIC_AMBASSADORS_COLLECTION).doc(uid));
+  // Decrement cohort acceptedCount to keep it in sync (GH#253).
+  batch.update(db.collection(AMBASSADOR_COHORTS_COLLECTION).doc(subdoc.cohortId), {
+    acceptedCount: FieldValue.increment(-1),
+  });
   await batch.commit();
 
   // Soft step 1: Discord role removal (DISC-05).
   let discordRemoved = false;
   if (subdoc.discordMemberId) {
     try {
-      discordRemoved = await removeDiscordRole(
-        subdoc.discordMemberId,
-        DISCORD_AMBASSADOR_ROLE_ID,
-      );
+      discordRemoved = await removeDiscordRole(subdoc.discordMemberId, DISCORD_AMBASSADOR_ROLE_ID);
     } catch (e) {
       logger.error("removeDiscordRole threw unexpectedly", { uid, error: e });
       discordRemoved = false;
@@ -97,7 +93,7 @@ export async function POST(
       emailSent = await sendAmbassadorOffboardingEmail(
         profile.email,
         profile.displayName,
-        cohort.name,
+        cohort.name
       );
     } catch (e) {
       logger.error("sendAmbassadorOffboardingEmail threw unexpectedly", { uid, error: e });

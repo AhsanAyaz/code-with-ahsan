@@ -21,6 +21,7 @@ vi.mock("firebase-admin/firestore", () => ({
     serverTimestamp: () => "SERVER_TS",
     arrayRemove: (v: string) => ({ __op: "arrayRemove", v }),
     arrayUnion: (v: string) => ({ __op: "arrayUnion", v }),
+    increment: (n: number) => ({ __op: "increment", n }),
   },
 }));
 
@@ -34,11 +35,13 @@ vi.mock("@/lib/firebaseAdmin", () => {
     collection: vi.fn().mockReturnValue({ doc: vi.fn().mockReturnValue(subdocRef) }),
   };
   const publicAmbDoc = { id: "pa-doc" };
+  const cohortDoc = { id: "c1" };
   return {
     db: {
       collection: vi.fn((name: string) => {
         if (name === "mentorship_profiles") return { doc: vi.fn().mockReturnValue(profileRef) };
         if (name === "public_ambassadors") return { doc: vi.fn().mockReturnValue(publicAmbDoc) };
+        if (name === "cohorts") return { doc: vi.fn().mockReturnValue(cohortDoc) };
         return { doc: vi.fn().mockReturnValue({}) };
       }),
       batch: vi.fn(() => ({ update: updateMock, delete: deleteMock, commit: commitMock })),
@@ -94,8 +97,8 @@ describe("POST /api/ambassador/members/[uid]/alumni", () => {
         expect(["arrayUnion", "arrayRemove"]).toContain(roles.__op);
       }
     }
-    // Total updateMock call count: 1 union + 1 remove + subdoc update + public_ambassadors update = 4
-    expect(updateMock.mock.calls.length).toBe(4);
+    // Total updateMock call count: 1 union + 1 remove + subdoc update + public_ambassadors update + cohort decrement = 5
+    expect(updateMock.mock.calls.length).toBe(5);
   });
 
   it("ALUMNI-03: public_ambassadors is UPDATED (active:false) NOT DELETED", async () => {
@@ -108,6 +111,16 @@ describe("POST /api/ambassador/members/[uid]/alumni", () => {
       return payload?.active === false && Object.keys(payload).length === 1;
     });
     expect(publicUpdates.length).toBe(1);
+  });
+
+  it("GH#253: decrements cohort acceptedCount on alumni transition", async () => {
+    await POST(makeReq(), { params: { uid: "u1" } });
+    const decrements = updateMock.mock.calls.filter((args) => {
+      const payload = args[1] as Record<string, unknown>;
+      const field = payload?.acceptedCount as { __op?: string; n?: number } | undefined;
+      return field?.__op === "increment" && field.n === -1;
+    });
+    expect(decrements.length).toBe(1);
   });
 
   it("returns 409 if subdoc.active is already false", async () => {
