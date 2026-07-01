@@ -1,17 +1,17 @@
-import { useContext, useRef, useState } from 'react'
-import { getApp } from 'firebase/app'
-import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
-import { getFirestore, setDoc, doc, getDoc } from 'firebase/firestore'
-import { getFireStorageFileName } from '../lib/utils/queryParams'
-import { URL_REGEX } from '../lib/regexes'
-import Button from './Button'
-import Dialog from './Dialog'
-import { getEnrollmentDoc } from '../services/EnrollmentService'
-import { AuthContext } from '@/contexts/AuthContext'
+import { useContext, useRef, useState } from "react";
+import { getApp } from "firebase/app";
+import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { getFirestore, setDoc, doc, getDoc } from "firebase/firestore";
+import { getFireStorageFileName } from "../lib/utils/queryParams";
+import { URL_REGEX } from "../lib/regexes";
+import Button from "./Button";
+import Dialog from "./Dialog";
+import { getEnrollmentDoc } from "../services/EnrollmentService";
+import { AuthContext } from "@/contexts/AuthContext";
 
 function getFirebaseServices() {
-  const app = getApp()
-  return { storage: getStorage(app), firestore: getFirestore(app) }
+  const app = getApp();
+  return { storage: getStorage(app), firestore: getFirestore(app) };
 }
 
 export default function SubmissionWrapper({
@@ -21,90 +21,105 @@ export default function SubmissionWrapper({
   submissionParams,
   children,
   submitButtonText,
-  submitModalTitle = 'Submit',
+  submitModalTitle = "Submit",
   enrollmentChanged,
 }) {
-  const submissionFileElRef = useRef(null)
-  const [showSubDialog, setShowSubDialog] = useState(false)
-  const [isSubmittingProject, setIsSubmittingProject] = useState(false)
-  const [submissionFile, setSubmissionFile] = useState(null)
-  const [submissionDemoLink, setSubmissionDemoLink] = useState('')
-  const supportedFileTypes = ['image/png', 'image/jpeg']
-  const { setShowLoginPopup } = useContext(AuthContext)
+  const submissionFileElRef = useRef(null);
+  const [showSubDialog, setShowSubDialog] = useState(false);
+  const [isSubmittingProject, setIsSubmittingProject] = useState(false);
+  const [submissionFile, setSubmissionFile] = useState(null);
+  const [submissionDemoLink, setSubmissionDemoLink] = useState("");
+  const supportedFileTypes = ["image/png", "image/jpeg"];
+  const { setShowLoginPopup } = useContext(AuthContext);
 
   const newSubmission = async () => {
     if (!user) {
-      setShowLoginPopup(true)
-      return
+      setShowLoginPopup(true);
+      return;
     }
-    await getEnrollmentDoc({ course: { slug: submissionParams.courseId }, attendee: user }, true)
-    enrollmentChanged?.({ enrolled: true })
-    setShowSubDialog(true)
-  }
+    // Open the submission dialog immediately so the button always responds to a
+    // click. Previously we awaited getEnrollmentDoc() *before* opening the
+    // dialog with no error handling — if that Firestore read/write threw
+    // (e.g. rules denied the enrollment create), the whole handler rejected and
+    // the modal never opened, so the button looked broken (silent no-op).
+    setShowSubDialog(true);
+
+    // Best-effort enrollment: ensure the user has an enrollment doc, but never
+    // let a failure here block submission. Surface it instead of swallowing it.
+    try {
+      await getEnrollmentDoc({ course: { slug: submissionParams.courseId }, attendee: user }, true);
+      enrollmentChanged?.({ enrolled: true });
+    } catch (e) {
+      console.error("Failed to ensure enrollment before submission", e);
+      alert(
+        "Could not verify your course enrollment. You can still submit; if the problem persists, please refresh."
+      );
+    }
+  };
 
   function handleFileSelect(evt) {
-    evt.stopPropagation()
-    evt.preventDefault()
-    const file = evt.target.files[0]
-    setSubmissionFile(file)
+    evt.stopPropagation();
+    evt.preventDefault();
+    const file = evt.target.files[0];
+    setSubmissionFile(file);
   }
 
   function dropHandler(ev) {
-    ev.preventDefault()
+    ev.preventDefault();
     if (ev.dataTransfer.items) {
-      const items = [...ev.dataTransfer.items].filter((item) => item.kind === 'file')
+      const items = [...ev.dataTransfer.items].filter((item) => item.kind === "file");
       if (items.length > 1) {
-        return alert('Please only select one file')
+        return alert("Please only select one file");
       } else {
-        const file = items[0].getAsFile()
-        setSubmissionFile(file)
+        const file = items[0].getAsFile();
+        setSubmissionFile(file);
       }
     } else {
-      const items = [...ev.dataTransfer.files]
+      const items = [...ev.dataTransfer.files];
       // Use DataTransfer interface to access the file(s)
       if (items.length > 1) {
-        return alert('Please only select one file')
+        return alert("Please only select one file");
       } else {
-        setSubmissionFile(items[0])
+        setSubmissionFile(items[0]);
       }
     }
   }
 
   function dragOverHandler(ev) {
-    ev.preventDefault()
+    ev.preventDefault();
   }
 
   const onSubModalClose = () => {
-    setSubmissionFile(null)
-    setSubmissionDemoLink('')
-    setShowSubDialog(false)
+    setSubmissionFile(null);
+    setSubmissionDemoLink("");
+    setShowSubDialog(false);
     if (submissionFileElRef.current) {
-      submissionFileElRef.current.value = ''
+      submissionFileElRef.current.value = "";
     }
-  }
+  };
 
   const deleteProjectFileIfExists = async (docRef) => {
-    const existingDoc = await getDoc(docRef)
+    const existingDoc = await getDoc(docRef);
     if (existingDoc.exists()) {
-      const { storage } = getFirebaseServices()
-      const existingFileUrl = existingDoc.data().screenshotUrl
-      const filePath = getFireStorageFileName(existingFileUrl)
-      await deleteObject(ref(storage, filePath))
+      const { storage } = getFirebaseServices();
+      const existingFileUrl = existingDoc.data().screenshotUrl;
+      const filePath = getFireStorageFileName(existingFileUrl);
+      await deleteObject(ref(storage, filePath));
     }
-  }
+  };
   const saveSubmission = async (file, user, link) => {
     if (!file || !user || !link) {
-      return
+      return;
     }
     if (!URL_REGEX.test(link)) {
-      return alert('Invalid URL')
+      return alert("Invalid URL");
     }
     try {
-      const { firestore } = getFirebaseServices()
-      const docRef = doc(firestore, submissionUrl)
-      setIsSubmittingProject(true)
-      deleteProjectFileIfExists(docRef)
-      const url = await uploadFile(file)
+      const { firestore } = getFirebaseServices();
+      const docRef = doc(firestore, submissionUrl);
+      setIsSubmittingProject(true);
+      deleteProjectFileIfExists(docRef);
+      const url = await uploadFile(file);
       const params = {
         ...(submissionParams || {}),
         by: {
@@ -114,35 +129,37 @@ export default function SubmissionWrapper({
         },
         screenshotUrl: url,
         demoLink: link,
+        // Timestamp captured inside an async submit handler, not during render.
+        // eslint-disable-next-line react-hooks/purity
         createdAt: Date.now(),
-      }
-      await setDoc(docRef, params)
-      setIsSubmittingProject(false)
-      onSubModalClose()
-      submissionDone()
+      };
+      await setDoc(docRef, params);
+      setIsSubmittingProject(false);
+      onSubModalClose();
+      submissionDone();
     } catch (e) {
-      setIsSubmittingProject(false)
-      console.log('Failed to submit project', e)
-      alert('Failed to submit project')
+      setIsSubmittingProject(false);
+      console.log("Failed to submit project", e);
+      alert("Failed to submit project");
     }
-  }
+  };
 
   const uploadFile = async (file) => {
     const metadata = {
       contentType: file.type,
-    }
-    const { storage } = getFirebaseServices()
-    const fileRef = ref(storage, `project-submissions/${file.name}`)
-    await uploadBytes(fileRef, file, metadata)
-    const url = await getDownloadURL(fileRef)
-    return url
-  }
+    };
+    const { storage } = getFirebaseServices();
+    const fileRef = ref(storage, `project-submissions/${file.name}`);
+    await uploadBytes(fileRef, file, metadata);
+    const url = await getDownloadURL(fileRef);
+    return url;
+  };
 
   return (
     <>
       <div className="flex items-center justify-end mb-4">
         <Button color="primary" title="Submit your project" onClick={newSubmission}>
-          {submitButtonText || '+'}
+          {submitButtonText || "+"}
         </Button>
       </div>
 
@@ -154,16 +171,16 @@ export default function SubmissionWrapper({
         isLoading={isSubmittingProject}
         actions={[
           {
-            label: 'Cancel',
+            label: "Cancel",
             onClick: onSubModalClose,
           },
           {
-            label: 'Save',
+            label: "Save",
             disabled: !(submissionFile && submissionDemoLink),
             onClick: () => {
-              saveSubmission(submissionFile, user, submissionDemoLink)
+              saveSubmission(submissionFile, user, submissionDemoLink);
             },
-            type: 'primary',
+            type: "primary",
           },
         ]}
       >
@@ -200,7 +217,7 @@ export default function SubmissionWrapper({
             <input
               ref={submissionFileElRef}
               type="file"
-              accept={supportedFileTypes.join(', ')}
+              accept={supportedFileTypes.join(", ")}
               onChange={handleFileSelect}
               name="file_upload"
               className="hidden"
@@ -211,7 +228,7 @@ export default function SubmissionWrapper({
             className="focus:ring-2 focus:ring-blue-500 focus:outline-none appearance-none w-full text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-md my-4 py-2 px-4 ring-1 ring-slate-200 shadow-sm"
             type="url"
             onChange={(ev) => {
-              setSubmissionDemoLink(ev.target.value)
+              setSubmissionDemoLink(ev.target.value);
             }}
             aria-label="Demo link"
             placeholder="Demo link"
@@ -219,5 +236,5 @@ export default function SubmissionWrapper({
         </div>
       </Dialog>
     </>
-  )
+  );
 }
