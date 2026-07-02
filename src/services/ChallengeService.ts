@@ -19,12 +19,7 @@ const SUBMISSIONS_COLLECTION = "submissions";
 const LEADERBOARD_COLLECTION = "leaderboard";
 const CHALLENGE_PARTICIPANTS_COLLECTION = "challenge_participants";
 
-type FirestoreDateValue =
-  | string
-  | Date
-  | { toDate: () => Date }
-  | null
-  | undefined;
+type FirestoreDateValue = string | Date | { toDate: () => Date } | null | undefined;
 
 /**
  * Error thrown when a user attempts to submit multiple projects
@@ -55,10 +50,18 @@ function toIsoString(value: FirestoreDateValue): string {
   return value.toDate().toISOString();
 }
 
-function normalizeChallenge(
-  doc: FirebaseFirestore.DocumentSnapshot,
-): Challenge {
+function deriveChallengeStatus(startDate: string, endDate: string): ChallengeStatus {
+  const now = new Date();
+  if (now < new Date(startDate)) return "upcoming";
+  if (now > new Date(endDate)) return "past";
+  return "active";
+}
+
+function normalizeChallenge(doc: FirebaseFirestore.DocumentSnapshot): Challenge {
   const data = doc.data() as Partial<Challenge>;
+
+  const startDate = toIsoString(data.startDate as FirestoreDateValue);
+  const endDate = toIsoString(data.endDate as FirestoreDateValue);
 
   return {
     id: doc.id,
@@ -66,9 +69,9 @@ function normalizeChallenge(
     description: data.description || "",
     topic: data.topic || "General",
     difficulty: data.difficulty || "intermediate",
-    startDate: toIsoString(data.startDate as FirestoreDateValue),
-    endDate: toIsoString(data.endDate as FirestoreDateValue),
-    status: data.status || "upcoming",
+    startDate,
+    endDate,
+    status: deriveChallengeStatus(startDate, endDate),
     brief: data.brief || "",
     deliverables: Array.isArray(data.deliverables) ? data.deliverables : [],
     resources: Array.isArray(data.resources) ? data.resources : [],
@@ -77,9 +80,7 @@ function normalizeChallenge(
   };
 }
 
-function normalizeSubmission(
-  doc: FirebaseFirestore.DocumentSnapshot,
-): Submission {
+function normalizeSubmission(doc: FirebaseFirestore.DocumentSnapshot): Submission {
   const data = doc.data() as Partial<Submission>;
 
   return {
@@ -98,9 +99,7 @@ function normalizeSubmission(
   };
 }
 
-function normalizeParticipant(
-  doc: FirebaseFirestore.DocumentSnapshot,
-): ChallengeParticipant {
+function normalizeParticipant(doc: FirebaseFirestore.DocumentSnapshot): ChallengeParticipant {
   const data = doc.data() as Partial<ChallengeParticipant>;
 
   return {
@@ -118,12 +117,12 @@ function normalizeParticipant(
 /**
  * Records a user's participation in a specific challenge.
  * This is a required step before they can submit a project.
- * 
+ *
  * @param participantData The user and challenge IDs.
  * @returns The new participant record.
  */
 export async function joinChallenge(
-  participantData: Omit<ChallengeParticipant, "id" | "joinedAt">,
+  participantData: Omit<ChallengeParticipant, "id" | "joinedAt">
 ): Promise<ChallengeParticipant> {
   const docId = `${participantData.challengeId}_${participantData.userId}`;
   const docRef = db.collection(CHALLENGE_PARTICIPANTS_COLLECTION).doc(docId);
@@ -160,13 +159,11 @@ export async function joinChallenge(
 
 /**
  * Gets the total number of users who have joined a specific challenge.
- * 
+ *
  * @param challengeId The ID of the challenge.
  * @returns The count of participants.
  */
-export async function getChallengeParticipantsCount(
-  challengeId: string,
-): Promise<number> {
+export async function getChallengeParticipantsCount(challengeId: string): Promise<number> {
   const snapshot = await db
     .collection(CHALLENGE_PARTICIPANTS_COLLECTION)
     .where("challengeId", "==", challengeId)
@@ -177,18 +174,16 @@ export async function getChallengeParticipantsCount(
 
 /**
  * Checks if a specific user has joined a specific challenge.
- * 
+ *
  * @param challengeId The ID of the challenge.
  * @param userId The ID of the user.
  * @returns True if the user has joined, false otherwise.
  */
 export async function isChallengeParticipant(
   challengeId: string,
-  userId: string,
+  userId: string
 ): Promise<boolean> {
-  const docRef = db
-    .collection(CHALLENGE_PARTICIPANTS_COLLECTION)
-    .doc(`${challengeId}_${userId}`);
+  const docRef = db.collection(CHALLENGE_PARTICIPANTS_COLLECTION).doc(`${challengeId}_${userId}`);
 
   const doc = await docRef.get();
   return doc.exists;
@@ -203,13 +198,10 @@ export async function isChallengeParticipant(
  * @returns Participants with their submission status.
  */
 export async function getChallengeParticipantsWithStatus(
-  challengeId: string,
+  challengeId: string
 ): Promise<ChallengeParticipantStatus[]> {
   const [participantsSnap, submissions] = await Promise.all([
-    db
-      .collection(CHALLENGE_PARTICIPANTS_COLLECTION)
-      .where("challengeId", "==", challengeId)
-      .get(),
+    db.collection(CHALLENGE_PARTICIPANTS_COLLECTION).where("challengeId", "==", challengeId).get(),
     getSubmissionsForChallenge(challengeId),
   ]);
 
@@ -235,15 +227,9 @@ export async function getChallengeParticipantsWithStatus(
 }
 
 function monthRange(yearMonth?: string) {
-  const current = yearMonth
-    ? new Date(`${yearMonth}-01T00:00:00.000Z`)
-    : new Date();
-  const start = new Date(
-    Date.UTC(current.getUTCFullYear(), current.getUTCMonth(), 1),
-  );
-  const end = new Date(
-    Date.UTC(current.getUTCFullYear(), current.getUTCMonth() + 1, 1),
-  );
+  const current = yearMonth ? new Date(`${yearMonth}-01T00:00:00.000Z`) : new Date();
+  const start = new Date(Date.UTC(current.getUTCFullYear(), current.getUTCMonth(), 1));
+  const end = new Date(Date.UTC(current.getUTCFullYear(), current.getUTCMonth() + 1, 1));
 
   return {
     month: `${start.getUTCFullYear()}-${String(start.getUTCMonth() + 1).padStart(2, "0")}`,
@@ -256,12 +242,12 @@ function monthRange(yearMonth?: string) {
 
 /**
  * Creates a new Challenge in Firestore.
- * 
+ *
  * @param challengeData The data for the new challenge.
  * @returns The created Challenge object including its generated ID.
  */
 export async function createChallenge(
-  challengeData: Omit<Challenge, "id" | "createdAt" | "updatedAt">,
+  challengeData: Omit<Challenge, "id" | "createdAt" | "updatedAt">
 ): Promise<Challenge> {
   const docRef = db.collection(CHALLENGES_COLLECTION).doc();
   const now = new Date().toISOString();
@@ -279,14 +265,11 @@ export async function createChallenge(
 
 /**
  * Updates an existing Challenge in Firestore.
- * 
+ *
  * @param id The ID of the challenge to update.
  * @param updates Partial challenge data to apply.
  */
-export async function updateChallenge(
-  id: string,
-  updates: Partial<Challenge>,
-): Promise<void> {
+export async function updateChallenge(id: string, updates: Partial<Challenge>): Promise<void> {
   const docRef = db.collection(CHALLENGES_COLLECTION).doc(id);
   await docRef.update({
     ...updates,
@@ -296,7 +279,7 @@ export async function updateChallenge(
 
 /**
  * Deletes a Challenge from Firestore.
- * 
+ *
  * @param id The ID of the challenge to delete.
  */
 export async function deleteChallenge(id: string): Promise<void> {
@@ -306,7 +289,7 @@ export async function deleteChallenge(id: string): Promise<void> {
 
 /**
  * Retrieves a single Challenge by its ID.
- * 
+ *
  * @param id The ID of the challenge.
  * @returns The Challenge object or null if not found.
  */
@@ -324,13 +307,11 @@ export async function getChallenge(id: string): Promise<Challenge | null> {
 /**
  * Retrieves a list of Challenges, optionally filtered by status.
  * Results are ordered by start date descending.
- * 
+ *
  * @param status Optional status to filter by (e.g. "active").
  * @returns An array of Challenges.
  */
-export async function getChallenges(
-  status?: ChallengeStatus,
-): Promise<Challenge[]> {
+export async function getChallenges(status?: ChallengeStatus): Promise<Challenge[]> {
   let query: FirebaseFirestore.Query = db.collection(CHALLENGES_COLLECTION);
 
   if (status) {
@@ -352,18 +333,16 @@ export async function getChallenges(
  * 2. Prevents duplicate submissions.
  * 3. Creates the submission record.
  * 4. Updates or creates the user's global leaderboard entry.
- * 
+ *
  * @param submissionData The data for the new submission.
  * @returns The created Submission object.
  */
 export async function createSubmission(
-  submissionData: Omit<Submission, "id" | "submittedAt" | "status" | "score">,
+  submissionData: Omit<Submission, "id" | "submittedAt" | "status" | "score">
 ): Promise<Submission> {
   const docId = `${submissionData.challengeId}_${submissionData.userId}`;
   const docRef = db.collection(SUBMISSIONS_COLLECTION).doc(docId);
-  const leaderboardRef = db
-    .collection(LEADERBOARD_COLLECTION)
-    .doc(submissionData.userId);
+  const leaderboardRef = db.collection(LEADERBOARD_COLLECTION).doc(submissionData.userId);
 
   const submission: Submission = {
     ...submissionData,
@@ -416,7 +395,9 @@ export async function createSubmission(
         totalPoints: FieldValue.increment(CHALLENGE_SUBMISSION_SCORE),
         challengesCompleted: FieldValue.increment(1),
         username: submission.userName,
-        ...(submission.userAvatar !== undefined ? { userAvatar: submission.userAvatar } : { userAvatar: FieldValue.delete() }),
+        ...(submission.userAvatar !== undefined
+          ? { userAvatar: submission.userAvatar }
+          : { userAvatar: FieldValue.delete() }),
       });
     }
   });
@@ -427,13 +408,11 @@ export async function createSubmission(
 /**
  * Retrieves all approved submissions for a specific challenge.
  * Results are ordered by submission date descending.
- * 
+ *
  * @param challengeId The ID of the challenge.
  * @returns An array of Submissions.
  */
-export async function getSubmissionsForChallenge(
-  challengeId: string,
-): Promise<Submission[]> {
+export async function getSubmissionsForChallenge(challengeId: string): Promise<Submission[]> {
   const query = db
     .collection(SUBMISSIONS_COLLECTION)
     .where("challengeId", "==", challengeId)
@@ -445,15 +424,32 @@ export async function getSubmissionsForChallenge(
 }
 
 /**
+ * Retrieves ALL submissions for a challenge regardless of status.
+ * For admin use only — do not expose on public endpoints.
+ *
+ * @param challengeId The ID of the challenge.
+ * @returns An array of Submissions ordered by submission date descending.
+ */
+export async function getAllSubmissionsForChallenge(challengeId: string): Promise<Submission[]> {
+  const query = db
+    .collection(SUBMISSIONS_COLLECTION)
+    .where("challengeId", "==", challengeId)
+    .orderBy("submittedAt", "desc");
+
+  const snapshot = await query.get();
+  return snapshot.docs.map((doc) => normalizeSubmission(doc));
+}
+
+/**
  * Generates a mini-leaderboard specific to a single challenge.
- * 
+ *
  * @param challengeId The ID of the challenge.
  * @param limit The maximum number of entries to return.
  * @returns An array of LeaderboardEntries.
  */
 export async function getLeaderboardForChallenge(
   challengeId: string,
-  limit: number = 10,
+  limit: number = 10
 ): Promise<LeaderboardEntry[]> {
   const submissions = await getSubmissionsForChallenge(challengeId);
   return buildLeaderboardFromSubmissions(submissions, limit);
@@ -465,7 +461,7 @@ export async function getLeaderboardForChallenge(
  * Manually updates a user's global leaderboard entry.
  * Primarily used via transaction within `createSubmission`, but exposed
  * here for potential admin adjustments or other point-awarding systems.
- * 
+ *
  * @param userId The ID of the user.
  * @param username The display name of the user.
  * @param userAvatar The avatar URL of the user.
@@ -475,7 +471,7 @@ export async function updateLeaderboardEntry(
   userId: string,
   username: string,
   userAvatar: string | undefined,
-  pointsToAdd: number,
+  pointsToAdd: number
 ): Promise<void> {
   const docRef = db.collection(LEADERBOARD_COLLECTION).doc(userId);
 
@@ -505,17 +501,12 @@ export async function updateLeaderboardEntry(
 /**
  * Retrieves the global all-time leaderboard.
  * Results are ordered by total points descending.
- * 
+ *
  * @param limit The maximum number of entries to return (default 50).
  * @returns An array of LeaderboardEntries.
  */
-export async function getLeaderboard(
-  limit: number = 50,
-): Promise<LeaderboardEntry[]> {
-  const query = db
-    .collection(LEADERBOARD_COLLECTION)
-    .orderBy("totalPoints", "desc")
-    .limit(limit);
+export async function getLeaderboard(limit: number = 50): Promise<LeaderboardEntry[]> {
+  const query = db.collection(LEADERBOARD_COLLECTION).orderBy("totalPoints", "desc").limit(limit);
 
   const snapshot = await query.get();
   return snapshot.docs.map((doc) => doc.data() as LeaderboardEntry);
@@ -524,14 +515,14 @@ export async function getLeaderboard(
 /**
  * Dynamically calculates a monthly leaderboard by aggregating all
  * submissions created within a specific month.
- * 
+ *
  * @param yearMonth Optional YYYY-MM string. Defaults to the current UTC month.
  * @param limit The maximum number of entries to return (default 50).
  * @returns An object containing the month string and the calculated leaderboard.
  */
 export async function getMonthlyLeaderboard(
   yearMonth?: string,
-  limit: number = 50,
+  limit: number = 50
 ): Promise<{ month: string; leaderboard: LeaderboardEntry[] }> {
   const { month, startIso, endIso } = monthRange(yearMonth);
   const snapshot = await db
