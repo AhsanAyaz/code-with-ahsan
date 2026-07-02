@@ -1,25 +1,6 @@
 {
   "indexes": [
     {
-      "collectionGroup": "applications",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "status",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "declinedAt",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
-        }
-      ],
-      "density": "SPARSE_ALL"
-    },
-    {
       "collectionGroup": "ambassador_applications",
       "queryScope": "COLLECTION",
       "fields": [
@@ -30,13 +11,8 @@
         {
           "fieldPath": "submittedAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "ambassador_applications",
@@ -53,13 +29,8 @@
         {
           "fieldPath": "status",
           "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "ambassador_applications",
@@ -72,13 +43,8 @@
         {
           "fieldPath": "submittedAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "ambassador_applications",
@@ -95,13 +61,8 @@
         {
           "fieldPath": "submittedAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "ambassador_applications",
@@ -114,13 +75,8 @@
         {
           "fieldPath": "status",
           "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "ambassador_applications",
@@ -133,13 +89,8 @@
         {
           "fieldPath": "submittedAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "ambassador_cron_flags",
@@ -152,13 +103,8 @@
         {
           "fieldPath": "resolved",
           "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "ambassador_cron_flags",
@@ -175,13 +121,8 @@
         {
           "fieldPath": "flaggedAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "ambassador_events",
@@ -194,13 +135,8 @@
         {
           "fieldPath": "date",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "ambassador_events",
@@ -213,13 +149,8 @@
         {
           "fieldPath": "hidden",
           "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "ambassador_events",
@@ -236,51 +167,36 @@
         {
           "fieldPath": "date",
           "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
-      "collectionGroup": "monthly_reports",
+      "collectionGroup": "applications",
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "ambassadorId",
+          "fieldPath": "status",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "submittedAt",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
+          "fieldPath": "declinedAt",
           "order": "ASCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
-      "collectionGroup": "referrals",
+      "collectionGroup": "challenges",
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "ambassadorId",
+          "fieldPath": "status",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "convertedAt",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
+          "fieldPath": "startDate",
+          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "cohorts",
@@ -297,13 +213,8 @@
         {
           "fieldPath": "startDate",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "mentor_ratings",
@@ -316,13 +227,8 @@
         {
           "fieldPath": "createdAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "mentorship_alerts",
@@ -335,13 +241,8 @@
         {
           "fieldPath": "createdAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "mentorship_bookings",
@@ -354,13 +255,8 @@
         {
           "fieldPath": "startTime",
           "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "mentorship_bookings",
@@ -373,13 +269,8 @@
         {
           "fieldPath": "startTime",
           "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "mentorship_bookings",
@@ -396,13 +287,8 @@
         {
           "fieldPath": "startTime",
           "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "mentorship_goals",
@@ -415,21 +301,29 @@
         {
           "fieldPath": "createdAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "mentorship_profiles",
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
+          "fieldPath": "bioEmbedding",
+          "vectorConfig": {
+            "dimension": 768,
+            "flat": {}
+          }
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mentorship_profiles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "roles",
+          "arrayConfig": "CONTAINS"
         },
         {
           "fieldPath": "bioEmbedding",
@@ -438,8 +332,7 @@
             "flat": {}
           }
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "mentorship_profiles",
@@ -454,40 +347,13 @@
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
-        },
-        {
           "fieldPath": "bioEmbedding",
           "vectorConfig": {
             "dimension": 768,
             "flat": {}
           }
         }
-      ],
-      "density": "SPARSE_ALL"
-    },
-    {
-      "collectionGroup": "mentorship_profiles",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "roles",
-          "arrayConfig": "CONTAINS"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "bioEmbedding",
-          "vectorConfig": {
-            "dimension": 768,
-            "flat": {}
-          }
-        }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "mentorship_scheduled_sessions",
@@ -500,13 +366,8 @@
         {
           "fieldPath": "scheduledAt",
           "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "monthly_reports",
@@ -519,13 +380,22 @@
         {
           "fieldPath": "month",
           "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "monthly_reports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ambassadorId",
+          "order": "ASCENDING"
         },
         {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
+          "fieldPath": "submittedAt",
+          "order": "ASCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "project_applications",
@@ -538,13 +408,8 @@
         {
           "fieldPath": "createdAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "project_invitations",
@@ -557,13 +422,8 @@
         {
           "fieldPath": "createdAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "project_invitations",
@@ -580,13 +440,8 @@
         {
           "fieldPath": "createdAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "project_members",
@@ -599,13 +454,8 @@
         {
           "fieldPath": "joinedAt",
           "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "ASCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "projects",
@@ -618,13 +468,8 @@
         {
           "fieldPath": "createdAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "projects",
@@ -637,13 +482,8 @@
         {
           "fieldPath": "completedAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "projects",
@@ -656,13 +496,8 @@
         {
           "fieldPath": "createdAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "projects",
@@ -679,13 +514,8 @@
         {
           "fieldPath": "createdAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "public_ambassadors",
@@ -702,13 +532,22 @@
         {
           "fieldPath": "updatedAt",
           "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "referrals",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ambassadorId",
+          "order": "ASCENDING"
         },
         {
-          "fieldPath": "__name__",
+          "fieldPath": "convertedAt",
           "order": "ASCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "roadmaps",
@@ -721,13 +560,8 @@
         {
           "fieldPath": "createdAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "roadmaps",
@@ -744,13 +578,8 @@
         {
           "fieldPath": "createdAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "roadmaps",
@@ -763,13 +592,8 @@
         {
           "fieldPath": "createdAt",
           "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
         }
-      ],
-      "density": "SPARSE_ALL"
+      ]
     },
     {
       "collectionGroup": "roadmaps",
@@ -781,25 +605,6 @@
         },
         {
           "fieldPath": "createdAt",
-          "order": "DESCENDING"
-        },
-        {
-          "fieldPath": "__name__",
-          "order": "DESCENDING"
-        }
-      ],
-      "density": "SPARSE_ALL"
-    },
-    {
-      "collectionGroup": "challenges",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "status",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "startDate",
           "order": "DESCENDING"
         }
       ]
