@@ -47,7 +47,8 @@ vi.mock("@/lib/firebaseAdmin", () => {
       collection: vi.fn((name: string) => {
         if (name === "mentorship_profiles") return { doc: vi.fn().mockReturnValue(profileRef) };
         if (name === "cohorts") return { doc: vi.fn().mockReturnValue(cohortRef) };
-        if (name === "public_ambassadors") return { doc: vi.fn().mockReturnValue({ id: "pa-doc" }) };
+        if (name === "public_ambassadors")
+          return { doc: vi.fn().mockReturnValue({ id: "pa-doc" }) };
         return { doc: vi.fn().mockReturnValue({}) };
       }),
       batch: vi.fn(() => ({ update: updateMock, delete: deleteMock, commit: commitMock })),
@@ -59,6 +60,7 @@ vi.mock("firebase-admin/firestore", () => ({
     serverTimestamp: () => "SERVER_TS",
     arrayRemove: (v: string) => ({ __op: "arrayRemove", v }),
     arrayUnion: (v: string) => ({ __op: "arrayUnion", v }),
+    increment: (n: number) => ({ __op: "increment", n }),
   },
 }));
 
@@ -127,5 +129,17 @@ describe("POST /api/ambassador/members/[uid]/offboard", () => {
     vi.mocked(sendAmbassadorOffboardingEmail).mockResolvedValue(true);
     await POST(makeReq(), { params: { uid: "u1" } });
     expect(deleteMock).toHaveBeenCalled();
+  });
+
+  it("GH#253: decrements cohort acceptedCount on offboard", async () => {
+    vi.mocked(removeDiscordRole).mockResolvedValue(true);
+    vi.mocked(sendAmbassadorOffboardingEmail).mockResolvedValue(true);
+    await POST(makeReq(), { params: { uid: "u1" } });
+    const decrements = updateMock.mock.calls.filter((args) => {
+      const payload = args[1] as Record<string, unknown>;
+      const field = payload?.acceptedCount as { __op?: string; n?: number } | undefined;
+      return field?.__op === "increment" && field.n === -1;
+    });
+    expect(decrements.length).toBe(1);
   });
 });
