@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Challenge } from '@/types/challenges';
-import { ADMIN_TOKEN_KEY } from '@/components/admin/AdminAuthGate';
-import { useToast } from '@/contexts/ToastContext';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Challenge } from "@/types/challenges";
+import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
+import { useToast } from "@/contexts/ToastContext";
 
 /**
  * Admin Dashboard - Challenges List.
@@ -20,15 +20,15 @@ export default function AdminChallengesPage() {
     const fetchChallenges = async () => {
       try {
         const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-        const res = await fetch('/api/admin/challenges', {
-          headers: token ? { 'x-admin-token': token } : {},
+        const res = await fetch("/api/admin/challenges", {
+          headers: token ? { "x-admin-token": token } : {},
         });
         if (res.ok) {
           const data = await res.json();
           setChallenges(data.challenges);
         }
       } catch (error) {
-        console.error('Failed to fetch challenges', error);
+        console.error("Failed to fetch challenges", error);
       } finally {
         setLoading(false);
       }
@@ -44,20 +44,20 @@ export default function AdminChallengesPage() {
     try {
       const token = localStorage.getItem(ADMIN_TOKEN_KEY);
       const res = await fetch(`/api/admin/challenges/${id}`, {
-        method: 'DELETE',
-        headers: token ? { 'x-admin-token': token } : {},
+        method: "DELETE",
+        headers: token ? { "x-admin-token": token } : {},
       });
 
       if (res.ok) {
-        toast.success('Challenge deleted!');
+        toast.success("Challenge deleted!");
         setChallenges(challenges.filter((c) => c.id !== id));
       } else {
         const error = await res.json();
-        toast.error(error.error || 'Failed to delete challenge');
+        toast.error(error.error || "Failed to delete challenge");
       }
     } catch (error) {
-      console.error('Error deleting challenge:', error);
-      toast.error('Something went wrong');
+      console.error("Error deleting challenge:", error);
+      toast.error("Something went wrong");
     }
   };
 
@@ -77,7 +77,19 @@ export default function AdminChallengesPage() {
       ) : challenges.length === 0 ? (
         <div className="alert alert-info shadow-lg">
           <div className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current flex-shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              className="stroke-current flex-shrink-0 w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
             <span>No challenges found. Create one to get started!</span>
           </div>
         </div>
@@ -97,29 +109,49 @@ export default function AdminChallengesPage() {
               {challenges.map((challenge) => (
                 <tr key={challenge.id}>
                   <td>
-                     <div className="font-bold">{challenge.title}</div>
-                     <div className="text-sm opacity-50">{challenge.topic}</div>
+                    <div className="font-bold">{challenge.title}</div>
+                    <div className="text-sm opacity-50">{challenge.topic}</div>
                   </td>
                   <td>
-                     <span className={`badge ${
-                       challenge.status === 'active' ? 'badge-success' :
-                       challenge.status === 'upcoming' ? 'badge-warning' : 'badge-ghost'
-                     }`}>
-                       {challenge.status}
-                     </span>
+                    <span
+                      className={`badge ${
+                        challenge.status === "active"
+                          ? "badge-success"
+                          : challenge.status === "upcoming"
+                            ? "badge-warning"
+                            : "badge-ghost"
+                      }`}
+                    >
+                      {challenge.status}
+                    </span>
                   </td>
                   <td>{challenge.difficulty}</td>
                   <td>
-                     <div className="text-sm">
-                       Start: {new Date(challenge.startDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}
-                     </div>
-                     <div className="text-sm">
-                       End: {new Date(challenge.endDate).toLocaleDateString(undefined, { timeZone: 'UTC' })}
-                     </div>
+                    <div className="text-sm">
+                      Start:{" "}
+                      {new Date(challenge.startDate).toLocaleDateString(undefined, {
+                        timeZone: "UTC",
+                      })}
+                    </div>
+                    <div className="text-sm">
+                      End:{" "}
+                      {new Date(challenge.endDate).toLocaleDateString(undefined, {
+                        timeZone: "UTC",
+                      })}
+                    </div>
                   </td>
                   <td>
                     <div className="flex gap-2">
-                      <Link href={`/admin/challenges/${challenge.id}/edit`} className="btn btn-sm btn-outline">
+                      <Link
+                        href={`/admin/challenges/${challenge.id}/submissions`}
+                        className="btn btn-sm btn-outline btn-info"
+                      >
+                        Submissions
+                      </Link>
+                      <Link
+                        href={`/admin/challenges/${challenge.id}/edit`}
+                        className="btn btn-sm btn-outline"
+                      >
                         Edit
                       </Link>
                       <button
