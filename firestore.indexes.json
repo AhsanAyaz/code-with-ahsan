@@ -827,6 +827,20 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "challengeId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "submittedAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "submissions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
           "fieldPath": "status",
           "order": "ASCENDING"
         },
