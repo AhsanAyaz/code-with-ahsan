@@ -13,6 +13,10 @@ interface BulkDeleteResult {
   message: string;
   deleted: number;
   failed: number;
+  /** Channels still awaiting deletion beyond this run's batch cap. */
+  remaining?: number;
+  /** True when another invocation is needed to finish the cleanup. */
+  hasMore?: boolean;
 }
 
 // Component
@@ -31,9 +35,7 @@ export default function AdminOverviewPage() {
   /** Tracks an in-progress delete request */
   const [deleting, setDeleting] = useState(false);
   /** Stores the result summary after deletion */
-  const [deleteResult, setDeleteResult] = useState<BulkDeleteResult | null>(
-    null
-  );
+  const [deleteResult, setDeleteResult] = useState<BulkDeleteResult | null>(null);
 
   // Keep a ref to the DaisyUI dialog element so we can call showModal / close
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -94,22 +96,41 @@ export default function AdminOverviewPage() {
 
     try {
       const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-      const response = await fetch(
-        "/api/mentorship/admin/sessions/delete-archived-channels",
-        {
-          method: "DELETE",
-          headers: token ? { "x-admin-token": token } : {},
-        }
-      );
+      const response = await fetch("/api/mentorship/admin/sessions/delete-archived-channels", {
+        method: "DELETE",
+        headers: token ? { "x-admin-token": token } : {},
+      });
 
-      const data: BulkDeleteResult = await response.json();
+      // The endpoint can return an HTML error page (e.g. a 504 if the batch
+      // ever times out) rather than JSON — parse defensively so we surface a
+      // meaningful message instead of a generic "unexpected error".
+      const raw = await response.text();
+      let data: BulkDeleteResult | null = null;
+      try {
+        data = raw ? (JSON.parse(raw) as BulkDeleteResult) : null;
+      } catch {
+        data = null;
+      }
+
+      if (!data) {
+        toast.error(
+          `Server returned an unexpected response (status ${response.status}). Please try again.`
+        );
+        handleCloseDeleteModal();
+        return;
+      }
 
       if (response.ok && data.success) {
         setDeleteResult(data);
-        // Success toast with channel count
-        toast.success(
-          `Cleanup complete — ${data.deleted} channel(s) deleted.`
-        );
+        if (data.hasMore) {
+          // More archived channels remain than fit in one run — tell the admin
+          // to click again to continue the cleanup.
+          toast.success(
+            `Deleted ${data.deleted} channel(s). ${data.remaining ?? 0} remaining — click again to continue.`
+          );
+        } else {
+          toast.success(`Cleanup complete — ${data.deleted} channel(s) deleted.`);
+        }
       } else {
         toast.error(data.message || "Failed to delete archived channels.");
         handleCloseDeleteModal();
@@ -175,9 +196,7 @@ export default function AdminOverviewPage() {
           </svg>
           <div className="flex-1">
             <h3 className="font-bold">{alerts.length} Low Rating Alert(s)</h3>
-            <p className="text-sm">
-              Sessions that received 1-star ratings need attention.
-            </p>
+            <p className="text-sm">Sessions that received 1-star ratings need attention.</p>
           </div>
         </div>
       )}
@@ -210,9 +229,7 @@ export default function AdminOverviewPage() {
                   </svg>
                 </div>
                 <div className="stat-title">Total Mentors</div>
-                <div className="stat-value text-primary">
-                  {stats.totalMentors}
-                </div>
+                <div className="stat-value text-primary">{stats.totalMentors}</div>
               </div>
             </div>
 
@@ -236,9 +253,7 @@ export default function AdminOverviewPage() {
                   </svg>
                 </div>
                 <div className="stat-title">Total Mentees</div>
-                <div className="stat-value text-secondary">
-                  {stats.totalMentees}
-                </div>
+                <div className="stat-value text-secondary">{stats.totalMentees}</div>
               </div>
             </div>
 
@@ -262,9 +277,7 @@ export default function AdminOverviewPage() {
                   </svg>
                 </div>
                 <div className="stat-title">Active Matches</div>
-                <div className="stat-value text-success">
-                  {stats.activeMatches}
-                </div>
+                <div className="stat-value text-success">{stats.activeMatches}</div>
                 <div className="stat-desc">of {stats.totalMatches} total</div>
               </div>
             </div>
@@ -289,9 +302,7 @@ export default function AdminOverviewPage() {
                   </svg>
                 </div>
                 <div className="stat-title">Avg Session Rating</div>
-                <div className="stat-value text-info">
-                  {stats.averageRating.toFixed(1)}
-                </div>
+                <div className="stat-value text-info">{stats.averageRating.toFixed(1)}</div>
                 <div className="stat-desc">out of 5 stars</div>
               </div>
             </div>
@@ -316,9 +327,7 @@ export default function AdminOverviewPage() {
                   </svg>
                 </div>
                 <div className="stat-title">Pending Projects</div>
-                <div className="stat-value text-warning">
-                  {stats.pendingProjects}
-                </div>
+                <div className="stat-value text-warning">{stats.pendingProjects}</div>
                 <div className="stat-desc">awaiting review</div>
               </div>
             </div>
@@ -343,9 +352,7 @@ export default function AdminOverviewPage() {
                   </svg>
                 </div>
                 <div className="stat-title">Pending Roadmaps</div>
-                <div className="stat-value text-warning">
-                  {stats.pendingRoadmaps}
-                </div>
+                <div className="stat-value text-warning">{stats.pendingRoadmaps}</div>
                 <div className="stat-desc">awaiting review</div>
               </div>
             </div>
@@ -390,26 +397,32 @@ export default function AdminOverviewPage() {
               /* ── Post-deletion result summary ─────────────────────────────── */
               <div className="space-y-3">
                 <div
-                  className={`alert ${deleteResult.failed === 0 ? "alert-success" : "alert-warning"
-                    }`}
+                  className={`alert ${
+                    deleteResult.failed === 0 ? "alert-success" : "alert-warning"
+                  }`}
                 >
                   <span>{deleteResult.message}</span>
                 </div>
 
                 <ul className="list-disc list-inside text-base-content/80 space-y-1">
                   <li>
-                    <span className="font-semibold text-success">
-                      {deleteResult.deleted}
-                    </span>{" "}
+                    <span className="font-semibold text-success">{deleteResult.deleted}</span>{" "}
                     channel(s) successfully deleted from Discord.
                   </li>
                   {deleteResult.failed > 0 && (
                     <li>
-                      <span className="font-semibold text-error">
-                        {deleteResult.failed}
+                      <span className="font-semibold text-error">{deleteResult.failed}</span>{" "}
+                      channel(s) could not be deleted (see server logs for details).
+                    </li>
+                  )}
+                  {deleteResult.hasMore && (
+                    <li>
+                      <span className="font-semibold text-warning">
+                        {deleteResult.remaining ?? 0}
                       </span>{" "}
-                      channel(s) could not be deleted (see server logs for
-                      details).
+                      archived channel(s) still remaining — click{" "}
+                      <span className="font-semibold">Delete All Archived Channels</span> again to
+                      continue.
                     </li>
                   )}
                 </ul>
@@ -419,16 +432,13 @@ export default function AdminOverviewPage() {
               <div className="space-y-3">
                 <p>
                   This action will{" "}
-                  <strong className="text-error">
-                    permanently delete all Discord channels
-                  </strong>{" "}
+                  <strong className="text-error">permanently delete all Discord channels</strong>{" "}
                   associated with mentorship sessions that have a status of{" "}
                   <code className="bg-base-200 px-1 rounded">completed</code> or{" "}
                   <code className="bg-base-200 px-1 rounded">cancelled</code>.
                 </p>
                 <p>
-                  The action is{" "}
-                  <strong>irreversible</strong> — deleted channels cannot be
+                  The action is <strong>irreversible</strong> — deleted channels cannot be
                   recovered.
                 </p>
                 <div className="alert alert-warning text-sm">
@@ -446,8 +456,8 @@ export default function AdminOverviewPage() {
                     />
                   </svg>
                   <span>
-                    Are you sure you want to proceed? This will remove all
-                    message history from those channels on Discord.
+                    Are you sure you want to proceed? This will remove all message history from
+                    those channels on Discord.
                   </span>
                 </div>
               </div>
@@ -457,14 +467,34 @@ export default function AdminOverviewPage() {
           {/* ── Modal footer / action buttons ─────────────────────────────────── */}
           <div className="modal-action">
             {deleteResult ? (
-              /* After deletion: only a "Close" button */
-              <button
-                id="admin-delete-channels-close-btn"
-                className="btn btn-primary"
-                onClick={handleCloseDeleteModal}
-              >
-                Close
-              </button>
+              /* After deletion: Close, plus Continue when more batches remain */
+              <>
+                <button
+                  id="admin-delete-channels-close-btn"
+                  className="btn btn-ghost"
+                  onClick={handleCloseDeleteModal}
+                  disabled={deleting}
+                >
+                  Close
+                </button>
+                {deleteResult.hasMore && (
+                  <button
+                    id="admin-delete-channels-continue-btn"
+                    className="btn btn-error"
+                    onClick={handleConfirmDelete}
+                    disabled={deleting}
+                  >
+                    {deleting ? (
+                      <>
+                        <span className="loading loading-spinner loading-sm"></span>
+                        Deleting…
+                      </>
+                    ) : (
+                      "Continue Deleting"
+                    )}
+                  </button>
+                )}
+              </>
             ) : (
               /* Before deletion: Cancel + Confirm */
               <>
