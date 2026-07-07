@@ -16,8 +16,7 @@ const baseNavLinks = [
 
 // Feature-flag-gated insertions (per D-11 in .planning/phases/01-foundation-roles-array-migration/01-CONTEXT.md).
 // NEXT_PUBLIC_* is inlined by Next.js at build time, so this evaluates at bundle time.
-const AMBASSADORS_ENABLED =
-  process.env.NEXT_PUBLIC_FEATURE_AMBASSADOR_PROGRAM === "true";
+const AMBASSADORS_ENABLED = process.env.NEXT_PUBLIC_FEATURE_AMBASSADOR_PROGRAM === "true";
 
 const headerNavLinks = AMBASSADORS_ENABLED
   ? [
@@ -32,6 +31,7 @@ export const MORE_LINKS = [
   { href: "/challenges", title: "Challenges" },
   { href: "/events", title: "Events" },
   { href: "/logic-buddy", title: "Logic Buddy" },
+  { href: "/sponsors", title: "Sponsorships" },
   { href: LINKS.DISCORD, title: "Discord", external: true },
 ];
 

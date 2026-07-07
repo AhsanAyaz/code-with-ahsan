@@ -1,14 +1,7 @@
 import coursesData from "@/content/courses.generated.json";
 import bannersData from "@/content/banners.json";
-import ratesData from "@/content/rates.json";
 import eventsData from "@/content/events.generated.json";
-import type {
-  BannerContent,
-  CourseContent,
-  EventContent,
-  PostContent,
-  RateCardContent,
-} from "@/types/content";
+import type { BannerContent, CourseContent, EventContent, PostContent } from "@/types/content";
 
 export function getLocalCourses(): CourseContent[] {
   const courses = (coursesData?.courses || []) as CourseContent[];
@@ -44,10 +37,6 @@ export function getLocalBanners(): BannerContent[] {
       dismissable: !!banner.dismissable,
     }))
     .filter((banner) => banner.isActive);
-}
-
-export function getLocalRateCard(): RateCardContent | null {
-  return (ratesData?.rateCard || null) as RateCardContent | null;
 }
 
 export function getLocalEvents(): EventContent[] {

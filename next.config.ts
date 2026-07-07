@@ -28,6 +28,8 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // GH#261 era: rate-card calculator replaced by the simpler /sponsors page.
+      { source: "/rates", destination: "/sponsors", permanent: true },
       // VIS-66 [GH#215]: consolidate to one community page. /community ("Community Hub")
       // is folded into the homepage (the canonical community landing). All legacy slugs
       // below that previously targeted /community now point at / directly (no redirect chain).
@@ -107,8 +109,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/dinq-giveaway",
-        destination:
-          "https://n8n.codewithahsan.dev/form/42d5787c-cba9-457e-b05e-a1116d5d1c3f",
+        destination: "https://n8n.codewithahsan.dev/form/42d5787c-cba9-457e-b05e-a1116d5d1c3f",
         permanent: true,
       },
       { source: "/mas-raffle", destination: "/raffle", permanent: true },
@@ -160,36 +161,87 @@ const nextConfig: NextConfig = {
       // siteMetadata.ngBook (used by AboutContent.tsx) is repointed to the SAME URL in src/data/siteMetadata.js,
       // so the internal CTA + external 301 converge on the live destination.
       // CSV rows: https://codewithahsan.dev/ng-book, https://www.codewithahsan.dev/ng-book
-      { source: "/ng-book", destination: "https://www.amazon.com/Angular-Cookbook-actionable-recipes-developers-ebook/dp/B0C3MG5X99", permanent: true },
+      {
+        source: "/ng-book",
+        destination:
+          "https://www.amazon.com/Angular-Cookbook-actionable-recipes-developers-ebook/dp/B0C3MG5X99",
+        permanent: true,
+      },
 
       // Group E — Legacy /blog/* → blog subdomain (REPLACES the previous rewrite for SEO 301 migration)
       // CSV rows: /blog/css-box-model, /blog/angular-unit-tests-constructor-not-compatible-with-angular-dependency-injection,
       //          /blog/extend-angular-built-in-pipes, /blog/the-most-easy-way-to-add-update-and-delete-contacts-in-flutter,
       //          /blog/flutter-marketplace-app-with-stripe/part-1
-      { source: "/blog/:path*", destination: "https://blog.codewithahsan.dev/:path*", permanent: true },
+      {
+        source: "/blog/:path*",
+        destination: "https://blog.codewithahsan.dev/:path*",
+        permanent: true,
+      },
 
       // Group F — Deep blog slugs that were never under /blog/ (top-level legacy posts) → blog subdomain at same slug
       // CSV rows: how-i-made-contributing-..., zero-to-3d-..., 10-mind-blowing-ways-..., how-to-pre-render-dynamic-routes-...
-      { source: "/how-i-made-contributing-to-an-open-source-firebase-app-10x-easier-and-what-ai-got-wrong-along-the-way", destination: "https://blog.codewithahsan.dev/how-i-made-contributing-to-an-open-source-firebase-app-10x-easier-and-what-ai-got-wrong-along-the-way", permanent: true },
-      { source: "/zero-to-3d-building-a-gesture-controlled-particle-system-with-one-prompt", destination: "https://blog.codewithahsan.dev/zero-to-3d-building-a-gesture-controlled-particle-system-with-one-prompt", permanent: true },
-      { source: "/10-mind-blowing-ways-to-use-gemini-cli-that-arent-just-write-code", destination: "https://blog.codewithahsan.dev/10-mind-blowing-ways-to-use-gemini-cli-that-arent-just-write-code", permanent: true },
-      { source: "/how-to-pre-render-dynamic-routes-in-angular-a-practical-guide", destination: "https://blog.codewithahsan.dev/how-to-pre-render-dynamic-routes-in-angular-a-practical-guide", permanent: true },
+      {
+        source:
+          "/how-i-made-contributing-to-an-open-source-firebase-app-10x-easier-and-what-ai-got-wrong-along-the-way",
+        destination:
+          "https://blog.codewithahsan.dev/how-i-made-contributing-to-an-open-source-firebase-app-10x-easier-and-what-ai-got-wrong-along-the-way",
+        permanent: true,
+      },
+      {
+        source: "/zero-to-3d-building-a-gesture-controlled-particle-system-with-one-prompt",
+        destination:
+          "https://blog.codewithahsan.dev/zero-to-3d-building-a-gesture-controlled-particle-system-with-one-prompt",
+        permanent: true,
+      },
+      {
+        source: "/10-mind-blowing-ways-to-use-gemini-cli-that-arent-just-write-code",
+        destination:
+          "https://blog.codewithahsan.dev/10-mind-blowing-ways-to-use-gemini-cli-that-arent-just-write-code",
+        permanent: true,
+      },
+      {
+        source: "/how-to-pre-render-dynamic-routes-in-angular-a-practical-guide",
+        destination:
+          "https://blog.codewithahsan.dev/how-to-pre-render-dynamic-routes-in-angular-a-practical-guide",
+        permanent: true,
+      },
 
       // === GSC 404 cleanup batch 2 (from for_llm/gsc_coverage 2026-06-01, 17 of 18 actionable rows). ===
       // 18th row /& excluded — special char causes path-to-regexp fragility, single URL, leave 404.
 
       // Group G — Event slug typos (dash variant → canonical slash form)
-      { source: "/events/cwa-promptathon-2026", destination: "/events/cwa-promptathon/2026", permanent: true },
+      {
+        source: "/events/cwa-promptathon-2026",
+        destination: "/events/cwa-promptathon/2026",
+        permanent: true,
+      },
       { source: "/events/hackstack-2023", destination: "/events/hackstack/2023", permanent: true },
 
       // Group H — Legacy top-level slugs verified live on blog subdomain (curl 200)
-      { source: "/zero-to-website-100-founding-legends", destination: "https://blog.codewithahsan.dev/zero-to-website-100-founding-legends", permanent: true },
-      { source: "/standardizing-ai-design-the-evolution-of-design-md-2", destination: "https://blog.codewithahsan.dev/standardizing-ai-design-the-evolution-of-design-md-2", permanent: true },
+      {
+        source: "/zero-to-website-100-founding-legends",
+        destination: "https://blog.codewithahsan.dev/zero-to-website-100-founding-legends",
+        permanent: true,
+      },
+      {
+        source: "/standardizing-ai-design-the-evolution-of-design-md-2",
+        destination:
+          "https://blog.codewithahsan.dev/standardizing-ai-design-the-evolution-of-design-md-2",
+        permanent: true,
+      },
 
       // Group H-bis — Legacy slugs absent from blog subdomain (curl 404) → / (community folded into homepage, VIS-66)
-      { source: "/cloud-bootcamp-free-online-event-by-cloudways-mar-10-11", destination: "/", permanent: true },
+      {
+        source: "/cloud-bootcamp-free-online-event-by-cloudways-mar-10-11",
+        destination: "/",
+        permanent: true,
+      },
       { source: "/duty-free-cc", destination: "/", permanent: true },
-      { source: "/how-i-turned-my-ai-into-a-sovereign-business-partner-my-openclaw-setup", destination: "/", permanent: true },
+      {
+        source: "/how-i-turned-my-ai-into-a-sovereign-business-partner-my-openclaw-setup",
+        destination: "/",
+        permanent: true,
+      },
 
       // Group I — Additional ahsync-bytes-weekly-digest-* → / (community folded into homepage, VIS-66) (extends Group A)
       { source: "/ahsync-bytes-weekly-digest-9th-mar-2026", destination: "/", permanent: true },
@@ -220,9 +272,7 @@ const nextConfig: NextConfig = {
   webpack(config) {
     // Grab the existing rule that handles SVG imports
     // @ts-expect-error - rule type
-    const fileLoaderRule = config.module.rules.find((rule) =>
-      rule.test?.test?.(".svg")
-    );
+    const fileLoaderRule = config.module.rules.find((rule) => rule.test?.test?.(".svg"));
 
     config.module.rules.push(
       // Reapply the existing rule, but only for svg imports ending in ?url

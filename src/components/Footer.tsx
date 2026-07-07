@@ -8,11 +8,7 @@ export default function Footer() {
       <nav>
         <div className="grid grid-flow-col gap-4">
           <SocialIcon kind="twitch" href={siteMetadata.twitch} size="24" />
-          <SocialIcon
-            kind="mail"
-            href={`mailto:${siteMetadata.email}`}
-            size="24"
-          />
+          <SocialIcon kind="mail" href={`mailto:${siteMetadata.email}`} size="24" />
           <SocialIcon kind="github" href={siteMetadata.github} size="24" />
           <SocialIcon kind="facebook" href={siteMetadata.facebook} size="24" />
           <SocialIcon kind="youtube" href={siteMetadata.youtube} size="24" />
@@ -21,8 +17,8 @@ export default function Footer() {
         </div>
       </nav>
       <nav className="grid grid-flow-col gap-4">
-        <Link href="/rates" className="link link-hover text-sm">
-          Rates
+        <Link href="/sponsors" className="link link-hover text-sm">
+          Sponsorships
         </Link>
         <Link href="/privacy" className="link link-hover text-sm">
           Privacy Policy
