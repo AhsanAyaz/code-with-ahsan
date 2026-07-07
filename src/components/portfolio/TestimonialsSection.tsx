@@ -1,13 +1,15 @@
 import { testimonials } from "@/data/testimonials";
 
 export default function TestimonialsSection() {
+  if (testimonials.length === 0) {
+    return null;
+  }
+
   return (
     <section className="border-t border-base-300 bg-base-200 py-16">
       <div className="page-padding">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-base-content mb-2">
-            What Mentees Say
-          </h2>
+          <h2 className="text-2xl font-bold text-base-content mb-2">What Mentees Say</h2>
           <p className="text-base-content/60 mb-8">
             Feedback from 1:1 mentorship sessions via{" "}
             <a
@@ -48,12 +50,8 @@ export default function TestimonialsSection() {
                     {testimonial.avatarInitials}
                   </div>
                   <div>
-                    <p className="font-semibold text-base-content text-sm">
-                      {testimonial.name}
-                    </p>
-                    <p className="text-xs text-base-content/50">
-                      {testimonial.date}
-                    </p>
+                    <p className="font-semibold text-base-content text-sm">{testimonial.name}</p>
+                    <p className="text-xs text-base-content/50">{testimonial.date}</p>
                   </div>
                 </div>
               </div>

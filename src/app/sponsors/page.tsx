@@ -2,6 +2,11 @@ import { Metadata } from "next";
 import { Video, Instagram, Linkedin, Mail, MessageSquare, Sparkles, Calendar } from "lucide-react";
 import SponsorContactForm from "./SponsorContactForm";
 import { BRAND_LOGOS } from "./logos";
+import { getCourses } from "@/lib/content/contentProvider";
+import PortfolioBio from "@/components/portfolio/PortfolioBio";
+import BooksSection from "@/components/portfolio/BooksSection";
+import CoursesSection from "@/components/portfolio/CoursesSection";
+import OpenSourceSection from "@/components/portfolio/OpenSourceSection";
 
 const BOOKING_URL = "https://calendar.app.google/Z6g5dMyczq25hmjYA";
 
@@ -17,7 +22,7 @@ const STATS = [
   { label: "Instagram", value: "64k+", sub: "Followers" },
   { label: "LinkedIn", value: "23k+", sub: "B2B Followers" },
   { label: "Newsletter", value: "2,100+", sub: "Subscribers" },
-  { label: "Discord", value: "4,400+", sub: "Members" },
+  { label: "Discord", value: "5,200+", sub: "Members" },
   { label: "TikTok", value: "9k+", sub: "Followers" },
 ];
 
@@ -50,7 +55,7 @@ const OFFERINGS = [
     icon: MessageSquare,
     title: "Community Placements",
     description:
-      "Sponsored announcements and pinned messages in a 4,400+ member Discord developer community.",
+      "Sponsored announcements and pinned messages in a 5,200+ member Discord developer community.",
   },
   {
     icon: Sparkles,
@@ -61,7 +66,7 @@ const OFFERINGS = [
 ];
 
 const description =
-  "Partner with Code with Ahsan to reach 180,000+ developers across YouTube, Instagram, LinkedIn, newsletter, and Discord.";
+  "Partner with Code with Ahsan to reach 200,000+ developers across YouTube, Instagram, LinkedIn, newsletter, and Discord.";
 
 export const metadata: Metadata = {
   title: "Sponsorships | Code with Ahsan",
@@ -83,7 +88,9 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function SponsorsPage() {
+export default async function SponsorsPage() {
+  const courses = await getCourses();
+
   return (
     <div className="page-padding">
       {/* Hero */}
@@ -93,7 +100,7 @@ export default function SponsorsPage() {
           Partner with <span className="text-primary">Code with Ahsan</span>
         </h1>
         <p className="mt-5 text-lg text-base-content/80">
-          Reach 180,000+ developers across YouTube, Instagram, LinkedIn, newsletter, and Discord —
+          Reach 200,000+ developers across YouTube, Instagram, LinkedIn, newsletter, and Discord —
           through content they already trust.
         </p>
         <p className="mt-4 text-sm text-base-content/60">{CREDENTIALS.join(" · ")}</p>
@@ -135,6 +142,9 @@ export default function SponsorsPage() {
           </div>
         </div>
       </section>
+
+      {/* About Ahsan — the person a brand buys access to */}
+      <PortfolioBio as="h2" />
 
       {/* What we offer */}
       <section className="max-w-5xl mx-auto py-12">
@@ -178,6 +188,11 @@ export default function SponsorsPage() {
           evergreen technical content.
         </p>
       </section>
+
+      {/* Ahsan's work showcase */}
+      <BooksSection />
+      <CoursesSection courses={courses} />
+      <OpenSourceSection />
 
       {/* Contact */}
       <section id="contact" className="max-w-xl mx-auto py-12 pb-20">
