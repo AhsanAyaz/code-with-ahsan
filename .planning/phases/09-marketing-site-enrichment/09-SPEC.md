@@ -126,16 +126,16 @@ Status: ✓ = met minimum, ⚠ = below minimum (planner treats as assumption)
 
 ## Interview Log
 
-| Round | Perspective     | Question summary                   | Decision locked                                                                       |
-| ----- | --------------- | ---------------------------------- | ------------------------------------------------------------------------------------- |
-| 1     | Researcher      | How deep does the home rebuild go? | Full rebuild, jamwithai-level richness                                                |
-| 1     | Researcher      | About framing (home + sponsors)?   | About Ahsan — personal creator authority                                              |
-| 1     | Boundary Keeper | GSD framing?                       | New milestone v8.0, parallel to in-flight v7.0                                        |
-| 1     | Researcher      | Social-proof content availability? | Ahsan provides testimonials + project list; reuse brand logos; placeholders meanwhile |
-| 2     | Simplifier      | "Projects to show off" — whose?    | Ahsan's own products/OSS (Cookbook, books, courses, libs) — not community projects    |
-| 2     | Boundary Keeper | Primary home CTAs?                 | Join community (Discord), Explore mentorship, Newsletter, Sponsor                     |
-| 2     | Boundary Keeper | Keep which existing home elements? | Keep live stats, FAQ, founder credibility; banner deprioritized                       |
-| 2     | Failure Analyst | Sponsor prominence?                | Yes — prominent nav + home slot (jamwithai-style)                                     |
+| Round | Perspective     | Question summary                   | Decision locked                                                                                                                                                                                                                                  |
+| ----- | --------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1     | Researcher      | How deep does the home rebuild go? | Full rebuild, jamwithai-level richness                                                                                                                                                                                                           |
+| 1     | Researcher      | About framing (home + sponsors)?   | About Ahsan — personal creator authority                                                                                                                                                                                                         |
+| 1     | Boundary Keeper | GSD framing?                       | New milestone v8.0, parallel to in-flight v7.0                                                                                                                                                                                                   |
+| 1     | Researcher      | Social-proof content availability? | Ahsan provides testimonials + project list; reuse brand logos; placeholders meanwhile                                                                                                                                                            |
+| 2     | Simplifier      | "Projects to show off" — whose?    | Ahsan's own products/OSS (Cookbook, books, courses, libs) — not community projects                                                                                                                                                               |
+| 2     | Boundary Keeper | Primary home CTAs?                 | Join community (Discord), Explore mentorship, Newsletter, Sponsor — later narrowed: hero shows exactly 3 (Discord, Newsletter, Sponsor); Explore Mentorship surfaces via Pillars + nav, not the hero (confirmed 2026-07-07, supersedes this row) |
+| 2     | Boundary Keeper | Keep which existing home elements? | Keep live stats, FAQ, founder credibility; banner deprioritized                                                                                                                                                                                  |
+| 2     | Failure Analyst | Sponsor prominence?                | Yes — prominent nav + home slot (jamwithai-style)                                                                                                                                                                                                |
 
 ---
 
