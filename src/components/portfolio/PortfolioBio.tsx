@@ -1,7 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function PortfolioBio() {
+interface PortfolioBioProps {
+  /** Heading level for the name element. Defaults to "h1" (canonical /about usage). */
+  as?: "h1" | "h2";
+}
+
+export default function PortfolioBio({ as = "h1" }: PortfolioBioProps) {
+  const Heading = as;
   return (
     <section className="bg-base-100 py-16">
       <div className="page-padding">
@@ -36,27 +42,22 @@ export default function PortfolioBio() {
 
             {/* Name and title */}
             <div>
-              <h1 className="text-3xl font-bold text-base-content">
+              <Heading className="text-3xl font-bold text-base-content">
                 Muhammad Ahsan Ayaz
-              </h1>
+              </Heading>
               <p className="text-base-content/60 mt-1">
-                Software Architect | Google Developer Expert in AI &amp; Angular
-                | Author | Speaker
+                Software Architect | Google Developer Expert in AI &amp; Angular | Author | Speaker
               </p>
-              <p className="text-base-content/50 text-sm mt-1">
-                Scania Group, Stockholm
-              </p>
+              <p className="text-base-content/50 text-sm mt-1">Scania Group, Stockholm</p>
             </div>
 
             {/* Bio paragraph */}
             <p className="text-base-content/70 max-w-xl leading-relaxed">
-              With 10+ years of professional engineering experience, I am a
-              Software Architect at Scania Group, a Google Developer Expert in
-              AI &amp; Angular, and the author of 4 published books including
-              the Angular Cookbook series. I founded Code With Ahsan — a
-              community of 4,500+ developers — and speak regularly at
-              international conferences on Angular, AI, and modern web
-              development.
+              With 10+ years of professional engineering experience, I am a Software Architect at
+              Scania Group, a Google Developer Expert in AI &amp; Angular, and the author of 4
+              published books including the Angular Cookbook series. I founded Code With Ahsan — a
+              community of 4,500+ developers — and speak regularly at international conferences on
+              Angular, AI, and modern web development.
             </p>
 
             {/* Social links */}
