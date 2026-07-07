@@ -78,17 +78,20 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 ## Phase Details
 
 ### Phase 1: Foundation — Roles Array Migration
+
 **Goal**: Every user of the platform (existing mentors, mentees, admins, and unauthenticated visitors) experiences the roles-array migration as a no-op — all v1.0–v5.0 capabilities continue to work identically — while the data layer, security rules, custom claims, tests, and call sites are now ready for an additional `"ambassador"` role to coexist with `"mentor"` / `"mentee"` / `"admin"`.
 **Depends on**: Nothing (first v6.0 phase; archives v5.0-phases as a prerequisite hygiene step)
 **Requirements**: ROLE-01, ROLE-02, ROLE-03, ROLE-04, ROLE-05, ROLE-06, ROLE-07, ROLE-08
 **Success Criteria** (what must be TRUE):
-  1. An existing mentor with `role: "mentor"` in their profile doc can still sign in, open the admin dashboard, approve / decline applications, edit time slots, and appear in every mentor query — with no visible change and no permission-denied errors during or after the 5-deploy rollout.
-  2. An existing mentee with an active booking still sees their booking, can still book new slots, and every mentee-targeted query (`array-contains "mentee"`) returns exactly the same set of mentees as the pre-migration `role == "mentee"` query returned — verified by pre/post document counts matching.
-  3. A holder of a pre-migration ID token (issued up to 1 hour before the rules flip) continues to pass rule evaluation throughout the dual-claim window because rules accept either `token.role == "mentor"` or `"mentor" in token.roles`.
-  4. `/ambassadors/*` routes are fully deployed but return 404 when `FEATURE_AMBASSADOR_PROGRAM` is disabled, so half-built ambassador features cannot be reached by real users during foundation rollout.
-  5. Every one of the 95 permission test fixtures uses the new `roles: [...]` shape, the TypeScript build is green, and coverage reports show the new `roles.includes(...)` code paths are exercised (no fixture silently passing on a legacy fallback).
+
+1. An existing mentor with `role: "mentor"` in their profile doc can still sign in, open the admin dashboard, approve / decline applications, edit time slots, and appear in every mentor query — with no visible change and no permission-denied errors during or after the 5-deploy rollout.
+2. An existing mentee with an active booking still sees their booking, can still book new slots, and every mentee-targeted query (`array-contains "mentee"`) returns exactly the same set of mentees as the pre-migration `role == "mentee"` query returned — verified by pre/post document counts matching.
+3. A holder of a pre-migration ID token (issued up to 1 hour before the rules flip) continues to pass rule evaluation throughout the dual-claim window because rules accept either `token.role == "mentor"` or `"mentor" in token.roles`.
+4. `/ambassadors/*` routes are fully deployed but return 404 when `FEATURE_AMBASSADOR_PROGRAM` is disabled, so half-built ambassador features cannot be reached by real users during foundation rollout.
+5. Every one of the 95 permission test fixtures uses the new `roles: [...]` shape, the TypeScript build is green, and coverage reports show the new `roles.includes(...)` code paths are exercised (no fixture silently passing on a legacy fallback).
 
 **Plans**: 10 plans
+
 - [x] 01-types-zod-role-schema-PLAN.md — Role union + RoleSchema Zod enum + MentorshipProfile.roles field (Deploy #1 / Wave 1 / ROLE-01)
 - [x] 02-feature-flag-helper-PLAN.md — `isAmbassadorProgramEnabled()`, `/ambassadors/*` 404 gates, nav filtering (Deploy #1 / Wave 1 / ROLE-08)
 - [x] 03-permission-helpers-PLAN.md — hasRole/hasAnyRole/hasAllRoles + claim-side mirrors with dual-read; refactor isAcceptedMentor (Deploy #1 / Wave 2 / ROLE-02)
@@ -101,18 +104,21 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 - [ ] 10-final-cleanup-deploy5-PLAN.md — Manual gate + drop MentorshipRole + array-only rules + `drop-legacy-role-field.ts` (Deploy #5 / Wave 5 / ROLE-04 final)
 
 ### Phase 2: Application Subsystem
+
 **Goal**: A prospective student can submit a complete ambassador application (identity + video or link + academic verification) through a public form, an admin can triage the queue end-to-end (list → detail → accept / decline with notes), and acceptance atomically seeds a real ambassador on the platform — Firestore role + ambassador subdoc + cohort attachment commit first, then Discord role assignment is attempted with an admin-visible retry path if Discord is unreachable.
 **Depends on**: Phase 1 (Foundation must be live in production before any write path can append `"ambassador"` into `roles[]`; flipping `FEATURE_AMBASSADOR_PROGRAM` on is the gate for this phase)
 **Requirements**: COHORT-01, COHORT-02, COHORT-03, COHORT-04, APPLY-01, APPLY-02, APPLY-03, APPLY-04, APPLY-05, APPLY-06, APPLY-07, APPLY-08, REVIEW-01, REVIEW-02, REVIEW-03, REVIEW-04, REVIEW-05, DISC-01, DISC-02, DISC-03, EMAIL-01, EMAIL-02, EMAIL-03
 **Success Criteria** (what must be TRUE):
-  1. An admin can create a cohort with name / start / end / maxSize / status from the admin panel, open or close its application window, view all accepted ambassadors attached to it, and the system refuses a new acceptance when `maxSize` is reached.
-  2. A signed-in prospective ambassador (account ≥30 days old) can complete `/ambassadors/apply` in one sitting — including video submission as either a direct Firebase Storage upload or an unlisted Loom / YouTube link — and see their application status (`submitted | under_review | accepted | declined`) on their own profile afterwards, confirmed via an automatic submission email.
-  3. An applicant with an unrecognized academic TLD is not rejected — the form surfaces the student-ID photo upload as a first-class fallback path and an admin reviewer can verify it manually.
-  4. An admin opens an application detail page, streams the video via a 1-hour signed URL (never a persistent `getDownloadURL`), and a Discord banner appears if the applicant's handle cannot be resolved to a `discordMemberId` — giving a retry or manual-link action before acceptance.
-  5. On accept, the Firestore commit (`roles += "ambassador"` + ambassador subdoc + cohort attach) succeeds independently of the Discord call, and if the Discord role assignment fails the admin panel shows a retry button — clicking it is idempotent (never double-assigns) and surfaces success.
-  6. Applicants receive the right transactional email at the right moment — confirmation on submit, acceptance email with onboarding steps on accept, decline email with kind-but-firm messaging and reapply encouragement on decline — and declined-application videos are auto-deleted 30 days after the decline decision.
+
+1. An admin can create a cohort with name / start / end / maxSize / status from the admin panel, open or close its application window, view all accepted ambassadors attached to it, and the system refuses a new acceptance when `maxSize` is reached.
+2. A signed-in prospective ambassador (account ≥30 days old) can complete `/ambassadors/apply` in one sitting — including video submission as either a direct Firebase Storage upload or an unlisted Loom / YouTube link — and see their application status (`submitted | under_review | accepted | declined`) on their own profile afterwards, confirmed via an automatic submission email.
+3. An applicant with an unrecognized academic TLD is not rejected — the form surfaces the student-ID photo upload as a first-class fallback path and an admin reviewer can verify it manually.
+4. An admin opens an application detail page, streams the video via a 1-hour signed URL (never a persistent `getDownloadURL`), and a Discord banner appears if the applicant's handle cannot be resolved to a `discordMemberId` — giving a retry or manual-link action before acceptance.
+5. On accept, the Firestore commit (`roles += "ambassador"` + ambassador subdoc + cohort attach) succeeds independently of the Discord call, and if the Discord role assignment fails the admin panel shows a retry button — clicking it is idempotent (never double-assigns) and surfaces success.
+6. Applicants receive the right transactional email at the right moment — confirmation on submit, acceptance email with onboarding steps on accept, decline email with kind-but-firm messaging and reapply encouragement on decline — and declined-application videos are auto-deleted 30 days after the decline decision.
 
 **Plans**: 9 plans
+
 - [x] 02-01-types-zod-feature-foundations-PLAN.md — ApplicationDoc/CohortDoc interfaces + Zod schemas + Discord role ID / age constants (Wave 1 / COHORT-01, APPLY-01/02, DISC-02/03)
 - [x] 02-02-validators-academic-email-video-url-PLAN.md — TDD for `validateAcademicEmail` (Hipo snapshot lazy-init + soft-warn per D-15) and `classifyVideoUrl` / `isValidVideoUrl` (YouTube / Loom / Drive per D-07) (Wave 1 / APPLY-03/04)
 - [x] 02-03-firestore-rules-email-templates-PLAN.md — firestore.rules + storage.rules for `applications/` + `cohorts/` (deny client writes, applicant read-own, admin read-all) + three `sendAmbassadorApplication*Email` functions (Wave 1 / APPLY-06, EMAIL-01/02/03)
@@ -124,36 +130,43 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 - [x] 02-09-cleanup-cron-preflight-PLAN.md — Weekly `cleanup-declined-application-media.ts` + GitHub Actions workflow + pre-flight checkpoints (AMBASSADOR_DISCORD_MIN_AGE_DAYS decision + DISCORD_AMBASSADOR_ROLE_ID creation) (Wave 4 / REVIEW-04)
 
 ### Phase 3: Public Presentation
+
 **Goal**: The world can see the active ambassador cohort on `codewithahsan.dev/ambassadors` with only the fields each ambassador has chosen to share publicly, and any user's profile page correctly displays an Ambassador (or Alumni Ambassador) badge so status is visible wherever an ambassador shows up on the platform.
 **Depends on**: Phase 2 (needs real accepted ambassadors in `mentorship_profiles` with `roles` containing `"ambassador"` to render anything meaningful; can run in parallel with Phase 4)
 **Requirements**: PRESENT-01, PRESENT-02, PRESENT-03, PRESENT-04
 **Success Criteria** (what must be TRUE):
-  1. A visitor hitting `/ambassadors` (unauthenticated) sees a card for every active-cohort ambassador with their photo, display name, university, one-line bio, and social links — and crucially nothing else (no email, no Discord handle, no private application video).
-  2. Any profile page (mentor profile, user profile) renders an "Ambassador" badge when the profile's `roles` array contains `"ambassador"`, and renders an "Alumni Ambassador" badge when it contains `"alumni-ambassador"` — verified by visiting a seeded ambassador's profile post-acceptance.
-  3. An accepted ambassador can (optionally) upload a separate public `cohortPresentationVideo` from their profile and it renders on their `/ambassadors` card — distinct from their private application video, which never becomes publicly accessible.
-  4. Offboarded or not-yet-accepted users never appear on `/ambassadors` — the page is strictly gated to currently-active members of the current cohort, verified by a `roles array-contains "ambassador"` + `ambassador.active == true` query.
+
+1. A visitor hitting `/ambassadors` (unauthenticated) sees a card for every active-cohort ambassador with their photo, display name, university, one-line bio, and social links — and crucially nothing else (no email, no Discord handle, no private application video).
+2. Any profile page (mentor profile, user profile) renders an "Ambassador" badge when the profile's `roles` array contains `"ambassador"`, and renders an "Alumni Ambassador" badge when it contains `"alumni-ambassador"` — verified by visiting a seeded ambassador's profile post-acceptance.
+3. An accepted ambassador can (optionally) upload a separate public `cohortPresentationVideo` from their profile and it renders on their `/ambassadors` card — distinct from their private application video, which never becomes publicly accessible.
+4. Offboarded or not-yet-accepted users never appear on `/ambassadors` — the page is strictly gated to currently-active members of the current cohort, verified by a `roles array-contains "ambassador"` + `ambassador.active == true` query.
 
 **Plans**: 6 plans
-  - [x] 03-01-types-rules-projection-schema-PLAN.md — AmbassadorPublicFields + PublicAmbassadorDoc types, Zod schema, buildPublicAmbassadorProjection helper, firestore.rules for public_ambassadors/{uid} (Wave 1)
-  - [x] 03-02-acceptance-snapshot-and-projection-write-PLAN.md — Extend runAcceptanceTransaction: username backfill, university/city snapshot on first accept, in-txn public_ambassadors/{uid} write (Wave 2)
-  - [x] 03-03-patch-ambassador-profile-endpoint-PLAN.md — PATCH /api/ambassador/profile (feature-flag + auth + role + Zod gates; batched subdoc + projection write) (Wave 2)
-  - [x] 03-04-badge-canonical-profile-route-redirect-PLAN.md — AmbassadorBadge component, /u/[username] canonical profile route, 308 redirect from /mentorship/mentors/[username] (Wave 3)
-  - [x] 03-05-public-ambassadors-listing-page-PLAN.md — /ambassadors SSR listing page, getCurrentCohortId helper, GET /api/ambassadors/public, AmbassadorCard with inline cohort-presentation VideoEmbed (Wave 3)
-  - [x] 03-06-profile-ambassador-public-card-section-PLAN.md — AmbassadorPublicCardSection on /profile with 7 editable fields + live video preview, role-gated via hasRole (Wave 3)
+
+- [x] 03-01-types-rules-projection-schema-PLAN.md — AmbassadorPublicFields + PublicAmbassadorDoc types, Zod schema, buildPublicAmbassadorProjection helper, firestore.rules for public_ambassadors/{uid} (Wave 1)
+- [x] 03-02-acceptance-snapshot-and-projection-write-PLAN.md — Extend runAcceptanceTransaction: username backfill, university/city snapshot on first accept, in-txn public_ambassadors/{uid} write (Wave 2)
+- [x] 03-03-patch-ambassador-profile-endpoint-PLAN.md — PATCH /api/ambassador/profile (feature-flag + auth + role + Zod gates; batched subdoc + projection write) (Wave 2)
+- [x] 03-04-badge-canonical-profile-route-redirect-PLAN.md — AmbassadorBadge component, /u/[username] canonical profile route, 308 redirect from /mentorship/mentors/[username] (Wave 3)
+- [x] 03-05-public-ambassadors-listing-page-PLAN.md — /ambassadors SSR listing page, getCurrentCohortId helper, GET /api/ambassadors/public, AmbassadorCard with inline cohort-presentation VideoEmbed (Wave 3)
+- [x] 03-06-profile-ambassador-public-card-section-PLAN.md — AmbassadorPublicCardSection on /profile with 7 editable fields + live video preview, role-gated via hasRole (Wave 3)
+
 **UI hint**: yes
 
 ### Phase 4: Activity Subsystem
+
 **Goal**: An accepted ambassador can drive measurable community growth and accountability from inside the program — sharing a human-readable referral code that attributes new signups to them, logging events they host, submitting a monthly self-report that feeds the 2-strike accountability loop — while the system uses human-in-the-loop cron jobs (flags for admin review, never auto-mutates state) to keep the program tone kind but credible.
 **Depends on**: Phase 2 (needs seeded ambassadors with `ambassador` subdocs to own referral codes, events, and reports; can run in parallel with Phase 3)
 **Requirements**: REF-01, REF-02, REF-03, REF-04, REF-05, EVENT-01, EVENT-02, EVENT-03, EVENT-04, REPORT-01, REPORT-02, REPORT-03, REPORT-04, REPORT-05, REPORT-06, REPORT-07, DISC-04
 **Success Criteria** (what must be TRUE):
-  1. An ambassador copies their unique referral code (e.g., `AHSAN-A7F2`) from their profile, shares `codewithahsan.dev/?ref=AHSAN-A7F2`, and when the recipient signs up for the first time (within 30 days and through any OAuth provider), a `referrals/{id}` doc is created attributing the signup to the ambassador — with self-attribution and double-attribution both blocked.
-  2. An ambassador logs an event they hosted (date, type, attendees, link, notes) from the dashboard, can edit or delete it up to 30 days after the event date, and an admin can view every cohort event and flag / hide spammy entries — with the ambassador's visible event count reflecting only non-hidden entries.
-  3. An ambassador submits a monthly self-report (3 short-answer fields, auto-populated with that month's events and referrals) once per month, the dashboard shows next-due date and status badge (on-time / overdue / submitted), and a friendly Discord DM reminder arrives 3 days before the deadline and again on deadline day.
-  4. A daily GitHub Actions cron evaluates missing reports against each ambassador's stored timezone and flags candidates for admin review — the cron itself never mutates strike counts; all strike increments are an explicit admin action from the admin panel, and the admin panel surfaces a one-click offboarding flow the moment an ambassador reaches 2 confirmed strikes.
-  5. A separate weekly reconciliation cron flags any accepted ambassador who is missing the Discord Ambassador role — again, no auto-mutation — so an admin can retry role assignment or follow up manually.
+
+1. An ambassador copies their unique referral code (e.g., `AHSAN-A7F2`) from their profile, shares `codewithahsan.dev/?ref=AHSAN-A7F2`, and when the recipient signs up for the first time (within 30 days and through any OAuth provider), a `referrals/{id}` doc is created attributing the signup to the ambassador — with self-attribution and double-attribution both blocked.
+2. An ambassador logs an event they hosted (date, type, attendees, link, notes) from the dashboard, can edit or delete it up to 30 days after the event date, and an admin can view every cohort event and flag / hide spammy entries — with the ambassador's visible event count reflecting only non-hidden entries.
+3. An ambassador submits a monthly self-report (3 short-answer fields, auto-populated with that month's events and referrals) once per month, the dashboard shows next-due date and status badge (on-time / overdue / submitted), and a friendly Discord DM reminder arrives 3 days before the deadline and again on deadline day.
+4. A daily GitHub Actions cron evaluates missing reports against each ambassador's stored timezone and flags candidates for admin review — the cron itself never mutates strike counts; all strike increments are an explicit admin action from the admin panel, and the admin panel surfaces a one-click offboarding flow the moment an ambassador reaches 2 confirmed strikes.
+5. A separate weekly reconciliation cron flags any accepted ambassador who is missing the Discord Ambassador role — again, no auto-mutation — so an admin can retry role assignment or follow up manually.
 
 **Plans**: 6 plans
+
 - [ ] 04-01-foundations-types-schemas-PLAN.md — Ambassador/event/report/cron-flag types + Zod schemas + EventType enum + referralCode generator + reportDeadline helpers + collection constants (Wave 1 / REF-01, EVENT-01, REPORT-01, REPORT-02, REPORT-04)
 - [ ] 04-02-referral-attribution-PLAN.md — Edge `src/middleware.ts` `cwa_ref` cookie setter + referral attribution in acceptance flow + Firestore denial for client referral writes (Wave 2 / REF-01..REF-05)
 - [ ] 04-03-event-logging-PLAN.md — `/api/ambassador/events` CRUD + 30-day edit/delete window + admin events panel + per-cohort event flagging (Wave 2 / EVENT-01..EVENT-04)
@@ -162,34 +175,38 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 - [ ] 04-06-cron-scripts-PLAN.md — `scripts/ambassador-report-flag.ts` (daily REPORT-04 + REPORT-05 DM reminders) + `scripts/ambassador-discord-reconciliation.ts` (weekly DISC-04 flagger) + GitHub Actions workflow with dry-run dispatch (Wave 2 / REPORT-04, REPORT-05, DISC-04)
 
 ### Phase 5: Dashboard, Leaderboard, Offboarding & Alumni
+
 **Goal**: An active ambassador can see their own impact at a glance and (after a 4-week grace period) compare against their cohort on a calm, hourly-updated leaderboard that shows raw per-category metrics (no composite score, nobody visibly last); a term-ending ambassador transitions cleanly to alumni with the right badge and retained recognition; a 2-strike offboarding atomically revokes the ambassador role, removes the Discord role, ends cohort membership, and fires the offboarding email.
 **Depends on**: Phase 4 (Activity must exist and have written denormalized counters / referral / event / report documents before Dashboard can aggregate anything meaningful)
 **Requirements**: DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06, DASH-07, DASH-08, DASH-09, ALUMNI-01, ALUMNI-02, ALUMNI-03, DISC-05, EMAIL-04
 **Success Criteria** (what must be TRUE):
-  1. An active ambassador visiting `/ambassadors/dashboard` sees their personal stats (referral count, events hosted, reports on-time, strike count, cohort progress, next-report-due), and any non-ambassador hitting the same URL gets a 404 — verified with a seeded mentee and an unauthenticated visitor.
-  2. On a first-visit, the dashboard presents an onboarding checklist (join `#ambassadors`, set bio, upload cohort video, share referral link, log first event) with per-item completion state persisting on the ambassador subdoc, plus an admin-curated "Ambassador of the Month" field read from the cohort doc.
-  3. Within the first 4 weeks of the cohort, the leaderboard section shows a friendly "Leaderboard unlocks in N weeks" banner; after week 4 it reveals top-3 of each raw category (referrals, events hosted, reports on-time) plus the ambassador's own rank privately ("Your rank: #7") — with cumulative (default) and "this month" views, both reading from an hourly-aggregated snapshot that displays "Updated N minutes ago" and offers a manual-refresh button.
-  4. When an ambassador successfully completes the term, their `ambassador.active` flips to `false` with `endedAt` set and their `mentorship_profiles.roles` atomically swaps `"ambassador"` → `"alumni-ambassador"` (via the shared `roleMutation` helper), and the public profile badge re-renders as "Alumni Ambassador" while `/ambassadors` stops listing them.
-  5. When an admin triggers the 2-strike offboarding flow, the ambassador role is revoked from `roles`, the Discord Ambassador role is removed (failures surface in the admin panel with a retry button), cohort membership is marked `ended`, the offboarding email fires, and the user does NOT receive the alumni flag (confirmed distinct from the term-completion alumni transition).
+
+1. An active ambassador visiting `/ambassadors/dashboard` sees their personal stats (referral count, events hosted, reports on-time, strike count, cohort progress, next-report-due), and any non-ambassador hitting the same URL gets a 404 — verified with a seeded mentee and an unauthenticated visitor.
+2. On a first-visit, the dashboard presents an onboarding checklist (join `#ambassadors`, set bio, upload cohort video, share referral link, log first event) with per-item completion state persisting on the ambassador subdoc, plus an admin-curated "Ambassador of the Month" field read from the cohort doc.
+3. Within the first 4 weeks of the cohort, the leaderboard section shows a friendly "Leaderboard unlocks in N weeks" banner; after week 4 it reveals top-3 of each raw category (referrals, events hosted, reports on-time) plus the ambassador's own rank privately ("Your rank: #7") — with cumulative (default) and "this month" views, both reading from an hourly-aggregated snapshot that displays "Updated N minutes ago" and offers a manual-refresh button.
+4. When an ambassador successfully completes the term, their `ambassador.active` flips to `false` with `endedAt` set and their `mentorship_profiles.roles` atomically swaps `"ambassador"` → `"alumni-ambassador"` (via the shared `roleMutation` helper), and the public profile badge re-renders as "Alumni Ambassador" while `/ambassadors` stops listing them.
+5. When an admin triggers the 2-strike offboarding flow, the ambassador role is revoked from `roles`, the Discord Ambassador role is removed (failures surface in the admin panel with a retry button), cohort membership is marked `ended`, the offboarding email fires, and the user does NOT receive the alumni flag (confirmed distinct from the term-completion alumni transition).
 
 **Plans**: 5 plans
-  - [x] 05-01-foundations-PLAN.md — Constants (LEADERBOARD_SNAPSHOTS_COLLECTION + grace ms), AmbassadorSubdoc/CohortDoc/CohortPatchSchema extensions, removeDiscordRole, sendAmbassadorOffboardingEmail, leaderboard.ts skeleton (Wave 1 / DASH-08, DASH-09, DISC-05, EMAIL-04)
-  - [x] 05-02-leaderboard-pipeline-PLAN.md — buildLeaderboardSnapshot with 1224 ranking + UTC month + grace math + scripts/ambassador-leaderboard-snapshot.ts + GitHub Actions hourly job (Wave 2 / DASH-03, DASH-04, DASH-05, DASH-06, DASH-07)
-  - [x] 05-03-dashboard-api-PLAN.md — GET /api/ambassador/dashboard/me (parallel reads + Pitfall 6 derivation) + GET /api/ambassador/dashboard/leaderboard (single doc, no ambassadorRanks leak) + firestore.rules update (Wave 2 / DASH-01, DASH-02, DASH-07)
-  - [x] 05-04-lifecycle-endpoints-PLAN.md — POST /api/ambassador/members/[uid]/offboard + POST /alumni admin endpoints with atomic batch, soft Discord/email/claim post-commit (Wave 2 / ALUMNI-01, ALUMNI-02, ALUMNI-03, DISC-05, EMAIL-04)
-  - [x] 05-05-ui-assembly-PLAN.md — /ambassadors/dashboard page + DashboardClient + 5 components (PersonalStatsPanel, OnboardingChecklist, LeaderboardPanel, AmbassadorOfMonthBanner) + OffboardConfirmModal + AlumniTransitionButton wired into MemberDetailClient (Wave 3 / DASH-01..06, DASH-08, DASH-09, ALUMNI-03)
+
+- [x] 05-01-foundations-PLAN.md — Constants (LEADERBOARD_SNAPSHOTS_COLLECTION + grace ms), AmbassadorSubdoc/CohortDoc/CohortPatchSchema extensions, removeDiscordRole, sendAmbassadorOffboardingEmail, leaderboard.ts skeleton (Wave 1 / DASH-08, DASH-09, DISC-05, EMAIL-04)
+- [x] 05-02-leaderboard-pipeline-PLAN.md — buildLeaderboardSnapshot with 1224 ranking + UTC month + grace math + scripts/ambassador-leaderboard-snapshot.ts + GitHub Actions hourly job (Wave 2 / DASH-03, DASH-04, DASH-05, DASH-06, DASH-07)
+- [x] 05-03-dashboard-api-PLAN.md — GET /api/ambassador/dashboard/me (parallel reads + Pitfall 6 derivation) + GET /api/ambassador/dashboard/leaderboard (single doc, no ambassadorRanks leak) + firestore.rules update (Wave 2 / DASH-01, DASH-02, DASH-07)
+- [x] 05-04-lifecycle-endpoints-PLAN.md — POST /api/ambassador/members/[uid]/offboard + POST /alumni admin endpoints with atomic batch, soft Discord/email/claim post-commit (Wave 2 / ALUMNI-01, ALUMNI-02, ALUMNI-03, DISC-05, EMAIL-04)
+- [x] 05-05-ui-assembly-PLAN.md — /ambassadors/dashboard page + DashboardClient + 5 components (PersonalStatsPanel, OnboardingChecklist, LeaderboardPanel, AmbassadorOfMonthBanner) + OffboardConfirmModal + AlumniTransitionButton wired into MemberDetailClient (Wave 3 / DASH-01..06, DASH-08, DASH-09, ALUMNI-03)
+
 **UI hint**: yes
 
 ## Progress
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| v6.0 Phase 1: Foundation — Roles Array Migration | 10/10 | Closed (Deploy #5 prod ops done) | 2026-05-21 |
-| v6.0 Phase 2: Application Subsystem | 9/9 | Shipped | 2026-05-07 |
-| v6.0 Phase 3: Public Presentation | 6/6 | Shipped | 2026-05-08 |
-| v6.0 Phase 4: Activity Subsystem | 7/7 | Shipped | 2026-05-10 |
-| v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 5/5 | Verifying — gaps_found (1 PASS / 3 PARTIAL / 1 FAIL) | — |
-| v7.0 Phase 6: Agent Workflow Refactor + State Wiring | 4/4 | PARTIAL-SHIP (deploy landed cwa-assistant-bot-00012-8x6; AGENT-PAR-02 P95 gate DEFERRED — see STATE.md Next Moves #1) | 2026-05-23 |
+| Phase                                                      | Plans Complete | Status                                                                                                                | Completed  |
+| ---------------------------------------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------- | ---------- |
+| v6.0 Phase 1: Foundation — Roles Array Migration           | 10/10          | Closed (Deploy #5 prod ops done)                                                                                      | 2026-05-21 |
+| v6.0 Phase 2: Application Subsystem                        | 9/9            | Shipped                                                                                                               | 2026-05-07 |
+| v6.0 Phase 3: Public Presentation                          | 6/6            | Shipped                                                                                                               | 2026-05-08 |
+| v6.0 Phase 4: Activity Subsystem                           | 7/7            | Shipped                                                                                                               | 2026-05-10 |
+| v6.0 Phase 5: Dashboard, Leaderboard, Offboarding & Alumni | 5/5            | Verifying — gaps_found (1 PASS / 3 PARTIAL / 1 FAIL)                                                                  | —          |
+| v7.0 Phase 6: Agent Workflow Refactor + State Wiring       | 4/4            | PARTIAL-SHIP (deploy landed cwa-assistant-bot-00012-8x6; AGENT-PAR-02 P95 gate DEFERRED — see STATE.md Next Moves #1) | 2026-05-23 |
 
 ### Phase 2: ADK Community Assistant for Discord (Google Cloud Next 2026 demo)
 
@@ -199,6 +216,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 **Plans:** 4/4 plans complete
 
 Plans:
+
 - [ ] TBD (run /gsd:plan-phase 2 to break down)
 
 ### Phase 2.1: ADK Content & External Knowledge Sub-Agents
@@ -209,6 +227,7 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
+
 - [x] 02.1-01-PLAN.md — Ghost blog ISR proxy + content_agent skeleton with search_blog_posts + root agent wiring + Vitest + pytest (Wave 1 / EXT-CONTENT-BLOG)
 - [x] 02.1-02-PLAN.md — YouTube ISR proxy (channelId-scoped, reuses YT_API_KEY) + content_agent.search_youtube_videos + Vitest + pytest (Wave 2 / EXT-CONTENT-YOUTUBE)
 - [ ] 02.1-03-PLAN.md — external_knowledge_agent with GitHub/dev.to/Stack Overflow direct httpx tools + root agent wiring + local adk web smoke + Cloud Run redeploy of cwa-assistant-bot (Wave 3 / EXT-KNOWLEDGE-GITHUB, EXT-KNOWLEDGE-DEVTO, EXT-KNOWLEDGE-STACKOVERFLOW, EXT-ADK-REDEPLOY)
@@ -223,11 +242,13 @@ Production `community_assistant` Discord bot self-audit (2026-05-22) measured ~3
 **Depends on**: Phase 02 (community_assistant base), Phase 02.1 (content + external sub-agents)
 **Requirements**: AGENT-PAR-01, AGENT-PAR-02, AGENT-STATE-01, AGENT-STATE-02, AGENT-TOOL-01, AGENT-TEST-01
 **Success Criteria** (what must be TRUE):
-  1. `external_knowledge` queries fire 3 branches interleaved in adk web Events tab (not stacked sequentially); P95 on 3-source queries drops ≥40% from ~19s baseline.
-  2. State tab populates `user_skill_level` / `user_goals` after onboarding; downstream mentor/project/roadmap agents read those keys.
-  3. Featured-resource items appear via `AgentTool` call (visible in Events tab) — not via Python list-prepend.
-  4. 24h prod soak passes — no regression on Discord HMAC-hashed usage metrics dashboard.
-  5. Talk demo `parallel_research` slide can be live-swapped to production `external_knowledge` running the same pattern.
+
+1. `external_knowledge` queries fire 3 branches interleaved in adk web Events tab (not stacked sequentially); P95 on 3-source queries drops ≥40% from ~19s baseline.
+2. State tab populates `user_skill_level` / `user_goals` after onboarding; downstream mentor/project/roadmap agents read those keys.
+3. Featured-resource items appear via `AgentTool` call (visible in Events tab) — not via Python list-prepend.
+4. 24h prod soak passes — no regression on Discord HMAC-hashed usage metrics dashboard.
+5. Talk demo `parallel_research` slide can be live-swapped to production `external_knowledge` running the same pattern.
+
 **Plans**: TBD (run /gsd-plan-phase 6)
 **UI hint**: no
 
@@ -237,16 +258,20 @@ Production `community_assistant` Discord bot self-audit (2026-05-22) measured ~3
 **Depends on**: Phase 6 (callbacks attach to the refactored tree)
 **Requirements**: AGENT-CB-MODEL-01, AGENT-CB-TOOL-01, AGENT-CB-TOOL-02, AGENT-CB-AGENT-01, AGENT-CB-AGENT-02, AGENT-TEST-02
 **Success Criteria** (what must be TRUE):
-  1. Credit-card / Discord-ID patterns in user content are `[REDACTED PII]` before the LLM sees them — raw values never appear in any log.
-  2. Repeat blog/youtube queries within 600s served from `tool_context.state` cache; Cloud Logging emits `tool_cache_hit` event.
-  3. Per-sub-agent `agent.enter` / `agent.exit` events with `duration_ms` emitted for every Discord turn — usable for P95-per-agent dashboards.
-  4. v6.0 HMAC privacy story preserved end-to-end (no raw user_id, no raw query text).
-  5. Talk can pause on stage to show `before_model_callback` debug pane (redaction) and `before_tool_callback` debug pane (cache hit timestamp).
+
+1. Credit-card / Discord-ID patterns in user content are `[REDACTED PII]` before the LLM sees them — raw values never appear in any log.
+2. Repeat blog/youtube queries within 600s served from `tool_context.state` cache; Cloud Logging emits `tool_cache_hit` event.
+3. Per-sub-agent `agent.enter` / `agent.exit` events with `duration_ms` emitted for every Discord turn — usable for P95-per-agent dashboards.
+4. v6.0 HMAC privacy story preserved end-to-end (no raw user_id, no raw query text).
+5. Talk can pause on stage to show `before_model_callback` debug pane (redaction) and `before_tool_callback` debug pane (cache hit timestamp).
+
 **Plans**: 4 plans
+
 - [x] 07-01-PLAN.md — PII redaction callback on root_agent (Wave 1 / AGENT-CB-MODEL-01)
 - [x] 07-02-PLAN.md — Tool-result cache callbacks on content_agent (Wave 2 / AGENT-CB-TOOL-01, AGENT-CB-TOOL-02)
 - [x] 07-03-PLAN.md — Structured lifecycle logging on 12 leaf LlmAgents (Wave 3 / AGENT-CB-AGENT-01, AGENT-CB-AGENT-02)
 - [ ] 07-04-PLAN.md — adk web smoke + Cloud Run redeploy + 24h soak + AGENT-PAR-02 closure (Wave 4 / AGENT-TEST-02)
+
 **UI hint**: no
 
 ### Phase 8: Agent Quality + Memory (LoopAgent + Sessions)
@@ -255,14 +280,30 @@ Production `community_assistant` Discord bot self-audit (2026-05-22) measured ~3
 **Depends on**: Phase 7 (lifecycle callbacks needed to instrument loop iterations)
 **Requirements**: AGENT-LOOP-CRITIC-01, AGENT-LOOP-CRITIC-02, AGENT-LOOP-CLARIFY-01, AGENT-LOOP-CLARIFY-02, AGENT-SESSION-01, AGENT-SESSION-02, AGENT-SESSION-03, AGENT-TEST-03
 **Success Criteria** (what must be TRUE):
-  1. User asking "find me a mentor" with empty state triggers `mentor_intake_clarifier` to ask ≥1 clarifying question, pause, resume on next turn until intake complete.
-  2. Critic loop runs after mentorship_agent / projects_agent recommendations — `Critic → exit_loop` visible in Events tab within ≤2 iterations.
-  3. Bot remembers user goals across Cloud Run redeploy (verified via `gcloud run services update --revision-suffix=...`).
-  4. `agent_sessions/{hmac}/turns/{turn_id}` Firestore docs populated; raw Discord user_id absent everywhere.
-  5. Daily cron (GitHub Actions + `scripts/agent-session-prune.ts`) prunes turns >30d old — idempotent, no active-session drops.
-  6. Talk demo `content_orchestra` LoopAgent slide live-swaps to `mentor_clarifier` running real intake.
+
+1. User asking "find me a mentor" with empty state triggers `mentor_intake_clarifier` to ask ≥1 clarifying question, pause, resume on next turn until intake complete.
+2. Critic loop runs after mentorship_agent / projects_agent recommendations — `Critic → exit_loop` visible in Events tab within ≤2 iterations.
+3. Bot remembers user goals across Cloud Run redeploy (verified via `gcloud run services update --revision-suffix=...`).
+4. `agent_sessions/{hmac}/turns/{turn_id}` Firestore docs populated; raw Discord user_id absent everywhere.
+5. Daily cron (GitHub Actions + `scripts/agent-session-prune.ts`) prunes turns >30d old — idempotent, no active-session drops.
+6. Talk demo `content_orchestra` LoopAgent slide live-swaps to `mentor_clarifier` running real intake.
+
 **Plans**: TBD (run /gsd-plan-phase 8)
 **UI hint**: no
 
+### Phase 9: Marketing Site Enrichment
+
+**Milestone:** v8.0 Marketing Site Refresh (parallel track — does not displace in-flight v7.0 agent work; mirrors the v3.0 "Brand Identity & Site Restructure" precedent).
+**Goal:** Rebuild the home page into a marketing-driven landing (jamwithai.dev-level richness) and enrich `/sponsors` with an "About Ahsan" section + a shared "Ahsan's work" (products/OSS) showcase — both pages sell Ahsan's authority and community reach instead of reading as empty.
+**Requirements**: See `09-SPEC.md` — 9 locked (home hero rebuild, shared products/OSS showcase, testimonials, trusted-by strip, prominent Sponsor CTA, retained live stats/FAQ/founder block, sponsors About-Ahsan + showcase, no-regression quality floor).
+**Depends on:** #263 (sponsors page + side nav, shipped)
+**Plans:** 0 plans (run /gsd:discuss-phase 9 → /gsd:ui-phase 9 → /gsd:plan-phase 9)
+**UI hint:** yes
+
+Plans:
+
+- [ ] TBD (run /gsd:plan-phase 9 to break down)
+
 ---
-*Last updated: 2026-05-23 — v7.0 Phase 6 PARTIAL-SHIP (4/4 plans landed). 06-04 deployed `cwa-assistant-bot-00012-8x6` to Cloud Run (us-central1) after 5-turn `adk web` smoke PASS (Open Questions 2+3 resolved YES; §5.4 fan-out visibility + Plan 03 AgentTool wrap verified live; AGENT-PAR-01 fail-fast guard verified LIVE on devto error). AGENT-PAR-02 P95 latency gate DEFERRED — user override accepted, carry-over to Phase 7/8 logged in `.planning/STATE.md` Next Moves #1. Phase 7 unblocked.*
+
+_Last updated: 2026-05-23 — v7.0 Phase 6 PARTIAL-SHIP (4/4 plans landed). 06-04 deployed `cwa-assistant-bot-00012-8x6` to Cloud Run (us-central1) after 5-turn `adk web` smoke PASS (Open Questions 2+3 resolved YES; §5.4 fan-out visibility + Plan 03 AgentTool wrap verified live; AGENT-PAR-01 fail-fast guard verified LIVE on devto error). AGENT-PAR-02 P95 latency gate DEFERRED — user override accepted, carry-over to Phase 7/8 logged in `.planning/STATE.md` Next Moves #1. Phase 7 unblocked._
