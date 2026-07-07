@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: Agentic Orchestra Upgrade
 status: verifying
-stopped_at: Phase 9 context gathered
-last_updated: "2026-07-07T19:37:24.053Z"
+stopped_at: Phase 9 UI-SPEC approved
+last_updated: "2026-07-07T19:53:00.123Z"
 last_activity: "2026-06-09 — Completed quick task 260609-f6n: challenge participants list with submission status + cert contact snapshot"
 progress:
   total_phases: 10
@@ -33,7 +33,7 @@ Last activity: 2026-06-09 — Completed quick task 260609-f6n: challenge partici
 
 ## Next Moves (queued, not in flight)
 
-1. **Phase 6 deferred — 24h soak + AGENT-PAR-02 P95 gate (carry-over from 06-04)**: AGENT-PAR-02 (≥40% P95 latency drop on 3-source external_knowledge queries vs ~19s baseline) is **DEFERRED, NOT GREEN**. User override resume-signal verbatim: _"go with option a. but proceed with the rest of the stuff? we can always come back if something goes wrong."_ Deploy landed (revision `cwa-assistant-bot-00012-8x6`, 2026-05-23) but baseline P95 not pulled + 24h soak observations not collected. To close the gate: (a) pull baseline P95 from Cloud Logging over last 7 days on `query_topic=external_knowledge` (procedure in `.planning/phases/06-agent-workflow-refactor-state-wiring/06-04-PLAN.md` Task 2 Part A); (b) observe T+1h / T+6h / T+24h post-deploy P95 + error rate vs. baseline; (c) record SHIP / ROLLBACK decision in `06-04-SOAK-LOG.md`. Best paired with Phase 7 (lifecycle callbacks) since per-leaf timing instrumentation lands there. If post-deploy P95 falls <40% drop, open a Plan 06-05 gap-closure stub (e.g., `skip_summarization=True` on featured_resources_tool per RESEARCH Assumption A6, or investigate per-branch tail latency).
+1. **Phase 6 deferred — 24h soak + AGENT-PAR-02 P95 gate (carry-over from 06-04)**: AGENT-PAR-02 (≥40% P95 latency drop on 3-source external*knowledge queries vs ~19s baseline) is **DEFERRED, NOT GREEN**. User override resume-signal verbatim: *"go with option a. but proceed with the rest of the stuff? we can always come back if something goes wrong."\_ Deploy landed (revision `cwa-assistant-bot-00012-8x6`, 2026-05-23) but baseline P95 not pulled + 24h soak observations not collected. To close the gate: (a) pull baseline P95 from Cloud Logging over last 7 days on `query_topic=external_knowledge` (procedure in `.planning/phases/06-agent-workflow-refactor-state-wiring/06-04-PLAN.md` Task 2 Part A); (b) observe T+1h / T+6h / T+24h post-deploy P95 + error rate vs. baseline; (c) record SHIP / ROLLBACK decision in `06-04-SOAK-LOG.md`. Best paired with Phase 7 (lifecycle callbacks) since per-leaf timing instrumentation lands there. If post-deploy P95 falls <40% drop, open a Plan 06-05 gap-closure stub (e.g., `skip_summarization=True` on featured_resources_tool per RESEARCH Assumption A6, or investigate per-branch tail latency).
 2. **v7.0 Phase 7 planning (unblocked, ready)**: callbacks — `before_model_callback` PII redaction, `before_/after_tool_callback` cache, `before_/after_agent_callback` structured lifecycle logging. Attaches to the Phase-6 tree (per leaf researcher + per onboarding child + per synthesizer + content_agent + wrapped featured_resources_agent — see `06-CONTEXT.md` cross-phase handoff). Lifecycle logging will provide the per-leaf timing data needed for the deferred AGENT-PAR-02 soak in Next Move #1.
 3. **v7.0 Phase 8 planning (blocked on 7)**: LoopAgent critic for mentor/project quality, LoopAgent clarifier for mentor/project intake, `DatabaseSessionService` (Firestore-backed, HMAC-keyed), daily session pruning cron.
 4. **Phase 5 Plan 05-05 human verification (optional, deferred)**: browser smoke test — onboarding tick persists, leaderboard renders, AlumniTransitionButton on past-cohort. Server-side already PASS so this is UX-only.
@@ -230,9 +230,9 @@ Do not deploy the rules flip before `sync-custom-claims.ts` completes. Dual-clai
 
 ## Session Continuity
 
-Last session: 2026-07-07T19:37:24.048Z
-Stopped at: Phase 9 context gathered
-Resume file: .planning/phases/09-marketing-site-enrichment/09-CONTEXT.md
+Last session: 2026-07-07T19:53:00.118Z
+Stopped at: Phase 9 UI-SPEC approved
+Resume file: .planning/phases/09-marketing-site-enrichment/09-UI-SPEC.md
 
 ---
 
