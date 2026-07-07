@@ -7,6 +7,7 @@ import SideNav from "./SideNav";
 import Image from "./Image";
 import ProfileMenu from "./ProfileMenu";
 import { ReactNode } from "react";
+import { HandCoins } from "lucide-react";
 
 const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   return (
@@ -33,6 +34,14 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
           </Link>
         </div>
         <div className="navbar-end gap-2">
+          <Link
+            href="/sponsors"
+            aria-label="Sponsor"
+            className="btn btn-sm btn-accent gap-1 min-h-11"
+          >
+            <HandCoins className="w-4 h-4" aria-hidden="true" />
+            <span className="hidden sm:inline">Sponsor</span>
+          </Link>
           <ProfileMenu />
           <SideNav />
         </div>
