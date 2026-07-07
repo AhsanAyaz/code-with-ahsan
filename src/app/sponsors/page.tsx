@@ -2,6 +2,11 @@ import { Metadata } from "next";
 import { Video, Instagram, Linkedin, Mail, MessageSquare, Sparkles, Calendar } from "lucide-react";
 import SponsorContactForm from "./SponsorContactForm";
 import { BRAND_LOGOS } from "./logos";
+import { getCourses } from "@/lib/content/contentProvider";
+import PortfolioBio from "@/components/portfolio/PortfolioBio";
+import BooksSection from "@/components/portfolio/BooksSection";
+import CoursesSection from "@/components/portfolio/CoursesSection";
+import OpenSourceSection from "@/components/portfolio/OpenSourceSection";
 
 const BOOKING_URL = "https://calendar.app.google/Z6g5dMyczq25hmjYA";
 
@@ -83,7 +88,9 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function SponsorsPage() {
+export default async function SponsorsPage() {
+  const courses = await getCourses();
+
   return (
     <div className="page-padding">
       {/* Hero */}
@@ -136,6 +143,9 @@ export default function SponsorsPage() {
         </div>
       </section>
 
+      {/* About Ahsan — the person a brand buys access to */}
+      <PortfolioBio as="h2" />
+
       {/* What we offer */}
       <section className="max-w-5xl mx-auto py-12">
         <SectionEyebrow>What we offer</SectionEyebrow>
@@ -178,6 +188,11 @@ export default function SponsorsPage() {
           evergreen technical content.
         </p>
       </section>
+
+      {/* Ahsan's work showcase */}
+      <BooksSection />
+      <CoursesSection courses={courses} />
+      <OpenSourceSection />
 
       {/* Contact */}
       <section id="contact" className="max-w-xl mx-auto py-12 pb-20">
