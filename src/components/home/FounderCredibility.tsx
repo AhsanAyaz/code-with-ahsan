@@ -33,20 +33,14 @@ export default function FounderCredibility() {
               </span>
             </div>
 
-            <h2 className="text-2xl font-bold text-base-content">
-              Muhammad Ahsan Ayaz
-            </h2>
+            <h2 className="text-2xl font-bold text-base-content">Muhammad Ahsan Ayaz</h2>
 
             <p className="text-base-content/70 max-w-xl leading-relaxed">
-              Google Developer Expert in Angular &amp; AI. Author, speaker, and
-              the founder of Code With Ahsan — a community of 4,500+ developers
-              learning and building together.
+              Google Developer Expert in Angular &amp; AI. Author, speaker, and the founder of Code
+              With Ahsan — a community of 5,200+ developers learning and building together.
             </p>
 
-            <Link
-              href="/about"
-              className="btn btn-outline btn-sm mt-1"
-            >
+            <Link href="/about" className="btn btn-outline btn-sm mt-1">
               Learn more about Ahsan
             </Link>
           </div>

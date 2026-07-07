@@ -7,7 +7,8 @@ import SideNav from "./SideNav";
 import Image from "./Image";
 import ProfileMenu from "./ProfileMenu";
 import { ReactNode } from "react";
-import { HandCoins } from "lucide-react";
+
+const SUBSCRIBE_URL = "https://blog.codewithahsan.dev/#/portal/signup";
 
 const LayoutWrapper = ({ children }: { children: ReactNode }) => {
   return (
@@ -33,15 +34,21 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
             </div>
           </Link>
         </div>
-        <div className="navbar-end gap-2">
-          <Link
-            href="/sponsors"
-            aria-label="Sponsor"
-            className="btn btn-sm btn-accent gap-1 min-h-11"
-          >
-            <HandCoins className="w-4 h-4" aria-hidden="true" />
-            <span className="hidden sm:inline">Sponsor</span>
+        <div className="navbar-end gap-1 sm:gap-2">
+          <Link href="/about" className="btn btn-ghost btn-sm hidden md:inline-flex">
+            About
           </Link>
+          <Link href="/sponsors" className="btn btn-ghost btn-sm hidden md:inline-flex">
+            Sponsorships
+          </Link>
+          <a
+            href={SUBSCRIBE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-primary btn-sm min-h-11"
+          >
+            Subscribe
+          </a>
           <ProfileMenu />
           <SideNav />
         </div>

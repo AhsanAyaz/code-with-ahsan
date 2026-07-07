@@ -53,10 +53,10 @@ export default function PortfolioBio({ as = "h1" }: PortfolioBioProps) {
 
             {/* Bio paragraph */}
             <p className="text-base-content/70 max-w-xl leading-relaxed">
-              With 10+ years of professional engineering experience, I am a Software Architect at
+              With 13+ years of professional engineering experience, I am a Software Architect at
               Scania Group, a Google Developer Expert in AI &amp; Angular, and the author of 4
               published books including the Angular Cookbook series. I founded Code With Ahsan — a
-              community of 4,500+ developers — and speak regularly at international conferences on
+              community of 5,200+ developers — and speak regularly at international conferences on
               Angular, AI, and modern web development.
             </p>
 

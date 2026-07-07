@@ -20,18 +20,18 @@ import TestimonialsSection from "@/components/portfolio/TestimonialsSection";
 export const metadata: Metadata = {
   title: "Code With Ahsan | Developer Community for Mentorship, Projects & Learning",
   description:
-    "Join 4,500+ developers in a community built around mentorship, real-world projects, learning roadmaps, courses, and books.",
+    "Join 5,200+ developers in a community built around mentorship, real-world projects, learning roadmaps, courses, and books.",
   openGraph: {
     title: "Code With Ahsan | Developer Community for Mentorship, Projects & Learning",
     description:
-      "Join 4,500+ developers in a community built around mentorship, real-world projects, learning roadmaps, courses, and books.",
+      "Join 5,200+ developers in a community built around mentorship, real-world projects, learning roadmaps, courses, and books.",
     images: ["/images/home-og.png"],
   },
   twitter: {
     card: "summary_large_image",
     title: "Code With Ahsan | Developer Community for Mentorship, Projects & Learning",
     description:
-      "Join 4,500+ developers in a community built around mentorship, real-world projects, learning roadmaps, courses, and books.",
+      "Join 5,200+ developers in a community built around mentorship, real-world projects, learning roadmaps, courses, and books.",
     images: ["/images/home-og.png"],
   },
 };

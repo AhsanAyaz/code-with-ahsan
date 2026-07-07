@@ -115,7 +115,7 @@ export default function CommunityHero() {
           </a>
           <Link href="/sponsors">
             <button className="btn btn-outline btn-lg w-full sm:w-auto text-accent border-accent hover:bg-accent hover:text-accent-content">
-              Sponsor us
+              Sponsorships
             </button>
           </Link>
         </motion.div>
