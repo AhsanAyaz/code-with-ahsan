@@ -169,17 +169,28 @@ Exceptions: Hero min-height `85vh` (`min-h-[85vh]`); interactive targets ≥ 44p
 
 ## Typography
 
-Rubik unless noted; JetBrains Mono for utility/data. Two Rubik weights (400/700) + one mono weight (500), with 600 permitted for card titles/eyebrows to match the existing DaisyUI house style.
+"Prose in Rubik, proof in Mono." **Exactly two prose weights + one mono weight:** Rubik 400 (all body) + Rubik 700 (all headings, subheadings, and card titles) + JetBrains Mono 500 (utility/data only). No 600 — if DaisyUI house style ever wants a mid-weight it is an explicit per-instance developer override, never part of this contract.
 
-| Role | Size | Weight | Line Height | Family |
-|------|------|--------|-------------|--------|
-| Display (hero h1) | clamp 40→72px (`text-5xl md:text-7xl`) | 700 | 1.05 (`leading-tight`) | Rubik |
-| Heading (section h2) | 30→36px (`text-3xl md:text-4xl`) | 700 | 1.15 | Rubik |
-| Subheading / card title | 18→20px (`text-lg`/`text-xl`) | 600 | 1.3 | Rubik |
-| Body | 16px (`text-base`) | 400 | 1.5–1.6 (`leading-relaxed`) | Rubik |
-| Mono eyebrow / data | 12–13px (`text-xs`) | 500 | 1.4, `tracking-widest`, lowercase for bracket tags / uppercase where existing | JetBrains Mono |
+### Prose scale — exactly 4 tiers (Rubik)
 
-Hero subhead may render at 18–20px (`text-lg`/`text-xl`) Rubik 400 — an allowed body-scale step-up, not a new role.
+| Tier | Role | Size | Weight | Line Height |
+|------|------|------|--------|-------------|
+| 1 | Display (hero h1) | clamp 40→72px (`text-5xl md:text-7xl`) | 700 | 1.05 (`leading-tight`) |
+| 2 | Heading (section h2) | 30→36px (`text-3xl md:text-4xl`) | 700 | 1.15 |
+| 3 | Subheading / card title | 18→20px (`text-lg`/`text-xl`) | 700 | 1.3 |
+| 4 | Body | 16px (`text-base`) | 400 | 1.5–1.6 (`leading-relaxed`) |
+
+These 4 tiers are the complete prose scale — **do not introduce a 5th prose size.** The hero subhead reuses Tier 3's 18–20px at Rubik **400** (body weight rendered at subheading size): a weight variant inside the existing scale, not a new tier.
+
+### Utility register — NON-PROSE (JetBrains Mono), sits outside the 4-tier prose scale
+
+Labels and data live in a separate monospace utility register that is intentionally *not* one of the four prose sizes. It carries the "proof in Mono" signature and the bracketed eyebrows, and never substitutes for Body/Subheading/Heading/Display:
+
+| Role | Size | Weight | Line Height | Notes |
+|------|------|--------|-------------|-------|
+| Mono eyebrow / data | 12–13px (`text-xs`) | 500 | 1.4 | JetBrains Mono; `tracking-widest`; lowercase for bracket tags (`<work />`), uppercase where existing eyebrows use it |
+
+This is a single utility style, not an additional prose size. Weight count stays at two prose weights (Rubik 400 / 700) plus this one mono weight (500).
 
 ---
 
