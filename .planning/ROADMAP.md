@@ -13,6 +13,7 @@ Code With Ahsan is a comprehensive community platform enabling mentorship, proje
 - [x] **v5.0 CWA Promptathon 2026** — Phase 1 (shipped 2026-04-21)
 - [ ] **v6.0 Student Ambassador Program** — Phases 1-5 (Phase 5 verified 2026-05-22; all 4 actionable invariants closed; awaiting final ship snapshot)
 - [ ] **v7.0 Agentic Orchestra Upgrade** — Phases 6-8 (in planning, started 2026-05-22 — see `.planning/milestones/v7.0-ROADMAP.md`)
+- [ ] **v8.0 Marketing Site Refresh** — Phase 9 (spec locked 2026-07-07; parallel track alongside v7.0; began with #263 sponsors page + side nav)
 
 ## Phases
 
