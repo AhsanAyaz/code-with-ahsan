@@ -1,10 +1,11 @@
 ---
 phase: 9
 slug: marketing-site-enrichment
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-07-07
+reviewed_at: 2026-07-07
 ---
 
 # Phase 9 — UI Design Contract
@@ -15,13 +16,13 @@ created: 2026-07-07
 
 ## Design System
 
-| Property | Value |
-|----------|-------|
-| Tool | none (DaisyUI is the locked design system — introducing shadcn would violate the "reuse existing DaisyUI tokens, no new color system" hard constraint) |
-| Preset | not applicable |
-| Component library | DaisyUI v5 (`btn`, `card`, `badge`) on Tailwind v4; framer-motion for reduced-motion-safe reveals |
-| Icon library | lucide-react (`^0.562.0`) |
-| Font | Rubik (display + body, `--font-rubik`) + JetBrains Mono (utility/data, `--font-mono`) |
+| Property          | Value                                                                                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Tool              | none (DaisyUI is the locked design system — introducing shadcn would violate the "reuse existing DaisyUI tokens, no new color system" hard constraint) |
+| Preset            | not applicable                                                                                                                                         |
+| Component library | DaisyUI v5 (`btn`, `card`, `badge`) on Tailwind v4; framer-motion for reduced-motion-safe reveals                                                      |
+| Icon library      | lucide-react (`^0.562.0`)                                                                                                                              |
+| Font              | Rubik (display + body, `--font-rubik`) + JetBrains Mono (utility/data, `--font-mono`)                                                                  |
 
 **shadcn gate outcome:** `components.json` absent. Tech stack is Next.js/React, but the phase constraints explicitly lock the visual system to DaisyUI tokens + brand primary `#8f27e0` and forbid a new color/component system. shadcn is therefore intentionally **not** initialized. Registry safety gate: not applicable.
 
@@ -29,30 +30,32 @@ created: 2026-07-07
 
 ## Design Thesis (frontend-design skill output)
 
-**Subject pinned.** Code With Ahsan — a mentor-led developer community founded by Muhammad Ahsan Ayaz (Google Developer Expert, author of 4 books, 13M+ library installs, 50+ talks). **Audience:** working developers (junior→senior) as the primary reader; brands/sponsors wanting to reach 180k+ developers as the secondary reader. **The home page's single job:** convince a developer this is a credible, *active* community worth joining — while surfacing Ahsan's authority and a first-class Sponsor path. **The `/sponsors` page's job:** make the person (Ahsan) and his body of work the thing a brand is buying access to, not just raw follower numbers.
+**Subject pinned.** Code With Ahsan — a mentor-led developer community founded by Muhammad Ahsan Ayaz (Google Developer Expert, author of 4 books, 13M+ library installs, 50+ talks). **Audience:** working developers (junior→senior) as the primary reader; brands/sponsors wanting to reach 180k+ developers as the secondary reader. **The home page's single job:** convince a developer this is a credible, _active_ community worth joining — while surfacing Ahsan's authority and a first-class Sponsor path. **The `/sponsors` page's job:** make the person (Ahsan) and his body of work the thing a brand is buying access to, not just raw follower numbers.
 
 ### Token system
 
 **Color** — reuse the existing DaisyUI theme tokens (no new hex system). Named palette:
 
-| Name | Token / Hex | Role |
-|------|-------------|------|
-| Canvas | `base-100` (theme surface) | Dominant background (light + dark) |
-| Panel | `base-200` | Alternating section bands, cards |
-| Hairline | `base-300` | Borders, dividers, rating empties |
-| Ink | `base-content` (theme text) | All primary text |
-| Violet | `#8f27e0` (`primary`) | Community/learning lane — see reserved list |
-| Teal | `#1fb2a6` (`accent`) | **The Sponsor lane** — see reserved list |
-| Magenta | `#d926a9` (`secondary`) | Decorative gradient endpoint + data highlights only |
+| Name     | Token / Hex                 | Role                                                |
+| -------- | --------------------------- | --------------------------------------------------- |
+| Canvas   | `base-100` (theme surface)  | Dominant background (light + dark)                  |
+| Panel    | `base-200`                  | Alternating section bands, cards                    |
+| Hairline | `base-300`                  | Borders, dividers, rating empties                   |
+| Ink      | `base-content` (theme text) | All primary text                                    |
+| Violet   | `#8f27e0` (`primary`)       | Community/learning lane — see reserved list         |
+| Teal     | `#1fb2a6` (`accent`)        | **The Sponsor lane** — see reserved list            |
+| Magenta  | `#d926a9` (`secondary`)     | Decorative gradient endpoint + data highlights only |
 
 **Reserved-color contract (the discipline that keeps this off-template):**
+
 - **Violet = "join / learn" actions only:** the header is quiet, but in-body: Join-the-Community (Discord) primary CTA, Explore-Mentorship, book/course "Get" buttons, live-count number, active/live pulse dot, link hovers.
-- **Teal = the Sponsor lane only:** the persistent header Sponsor button, the hero's third (Sponsor) CTA, and the dedicated home Sponsor band. Sponsor keeps *one recognizable color* across every surface so the commercial path is visually distinct from the community path.
+- **Teal = the Sponsor lane only:** the persistent header Sponsor button, the hero's third (Sponsor) CTA, and the dedicated home Sponsor band. Sponsor keeps _one recognizable color_ across every surface so the commercial path is visually distinct from the community path.
 - **Magenta = decoration only:** the second stop of the headline gradient and occasional data emphasis. Never a standalone button color.
 
 **Type** — "prose in Rubik, proof in Mono."
+
 - **Display / body:** Rubik. Headlines Rubik 700; body Rubik 400.
-- **Utility / data:** JetBrains Mono 500 — and, distinctively, the *proof metrics* (install counts, member counts, stars, credential line) are set in Mono, because npm counts and GitHub stars live in monospace in the developer's real world. Data is a first-class typographic citizen, not a footnote.
+- **Utility / data:** JetBrains Mono 500 — and, distinctively, the _proof metrics_ (install counts, member counts, stars, credential line) are set in Mono, because npm counts and GitHub stars live in monospace in the developer's real world. Data is a first-class typographic citizen, not a footnote.
 
 **Layout concept.** A vertical narrative that alternates `base-100` / `base-200` bands for rhythm, gated by `page-padding` gutters and 64px (`py-16`) vertical breaks. The story: **Hook → Reach proof → Substance proof → What you get → Voices → Who's behind it → Convert.** The rebuilt hero abandons "one gradient headline floating in empty space" and instead pairs the headline with a dense monospace proof block so the hero has jamwithai-level density from the first screen.
 
@@ -102,10 +105,11 @@ HOME (rebuilt)                          SPONSORS (enriched)
 Spend the boldness here. Everything else — the reused portfolio cards, testimonials, pillars — stays quiet and disciplined.
 
 ### Self-critique vs. AI-default looks
+
 - **Not** cream + serif + terracotta (theme surfaces + Rubik sans + Violet/Teal).
 - **Not** near-black + single acid accent (a disciplined three-token brand system, theme-aware light+dark).
 - **Not** broadsheet hairline/newspaper columns (rounded-xl cards, generous type, banded rhythm).
-- The site's *current* hero **is** the skill's warned-against "big gradient number + glow orbs" default; the proof-manifest + bracket motif is the deliberate move away from it. One restrained glow is retained, but the hero no longer *rests on* the gradient trick.
+- The site's _current_ hero **is** the skill's warned-against "big gradient number + glow orbs" default; the proof-manifest + bracket motif is the deliberate move away from it. One restrained glow is retained, but the hero no longer _rests on_ the gradient trick.
 
 ---
 
@@ -115,34 +119,35 @@ Spend the boldness here. Everything else — the reused portfolio cards, testimo
 
 ### Home (`src/app/page.tsx`) — final order
 
-| # | Section | Source | Band | Notes |
-|---|---------|--------|------|-------|
-| 1 | Banners | `HomeBanners` (env-gated) | base-100 | Retained, deprioritized |
-| 2 | **Hero (rebuilt)** | rebuild `CommunityHero` | base-100 | Bracket badge + headline + subhead + **proof manifest** + 3-CTA cluster |
-| 3 | **Trusted-by strip** | new, reuse `BRAND_LOGOS` from `src/app/sponsors/logos.ts` | base-100 (fused under hero) | `<trusted-by />` eyebrow; `currentColor` mono logos, theme-aware |
-| 4 | Live stats + reach | `CommunityStats` + `SocialReachBar` | base-200 | Untouched `/api/stats` (D-04) |
-| 5 | **Ahsan's work showcase** | `BooksSection` + `CoursesSection` + `OpenSourceSection` | alternating | `<work />` eyebrow group header; substance/authority proof |
-| 6 | Community Pillars | `PillarsGrid` | base-100 | Retained |
-| 7 | **Testimonials** | `TestimonialsSection` | base-200 | Portfolio testimonials; hides gracefully at 0 items |
-| 8 | Founder / About-Ahsan | `FounderCredibility` | base-100 | Retained (do NOT also place `PortfolioBio` here — avoids duplicate bio) |
-| 9 | **Sponsor band** | new | teal-tinted band | Prominent home Sponsor mention → `/sponsors` |
-| 10 | Newsletter | inline `NewsletterForm` | base-100 | Retained |
-| 11 | FAQ | `HomeFAQ` | base-200 | Retained |
+| #   | Section                   | Source                                                    | Band                        | Notes                                                                   |
+| --- | ------------------------- | --------------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------- |
+| 1   | Banners                   | `HomeBanners` (env-gated)                                 | base-100                    | Retained, deprioritized                                                 |
+| 2   | **Hero (rebuilt)**        | rebuild `CommunityHero`                                   | base-100                    | Bracket badge + headline + subhead + **proof manifest** + 3-CTA cluster |
+| 3   | **Trusted-by strip**      | new, reuse `BRAND_LOGOS` from `src/app/sponsors/logos.ts` | base-100 (fused under hero) | `<trusted-by />` eyebrow; `currentColor` mono logos, theme-aware        |
+| 4   | Live stats + reach        | `CommunityStats` + `SocialReachBar`                       | base-200                    | Untouched `/api/stats` (D-04)                                           |
+| 5   | **Ahsan's work showcase** | `BooksSection` + `CoursesSection` + `OpenSourceSection`   | alternating                 | `<work />` eyebrow group header; substance/authority proof              |
+| 6   | Community Pillars         | `PillarsGrid`                                             | base-100                    | Retained                                                                |
+| 7   | **Testimonials**          | `TestimonialsSection`                                     | base-200                    | Portfolio testimonials; hides gracefully at 0 items                     |
+| 8   | Founder / About-Ahsan     | `FounderCredibility`                                      | base-100                    | Retained (do NOT also place `PortfolioBio` here — avoids duplicate bio) |
+| 9   | **Sponsor band**          | new                                                       | teal-tinted band            | Prominent home Sponsor mention → `/sponsors`                            |
+| 10  | Newsletter                | inline `NewsletterForm`                                   | base-100                    | Retained                                                                |
+| 11  | FAQ                       | `HomeFAQ`                                                 | base-200                    | Retained                                                                |
 
 ### Sponsors (`src/app/sponsors/page.tsx`) — insertions
 
-| Position | Section | Source | Notes |
-|----------|---------|--------|-------|
-| After hero+brands strip | **About Ahsan** | `PortfolioBio` | Founder-forward; the person a brand buys access to |
-| After audience stats, before contact | **Ahsan's work showcase** | shared `BooksSection`/`CoursesSection`/`OpenSourceSection` | Same components as home Section 5 |
+| Position                             | Section                   | Source                                                     | Notes                                              |
+| ------------------------------------ | ------------------------- | ---------------------------------------------------------- | -------------------------------------------------- |
+| After hero+brands strip              | **About Ahsan**           | `PortfolioBio`                                             | Founder-forward; the person a brand buys access to |
+| After audience stats, before contact | **Ahsan's work showcase** | shared `BooksSection`/`CoursesSection`/`OpenSourceSection` | Same components as home Section 5                  |
 
 ### Header (`src/components/LayoutWrapper.tsx`) — persistent Sponsor button
 
 Add a persistent Sponsor affordance in `navbar-end`, before `ProfileMenu` + `SideNav`. **Treatment:** `Link` to `/sponsors` styled `btn btn-sm btn-accent` (teal, the Sponsor lane), lucide `HandCoins` icon; label "Sponsor" shown `≥ sm`, icon-only `< sm` (with `aria-label="Sponsor"`). Always visible while scrolling (header is already `sticky top-0`).
 
 ### Restyle call-outs (the "reads wrong in new context" exceptions)
+
 - **`PortfolioBio` renders an `<h1>`.** On `/sponsors` (and anywhere it is not the page's top heading) that internal `<h1>` MUST be demoted to `<h2>` to preserve one `<h1>` per page. This is the single genuine restyle required by reuse; flag for the executor.
-- **Section headings inside reused portfolio components use plain `<h2>` (e.g. "Published Books").** When grouped under the home `<work />` showcase, add the bracketed-mono group eyebrow *above* the group; the individual component `<h2>`s stay but drop to visual `text-xl`/`h3`-weight if the group header owns the section title. Executor's call per visual density — keep one clear title per visual block, no double-title stacking.
+- **Section headings inside reused portfolio components use plain `<h2>` (e.g. "Published Books").** When grouped under the home `<work />` showcase, add the bracketed-mono group eyebrow _above_ the group; the individual component `<h2>`s stay but drop to visual `text-xl`/`h3`-weight if the group header owns the section title. Executor's call per visual density — keep one clear title per visual block, no double-title stacking.
 - Everything else composes as-is.
 
 ---
@@ -151,15 +156,15 @@ Add a persistent Sponsor affordance in `navbar-end`, before `ProfileMenu` + `Sid
 
 Declared values (multiples of 4; matches existing Tailwind usage):
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| xs | 4px | Icon gaps, badge inline padding |
-| sm | 8px | Compact element spacing, tag gaps |
-| md | 16px | Default element spacing, card padding base |
-| lg | 24px | Card padding (`p-6`), grid gaps |
-| xl | 32px | Intra-section gaps |
-| 2xl | 48px | Section header → content |
-| 3xl | 64px | Section vertical rhythm (`py-16`) |
+| Token | Value | Usage                                      |
+| ----- | ----- | ------------------------------------------ |
+| xs    | 4px   | Icon gaps, badge inline padding            |
+| sm    | 8px   | Compact element spacing, tag gaps          |
+| md    | 16px  | Default element spacing, card padding base |
+| lg    | 24px  | Card padding (`p-6`), grid gaps            |
+| xl    | 32px  | Intra-section gaps                         |
+| 2xl   | 48px  | Section header → content                   |
+| 3xl   | 64px  | Section vertical rhythm (`py-16`)          |
 
 Gutters governed by the existing `.page-padding` utility (`px-4 sm:px-8 md:px-12 lg:px-16 py-8`).
 
@@ -173,22 +178,22 @@ Exceptions: Hero min-height `85vh` (`min-h-[85vh]`); interactive targets ≥ 44p
 
 ### Prose scale — exactly 4 tiers (Rubik)
 
-| Tier | Role | Size | Weight | Line Height |
-|------|------|------|--------|-------------|
-| 1 | Display (hero h1) | clamp 40→72px (`text-5xl md:text-7xl`) | 700 | 1.05 (`leading-tight`) |
-| 2 | Heading (section h2) | 30→36px (`text-3xl md:text-4xl`) | 700 | 1.15 |
-| 3 | Subheading / card title | 18→20px (`text-lg`/`text-xl`) | 700 | 1.3 |
-| 4 | Body | 16px (`text-base`) | 400 | 1.5–1.6 (`leading-relaxed`) |
+| Tier | Role                    | Size                                   | Weight | Line Height                 |
+| ---- | ----------------------- | -------------------------------------- | ------ | --------------------------- |
+| 1    | Display (hero h1)       | clamp 40→72px (`text-5xl md:text-7xl`) | 700    | 1.05 (`leading-tight`)      |
+| 2    | Heading (section h2)    | 30→36px (`text-3xl md:text-4xl`)       | 700    | 1.15                        |
+| 3    | Subheading / card title | 18→20px (`text-lg`/`text-xl`)          | 700    | 1.3                         |
+| 4    | Body                    | 16px (`text-base`)                     | 400    | 1.5–1.6 (`leading-relaxed`) |
 
 These 4 tiers are the complete prose scale — **do not introduce a 5th prose size.** The hero subhead reuses Tier 3's 18–20px at Rubik **400** (body weight rendered at subheading size): a weight variant inside the existing scale, not a new tier.
 
 ### Utility register — NON-PROSE (JetBrains Mono), sits outside the 4-tier prose scale
 
-Labels and data live in a separate monospace utility register that is intentionally *not* one of the four prose sizes. It carries the "proof in Mono" signature and the bracketed eyebrows, and never substitutes for Body/Subheading/Heading/Display:
+Labels and data live in a separate monospace utility register that is intentionally _not_ one of the four prose sizes. It carries the "proof in Mono" signature and the bracketed eyebrows, and never substitutes for Body/Subheading/Heading/Display:
 
-| Role | Size | Weight | Line Height | Notes |
-|------|------|--------|-------------|-------|
-| Mono eyebrow / data | 12–13px (`text-xs`) | 500 | 1.4 | JetBrains Mono; `tracking-widest`; lowercase for bracket tags (`<work />`), uppercase where existing eyebrows use it |
+| Role                | Size                | Weight | Line Height | Notes                                                                                                                |
+| ------------------- | ------------------- | ------ | ----------- | -------------------------------------------------------------------------------------------------------------------- |
+| Mono eyebrow / data | 12–13px (`text-xs`) | 500    | 1.4         | JetBrains Mono; `tracking-widest`; lowercase for bracket tags (`<work />`), uppercase where existing eyebrows use it |
 
 This is a single utility style, not an additional prose size. Weight count stays at two prose weights (Rubik 400 / 700) plus this one mono weight (500).
 
@@ -196,15 +201,16 @@ This is a single utility style, not an additional prose size. Weight count stays
 
 ## Color
 
-| Role | Value | Usage |
-|------|-------|-------|
-| Dominant (60%) | `base-100` | Page background, hero, alternating bands |
-| Secondary (30%) | `base-200` / `base-300` | Cards, alternating section bands, borders/hairlines |
-| Accent (10%) | Violet `#8f27e0` (`primary`) | Community/learning lane (see reserved list) |
-| Sponsor accent | Teal `#1fb2a6` (`accent`) | Sponsor lane only (see reserved list) |
-| Decoration | Magenta `#d926a9` (`secondary`) | Headline gradient endpoint + data emphasis only — never a solo button |
+| Role            | Value                           | Usage                                                                 |
+| --------------- | ------------------------------- | --------------------------------------------------------------------- |
+| Dominant (60%)  | `base-100`                      | Page background, hero, alternating bands                              |
+| Secondary (30%) | `base-200` / `base-300`         | Cards, alternating section bands, borders/hairlines                   |
+| Accent (10%)    | Violet `#8f27e0` (`primary`)    | Community/learning lane (see reserved list)                           |
+| Sponsor accent  | Teal `#1fb2a6` (`accent`)       | Sponsor lane only (see reserved list)                                 |
+| Decoration      | Magenta `#d926a9` (`secondary`) | Headline gradient endpoint + data emphasis only — never a solo button |
 
 Accent reserved for (explicit):
+
 - **Violet (`primary`):** Join-the-Community/Discord primary CTA, Explore-Mentorship, book/course "Get" buttons, live member count, live/active pulse dot, link hovers, showcase-card hover border.
 - **Teal (`accent`):** persistent header Sponsor button, hero Sponsor CTA (outline-teal), home Sponsor band + its CTA. Sponsor lane only.
 - Never apply Violet or Teal to "all interactive elements" — neutral/`btn-outline` is the default for tertiary actions (e.g. newsletter subscribe sits between them as neutral/outline).
@@ -217,33 +223,34 @@ Both themes: all choices are DaisyUI theme tokens, verified to work in `[data-th
 
 Sentence case, active voice, plain verbs. An action keeps its name through the flow.
 
-| Element | Copy |
-|---------|------|
-| Header Sponsor button | `Sponsor` (icon `HandCoins`, `aria-label="Sponsor"`) |
-| Hero eyebrow | `<community-led />` — open to all developers |
-| Hero headline | `Join {liveCount}+ developers learning together` (live count from `/api/stats`, falls back to `5,000`) |
-| Hero subhead | Keep existing: "Code With Ahsan is a mentor-led developer community where you learn from structured roadmaps, collaborate on real projects, and grow with the support of experienced engineers." |
-| Hero proof-manifest rows | `gde : Google Developer Expert` · `books : 4 published` · `installs : 13M+` · `talks : 50+` |
-| Primary CTA (hero) | `Join the community` → Discord (`btn btn-primary`, `Users` icon) |
-| Secondary CTA (hero) | `Subscribe to the newsletter` → newsletter (`btn btn-outline`, neutral) |
-| Tertiary CTA (hero) | `Sponsor us` → `/sponsors` (`btn btn-outline` teal / accent) |
-| Trusted-by eyebrow | `<trusted-by />` — brands we've worked with |
-| Showcase group eyebrow (home) | `<work />` — built and shared with the community |
-| Testimonials eyebrow | `<testimonials />` — what mentees say |
-| Sponsor band heading | `Put your product in front of 180,000+ developers` |
-| Sponsor band body | `Sponsorships across YouTube, Instagram, LinkedIn, the newsletter, and Discord — content developers already trust.` |
-| Sponsor band CTA | `See sponsorship options` → `/sponsors` (`btn btn-accent`) |
-| Primary CTA (phase) | `Join the community` (the page's top conversion action) |
-| Empty state heading | Showcase/testimonials with 0 items: section is **hidden** (no empty shell rendered) |
-| Empty state body | n/a — graceful hide; at 1 item the grid renders a single card without layout break; at 6+ the grid wraps normally |
-| Error state | `/api/stats` fetch failure: components degrade silently to last-known/static fallback numbers (existing behavior — CommunityHero falls back to 5,000). No error UI, no console error. |
-| Destructive confirmation | none — no destructive actions in this phase |
+| Element                       | Copy                                                                                                                                                                                             |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Header Sponsor button         | `Sponsor` (icon `HandCoins`, `aria-label="Sponsor"`)                                                                                                                                             |
+| Hero eyebrow                  | `<community-led />` — open to all developers                                                                                                                                                     |
+| Hero headline                 | `Join {liveCount}+ developers learning together` (live count from `/api/stats`, falls back to `5,000`)                                                                                           |
+| Hero subhead                  | Keep existing: "Code With Ahsan is a mentor-led developer community where you learn from structured roadmaps, collaborate on real projects, and grow with the support of experienced engineers." |
+| Hero proof-manifest rows      | `gde : Google Developer Expert` · `books : 4 published` · `installs : 13M+` · `talks : 50+`                                                                                                      |
+| Primary CTA (hero)            | `Join the community` → Discord (`btn btn-primary`, `Users` icon)                                                                                                                                 |
+| Secondary CTA (hero)          | `Subscribe to the newsletter` → newsletter (`btn btn-outline`, neutral)                                                                                                                          |
+| Tertiary CTA (hero)           | `Sponsor us` → `/sponsors` (`btn btn-outline` teal / accent)                                                                                                                                     |
+| Trusted-by eyebrow            | `<trusted-by />` — brands we've worked with                                                                                                                                                      |
+| Showcase group eyebrow (home) | `<work />` — built and shared with the community                                                                                                                                                 |
+| Testimonials eyebrow          | `<testimonials />` — what mentees say                                                                                                                                                            |
+| Sponsor band heading          | `Put your product in front of 180,000+ developers`                                                                                                                                               |
+| Sponsor band body             | `Sponsorships across YouTube, Instagram, LinkedIn, the newsletter, and Discord — content developers already trust.`                                                                              |
+| Sponsor band CTA              | `See sponsorship options` → `/sponsors` (`btn btn-accent`)                                                                                                                                       |
+| Primary CTA (phase)           | `Join the community` (the page's top conversion action)                                                                                                                                          |
+| Empty state heading           | Showcase/testimonials with 0 items: section is **hidden** (no empty shell rendered)                                                                                                              |
+| Empty state body              | n/a — graceful hide; at 1 item the grid renders a single card without layout break; at 6+ the grid wraps normally                                                                                |
+| Error state                   | `/api/stats` fetch failure: components degrade silently to last-known/static fallback numbers (existing behavior — CommunityHero falls back to 5,000). No error UI, no console error.            |
+| Destructive confirmation      | none — no destructive actions in this phase                                                                                                                                                      |
 
 ---
 
 ## Motion Contract
 
 framer-motion permitted; every effect MUST respect `prefers-reduced-motion` (disable transforms, keep content fully visible).
+
 - **Hero:** one orchestrated load reveal — staggered fade-up (opacity + 8–12px translate) of eyebrow → headline → manifest → CTA cluster. Retain a single soft glow (drop the dual dueling orbs to one restrained blur) behind the manifest.
 - **Sections:** subtle scroll-triggered fade-in (opacity + ≤12px translate, once) on section entrance. No parallax, no continuous ambient animation beyond the existing gradient utility.
 - **Cards:** hover border-color transition to Violet (existing pattern), no scale jumps.
@@ -252,6 +259,7 @@ framer-motion permitted; every effect MUST respect `prefers-reduced-motion` (dis
 ---
 
 ## Quality Floor (no-regression, SPEC Req 9)
+
 - Responsive to 375px, no horizontal scroll, light + dark themes.
 - Visible keyboard focus on the new header Sponsor button, hero CTAs, and Sponsor band CTA.
 - `npm run build` passes; no serverless `maxDuration > 60`; `/api/stats` integration intact.
@@ -261,19 +269,19 @@ framer-motion permitted; every effect MUST respect `prefers-reduced-motion` (dis
 
 ## Registry Safety
 
-| Registry | Blocks Used | Safety Gate |
-|----------|-------------|-------------|
+| Registry                             | Blocks Used    | Safety Gate                                         |
+| ------------------------------------ | -------------- | --------------------------------------------------- |
 | none (DaisyUI + existing components) | not applicable | not applicable — no shadcn, no third-party registry |
 
 ---
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved (reviewed 2026-07-07, revision 1 — typography gate resolved)
