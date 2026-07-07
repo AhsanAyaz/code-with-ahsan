@@ -298,12 +298,16 @@ Production `community_assistant` Discord bot self-audit (2026-05-22) measured ~3
 **Goal:** Rebuild the home page into a marketing-driven landing (jamwithai.dev-level richness) and enrich `/sponsors` with an "About Ahsan" section + a shared "Ahsan's work" (products/OSS) showcase — both pages sell Ahsan's authority and community reach instead of reading as empty.
 **Requirements**: See `09-SPEC.md` — 9 locked (home hero rebuild, shared products/OSS showcase, testimonials, trusted-by strip, prominent Sponsor CTA, retained live stats/FAQ/founder block, sponsors About-Ahsan + showcase, no-regression quality floor).
 **Depends on:** #263 (sponsors page + side nav, shipped)
-**Plans:** 0 plans (run /gsd:discuss-phase 9 → /gsd:ui-phase 9 → /gsd:plan-phase 9)
+**Plans:** 5 plans (3 waves)
 **UI hint:** yes
 
 Plans:
 
-- [ ] TBD (run /gsd:plan-phase 9 to break down)
+- [ ] 09-01-PLAN.md — Shared bracketed-mono eyebrow helper + reuse-forced edits (PortfolioBio h1→h2 prop, TestimonialsSection empty-state guard) [wave 1]
+- [ ] 09-02-PLAN.md — Persistent header Sponsor button in LayoutWrapper navbar-end (teal, D-05) [wave 1]
+- [ ] 09-03-PLAN.md — New home components: rebuilt CommunityHero (proof manifest + 3 CTAs), TrustedByStrip, teal SponsorBand [wave 2]
+- [ ] 09-04-PLAN.md — Sponsors enrichment: About-Ahsan (PortfolioBio) + work showcase, async conversion for getCourses [wave 2]
+- [ ] 09-05-PLAN.md — Home recompose (page.tsx locked section order) + quality-floor build verification + human visual QA [wave 3]
 
 ---
 
