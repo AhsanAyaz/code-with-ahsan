@@ -78,15 +78,6 @@ export interface BannerContent {
   publishedAt?: string | null;
 }
 
-export interface RateCardContent {
-  id: number;
-  title: string;
-  slug: string;
-  description?: string;
-  article?: string;
-  resources?: ContentResource[];
-}
-
 export type EventType = "workshop" | "hackathon" | "tech-talk" | "webinar" | "conference" | "other";
 export type EventStatus = "upcoming" | "completed" | "cancelled";
 
@@ -95,7 +86,7 @@ export interface EventContent {
   title: string;
   description: string;
   type: EventType;
-  date: string;                  // ISO date string
+  date: string; // ISO date string
   endDate?: string | null;
   location?: string | null;
   speaker?: string | null;
@@ -104,5 +95,5 @@ export interface EventContent {
   isVisible?: boolean;
   status: EventStatus;
   visibilityOrder?: number;
-  body: string;                  // MDX content (markdown only)
+  body: string; // MDX content (markdown only)
 }

@@ -1,11 +1,5 @@
 import qs from "qs";
-import type {
-  BannerContent,
-  CourseContent,
-  EventContent,
-  PostContent,
-  RateCardContent,
-} from "@/types/content";
+import type { BannerContent, CourseContent, EventContent, PostContent } from "@/types/content";
 import {
   getLocalBanners,
   getLocalCourseBySlug,
@@ -13,7 +7,6 @@ import {
   getLocalEventBySlug,
   getLocalEvents,
   getLocalPostBySlug,
-  getLocalRateCard,
 } from "@/lib/content/localContent";
 
 type ProviderMode = "local" | "strapi" | "dual";
@@ -56,14 +49,7 @@ async function getStrapiCourses(): Promise<CourseContent[]> {
           fields: ["name", "description", "showName", "order"],
           populate: {
             posts: {
-              fields: [
-                "title",
-                "slug",
-                "description",
-                "type",
-                "videoUrl",
-                "order",
-              ],
+              fields: ["title", "slug", "description", "type", "videoUrl", "order"],
             },
           },
         },
@@ -88,14 +74,7 @@ async function getStrapiCourseBySlug(slug: string): Promise<CourseContent | null
           fields: ["name", "description", "showName", "order"],
           populate: {
             posts: {
-              fields: [
-                "title",
-                "slug",
-                "description",
-                "type",
-                "videoUrl",
-                "order",
-              ],
+              fields: ["title", "slug", "description", "type", "videoUrl", "order"],
             },
           },
         },
@@ -141,24 +120,6 @@ async function getStrapiBanners(): Promise<BannerContent[]> {
     dismissable: !!banner.dismissable,
   }));
   return banners.filter((banner) => banner.isActive);
-}
-
-async function getStrapiRateCard(): Promise<RateCardContent | null> {
-  const rateDocId = process.env.STRAPI_RATE_CARD_DOC_ID || "tyzwd2y813dr8sldugy0y51l";
-  const query = qs.stringify(
-    {
-      fields: ["title", "slug", "description", "article"],
-      filters: {
-        documentId: { $eq: rateDocId },
-      },
-      populate: {
-        resources: { fields: ["*"] },
-      },
-    },
-    { encodeValuesOnly: true }
-  );
-  const data = await strapiFetch(`/api/posts?${query}`);
-  return ((data?.data || [])[0] as RateCardContent) || null;
 }
 
 function logDualMismatch(kind: string, details: Record<string, unknown>) {
@@ -223,22 +184,6 @@ export async function getBanners(): Promise<BannerContent[]> {
 
   if (shouldCompareDualRead() && local.length !== remote.length) {
     logDualMismatch("banners-length", { local: local.length, strapi: remote.length });
-  }
-
-  return local;
-}
-
-export async function getRateCard(): Promise<RateCardContent | null> {
-  const mode = getProviderMode();
-  const local = getLocalRateCard();
-
-  if (mode === "local") return local;
-
-  const remote = await getStrapiRateCard();
-  if (mode === "strapi") return remote;
-
-  if (shouldCompareDualRead() && !!local !== !!remote) {
-    logDualMismatch("rate-card-found", { local: !!local, strapi: !!remote });
   }
 
   return local;
