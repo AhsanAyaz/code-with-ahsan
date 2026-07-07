@@ -4,9 +4,11 @@ import { verifyAdminRequest } from "@/lib/adminAuth";
 import { deleteDiscordChannel, isDiscordConfigured } from "@/lib/discord";
 
 // Deleting Discord channels is a slow, sequential, rate-limited operation. Give
-// the function generous headroom and never let the platform cache it.
+// the function as much headroom as the plan allows (Vercel hobby caps at 60s)
+// and never let the platform cache it. The per-run batch cap below keeps each
+// invocation comfortably within this budget; the client re-invokes for the rest.
 export const dynamic = "force-dynamic";
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /**
  * Maximum number of channels processed in a single invocation. Discord deletes
