@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { Video, Instagram, Linkedin, Mail, MessageSquare, Sparkles, Calendar } from "lucide-react";
 import SponsorContactForm from "./SponsorContactForm";
 import { BRAND_LOGOS } from "./logos";
+import SocialStats from "@/components/social/SocialStats";
 import { getCourses } from "@/lib/content/contentProvider";
 import PortfolioBio from "@/components/portfolio/PortfolioBio";
 import BooksSection from "@/components/portfolio/BooksSection";
@@ -15,15 +16,6 @@ const CREDENTIALS = [
   "4 published books",
   "13M+ library installs",
   "50+ conference talks",
-];
-
-const STATS = [
-  { label: "YouTube", value: "35.5k+", sub: "Subscribers" },
-  { label: "Instagram", value: "64k+", sub: "Followers" },
-  { label: "LinkedIn", value: "23k+", sub: "B2B Followers" },
-  { label: "Newsletter", value: "2,100+", sub: "Subscribers" },
-  { label: "Discord", value: "5,200+", sub: "Members" },
-  { label: "TikTok", value: "9k+", sub: "Followers" },
 ];
 
 const OFFERINGS = [
@@ -99,9 +91,16 @@ export default async function SponsorsPage() {
         <h1 className="text-4xl sm:text-5xl font-bold text-base-content leading-tight">
           Partner with <span className="text-primary">Code with Ahsan</span>
         </h1>
+        <div className="mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm sm:text-base font-semibold">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+          </span>
+          200,000+ developers across platforms
+        </div>
         <p className="mt-5 text-lg text-base-content/80">
-          Reach 200,000+ developers across YouTube, Instagram, LinkedIn, newsletter, and Discord —
-          through content they already trust.
+          Reach them across YouTube, Instagram, LinkedIn, the newsletter, and Discord — through
+          content they already trust.
         </p>
         <p className="mt-4 text-sm text-base-content/60">{CREDENTIALS.join(" · ")}</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
@@ -168,25 +167,13 @@ export default async function SponsorsPage() {
         </div>
       </section>
 
-      {/* Audience stats */}
+      {/* Audience stats — shared SocialStats component, single source (socialReach → /api/stats) */}
       <section className="max-w-5xl mx-auto py-12">
-        <SectionEyebrow>The audience</SectionEyebrow>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {STATS.map((stat) => (
-            <div
-              key={stat.label}
-              className="flex flex-col items-center gap-1 px-4 py-5 rounded-lg bg-base-200 border border-base-300"
-            >
-              <span className="text-xl font-bold text-base-content">{stat.value}</span>
-              <span className="text-xs font-mono text-base-content/60">{stat.label}</span>
-              <span className="text-[11px] text-base-content/40">{stat.sub}</span>
-            </div>
-          ))}
-        </div>
-        <p className="mt-4 text-center text-sm text-base-content/50">
-          Audience of professional developers, tech leads, and architects — built on organic,
-          evergreen technical content.
-        </p>
+        <SocialStats
+          label="The audience"
+          showTotal={false}
+          caption="Audience of professional developers, tech leads, and architects — built on organic, evergreen technical content."
+        />
       </section>
 
       {/* Ahsan's work showcase */}

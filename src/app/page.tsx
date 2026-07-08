@@ -7,7 +7,7 @@ import { getBanners, getCourses } from "@/lib/content/contentProvider";
 import CommunityHero from "@/components/home/CommunityHero";
 import PillarsGrid from "@/components/home/PillarsGrid";
 import CommunityStats from "@/components/home/CommunityStats";
-import SocialReachBar from "@/components/home/SocialReachBar";
+import SocialStats from "@/components/social/SocialStats";
 import FounderCredibility from "@/components/home/FounderCredibility";
 import TrustedByStrip from "@/components/home/TrustedByStrip";
 import SponsorBand from "@/components/home/SponsorBand";
@@ -60,7 +60,9 @@ export default async function Home() {
 
       {/* 4. Live Community Stats + Social Reach */}
       <CommunityStats />
-      <SocialReachBar />
+      <section className="border-t border-base-300 bg-base-200 py-10">
+        <SocialStats />
+      </section>
 
       {/* 5. Ahsan's work showcase */}
       <section className="page-padding pt-16 bg-base-100 border-t border-base-300">
