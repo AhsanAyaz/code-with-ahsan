@@ -12,7 +12,9 @@ type SocialData = Record<string, SocialPlatform>;
 
 function formatCount(count: number): string {
   if (count >= 1000) {
-    return `${Math.floor(count / 1000)}k+`;
+    // One decimal, dropping a trailing ".0" (e.g. 10500 → "10.5k+", 37000 → "37k+").
+    const k = (count / 1000).toFixed(1).replace(/\.0$/, "");
+    return `${k}k+`;
   }
   return `${count}+`;
 }
@@ -24,6 +26,7 @@ const PLATFORM_ICONS: Record<string, string> = {
   linkedin: "in",
   github: "⌥",
   x: "𝕏",
+  tiktok: "♪",
   discord: "🎮",
 };
 
@@ -34,6 +37,7 @@ const PLATFORM_COLORS: Record<string, string> = {
   linkedin: "text-blue-600",
   github: "text-base-content",
   x: "text-base-content",
+  tiktok: "text-base-content",
   discord: "text-indigo-500",
 };
 
@@ -77,6 +81,7 @@ export default function SocialReachBar() {
     "linkedin",
     "github",
     "x",
+    "tiktok",
     "discord",
   ];
 
@@ -113,9 +118,7 @@ export default function SocialReachBar() {
                   >
                     {icon}
                   </span>
-                  <span className="text-xs font-mono text-base-content/60">
-                    {platform.label}
-                  </span>
+                  <span className="text-xs font-mono text-base-content/60">{platform.label}</span>
                   <span className="text-sm font-bold text-base-content">
                     {formatCount(platform.count)}
                   </span>

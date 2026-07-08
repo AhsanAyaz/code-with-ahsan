@@ -38,7 +38,10 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
           <Link href="/about" className="btn btn-ghost btn-sm hidden md:inline-flex">
             About
           </Link>
-          <Link href="/sponsors" className="btn btn-ghost btn-sm hidden md:inline-flex">
+          <Link
+            href="/sponsors"
+            className="btn btn-outline btn-sm text-accent border-accent hover:bg-accent hover:text-accent-content hidden md:inline-flex"
+          >
             Sponsorships
           </Link>
           <a
