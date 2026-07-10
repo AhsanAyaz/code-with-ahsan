@@ -1,7 +1,9 @@
 /**
  * Phase 4 (REF-03, REF-04): Server-side referral attribution helper.
  *
- * Called from POST /api/mentorship/profile after the first-time profile write.
+ * Called from POST /api/user/referral on sign-in (board decision GH#267 / VIS-136):
+ * attribution fires at account signup — and on every subsequent login while the
+ * cwa_ref cookie survives — rather than at mentorship-profile creation.
  * Looks up the ambassador by code, enforces REF-04 guards (self-attribution,
  * double-attribution), and writes a `referrals/{autoId}` doc.
  *
@@ -10,10 +12,7 @@
  */
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
-import {
-  REFERRAL_CODES_COLLECTION,
-  REFERRALS_COLLECTION,
-} from "@/lib/ambassador/constants";
+import { REFERRAL_CODES_COLLECTION, REFERRALS_COLLECTION } from "@/lib/ambassador/constants";
 import type { ReferralCodeLookup } from "@/types/ambassador";
 
 export type ConsumeReferralResult =
@@ -29,7 +28,7 @@ export type ConsumeReferralResult =
  */
 export async function consumeReferral(
   referredUserId: string,
-  refCode: string,
+  refCode: string
 ): Promise<ConsumeReferralResult> {
   try {
     // 1. Resolve code → ambassadorId via top-level lookup (O(1), no index needed)
@@ -65,7 +64,10 @@ export async function consumeReferral(
 
     return { ok: true, referralId: writeResult.id, ambassadorId };
   } catch (err) {
-    console.error(`[consumeReferral] failed for referredUserId=${referredUserId} refCode=${refCode}:`, err);
+    console.error(
+      `[consumeReferral] failed for referredUserId=${referredUserId} refCode=${refCode}:`,
+      err
+    );
     return { ok: false, reason: "error" };
   }
 }
