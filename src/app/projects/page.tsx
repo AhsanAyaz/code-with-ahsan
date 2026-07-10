@@ -27,15 +27,22 @@ function DiscoverProjectsContent() {
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
   // Initialize filters from URL params
-  const [searchTerm, setSearchTerm] = useState(
-    searchParams.get("search") || ""
-  );
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
   const [techFilter, setTechFilter] = useState<string[]>(
     searchParams.get("tech")?.split(",").filter(Boolean) || []
   );
-  const [difficultyFilter, setDifficultyFilter] = useState<
-    ProjectDifficulty | "all"
-  >((searchParams.get("difficulty") as ProjectDifficulty | "all") || "all");
+  const [difficultyFilter, setDifficultyFilter] = useState<ProjectDifficulty | "all">(
+    (searchParams.get("difficulty") as ProjectDifficulty | "all") || "all"
+  );
+
+  // GH#262: Filters are hidden by default so the page shows just the list.
+  // Reveal them via the toggle button. Start open when a filter is already
+  // active via URL (deep link) so the active state stays visible.
+  const [showFilters, setShowFilters] = useState(
+    Boolean(
+      searchParams.get("search") || searchParams.get("tech") || searchParams.get("difficulty")
+    )
+  );
 
   // Fetch active projects on mount
   useEffect(() => {
@@ -78,17 +85,11 @@ function DiscoverProjectsContent() {
           }
           const data = await response.json();
           // Sort by completedAt descending (newest first) by default
-          const sorted = (data.projects || []).sort(
-            (a: Project, b: Project) => {
-              const aDate = a.completedAt
-                ? new Date(a.completedAt).getTime()
-                : 0;
-              const bDate = b.completedAt
-                ? new Date(b.completedAt).getTime()
-                : 0;
-              return bDate - aDate;
-            }
-          );
+          const sorted = (data.projects || []).sort((a: Project, b: Project) => {
+            const aDate = a.completedAt ? new Date(a.completedAt).getTime() : 0;
+            const bDate = b.completedAt ? new Date(b.completedAt).getTime() : 0;
+            return bDate - aDate;
+          });
           setCompletedProjects(sorted);
           setCompletedFetched(true);
         } catch (err) {
@@ -109,9 +110,7 @@ function DiscoverProjectsContent() {
       if (tech.length > 0) params.set("tech", tech.join(","));
       if (difficulty !== "all") params.set("difficulty", difficulty);
 
-      const newURL = params.toString()
-        ? `/projects?${params.toString()}`
-        : "/projects";
+      const newURL = params.toString() ? `/projects?${params.toString()}` : "/projects";
       router.push(newURL, { scroll: false });
     }, 500),
     [router]
@@ -125,9 +124,7 @@ function DiscoverProjectsContent() {
   }, [searchTerm, techFilter, difficultyFilter, updateURL, activeTab]);
 
   // Extract unique tech stacks for active tab
-  const availableTechs = Array.from(
-    new Set(projects.flatMap((p) => p.techStack))
-  ).sort();
+  const availableTechs = Array.from(new Set(projects.flatMap((p) => p.techStack))).sort();
 
   // Extract unique tech stacks for completed tab
   const availableCompletedTechs = Array.from(
@@ -147,9 +144,7 @@ function DiscoverProjectsContent() {
       return false;
     }
     if (techFilter.length > 0) {
-      const hasMatchingTech = techFilter.some((tech) =>
-        project.techStack.includes(tech)
-      );
+      const hasMatchingTech = techFilter.some((tech) => project.techStack.includes(tech));
       if (!hasMatchingTech) return false;
     }
     return true;
@@ -165,16 +160,11 @@ function DiscoverProjectsContent() {
           project.description.toLowerCase().includes(searchLower);
         if (!matchesSearch) return false;
       }
-      if (
-        difficultyFilter !== "all" &&
-        project.difficulty !== difficultyFilter
-      ) {
+      if (difficultyFilter !== "all" && project.difficulty !== difficultyFilter) {
         return false;
       }
       if (techFilter.length > 0) {
-        const hasMatchingTech = techFilter.some((tech) =>
-          project.techStack.includes(tech)
-        );
+        const hasMatchingTech = techFilter.some((tech) => project.techStack.includes(tech));
         if (!hasMatchingTech) return false;
       }
       return true;
@@ -250,26 +240,50 @@ function DiscoverProjectsContent() {
         </button>
       </div>
 
-      <ProjectFilters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        techFilter={techFilter}
-        setTechFilter={setTechFilter}
-        difficultyFilter={difficultyFilter}
-        setDifficultyFilter={setDifficultyFilter}
-        availableTechs={
-          activeTab === "active" ? availableTechs : availableCompletedTechs
-        }
-      />
+      {/* GH#262: toggle to reveal the search & filter panel */}
+      <div className="mb-6">
+        <button
+          type="button"
+          className="btn btn-sm btn-outline gap-2"
+          aria-expanded={showFilters}
+          onClick={() => setShowFilters((v) => !v)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 018 21v-7.586L3.293 6.707A1 1 0 013 6V4z"
+            />
+          </svg>
+          {showFilters ? "Hide search & filters" : "Search & filter"}
+        </button>
+      </div>
+
+      {showFilters && (
+        <ProjectFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          techFilter={techFilter}
+          setTechFilter={setTechFilter}
+          difficultyFilter={difficultyFilter}
+          setDifficultyFilter={setDifficultyFilter}
+          availableTechs={activeTab === "active" ? availableTechs : availableCompletedTechs}
+        />
+      )}
 
       {/* Active tab content */}
       {activeTab === "active" && (
         <>
           {filteredProjects.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-lg text-base-content/70">
-                No active projects found
-              </p>
+              <p className="text-lg text-base-content/70">No active projects found</p>
             </div>
           ) : (
             <>
@@ -306,9 +320,7 @@ function DiscoverProjectsContent() {
                   <select
                     className="select select-bordered select-sm"
                     value={sortOrder}
-                    onChange={(e) =>
-                      setSortOrder(e.target.value as "newest" | "oldest")
-                    }
+                    onChange={(e) => setSortOrder(e.target.value as "newest" | "oldest")}
                   >
                     <option value="newest">Newest first</option>
                     <option value="oldest">Oldest first</option>
@@ -318,9 +330,7 @@ function DiscoverProjectsContent() {
 
               {filteredCompletedProjects.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-lg text-base-content/70">
-                    No completed projects found
-                  </p>
+                  <p className="text-lg text-base-content/70">No completed projects found</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
