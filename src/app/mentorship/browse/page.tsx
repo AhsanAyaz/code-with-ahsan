@@ -6,10 +6,10 @@ import { AuthContext } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useMentorship, MentorshipProfile } from "@/contexts/MentorshipContext";
 import MentorCard from "@/components/mentorship/MentorCard";
+import WithdrawToProceedDialog from "@/components/mentorship/WithdrawToProceedDialog";
+import { useMatchRequests } from "@/lib/mentorship/useMatchRequests";
 import Link from "next/link";
 import { hasRole } from "@/lib/permissions";
-
-type RequestStatus = "none" | "pending" | "declined" | "active" | "completed";
 
 export default function BrowseMentorsPage() {
   const router = useRouter();
@@ -20,20 +20,21 @@ export default function BrowseMentorsPage() {
   const [loadingMentors, setLoadingMentors] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedExpertise, setSelectedExpertise] = useState<string>("");
-  const [requestingMentor, setRequestingMentor] = useState<string | null>(null);
-  const [withdrawingMentor, setWithdrawingMentor] = useState<string | null>(null);
-  // Track request status per mentor (pending, declined, active, completed, or none)
-  const [mentorRequestStatus, setMentorRequestStatus] = useState<
-    Map<string, RequestStatus>
-  >(new Map());
-  // Track session IDs and rating status for completed mentorships
-  const [mentorSessionInfo, setMentorSessionInfo] = useState<
-    Map<string, { sessionId: string; hasRated: boolean }>
-  >(new Map());
-  // Track match IDs for pending requests (needed for withdraw)
-  const [pendingMatchIds, setPendingMatchIds] = useState<Map<string, string>>(
-    new Map()
-  );
+
+  const isMentee = hasRole(profile, "mentee");
+  const {
+    statusMap,
+    sessionInfo,
+    requestingMentor,
+    withdrawingMentor,
+    conflict,
+    switching,
+    requestMatch,
+    withdraw,
+    confirmSwitch,
+    cancelConflict,
+    refresh,
+  } = useMatchRequests(user?.uid, Boolean(user && isMentee));
 
   useEffect(() => {
     if (!loading && !profileLoading && !user) {
@@ -62,143 +63,16 @@ export default function BrowseMentorsPage() {
       }
     };
 
-    if (user && hasRole(profile, "mentee")) {
+    if (user && isMentee) {
       fetchMentors();
     }
-  }, [user, profile]);
-
-  // Fetch mentee's existing requests to show correct status
-  useEffect(() => {
-    const fetchMyRequests = async () => {
-      if (!user) return;
-      try {
-        const response = await fetch(
-          `/api/mentorship/mentee-requests?menteeId=${user.uid}`,
-        );
-        if (response.ok) {
-          const data = await response.json();
-          const statusMap = new Map<string, RequestStatus>();
-          const sessionInfoMap = new Map<
-            string,
-            { sessionId: string; hasRated: boolean }
-          >();
-
-          const pendingMap = new Map<string, string>();
-
-          // Map each mentor's request status
-          for (const request of data.requests || []) {
-            statusMap.set(request.mentorId, request.status as RequestStatus);
-            // Store session info for completed mentorships to enable rating
-            if (request.status === "completed") {
-              sessionInfoMap.set(request.mentorId, {
-                sessionId: request.sessionId || request.id,
-                hasRated: request.hasRated || false,
-              });
-            }
-            // Store match IDs for pending requests to enable withdraw
-            if (request.status === "pending") {
-              pendingMap.set(request.mentorId, request.sessionId || request.id);
-            }
-          }
-
-          setMentorRequestStatus(statusMap);
-          setMentorSessionInfo(sessionInfoMap);
-          setPendingMatchIds(pendingMap);
-        }
-      } catch (error) {
-        console.error("Error fetching mentee requests:", error);
-      }
-    };
-
-    if (user && hasRole(profile, "mentee")) {
-      fetchMyRequests();
-    }
-  }, [user, profile]);
-
-  const handleRequestMatch = async (mentorId: string) => {
-    if (!user) return;
-
-    setRequestingMentor(mentorId);
-    try {
-      const response = await fetch("/api/mentorship/match", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          menteeId: user.uid,
-          mentorId,
-        }),
-      });
-
-      if (response.ok) {
-        // Update status to pending
-        setMentorRequestStatus((prev) =>
-          new Map(prev).set(mentorId, "pending"),
-        );
-      } else {
-        const error = await response.json();
-        if (response.status === 409) {
-          // Already requested - update with actual status
-          setMentorRequestStatus((prev) =>
-            new Map(prev).set(mentorId, error.status || "pending"),
-          );
-        } else {
-          toast.error("Failed to send request: " + error.error);
-        }
-      }
-    } catch (error) {
-      console.error("Error requesting match:", error);
-      toast.error("An error occurred. Please try again.");
-    } finally {
-      setRequestingMentor(null);
-    }
-  };
-
-  const handleWithdraw = async (mentorId: string) => {
-    if (!user) return;
-    const matchId = pendingMatchIds.get(mentorId);
-    if (!matchId) return;
-
-    setWithdrawingMentor(mentorId);
-    try {
-      const response = await fetch("/api/mentorship/match", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          matchId,
-          action: "withdraw",
-          menteeId: user.uid,
-        }),
-      });
-
-      if (response.ok) {
-        setMentorRequestStatus((prev) => {
-          const updated = new Map(prev);
-          updated.delete(mentorId);
-          return updated;
-        });
-        setPendingMatchIds((prev) => {
-          const updated = new Map(prev);
-          updated.delete(mentorId);
-          return updated;
-        });
-        toast.success("Request withdrawn successfully.");
-      } else {
-        const error = await response.json();
-        toast.error(error.error || "Failed to withdraw request");
-      }
-    } catch (error) {
-      console.error("Error withdrawing request:", error);
-      toast.error("Failed to withdraw request. Please try again.");
-    } finally {
-      setWithdrawingMentor(null);
-    }
-  };
+  }, [user, isMentee]);
 
   const handleRateNow = async (
     mentorId: string,
     sessionId: string,
     rating: number,
-    feedback: string,
+    feedback: string
   ) => {
     if (!user) return;
     try {
@@ -215,15 +89,7 @@ export default function BrowseMentorsPage() {
       });
 
       if (response.ok) {
-        // Update session info to mark as rated
-        setMentorSessionInfo((prev) => {
-          const updated = new Map(prev);
-          const existing = updated.get(mentorId);
-          if (existing) {
-            updated.set(mentorId, { ...existing, hasRated: true });
-          }
-          return updated;
-        });
+        await refresh();
         toast.success("Thank you for your feedback!");
       } else {
         const error = await response.json();
@@ -262,9 +128,7 @@ export default function BrowseMentorsPage() {
     return (
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body text-center">
-          <h2 className="card-title justify-center text-2xl">
-            Access Required
-          </h2>
+          <h2 className="card-title justify-center text-2xl">Access Required</h2>
           <p className="text-base-content/70 mt-2">
             Please sign in and complete your mentee profile to browse mentors.
           </p>
@@ -344,20 +208,20 @@ export default function BrowseMentorsPage() {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMentors.map((mentor) => {
-            const sessionInfo = mentorSessionInfo.get(mentor.uid);
+            const info = sessionInfo.get(mentor.uid);
             return (
               <MentorCard
                 key={mentor.uid}
                 mentor={{
                   ...mentor,
-                  sessionId: sessionInfo?.sessionId,
-                  hasRated: sessionInfo?.hasRated,
+                  sessionId: info?.sessionId,
+                  hasRated: info?.hasRated,
                 }}
-                onRequestMatch={handleRequestMatch}
+                onRequestMatch={(id) => requestMatch(id, mentor.displayName)}
                 isRequesting={requestingMentor === mentor.uid}
-                requestStatus={mentorRequestStatus.get(mentor.uid) || "none"}
+                requestStatus={statusMap.get(mentor.uid) || "none"}
                 onRateNow={handleRateNow}
-                onWithdraw={handleWithdraw}
+                onWithdraw={withdraw}
                 isWithdrawing={withdrawingMentor === mentor.uid}
                 currentUserId={user?.uid}
               />
@@ -372,6 +236,13 @@ export default function BrowseMentorsPage() {
           Showing {filteredMentors.length} of {mentors.length} mentors
         </div>
       )}
+
+      <WithdrawToProceedDialog
+        conflict={conflict}
+        isSwitching={switching}
+        onConfirm={confirmSwitch}
+        onCancel={cancelConflict}
+      />
     </div>
   );
 }
