@@ -8,28 +8,20 @@ import {
   isDiscordConfigured,
   assignDiscordRole,
   DISCORD_MENTOR_ROLE_ID,
-  DISCORD_MENTEE_ROLE_ID
+  DISCORD_MENTEE_ROLE_ID,
 } from "@/lib/discord";
 import { syncRoleClaim } from "@/lib/ambassador/roleMutation";
-import { consumeReferral } from "@/lib/ambassador/referral";
-import { REFERRAL_COOKIE_NAME } from "@/lib/ambassador/constants";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const uid = searchParams.get("uid");
 
   if (!uid) {
-    return NextResponse.json(
-      { error: "Missing uid parameter" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Missing uid parameter" }, { status: 400 });
   }
 
   try {
-    const profileDoc = await db
-      .collection("mentorship_profiles")
-      .doc(uid)
-      .get();
+    const profileDoc = await db.collection("mentorship_profiles").doc(uid).get();
 
     if (!profileDoc.exists) {
       return NextResponse.json({ profile: null }, { status: 200 });
@@ -49,10 +41,7 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     console.error("Error fetching mentorship profile:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch profile" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch profile" }, { status: 500 });
   }
 }
 
@@ -62,10 +51,7 @@ export async function POST(request: NextRequest) {
     const { uid, role, displayName, email, photoURL, ...profileData } = body;
 
     if (!uid || !role) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     const now = new Date();
@@ -146,39 +132,10 @@ export async function POST(request: NextRequest) {
         expertise: profileData.expertise,
         currentRole: profileData.currentRole,
         bio: profileData.bio,
-      }).catch((err) =>
-        console.error("Failed to send admin notification:", err)
-      );
+      }).catch((err) => console.error("Failed to send admin notification:", err));
     }
 
-    // Phase 4 (REF-03): If a cwa_ref cookie is present, consume it now.
-    // HttpOnly cookie — only readable server-side. Must be synchronous (await) so the
-    // Set-Cookie clear header lands on the outgoing response (RESEARCH Pitfall 1).
-    // consumeReferral never throws (wraps all in try/catch) — signup always completes.
-    const refCode = request.cookies.get(REFERRAL_COOKIE_NAME)?.value;
-    let referralConsumed = false;
-    if (refCode) {
-      const result = await consumeReferral(uid, refCode);
-      if (result.ok) {
-        console.log(
-          `[profile.POST] Referral attribution success: ambassador=${result.ambassadorId} user=${uid} code=${refCode} referralId=${result.referralId}`,
-        );
-      } else {
-        console.log(
-          `[profile.POST] Referral attribution skipped: user=${uid} code=${refCode} reason=${result.reason}`,
-        );
-      }
-      // WR-05: Only clear the cookie on non-retriable outcomes. A transient
-      // Firestore error (reason="error") should NOT permanently delete the cookie
-      // — the next signup attempt should retry attribution. Definitive outcomes
-      // (ok, unknown_code, self_attribution, already_attributed) clear the cookie
-      // so the user isn't retried endlessly on a code that will never succeed.
-      if (result.ok || result.reason !== "error") {
-        referralConsumed = true;
-      }
-    }
-
-    const response = NextResponse.json(
+    return NextResponse.json(
       {
         success: true,
         profile: {
@@ -192,19 +149,9 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-
-    if (referralConsumed) {
-      // Phase 4 (REF-03): clear cookie on the outgoing response — one-time consumption
-      response.cookies.delete(REFERRAL_COOKIE_NAME);
-    }
-
-    return response;
   } catch (error) {
     console.error("Error creating mentorship profile:", error);
-    return NextResponse.json(
-      { error: "Failed to create profile" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create profile" }, { status: 500 });
   }
 }
 
@@ -231,8 +178,7 @@ export async function PUT(request: NextRequest) {
       if (cleanUsername !== username.toLowerCase()) {
         return NextResponse.json(
           {
-            error:
-              "Username can only contain letters, numbers, underscores, and hyphens",
+            error: "Username can only contain letters, numbers, underscores, and hyphens",
           },
           { status: 400 }
         );
@@ -253,10 +199,7 @@ export async function PUT(request: NextRequest) {
         .get();
 
       if (!existingProfile.empty && existingProfile.docs[0].id !== uid) {
-        return NextResponse.json(
-          { error: "This username is already taken" },
-          { status: 409 }
-        );
+        return NextResponse.json({ error: "This username is already taken" }, { status: 409 });
       }
 
       updates.username = username.toLowerCase();
@@ -264,11 +207,8 @@ export async function PUT(request: NextRequest) {
 
     // If discordUsername is being updated, validate it against the Discord server
     if (updates.discordUsername !== undefined && isDiscordConfigured()) {
-      const cleanDiscordUsername = updates.discordUsername
-        .trim()
-        .toLowerCase()
-        .replace(/^@/, "");
-      
+      const cleanDiscordUsername = updates.discordUsername.trim().toLowerCase().replace(/^@/, "");
+
       if (cleanDiscordUsername) {
         try {
           const member = await lookupMemberByUsername(cleanDiscordUsername);
@@ -296,8 +236,8 @@ export async function PUT(request: NextRequest) {
     // Handle resubmit: reset status from changes_requested to pending
     if (body.resubmit === true) {
       const currentData = profileDoc.data();
-      if (currentData?.status === 'changes_requested') {
-        updatePayload.status = 'pending';
+      if (currentData?.status === "changes_requested") {
+        updatePayload.status = "pending";
         updatePayload.changesFeedback = null;
         updatePayload.changesFeedbackAt = null;
       }
@@ -315,19 +255,14 @@ export async function PUT(request: NextRequest) {
 
     // Auto-embed mentor bio when status flips to accepted or bio text changes.
     // Fire-and-forget — never blocks the response.
-    const isMentor = (postUpdate.roles as string[] | undefined ?? []).includes("mentor");
+    const isMentor = ((postUpdate.roles as string[] | undefined) ?? []).includes("mentor");
     const wasAccepted = existingData.status === "accepted";
     const isNowAccepted =
       (updatePayload.status as string | undefined) === "accepted" ||
       (updatePayload.status === undefined && wasAccepted);
     const oldBio = extractBioText(existingData);
     const newBio = extractBioText(postUpdate);
-    if (
-      isMentor &&
-      isNowAccepted &&
-      newBio.length > 0 &&
-      (!wasAccepted || newBio !== oldBio)
-    ) {
+    if (isMentor && isNowAccepted && newBio.length > 0 && (!wasAccepted || newBio !== oldBio)) {
       embedBio(newBio)
         .then((embedding) =>
           profileRef.update({
@@ -335,9 +270,7 @@ export async function PUT(request: NextRequest) {
             bioEmbeddingGeneratedAt: FieldValue.serverTimestamp(),
           })
         )
-        .catch((err) =>
-          console.error(`[profile.PUT] bio embedding failed for ${uid}:`, err)
-        );
+        .catch((err) => console.error(`[profile.PUT] bio embedding failed for ${uid}:`, err));
     }
     const profile = {
       roles: Array.isArray(postUpdate.roles) ? (postUpdate.roles as string[]) : [],
@@ -363,9 +296,6 @@ export async function PUT(request: NextRequest) {
     );
   } catch (error) {
     console.error("Error updating mentorship profile:", error);
-    return NextResponse.json(
-      { error: "Failed to update profile" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });
   }
 }
