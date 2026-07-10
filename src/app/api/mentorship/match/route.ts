@@ -162,6 +162,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // One active request at a time (GH#234): reject if the mentee already has a
+    // pending request with a DIFFERENT mentor. The specific-mentor check above
+    // already rules out an existing session with this mentor, so any pending
+    // session found here belongs to another mentor. The client surfaces a
+    // withdrawal dialog using the details returned below.
+    const existingPending = await db
+      .collection("mentorship_sessions")
+      .where("menteeId", "==", menteeId)
+      .where("status", "==", "pending")
+      .limit(1)
+      .get();
+
+    if (!existingPending.empty) {
+      const pendingDoc = existingPending.docs[0];
+      const pendingMentorId = pendingDoc.data().mentorId;
+      const pendingMentorDoc = await db
+        .collection("mentorship_profiles")
+        .doc(pendingMentorId)
+        .get();
+      return NextResponse.json(
+        {
+          error: "You already have a pending mentorship request",
+          code: "pending_request_exists",
+          pendingMatchId: pendingDoc.id,
+          pendingMentorId,
+          pendingMentorName: pendingMentorDoc.exists
+            ? pendingMentorDoc.data()?.displayName
+            : undefined,
+        },
+        { status: 409 }
+      );
+    }
+
     // Check if mentee already has an active mentorship (one mentor per mentee)
     const existingActiveMentorship = await db
       .collection("mentorship_sessions")
