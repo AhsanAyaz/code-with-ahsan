@@ -97,9 +97,7 @@ async function fetchWithRateLimit(
  * Lookup a Discord user ID by their username in the guild
  * Returns null if not found
  */
-export async function lookupMemberByUsername(
-  username: string
-): Promise<DiscordMember | null> {
+export async function lookupMemberByUsername(username: string): Promise<DiscordMember | null> {
   // Normalize: strip leading @ and trailing #discriminator (legacy format)
   const normalized = username.trim().replace(/^@/, "").replace(/#\d+$/, "");
   const guildId = getGuildId();
@@ -114,9 +112,7 @@ export async function lookupMemberByUsername(
 
     if (!response.ok) {
       const errorText = await response.text();
-      log.error(
-        `Discord member search failed: ${response.status} - ${errorText}`
-      );
+      log.error(`Discord member search failed: ${response.status} - ${errorText}`);
       return null;
     }
 
@@ -179,17 +175,12 @@ async function getOrCreateMonthlyCategory(): Promise<string | null> {
 
   try {
     // Get all channels in the guild
-    const response = await fetchWithRateLimit(
-      `${DISCORD_API}/guilds/${guildId}/channels`,
-      {
-        headers: getHeaders(),
-      }
-    );
+    const response = await fetchWithRateLimit(`${DISCORD_API}/guilds/${guildId}/channels`, {
+      headers: getHeaders(),
+    });
 
     if (!response.ok) {
-      log.error(
-        `Failed to fetch guild channels: ${response.status} - ${await response.text()}`
-      );
+      log.error(`Failed to fetch guild channels: ${response.status} - ${await response.text()}`);
       return null;
     }
 
@@ -200,9 +191,7 @@ async function getOrCreateMonthlyCategory(): Promise<string | null> {
       (ch: { type: number; name: string }) =>
         ch.type === 4 &&
         (ch.name.toLowerCase() === baseNamePrefix.toLowerCase() ||
-          ch.name
-            .toLowerCase()
-            .startsWith(baseNamePrefix.toLowerCase() + " - batch"))
+          ch.name.toLowerCase().startsWith(baseNamePrefix.toLowerCase() + " - batch"))
     );
 
     // Sort by batch number (base name = batch 1, then Batch 2, Batch 3, etc.)
@@ -236,10 +225,7 @@ async function getOrCreateMonthlyCategory(): Promise<string | null> {
       const currentBatch =
         latestCategory.name.toLowerCase() === baseNamePrefix.toLowerCase()
           ? 1
-          : parseInt(
-              latestCategory.name.match(/batch\s*(\d+)/i)?.[1] || "1",
-              10
-            );
+          : parseInt(latestCategory.name.match(/batch\s*(\d+)/i)?.[1] || "1", 10);
       const newBatchNum = currentBatch + 1;
       const newCategoryName = `${baseNamePrefix} - Batch ${newBatchNum}`;
 
@@ -259,10 +245,7 @@ async function getOrCreateMonthlyCategory(): Promise<string | null> {
 /**
  * Helper to create a category with standard permissions
  */
-async function createCategory(
-  guildId: string,
-  categoryName: string
-): Promise<string | null> {
+async function createCategory(guildId: string, categoryName: string): Promise<string | null> {
   // Category permission: @everyone cannot view (private by default)
   const permissionOverwrites = [
     {
@@ -273,18 +256,15 @@ async function createCategory(
     },
   ];
 
-  const createResponse = await fetch(
-    `${DISCORD_API}/guilds/${guildId}/channels`,
-    {
-      method: "POST",
-      headers: getHeaders(),
-      body: JSON.stringify({
-        name: categoryName,
-        type: 4, // GUILD_CATEGORY
-        permission_overwrites: permissionOverwrites,
-      }),
-    }
-  );
+  const createResponse = await fetch(`${DISCORD_API}/guilds/${guildId}/channels`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({
+      name: categoryName,
+      type: 4, // GUILD_CATEGORY
+      permission_overwrites: permissionOverwrites,
+    }),
+  });
 
   if (!createResponse.ok) {
     log.error(
@@ -294,9 +274,7 @@ async function createCategory(
   }
 
   const newCategory = await createResponse.json();
-  log.debug(
-    `Created new category: ${newCategory.name} (ID: ${newCategory.id})`
-  );
+  log.debug(`Created new category: ${newCategory.name} (ID: ${newCategory.id})`);
   return newCategory.id;
 }
 
@@ -393,20 +371,15 @@ export async function createMentorshipChannel(
       channelPayload.parent_id = categoryId;
     }
 
-    const response = await fetchWithRateLimit(
-      `${DISCORD_API}/guilds/${guildId}/channels`,
-      {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify(channelPayload),
-      }
-    );
+    const response = await fetchWithRateLimit(`${DISCORD_API}/guilds/${guildId}/channels`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify(channelPayload),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      log.error(
-        `[Discord] Channel creation failed: ${response.status} - ${errorText}`
-      );
+      log.error(`[Discord] Channel creation failed: ${response.status} - ${errorText}`);
       return null;
     }
 
@@ -414,12 +387,8 @@ export async function createMentorshipChannel(
     log.debug(`Channel created: ${channel.name} (ID: ${channel.id})`);
 
     // Build mention string for users who were found
-    const mentorMention = mentorMemberId
-      ? `<@${mentorMemberId}>`
-      : `**${mentorName}**`;
-    const menteeMention = menteeMemberId
-      ? `<@${menteeMemberId}>`
-      : `**${menteeName}**`;
+    const mentorMention = mentorMemberId ? `<@${mentorMemberId}>` : `**${mentorName}**`;
+    const menteeMention = menteeMemberId ? `<@${menteeMemberId}>` : `**${menteeName}**`;
 
     // Send welcome message with @mentions
     await sendChannelMessage(
@@ -450,20 +419,14 @@ export async function createMentorshipChannel(
  * Send a message to a Discord channel
  * Exported for use in session/goal notifications
  */
-export async function sendChannelMessage(
-  channelId: string,
-  content: string
-): Promise<boolean> {
+export async function sendChannelMessage(channelId: string, content: string): Promise<boolean> {
   log.debug(` Sending message to channel ${channelId}...`);
   try {
-    const response = await fetch(
-      `${DISCORD_API}/channels/${channelId}/messages`,
-      {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify({ content }),
-      }
-    );
+    const response = await fetch(`${DISCORD_API}/channels/${channelId}/messages`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({ content }),
+    });
 
     if (response.ok) {
       log.debug(`Message sent successfully to channel ${channelId}`);
@@ -493,14 +456,11 @@ export async function sendChannelMessageWithComponents(
 ): Promise<boolean> {
   log.debug(` Sending message with components to channel ${channelId}...`);
   try {
-    const response = await fetch(
-      `${DISCORD_API}/channels/${channelId}/messages`,
-      {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify({ content, components }),
-      }
-    );
+    const response = await fetch(`${DISCORD_API}/channels/${channelId}/messages`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({ content, components }),
+    });
 
     if (response.ok) {
       log.debug(`Message with components sent successfully to channel ${channelId}`);
@@ -554,14 +514,11 @@ export async function sendDirectMessage(
     const dmChannel = await dmChannelResponse.json();
 
     // Send message
-    const messageResponse = await fetch(
-      `${DISCORD_API}/channels/${dmChannel.id}/messages`,
-      {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify({ content: message }),
-      }
-    );
+    const messageResponse = await fetch(`${DISCORD_API}/channels/${dmChannel.id}/messages`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({ content: message }),
+    });
 
     log.debug(` DM sent successfully to ${discordUsername}`);
     return messageResponse.ok;
@@ -587,12 +544,9 @@ export async function archiveMentorshipChannel(
 
   try {
     // Get current channel info
-    const channelResponse = await fetch(
-      `${DISCORD_API}/channels/${channelId}`,
-      {
-        headers: getHeaders(),
-      }
-    );
+    const channelResponse = await fetch(`${DISCORD_API}/channels/${channelId}`, {
+      headers: getHeaders(),
+    });
 
     if (!channelResponse.ok) {
       log.error("Failed to get channel:", await channelResponse.text());
@@ -618,9 +572,7 @@ export async function archiveMentorshipChannel(
 
     // Send archive message (use custom reason or default completion message)
     const archiveMessage =
-      reason ||
-      `📦 **This mentorship session has ended.**\n\n` +
-        `This channel is now archived.`;
+      reason || `📦 **This mentorship session has ended.**\n\n` + `This channel is now archived.`;
 
     await sendChannelMessage(channelId, archiveMessage);
 
@@ -646,10 +598,9 @@ export async function unarchiveMentorshipChannel(
 
   try {
     // Get current channel info
-    const channelResponse = await fetch(
-      `${DISCORD_API}/channels/${channelId}`,
-      { headers: getHeaders() }
-    );
+    const channelResponse = await fetch(`${DISCORD_API}/channels/${channelId}`, {
+      headers: getHeaders(),
+    });
 
     if (!channelResponse.ok) {
       log.error("Failed to get channel:", await channelResponse.text());
@@ -658,15 +609,15 @@ export async function unarchiveMentorshipChannel(
 
     const channel = await channelResponse.json();
     const newName = channel.name.replace(/^archived-/, "");
-    // If it didn't have archived- prefix, maybe just ensure permissions? 
+    // If it didn't have archived- prefix, maybe just ensure permissions?
     // But let's assume we want to clean it up.
 
     const newTopic = channel.topic?.replace(/^\[ARCHIVED\]\s*/, "") || "";
 
     // Prepare permission updates if IDs provided
-    // We need to fetch existing overwrites first if we want to preserve others, 
+    // We need to fetch existing overwrites first if we want to preserve others,
     // but typically we just want to ensure these two have access.
-    // However, PATCH /channels/{id} expects the FULL list of overwrites if provided, 
+    // However, PATCH /channels/{id} expects the FULL list of overwrites if provided,
     // OR we can use PUT /channels/{id}/permissions/{trigger_id} for individual updates.
     // Using individual PUTs is safer to not wipe other permissions (like bots/mods).
 
@@ -684,51 +635,49 @@ export async function unarchiveMentorshipChannel(
       log.error("Failed to unarchive channel (rename):", await updateResponse.text());
       return { success: false };
     }
-    
+
     // 2. Restore permissions for Mentor
     if (mentorDiscordId) {
       await fetch(`${DISCORD_API}/channels/${channelId}/permissions/${mentorDiscordId}`, {
-         method: "PUT",
-         headers: getHeaders(),
-         body: JSON.stringify({
-           allow: "3072", // VIEW_CHANNEL + SEND_MESSAGES
-           deny: "0",
-           type: 1 // Member
-         })
+        method: "PUT",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          allow: "3072", // VIEW_CHANNEL + SEND_MESSAGES
+          deny: "0",
+          type: 1, // Member
+        }),
       });
     }
 
     // 3. Restore permissions for Mentee
     if (menteeDiscordId) {
       await fetch(`${DISCORD_API}/channels/${channelId}/permissions/${menteeDiscordId}`, {
-         method: "PUT",
-         headers: getHeaders(),
-         body: JSON.stringify({
-           allow: "3072", // VIEW_CHANNEL + SEND_MESSAGES
-           deny: "0",
-           type: 1 // Member
-         })
+        method: "PUT",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          allow: "3072", // VIEW_CHANNEL + SEND_MESSAGES
+          deny: "0",
+          type: 1, // Member
+        }),
       });
     }
 
-    
     const channelUrl = `https://discord.com/channels/${guildId}/${channelId}`;
     await sendChannelMessage(channelId, "♻️ **This channel has been restored/unarchived.**");
 
     log.debug(` Channel unarchived successfully: ${channelId}`);
     return { success: true, channelUrl };
-
   } catch (error) {
     log.error("[Discord] Error unarchiving channel:", error);
     return { success: false };
   }
 }
 
-
 /**
  * Get a Discord channel by ID to check if it exists
  * returns null if not found (404) or other error
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Discord channel payload is untyped
 export async function getChannel(channelId: string): Promise<any | null> {
   const channelUrl = `${DISCORD_API}/channels/${channelId}`;
   log.debug(` Checking if channel exists: ${channelId}`);
@@ -759,9 +708,7 @@ export async function getChannel(channelId: string): Promise<any | null> {
  * Used by inactivity cron jobs to determine real channel activity.
  * Returns null if the channel doesn't exist, has no messages, or all messages are from bots.
  */
-export async function getLastChannelActivityDate(
-  channelId: string
-): Promise<Date | null> {
+export async function getLastChannelActivityDate(channelId: string): Promise<Date | null> {
   try {
     const response = await fetchWithRateLimit(
       `${DISCORD_API}/channels/${channelId}/messages?limit=50`,
@@ -770,9 +717,7 @@ export async function getLastChannelActivityDate(
 
     if (!response.ok) {
       if (response.status === 404) return null;
-      log.error(
-        `Failed to fetch messages for channel ${channelId}: ${response.status}`
-      );
+      log.error(`Failed to fetch messages for channel ${channelId}: ${response.status}`);
       return null;
     }
 
@@ -839,9 +784,7 @@ export async function getGuildMemberById(
  * Check if Discord integration is properly configured
  */
 export function isDiscordConfigured(): boolean {
-  const configured = !!(
-    process.env.DISCORD_BOT_TOKEN && process.env.DISCORD_GUILD_ID
-  );
+  const configured = !!(process.env.DISCORD_BOT_TOKEN && process.env.DISCORD_GUILD_ID);
   if (!configured) {
     log.debug("Not configured - missing DISCORD_BOT_TOKEN or DISCORD_GUILD_ID");
   }
@@ -876,6 +819,40 @@ const MONTHLY_LEARNING_CHALLENGES_CHANNEL_ID =
   process.env.DISCORD_MONTHLY_CHALLENGES_CHANNEL_ID || "1498942172488007780";
 
 /**
+ * Moderators / mentorship-registration notifications channel. New mentorship
+ * registrations are announced here for the moderators to review. Per the
+ * VIS-141 board decision, this channel must NEVER be deleted by the
+ * mentorship-end cleanup flows. Configurable via env so it can differ per
+ * environment; falls back to the known CWA server channel.
+ */
+const MODERATORS_CHANNEL_ID = process.env.DISCORD_MODERATORS_CHANNEL_ID || "874565618458824715";
+
+/**
+ * Community/shared channels that must never be deleted by any mentorship or
+ * project cleanup flow. These are long-lived server channels (announcements,
+ * moderator review, collaboration) — only the ephemeral per-mentorship and
+ * per-project channels are eligible for deletion. Guarding here gives every
+ * `deleteDiscordChannel` caller defense-in-depth against a bad channel ID.
+ * (VIS-141)
+ */
+const PROTECTED_CHANNEL_IDS: ReadonlySet<string> = new Set([
+  FIND_A_MENTOR_CHANNEL_ID,
+  PROJECT_REVIEW_CHANNEL_ID,
+  PROJECT_COLLABORATION_CHANNEL_ID,
+  MONTHLY_LEARNING_CHALLENGES_CHANNEL_ID,
+  MODERATORS_CHANNEL_ID,
+]);
+
+/**
+ * Returns true if the given channel is a protected community channel that must
+ * never be deleted. Exported for unit testing and for callers that want to
+ * branch before attempting a delete. (VIS-141)
+ */
+export function isProtectedChannel(channelId: string): boolean {
+  return PROTECTED_CHANNEL_IDS.has(channelId);
+}
+
+/**
  * Assign a Discord role to a user
  * This is a fire-and-forget operation - failures are logged but do not throw
  *
@@ -898,9 +875,7 @@ export async function assignDiscordRole(
     } else {
       const member = await lookupMemberByUsername(discordUsernameOrId);
       if (!member) {
-        log.warn(
-          `[Discord] Cannot assign role - user not found: ${discordUsernameOrId}`
-        );
+        log.warn(`[Discord] Cannot assign role - user not found: ${discordUsernameOrId}`);
         return false;
       }
       memberId = member.id;
@@ -918,9 +893,7 @@ export async function assignDiscordRole(
     );
 
     if (response.status === 204) {
-      log.debug(
-        `Successfully assigned role ${roleId} to ${discordUsernameOrId} (ID: ${memberId})`
-      );
+      log.debug(`Successfully assigned role ${roleId} to ${discordUsernameOrId} (ID: ${memberId})`);
       return true;
     } else {
       const errorText = await response.text();
@@ -930,10 +903,7 @@ export async function assignDiscordRole(
       return false;
     }
   } catch (error) {
-    log.error(
-      `[Discord] Error assigning role ${roleId} to ${discordUsernameOrId}:`,
-      error
-    );
+    log.error(`[Discord] Error assigning role ${roleId} to ${discordUsernameOrId}:`, error);
     return false;
   }
 }
@@ -951,7 +921,7 @@ export async function assignDiscordRole(
  */
 export async function removeDiscordRole(
   discordMemberIdOrUsername: string,
-  roleId: string,
+  roleId: string
 ): Promise<boolean> {
   log.debug(`Removing role ${roleId} from user ${discordMemberIdOrUsername}`);
   try {
@@ -971,18 +941,16 @@ export async function removeDiscordRole(
     const guildId = getGuildId();
     const response = await fetchWithRateLimit(
       `${DISCORD_API}/guilds/${guildId}/members/${memberId}/roles/${roleId}`,
-      { method: "DELETE", headers: getHeaders() },
+      { method: "DELETE", headers: getHeaders() }
     );
     if (response.status === 204 || response.status === 404) {
       log.debug(
-        `Role ${roleId} removed from ${discordMemberIdOrUsername} (status ${response.status})`,
+        `Role ${roleId} removed from ${discordMemberIdOrUsername} (status ${response.status})`
       );
       return true;
     }
     const errorText = await response.text();
-    log.error(
-      `[Discord] Failed to remove role ${roleId}: ${response.status} - ${errorText}`,
-    );
+    log.error(`[Discord] Failed to remove role ${roleId}: ${response.status} - ${errorText}`);
     return false;
   } catch (error) {
     log.error(`[Discord] Error removing role ${roleId}:`, error);
@@ -1005,9 +973,7 @@ export async function sendMentorshipCompletionAnnouncement(
   mentorDiscordUsername?: string,
   menteeDiscordUsername?: string
 ): Promise<boolean> {
-  log.debug(
-    `Sending completion announcement for ${mentorName} <-> ${menteeName}`
-  );
+  log.debug(`Sending completion announcement for ${mentorName} <-> ${menteeName}`);
 
   try {
     // Look up members for @mentions
@@ -1058,16 +1024,14 @@ export async function sendMentorshipCompletionAnnouncement(
  *
  * @param challenge The challenge that was published.
  */
-export async function announceChallenge(
-  challenge: {
-    id: string;
-    title: string;
-    topic: string;
-    difficulty: string;
-    startDate: string;
-    endDate: string;
-  }
-): Promise<boolean> {
+export async function announceChallenge(challenge: {
+  id: string;
+  title: string;
+  topic: string;
+  difficulty: string;
+  startDate: string;
+  endDate: string;
+}): Promise<boolean> {
   log.debug(`Sending monthly challenge announcement for: ${challenge.title}`);
 
   try {
@@ -1099,10 +1063,7 @@ export async function announceChallenge(
       `👉 ${challengeUrl}\n\n` +
       `Good luck! 💻✨`;
 
-    const success = await sendChannelMessage(
-      MONTHLY_LEARNING_CHALLENGES_CHANNEL_ID,
-      message
-    );
+    const success = await sendChannelMessage(MONTHLY_LEARNING_CHALLENGES_CHANNEL_ID, message);
 
     if (success) {
       log.debug(`Monthly challenge announcement sent successfully`);
@@ -1134,17 +1095,12 @@ async function getOrCreateProjectsCategory(): Promise<string | null> {
 
   try {
     // Get all channels in the guild
-    const response = await fetchWithRateLimit(
-      `${DISCORD_API}/guilds/${guildId}/channels`,
-      {
-        headers: getHeaders(),
-      }
-    );
+    const response = await fetchWithRateLimit(`${DISCORD_API}/guilds/${guildId}/channels`, {
+      headers: getHeaders(),
+    });
 
     if (!response.ok) {
-      log.error(
-        `Failed to fetch guild channels: ${response.status} - ${await response.text()}`
-      );
+      log.error(`Failed to fetch guild channels: ${response.status} - ${await response.text()}`);
       return null;
     }
 
@@ -1155,9 +1111,7 @@ async function getOrCreateProjectsCategory(): Promise<string | null> {
       (ch: { type: number; name: string }) =>
         ch.type === 4 &&
         (ch.name.toLowerCase() === baseNamePrefix.toLowerCase() ||
-          ch.name
-            .toLowerCase()
-            .startsWith(baseNamePrefix.toLowerCase() + " - batch"))
+          ch.name.toLowerCase().startsWith(baseNamePrefix.toLowerCase() + " - batch"))
     );
 
     // Sort by batch number (base name = batch 1, then Batch 2, Batch 3, etc.)
@@ -1191,10 +1145,7 @@ async function getOrCreateProjectsCategory(): Promise<string | null> {
       const currentBatch =
         latestCategory.name.toLowerCase() === baseNamePrefix.toLowerCase()
           ? 1
-          : parseInt(
-              latestCategory.name.match(/batch\s*(\d+)/i)?.[1] || "1",
-              10
-            );
+          : parseInt(latestCategory.name.match(/batch\s*(\d+)/i)?.[1] || "1", 10);
       const newBatchNum = currentBatch + 1;
       const newCategoryName = `${baseNamePrefix} - Batch ${newBatchNum}`;
 
@@ -1227,9 +1178,7 @@ export async function createProjectChannel(
   creatorDiscordUsername?: string
 ): Promise<ChannelResult | null> {
   log.debug(`Creating project channel for ${projectTitle} by ${creatorName}`);
-  log.debug(
-    `Discord username - Creator: ${creatorDiscordUsername || "not set"}`
-  );
+  log.debug(`Discord username - Creator: ${creatorDiscordUsername || "not set"}`);
 
   const guildId = getGuildId();
 
@@ -1289,20 +1238,15 @@ export async function createProjectChannel(
       channelPayload.parent_id = categoryId;
     }
 
-    const response = await fetchWithRateLimit(
-      `${DISCORD_API}/guilds/${guildId}/channels`,
-      {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify(channelPayload),
-      }
-    );
+    const response = await fetchWithRateLimit(`${DISCORD_API}/guilds/${guildId}/channels`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify(channelPayload),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      log.error(
-        `[Discord] Channel creation failed: ${response.status} - ${errorText}`
-      );
+      log.error(`[Discord] Channel creation failed: ${response.status} - ${errorText}`);
       return null;
     }
 
@@ -1310,9 +1254,7 @@ export async function createProjectChannel(
     log.debug(`Channel created: ${channel.name} (ID: ${channel.id})`);
 
     // Build mention string for creator if found
-    const creatorMention = creatorMemberId
-      ? `<@${creatorMemberId}>`
-      : `**${creatorName}**`;
+    const creatorMention = creatorMemberId ? `<@${creatorMemberId}>` : `**${creatorName}**`;
 
     // Send welcome message
     await sendChannelMessage(
@@ -1360,12 +1302,8 @@ export async function sendProjectDetailsMessage(
   try {
     // Format the details message
     const techStackText =
-      project.techStack.length > 0
-        ? project.techStack.join(", ")
-        : "Not specified";
-    const githubText = project.githubRepo
-      ? `\n**GitHub:** ${project.githubRepo}`
-      : "";
+      project.techStack.length > 0 ? project.techStack.join(", ") : "Not specified";
+    const githubText = project.githubRepo ? `\n**GitHub:** ${project.githubRepo}` : "";
 
     const message =
       `**${project.title}**\n\n` +
@@ -1374,20 +1312,15 @@ export async function sendProjectDetailsMessage(
       `**Difficulty:** ${project.difficulty}${githubText}`;
 
     // Send the message
-    const response = await fetchWithRateLimit(
-      `${DISCORD_API}/channels/${channelId}/messages`,
-      {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify({ content: message }),
-      }
-    );
+    const response = await fetchWithRateLimit(`${DISCORD_API}/channels/${channelId}/messages`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({ content: message }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      log.error(
-        `[Discord] Failed to send project details: ${response.status} - ${errorText}`
-      );
+      log.error(`[Discord] Failed to send project details: ${response.status} - ${errorText}`);
       return false;
     }
 
@@ -1405,9 +1338,7 @@ export async function sendProjectDetailsMessage(
 
     if (!pinResponse.ok) {
       const errorText = await pinResponse.text();
-      log.error(
-        `[Discord] Failed to pin message: ${pinResponse.status} - ${errorText}`
-      );
+      log.error(`[Discord] Failed to pin message: ${pinResponse.status} - ${errorText}`);
       return false;
     }
 
@@ -1473,9 +1404,7 @@ export async function addMemberToChannel(
       return true;
     } else {
       const errorText = await response.text();
-      log.error(
-        `[Discord] Failed to add member to channel: ${response.status} - ${errorText}`
-      );
+      log.error(`[Discord] Failed to add member to channel: ${response.status} - ${errorText}`);
       return false;
     }
   } catch (error) {
@@ -1501,10 +1430,10 @@ export async function removeMemberFromChannel(
     // Look up member by username
     const member = await lookupMemberByUsername(discordUsername);
     if (!member) {
-      log.warn(
-        `[Discord] Cannot remove member - user not found in guild`,
-        { channelId, discordUsername }
-      );
+      log.warn(`[Discord] Cannot remove member - user not found in guild`, {
+        channelId,
+        discordUsername,
+      });
       return false;
     }
 
@@ -1536,10 +1465,11 @@ export async function removeMemberFromChannel(
       return false;
     }
   } catch (error) {
-    log.error(
-      `[Discord] Error removing member from channel`,
-      { channelId, discordUsername, error }
-    );
+    log.error(`[Discord] Error removing member from channel`, {
+      channelId,
+      discordUsername,
+      error,
+    });
     return false;
   }
 }
@@ -1558,9 +1488,7 @@ export async function sendProjectSubmissionNotification(
   creatorName: string,
   projectId: string
 ): Promise<boolean> {
-  log.debug(
-    `Sending project submission notification for "${projectTitle}" by ${creatorName}`
-  );
+  log.debug(`Sending project submission notification for "${projectTitle}" by ${creatorName}`);
 
   try {
     const message =
@@ -1613,9 +1541,7 @@ export async function sendNewProjectAnnouncementToCollaborators(
   creatorName: string,
   projectId: string
 ): Promise<boolean> {
-  log.debug(
-    `Sending project collaboration announcement for "${projectTitle}" by ${creatorName}`
-  );
+  log.debug(`Sending project collaboration announcement for "${projectTitle}" by ${creatorName}`);
 
   try {
     const message =
@@ -1851,9 +1777,7 @@ export async function sendMentorChangesRequestedNotification(
   mentorName: string,
   feedback: string
 ): Promise<boolean> {
-  log.debug(
-    `Sending mentor changes requested notification to ${discordUsername}`
-  );
+  log.debug(`Sending mentor changes requested notification to ${discordUsername}`);
 
   if (!discordUsername) {
     log.warn("[Discord] Cannot send mentor changes notification - discordUsername is empty");
@@ -1880,23 +1804,24 @@ export async function sendMentorChangesRequestedNotification(
  * @param reason - Reason for deletion (added to audit log)
  * @returns true if deleted successfully (200) or already gone (404), false on other errors
  */
-export async function deleteDiscordChannel(
-  channelId: string,
-  reason: string
-): Promise<boolean> {
+export async function deleteDiscordChannel(channelId: string, reason: string): Promise<boolean> {
   log.debug(`Deleting Discord channel: ${channelId} (reason: ${reason})`);
 
+  // Guard: never delete a protected community/moderators channel, no matter
+  // which flow (mentorship end, project cleanup, bulk delete) asks. (VIS-141)
+  if (isProtectedChannel(channelId)) {
+    log.warn(`[Discord] Refusing to delete protected channel ${channelId} (reason: ${reason})`);
+    return false;
+  }
+
   try {
-    const response = await fetchWithRateLimit(
-      `${DISCORD_API}/channels/${channelId}`,
-      {
-        method: "DELETE",
-        headers: {
-          ...getHeaders(),
-          "X-Audit-Log-Reason": reason,
-        },
-      }
-    );
+    const response = await fetchWithRateLimit(`${DISCORD_API}/channels/${channelId}`, {
+      method: "DELETE",
+      headers: {
+        ...getHeaders(),
+        "X-Audit-Log-Reason": reason,
+      },
+    });
 
     if (response.ok) {
       log.debug(`Channel ${channelId} deleted successfully`);
@@ -1915,4 +1840,67 @@ export async function deleteDiscordChannel(
     log.error(`[Discord] Error deleting channel ${channelId}:`, error);
     return false;
   }
+}
+
+/**
+ * Per-member direct-message notices sent before a mentorship channel is
+ * deleted. Each message is optional — omit one to skip DMing that member.
+ * (VIS-141)
+ */
+export interface MentorshipChannelDeletionNotice {
+  /** Discord username of the mentor. */
+  mentorUsername?: string;
+  /** Discord username of the mentee. */
+  menteeUsername?: string;
+  /** DM sent to the mentor. Skipped when omitted. */
+  mentorMessage?: string;
+  /** DM sent to the mentee. Skipped when omitted. */
+  menteeMessage?: string;
+  /** Audit-log reason recorded on the Discord channel deletion. */
+  reason: string;
+}
+
+/**
+ * Delete a mentorship channel after directly notifying the affected members.
+ *
+ * Per the VIS-141 board decision, ended mentorships have their Discord channel
+ * DELETED (not archived). Because a deleted channel takes any in-channel
+ * message with it, the affected members are notified individually via DM
+ * FIRST, then the channel is removed. Protected community/moderators channels
+ * are refused by the underlying `deleteDiscordChannel` guard.
+ *
+ * DM failures never block the deletion — members may have DMs disabled or have
+ * left the server. Each outcome is reported back so callers can log it.
+ *
+ * @returns per-step outcomes: whether the channel was deleted and whether each
+ *          member DM was delivered.
+ */
+export async function deleteMentorshipChannel(
+  channelId: string,
+  notice: MentorshipChannelDeletionNotice
+): Promise<{
+  deleted: boolean;
+  mentorNotified: boolean;
+  menteeNotified: boolean;
+}> {
+  // Notify the affected members BEFORE the channel disappears. Run both DMs
+  // concurrently; a failure on one must not stop the other or the delete.
+  const [mentorNotified, menteeNotified] = await Promise.all([
+    notice.mentorUsername && notice.mentorMessage
+      ? sendDirectMessage(notice.mentorUsername, notice.mentorMessage).catch((err) => {
+          log.error("[Discord] Mentor deletion DM failed:", err);
+          return false;
+        })
+      : Promise.resolve(false),
+    notice.menteeUsername && notice.menteeMessage
+      ? sendDirectMessage(notice.menteeUsername, notice.menteeMessage).catch((err) => {
+          log.error("[Discord] Mentee deletion DM failed:", err);
+          return false;
+        })
+      : Promise.resolve(false),
+  ]);
+
+  const deleted = await deleteDiscordChannel(channelId, notice.reason);
+
+  return { deleted, mentorNotified, menteeNotified };
 }
