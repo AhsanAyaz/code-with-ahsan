@@ -168,9 +168,7 @@ export default function ProjectDetailPage() {
 
       // Fetch user's application status if logged in
       if (user) {
-        const appRes = await fetch(
-          `/api/projects/${projectId}/applications?userId=${user.uid}`
-        );
+        const appRes = await fetch(`/api/projects/${projectId}/applications?userId=${user.uid}`);
         if (appRes.ok) {
           const appData = await appRes.json();
           if (appData.applications?.length > 0) {
@@ -230,14 +228,11 @@ export default function ProjectDetailPage() {
   const handleApproveApplication = async (userId: string) => {
     setApprovingUserId(userId);
     try {
-      const response = await authFetch(
-        `/api/projects/${projectId}/applications/${userId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "approve" }),
-        }
-      );
+      const response = await authFetch(`/api/projects/${projectId}/applications/${userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "approve" }),
+      });
 
       if (response.ok) {
         fetchProjectData();
@@ -258,14 +253,11 @@ export default function ProjectDetailPage() {
     const feedback = declineFeedback[userId];
     setDecliningUserId(userId);
     try {
-      const response = await authFetch(
-        `/api/projects/${projectId}/applications/${userId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "decline", feedback }),
-        }
-      );
+      const response = await authFetch(`/api/projects/${projectId}/applications/${userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "decline", feedback }),
+      });
 
       if (response.ok) {
         fetchProjectData();
@@ -325,14 +317,11 @@ export default function ProjectDetailPage() {
 
     setInvitationLoading(true);
     try {
-      const response = await authFetch(
-        `/api/projects/${projectId}/invitations/${user?.uid}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "accept" }),
-        }
-      );
+      const response = await authFetch(`/api/projects/${projectId}/invitations/${user?.uid}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "accept" }),
+      });
 
       if (response.ok) {
         fetchProjectData();
@@ -354,14 +343,11 @@ export default function ProjectDetailPage() {
 
     setInvitationLoading(true);
     try {
-      const response = await authFetch(
-        `/api/projects/${projectId}/invitations/${user?.uid}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "decline" }),
-        }
-      );
+      const response = await authFetch(`/api/projects/${projectId}/invitations/${user?.uid}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "decline" }),
+      });
 
       if (response.ok) {
         fetchProjectData();
@@ -442,13 +428,10 @@ export default function ProjectDetailPage() {
       onConfirm: async () => {
         setRemovingMemberId(memberId);
         try {
-          const response = await authFetch(
-            `/api/projects/${projectId}/members/${memberId}`,
-            {
-              method: "DELETE",
-              body: JSON.stringify({ requestorId: user?.uid }),
-            }
-          );
+          const response = await authFetch(`/api/projects/${projectId}/members/${memberId}`, {
+            method: "DELETE",
+            body: JSON.stringify({ requestorId: user?.uid }),
+          });
 
           if (response.ok) {
             fetchProjectData();
@@ -609,8 +592,18 @@ export default function ProjectDetailPage() {
         {/* Pending Updates Banner */}
         {project.status === "update_pending" && project.pendingUpdates && (
           <div className="alert alert-warning">
-            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="stroke-current shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
             </svg>
             <div className="flex-1">
               <h3 className="font-bold">Updates Waiting for Approval</h3>
@@ -619,7 +612,9 @@ export default function ProjectDetailPage() {
                 {isAdmin && (
                   <div className="mt-2 space-y-1">
                     {project.pendingUpdates.title && <p>• Title: {project.pendingUpdates.title}</p>}
-                    {project.pendingUpdates.maxTeamSize && <p>• Max Team Size: {project.pendingUpdates.maxTeamSize}</p>}
+                    {project.pendingUpdates.maxTeamSize && (
+                      <p>• Max Team Size: {project.pendingUpdates.maxTeamSize}</p>
+                    )}
                     {project.pendingUpdates.description && <p>• Description updated</p>}
                     {project.pendingUpdates.techStack && <p>• Tech Stack updated</p>}
                     {project.pendingUpdates.githubRepo && <p>• GitHub Repository updated</p>}
@@ -635,12 +630,65 @@ export default function ProjectDetailPage() {
           </div>
         )}
 
+        {/* Update result banners (Bug #250: in-page notification for approve/decline) */}
+        {isCreator &&
+          project.status === "active" &&
+          project.updateApprovedAt &&
+          !project.pendingUpdates && (
+            <div className="alert alert-success">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="stroke-current shrink-0 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>
+                Your last project update was <strong>approved</strong> and is now live.
+              </span>
+            </div>
+          )}
+        {isCreator &&
+          project.status === "active" &&
+          project.updateDeclinedAt &&
+          !project.pendingUpdates && (
+            <div className="alert alert-error">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="stroke-current shrink-0 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <div>
+                <span>
+                  Your last project update was <strong>declined</strong>.
+                </span>
+                {project.updateDeclineReason && (
+                  <p className="text-sm mt-1">Reason: {project.updateDeclineReason}</p>
+                )}
+              </div>
+            </div>
+          )}
+
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h1 className="text-3xl font-bold mb-2">{project.title}</h1>
           </div>
           <div className="flex gap-2">
-            {isCreator && project.status !== "update_pending" && (
+            {isCreator && (
               <Link href={`/projects/${projectId}/edit`} className="btn btn-primary btn-sm">
                 ✏️ Edit Project
               </Link>
@@ -692,9 +740,7 @@ export default function ProjectDetailPage() {
               size="lg"
             />
             <div className="flex-1">
-              <div className="font-semibold">
-                {project.creatorProfile?.displayName}
-              </div>
+              <div className="font-semibold">{project.creatorProfile?.displayName}</div>
               <ContactInfo discordUsername={project.creatorProfile?.discordUsername} />
             </div>
           </div>
@@ -773,7 +819,9 @@ export default function ProjectDetailPage() {
                 </div>
               )}
               {project.demoDescription && (
-                <p className="text-base-content/80 whitespace-pre-wrap">{project.demoDescription}</p>
+                <p className="text-base-content/80 whitespace-pre-wrap">
+                  {project.demoDescription}
+                </p>
               )}
             </div>
           </div>
@@ -787,7 +835,9 @@ export default function ProjectDetailPage() {
         isCreator={!!isCreator}
         onRemoveMember={isCreator ? handleRemoveMember : undefined}
         removingMemberId={removingMemberId}
-        onTransferOwnership={isCreator && project.status === "active" ? handleTransferOwnership : undefined}
+        onTransferOwnership={
+          isCreator && project.status === "active" ? handleTransferOwnership : undefined
+        }
       />
 
       {/* Join Project Button — for creator who hasn't joined */}
@@ -813,10 +863,7 @@ export default function ProjectDetailPage() {
       {/* Creator Actions: Complete Project Button */}
       {isCreator && project.status === "active" && (
         <div className="flex justify-end gap-2">
-          <button
-            onClick={handleCompleteProject}
-            className="btn btn-success btn-sm"
-          >
+          <button onClick={handleCompleteProject} className="btn btn-success btn-sm">
             Complete Project
           </button>
         </div>
@@ -860,13 +907,13 @@ export default function ProjectDetailPage() {
                           size="md"
                         />
                         <div className="flex-1">
-                          <div className="font-semibold">
-                            {app.userProfile?.displayName}
-                          </div>
+                          <div className="font-semibold">{app.userProfile?.displayName}</div>
                           <ContactInfo discordUsername={app.userProfile?.discordUsername} />
                         </div>
                         {app.userProfile?.skillLevel && (
-                          <span className={`badge ${difficultyColors[app.userProfile.skillLevel as ProjectDifficulty]}`}>
+                          <span
+                            className={`badge ${difficultyColors[app.userProfile.skillLevel as ProjectDifficulty]}`}
+                          >
                             Skill level: {app.userProfile.skillLevel}
                           </span>
                         )}
@@ -876,7 +923,9 @@ export default function ProjectDetailPage() {
                         <button
                           onClick={() => handleApproveApplication(app.userId)}
                           className="btn btn-success btn-sm"
-                          disabled={approvingUserId === app.userId || decliningUserId === app.userId}
+                          disabled={
+                            approvingUserId === app.userId || decliningUserId === app.userId
+                          }
                         >
                           {approvingUserId === app.userId ? (
                             <>
@@ -897,7 +946,9 @@ export default function ProjectDetailPage() {
                             }
                           }}
                           className="btn btn-error btn-sm"
-                          disabled={approvingUserId === app.userId || decliningUserId === app.userId}
+                          disabled={
+                            approvingUserId === app.userId || decliningUserId === app.userId
+                          }
                         >
                           Decline
                         </button>
@@ -939,7 +990,7 @@ export default function ProjectDetailPage() {
           )}
 
           {/* Invitation Form */}
-          {project.status === 'active' && (
+          {project.status === "active" && (
             <div>
               <h2 className="text-xl font-semibold mb-4">Invite Team Members</h2>
               <div className="flex gap-2">
@@ -998,9 +1049,7 @@ export default function ProjectDetailPage() {
                           <ContactInfo discordUsername={inv.userProfile?.discordUsername} />
                         </div>
                       </div>
-                      <span
-                        className={`badge ${statusBadge[inv.status] || "badge-ghost"}`}
-                      >
+                      <span className={`badge ${statusBadge[inv.status] || "badge-ghost"}`}>
                         {inv.status}
                       </span>
                     </div>
@@ -1013,22 +1062,29 @@ export default function ProjectDetailPage() {
       )}
 
       {/* Non-creator, Non-member: Application Form */}
-      {user && !isCreator && !isMember && !userApplication && !userInvitation && project.status === 'active' && (
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Apply to Join</h2>
-          <ApplicationForm
-            projectId={projectId}
-            project={project}
-            userId={user.uid}
-            userSkillLevel={profile?.skillLevel || "beginner"}
-            onSuccess={fetchProjectData}
-          />
-        </div>
-      )}
+      {user &&
+        !isCreator &&
+        !isMember &&
+        !userApplication &&
+        !userInvitation &&
+        project.status === "active" && (
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Apply to Join</h2>
+            <ApplicationForm
+              projectId={projectId}
+              project={project}
+              userId={user.uid}
+              userSkillLevel={profile?.skillLevel || "beginner"}
+              onSuccess={fetchProjectData}
+            />
+          </div>
+        )}
 
       {/* User has already applied */}
       {userApplication && !isMember && (
-        <div className={`alert ${userApplication.status === "declined" ? "alert-error" : "alert-info"}`}>
+        <div
+          className={`alert ${userApplication.status === "declined" ? "alert-error" : "alert-info"}`}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="stroke-current shrink-0 h-6 w-6"
@@ -1060,10 +1116,10 @@ export default function ProjectDetailPage() {
       {userInvitation && !isMember && (
         <div className="card bg-base-200 shadow-md">
           <div className="card-body">
-            <h2 className="card-title">You've Been Invited!</h2>
+            <h2 className="card-title">You&apos;ve Been Invited!</h2>
             <p>
-              The project creator has invited you to join this project. Accept the
-              invitation to become a team member.
+              The project creator has invited you to join this project. Accept the invitation to
+              become a team member.
             </p>
             <div className="flex gap-2 mt-4">
               <button
@@ -1093,7 +1149,7 @@ export default function ProjectDetailPage() {
       )}
 
       {/* Unauthenticated users */}
-      {!user && project.status === 'active' && (
+      {!user && project.status === "active" && (
         <div className="alert alert-warning">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -1160,7 +1216,9 @@ export default function ProjectDetailPage() {
                 disabled={completeLoading}
               />
               <label className="label">
-                <span className="label-text-alt">YouTube, Loom, Vimeo, Google Drive, or any HTTPS URL</span>
+                <span className="label-text-alt">
+                  YouTube, Loom, Vimeo, Google Drive, or any HTTPS URL
+                </span>
               </label>
             </div>
 
@@ -1195,14 +1253,19 @@ export default function ProjectDetailPage() {
                 disabled={completeLoading}
               >
                 {completeLoading ? (
-                  <><span className="loading loading-spinner loading-sm"></span> Completing...</>
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span> Completing...
+                  </>
                 ) : (
                   "Complete Project"
                 )}
               </button>
             </div>
           </div>
-          <div className="modal-backdrop" onClick={() => !completeLoading && setShowCompleteModal(false)}></div>
+          <div
+            className="modal-backdrop"
+            onClick={() => !completeLoading && setShowCompleteModal(false)}
+          ></div>
         </div>
       )}
     </div>

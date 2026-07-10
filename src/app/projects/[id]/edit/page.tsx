@@ -20,6 +20,7 @@ export default function EditProjectPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [warning, setWarning] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
 
   // Form state
@@ -27,7 +28,9 @@ export default function EditProjectPage() {
   const [description, setDescription] = useState("");
   const [githubRepo, setGithubRepo] = useState("");
   const [techStack, setTechStack] = useState("");
-  const [difficulty, setDifficulty] = useState<"beginner" | "intermediate" | "advanced">("intermediate");
+  const [difficulty, setDifficulty] = useState<"beginner" | "intermediate" | "advanced">(
+    "intermediate"
+  );
   const [maxTeamSize, setMaxTeamSize] = useState(4);
 
   // Check admin status
@@ -93,17 +96,15 @@ export default function EditProjectPage() {
         setDifficulty(projectData.difficulty || "intermediate");
         setMaxTeamSize(projectData.maxTeamSize || 4);
 
-        // If project has pending updates, disable editing
+        // If project has pending updates, warn but still allow editing (will replace pending)
         if (projectData.status === "update_pending" && !isAdmin) {
-          setError("This project has pending updates waiting for admin approval. You cannot make further changes until they are reviewed.");
-          setTimeout(() => {
-            router.push(`/projects/${projectId}`);
-          }, 3000);
-          return;
+          setWarning(
+            "You have a pending update awaiting admin review. Saving will replace it with your new changes."
+          );
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error loading project:", err);
-        setError(err.message || "Failed to load project");
+        setError(err instanceof Error ? err.message : "Failed to load project");
         setTimeout(() => {
           router.push(`/projects/${projectId}`);
         }, 2000);
@@ -179,8 +180,8 @@ export default function EditProjectPage() {
         setError(data.error || "Failed to update project");
         setSaving(false);
       }
-    } catch (err: any) {
-      console.error("Error updating project:", err);
+    } catch {
+      console.error("Error updating project");
       setError("An error occurred while updating the project");
       setSaving(false);
     }
@@ -235,9 +236,7 @@ export default function EditProjectPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold">Edit Project</h2>
-            <p className="text-base-content/70">
-              Update project details and settings
-            </p>
+            <p className="text-base-content/70">Update project details and settings</p>
           </div>
           <Link href={`/projects/${projectId}`} className="btn btn-ghost btn-sm">
             ← Back to Project
@@ -249,6 +248,26 @@ export default function EditProjectPage() {
           <div className="card-body">
             <h3 className="card-title">Project Details</h3>
             <div className="divider"></div>
+
+            {/* Warning alert (non-blocking) */}
+            {warning && (
+              <div className="alert alert-warning mb-6">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="stroke-current shrink-0 h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+                <span>{warning}</span>
+              </div>
+            )}
 
             {/* Error alert */}
             {error && (
@@ -349,7 +368,9 @@ export default function EditProjectPage() {
                   </label>
                   <select
                     value={difficulty}
-                    onChange={(e) => setDifficulty(e.target.value as any)}
+                    onChange={(e) =>
+                      setDifficulty(e.target.value as "beginner" | "intermediate" | "advanced")
+                    }
                     className="select select-bordered w-full"
                     disabled={saving}
                   >
@@ -377,11 +398,7 @@ export default function EditProjectPage() {
               </div>
 
               {/* Action buttons */}
-              <button
-                type="submit"
-                className="btn btn-primary w-full"
-                disabled={saving}
-              >
+              <button type="submit" className="btn btn-primary w-full" disabled={saving}>
                 {saving ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
