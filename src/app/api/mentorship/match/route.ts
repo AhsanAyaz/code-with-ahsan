@@ -20,10 +20,7 @@ export async function GET(request: NextRequest) {
   const role = searchParams.get("role");
 
   if (!uid || !role) {
-    return NextResponse.json(
-      { error: "Missing uid or role parameter" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Missing uid or role parameter" }, { status: 400 });
   }
 
   try {
@@ -76,10 +73,7 @@ export async function GET(request: NextRequest) {
         const matchData = doc.data();
 
         // Fetch mentee profile
-        const menteeDoc = await db
-          .collection("mentorship_profiles")
-          .doc(matchData.menteeId)
-          .get();
+        const menteeDoc = await db.collection("mentorship_profiles").doc(matchData.menteeId).get();
 
         const menteeProfile = menteeDoc.exists ? menteeDoc.data() : null;
 
@@ -107,10 +101,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ matches, pendingRequests }, { status: 200 });
   } catch (error) {
     console.error("Error fetching matches:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch matches" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch matches" }, { status: 500 });
   }
 }
 
@@ -120,10 +111,7 @@ export async function POST(request: NextRequest) {
     const { menteeId, mentorId, matchScore } = body;
 
     if (!menteeId || !mentorId) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     // Check mentor capacity before creating request
@@ -204,10 +192,7 @@ export async function POST(request: NextRequest) {
     const docRef = await db.collection("mentorship_sessions").add(matchData);
 
     // Send email notification to mentor about new request
-    const menteeProfile = await db
-      .collection("mentorship_profiles")
-      .doc(menteeId)
-      .get();
+    const menteeProfile = await db.collection("mentorship_profiles").doc(menteeId).get();
     if (menteeProfile.exists && mentorData) {
       const menteeData = menteeProfile.data();
       const notificationTasks = [];
@@ -236,18 +221,21 @@ export async function POST(request: NextRequest) {
 
       // Discord DM task
       if (isDiscordConfigured() && mentorData?.discordUsername) {
+        // Option C (GH#207): address the mentee by first name instead of
+        // pronouns to avoid gendered/ambiguous "they/their" phrasing.
+        const menteeDisplayName = menteeData?.displayName || "A mentee";
+        const menteeFirstName =
+          (menteeData?.displayName || "").trim().split(/\s+/)[0] || "the mentee";
         notificationTasks.push(
           sendDirectMessage(
             mentorData.discordUsername,
             `📬 **New Mentorship Request!**\n\n` +
-              `**${menteeData?.displayName || "A mentee"}** wants you to be their mentor!\n\n` +
-              `**Skills they want to learn:** ${menteeData?.skillsSought?.join(", ") || "Not specified"}\n` +
-              `**Career Goals:** ${menteeData?.careerGoals || "Not specified"}\n` +
-              `**What they're looking for:** ${menteeData?.mentorshipGoals || "Not specified"}\n\n` +
+              `**${menteeDisplayName}** has requested you as a mentor!\n\n` +
+              `**Skills ${menteeFirstName} wants to learn:** ${menteeData?.skillsSought?.join(", ") || "Not specified"}\n` +
+              `**${menteeFirstName}'s Career Goals:** ${menteeData?.careerGoals || "Not specified"}\n` +
+              `**What ${menteeFirstName} is looking for:** ${menteeData?.mentorshipGoals || "Not specified"}\n\n` +
               `Review the request: https://codewithahsan.dev/mentorship/requests`
-          ).catch((err) =>
-            console.error("Failed to send Discord DM to mentor:", err)
-          )
+          ).catch((err) => console.error("Failed to send Discord DM to mentor:", err))
         );
       }
 
@@ -265,10 +253,7 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error("Error creating match request:", error);
-    return NextResponse.json(
-      { error: "Failed to create match request" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create match request" }, { status: 500 });
   }
 }
 
@@ -278,10 +263,7 @@ export async function PUT(request: NextRequest) {
     const { matchId, action, mentorId } = body;
 
     if (!matchId || !action) {
-      return NextResponse.json(
-        { error: "Missing matchId or action" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing matchId or action" }, { status: 400 });
     }
 
     const matchRef = db.collection("mentorship_sessions").doc(matchId);
@@ -378,8 +360,7 @@ export async function PUT(request: NextRequest) {
         if (!mentorMember) {
           return NextResponse.json(
             {
-              error:
-                "Mentor not found on Discord. Please update your discord username.",
+              error: "Mentor not found on Discord. Please update your discord username.",
               message: `Could not find mentor's Discord user '${mentorDiscord}' in the server. Please join the server first.`,
             },
             { status: 400 }
@@ -427,9 +408,7 @@ export async function PUT(request: NextRequest) {
               // We CAN fire-and-forget this one as it's less critical,
               // BUT for Vercel reliability it's safer to await or Promise.all if we had multiple
               const menteeName =
-                menteeData.displayName ||
-                menteeData.email?.split("@")[0] ||
-                "there";
+                menteeData.displayName || menteeData.email?.split("@")[0] || "there";
               await sendDirectMessage(
                 menteeData.discordUsername,
                 `🎉 Great news! **${mentorProfileData.displayName}** has accepted your mentorship request!\n\n` +
@@ -461,9 +440,7 @@ export async function PUT(request: NextRequest) {
             expertise: mentorProfileData.expertise,
             currentRole: mentorProfileData.currentRole,
           }
-        ).catch((err) =>
-          console.error("Failed to send acceptance email:", err)
-        );
+        ).catch((err) => console.error("Failed to send acceptance email:", err));
       }
 
       // Auto-cancel other pending requests for this mentee
@@ -473,9 +450,7 @@ export async function PUT(request: NextRequest) {
         .where("status", "==", "pending")
         .get();
 
-      const cancelledCount = otherPendingRequests.docs.filter(
-        (doc) => doc.id !== matchId
-      ).length;
+      const cancelledCount = otherPendingRequests.docs.filter((doc) => doc.id !== matchId).length;
 
       if (cancelledCount > 0) {
         const batch = db.batch();
@@ -495,16 +470,11 @@ export async function PUT(request: NextRequest) {
           sendDirectMessage(
             menteeData.discordUsername,
             `ℹ️ Since **${mentorProfileData.displayName}** accepted you as their mentee, your ${cancelledCount} other pending request(s) have been automatically cancelled.`
-          ).catch((err) =>
-            console.error("Failed to send cancelled requests DM:", err)
-          );
+          ).catch((err) => console.error("Failed to send cancelled requests DM:", err));
         }
       }
 
-      return NextResponse.json(
-        { success: true, message: "Match approved" },
-        { status: 200 }
-      );
+      return NextResponse.json({ success: true, message: "Match approved" }, { status: 200 });
     } else if (action === "decline") {
       await matchRef.update({
         status: "declined",
@@ -534,10 +504,7 @@ export async function PUT(request: NextRequest) {
         ).catch((err) => console.error("Failed to send decline email:", err));
       }
 
-      return NextResponse.json(
-        { success: true, message: "Match declined" },
-        { status: 200 }
-      );
+      return NextResponse.json({ success: true, message: "Match declined" }, { status: 200 });
     } else if (action === "withdraw") {
       // Mentees can withdraw their own pending requests
       const { menteeId } = body;
@@ -547,10 +514,7 @@ export async function PUT(request: NextRequest) {
       }
 
       if (matchData?.status !== "pending") {
-        return NextResponse.json(
-          { error: "Can only withdraw pending requests" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Can only withdraw pending requests" }, { status: 400 });
       }
 
       await matchRef.update({
@@ -572,15 +536,10 @@ export async function PUT(request: NextRequest) {
         sendDirectMessage(
           mentorData.discordUsername,
           `📢 **${menteeData.displayName || "A mentee"}** has withdrawn their mentorship request.`
-        ).catch((err) =>
-          console.error("Failed to send withdrawal DM to mentor:", err)
-        );
+        ).catch((err) => console.error("Failed to send withdrawal DM to mentor:", err));
       }
 
-      return NextResponse.json(
-        { success: true, message: "Request withdrawn" },
-        { status: 200 }
-      );
+      return NextResponse.json({ success: true, message: "Request withdrawn" }, { status: 200 });
     }
 
     // Note: 'complete' action is handled by /api/mentorship/dashboard/[matchId]
@@ -588,9 +547,6 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     console.error("Error updating match:", error);
-    return NextResponse.json(
-      { error: "Failed to update match" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update match" }, { status: 500 });
   }
 }
