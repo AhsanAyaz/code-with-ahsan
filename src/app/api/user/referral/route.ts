@@ -6,10 +6,13 @@ import { REFERRAL_COOKIE_NAME } from "@/lib/ambassador/constants";
 /**
  * POST /api/user/referral
  *
- * Consumes the cwa_ref attribution cookie on account signup.
- * Called client-side by AuthService immediately after signInWithPopup when
- * additionalUserInfo.isNewUser is true — attributing the referral to account
- * creation rather than mentorship-profile creation (board decision GH#267).
+ * Consumes the cwa_ref attribution cookie on sign-in.
+ * Called client-side by AuthService after every signInWithPopup (GH#267 / VIS-135):
+ *   - new users are attributed at signup (their first login);
+ *   - existing users who still hold a valid cwa_ref cookie are backfilled on their
+ *     next login (the Firebase v12 SDK does not expose additionalUserInfo.isNewUser,
+ *     so we do not gate on it — consumeReferral is idempotent, making this safe).
+ * Attribution is tied to account creation, not mentorship-profile creation.
  *
  * Never returns a non-2xx for attribution failures — signup must always succeed.
  */
