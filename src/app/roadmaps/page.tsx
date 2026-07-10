@@ -21,6 +21,10 @@ function RoadmapsCatalogContent() {
   const [domainFilter, setDomainFilter] = useState<RoadmapDomain | "all">("all");
   const [difficultyFilter, setDifficultyFilter] = useState<ProjectDifficulty | "all">("all");
 
+  // GH#262: Filters hidden by default so the page shows just the list.
+  // Reveal them via the toggle button below.
+  const [showFilters, setShowFilters] = useState(false);
+
   // Fetch approved roadmaps on mount
   useEffect(() => {
     const fetchRoadmaps = async () => {
@@ -129,20 +133,46 @@ function RoadmapsCatalogContent() {
         </p>
       </div>
 
-      <RoadmapFilters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        domainFilter={domainFilter}
-        setDomainFilter={setDomainFilter}
-        difficultyFilter={difficultyFilter}
-        setDifficultyFilter={setDifficultyFilter}
-      />
+      {/* GH#262: toggle to reveal the search & filter panel */}
+      <div className="mb-6">
+        <button
+          type="button"
+          className="btn btn-sm btn-outline gap-2"
+          aria-expanded={showFilters}
+          onClick={() => setShowFilters((v) => !v)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 018 21v-7.586L3.293 6.707A1 1 0 013 6V4z"
+            />
+          </svg>
+          {showFilters ? "Hide search & filters" : "Search & filter"}
+        </button>
+      </div>
+
+      {showFilters && (
+        <RoadmapFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          domainFilter={domainFilter}
+          setDomainFilter={setDomainFilter}
+          difficultyFilter={difficultyFilter}
+          setDifficultyFilter={setDifficultyFilter}
+        />
+      )}
 
       {filteredRoadmaps.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-lg text-base-content/70">
-            No roadmaps found matching your filters
-          </p>
+          <p className="text-lg text-base-content/70">No roadmaps found matching your filters</p>
         </div>
       ) : (
         <>
