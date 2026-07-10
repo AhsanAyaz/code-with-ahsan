@@ -1,68 +1,66 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/firebaseAdmin'
-import { sendRegistrationStatusEmail, sendAccountStatusEmail } from '@/lib/email'
-import { sendMentorChangesRequestedNotification } from '@/lib/discord'
-import { syncRoleClaim } from '@/lib/ambassador/roleMutation'
-
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/firebaseAdmin";
+import { sendRegistrationStatusEmail, sendAccountStatusEmail } from "@/lib/email";
+import { sendMentorChangesRequestedNotification } from "@/lib/discord";
+import { syncRoleClaim } from "@/lib/ambassador/roleMutation";
 
 // GET: Fetch all profiles with optional filters
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const role = searchParams.get('role') // 'mentor' | 'mentee' | null for all
-  const status = searchParams.get('status') // 'pending' | 'accepted' | 'declined' | 'disabled' | null for all
+  const { searchParams } = new URL(request.url);
+  const role = searchParams.get("role"); // 'mentor' | 'mentee' | null for all
+  const status = searchParams.get("status"); // 'pending' | 'accepted' | 'declined' | 'disabled' | null for all
 
   try {
     // Use roles array-contains in query; filter status in-memory to avoid
     // requiring a composite index for every (role, status) combination.
-    let query: FirebaseFirestore.Query = db.collection('mentorship_profiles')
+    let query: FirebaseFirestore.Query = db.collection("mentorship_profiles");
 
     if (role) {
-      query = query.where('roles', 'array-contains', role)
+      query = query.where("roles", "array-contains", role);
     } else if (status) {
-      query = query.where('status', '==', status)
+      query = query.where("status", "==", status);
     }
 
     // Also fetch disabled sessions count and ratings for each profile
     const [snapshot, sessionsSnapshot, ratingsSnapshot] = await Promise.all([
       query.get(),
-      db.collection('mentorship_sessions').where('status', '==', 'disabled').get(),
-      db.collection('mentor_ratings').get()
-    ])
+      db.collection("mentorship_sessions").where("status", "==", "disabled").get(),
+      db.collection("mentor_ratings").get(),
+    ]);
 
-    const filteredDocs = role && status
-      ? snapshot.docs.filter(d => d.data().status === status)
-      : snapshot.docs
+    const filteredDocs =
+      role && status ? snapshot.docs.filter((d) => d.data().status === status) : snapshot.docs;
 
     // Count disabled sessions per user
-    const disabledSessionsMap: Record<string, number> = {}
-    sessionsSnapshot.docs.forEach(doc => {
-      const data = doc.data()
+    const disabledSessionsMap: Record<string, number> = {};
+    sessionsSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
       if (data.mentorId) {
-        disabledSessionsMap[data.mentorId] = (disabledSessionsMap[data.mentorId] || 0) + 1
+        disabledSessionsMap[data.mentorId] = (disabledSessionsMap[data.mentorId] || 0) + 1;
       }
       if (data.menteeId) {
-        disabledSessionsMap[data.menteeId] = (disabledSessionsMap[data.menteeId] || 0) + 1
+        disabledSessionsMap[data.menteeId] = (disabledSessionsMap[data.menteeId] || 0) + 1;
       }
-    })
+    });
 
     // Calculate average ratings per mentor
-    const mentorRatings: Record<string, { total: number; count: number }> = {}
-    ratingsSnapshot.docs.forEach(doc => {
-      const data = doc.data()
-      const mentorId = data.mentorId
+    const mentorRatings: Record<string, { total: number; count: number }> = {};
+    ratingsSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const mentorId = data.mentorId;
       if (!mentorRatings[mentorId]) {
-        mentorRatings[mentorId] = { total: 0, count: 0 }
+        mentorRatings[mentorId] = { total: 0, count: 0 };
       }
-      mentorRatings[mentorId].total += data.rating || 0
-      mentorRatings[mentorId].count += 1
-    })
+      mentorRatings[mentorId].total += data.rating || 0;
+      mentorRatings[mentorId].count += 1;
+    });
 
-    const profiles = filteredDocs.map(doc => {
-      const data = doc.data()
-      const ratings = mentorRatings[doc.id]
-      const avgRating = ratings ? Math.round((ratings.total / ratings.count) * 10) / 10 : 0
-      const ratingCount = ratings?.count || 0
-      
+    const profiles = filteredDocs.map((doc) => {
+      const data = doc.data();
+      const ratings = mentorRatings[doc.id];
+      const avgRating = ratings ? Math.round((ratings.total / ratings.count) * 10) / 10 : 0;
+      const ratingCount = ratings?.count || 0;
+
       return {
         uid: doc.id,
         ...data,
@@ -71,220 +69,265 @@ export async function GET(request: NextRequest) {
         ratingCount,
         createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
-      }
-    })
+      };
+    });
 
-    return NextResponse.json({ profiles }, { status: 200 })
+    return NextResponse.json({ profiles }, { status: 200 });
   } catch (error) {
-    console.error('Error fetching profiles:', error)
-    return NextResponse.json({ error: 'Failed to fetch profiles' }, { status: 500 })
+    console.error("Error fetching profiles:", error);
+    return NextResponse.json({ error: "Failed to fetch profiles" }, { status: 500 });
   }
 }
 
 // Discord username validation regex (Discord 2023+ format)
 // Lowercase alphanumeric + underscore/period, 2-32 characters
-const DISCORD_USERNAME_REGEX = /^[a-z0-9_.]{2,32}$/
+const DISCORD_USERNAME_REGEX = /^[a-z0-9_.]{2,32}$/;
+
+// LinkedIn profile URL: any linkedin.com host over https (mirrors src/lib/validation/urls.ts)
+const LINKEDIN_URL_REGEX = /^https:\/\/([\w-]+\.)?linkedin\.com\/.+/i;
 
 // PUT: Update profile status (accept/decline/disable) and/or Discord username
 export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { uid, status, adminNotes, reactivateSessions, discordUsername, feedback } = body
+    const body = await request.json();
+    const { uid, status, adminNotes, reactivateSessions, discordUsername, linkedinUrl, feedback } =
+      body;
 
     if (!uid) {
-      return NextResponse.json({ error: 'Missing uid' }, { status: 400 })
+      return NextResponse.json({ error: "Missing uid" }, { status: 400 });
     }
 
     // Validate Discord username format if provided
-    if (discordUsername !== undefined && discordUsername !== null && discordUsername !== '') {
+    if (discordUsername !== undefined && discordUsername !== null && discordUsername !== "") {
       if (!DISCORD_USERNAME_REGEX.test(discordUsername)) {
-        return NextResponse.json({
-          error: 'Invalid Discord username format. Must be 2-32 lowercase characters (letters, numbers, underscore, period).'
-        }, { status: 400 })
+        return NextResponse.json(
+          {
+            error:
+              "Invalid Discord username format. Must be 2-32 lowercase characters (letters, numbers, underscore, period).",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Validate LinkedIn URL format if provided (non-empty)
+    if (linkedinUrl !== undefined && linkedinUrl !== null && linkedinUrl !== "") {
+      if (!LINKEDIN_URL_REGEX.test(linkedinUrl)) {
+        return NextResponse.json(
+          {
+            error: "Invalid LinkedIn URL. Must be a valid https://www.linkedin.com/... link.",
+          },
+          { status: 400 }
+        );
       }
     }
 
     // If status is provided, validate it
-    if (status !== undefined && !['pending', 'accepted', 'declined', 'disabled', 'changes_requested'].includes(status)) {
-      return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+    if (
+      status !== undefined &&
+      !["pending", "accepted", "declined", "disabled", "changes_requested"].includes(status)
+    ) {
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 
     // Require at least one update field
-    if (status === undefined && discordUsername === undefined) {
-      return NextResponse.json({ error: 'Must provide status or discordUsername to update' }, { status: 400 })
+    if (status === undefined && discordUsername === undefined && linkedinUrl === undefined) {
+      return NextResponse.json(
+        { error: "Must provide status, discordUsername or linkedinUrl to update" },
+        { status: 400 }
+      );
     }
 
-    const profileRef = db.collection('mentorship_profiles').doc(uid)
-    const profileDoc = await profileRef.get()
+    const profileRef = db.collection("mentorship_profiles").doc(uid);
+    const profileDoc = await profileRef.get();
 
     if (!profileDoc.exists) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
-    const previousStatus = profileDoc.data()?.status
+    const previousStatus = profileDoc.data()?.status;
 
     // Build update data object
     const updateData: Record<string, unknown> = {
       updatedAt: new Date(),
-    }
+    };
 
     // Add status if provided
     if (status !== undefined) {
-      updateData.status = status
+      updateData.status = status;
     }
 
     // Add discordUsername if provided (including empty string to clear it)
     if (discordUsername !== undefined) {
-      updateData.discordUsername = discordUsername === '' ? null : discordUsername
+      updateData.discordUsername = discordUsername === "" ? null : discordUsername;
+    }
+
+    // Add linkedinUrl if provided (including empty string to clear it)
+    if (linkedinUrl !== undefined) {
+      updateData.linkedinUrl = linkedinUrl === "" ? null : (linkedinUrl as string).trim();
     }
 
     if (adminNotes !== undefined) {
-      updateData.adminNotes = adminNotes
+      updateData.adminNotes = adminNotes;
     }
 
     // Handle changes_requested: require feedback and store it
-    if (status === 'changes_requested') {
-      if (!feedback || typeof feedback !== 'string' || feedback.trim().length < 10) {
-        return NextResponse.json({ error: 'Feedback must be at least 10 characters' }, { status: 400 })
+    if (status === "changes_requested") {
+      if (!feedback || typeof feedback !== "string" || feedback.trim().length < 10) {
+        return NextResponse.json(
+          { error: "Feedback must be at least 10 characters" },
+          { status: 400 }
+        );
       }
-      updateData.changesFeedback = feedback.trim()
-      updateData.changesFeedbackAt = new Date()
+      updateData.changesFeedback = feedback.trim();
+      updateData.changesFeedbackAt = new Date();
     }
 
     // Track when status changed to accepted
-    if (status === 'accepted' && previousStatus !== 'accepted') {
-      updateData.acceptedAt = new Date()
+    if (status === "accepted" && previousStatus !== "accepted") {
+      updateData.acceptedAt = new Date();
     }
 
-    const currentRoles: string[] = profileDoc.data()?.roles ?? []
+    const currentRoles: string[] = profileDoc.data()?.roles ?? [];
 
     // On disable: remove mentor role and snapshot current roles for restoration
-    if (status === 'disabled') {
-      updateData.disabledRoles = currentRoles
-      updateData.roles = currentRoles.filter((r: string) => r !== 'mentor')
+    if (status === "disabled") {
+      updateData.disabledRoles = currentRoles;
+      updateData.roles = currentRoles.filter((r: string) => r !== "mentor");
     }
 
     // On re-enable from disabled: restore previously held roles
-    if (status === 'accepted' && previousStatus === 'disabled') {
-      const savedRoles: string[] = profileDoc.data()?.disabledRoles ?? currentRoles
-      const merged = Array.from(new Set([...currentRoles, ...savedRoles]))
-      updateData.roles = merged
-      updateData.disabledRoles = null
+    if (status === "accepted" && previousStatus === "disabled") {
+      const savedRoles: string[] = profileDoc.data()?.disabledRoles ?? currentRoles;
+      const merged = Array.from(new Set([...currentRoles, ...savedRoles]));
+      updateData.roles = merged;
+      updateData.disabledRoles = null;
     }
 
-    await profileRef.update(updateData)
+    await profileRef.update(updateData);
 
     // Sync Firebase custom claims when roles changed
-    const rolesChanged = status === 'disabled' || (status === 'accepted' && previousStatus === 'disabled')
+    const rolesChanged =
+      status === "disabled" || (status === "accepted" && previousStatus === "disabled");
     if (rolesChanged) {
-      const finalRoles = updateData.roles as string[] ?? currentRoles
-      const isAdmin = profileDoc.data()?.isAdmin ?? false
-      syncRoleClaim(uid, { roles: finalRoles, admin: isAdmin })
-        .catch(err => console.error('Failed to sync role claims:', err))
+      const finalRoles = (updateData.roles as string[]) ?? currentRoles;
+      const isAdmin = profileDoc.data()?.isAdmin ?? false;
+      syncRoleClaim(uid, { roles: finalRoles, admin: isAdmin }).catch((err) =>
+        console.error("Failed to sync role claims:", err)
+      );
     }
 
     // If disabling a profile, also deactivate their mentorship sessions
-    if (status === 'disabled') {
-      const sessionsSnapshot = await db.collection('mentorship_sessions')
-        .where('status', '==', 'active')
-        .get()
+    if (status === "disabled") {
+      const sessionsSnapshot = await db
+        .collection("mentorship_sessions")
+        .where("status", "==", "active")
+        .get();
 
-      const batch = db.batch()
-      sessionsSnapshot.docs.forEach(doc => {
-        const data = doc.data()
+      const batch = db.batch();
+      sessionsSnapshot.docs.forEach((doc) => {
+        const data = doc.data();
         // Check if this user is involved in the session
         if (data.mentorId === uid || data.menteeId === uid) {
           batch.update(doc.ref, {
-            status: 'disabled',
+            status: "disabled",
             disabledAt: new Date(),
-            disabledReason: 'Profile disabled by admin'
-          })
+            disabledReason: "Profile disabled by admin",
+          });
         }
-      })
+      });
 
-      await batch.commit()
+      await batch.commit();
     }
 
     // If re-enabling and reactivateSessions flag is true, reactivate disabled sessions
-    let reactivatedCount = 0
-    if (status === 'accepted' && reactivateSessions) {
-      const disabledSessionsSnapshot = await db.collection('mentorship_sessions')
-        .where('status', '==', 'disabled')
-        .get()
+    let reactivatedCount = 0;
+    if (status === "accepted" && reactivateSessions) {
+      const disabledSessionsSnapshot = await db
+        .collection("mentorship_sessions")
+        .where("status", "==", "disabled")
+        .get();
 
-      const batch = db.batch()
-      disabledSessionsSnapshot.docs.forEach(doc => {
-        const data = doc.data()
+      const batch = db.batch();
+      disabledSessionsSnapshot.docs.forEach((doc) => {
+        const data = doc.data();
         // Check if this user is involved in the session and it was disabled by admin
-        if ((data.mentorId === uid || data.menteeId === uid) && data.disabledReason === 'Profile disabled by admin') {
+        if (
+          (data.mentorId === uid || data.menteeId === uid) &&
+          data.disabledReason === "Profile disabled by admin"
+        ) {
           batch.update(doc.ref, {
-            status: 'active',
+            status: "active",
             reactivatedAt: new Date(),
             disabledAt: null,
-            disabledReason: null
-          })
-          reactivatedCount++
+            disabledReason: null,
+          });
+          reactivatedCount++;
         }
-      })
+      });
 
-      await batch.commit()
+      await batch.commit();
     }
 
     // Send email notifications for status changes
-    const profileData = profileDoc.data()
+    const profileData = profileDoc.data();
     if (profileData?.email) {
       const userProfile = {
         uid,
-        displayName: profileData.displayName || '',
+        displayName: profileData.displayName || "",
         email: profileData.email,
         roles: profileData.roles ?? [],
-      }
-      
+      };
+
       // Registration approval/decline emails (only for pending -> accepted/declined)
-      if (status === 'accepted' && previousStatus === 'pending') {
-        sendRegistrationStatusEmail(userProfile, true)
-          .catch(err => console.error('Failed to send approval email:', err))
-      } else if (status === 'declined' && previousStatus === 'pending') {
-        sendRegistrationStatusEmail(userProfile, false)
-          .catch(err => console.error('Failed to send decline email:', err))
+      if (status === "accepted" && previousStatus === "pending") {
+        sendRegistrationStatusEmail(userProfile, true).catch((err) =>
+          console.error("Failed to send approval email:", err)
+        );
+      } else if (status === "declined" && previousStatus === "pending") {
+        sendRegistrationStatusEmail(userProfile, false).catch((err) =>
+          console.error("Failed to send decline email:", err)
+        );
       }
-      
+
       // Account disabled/enabled emails
-      if (status === 'disabled' && previousStatus !== 'disabled') {
-        sendAccountStatusEmail(userProfile, 'disabled', adminNotes)
-          .catch(err => console.error('Failed to send disabled email:', err))
-      } else if (status === 'accepted' && previousStatus === 'disabled') {
-        sendAccountStatusEmail(userProfile, 'enabled')
-          .catch(err => console.error('Failed to send enabled email:', err))
+      if (status === "disabled" && previousStatus !== "disabled") {
+        sendAccountStatusEmail(userProfile, "disabled", adminNotes).catch((err) =>
+          console.error("Failed to send disabled email:", err)
+        );
+      } else if (status === "accepted" && previousStatus === "disabled") {
+        sendAccountStatusEmail(userProfile, "enabled").catch((err) =>
+          console.error("Failed to send enabled email:", err)
+        );
       }
     }
 
     // Send Discord DM for changes_requested
-    if (status === 'changes_requested' && profileData?.discordUsername) {
+    if (status === "changes_requested" && profileData?.discordUsername) {
       sendMentorChangesRequestedNotification(
         profileData.discordUsername,
-        profileData.displayName || '',
+        profileData.displayName || "",
         feedback
-      ).catch(err => console.error('Failed to send changes requested Discord DM:', err))
+      ).catch((err) => console.error("Failed to send changes requested Discord DM:", err));
     }
 
     // Build response
     const response: Record<string, unknown> = {
       success: true,
       uid,
-    }
+    };
 
     if (status !== undefined) {
-      response.message = `Profile ${status === 'accepted' ? 'approved' : status === 'declined' ? 'declined' : status === 'disabled' ? 'disabled' : status === 'changes_requested' ? 'changes requested' : 'updated'} successfully`
-      response.reactivatedSessions = reactivatedCount
+      response.message = `Profile ${status === "accepted" ? "approved" : status === "declined" ? "declined" : status === "disabled" ? "disabled" : status === "changes_requested" ? "changes requested" : "updated"} successfully`;
+      response.reactivatedSessions = reactivatedCount;
     } else if (discordUsername !== undefined) {
-      response.message = 'Discord username updated successfully'
-      response.discordUsername = discordUsername === '' ? null : discordUsername
+      response.message = "Discord username updated successfully";
+      response.discordUsername = discordUsername === "" ? null : discordUsername;
     }
 
-    return NextResponse.json(response, { status: 200 })
+    return NextResponse.json(response, { status: 200 });
   } catch (error) {
-    console.error('Error updating profile status:', error)
-    return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
+    console.error("Error updating profile status:", error);
+    return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });
   }
 }

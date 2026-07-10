@@ -18,6 +18,7 @@ import {
 } from "@/utils/streamer-mode";
 import Link from "next/link";
 import { useDebouncedCallback } from "use-debounce";
+import { isValidLinkedInUrl } from "@/lib/validation/urls";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { format } from "date-fns";
 import { hasRole } from "@/lib/permissions";
@@ -29,8 +30,7 @@ export default function AllMentorsPage() {
   // Mentorship mapping state
   const [mentorshipData, setMentorshipData] = useState<GroupedMentorship[]>([]);
   const [loadingMentorships, setLoadingMentorships] = useState(false);
-  const [mentorshipSummary, setMentorshipSummary] =
-    useState<MentorshipSummary | null>(null);
+  const [mentorshipSummary, setMentorshipSummary] = useState<MentorshipSummary | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInputValue, setSearchInputValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,6 +41,11 @@ export default function AllMentorsPage() {
   const [editingDiscordValue, setEditingDiscordValue] = useState("");
   const [savingDiscord, setSavingDiscord] = useState(false);
 
+  // Inline LinkedIn edit state
+  const [editingLinkedin, setEditingLinkedin] = useState<string | null>(null);
+  const [editingLinkedinValue, setEditingLinkedinValue] = useState("");
+  const [savingLinkedin, setSavingLinkedin] = useState(false);
+
   // Mentorship status management state
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [deletingSession, setDeletingSession] = useState<string | null>(null);
@@ -49,15 +54,11 @@ export default function AllMentorsPage() {
     id: string;
     partnerName: string;
   } | null>(null);
-  const [regeneratingChannel, setRegeneratingChannel] = useState<string | null>(
-    null
-  );
+  const [regeneratingChannel, setRegeneratingChannel] = useState<string | null>(null);
 
   // Reviews modal state
   const [showReviewsModal, setShowReviewsModal] = useState(false);
-  const [reviewMentor, setReviewMentor] = useState<ProfileWithDetails | null>(
-    null
-  );
+  const [reviewMentor, setReviewMentor] = useState<ProfileWithDetails | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
 
@@ -69,9 +70,7 @@ export default function AllMentorsPage() {
     rating: "all" as "all" | "rated" | "unrated",
     discord: "all" as "all" | "with" | "without",
   });
-  const activeFilterCount = Object.values(filters).filter(
-    (v) => v !== "all"
-  ).length;
+  const activeFilterCount = Object.values(filters).filter((v) => v !== "all").length;
 
   // Profile state for status operations
   const [profiles, setProfiles] = useState<ProfileWithDetails[]>([]);
@@ -165,13 +164,58 @@ export default function AllMentorsPage() {
       toast.success("Discord username updated");
       setEditingDiscord(null);
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to update Discord username"
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to update Discord username");
     } finally {
       setSavingDiscord(false);
+    }
+  };
+
+  const handleLinkedinSave = async (uid: string, newUrl: string) => {
+    const trimmed = newUrl.trim();
+
+    // Validate format client-side first (empty clears the value)
+    if (trimmed && !isValidLinkedInUrl(trimmed)) {
+      toast.error("Invalid LinkedIn URL. Must be a valid https://www.linkedin.com/... link.");
+      return;
+    }
+
+    setSavingLinkedin(true);
+    try {
+      const response = await fetch("/api/mentorship/admin/profiles", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, linkedinUrl: trimmed }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Update failed");
+      }
+
+      // Update local state
+      setMentorshipData((prev) =>
+        prev.map((group) => ({
+          ...group,
+          profile:
+            group.profile.uid === uid
+              ? { ...group.profile, linkedinUrl: trimmed || undefined }
+              : group.profile,
+          mentorships: group.mentorships.map((m) => ({
+            ...m,
+            partnerProfile:
+              m.partnerProfile?.uid === uid
+                ? { ...m.partnerProfile, linkedinUrl: trimmed || undefined }
+                : m.partnerProfile,
+          })),
+        }))
+      );
+
+      toast.success(trimmed ? "LinkedIn URL updated" : "LinkedIn URL cleared");
+      setEditingLinkedin(null);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to update LinkedIn URL");
+    } finally {
+      setSavingLinkedin(false);
     }
   };
 
@@ -203,16 +247,10 @@ export default function AllMentorsPage() {
       );
 
       toast.success(
-        newStatus === "completed"
-          ? "Mentorship marked as completed"
-          : "Mentorship re-activated"
+        newStatus === "completed" ? "Mentorship marked as completed" : "Mentorship re-activated"
       );
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to update mentorship status"
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to update mentorship status");
     } finally {
       setUpdatingStatus(null);
     }
@@ -223,12 +261,9 @@ export default function AllMentorsPage() {
 
     setDeletingSession(sessionToDelete.id);
     try {
-      const response = await fetch(
-        `/api/mentorship/admin/sessions?id=${sessionToDelete.id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`/api/mentorship/admin/sessions?id=${sessionToDelete.id}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         const data = await response.json();
@@ -247,9 +282,7 @@ export default function AllMentorsPage() {
       setShowDeleteModal(false);
       setSessionToDelete(null);
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to end mentorship"
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to end mentorship");
     } finally {
       setDeletingSession(null);
     }
@@ -258,14 +291,11 @@ export default function AllMentorsPage() {
   const handleRegenerateChannel = async (sessionId: string) => {
     setRegeneratingChannel(sessionId);
     try {
-      const response = await fetch(
-        "/api/mentorship/admin/sessions/regenerate-channel",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId }),
-        }
-      );
+      const response = await fetch("/api/mentorship/admin/sessions/regenerate-channel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      });
 
       if (!response.ok) {
         const data = await response.json();
@@ -286,11 +316,7 @@ export default function AllMentorsPage() {
 
       toast.success(`Discord channel created! URL: ${data.channelUrl}`);
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to regenerate Discord channel"
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to regenerate Discord channel");
     } finally {
       setRegeneratingChannel(null);
     }
@@ -302,9 +328,7 @@ export default function AllMentorsPage() {
     setLoadingReviews(true);
 
     try {
-      const response = await fetch(
-        `/api/mentorship/admin/reviews?mentorId=${mentor.uid}`
-      );
+      const response = await fetch(`/api/mentorship/admin/reviews?mentorId=${mentor.uid}`);
       if (response.ok) {
         const data = await response.json();
         setReviews(data.reviews || []);
@@ -340,21 +364,22 @@ export default function AllMentorsPage() {
                   ...p,
                   status: newStatus,
                   // Remove mentor role locally when disabling
-                  roles: newStatus === "disabled"
-                    ? p.roles.filter((r) => r !== "mentor")
-                    : newStatus === "accepted" && p.status === "disabled"
-                    ? Array.from(new Set([...p.roles, "mentor"]))
-                    : p.roles,
-                  disabledSessionsCount: reactivateSessions
-                    ? 0
-                    : p.disabledSessionsCount,
+                  roles:
+                    newStatus === "disabled"
+                      ? p.roles.filter((r) => r !== "mentor")
+                      : newStatus === "accepted" && p.status === "disabled"
+                        ? Array.from(new Set([...p.roles, "mentor"]))
+                        : p.roles,
+                  disabledSessionsCount: reactivateSessions ? 0 : p.disabledSessionsCount,
                 }
               : p
           )
         );
 
         if (newStatus === "disabled") {
-          toast.success("Mentor account disabled. Active mentorships ended and mentor role removed.");
+          toast.success(
+            "Mentor account disabled. Active mentorships ended and mentor role removed."
+          );
         } else if (newStatus === "accepted" && data.reactivatedSessions > 0) {
           toast.success(
             `Mentor re-enabled. ${data.reactivatedSessions} mentorship session(s) reactivated.`
@@ -422,14 +447,12 @@ export default function AllMentorsPage() {
     // Rating filter
     const profileWithDetails = profile as ProfileWithDetails;
     const hasRating =
-      profileWithDetails.avgRating !== undefined &&
-      profileWithDetails.avgRating > 0;
+      profileWithDetails.avgRating !== undefined && profileWithDetails.avgRating > 0;
     if (filters.rating === "rated" && !hasRating) return false;
     if (filters.rating === "unrated" && hasRating) return false;
 
     // Discord filter
-    const hasDiscord =
-      profile.discordUsername && profile.discordUsername.trim() !== "";
+    const hasDiscord = profile.discordUsername && profile.discordUsername.trim() !== "";
     if (filters.discord === "with" && !hasDiscord) return false;
     if (filters.discord === "without" && hasDiscord) return false;
 
@@ -459,9 +482,7 @@ export default function AllMentorsPage() {
         <div className="stats shadow bg-base-100 w-full">
           <div className="stat">
             <div className="stat-title">Total Mentors</div>
-            <div className="stat-value text-primary text-2xl">
-              {mentorshipSummary.totalMentors}
-            </div>
+            <div className="stat-value text-primary text-2xl">{mentorshipSummary.totalMentors}</div>
           </div>
           <div className="stat">
             <div className="stat-title">Total Mentees</div>
@@ -494,10 +515,7 @@ export default function AllMentorsPage() {
 
       {/* Filter Button */}
       <div className="flex items-center gap-2">
-        <button
-          className="btn btn-outline btn-sm gap-2"
-          onClick={() => setShowFilterModal(true)}
-        >
+        <button className="btn btn-outline btn-sm gap-2" onClick={() => setShowFilterModal(true)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-4 w-4"
@@ -514,9 +532,7 @@ export default function AllMentorsPage() {
           </svg>
           Filters
           {activeFilterCount > 0 && (
-            <span className="badge badge-primary badge-sm">
-              {activeFilterCount}
-            </span>
+            <span className="badge badge-primary badge-sm">{activeFilterCount}</span>
           )}
         </button>
         {activeFilterCount > 0 && (
@@ -563,8 +579,8 @@ export default function AllMentorsPage() {
               {searchQuery
                 ? "Try adjusting your search query."
                 : activeFilterCount > 0
-                ? "No mentors match your filters. Try adjusting or clearing filters."
-                : "No profiles found in this category."}
+                  ? "No mentors match your filters. Try adjusting or clearing filters."
+                  : "No profiles found in this category."}
             </p>
           </div>
         </div>
@@ -574,18 +590,10 @@ export default function AllMentorsPage() {
           <div className="grid gap-4">
             {paginatedData.map((item) => {
               const p = item.profile;
-              const activeMentorships = item.mentorships.filter(
-                (m) => m.status === "active"
-              );
-              const completedMentorships = item.mentorships.filter(
-                (m) => m.status === "completed"
-              );
-              const pendingMentorships = item.mentorships.filter(
-                (m) => m.status === "pending"
-              );
-              const cancelledMentorships = item.mentorships.filter(
-                (m) => m.status === "cancelled"
-              );
+              const activeMentorships = item.mentorships.filter((m) => m.status === "active");
+              const completedMentorships = item.mentorships.filter((m) => m.status === "completed");
+              const pendingMentorships = item.mentorships.filter((m) => m.status === "pending");
+              const cancelledMentorships = item.mentorships.filter((m) => m.status === "cancelled");
               const activeRelationshipCount = activeMentorships.length;
 
               return (
@@ -595,22 +603,14 @@ export default function AllMentorsPage() {
                     <div className="flex items-start gap-4">
                       <ProfileAvatar
                         photoURL={p.photoURL}
-                        displayName={getAnonymizedDisplayName(
-                          p.displayName,
-                          p.uid,
-                          isStreamerMode
-                        )}
+                        displayName={getAnonymizedDisplayName(p.displayName, p.uid, isStreamerMode)}
                         size="xl"
                         ring
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="text-lg font-bold">
-                            {getAnonymizedDisplayName(
-                              p.displayName,
-                              p.uid,
-                              isStreamerMode
-                            )}
+                            {getAnonymizedDisplayName(p.displayName, p.uid, isStreamerMode)}
                           </h3>
                           {getStatusBadge(p.status)}
                           <span className="badge badge-outline">
@@ -618,18 +618,14 @@ export default function AllMentorsPage() {
                           </span>
                           <span
                             className={`badge ${
-                              activeRelationshipCount === 0
-                                ? "badge-ghost"
-                                : "badge-info"
+                              activeRelationshipCount === 0 ? "badge-ghost" : "badge-info"
                             }`}
                           >
                             {activeRelationshipCount} mentees
                           </span>
                           {/* Profile button for mentors */}
                           <Link
-                            href={`/mentorship/mentors/${
-                              p.username || p.uid
-                            }?admin=1`}
+                            href={`/mentorship/mentors/${p.username || p.uid}?admin=1`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-ghost btn-sm btn-circle"
@@ -670,7 +666,11 @@ export default function AllMentorsPage() {
                               className="btn btn-error btn-sm"
                               disabled={actionLoading === p.uid}
                               onClick={() => {
-                                if (window.confirm(`Disable ${p.displayName}'s account? This will end all active mentorships and remove their mentor role.`)) {
+                                if (
+                                  window.confirm(
+                                    `Disable ${p.displayName}'s account? This will end all active mentorships and remove their mentor role.`
+                                  )
+                                ) {
                                   handleStatusChange(p.uid, "disabled");
                                 }
                               }}
@@ -711,9 +711,7 @@ export default function AllMentorsPage() {
                                   className="input input-xs input-bordered w-32"
                                   value={editingDiscordValue}
                                   onChange={(e) =>
-                                    setEditingDiscordValue(
-                                      e.target.value.toLowerCase()
-                                    )
+                                    setEditingDiscordValue(e.target.value.toLowerCase())
                                   }
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") {
@@ -724,10 +722,7 @@ export default function AllMentorsPage() {
                                   }}
                                   onBlur={() => {
                                     setTimeout(() => {
-                                      if (
-                                        editingDiscord === `profile-${p.uid}` &&
-                                        !savingDiscord
-                                      ) {
+                                      if (editingDiscord === `profile-${p.uid}` && !savingDiscord) {
                                         handleDiscordSave(p.uid, editingDiscordValue);
                                       }
                                     }, 150);
@@ -749,17 +744,10 @@ export default function AllMentorsPage() {
                                 }}
                               >
                                 <span
-                                  className={
-                                    p.discordUsername
-                                      ? ""
-                                      : "italic text-base-content/40"
-                                  }
+                                  className={p.discordUsername ? "" : "italic text-base-content/40"}
                                 >
-                                  {getAnonymizedDiscord(
-                                    p.discordUsername,
-                                    p.uid,
-                                    isStreamerMode
-                                  ) || "not set"}
+                                  {getAnonymizedDiscord(p.discordUsername, p.uid, isStreamerMode) ||
+                                    "not set"}
                                 </span>
                                 <svg
                                   className="w-3 h-3 text-base-content/40"
@@ -778,20 +766,86 @@ export default function AllMentorsPage() {
                             )}
                           </span>
                         </div>
+                        {/* Inline LinkedIn Edit for main profile */}
+                        <div className="text-sm text-base-content/70">
+                          <span className="inline-flex items-center gap-1 max-w-full">
+                            LinkedIn:{" "}
+                            {editingLinkedin === `profile-${p.uid}` ? (
+                              <span className="inline-flex items-center gap-1">
+                                <input
+                                  type="url"
+                                  className="input input-xs input-bordered w-64"
+                                  value={editingLinkedinValue}
+                                  onChange={(e) => setEditingLinkedinValue(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                      handleLinkedinSave(p.uid, editingLinkedinValue);
+                                    } else if (e.key === "Escape") {
+                                      setEditingLinkedin(null);
+                                    }
+                                  }}
+                                  onBlur={() => {
+                                    setTimeout(() => {
+                                      if (
+                                        editingLinkedin === `profile-${p.uid}` &&
+                                        !savingLinkedin
+                                      ) {
+                                        handleLinkedinSave(p.uid, editingLinkedinValue);
+                                      }
+                                    }, 150);
+                                  }}
+                                  placeholder="https://www.linkedin.com/in/..."
+                                  disabled={savingLinkedin}
+                                  autoFocus
+                                />
+                                {savingLinkedin && (
+                                  <span className="loading loading-spinner loading-xs"></span>
+                                )}
+                              </span>
+                            ) : (
+                              <button
+                                className="inline-flex items-center gap-1 hover:bg-base-200 rounded px-1 -ml-1 cursor-pointer max-w-full"
+                                onClick={() => {
+                                  setEditingLinkedin(`profile-${p.uid}`);
+                                  setEditingLinkedinValue(p.linkedinUrl || "");
+                                }}
+                                title={p.linkedinUrl || "Set LinkedIn URL"}
+                              >
+                                <span
+                                  className={
+                                    p.linkedinUrl
+                                      ? "truncate max-w-[16rem]"
+                                      : "italic text-base-content/40"
+                                  }
+                                >
+                                  {p.linkedinUrl || "not set"}
+                                </span>
+                                <svg
+                                  className="w-3 h-3 text-base-content/40 shrink-0"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                                  />
+                                </svg>
+                              </button>
+                            )}
+                          </span>
+                        </div>
                         {p.currentRole && (
-                          <p className="text-sm text-base-content/70 mt-1">
-                            {p.currentRole}
-                          </p>
+                          <p className="text-sm text-base-content/70 mt-1">{p.currentRole}</p>
                         )}
 
                         {/* Expertise Tags */}
                         {p.expertise && p.expertise.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
                             {p.expertise.map((skill) => (
-                              <span
-                                key={skill}
-                                className="badge badge-primary badge-sm"
-                              >
+                              <span key={skill} className="badge badge-primary badge-sm">
                                 {skill}
                               </span>
                             ))}
@@ -948,18 +1002,13 @@ export default function AllMentorsPage() {
                       </div>
                     )}
 
-
                     {/* No mentorships message */}
                     {item.mentorships.length === 0 && (
                       <div className="collapse collapse-arrow bg-base-200 mt-4">
                         <input type="checkbox" />
-                        <div className="collapse-title font-medium">
-                          Mentorships (0)
-                        </div>
+                        <div className="collapse-title font-medium">Mentorships (0)</div>
                         <div className="collapse-content">
-                          <p className="text-sm text-base-content/60 pt-2">
-                            No mentees assigned
-                          </p>
+                          <p className="text-sm text-base-content/60 pt-2">No mentees assigned</p>
                         </div>
                       </div>
                     )}
@@ -983,9 +1032,7 @@ export default function AllMentorsPage() {
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <button
                     key={page}
-                    className={`join-item btn btn-sm ${
-                      currentPage === page ? "btn-active" : ""
-                    }`}
+                    className={`join-item btn btn-sm ${currentPage === page ? "btn-active" : ""}`}
                     onClick={() => setCurrentPage(page)}
                   >
                     {page}
@@ -993,9 +1040,7 @@ export default function AllMentorsPage() {
                 ))}
                 <button
                   className="join-item btn btn-sm"
-                  onClick={() =>
-                    setCurrentPage((p) => Math.min(totalPages, p + 1))
-                  }
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
                 >
                   »
@@ -1056,9 +1101,7 @@ export default function AllMentorsPage() {
                     ))}
                   </div>
                   <span className="font-semibold">{reviewMentor.avgRating}</span>
-                  <span className="text-base-content/50">
-                    ({reviewMentor.ratingCount} reviews)
-                  </span>
+                  <span className="text-base-content/50">({reviewMentor.ratingCount} reviews)</span>
                 </div>
               </div>
             </div>
@@ -1107,14 +1150,11 @@ export default function AllMentorsPage() {
                             </div>
                             <div className="text-xs text-base-content/50">
                               {review.createdAt
-                                ? new Date(review.createdAt).toLocaleDateString(
-                                    "en-US",
-                                    {
-                                      year: "numeric",
-                                      month: "short",
-                                      day: "numeric",
-                                    }
-                                  )
+                                ? new Date(review.createdAt).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  })
                                 : "N/A"}
                             </div>
                           </div>
@@ -1125,9 +1165,7 @@ export default function AllMentorsPage() {
                               <svg
                                 key={star}
                                 className={`w-4 h-4 ${
-                                  star <= review.rating
-                                    ? "text-yellow-400"
-                                    : "text-base-content/20"
+                                  star <= review.rating ? "text-yellow-400" : "text-base-content/20"
                                 }`}
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
@@ -1135,16 +1173,14 @@ export default function AllMentorsPage() {
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                               </svg>
                             ))}
-                            <span className="text-sm font-medium ml-1">
-                              {review.rating}/5
-                            </span>
+                            <span className="text-sm font-medium ml-1">{review.rating}/5</span>
                           </div>
 
                           {/* Feedback */}
                           {review.feedback && (
                             <div className="mt-3 p-3 bg-base-100 rounded-lg">
                               <p className="text-sm italic text-base-content/80">
-                                "{review.feedback}"
+                                &ldquo;{review.feedback}&rdquo;
                               </p>
                             </div>
                           )}
@@ -1301,8 +1337,8 @@ export default function AllMentorsPage() {
               <span className="font-semibold">{sessionToDelete.partnerName}</span>?
             </p>
             <p className="text-sm text-base-content/70">
-              This will archive the Discord channel and notify both participants.
-              This action cannot be undone.
+              This will archive the Discord channel and notify both participants. This action cannot
+              be undone.
             </p>
             <div className="modal-action">
               <button
@@ -1423,22 +1459,16 @@ function MentorshipCard({
               <div className="text-xs text-base-content/60">
                 <span className="inline-flex items-center gap-1">
                   Discord:{" "}
-                  {editingDiscord ===
-                  `${mentorship.id}-${mentorship.partnerProfile.uid}` ? (
+                  {editingDiscord === `${mentorship.id}-${mentorship.partnerProfile.uid}` ? (
                     <span className="inline-flex items-center gap-1">
                       <input
                         type="text"
                         className="input input-xs input-bordered w-28"
                         value={editingDiscordValue}
-                        onChange={(e) =>
-                          setEditingDiscordValue(e.target.value.toLowerCase())
-                        }
+                        onChange={(e) => setEditingDiscordValue(e.target.value.toLowerCase())}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
-                            handleDiscordSave(
-                              mentorship.partnerProfile!.uid,
-                              editingDiscordValue
-                            );
+                            handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
                           } else if (e.key === "Escape") {
                             setEditingDiscord(null);
                           }
@@ -1469,12 +1499,8 @@ function MentorshipCard({
                     <button
                       className="inline-flex items-center gap-1 hover:bg-base-200 rounded px-1 -ml-1 cursor-pointer"
                       onClick={() => {
-                        setEditingDiscord(
-                          `${mentorship.id}-${mentorship.partnerProfile!.uid}`
-                        );
-                        setEditingDiscordValue(
-                          mentorship.partnerProfile?.discordUsername || ""
-                        );
+                        setEditingDiscord(`${mentorship.id}-${mentorship.partnerProfile!.uid}`);
+                        setEditingDiscordValue(mentorship.partnerProfile?.discordUsername || "");
                       }}
                     >
                       <span
@@ -1544,21 +1570,15 @@ function MentorshipCard({
             {/* Dates */}
             <div className="text-xs text-base-content/50 mt-2 space-y-1">
               {mentorship.approvedAt && (
-                <div>
-                  Started: {format(new Date(mentorship.approvedAt), "MMM d, yyyy")}
-                </div>
+                <div>Started: {format(new Date(mentorship.approvedAt), "MMM d, yyyy")}</div>
               )}
               {mentorship.lastContactAt && (
                 <div>
-                  Last activity:{" "}
-                  {format(new Date(mentorship.lastContactAt), "MMM d, yyyy")}
+                  Last activity: {format(new Date(mentorship.lastContactAt), "MMM d, yyyy")}
                 </div>
               )}
               {mentorship.requestedAt && !mentorship.approvedAt && (
-                <div>
-                  Requested:{" "}
-                  {format(new Date(mentorship.requestedAt), "MMM d, yyyy")}
-                </div>
+                <div>Requested: {format(new Date(mentorship.requestedAt), "MMM d, yyyy")}</div>
               )}
             </div>
 
