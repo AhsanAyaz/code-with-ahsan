@@ -504,7 +504,13 @@ export default function MentorProfileClient({
   // requestStatus === "active" means the viewer has an active mentorship_sessions doc with this mentor.
   const canBook = requestStatus === "active";
   const bookGateTooltip =
-    "Only active mentees of this mentor can book a session. Request mentorship first.";
+    requestStatus === "pending"
+      ? "Your mentorship request is pending. You can book a session once your mentor accepts it."
+      : requestStatus === "completed"
+        ? "Your mentorship has completed. Request mentorship again to book another session."
+        : requestStatus === "declined"
+          ? "Your mentorship request was declined, so booking is unavailable."
+          : "Only active mentees of this mentor can book a session. Request mentorship first.";
 
   return (
     <div className="space-y-6">
@@ -818,7 +824,10 @@ export default function MentorProfileClient({
                     Book a Session
                   </Link>
                 ) : (
-                  <span className="tooltip" data-tip={bookGateTooltip}>
+                  <span
+                    className="tooltip tooltip-top inline-block before:max-w-[16rem] before:whitespace-normal"
+                    data-tip={bookGateTooltip}
+                  >
                     <button
                       type="button"
                       className="btn btn-primary btn-sm btn-disabled"
@@ -881,7 +890,10 @@ export default function MentorProfileClient({
                   View Available Slots
                 </Link>
               ) : (
-                <span className="tooltip" data-tip={bookGateTooltip}>
+                <span
+                  className="tooltip tooltip-top inline-block before:max-w-[16rem] before:whitespace-normal"
+                  data-tip={bookGateTooltip}
+                >
                   <button
                     type="button"
                     className="btn btn-primary btn-sm btn-disabled"
