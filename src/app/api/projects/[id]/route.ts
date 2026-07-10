@@ -13,10 +13,7 @@ import { canDeleteProject } from "@/lib/permissions";
 import { auth } from "@/lib/firebaseAdmin";
 import { Project } from "@/types/mentorship";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
 
@@ -25,10 +22,7 @@ export async function GET(
     const projectDoc = await projectRef.get();
 
     if (!projectDoc.exists) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
     const projectData = projectDoc.data();
@@ -42,22 +36,19 @@ export async function GET(
       approvedAt: projectData?.approvedAt?.toDate?.()?.toISOString() || null,
       lastActivityAt: projectData?.lastActivityAt?.toDate?.()?.toISOString() || null,
       completedAt: projectData?.completedAt?.toDate?.()?.toISOString() || null,
+      updateRequestedAt: projectData?.updateRequestedAt?.toDate?.()?.toISOString() || null,
+      updateApprovedAt: projectData?.updateApprovedAt?.toDate?.()?.toISOString() || null,
+      updateDeclinedAt: projectData?.updateDeclinedAt?.toDate?.()?.toISOString() || null,
     };
 
     return NextResponse.json({ project }, { status: 200 });
   } catch (error) {
     console.error("Error fetching project:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch project" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch project" }, { status: 500 });
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Phase 1: Authentication - check admin token OR Firebase auth
     let userId: string | null = null;
@@ -91,31 +82,43 @@ export async function PUT(
 
     // If still no userId, authentication failed
     if (!userId) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
     const { id } = await params;
     const body = await request.json();
-    const { action, declineReason, demoUrl, demoDescription, title, description, githubRepo, techStack, difficulty, maxTeamSize } = body;
+    const {
+      action,
+      declineReason,
+      demoUrl,
+      demoDescription,
+      title,
+      description,
+      githubRepo,
+      techStack,
+      difficulty,
+      maxTeamSize,
+    } = body;
 
     // Fetch project document
     const projectRef = db.collection("projects").doc(id);
     const projectDoc = await projectRef.get();
 
     if (!projectDoc.exists) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
     const projectData = projectDoc.data();
 
     // Determine if this is a field update request (vs action-based)
-    const isFieldUpdate = !action && (title !== undefined || description !== undefined || githubRepo !== undefined || techStack !== undefined || difficulty !== undefined || maxTeamSize !== undefined);
+    const isFieldUpdate =
+      !action &&
+      (title !== undefined ||
+        description !== undefined ||
+        githubRepo !== undefined ||
+        techStack !== undefined ||
+        difficulty !== undefined ||
+        maxTeamSize !== undefined);
 
     if (isFieldUpdate) {
       // Field update flow: edit project fields
@@ -129,13 +132,7 @@ export async function PUT(
           );
         }
 
-        // Cannot edit if there is already a pending update
-        if (projectData?.status === "update_pending") {
-          return NextResponse.json(
-            { error: "This project already has pending updates waiting for approval" },
-            { status: 403 }
-          );
-        }
+        // update_pending is allowed: owner can replace their pending update
       }
       // Admin can edit any project at any status
 
@@ -150,7 +147,11 @@ export async function PUT(
       }
 
       if (description !== undefined) {
-        if (typeof description !== "string" || description.length < 10 || description.length > 2000) {
+        if (
+          typeof description !== "string" ||
+          description.length < 10 ||
+          description.length > 2000
+        ) {
           return NextResponse.json(
             { error: "Description must be between 10 and 2000 characters" },
             { status: 400 }
@@ -170,19 +171,13 @@ export async function PUT(
 
       if (techStack !== undefined) {
         if (!Array.isArray(techStack)) {
-          return NextResponse.json(
-            { error: "techStack must be an array" },
-            { status: 400 }
-          );
+          return NextResponse.json({ error: "techStack must be an array" }, { status: 400 });
         }
       }
 
       if (difficulty !== undefined) {
         if (!["beginner", "intermediate", "advanced"].includes(difficulty)) {
-          return NextResponse.json(
-            { error: "Invalid difficulty level" },
-            { status: 400 }
-          );
+          return NextResponse.json({ error: "Invalid difficulty level" }, { status: 400 });
         }
       }
 
@@ -196,7 +191,7 @@ export async function PUT(
       }
 
       // Phase 4: Build update object
-      const updateData: Record<string, any> = {
+      const updateData: Record<string, unknown> = {
         updatedAt: FieldValue.serverTimestamp(),
         lastActivityAt: FieldValue.serverTimestamp(),
       };
@@ -243,10 +238,7 @@ export async function PUT(
         completedAt: updatedData?.completedAt?.toDate?.()?.toISOString() || null,
       };
 
-      return NextResponse.json(
-        { success: true, project },
-        { status: 200 }
-      );
+      return NextResponse.json({ success: true, project }, { status: 200 });
     }
 
     // Action-based flow (existing logic)
@@ -338,8 +330,7 @@ export async function PUT(
           const discordUsername = creatorData?.discordUsername;
 
           if (discordUsername) {
-            const siteUrl =
-              process.env.NEXT_PUBLIC_SITE_URL || "https://codewithahsan.dev";
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://codewithahsan.dev";
             const dmMessage =
               `Your project "${projectData.title}" was not approved.\n\n` +
               `**Reason:** ${declineReason}\n\n` +
@@ -361,10 +352,7 @@ export async function PUT(
         updatedAt: FieldValue.serverTimestamp(),
       });
 
-      return NextResponse.json(
-        { success: true, message: "Project declined" },
-        { status: 200 }
-      );
+      return NextResponse.json({ success: true, message: "Project declined" }, { status: 200 });
     } else if (action === "complete") {
       // Verify creator owns the project
       if (projectData?.creatorId !== userId) {
@@ -437,19 +425,13 @@ export async function PUT(
         }
       }
 
-      return NextResponse.json(
-        { success: true, message: "Project completed" },
-        { status: 200 }
-      );
+      return NextResponse.json({ success: true, message: "Project completed" }, { status: 200 });
     } else {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     console.error("Error updating project:", error);
-    return NextResponse.json(
-      { error: "Failed to update project" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update project" }, { status: 500 });
   }
 }
 
@@ -460,10 +442,7 @@ export async function DELETE(
   try {
     const authResult = await verifyAuth(request);
     if (!authResult) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -473,10 +452,7 @@ export async function DELETE(
     const projectDoc = await projectRef.get();
 
     if (!projectDoc.exists) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
     const projectData = projectDoc.data();
@@ -495,15 +471,16 @@ export async function DELETE(
     const canDelete = canDeleteProject(permissionUser, {
       ...projectData,
       id,
-    } as any);
+    } as Project);
 
     if (!canDelete) {
       return NextResponse.json(
         {
           error: "Permission denied",
-          message: projectData?.status === "declined"
-            ? "Only the project creator can delete declined projects"
-            : "Only declined projects can be deleted by creators (admins can delete any project)",
+          message:
+            projectData?.status === "declined"
+              ? "Only the project creator can delete declined projects"
+              : "Only declined projects can be deleted by creators (admins can delete any project)",
         },
         { status: 403 }
       );
@@ -518,9 +495,6 @@ export async function DELETE(
     );
   } catch (error) {
     console.error("Error deleting project:", error);
-    return NextResponse.json(
-      { error: "Failed to delete project" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to delete project" }, { status: 500 });
   }
 }
