@@ -103,18 +103,18 @@ export default function CommunityHero() {
           className="flex flex-col sm:flex-row gap-4 pt-2"
         >
           <a href="https://codewithahsan.dev/discord" target="_blank" rel="noopener noreferrer">
-            <button className="btn btn-primary btn-lg w-full sm:w-auto">
+            <button className="btn btn-primary text-shadow-primary-content border-primary hover:bg-transparent hover:text-primary-content hidden md:inline-flex">
               <Users className="w-5 h-5 mr-2" />
               Join the community
             </button>
           </a>
           <a href="#newsletter">
-            <button className="btn btn-outline btn-lg w-full sm:w-auto">
+            <button className="btn btn-outline text-shadow-primary-content border-primary hover:bg-primary hover:text-primary-content hidden md:inline-flex">
               Subscribe to the newsletter
             </button>
           </a>
           <Link href="/sponsors">
-            <button className="btn btn-outline btn-lg w-full sm:w-auto text-accent border-accent hover:bg-accent hover:text-accent-content">
+            <button className="btn btn-outline text-shadow-accent-content border-accent hover:bg-accent hover:text-accent-content hidden md:inline-flex">
               Sponsorships
             </button>
           </Link>
