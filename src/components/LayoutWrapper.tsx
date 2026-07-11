@@ -38,9 +38,14 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
             { label: "Start learning", links: START_LEARNING_LINKS },
             { label: "Community Engagements", links: COMMUNITY_LINKS },
           ].map((group) => (
-            <details key={group.label} className="dropdown hidden md:inline-block">
-              <summary className="btn btn-outline btn-sm">{group.label}</summary>
-              <ul className="menu dropdown-content bg-base-100 rounded-box z-50 w-52 p-2 shadow">
+            <div key={group.label} className="dropdown dropdown-hover hidden md:inline-block">
+              <div tabIndex={0} role="button" className="btn btn-ghost btn-sm">
+                {group.label}
+              </div>
+              <ul
+                tabIndex={0}
+                className="menu dropdown-content bg-base-200 rounded-box z-50 w-52 p-2 shadow"
+              >
                 {group.links.map((l) => (
                   <li key={l.href}>
                     {l.external ? (
@@ -53,11 +58,14 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                   </li>
                 ))}
               </ul>
-            </details>
+            </div>
           ))}
         </div>
         <div className="navbar-end gap-1 sm:gap-2">
-          <Link href="/about" className="btn btn-ghost btn-sm hidden md:inline-flex">
+          <Link
+            href="/about"
+            className="btn btn-ghost btn-sm border-light hover:bg-light hover:text-primary-content hidden md:inline-flex"
+          >
             About
           </Link>
           <Link
@@ -70,7 +78,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
             href={SUBSCRIBE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn btn-primary btn-sm min-h-11"
+            className="btn btn-outline btn-sm text-primary border-primary hover:bg-primary hover:text-primary-content hidden md:inline-flex"
           >
             Subscribe
           </a>
