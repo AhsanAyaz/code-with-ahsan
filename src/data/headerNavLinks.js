@@ -35,4 +35,23 @@ export const MORE_LINKS = [
   { href: LINKS.DISCORD, title: "Discord", external: true },
 ];
 
+// Sketch group A — "Start learning" (GH#275)
+export const START_LEARNING_LINKS = [
+  { href: "/books", title: "Books" },
+  { href: "/courses", title: "Courses" },
+  { href: "/roadmaps", title: "Roadmap" },
+  { href: "/challenges", title: "Challenges" },
+  { href: "/logic-buddy", title: "Logic Buddy" },
+  { href: "/projects", title: "Projects" },
+  { href: "https://blog.codewithahsan.dev/", title: "Blog", external: true },
+];
+
+// Sketch group B — "Community Engagements" (GH#275)
+export const COMMUNITY_LINKS = [
+  { href: "/mentorship", title: "Mentorship" },
+  ...(AMBASSADORS_ENABLED ? [{ href: "/ambassadors", title: "Ambassadors" }] : []),
+  { href: "/events", title: "Events" },
+  { href: LINKS.DISCORD, title: "Discord", external: true },
+];
+
 export default headerNavLinks;

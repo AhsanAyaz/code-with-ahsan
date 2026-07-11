@@ -7,13 +7,11 @@ export default function BooksSection() {
     <section className="border-t border-base-300 bg-base-200 py-16">
       <div className="page-padding">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-base-content mb-8">
-            Published Books
-          </h2>
+          <h2 className="text-2xl font-bold text-base-content mb-8">Published Books</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {booksData.map((book) => {
               const href = book.link || book.amazonLink || "#";
-              const btnLabel = book.btnText || "Get on Amazon";
+              const btnLabel = book.btnText || "Get your copy";
               return (
                 <div
                   key={book.id}
@@ -33,13 +31,9 @@ export default function BooksSection() {
                   {/* Info */}
                   <div className="flex flex-col flex-1 p-4 gap-2">
                     <div>
-                      <h3 className="font-bold text-base-content leading-tight">
-                        {book.title}
-                      </h3>
+                      <h3 className="font-bold text-base-content leading-tight">{book.title}</h3>
                       {book.edition && (
-                        <span className="text-xs text-base-content/50">
-                          {book.edition}
-                        </span>
+                        <span className="text-xs text-base-content/50">{book.edition}</span>
                       )}
                     </div>
                     <p className="text-sm text-base-content/70 leading-relaxed flex-1">
