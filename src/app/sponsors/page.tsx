@@ -118,6 +118,15 @@ export default async function SponsorsPage() {
           </a>
         </div>
 
+        {/* Audience stats — shared SocialStats component, single source (socialReach → /api/stats) */}
+        <section className="max-w-5xl mx-auto py-12">
+          <SocialStats
+            label="The audience"
+            showTotal={false}
+            caption="Audience of professional developers, tech leads, and architects — built on organic, evergreen technical content."
+          />
+        </section>
+
         {/* Brands strip — signature element, fused into the hero */}
         <div className="mt-14">
           <SectionEyebrow>Brands we&apos;ve worked with</SectionEyebrow>
@@ -142,9 +151,6 @@ export default async function SponsorsPage() {
         </div>
       </section>
 
-      {/* About Ahsan — the person a brand buys access to */}
-      <PortfolioBio as="h2" />
-
       {/* What we offer */}
       <section className="max-w-5xl mx-auto py-12">
         <SectionEyebrow>What we offer</SectionEyebrow>
@@ -167,14 +173,8 @@ export default async function SponsorsPage() {
         </div>
       </section>
 
-      {/* Audience stats — shared SocialStats component, single source (socialReach → /api/stats) */}
-      <section className="max-w-5xl mx-auto py-12">
-        <SocialStats
-          label="The audience"
-          showTotal={false}
-          caption="Audience of professional developers, tech leads, and architects — built on organic, evergreen technical content."
-        />
-      </section>
+      {/* About Ahsan — the person a brand buys access to */}
+      <PortfolioBio as="h2" />
 
       {/* Ahsan's work showcase */}
       <BooksSection />
