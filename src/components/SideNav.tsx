@@ -77,7 +77,7 @@ const SideNav = () => {
   }, [navShow]);
 
   return (
-    <div className="z-[100]">
+    <div className="z-[100] md:hidden">
       <button
         ref={hamburgerRef}
         type="button"
