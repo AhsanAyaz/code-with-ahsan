@@ -122,7 +122,7 @@ export default function CommunityStats() {
       <div className="mb-10 text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-3 text-base-content">
           Community in{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-bright to-secondary">
             Numbers
           </span>
         </h2>
@@ -146,9 +146,7 @@ export default function CommunityStats() {
                 >
                   <stat.icon className="w-5 h-5" />
                 </div>
-                <div className={`text-2xl font-bold ${stat.color}`}>
-                  {stat.value}
-                </div>
+                <div className={`text-2xl font-bold ${stat.color}`}>{stat.value}</div>
                 <div className="text-base-content/60 text-xs font-medium leading-tight">
                   {stat.label}
                 </div>
