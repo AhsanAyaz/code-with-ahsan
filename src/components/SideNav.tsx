@@ -155,8 +155,8 @@ const SideNav = () => {
             <div key={link.title} className="py-2.5">
               <Link
                 href={link.href}
-                className={`text-lg font-semibold hover:text-primary ${
-                  isActive(link.href) ? "text-primary font-bold" : "text-base-content"
+                className={`text-lg font-semibold hover:text-primary-bright ${
+                  isActive(link.href) ? "text-primary-bright font-bold" : "text-base-content"
                 }`}
                 onClick={closeNav}
                 {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
@@ -180,8 +180,8 @@ const SideNav = () => {
               <div key={item.title}>
                 <Link
                   href={item.href}
-                  className={`flex items-center gap-2.5 px-1 py-2 text-base hover:text-primary rounded-lg ${
-                    isActive(item.href) ? "text-primary font-bold" : "text-base-content/80"
+                  className={`flex items-center gap-2.5 px-1 py-2 text-base hover:text-primary-bright rounded-lg ${
+                    isActive(item.href) ? "text-primary-bright font-bold" : "text-base-content/80"
                   }`}
                   onClick={closeNav}
                   {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}

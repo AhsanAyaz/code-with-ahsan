@@ -58,7 +58,7 @@ export default function PillarsGrid() {
       <div className="mb-12 text-center">
         <h2 className="text-3xl md:text-5xl font-bold mb-4 text-base-content">
           Community{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-bright to-secondary">
             Pillars
           </span>
         </h2>
@@ -108,9 +108,7 @@ function PillarCard({ pillar }: { pillar: Pillar }) {
           {pillar.title}
           <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-base-content/50" />
         </h3>
-        <p className="text-base-content/70 text-sm leading-relaxed">
-          {pillar.description}
-        </p>
+        <p className="text-base-content/70 text-sm leading-relaxed">{pillar.description}</p>
       </div>
     </Link>
   );

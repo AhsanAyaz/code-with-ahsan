@@ -21,7 +21,7 @@ export default function SectionEyebrow({ tag, children, align = "center" }: Sect
     <p
       className={`${
         align === "center" ? "text-center" : "text-left"
-      } text-xs font-mono text-base-content/40 tracking-widest mb-3`}
+      } text-xs font-mono text-base-content/60 tracking-widest mb-3`}
     >
       &lt;{tag} /&gt;
       {children ? <span className="ml-2">{children}</span> : null}
