@@ -7,7 +7,7 @@ const booksData = [
     amazonLink: null,
     imageUrl: "/static/images/books/zero-to-website-cover.png",
     author: "Ahsan Ayaz",
-    link: "https://z2website.com",
+    link: "https://z2website.com/book",
     btnText: "Get your copy",
     actionType: "link",
   },
