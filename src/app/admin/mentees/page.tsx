@@ -29,8 +29,7 @@ export default function AllMentorsPage() {
   // Mentorship mapping state
   const [mentorshipData, setMentorshipData] = useState<GroupedMentorship[]>([]);
   const [loadingMentorships, setLoadingMentorships] = useState(false);
-  const [mentorshipSummary, setMentorshipSummary] =
-    useState<MentorshipSummary | null>(null);
+  const [mentorshipSummary, setMentorshipSummary] = useState<MentorshipSummary | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInputValue, setSearchInputValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -49,15 +48,11 @@ export default function AllMentorsPage() {
     id: string;
     partnerName: string;
   } | null>(null);
-  const [regeneratingChannel, setRegeneratingChannel] = useState<string | null>(
-    null
-  );
+  const [regeneratingChannel, setRegeneratingChannel] = useState<string | null>(null);
 
   // Reviews modal state
   const [showReviewsModal, setShowReviewsModal] = useState(false);
-  const [reviewMentor, setReviewMentor] = useState<ProfileWithDetails | null>(
-    null
-  );
+  const [reviewMentor, setReviewMentor] = useState<ProfileWithDetails | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
 
@@ -68,13 +63,20 @@ export default function AllMentorsPage() {
     mentors: "all" as "all" | "with" | "without",
     discord: "all" as "all" | "with" | "without",
   });
-  const activeFilterCount = Object.values(filters).filter(
-    (v) => v !== "all"
-  ).length;
+  const activeFilterCount = Object.values(filters).filter((v) => v !== "all").length;
 
   // Profile state for status operations
   const [profiles, setProfiles] = useState<ProfileWithDetails[]>([]);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Cascade delete-user state (GH#239 / VIS-142)
+  const [userToDelete, setUserToDelete] = useState<{
+    uid: string;
+    displayName: string;
+    email?: string;
+  } | null>(null);
+  const [deleteConfirmChecked, setDeleteConfirmChecked] = useState(false);
+  const [deletingUser, setDeletingUser] = useState(false);
 
   // Debounced search handler
   const debouncedSearch = useDebouncedCallback((value: string) => {
@@ -164,11 +166,7 @@ export default function AllMentorsPage() {
       toast.success("Discord username updated");
       setEditingDiscord(null);
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to update Discord username"
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to update Discord username");
     } finally {
       setSavingDiscord(false);
     }
@@ -207,11 +205,7 @@ export default function AllMentorsPage() {
           : "Mentorship reverted to active"
       );
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to update mentorship status"
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to update mentorship status");
     } finally {
       setUpdatingStatus(null);
     }
@@ -222,12 +216,9 @@ export default function AllMentorsPage() {
 
     setDeletingSession(sessionToDelete.id);
     try {
-      const response = await fetch(
-        `/api/mentorship/admin/sessions?id=${sessionToDelete.id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`/api/mentorship/admin/sessions?id=${sessionToDelete.id}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         const data = await response.json();
@@ -246,9 +237,7 @@ export default function AllMentorsPage() {
       setShowDeleteModal(false);
       setSessionToDelete(null);
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to end mentorship"
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to end mentorship");
     } finally {
       setDeletingSession(null);
     }
@@ -257,14 +246,11 @@ export default function AllMentorsPage() {
   const handleRegenerateChannel = async (sessionId: string) => {
     setRegeneratingChannel(sessionId);
     try {
-      const response = await fetch(
-        "/api/mentorship/admin/sessions/regenerate-channel",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId }),
-        }
-      );
+      const response = await fetch("/api/mentorship/admin/sessions/regenerate-channel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      });
 
       if (!response.ok) {
         const data = await response.json();
@@ -285,11 +271,7 @@ export default function AllMentorsPage() {
 
       toast.success(`Discord channel created! URL: ${data.channelUrl}`);
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to regenerate Discord channel"
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to regenerate Discord channel");
     } finally {
       setRegeneratingChannel(null);
     }
@@ -301,9 +283,7 @@ export default function AllMentorsPage() {
     setLoadingReviews(true);
 
     try {
-      const response = await fetch(
-        `/api/mentorship/admin/reviews?mentorId=${mentor.uid}`
-      );
+      const response = await fetch(`/api/mentorship/admin/reviews?mentorId=${mentor.uid}`);
       if (response.ok) {
         const data = await response.json();
         setReviews(data.reviews || []);
@@ -338,9 +318,7 @@ export default function AllMentorsPage() {
               ? {
                   ...p,
                   status: newStatus,
-                  disabledSessionsCount: reactivateSessions
-                    ? 0
-                    : p.disabledSessionsCount,
+                  disabledSessionsCount: reactivateSessions ? 0 : p.disabledSessionsCount,
                 }
               : p
           )
@@ -348,15 +326,52 @@ export default function AllMentorsPage() {
 
         // Show success message if sessions were reactivated
         if (data.reactivatedSessions > 0) {
-          toast.success(
-            `${data.reactivatedSessions} mentorship session(s) have been reactivated.`
-          );
+          toast.success(`${data.reactivatedSessions} mentorship session(s) have been reactivated.`);
         }
       }
     } catch (error) {
       console.error("Error updating status:", error);
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete || !deleteConfirmChecked) return;
+
+    const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
+    if (!token) {
+      toast.error("Admin session expired. Please log in again.");
+      return;
+    }
+
+    setDeletingUser(true);
+    try {
+      const response = await fetch("/api/mentorship/admin/profiles", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": token,
+        },
+        body: JSON.stringify({ uid: userToDelete.uid, confirmed: true }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Delete failed");
+      }
+
+      // Remove the deleted user from all local state
+      setMentorshipData((prev) => prev.filter((group) => group.profile.uid !== userToDelete.uid));
+      setProfiles((prev) => prev.filter((p) => p.uid !== userToDelete.uid));
+
+      toast.success(`${userToDelete.displayName} and all associated data deleted`);
+      setUserToDelete(null);
+      setDeleteConfirmChecked(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to delete user");
+    } finally {
+      setDeletingUser(false);
     }
   };
 
@@ -409,8 +424,7 @@ export default function AllMentorsPage() {
     if (filters.mentors === "without" && hasRelationships) return false;
 
     // Discord filter
-    const hasDiscord =
-      profile.discordUsername && profile.discordUsername.trim() !== "";
+    const hasDiscord = profile.discordUsername && profile.discordUsername.trim() !== "";
     if (filters.discord === "with" && !hasDiscord) return false;
     if (filters.discord === "without" && hasDiscord) return false;
 
@@ -440,9 +454,7 @@ export default function AllMentorsPage() {
         <div className="stats shadow bg-base-100 w-full">
           <div className="stat">
             <div className="stat-title">Total Mentors</div>
-            <div className="stat-value text-primary text-2xl">
-              {mentorshipSummary.totalMentors}
-            </div>
+            <div className="stat-value text-primary text-2xl">{mentorshipSummary.totalMentors}</div>
           </div>
           <div className="stat">
             <div className="stat-title">Total Mentees</div>
@@ -475,10 +487,7 @@ export default function AllMentorsPage() {
 
       {/* Filter Button */}
       <div className="flex items-center gap-2">
-        <button
-          className="btn btn-outline btn-sm gap-2"
-          onClick={() => setShowFilterModal(true)}
-        >
+        <button className="btn btn-outline btn-sm gap-2" onClick={() => setShowFilterModal(true)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-4 w-4"
@@ -495,9 +504,7 @@ export default function AllMentorsPage() {
           </svg>
           Filters
           {activeFilterCount > 0 && (
-            <span className="badge badge-primary badge-sm">
-              {activeFilterCount}
-            </span>
+            <span className="badge badge-primary badge-sm">{activeFilterCount}</span>
           )}
         </button>
         {activeFilterCount > 0 && (
@@ -543,8 +550,8 @@ export default function AllMentorsPage() {
               {searchQuery
                 ? "Try adjusting your search query."
                 : activeFilterCount > 0
-                ? "No mentors match your filters. Try adjusting or clearing filters."
-                : "No profiles found in this category."}
+                  ? "No mentors match your filters. Try adjusting or clearing filters."
+                  : "No profiles found in this category."}
             </p>
           </div>
         </div>
@@ -554,18 +561,10 @@ export default function AllMentorsPage() {
           <div className="grid gap-4">
             {paginatedData.map((item) => {
               const p = item.profile;
-              const activeMentorships = item.mentorships.filter(
-                (m) => m.status === "active"
-              );
-              const completedMentorships = item.mentorships.filter(
-                (m) => m.status === "completed"
-              );
-              const pendingMentorships = item.mentorships.filter(
-                (m) => m.status === "pending"
-              );
-              const cancelledMentorships = item.mentorships.filter(
-                (m) => m.status === "cancelled"
-              );
+              const activeMentorships = item.mentorships.filter((m) => m.status === "active");
+              const completedMentorships = item.mentorships.filter((m) => m.status === "completed");
+              const pendingMentorships = item.mentorships.filter((m) => m.status === "pending");
+              const cancelledMentorships = item.mentorships.filter((m) => m.status === "cancelled");
               const activeRelationshipCount = activeMentorships.length;
 
               return (
@@ -575,22 +574,14 @@ export default function AllMentorsPage() {
                     <div className="flex items-start gap-4">
                       <ProfileAvatar
                         photoURL={p.photoURL}
-                        displayName={getAnonymizedDisplayName(
-                          p.displayName,
-                          p.uid,
-                          isStreamerMode
-                        )}
+                        displayName={getAnonymizedDisplayName(p.displayName, p.uid, isStreamerMode)}
                         size="xl"
                         ring
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="text-lg font-bold">
-                            {getAnonymizedDisplayName(
-                              p.displayName,
-                              p.uid,
-                              isStreamerMode
-                            )}
+                            {getAnonymizedDisplayName(p.displayName, p.uid, isStreamerMode)}
                           </h3>
                           {getStatusBadge(p.status)}
                           <span className="badge badge-outline">
@@ -598,9 +589,7 @@ export default function AllMentorsPage() {
                           </span>
                           <span
                             className={`badge ${
-                              activeRelationshipCount === 0
-                                ? "badge-ghost"
-                                : "badge-info"
+                              activeRelationshipCount === 0 ? "badge-ghost" : "badge-info"
                             }`}
                           >
                             {activeRelationshipCount} mentors
@@ -619,6 +608,20 @@ export default function AllMentorsPage() {
                               )}
                             </button>
                           )}
+                          {/* Cascade delete-user (GH#239 / VIS-142) */}
+                          <button
+                            className="btn btn-error btn-outline btn-sm"
+                            onClick={() => {
+                              setUserToDelete({
+                                uid: p.uid,
+                                displayName: p.displayName || "this user",
+                                email: p.email,
+                              });
+                              setDeleteConfirmChecked(false);
+                            }}
+                          >
+                            Delete User
+                          </button>
                         </div>
                         <p className="text-sm text-base-content/70">
                           {getAnonymizedEmail(p.email, p.uid, isStreamerMode)}
@@ -634,9 +637,7 @@ export default function AllMentorsPage() {
                                   className="input input-xs input-bordered w-32"
                                   value={editingDiscordValue}
                                   onChange={(e) =>
-                                    setEditingDiscordValue(
-                                      e.target.value.toLowerCase()
-                                    )
+                                    setEditingDiscordValue(e.target.value.toLowerCase())
                                   }
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") {
@@ -647,10 +648,7 @@ export default function AllMentorsPage() {
                                   }}
                                   onBlur={() => {
                                     setTimeout(() => {
-                                      if (
-                                        editingDiscord === `profile-${p.uid}` &&
-                                        !savingDiscord
-                                      ) {
+                                      if (editingDiscord === `profile-${p.uid}` && !savingDiscord) {
                                         handleDiscordSave(p.uid, editingDiscordValue);
                                       }
                                     }, 150);
@@ -672,17 +670,10 @@ export default function AllMentorsPage() {
                                 }}
                               >
                                 <span
-                                  className={
-                                    p.discordUsername
-                                      ? ""
-                                      : "italic text-base-content/40"
-                                  }
+                                  className={p.discordUsername ? "" : "italic text-base-content/40"}
                                 >
-                                  {getAnonymizedDiscord(
-                                    p.discordUsername,
-                                    p.uid,
-                                    isStreamerMode
-                                  ) || "not set"}
+                                  {getAnonymizedDiscord(p.discordUsername, p.uid, isStreamerMode) ||
+                                    "not set"}
                                 </span>
                                 <svg
                                   className="w-3 h-3 text-base-content/40"
@@ -702,19 +693,14 @@ export default function AllMentorsPage() {
                           </span>
                         </div>
                         {p.currentRole && (
-                          <p className="text-sm text-base-content/70 mt-1">
-                            {p.currentRole}
-                          </p>
+                          <p className="text-sm text-base-content/70 mt-1">{p.currentRole}</p>
                         )}
 
                         {/* Expertise Tags */}
                         {p.expertise && p.expertise.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
                             {p.expertise.map((skill) => (
-                              <span
-                                key={skill}
-                                className="badge badge-primary badge-sm"
-                              >
+                              <span key={skill} className="badge badge-primary badge-sm">
                                 {skill}
                               </span>
                             ))}
@@ -874,10 +860,7 @@ export default function AllMentorsPage() {
                                       {mentorship.cancelledAt && (
                                         <div className="text-xs text-base-content/50 mt-2">
                                           Cancelled:{" "}
-                                          {format(
-                                            new Date(mentorship.cancelledAt),
-                                            "MMM d, yyyy"
-                                          )}
+                                          {format(new Date(mentorship.cancelledAt), "MMM d, yyyy")}
                                         </div>
                                       )}
                                       {mentorship.cancellationReason && (
@@ -900,13 +883,9 @@ export default function AllMentorsPage() {
                     {item.mentorships.length === 0 && (
                       <div className="collapse collapse-arrow bg-base-200 mt-4">
                         <input type="checkbox" />
-                        <div className="collapse-title font-medium">
-                          Mentorships (0)
-                        </div>
+                        <div className="collapse-title font-medium">Mentorships (0)</div>
                         <div className="collapse-content">
-                          <p className="text-sm text-base-content/60 pt-2">
-                            No mentors assigned
-                          </p>
+                          <p className="text-sm text-base-content/60 pt-2">No mentors assigned</p>
                         </div>
                       </div>
                     )}
@@ -930,9 +909,7 @@ export default function AllMentorsPage() {
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <button
                     key={page}
-                    className={`join-item btn btn-sm ${
-                      currentPage === page ? "btn-active" : ""
-                    }`}
+                    className={`join-item btn btn-sm ${currentPage === page ? "btn-active" : ""}`}
                     onClick={() => setCurrentPage(page)}
                   >
                     {page}
@@ -940,9 +917,7 @@ export default function AllMentorsPage() {
                 ))}
                 <button
                   className="join-item btn btn-sm"
-                  onClick={() =>
-                    setCurrentPage((p) => Math.min(totalPages, p + 1))
-                  }
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
                 >
                   »
@@ -1003,9 +978,7 @@ export default function AllMentorsPage() {
                     ))}
                   </div>
                   <span className="font-semibold">{reviewMentor.avgRating}</span>
-                  <span className="text-base-content/50">
-                    ({reviewMentor.ratingCount} reviews)
-                  </span>
+                  <span className="text-base-content/50">({reviewMentor.ratingCount} reviews)</span>
                 </div>
               </div>
             </div>
@@ -1054,14 +1027,11 @@ export default function AllMentorsPage() {
                             </div>
                             <div className="text-xs text-base-content/50">
                               {review.createdAt
-                                ? new Date(review.createdAt).toLocaleDateString(
-                                    "en-US",
-                                    {
-                                      year: "numeric",
-                                      month: "short",
-                                      day: "numeric",
-                                    }
-                                  )
+                                ? new Date(review.createdAt).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  })
                                 : "N/A"}
                             </div>
                           </div>
@@ -1072,9 +1042,7 @@ export default function AllMentorsPage() {
                               <svg
                                 key={star}
                                 className={`w-4 h-4 ${
-                                  star <= review.rating
-                                    ? "text-yellow-400"
-                                    : "text-base-content/20"
+                                  star <= review.rating ? "text-yellow-400" : "text-base-content/20"
                                 }`}
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
@@ -1082,16 +1050,14 @@ export default function AllMentorsPage() {
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                               </svg>
                             ))}
-                            <span className="text-sm font-medium ml-1">
-                              {review.rating}/5
-                            </span>
+                            <span className="text-sm font-medium ml-1">{review.rating}/5</span>
                           </div>
 
                           {/* Feedback */}
                           {review.feedback && (
                             <div className="mt-3 p-3 bg-base-100 rounded-lg">
                               <p className="text-sm italic text-base-content/80">
-                                "{review.feedback}"
+                                &ldquo;{review.feedback}&rdquo;
                               </p>
                             </div>
                           )}
@@ -1216,6 +1182,96 @@ export default function AllMentorsPage() {
         </dialog>
       )}
 
+      {/* Cascade Delete-User Confirmation Modal (GH#239 / VIS-142) */}
+      {userToDelete && (
+        <dialog className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg text-error">Delete User — Permanent</h3>
+            <p className="py-2">
+              You are about to permanently delete{" "}
+              <span className="font-semibold">{userToDelete.displayName}</span>
+              {userToDelete.email && (
+                <>
+                  {" "}
+                  (<span className="font-mono text-sm">{userToDelete.email}</span>)
+                </>
+              )}
+              .
+            </p>
+            <div className="alert alert-warning text-sm">
+              <div>
+                <p className="font-semibold">
+                  This cascade-deletes ALL of their data and cannot be undone:
+                </p>
+                <ul className="list-disc list-inside mt-1 space-y-0.5">
+                  <li>Mentorship profile</li>
+                  <li>Mentorship requests &amp; matches (sessions)</li>
+                  <li>Goals, scheduled sessions &amp; alerts</li>
+                  <li>Bookings &amp; ratings given/received</li>
+                  <li>Project applications, memberships &amp; invitations</li>
+                  <li>Firebase Auth account &amp; user record</li>
+                  <li>Discord channels &amp; roles (best-effort)</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="form-control mt-4">
+              <label className="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  className="checkbox checkbox-error"
+                  checked={deleteConfirmChecked}
+                  onChange={(e) => setDeleteConfirmChecked(e.target.checked)}
+                  disabled={deletingUser}
+                />
+                <span className="label-text">
+                  I have confirmed this deletion with Ahsan and understand it is permanent.
+                </span>
+              </label>
+            </div>
+
+            <div className="modal-action">
+              <button
+                className="btn btn-ghost"
+                onClick={() => {
+                  setUserToDelete(null);
+                  setDeleteConfirmChecked(false);
+                }}
+                disabled={deletingUser}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-error"
+                onClick={handleDeleteUser}
+                disabled={!deleteConfirmChecked || deletingUser}
+              >
+                {deletingUser ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete User"
+                )}
+              </button>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button
+              onClick={() => {
+                if (!deletingUser) {
+                  setUserToDelete(null);
+                  setDeleteConfirmChecked(false);
+                }
+              }}
+            >
+              close
+            </button>
+          </form>
+        </dialog>
+      )}
+
       {/* End Mentorship Confirmation Modal */}
       {showDeleteModal && sessionToDelete && (
         <dialog className="modal modal-open">
@@ -1226,8 +1282,8 @@ export default function AllMentorsPage() {
               <span className="font-semibold">{sessionToDelete.partnerName}</span>?
             </p>
             <p className="text-sm text-base-content/70">
-              This will archive the Discord channel and notify both participants.
-              This action cannot be undone.
+              This will archive the Discord channel and notify both participants. This action cannot
+              be undone.
             </p>
             <div className="modal-action">
               <button
@@ -1346,22 +1402,16 @@ function MentorshipCard({
               <div className="text-xs text-base-content/60">
                 <span className="inline-flex items-center gap-1">
                   Discord:{" "}
-                  {editingDiscord ===
-                  `${mentorship.id}-${mentorship.partnerProfile.uid}` ? (
+                  {editingDiscord === `${mentorship.id}-${mentorship.partnerProfile.uid}` ? (
                     <span className="inline-flex items-center gap-1">
                       <input
                         type="text"
                         className="input input-xs input-bordered w-28"
                         value={editingDiscordValue}
-                        onChange={(e) =>
-                          setEditingDiscordValue(e.target.value.toLowerCase())
-                        }
+                        onChange={(e) => setEditingDiscordValue(e.target.value.toLowerCase())}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
-                            handleDiscordSave(
-                              mentorship.partnerProfile!.uid,
-                              editingDiscordValue
-                            );
+                            handleDiscordSave(mentorship.partnerProfile!.uid, editingDiscordValue);
                           } else if (e.key === "Escape") {
                             setEditingDiscord(null);
                           }
@@ -1392,12 +1442,8 @@ function MentorshipCard({
                     <button
                       className="inline-flex items-center gap-1 hover:bg-base-200 rounded px-1 -ml-1 cursor-pointer"
                       onClick={() => {
-                        setEditingDiscord(
-                          `${mentorship.id}-${mentorship.partnerProfile!.uid}`
-                        );
-                        setEditingDiscordValue(
-                          mentorship.partnerProfile?.discordUsername || ""
-                        );
+                        setEditingDiscord(`${mentorship.id}-${mentorship.partnerProfile!.uid}`);
+                        setEditingDiscordValue(mentorship.partnerProfile?.discordUsername || "");
                       }}
                     >
                       <span
@@ -1467,21 +1513,15 @@ function MentorshipCard({
             {/* Dates */}
             <div className="text-xs text-base-content/50 mt-2 space-y-1">
               {mentorship.approvedAt && (
-                <div>
-                  Started: {format(new Date(mentorship.approvedAt), "MMM d, yyyy")}
-                </div>
+                <div>Started: {format(new Date(mentorship.approvedAt), "MMM d, yyyy")}</div>
               )}
               {mentorship.lastContactAt && (
                 <div>
-                  Last activity:{" "}
-                  {format(new Date(mentorship.lastContactAt), "MMM d, yyyy")}
+                  Last activity: {format(new Date(mentorship.lastContactAt), "MMM d, yyyy")}
                 </div>
               )}
               {mentorship.requestedAt && !mentorship.approvedAt && (
-                <div>
-                  Requested:{" "}
-                  {format(new Date(mentorship.requestedAt), "MMM d, yyyy")}
-                </div>
+                <div>Requested: {format(new Date(mentorship.requestedAt), "MMM d, yyyy")}</div>
               )}
             </div>
 

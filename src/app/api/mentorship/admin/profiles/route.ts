@@ -3,6 +3,8 @@ import { db } from "@/lib/firebaseAdmin";
 import { sendRegistrationStatusEmail, sendAccountStatusEmail } from "@/lib/email";
 import { sendMentorChangesRequestedNotification } from "@/lib/discord";
 import { syncRoleClaim } from "@/lib/ambassador/roleMutation";
+import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { cascadeDeleteMentee } from "@/lib/mentorship/deleteMenteeCascade";
 
 // GET: Fetch all profiles with optional filters
 export async function GET(request: NextRequest) {
@@ -329,5 +331,68 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error("Error updating profile status:", error);
     return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });
+  }
+}
+
+// DELETE: Cascade-delete a mentee and ALL associated data (GH#239 / VIS-142).
+//
+// Destructive + irreversible, so it is gated on:
+//   1. A valid admin session (x-admin-token).
+//   2. An explicit `confirmed: true` flag in the request body — mirrors the
+//      confirmation checkbox the admin must tick in the UI.
+export async function DELETE(request: NextRequest) {
+  const authResult = await requireAdmin(request);
+  if (!authResult.ok) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+  }
+
+  let body: { uid?: string; confirmed?: boolean };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  const { uid, confirmed } = body;
+
+  if (!uid) {
+    return NextResponse.json({ error: "Missing uid" }, { status: 400 });
+  }
+
+  if (confirmed !== true) {
+    return NextResponse.json({ error: "Deletion must be explicitly confirmed" }, { status: 400 });
+  }
+
+  try {
+    const profileRef = db.collection("mentorship_profiles").doc(uid);
+    const profileDoc = await profileRef.get();
+
+    if (!profileDoc.exists) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    }
+
+    const profileData = profileDoc.data();
+
+    // Perform the cascade (Firestore + Auth + best-effort Discord teardown).
+    const summary = await cascadeDeleteMentee(uid);
+
+    // Audit log: who deleted which user, when, and what was removed.
+    await db.collection("mentorship_admin_audit_log").add({
+      action: "delete_mentee",
+      targetUid: uid,
+      targetEmail: profileData?.email ?? null,
+      targetDisplayName: profileData?.displayName ?? null,
+      performedBy: authResult.uid,
+      summary,
+      createdAt: new Date(),
+    });
+
+    return NextResponse.json(
+      { success: true, message: "Mentee and associated data deleted", summary },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting mentee:", error);
+    return NextResponse.json({ error: "Failed to delete mentee" }, { status: 500 });
   }
 }
