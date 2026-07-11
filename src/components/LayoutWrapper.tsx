@@ -46,17 +46,28 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                 tabIndex={0}
                 className="menu dropdown-content bg-base-200 rounded-box z-50 w-52 p-2 shadow"
               >
-                {group.links.map((l) => (
-                  <li key={l.href}>
-                    {l.external ? (
-                      <a href={l.href} target="_blank" rel="noopener noreferrer">
-                        {l.title}
-                      </a>
-                    ) : (
-                      <Link href={l.href}>{l.title}</Link>
-                    )}
-                  </li>
-                ))}
+                {group.links.map((l) => {
+                  const closeDropdown = () =>
+                    (document.activeElement as HTMLElement | null)?.blur();
+                  return (
+                    <li key={l.href}>
+                      {l.external ? (
+                        <a
+                          href={l.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={closeDropdown}
+                        >
+                          {l.title}
+                        </a>
+                      ) : (
+                        <Link href={l.href} onClick={closeDropdown}>
+                          {l.title}
+                        </Link>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
@@ -70,7 +81,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
           </Link>
           <Link
             href="/sponsors"
-            className="btn btn-outline btn-sm text-accent border-accent hover:bg-accent hover:text-accent-content hidden md:inline-flex"
+            className="btn btn-outline btn-sm text-shadow-accent-content border-accent hover:bg-accent hover:text-accent-content hidden md:inline-flex"
           >
             Sponsorships
           </Link>
@@ -78,7 +89,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
             href={SUBSCRIBE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn btn-outline btn-sm text-primary border-primary hover:bg-primary hover:text-primary-content hidden md:inline-flex"
+            className="btn btn-outline btn-sm text-shadow-primary-content border-primary hover:bg-primary hover:text-primary-content hidden md:inline-flex"
           >
             Subscribe
           </a>
