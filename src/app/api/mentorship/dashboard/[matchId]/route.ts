@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
+import { sendMentorshipCompletedEmail, sendMentorshipRemovedEmail } from "@/lib/email";
 import {
-  sendMentorshipCompletedEmail,
-  sendMentorshipRemovedEmail,
-} from "@/lib/email";
-import {
-  sendChannelMessage,
   sendDirectMessage,
   isDiscordConfigured,
-  archiveMentorshipChannel,
+  deleteMentorshipChannel,
   sendMentorshipCompletionAnnouncement,
 } from "@/lib/discord";
 
@@ -21,17 +17,11 @@ export async function GET(
   const uid = searchParams.get("uid");
 
   if (!uid) {
-    return NextResponse.json(
-      { error: "Missing uid parameter" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Missing uid parameter" }, { status: 400 });
   }
 
   try {
-    const matchDoc = await db
-      .collection("mentorship_sessions")
-      .doc(resolvedParams.matchId)
-      .get();
+    const matchDoc = await db.collection("mentorship_sessions").doc(resolvedParams.matchId).get();
 
     if (!matchDoc.exists) {
       return NextResponse.json({ error: "Match not found" }, { status: 404 });
@@ -46,19 +36,12 @@ export async function GET(
 
     // Check match is active
     if (matchData.status !== "active") {
-      return NextResponse.json(
-        { error: "Match is not active" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Match is not active" }, { status: 403 });
     }
 
     // Get partner profile
-    const partnerId =
-      matchData.mentorId === uid ? matchData.menteeId : matchData.mentorId;
-    const partnerDoc = await db
-      .collection("mentorship_profiles")
-      .doc(partnerId)
-      .get();
+    const partnerId = matchData.mentorId === uid ? matchData.menteeId : matchData.mentorId;
+    const partnerDoc = await db.collection("mentorship_profiles").doc(partnerId).get();
 
     const partnerData = partnerDoc.exists ? partnerDoc.data() : null;
 
@@ -86,10 +69,7 @@ export async function GET(
     );
   } catch (error) {
     console.error("Error fetching match details:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch match" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch match" }, { status: 500 });
   }
 }
 
@@ -108,10 +88,7 @@ export async function PUT(
       return NextResponse.json({ error: "Missing uid" }, { status: 400 });
     }
 
-    const matchDoc = await db
-      .collection("mentorship_sessions")
-      .doc(resolvedParams.matchId)
-      .get();
+    const matchDoc = await db.collection("mentorship_sessions").doc(resolvedParams.matchId).get();
 
     if (!matchDoc.exists) {
       return NextResponse.json({ error: "Match not found" }, { status: 404 });
@@ -164,23 +141,6 @@ export async function PUT(
       // Execute notification tasks in parallel but await them to ensure Vercel function stays alive
       const notificationTasks = [];
 
-      // Send congratulations message to the mentorship channel
-      if (isDiscordConfigured() && matchData.discordChannelId) {
-        notificationTasks.push(
-          sendChannelMessage(
-            matchData.discordChannelId,
-            `🎓 **Congratulations! This mentorship has been marked as completed by ${mentorData?.displayName || "the mentor"}!** 🎉\n\n` +
-              `Thank you both for your dedication to learning and growth.\n\n` +
-              `**${mentorData?.displayName || "Mentor"}**, thank you for sharing your knowledge!\n` +
-              `**${menteeData?.displayName || "Mentee"}**, we hope you learned a lot!\n\n` +
-              `This channel will remain available for you to reference past conversations.\n\n` +
-              `Best of luck on your continued journey! 🚀`
-          ).catch((err) =>
-            console.error("Completion channel message failed:", err)
-          )
-        );
-      }
-
       // Send DM to mentee asking to rate the mentor
       if (isDiscordConfigured() && menteeData?.discordUsername && mentorData) {
         notificationTasks.push(
@@ -202,22 +162,21 @@ export async function PUT(
             menteeData.displayName || "Mentee",
             mentorData.discordUsername,
             menteeData.discordUsername
-          ).catch((err) =>
-            console.error("Completion announcement failed:", err)
-          )
+          ).catch((err) => console.error("Completion announcement failed:", err))
         );
       }
 
-      // Archive Discord channel
+      // DM the mentor a completion notice, then delete the channel (VIS-141).
+      // The mentee is notified separately above via the rating DM.
       if (isDiscordConfigured() && matchData.discordChannelId) {
         notificationTasks.push(
-          archiveMentorshipChannel(
-            matchData.discordChannelId,
-            `📦 **This mentorship session has been completed.**\n\n` +
-              `This channel is now archived. Thank you for being part of the mentorship program!`
-          ).catch((err) =>
-            console.error("Discord channel archiving failed:", err)
-          )
+          deleteMentorshipChannel(matchData.discordChannelId, {
+            mentorUsername: mentorData?.discordUsername,
+            mentorMessage:
+              `🎓 **Your mentorship with ${menteeData?.displayName || "your mentee"} is now complete!** 🎉\n\n` +
+              `Thank you for sharing your knowledge and mentoring. The Discord channel has been closed.`,
+            reason: "Mentorship completed (VIS-141)",
+          }).catch((err) => console.error("Discord channel deletion failed:", err))
         );
       }
 
@@ -237,9 +196,7 @@ export async function PUT(
               email: menteeData?.email || "",
               roles: ["mentee"],
             }
-          ).catch((err) =>
-            console.error("Failed to send completion email:", err)
-          )
+          ).catch((err) => console.error("Failed to send completion email:", err))
         );
       }
 
@@ -263,10 +220,7 @@ export async function PUT(
       }
 
       if (matchData.status !== "active") {
-        return NextResponse.json(
-          { error: "Can only remove active mentorships" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Can only remove active mentorships" }, { status: 400 });
       }
 
       await db
@@ -290,35 +244,17 @@ export async function PUT(
 
       const notificationTasks = [];
 
-      // Send message to channel before archiving
+      // DM the mentee, then delete the channel (VIS-141). Deletion replaces the
+      // previous archive; the mentee is the affected member here.
       if (isDiscordConfigured() && matchData.discordChannelId) {
         notificationTasks.push(
-          sendChannelMessage(
-            matchData.discordChannelId,
-            `📢 This mentorship has been ended by the mentor. The channel will be archived.`
-          ).catch((err) =>
-            console.error("Channel message before archive failed:", err)
-          )
-        );
-      }
-
-      // Archive Discord channel
-      if (isDiscordConfigured() && matchData.discordChannelId) {
-        notificationTasks.push(
-          archiveMentorshipChannel(matchData.discordChannelId).catch((err) =>
-            console.error("Discord channel archiving failed:", err)
-          )
-        );
-      }
-
-      // Notify mentee via DM
-      if (isDiscordConfigured() && menteeData?.discordUsername && mentorData) {
-        notificationTasks.push(
-          sendDirectMessage(
-            menteeData.discordUsername,
-            `📢 Your mentorship with **${mentorData.displayName}** has been ended.\n\n` +
-              `You can browse for a new mentor: https://codewithahsan.dev/mentorship/browse`
-          ).catch((err) => console.error("Mentee removal DM failed:", err))
+          deleteMentorshipChannel(matchData.discordChannelId, {
+            menteeUsername: menteeData?.discordUsername,
+            menteeMessage:
+              `📢 Your mentorship with **${mentorData?.displayName || "your mentor"}** has been ended. The Discord channel has been closed.\n\n` +
+              `You can browse for a new mentor: https://codewithahsan.dev/mentorship/browse`,
+            reason: "Mentorship ended by mentor (VIS-141)",
+          }).catch((err) => console.error("Discord channel deletion failed:", err))
         );
       }
 
@@ -361,10 +297,7 @@ export async function PUT(
       }
 
       if (matchData.status !== "active") {
-        return NextResponse.json(
-          { error: "Can only end active mentorships" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Can only end active mentorships" }, { status: 400 });
       }
 
       await db
@@ -388,35 +321,17 @@ export async function PUT(
 
       const notificationTasks = [];
 
-      // Send message to channel before archiving
+      // DM the mentor, then delete the channel (VIS-141). Deletion replaces the
+      // previous archive; the mentor is the affected member here.
       if (isDiscordConfigured() && matchData.discordChannelId) {
         notificationTasks.push(
-          sendChannelMessage(
-            matchData.discordChannelId,
-            `📢 This mentorship has been ended by the mentee. The channel will be archived.`
-          ).catch((err) =>
-            console.error("Channel message before archive failed:", err)
-          )
-        );
-      }
-
-      // Archive Discord channel
-      if (isDiscordConfigured() && matchData.discordChannelId) {
-        notificationTasks.push(
-          archiveMentorshipChannel(matchData.discordChannelId).catch((err) =>
-            console.error("Discord channel archiving failed:", err)
-          )
-        );
-      }
-
-      // Notify mentor via DM
-      if (isDiscordConfigured() && mentorData?.discordUsername && menteeData) {
-        notificationTasks.push(
-          sendDirectMessage(
-            mentorData.discordUsername,
-            `📢 **${menteeData.displayName || "Your mentee"}** has ended the mentorship.\n\n` +
-              `You now have an open slot for a new mentee.`
-          ).catch((err) => console.error("Mentor end DM failed:", err))
+          deleteMentorshipChannel(matchData.discordChannelId, {
+            mentorUsername: mentorData?.discordUsername,
+            mentorMessage:
+              `📢 **${menteeData?.displayName || "Your mentee"}** has ended the mentorship. The Discord channel has been closed.\n\n` +
+              `You now have an open slot for a new mentee.`,
+            reason: "Mentorship ended by mentee (VIS-141)",
+          }).catch((err) => console.error("Discord channel deletion failed:", err))
         );
       }
 
@@ -454,9 +369,6 @@ export async function PUT(
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     console.error("Error updating match:", error);
-    return NextResponse.json(
-      { error: "Failed to update match" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update match" }, { status: 500 });
   }
 }
