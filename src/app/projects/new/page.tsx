@@ -9,7 +9,7 @@ import { PROJECT_TEMPLATES, getTemplateById } from "@/lib/projectTemplates";
 import type { ProjectTemplateId } from "@/types/mentorship";
 
 // Force dynamic rendering to prevent prerender errors with client-side context
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 interface FormState {
   success?: boolean;
@@ -30,6 +30,11 @@ export default function CreateProjectPage() {
   const [techStack, setTechStack] = useState("");
   const [difficulty, setDifficulty] = useState("intermediate");
   const [maxTeamSize, setMaxTeamSize] = useState(4);
+
+  // AI fill state
+  const [aiFilling, setAiFilling] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiUsesLeft, setAiUsesLeft] = useState<number | null>(null);
 
   const createProjectAction = async (
     prevState: FormState,
@@ -56,8 +61,7 @@ export default function CreateProjectPage() {
         descriptionValue.trim().length < 10 ||
         descriptionValue.trim().length > 2000
       ) {
-        fieldErrors.description =
-          "Description must be between 10 and 2000 characters";
+        fieldErrors.description = "Description must be between 10 and 2000 characters";
       }
 
       if (Object.keys(fieldErrors).length > 0) {
@@ -122,6 +126,39 @@ export default function CreateProjectPage() {
         setDifficulty(template.suggestedDifficulty);
         setMaxTeamSize(template.suggestedMaxTeamSize);
       }
+    }
+  };
+
+  const handleAiFill = async () => {
+    if (!title || title.trim().length < 3) {
+      setAiError("Enter at least 3 characters in the title first.");
+      return;
+    }
+    setAiFilling(true);
+    setAiError(null);
+    try {
+      const res = await authFetch("/api/projects/ai-fill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setAiError(data.error || "AI fill failed. Try again.");
+        return;
+      }
+      const data = await res.json();
+      if (data.description) setDescription(data.description);
+      if (Array.isArray(data.techStack)) setTechStack(data.techStack.join(", "));
+      if (data.difficulty && ["beginner", "intermediate", "advanced"].includes(data.difficulty)) {
+        setDifficulty(data.difficulty);
+      }
+      if (typeof data.maxTeamSize === "number") setMaxTeamSize(data.maxTeamSize);
+      setAiUsesLeft(data.usesLeft ?? null);
+    } catch {
+      setAiError("Failed to reach AI service. Try again.");
+    } finally {
+      setAiFilling(false);
     }
   };
 
@@ -201,22 +238,16 @@ export default function CreateProjectPage() {
           <div>
             <h3 className="font-bold">Project Created Successfully!</h3>
             <div className="text-sm">
-              Your project has been submitted for admin review. You'll be
-              notified once it's approved.
+              Your project has been submitted for admin review. You&apos;ll be notified once
+              it&apos;s approved.
             </div>
           </div>
         </div>
         <div className="mt-6 flex gap-4">
-          <button
-            className="btn btn-primary"
-            onClick={() => router.push("/mentorship/dashboard")}
-          >
+          <button className="btn btn-primary" onClick={() => router.push("/mentorship/dashboard")}>
             Go to Dashboard
           </button>
-          <button
-            className="btn btn-ghost"
-            onClick={() => router.push("/projects/new")}
-          >
+          <button className="btn btn-ghost" onClick={() => router.push("/projects/new")}>
             Create Another Project
           </button>
         </div>
@@ -226,19 +257,27 @@ export default function CreateProjectPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-8">
-      <Link
-        href="/projects/my"
-        className="btn btn-ghost btn-sm mb-4"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      <Link href="/projects/my" className="btn btn-ghost btn-sm mb-4">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
         </svg>
         Back to Projects
       </Link>
       <h1 className="text-3xl font-bold mb-2">Create New Project</h1>
       <p className="text-base-content/70 mb-6">
-        Submit a project proposal for admin review. Once approved, a Discord
-        channel will be created for collaboration.
+        Submit a project proposal for admin review. Once approved, a Discord channel will be created
+        for collaboration.
       </p>
 
       {/* Project Guidelines */}
@@ -307,8 +346,8 @@ export default function CreateProjectPage() {
               />
             </svg>
             <span className="text-xs">
-              All team members must be on Discord. Projects are publicly visible,
-              but team member details are only shown to logged-in users.
+              All team members must be on Discord. Projects are publicly visible, but team member
+              details are only shown to logged-in users.
             </span>
           </div>
         </div>
@@ -350,9 +389,7 @@ export default function CreateProjectPage() {
               }`}
             >
               <h3 className="font-semibold">Blank Project</h3>
-              <p className="text-sm text-base-content/70">
-                Start from scratch with empty fields
-              </p>
+              <p className="text-sm text-base-content/70">Start from scratch with empty fields</p>
             </div>
             {/* Template cards */}
             {PROJECT_TEMPLATES.map((t) => (
@@ -380,25 +417,25 @@ export default function CreateProjectPage() {
         </div>
 
         {/* Template info box */}
-        {selectedTemplate !== "blank" && (() => {
-          const template = getTemplateById(selectedTemplate);
-          return template ? (
-            <div className="alert alert-info mb-4">
-              <div className="w-full">
-                <p className="text-sm">
-                  <strong>Suggested timeline:</strong> {template.suggestedTimeline}
-                </p>
-                <p className="text-sm">
-                  <strong>Recommended skills:</strong>{" "}
-                  {template.recommendedSkills.join(", ")}
-                </p>
-                <p className="text-xs mt-1">
-                  All fields are customizable - adjust to fit your project needs.
-                </p>
+        {selectedTemplate !== "blank" &&
+          (() => {
+            const template = getTemplateById(selectedTemplate);
+            return template ? (
+              <div className="alert alert-info mb-4">
+                <div className="w-full">
+                  <p className="text-sm">
+                    <strong>Suggested timeline:</strong> {template.suggestedTimeline}
+                  </p>
+                  <p className="text-sm">
+                    <strong>Recommended skills:</strong> {template.recommendedSkills.join(", ")}
+                  </p>
+                  <p className="text-xs mt-1">
+                    All fields are customizable - adjust to fit your project needs.
+                  </p>
+                </div>
               </div>
-            </div>
-          ) : null;
-        })()}
+            ) : null;
+          })()}
 
         {/* Title */}
         <div className="form-control">
@@ -406,24 +443,47 @@ export default function CreateProjectPage() {
             <span className="label-text font-semibold">
               Project Title <span className="text-error">*</span>
             </span>
+            {aiUsesLeft !== null && (
+              <span className="label-text-alt text-base-content/50">
+                {aiUsesLeft} AI fill{aiUsesLeft !== 1 ? "s" : ""} left today
+              </span>
+            )}
           </label>
-          <input
-            type="text"
-            name="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="My Awesome Project"
-            className="input input-bordered w-full"
-            required
-            disabled={isPending}
-            minLength={3}
-            maxLength={100}
-          />
+          <div className="flex gap-2 items-center">
+            <input
+              type="text"
+              name="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="My Awesome Project"
+              className="input input-bordered w-full"
+              required
+              disabled={isPending || aiFilling}
+              minLength={3}
+              maxLength={100}
+            />
+            <button
+              type="button"
+              onClick={handleAiFill}
+              disabled={isPending || aiFilling || title.trim().length < 3}
+              className="btn btn-outline btn-sm h-12 px-3 shrink-0"
+              title="AI fill: generate description, tech stack, difficulty and team size from your title"
+            >
+              {aiFilling ? (
+                <span className="loading loading-spinner loading-xs" />
+              ) : (
+                <span className="text-lg">✨</span>
+              )}
+            </button>
+          </div>
+          {aiError && (
+            <label className="label">
+              <span className="label-text-alt text-error">{aiError}</span>
+            </label>
+          )}
           {state.fieldErrors?.title && (
             <label className="label">
-              <span className="label-text-alt text-error">
-                {state.fieldErrors.title}
-              </span>
+              <span className="label-text-alt text-error">{state.fieldErrors.title}</span>
             </label>
           )}
         </div>
@@ -442,15 +502,13 @@ export default function CreateProjectPage() {
             placeholder="Describe your project, its goals, and what you hope to achieve..."
             className="textarea textarea-bordered w-full h-32"
             required
-            disabled={isPending}
+            disabled={isPending || aiFilling}
             minLength={10}
             maxLength={2000}
           />
           {state.fieldErrors?.description && (
             <label className="label">
-              <span className="label-text-alt text-error">
-                {state.fieldErrors.description}
-              </span>
+              <span className="label-text-alt text-error">{state.fieldErrors.description}</span>
             </label>
           )}
         </div>
@@ -458,9 +516,7 @@ export default function CreateProjectPage() {
         {/* GitHub Repository */}
         <div className="form-control">
           <label className="label">
-            <span className="label-text font-semibold">
-              GitHub Repository URL
-            </span>
+            <span className="label-text font-semibold">GitHub Repository URL</span>
           </label>
           <input
             type="url"
@@ -469,7 +525,7 @@ export default function CreateProjectPage() {
             onChange={(e) => setGithubRepo(e.target.value)}
             placeholder="https://github.com/username/repo"
             className="input input-bordered w-full"
-            disabled={isPending}
+            disabled={isPending || aiFilling}
           />
           <label className="label">
             <span className="label-text-alt">Optional</span>
@@ -488,12 +544,10 @@ export default function CreateProjectPage() {
             onChange={(e) => setTechStack(e.target.value)}
             placeholder="React, Node.js, PostgreSQL"
             className="input input-bordered w-full"
-            disabled={isPending}
+            disabled={isPending || aiFilling}
           />
           <label className="label">
-            <span className="label-text-alt">
-              Comma-separated list of technologies
-            </span>
+            <span className="label-text-alt">Comma-separated list of technologies</span>
           </label>
         </div>
 
@@ -510,7 +564,7 @@ export default function CreateProjectPage() {
             onChange={(e) => setDifficulty(e.target.value)}
             className="select select-bordered w-full"
             required
-            disabled={isPending}
+            disabled={isPending || aiFilling}
           >
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
@@ -534,21 +588,15 @@ export default function CreateProjectPage() {
             max="10"
             className="input input-bordered w-full"
             required
-            disabled={isPending}
+            disabled={isPending || aiFilling}
           />
           <label className="label">
-            <span className="label-text-alt">
-              Maximum number of team members (1-10)
-            </span>
+            <span className="label-text-alt">Maximum number of team members (1-10)</span>
           </label>
         </div>
 
         {/* Submit Button */}
-        <button
-          type="submit"
-          className="btn btn-primary w-full"
-          disabled={isPending}
-        >
+        <button type="submit" className="btn btn-primary w-full" disabled={isPending}>
           {isPending ? (
             <>
               <span className="loading loading-spinner loading-sm"></span>
