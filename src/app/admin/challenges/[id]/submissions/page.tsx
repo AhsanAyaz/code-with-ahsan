@@ -59,6 +59,7 @@ export default function AdminChallengeSubmissionsPage() {
             <thead>
               <tr>
                 <th>User</th>
+                <th>Email</th>
                 <th>Repo</th>
                 <th>Demo</th>
                 <th>LinkedIn</th>
@@ -81,6 +82,15 @@ export default function AdminChallengeSubmissionsPage() {
                       )}
                       <span className="font-medium">{s.userName}</span>
                     </div>
+                  </td>
+                  <td>
+                    {s.userEmail ? (
+                      <a href={`mailto:${s.userEmail}`} className="link link-primary text-sm">
+                        {s.userEmail}
+                      </a>
+                    ) : (
+                      <span className="text-base-content/40 text-sm">—</span>
+                    )}
                   </td>
                   <td>
                     <a

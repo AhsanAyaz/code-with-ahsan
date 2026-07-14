@@ -426,6 +426,7 @@ export async function getSubmissionsForChallenge(challengeId: string): Promise<S
 /**
  * Retrieves ALL submissions for a challenge regardless of status.
  * For admin use only — do not expose on public endpoints.
+ * Also joins participant email from challenge_participants for each submitter.
  *
  * @param challengeId The ID of the challenge.
  * @returns An array of Submissions ordered by submission date descending.
@@ -436,8 +437,23 @@ export async function getAllSubmissionsForChallenge(challengeId: string): Promis
     .where("challengeId", "==", challengeId)
     .orderBy("submittedAt", "desc");
 
-  const snapshot = await query.get();
-  return snapshot.docs.map((doc) => normalizeSubmission(doc));
+  const [snapshot, participantsSnap] = await Promise.all([
+    query.get(),
+    db.collection(CHALLENGE_PARTICIPANTS_COLLECTION).where("challengeId", "==", challengeId).get(),
+  ]);
+
+  const emailByUserId = new Map<string, string>();
+  for (const doc of participantsSnap.docs) {
+    const p = normalizeParticipant(doc);
+    if (p.email) emailByUserId.set(p.userId, p.email);
+  }
+
+  return snapshot.docs.map((doc) => {
+    const submission = normalizeSubmission(doc);
+    const email = emailByUserId.get(submission.userId);
+    if (email) submission.userEmail = email;
+    return submission;
+  });
 }
 
 /**

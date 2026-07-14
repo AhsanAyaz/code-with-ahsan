@@ -46,6 +46,7 @@ export interface Submission {
   userId: string;
   userName: string;
   userAvatar?: string;
+  userEmail?: string; // Admin-only — populated from participant record; never exposed on public endpoints
   repoUrl: string;
   demoUrl?: string;
   linkedinUrl: string;
