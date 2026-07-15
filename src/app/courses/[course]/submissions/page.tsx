@@ -51,13 +51,14 @@ export default function SubmissionsPage() {
   const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [isDeletingSubmission, setIsDeletingSubmission] = useState(false);
 
   useEffect(() => {
     const { auth } = getFirebaseServices();
-    setUser(auth.currentUser);
     const sub = auth.onAuthStateChanged((authUser) => {
       setUser(authUser);
+      setAuthLoading(false);
     });
     return () => sub();
   }, []);
@@ -88,9 +89,7 @@ export default function SubmissionsPage() {
     getSubmissions();
   }, [getSubmissions]);
 
-  const deleteProjectFileIfExists = async (
-    docRef: DocumentReference<DocumentData>
-  ) => {
+  const deleteProjectFileIfExists = async (docRef: DocumentReference<DocumentData>) => {
     const existingDoc = await getDoc(docRef);
     if (existingDoc.exists()) {
       const { storage } = getFirebaseServices();
@@ -105,10 +104,7 @@ export default function SubmissionsPage() {
     setIsDeletingSubmission(true);
     try {
       const { firestore } = getFirebaseServices();
-      const docRef = doc(
-        firestore,
-        `cwa-web/project-submissions/${courseSlug}/${user.uid}`
-      );
+      const docRef = doc(firestore, `cwa-web/project-submissions/${courseSlug}/${user.uid}`);
       await deleteProjectFileIfExists(docRef);
       await deleteDoc(docRef);
       getSubmissions();
@@ -131,15 +127,12 @@ export default function SubmissionsPage() {
     <div className="page-padding">
       <header className="mb-6">
         <h1 className="text-4xl text-center">Submissions</h1>
-        {course && (
-          <h2 className="text-xl mt-2 text-center text-base-content/70">
-            {course.name}
-          </h2>
-        )}
+        {course && <h2 className="text-xl mt-2 text-center text-base-content/70">{course.name}</h2>}
       </header>
 
       <SubmissionWrapper
         user={user}
+        authLoading={authLoading}
         submissionUrl={`cwa-web/project-submissions/${courseSlug}/${user?.uid}`}
         submissionDone={getSubmissions}
         submissionParams={{
@@ -183,11 +176,7 @@ export default function SubmissionsPage() {
 
                 <div className="p-5 border-t border-base-200">
                   <div className="flex items-center gap-4">
-                    <ProfileAvatar
-                      photoURL={sub.by.photoURL}
-                      displayName={sub.by.name}
-                      size="md"
-                    />
+                    <ProfileAvatar photoURL={sub.by.photoURL} displayName={sub.by.name} size="md" />
                     <a
                       href={sub.demoLink}
                       target="_blank"
@@ -204,9 +193,7 @@ export default function SubmissionsPage() {
             ))}
           </ul>
         ) : (
-          <h2 className="text-2xl text-center my-8 text-base-content/60">
-            No submissions yet
-          </h2>
+          <h2 className="text-2xl text-center my-8 text-base-content/60">No submissions yet</h2>
         )}
       </SubmissionWrapper>
     </div>

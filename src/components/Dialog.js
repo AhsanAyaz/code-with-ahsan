@@ -1,27 +1,25 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import Spinner from "./Spinner";
 
 const Dialog = ({ show, onClose, actions, children, isLoading, title }) => {
-  const toggleModal = useCallback(() => {
+  useEffect(() => {
     const body = document.querySelector("body");
-    const modal = document.querySelector(".modal");
-    if (!show) {
-      modal.classList.add("opacity-0");
-      modal.classList.add("pointer-events-none");
-      body.classList.remove("modal-active");
-    } else {
-      modal.classList.remove("opacity-0");
-      modal.classList.remove("pointer-events-none");
+    if (show) {
       body.classList.add("modal-active");
+    } else {
+      body.classList.remove("modal-active");
     }
+    return () => {
+      body.classList.remove("modal-active");
+    };
   }, [show]);
 
-  useEffect(() => {
-    toggleModal();
-  }, [show, toggleModal]);
-
   return (
-    <div className="modal z-50 opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center">
+    <div
+      className={`modal z-50 fixed w-full h-full top-0 left-0 flex items-center justify-center transition-opacity duration-300 ease ${
+        show ? "" : "opacity-0 pointer-events-none"
+      }`}
+    >
       <div className="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
 
       <div className="modal-container bg-base-100 text-base-content w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
@@ -30,8 +28,8 @@ const Dialog = ({ show, onClose, actions, children, isLoading, title }) => {
             <header>
               <h2 className="text-2xl font-bold">{title || "I am a dialog"}</h2>
               <p className="text-sm my-1 pr-4">
-                Paste the link of your project (GitHub, CodePen, etc) and attach
-                the screenshot of the running project
+                Paste the link of your project (GitHub, CodePen, etc) and attach the screenshot of
+                the running project
               </p>
             </header>
             <button

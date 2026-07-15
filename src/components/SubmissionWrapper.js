@@ -16,6 +16,7 @@ function getFirebaseServices() {
 
 export default function SubmissionWrapper({
   user,
+  authLoading = false,
   submissionUrl,
   submissionDone,
   submissionParams,
@@ -158,7 +159,12 @@ export default function SubmissionWrapper({
   return (
     <>
       <div className="flex items-center justify-end mb-4">
-        <Button color="primary" title="Submit your project" onClick={newSubmission}>
+        <Button
+          color="primary"
+          title="Submit your project"
+          onClick={newSubmission}
+          disabled={authLoading}
+        >
           {submitButtonText || "+"}
         </Button>
       </div>
