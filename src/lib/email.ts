@@ -1,3 +1,5 @@
+import { readFileSync } from "fs";
+import { join } from "path";
 import { Resend } from "resend";
 import { createLogger } from "./logger";
 
@@ -115,9 +117,7 @@ export interface BatchEmailResult {
  * Send multiple emails via Resend batch API (100 per call).
  * Avoids per-email round-trips that would timeout for large recipient lists.
  */
-export async function sendEmailBatch(
-  emails: BatchEmailPayload[],
-): Promise<BatchEmailResult[]> {
+export async function sendEmailBatch(emails: BatchEmailPayload[]): Promise<BatchEmailResult[]> {
   if (process.env.DISABLE_EMAILS === "true") {
     log.info(`Emails disabled. Would have sent batch of ${emails.length}`);
     return emails.map((e) => ({ to: e.to, ok: true }));
@@ -138,7 +138,7 @@ export async function sendEmailBatch(
     const chunk = emails.slice(i, i + CHUNK);
     try {
       const result = await client.batch.send(
-        chunk.map((e) => ({ from, to: [e.to], replyTo, subject: e.subject, html: e.html })),
+        chunk.map((e) => ({ from, to: [e.to], replyTo, subject: e.subject, html: e.html }))
       );
       if (result.error) {
         log.error("Batch send error:", { error: result.error });
@@ -156,12 +156,20 @@ export async function sendEmailBatch(
   return results;
 }
 
+/** A file to attach to an outgoing email (Resend attachment shape). */
+export interface EmailAttachment {
+  filename: string;
+  /** Base64-encoded (or raw) file content. */
+  content: string;
+}
+
 // Core send function
 export async function sendEmail(
   to: string,
   subject: string,
   html: string,
   cc?: string,
+  attachments?: EmailAttachment[]
 ): Promise<boolean> {
   // Check if emails are disabled (useful for local testing)
   if (process.env.DISABLE_EMAILS === "true") {
@@ -176,11 +184,8 @@ export async function sendEmail(
     return false;
   }
 
-  const from =
-    process.env.RESEND_FROM_EMAIL ??
-    "Code With Ahsan <notifications@codewithahsan.dev>";
-  const replyTo =
-    process.env.RESEND_REPLY_TO ?? "no-reply@codewithahsan.dev";
+  const from = process.env.RESEND_FROM_EMAIL ?? "Code With Ahsan <notifications@codewithahsan.dev>";
+  const replyTo = process.env.RESEND_REPLY_TO ?? "no-reply@codewithahsan.dev";
 
   try {
     const result = await client.emails.send({
@@ -190,6 +195,7 @@ export async function sendEmail(
       replyTo,
       subject,
       html,
+      attachments: attachments && attachments.length > 0 ? attachments : undefined,
     });
     if (result.error) {
       log.error("Failed to send email:", { error: result.error });
@@ -210,9 +216,7 @@ export async function sendEmail(
 /**
  * Send email to admin when a new mentor registers (pending approval)
  */
-export async function sendAdminMentorPendingEmail(
-  mentor: MentorshipProfile,
-): Promise<boolean> {
+export async function sendAdminMentorPendingEmail(mentor: MentorshipProfile): Promise<boolean> {
   const subject = `🆕 New Mentor Registration: ${mentor.displayName}`;
   const content = `
     <h2>New Mentor Awaiting Approval</h2>
@@ -234,7 +238,7 @@ export async function sendAdminMentorPendingEmail(
  */
 export async function sendRegistrationStatusEmail(
   mentor: MentorshipProfile,
-  approved: boolean,
+  approved: boolean
 ): Promise<boolean> {
   const subject = approved
     ? "🎉 Your Mentor Application Has Been Approved!"
@@ -272,7 +276,7 @@ export async function sendRegistrationStatusEmail(
 export async function sendAccountStatusEmail(
   user: MentorshipProfile,
   status: "disabled" | "enabled",
-  reason?: string,
+  reason?: string
 ): Promise<boolean> {
   const subject =
     status === "disabled"
@@ -307,7 +311,7 @@ export async function sendAccountStatusEmail(
  */
 export async function sendMentorshipRequestEmail(
   mentor: MentorshipProfile,
-  mentee: MentorshipProfile,
+  mentee: MentorshipProfile
 ): Promise<boolean> {
   const subject = `🙋 New Mentorship Request from ${mentee.displayName}`;
   const content = `
@@ -319,12 +323,16 @@ export async function sendMentorshipRequestEmail(
       <p><strong>Skills Sought:</strong> ${mentee.skillsSought?.join(", ") || "Not specified"}</p>
       <p><strong>Career Goals:</strong> ${mentee.careerGoals || "Not specified"}</p>
     </div>
-    ${mentee.mentorshipGoals ? `
+    ${
+      mentee.mentorshipGoals
+        ? `
     <div class="highlight">
       <p><strong>What they're looking for in a mentorship:</strong></p>
       <p>${mentee.mentorshipGoals}</p>
     </div>
-    ` : ""}
+    `
+        : ""
+    }
     <p>Please review their profile and decide if you'd like to mentor them.</p>
     <a href="${getSiteUrl()}/mentorship/requests" class="button">View Request</a>
   `;
@@ -336,7 +344,7 @@ export async function sendMentorshipRequestEmail(
  */
 export async function sendRequestAcceptedEmail(
   mentee: MentorshipProfile,
-  mentor: MentorshipProfile,
+  mentor: MentorshipProfile
 ): Promise<boolean> {
   const subject = `🎉 ${mentor.displayName} Accepted Your Mentorship Request!`;
   const content = `
@@ -365,7 +373,7 @@ export async function sendRequestAcceptedEmail(
  */
 export async function sendRequestDeclinedEmail(
   mentee: MentorshipProfile,
-  mentor: MentorshipProfile,
+  mentor: MentorshipProfile
 ): Promise<boolean> {
   const subject = `📝 Update on Your Mentorship Request`;
   const content = `
@@ -391,7 +399,7 @@ export async function sendRequestDeclinedEmail(
 export async function sendSessionScheduledEmail(
   mentor: MentorshipProfile,
   mentee: MentorshipProfile,
-  session: ScheduledSession,
+  session: ScheduledSession
 ): Promise<boolean> {
   const sessionDate = new Date(session.scheduledAt);
   const formattedDate = sessionDate.toLocaleDateString("en-US", {
@@ -408,10 +416,7 @@ export async function sendSessionScheduledEmail(
 
   const subject = `📅 Session Scheduled: ${formattedDate}`;
 
-  const createContent = (
-    recipient: MentorshipProfile,
-    partner: MentorshipProfile,
-  ) => `
+  const createContent = (recipient: MentorshipProfile, partner: MentorshipProfile) => `
     <h2>Session Scheduled!</h2>
     <p>Hi ${recipient.displayName}, a mentorship session has been scheduled.</p>
     <div class="info-box">
@@ -427,16 +432,8 @@ export async function sendSessionScheduledEmail(
 
   // Send to both mentor and mentee
   const [mentorResult, menteeResult] = await Promise.all([
-    sendEmail(
-      mentor.email,
-      subject,
-      wrapEmailHtml(createContent(mentor, mentee), subject),
-    ),
-    sendEmail(
-      mentee.email,
-      subject,
-      wrapEmailHtml(createContent(mentee, mentor), subject),
-    ),
+    sendEmail(mentor.email, subject, wrapEmailHtml(createContent(mentor, mentee), subject)),
+    sendEmail(mentee.email, subject, wrapEmailHtml(createContent(mentee, mentor), subject)),
   ]);
 
   return mentorResult && menteeResult;
@@ -447,7 +444,7 @@ export async function sendSessionScheduledEmail(
  */
 export async function sendMentorshipCompletedEmail(
   mentor: MentorshipProfile,
-  mentee: MentorshipProfile,
+  mentee: MentorshipProfile
 ): Promise<boolean> {
   const mentorSubject = `🎓 Mentorship Completed with ${mentee.displayName}`;
   const menteeSubject = `🎓 Mentorship Completed with ${mentor.displayName}`;
@@ -473,16 +470,8 @@ export async function sendMentorshipCompletedEmail(
   `;
 
   const [mentorResult, menteeResult] = await Promise.all([
-    sendEmail(
-      mentor.email,
-      mentorSubject,
-      wrapEmailHtml(mentorContent, mentorSubject),
-    ),
-    sendEmail(
-      mentee.email,
-      menteeSubject,
-      wrapEmailHtml(menteeContent, menteeSubject),
-    ),
+    sendEmail(mentor.email, mentorSubject, wrapEmailHtml(mentorContent, mentorSubject)),
+    sendEmail(mentee.email, menteeSubject, wrapEmailHtml(menteeContent, menteeSubject)),
   ]);
 
   return mentorResult && menteeResult;
@@ -493,7 +482,7 @@ export async function sendMentorshipCompletedEmail(
  */
 export async function sendRatingReceivedEmail(
   mentor: MentorshipProfile,
-  ratingInfo: RatingInfo,
+  ratingInfo: RatingInfo
 ): Promise<boolean> {
   const stars = "⭐".repeat(ratingInfo.rating);
   const subject = `${stars} You Received a ${ratingInfo.rating}-Star Rating!`;
@@ -527,7 +516,7 @@ export async function sendRatingReceivedEmail(
  */
 export async function sendMentorshipRemovedEmail(
   mentee: MentorshipProfile,
-  mentor: MentorshipProfile,
+  mentor: MentorshipProfile
 ): Promise<boolean> {
   const subject = `📝 Update on Your Mentorship`;
   const content = `
@@ -547,7 +536,7 @@ export async function sendMentorshipRemovedEmail(
  */
 export async function sendMentorshipInactivityWarningEmail(
   mentor: MentorshipProfile,
-  mentee: MentorshipProfile,
+  mentee: MentorshipProfile
 ): Promise<boolean> {
   const subject = `⚠️ Mentorship Inactivity Warning`;
   const content = `
@@ -572,7 +561,7 @@ export async function sendDiscordUsernameReminderEmail(
   user: { displayName: string; email: string },
   role: "mentor" | "mentee",
   partnerName?: string,
-  cc?: string,
+  cc?: string
 ): Promise<boolean> {
   const subject = `🔔 Action Required: Set Your Discord Username`;
 
@@ -626,7 +615,7 @@ export async function sendDiscordUsernameReminderEmail(
 export async function sendProjectApplicationEmail(
   creator: { displayName: string; email: string },
   applicant: { displayName: string; message: string },
-  project: { id: string; title: string },
+  project: { id: string; title: string }
 ): Promise<boolean> {
   const subject = `📋 New Application for "${project.title}"`;
   const content = `
@@ -731,7 +720,7 @@ function getSiteUrlForAmbassadorEmails(): string {
 export async function sendAmbassadorApplicationSubmittedEmail(
   applicantEmail: string,
   applicantName: string,
-  cohortName: string,
+  cohortName: string
 ): Promise<boolean> {
   const subject = "Your Ambassador Application Has Been Received";
   const siteUrl = getSiteUrlForAmbassadorEmails();
@@ -757,11 +746,30 @@ export async function sendAmbassadorApplicationSubmittedEmail(
  * @param cohortName - e.g. "Cohort 1 — Spring 2026"
  * @param discordInviteUrl - #ambassadors channel deep link (falls back to server invite)
  */
+/**
+ * GH#287 — Program structure PDF attached to the acceptance email so a newly
+ * accepted ambassador immediately knows their responsibilities and benefits.
+ * The file ships in `public/docs/` and is read from disk at send time. Missing
+ * file must NOT block the email — we log and send without the attachment.
+ */
+const AMBASSADOR_PROGRAM_DOC_FILENAME = "CWA Ambassador Program Structure.pdf";
+
+function loadAmbassadorProgramDoc(): EmailAttachment | null {
+  try {
+    const filePath = join(process.cwd(), "public", "docs", "cwa-ambassador-program-structure.pdf");
+    const content = readFileSync(filePath).toString("base64");
+    return { filename: AMBASSADOR_PROGRAM_DOC_FILENAME, content };
+  } catch (error) {
+    log.error("Failed to load ambassador program doc for acceptance email:", { error });
+    return null;
+  }
+}
+
 export async function sendAmbassadorApplicationAcceptedEmail(
   applicantEmail: string,
   applicantName: string,
   cohortName: string,
-  discordInviteUrl: string,
+  discordInviteUrl: string
 ): Promise<boolean> {
   const subject = `Welcome to the ${cohortName} Ambassador Cohort!`;
   const siteUrl = getSiteUrlForAmbassadorEmails();
@@ -772,6 +780,7 @@ export async function sendAmbassadorApplicationAcceptedEmail(
     <div class="highlight success">
       <p><strong>Next steps:</strong></p>
       <ol>
+        <li>Read the attached <strong>Ambassador Program Structure</strong> for your responsibilities and benefits.</li>
         <li>Join the <a href="${discordInviteUrl}">#ambassadors Discord channel</a> — your new role should already be live.</li>
         <li>Visit your <a href="${siteUrl}/ambassadors/dashboard">ambassador dashboard</a> to see your onboarding checklist.</li>
         <li>Grab your referral code and start sharing.</li>
@@ -780,7 +789,14 @@ export async function sendAmbassadorApplicationAcceptedEmail(
     </div>
     <p>Excited to build this with you.<br/>— Ahsan</p>
   `;
-  return sendEmail(applicantEmail, subject, wrapEmailHtml(content, subject));
+  const doc = loadAmbassadorProgramDoc();
+  return sendEmail(
+    applicantEmail,
+    subject,
+    wrapEmailHtml(content, subject),
+    undefined,
+    doc ? [doc] : undefined
+  );
 }
 
 /**
@@ -795,7 +811,7 @@ export async function sendAmbassadorApplicationDeclinedEmail(
   applicantEmail: string,
   applicantName: string,
   cohortName: string,
-  reviewerNotes?: string,
+  reviewerNotes?: string
 ): Promise<boolean> {
   const subject = "Your Ambassador Application — Update";
   const siteUrl = getSiteUrlForAmbassadorEmails();
@@ -825,7 +841,7 @@ export async function sendAmbassadorApplicationDeclinedEmail(
 export async function sendAmbassadorOffboardingEmail(
   recipientEmail: string,
   displayName: string,
-  cohortName: string,
+  cohortName: string
 ): Promise<boolean> {
   const subject = "Your Ambassador Status — Important Update";
   const siteUrl = getSiteUrlForAmbassadorEmails();
