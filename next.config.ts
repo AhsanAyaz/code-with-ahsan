@@ -28,8 +28,6 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // GH#261 era: rate-card calculator replaced by the simpler /sponsors page.
-      { source: "/rates", destination: "/sponsors", permanent: true },
       // VIS-66 [GH#215]: consolidate to one community page. /community ("Community Hub")
       // is folded into the homepage (the canonical community landing). All legacy slugs
       // below that previously targeted /community now point at / directly (no redirect chain).
