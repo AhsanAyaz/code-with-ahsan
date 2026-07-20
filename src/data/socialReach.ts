@@ -47,7 +47,7 @@ export const socialReach: Record<string, SocialPlatform> = {
   },
   newsletter: {
     label: "Newsletter",
-    count: 2100,
+    count: 3000,
     url: "https://blog.codewithahsan.dev/#/portal/signup",
     sub: "Subscribers",
   },

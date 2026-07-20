@@ -13,7 +13,7 @@ export type StatItem = {
 };
 
 export const COMMUNITY_STATS: StatItem[] = [
-  { value: "4,500+", label: "Discord Members" },
+  { value: "5,200+", label: "Discord Members" },
   { value: "130,000+", label: "Social Followers" },
   { value: "60+", label: "Active Mentorships" },
   { value: "20+", label: "Weekly Meetups" },
@@ -21,7 +21,7 @@ export const COMMUNITY_STATS: StatItem[] = [
 ];
 
 export const SPONSOR_STATS: StatItem[] = [
-  { value: "4,500+", label: "Discord Members" },
+  { value: "5,200+", label: "Discord Members" },
   { value: "130,000+", label: "Social Followers" },
   { value: "50", label: "Participants" },
   { value: "4", label: "Confirmed Judges" },
@@ -48,18 +48,15 @@ export type ThemeItem = {
 export const HACKATHON_THEMES: ThemeItem[] = [
   {
     title: "AI Brand Architect",
-    description:
-      "Create AI tools for brand identity, content, media, or voice experiences.",
+    description: "Create AI tools for brand identity, content, media, or voice experiences.",
   },
   {
     title: "AI Community Board",
-    description:
-      "Build solutions that help developer communities collaborate and scale impact.",
+    description: "Build solutions that help developer communities collaborate and scale impact.",
   },
   {
     title: "Personal AI Trainer",
-    description:
-      "Design assistants that coach learning, productivity, and personal growth.",
+    description: "Design assistants that coach learning, productivity, and personal growth.",
   },
 ];
 
@@ -77,24 +74,21 @@ export const JUDGES: JudgeProfile[] = [
     title: "Principal Software Consultant at 10 Pearls",
     experience: "9+ years",
     linkedinUrl: "https://www.linkedin.com/in/mnomanmemon",
-    avatarUrl:
-      "/static/images/events/cwa-promptathon-2026/judges/muhammad-noman.jpg",
+    avatarUrl: "/static/images/events/cwa-promptathon-2026/judges/muhammad-noman.jpg",
   },
   {
     name: "Asad Ullah Khalid",
     title: "Senior Frontend Engineer at Mercedes-Benz.io",
     experience: "6+ years",
     linkedinUrl: "https://www.linkedin.com/in/asadkhalid305/",
-    avatarUrl:
-      "/static/images/events/cwa-promptathon-2026/judges/asadullah-khalid.jpg",
+    avatarUrl: "/static/images/events/cwa-promptathon-2026/judges/asadullah-khalid.jpg",
   },
   {
     name: "Muhammad Faheem",
     title: "Senior Software Engineer at Enoch Tech",
     experience: "5+ years",
     linkedinUrl: "https://www.linkedin.com/in/mfaheemrajput/",
-    avatarUrl:
-      "/static/images/events/cwa-promptathon-2026/judges/muhammad-faheem.jpg",
+    avatarUrl: "/static/images/events/cwa-promptathon-2026/judges/muhammad-faheem.jpg",
   },
 ];
 

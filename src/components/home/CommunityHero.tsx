@@ -9,7 +9,7 @@ import SectionEyebrow from "@/components/home/SectionEyebrow";
 const MANIFEST = [
   { k: "gde", v: "Google Developer Expert" },
   { k: "books", v: "4 published" },
-  { k: "installs", v: "13M+" },
+  { k: "installs", v: "14M+" },
   { k: "talks", v: "50+" },
 ];
 

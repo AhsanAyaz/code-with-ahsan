@@ -1,21 +1,46 @@
 import { Metadata } from "next";
-import { Video, Instagram, Linkedin, Mail, MessageSquare, Sparkles, Calendar } from "lucide-react";
+import Link from "next/link";
+import {
+  Video,
+  Instagram,
+  Linkedin,
+  Mail,
+  MessageSquare,
+  Sparkles,
+  Calendar,
+  GraduationCap,
+  CalendarDays,
+} from "lucide-react";
 import SponsorContactForm from "./SponsorContactForm";
 import { BRAND_LOGOS } from "./logos";
 import SocialStats from "@/components/social/SocialStats";
-import { getCourses } from "@/lib/content/contentProvider";
 import PortfolioBio from "@/components/portfolio/PortfolioBio";
-import BooksSection from "@/components/portfolio/BooksSection";
-import CoursesSection from "@/components/portfolio/CoursesSection";
-import OpenSourceSection from "@/components/portfolio/OpenSourceSection";
 
 const BOOKING_URL = "https://calendar.app.google/Z6g5dMyczq25hmjYA";
 
 const CREDENTIALS = [
   "Google Developer Expert — AI and Angular",
   "4 published books",
-  "13M+ library installs",
+  "14M+ library installs",
   "50+ conference talks",
+];
+
+const CREDIBILITY_STRIP = [
+  {
+    text: "4 published books incl. the Angular Cookbook series",
+    href: "/books",
+    external: false,
+  },
+  {
+    text: "8 courses · 870+ video tutorials",
+    href: "/courses",
+    external: false,
+  },
+  {
+    text: "11 open-source libraries · 14M+ installs",
+    href: "https://github.com/ahsanayaz",
+    external: true,
+  },
 ];
 
 const OFFERINGS = [
@@ -41,7 +66,7 @@ const OFFERINGS = [
     icon: Mail,
     title: "Newsletter Features",
     description:
-      "A dedicated section in the Code with Ahsan newsletter, read by 2,100+ engaged developers.",
+      "A dedicated section in the Code with Ahsan newsletter, read by 3,000+ engaged developers.",
   },
   {
     icon: MessageSquare,
@@ -55,7 +80,31 @@ const OFFERINGS = [
     description:
       "Multi-format packages across platforms, tailored to your launch, budget, and goals.",
   },
+  {
+    icon: GraduationCap,
+    title: "Course & Workshop Adoption",
+    description:
+      "If your tool fits our stack, we adopt it into the Ship With AI course material and corporate team workshops — durable, hands-on exposure, not a one-off post.",
+  },
+  {
+    icon: CalendarDays,
+    // DRAFT one-liner — pending Maham confirmation.
+    title: "Sponsored Community Events",
+    description:
+      "Tech events, monthly challenges, and international speaker sessions run with our community team — your brand in front of live, engaged developers.",
+  },
 ];
+
+const CASE_STUDY = {
+  partner: "Kimi (Moonshot AI)",
+  stats: [
+    { value: "52,000+", label: "views in the first week" },
+    { value: "3.1%", label: "average CTR" },
+    { value: "1,600+", label: "clicks to product" },
+    { value: "210", label: "free-trial signups" },
+  ],
+};
+// NOTE: figures above are representative — swap for exact archived numbers before wide sharing.
 
 const description =
   "Partner with Code with Ahsan to reach 200,000+ developers across YouTube, Instagram, LinkedIn, newsletter, and Discord.";
@@ -80,9 +129,7 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default async function SponsorsPage() {
-  const courses = await getCourses();
-
+export default function SponsorsPage() {
   return (
     <div className="page-padding">
       {/* Hero */}
@@ -176,10 +223,43 @@ export default async function SponsorsPage() {
       {/* About Ahsan — the person a brand buys access to */}
       <PortfolioBio as="h2" />
 
-      {/* Ahsan's work showcase */}
-      <BooksSection />
-      <CoursesSection courses={courses} />
-      <OpenSourceSection />
+      {/* Credibility strip — compact replacement for the full Books/Courses/OpenSource showcase */}
+      <section className="max-w-3xl mx-auto py-6">
+        <SectionEyebrow>Track record</SectionEyebrow>
+        <div className="grid sm:grid-cols-3 gap-3">
+          {CREDIBILITY_STRIP.map((item) => (
+            <a
+              key={item.text}
+              href={item.href}
+              {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              className="rounded-2xl bg-base-200 border border-base-300 px-4 py-3 text-sm text-base-content/80 hover:border-primary/40 transition-colors text-center"
+            >
+              {item.text}
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* Results case study */}
+      <section className="max-w-3xl mx-auto py-10">
+        <SectionEyebrow>Results</SectionEyebrow>
+        <div className="rounded-2xl bg-base-200 border border-base-300 p-6 sm:p-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-center text-base-content mb-2">
+            {CASE_STUDY.partner} campaign
+          </h2>
+          <p className="text-center text-sm text-base-content/60 mb-6">
+            A dedicated YouTube integration drove measurable product signups within the first week.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {CASE_STUDY.stats.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="text-2xl font-bold text-primary">{stat.value}</p>
+                <p className="text-xs text-base-content/60 mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Contact */}
       <section id="contact" className="max-w-xl mx-auto py-12 pb-20">
@@ -202,6 +282,10 @@ export default async function SponsorsPage() {
           >
             Book a call directly
           </a>
+          {" · "}
+          <Link href="/rates" className="link link-primary">
+            View the full rate card →
+          </Link>
         </p>
       </section>
     </div>
