@@ -50,6 +50,7 @@ const NAV: NavSection[] = [
     items: [
       { label: "Raffle", href: "/admin/raffle" },
       { label: "Email Blasts", href: "/admin/events/email" },
+      { label: "Broadcast", href: "/admin/broadcast" },
     ],
   },
 ];
@@ -57,8 +58,7 @@ const NAV: NavSection[] = [
 function isActive(pathname: string, href: string, exact?: boolean) {
   if (exact) return pathname === href;
   // Avoid /admin/ambassadors matching /admin/ambassadors/members etc. for the top entry
-  if (href === "/admin/ambassadors")
-    return pathname === href || pathname === "/admin/ambassadors/";
+  if (href === "/admin/ambassadors") return pathname === href || pathname === "/admin/ambassadors/";
   return pathname.startsWith(href);
 }
 
