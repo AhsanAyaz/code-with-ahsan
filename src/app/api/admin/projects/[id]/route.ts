@@ -282,6 +282,26 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         { success: true, message: "Project updates declined" },
         { status: 200 }
       );
+    } else if (action === "reactivate") {
+      // Verify project is completed
+      if (projectData.status !== "completed") {
+        return NextResponse.json(
+          { error: "Only completed projects can be reactivated" },
+          { status: 400 }
+        );
+      }
+
+      // Update project status back to active and clear the completion marker
+      await projectRef.update({
+        status: "active",
+        completedAt: FieldValue.delete(),
+        reactivatedAt: FieldValue.serverTimestamp(),
+        reactivatedBy: session.adminId || "admin",
+        updatedAt: FieldValue.serverTimestamp(),
+        lastActivityAt: FieldValue.serverTimestamp(),
+      });
+
+      return NextResponse.json({ success: true, message: "Project reactivated" }, { status: 200 });
     } else {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }

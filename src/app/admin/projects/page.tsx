@@ -41,18 +41,11 @@ export default function AdminProjectsPage() {
     techStack: "",
     creator: "",
   });
-  const [deleteTarget, setDeleteTarget] = useState<EnrichedProject | null>(
-    null,
-  );
-  const [declineTarget, setDeclineTarget] = useState<EnrichedProject | null>(
-    null,
-  );
+  const [deleteTarget, setDeleteTarget] = useState<EnrichedProject | null>(null);
+  const [declineTarget, setDeclineTarget] = useState<EnrichedProject | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [deletionSummary, setDeletionSummary] =
-    useState<DeletionSummary | null>(null);
-  const [reviewTarget, setReviewTarget] = useState<EnrichedProject | null>(
-    null,
-  );
+  const [deletionSummary, setDeletionSummary] = useState<DeletionSummary | null>(null);
+  const [reviewTarget, setReviewTarget] = useState<EnrichedProject | null>(null);
   const [declineReason, setDeclineReason] = useState("");
 
   useEffect(() => {
@@ -68,12 +61,9 @@ export default function AdminProjectsPage() {
         if (filters.techStack) params.set("techStack", filters.techStack);
         if (filters.creator) params.set("creator", filters.creator);
 
-        const response = await fetch(
-          `/api/admin/projects?${params.toString()}`,
-          {
-            headers: token ? { "x-admin-token": token } : {},
-          },
-        );
+        const response = await fetch(`/api/admin/projects?${params.toString()}`, {
+          headers: token ? { "x-admin-token": token } : {},
+        });
 
         if (response.ok) {
           const data = await response.json();
@@ -125,9 +115,7 @@ export default function AdminProjectsPage() {
         toast.success("Project approved successfully");
         // Update project status in list
         setProjects((prev) =>
-          prev.map((p) =>
-            p.id === project.id ? { ...p, status: "active" } : p,
-          ),
+          prev.map((p) => (p.id === project.id ? { ...p, status: "active" } : p))
         );
       } else {
         const data = await response.json();
@@ -136,6 +124,42 @@ export default function AdminProjectsPage() {
     } catch (error) {
       console.error("Error approving project:", error);
       toast.error("Failed to approve project");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleReactivate = async (project: EnrichedProject) => {
+    setActionLoading(project.id);
+
+    try {
+      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+      const response = await fetch(`/api/admin/projects/${project.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { "x-admin-token": token } : {}),
+        },
+        body: JSON.stringify({ action: "reactivate" }),
+      });
+
+      if (response.ok) {
+        toast.success("Project reactivated successfully");
+        // Update project status in list and clear completion timestamp
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === project.id
+              ? ({ ...p, status: "active", completedAt: undefined } as EnrichedProject)
+              : p
+          )
+        );
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to reactivate project");
+      }
+    } catch (error) {
+      console.error("Error reactivating project:", error);
+      toast.error("Failed to reactivate project");
     } finally {
       setActionLoading(null);
     }
@@ -159,9 +183,7 @@ export default function AdminProjectsPage() {
         toast.success("Project declined");
         // Update project status in list
         setProjects((prev) =>
-          prev.map((p) =>
-            p.id === declineTarget.id ? { ...p, status: "declined" } : p,
-          ),
+          prev.map((p) => (p.id === declineTarget.id ? { ...p, status: "declined" } : p))
         );
         // Close dialog
         setDeclineTarget(null);
@@ -261,9 +283,7 @@ export default function AdminProjectsPage() {
       {/* Page header */}
       <div>
         <h1 className="text-3xl font-bold">Projects Management</h1>
-        <p className="text-base-content/60 mt-1">
-          View and manage all projects in the system
-        </p>
+        <p className="text-base-content/60 mt-1">View and manage all projects in the system</p>
       </div>
 
       {/* Filters */}
@@ -300,9 +320,7 @@ export default function AdminProjectsPage() {
           </svg>
           <div>
             <h3 className="text-lg font-semibold">No projects found</h3>
-            <p className="text-base-content/60 mt-1">
-              Try adjusting your filters
-            </p>
+            <p className="text-base-content/60 mt-1">Try adjusting your filters</p>
           </div>
           <button className="btn btn-ghost btn-sm" onClick={handleClearFilters}>
             Clear Filters
@@ -317,9 +335,7 @@ export default function AdminProjectsPage() {
                 {/* Header row: Title + Status */}
                 <div className="flex items-start justify-between gap-4">
                   <h3 className="card-title text-xl">{project.title}</h3>
-                  <span
-                    className={`badge ${getStatusBadgeClass(project.status)}`}
-                  >
+                  <span className={`badge ${getStatusBadgeClass(project.status)}`}>
                     {project.status}
                   </span>
                 </div>
@@ -368,25 +384,15 @@ export default function AdminProjectsPage() {
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xs text-base-content/60">
-                      Applications
-                    </div>
-                    <div className="text-sm font-semibold">
-                      {project.applicationCount}
-                    </div>
+                    <div className="text-xs text-base-content/60">Applications</div>
+                    <div className="text-sm font-semibold">{project.applicationCount}</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xs text-base-content/60">
-                      Invitations
-                    </div>
-                    <div className="text-sm font-semibold">
-                      {project.invitationCount}
-                    </div>
+                    <div className="text-xs text-base-content/60">Invitations</div>
+                    <div className="text-sm font-semibold">{project.invitationCount}</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-xs text-base-content/60">
-                      Difficulty
-                    </div>
+                    <div className="text-xs text-base-content/60">Difficulty</div>
                     <div>
                       <span
                         className={`badge badge-sm ${getDifficultyBadgeClass(project.difficulty)}`}
@@ -400,8 +406,7 @@ export default function AdminProjectsPage() {
                 {/* Timestamps row */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3 text-xs text-base-content/60">
                   <div>
-                    <span className="font-semibold">Created:</span>{" "}
-                    {formatDate(project.createdAt)}
+                    <span className="font-semibold">Created:</span> {formatDate(project.createdAt)}
                   </div>
                   {project.lastActivityAt && (
                     <div>
@@ -493,10 +498,7 @@ export default function AdminProjectsPage() {
                         </Link>
                       </li>
                       <li>
-                        <Link
-                          href={`/projects/${project.id}/edit`}
-                          target="_blank"
-                        >
+                        <Link href={`/projects/${project.id}/edit`} target="_blank">
                           Edit Project
                         </Link>
                       </li>
@@ -529,27 +531,42 @@ export default function AdminProjectsPage() {
                         </>
                       )}
 
-                      {project.status === "update_pending" &&
-                        project.pendingUpdates && (
-                          <>
-                            <li className="border-t border-base-300 pt-2">
-                              <button
-                                className="text-primary font-medium"
-                                onClick={() => {
-                                  setReviewTarget(project);
-                                  setDeclineReason("");
-                                }}
-                              >
-                                📋 Review Changes
-                              </button>
-                            </li>
-                          </>
-                        )}
+                      {project.status === "completed" && (
+                        <li className="border-t border-base-300 pt-2">
+                          <button
+                            className="text-success"
+                            onClick={() => handleReactivate(project)}
+                            disabled={actionLoading === project.id}
+                          >
+                            {actionLoading === project.id ? (
+                              <>
+                                <span className="loading loading-spinner loading-xs"></span>
+                                Reactivating...
+                              </>
+                            ) : (
+                              "Reactivate Project"
+                            )}
+                          </button>
+                        </li>
+                      )}
+
+                      {project.status === "update_pending" && project.pendingUpdates && (
+                        <>
+                          <li className="border-t border-base-300 pt-2">
+                            <button
+                              className="text-primary font-medium"
+                              onClick={() => {
+                                setReviewTarget(project);
+                                setDeclineReason("");
+                              }}
+                            >
+                              📋 Review Changes
+                            </button>
+                          </li>
+                        </>
+                      )}
                       <li className="border-t border-base-300 pt-2">
-                        <button
-                          className="text-error"
-                          onClick={() => setDeleteTarget(project)}
-                        >
+                        <button className="text-error" onClick={() => setDeleteTarget(project)}>
                           Delete Project
                         </button>
                       </li>
@@ -582,10 +599,7 @@ export default function AdminProjectsPage() {
 
       {/* Deletion summary modal */}
       {deletionSummary && (
-        <DeletionSummaryModal
-          summary={deletionSummary}
-          onClose={() => setDeletionSummary(null)}
-        />
+        <DeletionSummaryModal summary={deletionSummary} onClose={() => setDeletionSummary(null)} />
       )}
 
       {/* Review Pending Updates Modal */}
@@ -594,8 +608,7 @@ export default function AdminProjectsPage() {
           <div className="modal-box max-w-2xl">
             <h3 className="font-bold text-lg">Review Project Updates</h3>
             <p className="py-2 text-base-content/70">
-              Review changes requested by project creator for{" "}
-              <strong>{reviewTarget.title}</strong>
+              Review changes requested by project creator for <strong>{reviewTarget.title}</strong>
             </p>
 
             <div className="divider"></div>
@@ -629,9 +642,7 @@ export default function AdminProjectsPage() {
                   <div className="font-medium">Title</div>
                   <div className="grid grid-cols-2 gap-4 mt-2">
                     <div>
-                      <div className="text-sm text-error line-through">
-                        {reviewTarget.title}
-                      </div>
+                      <div className="text-sm text-error line-through">{reviewTarget.title}</div>
                     </div>
                     <div>
                       <div className="text-sm text-success font-medium">
@@ -714,9 +725,7 @@ export default function AdminProjectsPage() {
             {/* Decline Reason Input */}
             <div className="form-control mt-6">
               <label className="label">
-                <span className="label-text font-semibold">
-                  Decline Reason (optional)
-                </span>
+                <span className="label-text font-semibold">Decline Reason (optional)</span>
               </label>
               <textarea
                 placeholder="Enter reason for declining these changes... This will be sent to the project creator."
@@ -743,20 +752,17 @@ export default function AdminProjectsPage() {
                   setActionLoading(reviewTarget.id);
                   try {
                     const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-                    const response = await fetch(
-                      `/api/admin/projects/${reviewTarget.id}`,
-                      {
-                        method: "PUT",
-                        headers: {
-                          "Content-Type": "application/json",
-                          ...(token ? { "x-admin-token": token } : {}),
-                        },
-                        body: JSON.stringify({
-                          action: "decline_update",
-                          declineReason,
-                        }),
+                    const response = await fetch(`/api/admin/projects/${reviewTarget.id}`, {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                        ...(token ? { "x-admin-token": token } : {}),
                       },
-                    );
+                      body: JSON.stringify({
+                        action: "decline_update",
+                        declineReason,
+                      }),
+                    });
 
                     if (response.ok) {
                       toast.success("Project updates declined");
@@ -769,8 +775,8 @@ export default function AdminProjectsPage() {
                                 status: "active",
                                 pendingUpdates: undefined,
                               } as EnrichedProject)
-                            : p,
-                        ),
+                            : p
+                        )
                       );
                       setReviewTarget(null);
                       setDeclineReason("");
@@ -789,8 +795,7 @@ export default function AdminProjectsPage() {
               >
                 {actionLoading === reviewTarget.id ? (
                   <>
-                    <span className="loading loading-spinner loading-sm"></span>{" "}
-                    Declining...
+                    <span className="loading loading-spinner loading-sm"></span> Declining...
                   </>
                 ) : (
                   "❌ Decline Changes"
@@ -802,17 +807,14 @@ export default function AdminProjectsPage() {
                   setActionLoading(reviewTarget.id);
                   try {
                     const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-                    const response = await fetch(
-                      `/api/admin/projects/${reviewTarget.id}`,
-                      {
-                        method: "PUT",
-                        headers: {
-                          "Content-Type": "application/json",
-                          ...(token ? { "x-admin-token": token } : {}),
-                        },
-                        body: JSON.stringify({ action: "approve_update" }),
+                    const response = await fetch(`/api/admin/projects/${reviewTarget.id}`, {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                        ...(token ? { "x-admin-token": token } : {}),
                       },
-                    );
+                      body: JSON.stringify({ action: "approve_update" }),
+                    });
 
                     if (response.ok) {
                       toast.success("Project updates approved successfully");
@@ -826,8 +828,8 @@ export default function AdminProjectsPage() {
                                 status: "active",
                                 pendingUpdates: undefined,
                               } as EnrichedProject)
-                            : p,
-                        ),
+                            : p
+                        )
                       );
                       setReviewTarget(null);
                       setDeclineReason("");
@@ -846,8 +848,7 @@ export default function AdminProjectsPage() {
               >
                 {actionLoading === reviewTarget.id ? (
                   <>
-                    <span className="loading loading-spinner loading-sm"></span>{" "}
-                    Approving...
+                    <span className="loading loading-spinner loading-sm"></span> Approving...
                   </>
                 ) : (
                   "✅ Approve Changes"
