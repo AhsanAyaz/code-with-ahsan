@@ -10,6 +10,7 @@ import VersionHistoryList from "@/components/roadmaps/VersionHistoryList";
 import { Roadmap, MentorshipProfile } from "@/types/mentorship";
 import RelatedProjectsWidget from "@/components/roadmaps/RelatedProjectsWidget";
 import RoadmapActionsDropdown from "@/components/roadmaps/RoadmapActionsDropdown";
+import { canViewRoadmap } from "@/lib/permissions";
 import { useRouter } from "next/navigation";
 import ProfileAvatar from "@/components/ProfileAvatar";
 
@@ -36,11 +37,13 @@ export default function RoadmapDetailPage() {
 
         // Check if we should preview the draft version
         const searchParams = new URLSearchParams(window.location.search);
-        const previewDraft = searchParams.get('preview') === 'draft';
+        const previewDraft = searchParams.get("preview") === "draft";
         setIsPreviewingDraft(previewDraft);
 
         // Fetch roadmap with full content
-        const roadmapRes = await fetch(`/api/roadmaps/${roadmapId}${previewDraft ? '?preview=draft' : ''}`);
+        const roadmapRes = await fetch(
+          `/api/roadmaps/${roadmapId}${previewDraft ? "?preview=draft" : ""}`
+        );
 
         if (!roadmapRes.ok) {
           throw new Error("Roadmap not found");
@@ -98,7 +101,7 @@ export default function RoadmapDetailPage() {
     if (action === "delete") {
       router.push("/roadmaps/my");
     } else if (action === "submit") {
-      setRoadmap((prev) => prev ? { ...prev, status: "pending" } : null);
+      setRoadmap((prev) => (prev ? { ...prev, status: "pending" } : null));
     }
   };
 
@@ -123,12 +126,22 @@ export default function RoadmapDetailPage() {
     );
   }
 
-  // Access control: Only show unpublished roadmaps to creator
-  // (Server-side will enforce admin access if needed)
+  // Access control: unpublished roadmaps are visible to the creator or an admin.
+  // Admins need this to preview pending submissions before approving (GH#296).
   const isCreator = user?.uid === roadmap.creatorId;
-  const isPublished = roadmap.status === "approved";
+  const canView = canViewRoadmap(
+    profile
+      ? {
+          uid: profile.uid,
+          roles: profile.roles ?? [],
+          status: profile.status,
+          isAdmin: (profile as { isAdmin?: boolean }).isAdmin,
+        }
+      : null,
+    { status: roadmap.status, creatorId: roadmap.creatorId }
+  );
 
-  if (!isPublished && !isCreator) {
+  if (!canView) {
     return (
       <div className="max-w-4xl mx-auto p-8">
         <div className="alert alert-warning">
@@ -203,35 +216,33 @@ export default function RoadmapDetailPage() {
             />
           </svg>
           <span>
-            <strong>Admin Preview Mode:</strong> This roadmap is pending approval and not visible to the public yet.
+            <strong>Admin Preview Mode:</strong> This roadmap is pending approval and not visible to
+            the public yet.
           </span>
         </div>
       )}
 
-              {/* Header Section */}
-            <div className="mb-8">
-              <div className="flex items-start justify-between mb-4">
-                <h1 className="text-4xl font-bold flex-1">{roadmap.title}</h1>
-                <div className="flex items-center gap-2">
-                  {user?.uid === roadmap.creatorId && (
-                    <RoadmapActionsDropdown 
-                      roadmap={roadmap} 
-                      onAction={handleAction} 
-                      className="dropdown-end"
-                    />
-                  )}
-                </div>
-              </div>
-      
-              {/* Metadata badges */}        <div className="flex items-center gap-4 text-sm text-base-content/70 mb-4">
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex items-start justify-between mb-4">
+          <h1 className="text-4xl font-bold flex-1">{roadmap.title}</h1>
+          <div className="flex items-center gap-2">
+            {user?.uid === roadmap.creatorId && (
+              <RoadmapActionsDropdown
+                roadmap={roadmap}
+                onAction={handleAction}
+                className="dropdown-end"
+              />
+            )}
+          </div>
+        </div>
+        {/* Metadata badges */}{" "}
+        <div className="flex items-center gap-4 text-sm text-base-content/70 mb-4">
           <span className="badge badge-primary">{domainLabel}</span>
           <span className="badge badge-secondary">{roadmap.difficulty}</span>
-          {roadmap.estimatedHours && (
-            <span>{roadmap.estimatedHours}h estimated</span>
-          )}
+          {roadmap.estimatedHours && <span>{roadmap.estimatedHours}h estimated</span>}
           <span>Version {roadmap.version}</span>
         </div>
-
         {/* Author Attribution */}
         {roadmap.creatorProfile && (
           <div className="card bg-base-200 p-4 mb-4">
@@ -243,9 +254,7 @@ export default function RoadmapDetailPage() {
               />
               <div className="flex-1">
                 <p className="text-sm text-base-content/70">Created by</p>
-                <p className="font-semibold text-lg">
-                  {roadmap.creatorProfile.displayName}
-                </p>
+                <p className="font-semibold text-lg">{roadmap.creatorProfile.displayName}</p>
                 {roadmap.creatorProfile.discordUsername && (
                   <div className="flex items-center gap-2 mt-1">
                     <svg
@@ -264,14 +273,10 @@ export default function RoadmapDetailPage() {
             </div>
           </div>
         )}
-
         {/* Description */}
         {roadmap.description && (
-          <p className="text-lg text-base-content/80 mb-4">
-            {roadmap.description}
-          </p>
+          <p className="text-lg text-base-content/80 mb-4">{roadmap.description}</p>
         )}
-
         {/* Last updated timestamp */}
         <p className="text-xs text-base-content/60">
           Last updated: {new Date(roadmap.updatedAt).toLocaleDateString()}
@@ -295,8 +300,7 @@ export default function RoadmapDetailPage() {
         <div className="mt-12 border-t pt-8">
           <h2 className="text-2xl font-bold mb-4">Related Mentors</h2>
           <p className="text-base-content/70 mb-6">
-            These mentors teach {domainLabel} and can help guide you through
-            this roadmap
+            These mentors teach {domainLabel} and can help guide you through this roadmap
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {relatedMentors.map((mentor: MentorshipProfile) => (
@@ -313,9 +317,7 @@ export default function RoadmapDetailPage() {
                       size="lg"
                     />
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm truncate">
-                        {mentor.displayName}
-                      </h3>
+                      <h3 className="font-semibold text-sm truncate">{mentor.displayName}</h3>
                       {mentor.currentRole && (
                         <p className="text-xs text-base-content/70 truncate">
                           {mentor.currentRole}
@@ -326,10 +328,7 @@ export default function RoadmapDetailPage() {
                   {mentor.expertise && mentor.expertise.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {mentor.expertise.slice(0, 3).map((skill, idx) => (
-                        <span
-                          key={idx}
-                          className="badge badge-sm badge-outline"
-                        >
+                        <span key={idx} className="badge badge-sm badge-outline">
                           {skill}
                         </span>
                       ))}
