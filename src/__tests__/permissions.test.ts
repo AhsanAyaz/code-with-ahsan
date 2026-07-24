@@ -14,6 +14,7 @@ import {
   canManageProjectMembers,
   canApplyToProject,
   canEditRoadmap,
+  canViewRoadmap,
   hasRole,
   hasAnyRole,
   hasAllRoles,
@@ -233,9 +234,7 @@ describe("Permission System", () => {
     });
 
     it("returns true for accepted mentor (owner)", () => {
-      expect(canManageProjectMembers(acceptedMentorOwner, testProject)).toBe(
-        true
-      );
+      expect(canManageProjectMembers(acceptedMentorOwner, testProject)).toBe(true);
     });
 
     it("returns false for accepted mentor (non-owner)", () => {
@@ -448,9 +447,7 @@ describe("hasAnyRole (new helper)", () => {
   };
 
   it("returns true when at least one argument role is present", () => {
-    expect(hasAnyRole(multiProfile, ["mentor", "alumni-ambassador"])).toBe(
-      true
-    );
+    expect(hasAnyRole(multiProfile, ["mentor", "alumni-ambassador"])).toBe(true);
   });
 
   it("returns true when the profile has all argument roles", () => {
@@ -459,9 +456,7 @@ describe("hasAnyRole (new helper)", () => {
 
   it("returns true for alumni-ambassador match", () => {
     expect(hasAnyRole(alumniMulti, ["alumni-ambassador"])).toBe(true);
-    expect(hasAnyRole(alumniMulti, ["ambassador", "alumni-ambassador"])).toBe(
-      true
-    );
+    expect(hasAnyRole(alumniMulti, ["ambassador", "alumni-ambassador"])).toBe(true);
   });
 
   it("returns true for mentee-only profile when mentee is requested", () => {
@@ -470,9 +465,7 @@ describe("hasAnyRole (new helper)", () => {
   });
 
   it("returns false when no argument role is present", () => {
-    expect(hasAnyRole(multiProfile, ["mentee", "alumni-ambassador"])).toBe(
-      false
-    );
+    expect(hasAnyRole(multiProfile, ["mentee", "alumni-ambassador"])).toBe(false);
   });
 
   it("returns false for empty argument array", () => {
@@ -482,9 +475,7 @@ describe("hasAnyRole (new helper)", () => {
 
   it("returns false for empty profile.roles array", () => {
     expect(hasAnyRole(emptyProfile, ["mentor"])).toBe(false);
-    expect(hasAnyRole(emptyProfile, ["mentor", "mentee", "ambassador"])).toBe(
-      false
-    );
+    expect(hasAnyRole(emptyProfile, ["mentor", "mentee", "ambassador"])).toBe(false);
   });
 
   it("returns false for null/undefined profile", () => {
@@ -530,13 +521,9 @@ describe("hasAllRoles (new helper)", () => {
   });
 
   it("returns true when profile has all three argument roles", () => {
-    expect(
-      hasAllRoles(tripleRoleProfile, [
-        "mentor",
-        "ambassador",
-        "alumni-ambassador",
-      ])
-    ).toBe(true);
+    expect(hasAllRoles(tripleRoleProfile, ["mentor", "ambassador", "alumni-ambassador"])).toBe(
+      true
+    );
   });
 
   it("returns true for single-role mentor profile asked for mentor", () => {
@@ -549,9 +536,7 @@ describe("hasAllRoles (new helper)", () => {
 
   it("returns false when profile is missing one argument role", () => {
     expect(hasAllRoles(mentorOnly, ["mentor", "ambassador"])).toBe(false);
-    expect(
-      hasAllRoles(multiProfile, ["mentor", "ambassador", "alumni-ambassador"])
-    ).toBe(false);
+    expect(hasAllRoles(multiProfile, ["mentor", "ambassador", "alumni-ambassador"])).toBe(false);
   });
 
   it("returns true (vacuous) for empty argument array", () => {
@@ -599,9 +584,7 @@ describe("claim-side helpers (hasRoleClaim / hasAnyRoleClaim / hasAllRoleClaimsC
 
   it("hasAnyRoleClaim honors multi-role intent", () => {
     expect(hasAnyRoleClaim(arrayClaim, ["mentee", "ambassador"])).toBe(true);
-    expect(hasAnyRoleClaim(arrayClaim, ["mentee", "alumni-ambassador"])).toBe(
-      false
-    );
+    expect(hasAnyRoleClaim(arrayClaim, ["mentee", "alumni-ambassador"])).toBe(false);
   });
 
   it("hasAnyRoleClaim handles empty argument array + null token", () => {
@@ -611,9 +594,7 @@ describe("claim-side helpers (hasRoleClaim / hasAnyRoleClaim / hasAllRoleClaimsC
   });
 
   it("hasAllRoleClaimsClaim returns true iff every argument is present", () => {
-    expect(hasAllRoleClaimsClaim(arrayClaim, ["mentor", "ambassador"])).toBe(
-      true
-    );
+    expect(hasAllRoleClaimsClaim(arrayClaim, ["mentor", "ambassador"])).toBe(true);
     expect(hasAllRoleClaimsClaim(arrayClaim, ["mentor", "mentee"])).toBe(false);
   });
 
@@ -646,38 +627,68 @@ describe("role fixture matrix", () => {
   });
 
   it("mentor + ambassador: roles=['mentor','ambassador']", () => {
-    const p: PermissionUser = { uid: "m-3", roles: ["mentor", "ambassador"], status: "accepted", isAdmin: false };
+    const p: PermissionUser = {
+      uid: "m-3",
+      roles: ["mentor", "ambassador"],
+      status: "accepted",
+      isAdmin: false,
+    };
     expect(hasRole(p, "mentor")).toBe(true);
     expect(hasRole(p, "ambassador")).toBe(true);
     expect(hasAllRoles(p, ["mentor", "ambassador"])).toBe(true);
   });
 
   it("mentee + ambassador: roles=['mentee','ambassador']", () => {
-    const p: PermissionUser = { uid: "m-4", roles: ["mentee", "ambassador"], status: "accepted", isAdmin: false };
+    const p: PermissionUser = {
+      uid: "m-4",
+      roles: ["mentee", "ambassador"],
+      status: "accepted",
+      isAdmin: false,
+    };
     expect(hasRole(p, "mentee")).toBe(true);
     expect(hasRole(p, "ambassador")).toBe(true);
     expect(hasAllRoles(p, ["mentee", "ambassador"])).toBe(true);
   });
 
   it("mentor + alumni-ambassador: roles=['mentor','alumni-ambassador']", () => {
-    const p: PermissionUser = { uid: "m-5", roles: ["mentor", "alumni-ambassador"], status: "accepted", isAdmin: false };
+    const p: PermissionUser = {
+      uid: "m-5",
+      roles: ["mentor", "alumni-ambassador"],
+      status: "accepted",
+      isAdmin: false,
+    };
     expect(hasRole(p, "alumni-ambassador")).toBe(true);
     expect(hasAnyRole(p, ["alumni-ambassador"])).toBe(true);
   });
 
   it("triple-role: roles=['mentor','ambassador','alumni-ambassador']", () => {
-    const p: PermissionUser = { uid: "m-6", roles: ["mentor", "ambassador", "alumni-ambassador"], status: "accepted", isAdmin: false };
+    const p: PermissionUser = {
+      uid: "m-6",
+      roles: ["mentor", "ambassador", "alumni-ambassador"],
+      status: "accepted",
+      isAdmin: false,
+    };
     expect(hasAllRoles(p, ["mentor", "ambassador", "alumni-ambassador"])).toBe(true);
   });
 
   it("ambassador-only: roles=['ambassador']", () => {
-    const p: PermissionUser = { uid: "m-12", roles: ["ambassador"], status: "accepted", isAdmin: false };
+    const p: PermissionUser = {
+      uid: "m-12",
+      roles: ["ambassador"],
+      status: "accepted",
+      isAdmin: false,
+    };
     expect(hasRole(p, "ambassador")).toBe(true);
     expect(hasRole(p, "mentor")).toBe(false);
   });
 
   it("alumni-ambassador-only: roles=['alumni-ambassador']", () => {
-    const p: PermissionUser = { uid: "m-13", roles: ["alumni-ambassador"], status: "accepted", isAdmin: false };
+    const p: PermissionUser = {
+      uid: "m-13",
+      roles: ["alumni-ambassador"],
+      status: "accepted",
+      isAdmin: false,
+    };
     expect(hasRole(p, "alumni-ambassador")).toBe(true);
   });
 
@@ -688,21 +699,106 @@ describe("role fixture matrix", () => {
 
   it("bulk fixture sanity: every permutation of the four-role vocabulary", () => {
     const fixtures: Array<{ p: PermissionUser; role: Role; expected: boolean }> = [
-      { p: { uid: "b-1", roles: ["mentor"], status: "accepted", isAdmin: false }, role: "mentor", expected: true },
-      { p: { uid: "b-2", roles: ["mentor"], status: "accepted", isAdmin: false }, role: "mentee", expected: false },
-      { p: { uid: "b-3", roles: ["mentee"], status: "accepted", isAdmin: false }, role: "mentee", expected: true },
-      { p: { uid: "b-4", roles: ["mentee"], status: "accepted", isAdmin: false }, role: "mentor", expected: false },
-      { p: { uid: "b-5", roles: ["mentor", "ambassador"], status: "accepted", isAdmin: false }, role: "ambassador", expected: true },
-      { p: { uid: "b-6", roles: ["mentor", "ambassador"], status: "accepted", isAdmin: false }, role: "alumni-ambassador", expected: false },
-      { p: { uid: "b-7", roles: ["mentee", "ambassador"], status: "accepted", isAdmin: false }, role: "ambassador", expected: true },
-      { p: { uid: "b-8", roles: ["mentor", "alumni-ambassador"], status: "accepted", isAdmin: false }, role: "alumni-ambassador", expected: true },
-      { p: { uid: "b-9", roles: ["mentor", "ambassador", "alumni-ambassador"], status: "accepted", isAdmin: false }, role: "ambassador", expected: true },
-      { p: { uid: "b-10", roles: ["ambassador"], status: "accepted", isAdmin: false }, role: "ambassador", expected: true },
-      { p: { uid: "b-11", roles: ["alumni-ambassador"], status: "accepted", isAdmin: false }, role: "alumni-ambassador", expected: true },
-      { p: { uid: "b-12", roles: [], status: "pending", isAdmin: false }, role: "mentor", expected: false },
+      {
+        p: { uid: "b-1", roles: ["mentor"], status: "accepted", isAdmin: false },
+        role: "mentor",
+        expected: true,
+      },
+      {
+        p: { uid: "b-2", roles: ["mentor"], status: "accepted", isAdmin: false },
+        role: "mentee",
+        expected: false,
+      },
+      {
+        p: { uid: "b-3", roles: ["mentee"], status: "accepted", isAdmin: false },
+        role: "mentee",
+        expected: true,
+      },
+      {
+        p: { uid: "b-4", roles: ["mentee"], status: "accepted", isAdmin: false },
+        role: "mentor",
+        expected: false,
+      },
+      {
+        p: { uid: "b-5", roles: ["mentor", "ambassador"], status: "accepted", isAdmin: false },
+        role: "ambassador",
+        expected: true,
+      },
+      {
+        p: { uid: "b-6", roles: ["mentor", "ambassador"], status: "accepted", isAdmin: false },
+        role: "alumni-ambassador",
+        expected: false,
+      },
+      {
+        p: { uid: "b-7", roles: ["mentee", "ambassador"], status: "accepted", isAdmin: false },
+        role: "ambassador",
+        expected: true,
+      },
+      {
+        p: {
+          uid: "b-8",
+          roles: ["mentor", "alumni-ambassador"],
+          status: "accepted",
+          isAdmin: false,
+        },
+        role: "alumni-ambassador",
+        expected: true,
+      },
+      {
+        p: {
+          uid: "b-9",
+          roles: ["mentor", "ambassador", "alumni-ambassador"],
+          status: "accepted",
+          isAdmin: false,
+        },
+        role: "ambassador",
+        expected: true,
+      },
+      {
+        p: { uid: "b-10", roles: ["ambassador"], status: "accepted", isAdmin: false },
+        role: "ambassador",
+        expected: true,
+      },
+      {
+        p: { uid: "b-11", roles: ["alumni-ambassador"], status: "accepted", isAdmin: false },
+        role: "alumni-ambassador",
+        expected: true,
+      },
+      {
+        p: { uid: "b-12", roles: [], status: "pending", isAdmin: false },
+        role: "mentor",
+        expected: false,
+      },
     ];
     for (const { p, role, expected } of fixtures) {
       expect(hasRole(p, role)).toBe(expected);
     }
+  });
+
+  describe("canViewRoadmap (GH#296 admin preview)", () => {
+    const pendingRoadmap = { status: "pending", creatorId: "mentor-owner-789" };
+    const draftRoadmap = { status: "draft", creatorId: "mentor-owner-789" };
+    const approvedRoadmap = { status: "approved", creatorId: "mentor-owner-789" };
+
+    it("lets anyone (even null) view an approved roadmap", () => {
+      expect(canViewRoadmap(nullUser, approvedRoadmap)).toBe(true);
+      expect(canViewRoadmap(mentee, approvedRoadmap)).toBe(true);
+    });
+
+    it("lets an admin preview a pending roadmap they did not create", () => {
+      expect(canViewRoadmap(adminUser, pendingRoadmap)).toBe(true);
+      expect(canViewRoadmap(adminUser, draftRoadmap)).toBe(true);
+    });
+
+    it("lets the creator view their own unpublished roadmap", () => {
+      expect(canViewRoadmap(acceptedMentorOwner, pendingRoadmap)).toBe(true);
+      expect(canViewRoadmap(acceptedMentorOwner, draftRoadmap)).toBe(true);
+    });
+
+    it("blocks a non-admin non-creator from an unpublished roadmap", () => {
+      expect(canViewRoadmap(acceptedMentor, pendingRoadmap)).toBe(false);
+      expect(canViewRoadmap(mentee, draftRoadmap)).toBe(false);
+      expect(canViewRoadmap(nullUser, pendingRoadmap)).toBe(false);
+    });
   });
 });
