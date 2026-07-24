@@ -108,6 +108,23 @@ items:{}}` if absent). This is your idempotency + sync spine.
 For each ledger item whose `clickupStatus` ∈ {`in review`, `board review`,
 `test on production`}:
 
+0. **PR-merge detection FIRST (before reading comments).** Ahsan often approves by
+   **merging the PR directly on GitHub**, not by commenting on ClickUp — the loop
+   must notice that on its own. For any ledger item with a `prUrl`/`branch` still
+   in `in-review` (or `board-review` with a PR), run
+   `gh pr view <pr> --json state,mergedBy` (or `gh pr list --search head:<branch>`):
+   - **state == MERGED** → a human shipped it. Route to **test on production**,
+     assign **Najla (106789070) + Maham (100676509)**, comment "Merged in <PR> by
+     <mergedBy>. Please test on production." If GitHub auto-closed the issue via
+     `Closes #<n>`, **reopen it** (`gh issue reopen <n>`) so GH mirrors the QA-pending
+     state — the issue closes only when QA approves. Ledger: `phase = test-on-prod`.
+     Then continue to the comment check below (a merged item can still get QA
+     comments).
+   - **state == CLOSED (not merged)** → the PR was rejected/closed by a human →
+     ClickUp **cancelled**, `gh issue close <n>` if still open. Ledger `phase =
+cancelled`.
+   - **state == OPEN** → nothing merged yet; fall through to the comment check.
+
 1. Fetch task comments (`clickup_get_task_comments`). Find comments newer than
    `lastSeenCommentTs`. If none, skip.
 2. Interpret the newest actionable comment **by author + intent**:
