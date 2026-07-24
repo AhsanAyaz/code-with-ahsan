@@ -61,12 +61,28 @@ items:{}}` if absent). This is your idempotency + sync spine.
 
 ## Phase A2 — Implement (for auto-fix items)
 
-1. `git checkout main && git pull --ff-only`.
+> **Run implementers ONE AT A TIME.** They mutate the shared working tree, so a
+> second implementer launched while another's branch is still checked out starts
+> dirty (this actually happened — a broadcast PR inherited a prior task's branch).
+> Never spawn two implementers concurrently on the same repo. If you must
+> parallelize, give each `isolation: 'worktree'`.
+
+1. **Reset the tree yourself BEFORE every implementer — do not trust the previous
+   step to have left you on `main`:**
+   - `git checkout main && git pull --ff-only`.
+   - Verify clean + on main: `git status --porcelain` empty and
+     `git branch --show-current` == `main`. If dirty, STOP and report — never
+     stash/discard someone's work.
 2. Spawn **fix-implementer** (Agent tool, `model: opus`, agentType
    `fix-implementer`) with the issue + triage JSON. Parse its JSON.
    Increment `attempts` in the ledger.
 3. **Merge gate — authoritative, on the REAL diff** (not the triage guess):
-   - Compute `git diff --name-only main...<branch>` and test it against the
+   - **Provenance check first:** `git fetch origin <branch>` then
+     `git log --oneline main..origin/<branch>` — confirm the branch contains
+     ONLY this issue's commit(s) and nothing from another task (guards against a
+     contaminated base). If it carries unrelated commits/files, do NOT merge →
+     escalate to Ahsan with a note.
+   - Compute `git diff --name-only main...origin/<branch>` and test it against the
      sensitive-path gate in config.md.
    - **Merge** iff `verifyStatus == green` AND diff touches **no** sensitive path
      AND decision was `auto-fix`:
@@ -96,10 +112,11 @@ For each ledger item whose `clickupStatus` ∈ {`in review`, `board review`,
    `lastSeenCommentTs`. If none, skip.
 2. Interpret the newest actionable comment **by author + intent**:
    - **test on production** + comment reads as **fail / "still broken" / reopened**
-     → ClickUp **in development**; `git checkout main && git pull`; spawn
-     fix-implementer with the feedback (update the existing branch/PR, or new
-     branch if already merged); re-run the **merge gate**; on green+safe re-merge
-     → back to **test on production** + Najla+Maham. Bump `attempts`.
+     → ClickUp **in development**; **reset the tree first** (`git checkout main &&
+git pull --ff-only`, verify clean per Phase A2.1); spawn fix-implementer with
+     the feedback (update the existing branch/PR, or new branch if already merged);
+     re-run the **merge gate** (incl. provenance check); on green+safe re-merge →
+     back to **test on production** + Najla+Maham. Bump `attempts`.
    - **test on production** + comment reads as **pass / approved / "works"**
      → ClickUp **shipped**; `gh issue close <n> --comment "Verified on production
 — shipped."`; ledger `phase = shipped`.
