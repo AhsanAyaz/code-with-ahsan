@@ -126,7 +126,12 @@ cancelled`.
    - **state == OPEN** → nothing merged yet; fall through to the comment check.
 
 1. Fetch task comments (`clickup_get_task_comments`). Find comments newer than
-   `lastSeenCommentTs`. If none, skip.
+   `lastSeenCommentTs`. **Ignore the loop's own comments** — any whose text starts
+   with the `🤖 [agent-loop]` marker (the loop posts via Ahsan's ClickUp account,
+   so the author id alone can't distinguish loop posts from real human input;
+   the marker is the reliable signal). Only genuine human comments drive actions.
+   Still advance `lastSeenCommentTs` past skipped self-comments. If nothing
+   human-authored remains, skip.
 2. Interpret the newest actionable comment **by author + intent**:
    - **test on production** + comment reads as **fail / "still broken" / reopened**
      → ClickUp **in development**; **reset the tree first** (`git checkout main &&
@@ -163,6 +168,12 @@ git pull --ff-only`, verify clean per Phase A2.1); spawn fix-implementer with
   skipped) and the reason. List deferred (over-cap) issues explicitly.
 
 ## Notes on ClickUp MCP
+
+**Every ClickUp comment the orchestrator posts MUST begin with the marker
+`🤖 [agent-loop] `.** The loop authenticates as Ahsan's account, so its own status
+posts otherwise look like human comments (and can contain words like "approved") —
+Phase B would re-read them as fresh decisions and loop. The marker lets Phase B
+skip them (see Phase B step 1). Human comments never carry the marker.
 
 Use the `mcp__clickup__*` tools: `clickup_create_task` (with `custom_fields:
 [{id, value}]`, `assignees`, `status`, `markdown_description`),

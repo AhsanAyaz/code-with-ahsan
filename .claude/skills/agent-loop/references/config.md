@@ -43,6 +43,11 @@ value:"<n>"}])`; change status/assignees later via `clickup_update_task`.
 When ClickUp status setter needs a value, prefer the status **name** (the MCP
 resolves it); ids above are the fallback / disambiguation reference.
 
+**Self-comment marker:** the loop posts ClickUp comments via Ahsan's account, so
+every orchestrator-authored comment MUST start with `🤖 [agent-loop] `. Phase B
+ignores comments bearing this marker (only human comments drive actions) — this
+prevents the loop re-reading its own "…approved…" recaps as fresh decisions.
+
 ## GitHub ↔ ClickUp mapping (1:1)
 
 Three redundant links, checked in this order:
