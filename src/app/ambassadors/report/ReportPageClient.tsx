@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { authFetch } from "@/lib/apiClient";
 import { MonthlyReportForm } from "./MonthlyReportForm";
 import { ReportStatusBadge, type ReportCurrent } from "./ReportStatusBadge";
@@ -14,35 +14,39 @@ export function ReportPageClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
+  const cancelled = useRef(false);
 
   useEffect(() => {
-    let cancelled = false;
+    cancelled.current = false;
     (async () => {
       try {
         const res = await authFetch("/api/ambassador/report/current");
         if (!res.ok) {
           if (res.status === 403) {
-            setError("You don't have permission to access the ambassador report page.");
-            toast.error("Ambassador role required to view this page.");
+            if (!cancelled.current) {
+              setError("You don't have permission to access the ambassador report page.");
+              toast.error("Ambassador role required to view this page.");
+            }
           } else if (res.status === 401) {
-            setError("Please log in to view your report.");
+            if (!cancelled.current) setError("Please log in to view your report.");
           } else {
-            setError("Failed to load report status. Please try again.");
+            if (!cancelled.current) setError("Failed to load report status. Please try again.");
           }
           return;
         }
         const json = (await res.json()) as ReportCurrent;
-        if (!cancelled) setCurrent(json);
+        if (!cancelled.current) setCurrent(json);
       } catch {
-        setError("Network error. Please check your connection and try again.");
+        if (!cancelled.current)
+          setError("Network error. Please check your connection and try again.");
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled.current) setLoading(false);
       }
     })();
     return () => {
-      cancelled = true;
+      cancelled.current = true;
     };
-  }, [refreshKey, toast]);
+  }, [refreshKey]);
 
   if (loading) {
     return (
