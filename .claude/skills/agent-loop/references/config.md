@@ -74,6 +74,21 @@ are escalated (never auto-merged), so the loop does not run it inline.
 "Green" = tsc + lint + build + vitest all pass. There is **no CI status gate**,
 so local green is the bar.
 
+**Known environment traps when verifying:**
+
+- `npm run build` (Turbopack) **cannot run inside `.claude/worktrees/*`** — it
+  infers the workspace root as the parent worktrees dir ("couldn't find the
+  Next.js package"). A worktree implementer's "build green" is therefore
+  unverified; the orchestrator must re-run it from the main checkout.
+- While an agent's worktree holds a branch, `git checkout <branch>` in the main
+  checkout **fails and leaves you on `main`** — building the wrong tree. Always
+  `git checkout --detach <headSha>` and assert `git rev-parse --short HEAD`.
+- `npm run lint` may OOM on large local runs; compare behaviour against `main`
+  rather than trusting an absolute problem count.
+- Some suites are **red on `main`** (email-blast timing mocks; firestore
+  security-rules tests needing the emulator). Judge "no NEW failures vs main",
+  never "all green".
+
 ## Conventions
 
 - Branch: `fix/<issue#>-<slug>` or `feat/<issue#>-<slug>` (kebab slug, ≤ ~5 words).

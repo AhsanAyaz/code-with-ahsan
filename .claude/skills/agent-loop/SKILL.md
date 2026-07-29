@@ -61,11 +61,13 @@ items:{}}` if absent). This is your idempotency + sync spine.
 
 ## Phase A2 — Implement (for auto-fix items)
 
-> **Run implementers ONE AT A TIME.** They mutate the shared working tree, so a
-> second implementer launched while another's branch is still checked out starts
-> dirty (this actually happened — a broadcast PR inherited a prior task's branch).
-> Never spawn two implementers concurrently on the same repo. If you must
-> parallelize, give each `isolation: 'worktree'`.
+> **Run implementers ONE AT A TIME** on the shared tree. They mutate the working
+> tree, so a second implementer launched while another's branch is still checked
+> out starts dirty (this actually happened — a broadcast PR inherited a prior
+> task's branch). To parallelize safely, give each `isolation: 'worktree'` —
+> but then you MUST re-verify the build yourself (see the merge gate: Turbopack
+> can't build inside a worktree, and the branch is locked to that worktree, so
+> only a `--detach` checkout at the head sha gives a real result).
 
 1. **Reset the tree yourself BEFORE every implementer — do not trust the previous
    step to have left you on `main`:**
@@ -77,6 +79,23 @@ items:{}}` if absent). This is your idempotency + sync spine.
    `fix-implementer`) with the issue + triage JSON. Parse its JSON.
    Increment `attempts` in the ledger.
 3. **Merge gate — authoritative, on the REAL diff** (not the triage guess):
+   - **Re-verify the build yourself when the implementer ran in a worktree.**
+     `npm run build` (Turbopack) FAILS inside `.claude/worktrees/*` — it infers the
+     workspace root as the parent worktrees dir and errors "couldn't find the
+     Next.js package". So a worktree implementer literally cannot run the repo's
+     real build; treat its "build green" as unverified and re-run it here.
+     **Use a detached checkout — a plain `git checkout <branch>` SILENTLY FAILS
+     while the agent's worktree still holds that branch, leaving you on `main` and
+     building the wrong tree (this happened; the "verification" was of main):**
+     ```
+     git fetch origin <branch>
+     git checkout --detach <headSha>     # NOT `git checkout <branch>`
+     git rev-parse --short HEAD          # assert it equals <headSha>
+     npm run build; echo "exit=$?"       # exit 0 required
+     npx vitest run                      # no NEW failures vs main's baseline
+     git checkout main && git pull --ff-only
+     ```
+     Never report a build as verified without asserting HEAD == the PR's head sha.
    - **Provenance check first:** `git fetch origin <branch>` then
      `git log --oneline main..origin/<branch>` — confirm the branch contains
      ONLY this issue's commit(s) and nothing from another task (guards against a
