@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function TermsOfServicePage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="prose prose-lg max-w-none">
+      <div className="prose dark:prose-invert prose-lg max-w-none">
         <h1>Terms of Service</h1>
         <p>
           <strong>Effective Date:</strong> February 16, 2026

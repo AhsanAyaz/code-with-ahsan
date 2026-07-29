@@ -61,7 +61,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                           {l.title}
                         </a>
                       ) : (
-                        <Link href={l.href} onClick={closeDropdown}>
+                        <Link href={l.href} className="no-underline" onClick={closeDropdown}>
                           {l.title}
                         </Link>
                       )}
