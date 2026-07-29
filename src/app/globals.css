@@ -3,6 +3,18 @@
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
 
+/*
+ * The app forces `data-theme="dark"` (see src/app/providers.tsx). Tailwind v4's
+ * built-in `dark:` variant, however, defaults to `prefers-color-scheme`, so on a
+ * visitor whose OS is in light mode every `dark:` utility silently no-ops while
+ * the daisyUI palette stays dark — e.g. `dark:prose-invert` never applies and
+ * prose renders near-black text on a near-black background.
+ * Bind `dark:` to the theme attribute we actually set instead.
+ * (tailwind.config.js is dead code: nothing `@config`-imports it, so its
+ * `darkMode` setting never reached the build.)
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme inline {
   --font-mono: "JetBrains Mono", monospace;
   --font-sans: var(--font-rubik), "Rubik", ui-sans-serif, system-ui, sans-serif;
@@ -12,9 +24,6 @@
   --color-neon-purple: #bc13fe;
   --color-neon-green: #00ff41;
   --color-void-black: #050505;
-
-  /* Lighter violet — purple text on dark bg (AA on base-100). Brand fills keep --color-primary. */
-  --color-primary-bright: #bda4f5;
 
   /* Gray scale */
   --color-gray-50: #fafafa;
@@ -28,6 +37,16 @@
   --color-gray-800: #262626;
   --color-gray-900: #171717;
   --color-gray-950: #0a0a0a;
+}
+
+/*
+ * Not `inline`: this token is referenced from hand-written CSS below (link and
+ * prose colors), so it has to be emitted as a real custom property on :root.
+ * Lighter violet — purple TEXT on dark bg (AA on base-100, ~7:1 vs ~3:1 for
+ * --color-primary). Brand FILLS (btn-primary, badges) keep --color-primary.
+ */
+@theme {
+  --color-primary-bright: #bda4f5;
 }
 
 @layer base {
@@ -103,6 +122,36 @@
 
 :root {
   --default-font-family: "Rubik", sans-serif;
+}
+
+/*
+ * Link contrast.
+ * daisyUI ships `.link-primary { color: var(--color-primary) }`, and its hover
+ * state mixes the color toward #000 — both fail WCAG AA as text on our dark
+ * base-100. These rules are intentionally unlayered so they win over daisyUI's
+ * `@layer daisyui.*` output without needing `!important`, and they only touch
+ * link COLOR: `btn-primary` and every other brand fill still uses
+ * --color-primary (#8f27e0) with white content.
+ */
+.link-primary {
+  color: var(--color-primary-bright);
+}
+
+@media (hover: hover) {
+  .link-primary:hover {
+    /* Brighten on hover instead of darkening (daisyUI's default mixes to #000). */
+    color: color-mix(in oklab, var(--color-primary-bright) 80%, #fff);
+  }
+}
+
+/*
+ * @tailwindcss/typography link tokens. `prose` alone renders links in near-black
+ * and `prose-invert` renders them plain white (indistinguishable from body copy);
+ * both become the AA-safe violet on the dark theme.
+ */
+[data-theme="dark"] .prose {
+  --tw-prose-links: var(--color-primary-bright);
+  --tw-prose-invert-links: var(--color-primary-bright);
 }
 
 @import "../css/prism.css";

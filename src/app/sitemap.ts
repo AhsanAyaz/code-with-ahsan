@@ -27,6 +27,7 @@ const STATIC_PATHS = [
   "/projects",
   "/projects/discover",
   "/raffle",
+  "/rates",
   "/roadmaps",
   "/sponsors",
   "/terms",
