@@ -1,32 +1,68 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { authFetch } from "@/lib/apiClient";
 import { MonthlyReportForm } from "./MonthlyReportForm";
 import { ReportStatusBadge, type ReportCurrent } from "./ReportStatusBadge";
 import LogEventForm from "./LogEventForm";
 import EventList from "./EventList";
+import { useToast } from "@/contexts/ToastContext";
 
 export function ReportPageClient() {
   const [current, setCurrent] = useState<ReportCurrent | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
+  const cancelled = useRef(false);
 
   useEffect(() => {
-    let cancelled = false;
+    cancelled.current = false;
     (async () => {
       try {
         const res = await authFetch("/api/ambassador/report/current");
-        if (!res.ok) return;
+        if (!res.ok) {
+          if (res.status === 403) {
+            if (!cancelled.current) {
+              setError("You don't have permission to access the ambassador report page.");
+              toast.error("Ambassador role required to view this page.");
+            }
+          } else if (res.status === 401) {
+            if (!cancelled.current) setError("Please log in to view your report.");
+          } else {
+            if (!cancelled.current) setError("Failed to load report status. Please try again.");
+          }
+          return;
+        }
         const json = (await res.json()) as ReportCurrent;
-        if (!cancelled) setCurrent(json);
+        if (!cancelled.current) setCurrent(json);
       } catch {
-        /* silent — MonthlyReportForm will render its own error */
+        if (!cancelled.current)
+          setError("Network error. Please check your connection and try again.");
+      } finally {
+        if (!cancelled.current) setLoading(false);
       }
     })();
     return () => {
-      cancelled = true;
+      cancelled.current = true;
     };
   }, [refreshKey]);
+
+  if (loading) {
+    return (
+      <section className="py-12 text-center">
+        <span className="loading loading-spinner loading-md" aria-label="Loading report status" />
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="alert alert-error" role="alert">
+        <span>{error}</span>
+      </div>
+    );
+  }
 
   return (
     <>
