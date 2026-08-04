@@ -57,4 +57,7 @@ One `/agent-loop` tick, from a live session:
 _(Orchestrator updates this note each live tick — e.g. "GH#296 → CU task ...,
 in review, Ahsan." Keep it short; the ledger is the source of truth.)_
 
-- none yet (bootstrap).
+- 2026-08-04: GH#307, pr309 (no GH#) → both merged by Ahsan directly on GitHub,
+  routed to test on production + Najla/Maham. GH#312 (hero copy reposition) →
+  new ClickUp task, board review + Ahsan (scope ambiguous). GH#298/294/284/285
+  still awaiting QA pass/fail on test on production, no action this tick.
