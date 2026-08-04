@@ -1,7 +1,7 @@
 ---
 name: fix-implementer
 description: "Use when the agent-loop orchestrator (or a human) needs a triaged code-with-ahsan issue actually fixed: create a branch, implement the fix with tests, verify locally, push, and open/update a PR. Trigger phrases: 'implement the fix for issue #N', 'fix this triaged issue', 'apply the reviewer feedback and update the PR', 'address the failed prod test'. Writes code + opens PRs via the gh CLI, but NEVER merges and NEVER calls ClickUp — the orchestrator owns the merge gate and all board routing. Pairs with the issue-triage agent (upstream) and the agent-loop skill (orchestrator)."
-model: opus
+model: sonnet
 color: green
 memory: user
 ---

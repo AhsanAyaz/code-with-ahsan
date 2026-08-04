@@ -1,6 +1,6 @@
 ---
 name: agent-loop
-description: "Run one tick of the code-with-ahsan GitHub⇄ClickUp autonomous loop: triage new GitHub issues, auto-fix + merge safe ones, escalate risky ones to a human, and reconcile ClickUp board activity (in review / board review / test on production) into next actions. Use when the user says 'run the agent loop', 'run a loop tick', '/agent-loop', or drives it recurringly via '/loop 15m /agent-loop'. Runs in the main session (needs ClickUp + GitHub MCP). Delegates analysis to the issue-triage agent (Sonnet 5) and coding to the fix-implementer agent (Opus 4.8); the orchestrator owns every ClickUp write and the merge gate."
+description: "Run one tick of the code-with-ahsan GitHub⇄ClickUp autonomous loop: triage new GitHub issues, auto-fix + merge safe ones, escalate risky ones to a human, and reconcile ClickUp board activity (in review / board review / test on production) into next actions. Use when the user says 'run the agent loop', 'run a loop tick', '/agent-loop', or drives it recurringly via '/loop 15m /agent-loop'. Runs in the main session (needs ClickUp + GitHub MCP). Delegates analysis to the issue-triage agent (Sonnet 5) and coding to the fix-implementer agent (Sonnet 5); the orchestrator owns every ClickUp write and the merge gate."
 ---
 
 # agent-loop (orchestrator)
@@ -75,7 +75,7 @@ items:{}}` if absent). This is your idempotency + sync spine.
    - Verify clean + on main: `git status --porcelain` empty and
      `git branch --show-current` == `main`. If dirty, STOP and report — never
      stash/discard someone's work.
-2. Spawn **fix-implementer** (Agent tool, `model: opus`, agentType
+2. Spawn **fix-implementer** (Agent tool, `model: sonnet`, agentType
    `fix-implementer`) with the issue + triage JSON. Parse its JSON.
    Increment `attempts` in the ledger.
 3. **Merge gate — authoritative, on the REAL diff** (not the triage guess):
