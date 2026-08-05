@@ -15,7 +15,6 @@ import ContactSection from "./components/ContactSection";
 import OrganizersSection from "./components/OrganizersSection";
 import WinnersDisplay from "./components/WinnersDisplay";
 import CommunityStats from "@/components/home/CommunityStats";
-import SocialStats from "@/components/social/SocialStats";
 
 const CwaShipKarachi2026Page = () => {
   return (
@@ -24,7 +23,6 @@ const CwaShipKarachi2026Page = () => {
       <HeroSection />
       <TracksSection />
       <CommunityStats />
-      <SocialStats />
       <AboutSection />
       <ScheduleSection />
       <EventStructureSection />
