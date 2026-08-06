@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  ReactNode,
-} from "react";
+import { createContext, useContext, useState, useCallback, useMemo, ReactNode } from "react";
 
 export type ToastType = "success" | "error" | "info" | "warning";
 
@@ -53,33 +47,32 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   );
 
   const success = useCallback(
-    (message: string, duration?: number) =>
-      showToast(message, "success", duration),
+    (message: string, duration?: number) => showToast(message, "success", duration),
     [showToast]
   );
 
   const error = useCallback(
-    (message: string, duration?: number) =>
-      showToast(message, "error", duration),
+    (message: string, duration?: number) => showToast(message, "error", duration),
     [showToast]
   );
 
   const info = useCallback(
-    (message: string, duration?: number) =>
-      showToast(message, "info", duration),
+    (message: string, duration?: number) => showToast(message, "info", duration),
     [showToast]
   );
 
   const warning = useCallback(
-    (message: string, duration?: number) =>
-      showToast(message, "warning", duration),
+    (message: string, duration?: number) => showToast(message, "warning", duration),
     [showToast]
   );
 
+  const value = useMemo(
+    () => ({ toasts, showToast, success, error, info, warning, removeToast }),
+    [toasts, showToast, success, error, info, warning, removeToast]
+  );
+
   return (
-    <ToastContext.Provider
-      value={{ toasts, showToast, success, error, info, warning, removeToast }}
-    >
+    <ToastContext.Provider value={value}>
       {children}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </ToastContext.Provider>
@@ -95,13 +88,7 @@ export function useToast() {
 }
 
 // Toast Container Component
-function ToastContainer({
-  toasts,
-  onRemove,
-}: {
-  toasts: Toast[];
-  onRemove: (id: string) => void;
-}) {
+function ToastContainer({ toasts, onRemove }: { toasts: Toast[]; onRemove: (id: string) => void }) {
   if (toasts.length === 0) return null;
 
   const getAlertClass = (type: ToastType) => {
