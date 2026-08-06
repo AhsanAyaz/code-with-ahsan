@@ -7,6 +7,9 @@ export const headingFont = USE_BEBAS_HEADINGS
   ? "var(--font-bebas, 'Bebas Neue', sans-serif)"
   : "var(--font-rubik, 'Rubik', sans-serif)";
 
+/** Single shared placeholder for any person whose photo isn't in yet. */
+export const TBD_AVATAR = "/static/images/placeholders/tbd.svg";
+
 // ─── Section anchors ─────────────────────────────────────────────────────────
 // Used for in-page scrolling (e.g. the hero "Become a Sponsor" button).
 export const SECTION_IDS = {
@@ -18,6 +21,7 @@ export const SECTION_IDS = {
   venue: "venue",
   contact: "contact",
   organizers: "organizers",
+  collaborationPartners: "collaboration-partners",
 } as const;
 
 // ─── Event meta ──────────────────────────────────────────────────────────────
@@ -25,7 +29,6 @@ export const SECTION_IDS = {
 // kick-off opens the day, but the whole event is one hackathon track.
 // TODO: confirm the venue and lock the exact day (17 vs 18 September).
 const EVENT_PATH = "/events/cwa-ship-karachi/2026";
-const ORGANIZER_IMG = "/static/images/events/cwa-ship-karachi-2026/organizers";
 
 export const EVENT = {
   /** Firestore document id — events/{eventId}/winners/data */
@@ -36,10 +39,10 @@ export const EVENT = {
   tagline: "One day. One track. On-site.",
   theme: "Building with AI",
   /** Human-facing date. The exact day is not locked yet. */
-  dateLabel: "17 or 18 September 2026",
-  timeLabel: "9:00 AM – 6:00 PM",
+  dateLabel: "12 or 13 September 2026",
+  timeLabel: "9:00 AM – 7:15 PM",
   /** Countdown target (local time). Uses the earlier of the two candidate days. */
-  isoStart: "2026-09-17T09:00:00",
+  isoStart: "2026-09-13T09:00:00",
   locationShort: "On-site · Karachi, PK",
   registerUrl: "https://forms.gle/davuSPGjiDxTLkte6",
   sponsorshipUrl: `${EVENT_PATH}/sponsorship`,
@@ -65,19 +68,9 @@ export type ThemeItem = {
 
 export const HACKATHON_THEMES: ThemeItem[] = [
   {
-    title: "TBD - 01",
+    title: "TBD",
     description:
-      "Build AI-powered tools that enhance productivity, creativity, and collaboration for developers.",
-  },
-  {
-    title: "TBD - 02",
-    description:
-      "Create AI-driven solutions that improve accessibility, inclusivity, and user experience in digital products.",
-  },
-  {
-    title: "TBD - 03",
-    description:
-      "Develop AI applications that leverage data analytics, machine learning, and natural language processing to solve real-world problems.",
+      " ------ TO BE DECIDED ------. The hackathon themes will be revealed at the start of the event, challenging participants to build innovative solutions in real-time.",
   },
 ];
 
@@ -96,38 +89,20 @@ export type JudgeProfile = {
 
 export const JUDGES: JudgeProfile[] = [
   {
-    name: "TBD - 01",
+    name: "TBD",
     position: "------------",
     company: "-------------",
     experience: "",
     quote: "",
     linkedinUrl: "",
-    avatarUrl: "/static/images/events/cwa-ship-karachi-2026/judges/tbd.svg",
-  },
-  {
-    name: "TBD - 02",
-    position: "------------",
-    company: "-------------",
-    experience: "",
-    quote: "",
-    linkedinUrl: "",
-    avatarUrl: "/static/images/events/cwa-ship-karachi-2026/judges/tbd.svg",
-  },
-  {
-    name: "TBD - 03",
-    position: "------------",
-    company: "-------------",
-    experience: "",
-    quote: "",
-    linkedinUrl: "",
-    avatarUrl: "/static/images/events/cwa-ship-karachi-2026/judges/tbd.svg",
+    avatarUrl: TBD_AVATAR,
   },
 ];
 
 // ─── Mentors ─────────────────────────────────────────────────────────────────
 // Mentors guide the teams through the build sprint (they do not give talks).
-// Every mentor currently points at the shared tbd.svg placeholder. Swap an
-// individual `avatarUrl` to a real file as each headshot arrives.
+// Every mentor points at the shared TBD_AVATAR. Swap an individual `avatarUrl`
+// to a real file as each headshot arrives.
 // TODO: confirm each mentor's position, organisation and years of experience.
 export type MentorProfile = {
   name: string;
@@ -140,39 +115,11 @@ export type MentorProfile = {
 
 export const MENTOR_PROFILES: MentorProfile[] = [
   {
-    name: "Mentor - 01",
+    name: "Mentor",
     experience: "TODO",
     position: "TODO",
     organization: "TODO",
-    avatarUrl: "/static/images/events/cwa-ship-karachi-2026/mentors/tbd.svg",
-  },
-  {
-    name: "Mentor - 02",
-    experience: "TODO",
-    position: "TODO",
-    organization: "TODO",
-    avatarUrl: "/static/images/events/cwa-ship-karachi-2026/mentors/tbd.svg",
-  },
-  {
-    name: "Mentor - 03",
-    experience: "TODO",
-    position: "TODO",
-    organization: "TODO",
-    avatarUrl: "/static/images/events/cwa-ship-karachi-2026/mentors/tbd.svg",
-  },
-  {
-    name: "Mentor - 04",
-    experience: "TODO",
-    position: "TODO",
-    organization: "TODO",
-    avatarUrl: "/static/images/events/cwa-ship-karachi-2026/mentors/tbd.svg",
-  },
-  {
-    name: "Mentor - 05",
-    experience: "TODO",
-    position: "TODO",
-    organization: "TODO",
-    avatarUrl: "/static/images/events/cwa-ship-karachi-2026/mentors/tbd.svg",
+    avatarUrl: TBD_AVATAR,
   },
 ];
 
@@ -181,9 +128,8 @@ export const MENTORS: string[] = MENTOR_PROFILES.map((mentor) => mentor.name);
 
 // ─── Organisers ──────────────────────────────────────────────────────────────
 // Social handles are stored WITHOUT the leading "@"; an empty string hides that
-// link on the card. Drop headshots into
-// public/static/images/events/cwa-ship-karachi-2026/organizers/ using the
-// filename in `avatarUrl` — the card falls back to initials until then.
+// link on the card. Everyone points at the shared TBD_AVATAR until a real
+// headshot is added under public/static/images/events/cwa-ship-karachi-2026/.
 // TODO: confirm each organiser's role, handles and email.
 export type Organizer = {
   name: string;
@@ -194,46 +140,55 @@ export type Organizer = {
   avatarUrl: string;
 };
 
+const ORGANIZER_IMG = "/static/images/events/cwa-ship-karachi-2026/organizers";
 export const ORGANIZER_PROFILES: Organizer[] = [
   {
-    name: "Organizer - 01",
-    title: "TODO",
-    linkedin: "",
-    instagram: "",
-    email: "",
-    avatarUrl: `${ORGANIZER_IMG}/tbd.svg`,
+    name: "Arsalan Paracha",
+    title: "Organizer",
+    linkedin: "http://www.linkedin.com/in/arsalan-paracha-4b034a38",
+    instagram: "https://www.instagram.com/arsalanparacha81",
+    email: "arsalanparacha81@gmail.com",
+    avatarUrl: `${ORGANIZER_IMG}/arsalan.jpg`,
   },
   {
-    name: "Organizer - 02",
-    title: "TODO",
-    linkedin: "",
-    instagram: "",
-    email: "",
-    avatarUrl: `${ORGANIZER_IMG}/tbd.svg`,
+    name: "Javeria",
+    title: "Organizer",
+    linkedin: "https://www.linkedin.com/in/javeria-kamran-613833417",
+    instagram: "https://www.instagram.com/ozge.belle_",
+    email: "javeriakamran668@gmail.com",
+    avatarUrl: `${ORGANIZER_IMG}/javeria.jpg`,
   },
   {
-    name: "Organizer - 03",
-    title: "TODO",
-    linkedin: "",
-    instagram: "",
-    email: "",
-    avatarUrl: `${ORGANIZER_IMG}/tbd.svg`,
+    name: "Kinza",
+    title: "Organizer",
+    linkedin: "https://www.linkedin.com/in/kinza-pervez",
+    instagram: "https://www.instagram.com/kp_mallick",
+    email: "kp.visionwise@gmail.com",
+    avatarUrl: `${ORGANIZER_IMG}/kinza.jpg`,
   },
   {
-    name: "Organizer - 04",
-    title: "TODO",
-    linkedin: "",
-    instagram: "",
-    email: "",
-    avatarUrl: `${ORGANIZER_IMG}/tbd.svg`,
+    name: "Muhammad Noman",
+    title: "Organizer",
+    linkedin: "https://www.linkedin.com/in/mnomanmemon",
+    instagram: "https://www.instagram.com/m_nomanmemon",
+    email: "muhammadnoumanmemon@gmail.com",
+    avatarUrl: `${ORGANIZER_IMG}/noman.jpg`,
   },
   {
-    name: "Organizer - 05",
-    title: "TODO",
-    linkedin: "",
-    instagram: "",
-    email: "",
-    avatarUrl: `${ORGANIZER_IMG}/tbd.svg`,
+    name: "Muhammad Saad",
+    title: "Organizer",
+    linkedin: "https://www.linkedin.com/in/saadbandukada",
+    instagram: "https://www.instagram.com/saadbandukada",
+    email: "saadbandukada@gmail.com",
+    avatarUrl: `${ORGANIZER_IMG}/saad.jpg`,
+  },
+  {
+    name: "Warisha",
+    title: "Organizer",
+    linkedin: "https://www.linkedin.com/in/warishasheikh",
+    instagram: "https://www.instagram.com/warisha_sh_",
+    email: "warishasheikh007@gmail.com",
+    avatarUrl: `${ORGANIZER_IMG}/warisha.jpg`,
   },
 ];
 
@@ -256,14 +211,15 @@ export const CONTACTS: ContactPerson[] = [
   {
     role: "Primary Contact",
     name: "Maham Tahir",
-    title: "Community Manager",
-    email: "maham.tahir@visionwise.solutions",
+    title: "Content Strategist & Community Manager",
+    email: "maham.visionwiseab@gmail.com",
     avatarUrl: `${CONTACT_IMG}/maham-tahir.jpeg`,
   },
   {
     role: "Secondary Contact",
     name: "Muhammad Ahsan Ayaz",
-    title: "Founder, Code With Ahsan",
+    title:
+      "Founder, Code With Ahsan, \n GDE in AI & Angular | Software Architect at Scania Group, Sweden",
     email: "ahsan.ubitian@gmail.com",
     avatarUrl: `${CONTACT_IMG}/ahsan-ayaz.jpeg`,
   },
@@ -284,21 +240,31 @@ export type ConfirmedSponsor = {
   tier: string;
 };
 
-const SPONSOR_IMG = "/static/images/events/cwa-ship-karachi-2026/sponsors";
-
 export const CONFIRMED_SPONSORS: ConfirmedSponsor[] = [
   {
-    name: "SP - 01",
-    logoUrl: `${SPONSOR_IMG}/tbd.svg`,
+    name: "SPONSOR NAME",
+    logoUrl: TBD_AVATAR,
     websiteUrl: "https://example.com",
     tier: "TODO",
   },
-  {
-    name: "SP - 02",
-    logoUrl: `${SPONSOR_IMG}/tbd.svg`,
-    websiteUrl: "https://example.com",
-    tier: "TODO",
-  },
+];
+
+// ─── Collaboration partners ──────────────────────────────────────────────────
+// Communities, spaces and organisations collaborating on the event — distinct
+// from paid sponsorship tiers. An empty `websiteUrl` renders a non-clickable
+// tile, so a partner can be listed before its link is confirmed.
+// TODO: replace the placeholders with real names, logos and links.
+export type CollaborationPartner = {
+  name: string;
+  logoUrl: string;
+  websiteUrl: string;
+};
+
+const COLLABORATION_PARTNER_IMG =
+  "/static/images/events/cwa-ship-karachi-2026/collaboration-partners";
+
+export const COLLABORATION_PARTNERS: CollaborationPartner[] = [
+  { name: "MLSA KHI", logoUrl: `${COLLABORATION_PARTNER_IMG}/mlsa-khi.jpeg`, websiteUrl: "" },
 ];
 
 export type SponsorLogoPlaceholder = {
@@ -316,7 +282,7 @@ export type SponsorshipFeature = {
 
 export const SPONSORSHIP_FEATURES: SponsorshipFeature[] = [
   {
-    name: "Social Media Mentions",
+    name: "Social Media Mentions & Postings",
     community: "2-3 posts",
     gold: "All posts",
     platinum: "All posts",
@@ -346,12 +312,6 @@ export const SPONSORSHIP_FEATURES: SponsorshipFeature[] = [
     platinum: "Yes",
   },
   {
-    name: "Logo on Stream Overlays",
-    community: "Yes",
-    gold: "Yes",
-    platinum: "Yes",
-  },
-  {
     name: "Product Used in Hackathon",
     community: "Yes",
     gold: "Yes",
@@ -371,18 +331,7 @@ export const SPONSORSHIP_FEATURES: SponsorshipFeature[] = [
   },
 ];
 
-export const HACKATHON_TEAMS: string[] = [
-  "Team 01",
-  "Team 02",
-  "Team 03",
-  "Team 04",
-  "Team 05",
-  "Team 06",
-  "Team 07",
-  "Team 08",
-  "Team 09",
-  "Team 10",
-];
+export const HACKATHON_TEAMS: string[] = ["Team 01"];
 
 export const HACKATHON_TWIST: HackathonTwist = {
   title: "TBD — The Hackathon Twist",
@@ -390,19 +339,9 @@ export const HACKATHON_TWIST: HackathonTwist = {
     "A surprise element that will be revealed at the start of the hackathon. It will challenge teams to adapt their projects in real-time, testing their creativity and problem-solving skills.",
   perThemeExamples: [
     {
-      theme: "TBD - 01",
+      theme: "TBD",
       example:
-        "Teams must integrate a specific AI API into their project, which will be revealed at the start of the hackathon.",
-    },
-    {
-      theme: "TBD - 02",
-      example:
-        "Teams must integrate a specific AI API into their project, which will be revealed at the start of the hackathon.",
-    },
-    {
-      theme: "TBD - 03",
-      example:
-        "Teams must integrate a specific AI API into their project, which will be revealed at the start of the hackathon.",
+        "------ TO BE DECIDED ------. The twist will be designed to push teams to think outside the box and innovate under pressure.",
     },
   ],
 };
@@ -490,13 +429,13 @@ export const DAY_SCHEDULE: ScheduleItem[] = [
     description: "Tools down. Every team submits its project for judging.",
   },
   {
-    time: "4:30 – 5:30 PM",
+    time: "4:30 – 6:45 PM",
     title: "Judging & Evaluation",
     kind: "judging",
     description: "Teams present to the panel while the judges score each submission.",
   },
   {
-    time: "5:30 – 6:00 PM",
+    time: "6:45 – 7:15 PM",
     title: "Closing Remarks & Winner Announcement",
     kind: "closing",
     description: "Top three teams announced, prizes handed out, and a group send-off.",

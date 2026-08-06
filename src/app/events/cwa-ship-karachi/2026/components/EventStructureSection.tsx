@@ -20,7 +20,7 @@ const EventStructureSection = () => {
           </p>
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="mt-4">
             <a
-              href="https://docs.google.com/document/d/1fZ7ACZCrpSshl1Yaqe5auighP51ggut9xB7oIK_981E/edit?usp=sharing"
+              href="https://docs.google.com/document/d/1eBNSVF1H1EJlLH6DdW0fzM7uCE8-Z_qtrspJY5Xd00o/edit?usp=sharing"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-outline btn-primary btn-md rounded-xl gap-2 shadow-[0_0_18px_rgba(143,39,224,0.25)] hover:shadow-[0_0_28px_rgba(143,39,224,0.45)] transition-shadow duration-300"
@@ -31,7 +31,7 @@ const EventStructureSection = () => {
           </motion.div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="flex flex-wrap items-stretch justify-center gap-4">
           {HACKATHON_THEMES.map((theme, index) => (
             <motion.div
               key={theme.title}
@@ -40,7 +40,7 @@ const EventStructureSection = () => {
               viewport={{ once: true, amount: 0.1 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
               whileHover={{ y: -5 }}
-              className="group bg-base-200 border border-primary/10 rounded-xl p-5 transition-shadow duration-300 hover:border-primary/30 hover:shadow-[0_0_24px_rgba(143,39,224,0.16)]"
+              className="group w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] bg-base-200 border border-primary/10 rounded-xl p-5 transition-shadow duration-300 hover:border-primary/30 hover:shadow-[0_0_24px_rgba(143,39,224,0.16)]"
             >
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xs font-mono text-primary/60">

@@ -1,9 +1,5 @@
-"use client";
-
 import { Sparkles, Handshake, Crown } from "lucide-react";
-import { EVENT, SECTION_IDS } from "../constants";
-
-const SPONSORSHIP_PAGE = EVENT.sponsorshipUrl;
+import { SECTION_IDS } from "../constants";
 
 const SponsorshipPackagesSection = () => {
   return (
@@ -37,15 +33,15 @@ const SponsorshipPackagesSection = () => {
               <li>Live demo slot</li>
               <li>Product featured in participant onboarding</li>
             </ul>
-            <a href={`${SPONSORSHIP_PAGE}#tool-partner`} className="btn btn-success btn-sm w-full">
+            <a href={`#${SECTION_IDS.contact}`} className="btn btn-success btn-sm w-full">
               <Sparkles className="w-4 h-4" />
-              Become a Tool Partner
+              Contact Us Now
             </a>
           </article>
 
           <article className="rounded-2xl border border-primary/30 bg-base-200 p-6 shadow-[0_0_20px_rgba(143,39,224,0.12)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(143,39,224,0.26)]">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-              <h3 className="text-xl font-semibold text-base-content">Community Partner</h3>
+              <h3 className="text-xl font-semibold text-base-content">Silver Package</h3>
               <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-primary text-primary-content whitespace-nowrap self-start sm:self-auto">
                 $750
               </span>
@@ -54,17 +50,14 @@ const SponsorshipPackagesSection = () => {
               Entry-level cash sponsorship focused on brand visibility and swag.
             </p>
             <ul className="text-sm text-base-content/80 space-y-2 mb-5">
-              <li>Logo on event page and stream overlays</li>
-              <li>Social media mentions</li>
+              <li>Logo on event page</li>
+              <li>Social media mentions & Postings</li>
               <li>Swag distribution</li>
               <li>Discord channel and demo room support</li>
             </ul>
-            <a
-              href={`${SPONSORSHIP_PAGE}#community-partner`}
-              className="btn btn-primary btn-sm w-full"
-            >
+            <a href={`#${SECTION_IDS.contact}`} className="btn btn-primary btn-sm w-full">
               <Handshake className="w-4 h-4" />
-              Become a Community Partner
+              Contact Us for Silver
             </a>
           </article>
 
@@ -75,26 +68,18 @@ const SponsorshipPackagesSection = () => {
                 $1,500 - $2,000
               </span>
             </div>
-            <p className="text-sm text-base-content/70 mb-4">
-              Full visibility, speaker slot, and premium access.
-            </p>
+            <p className="text-sm text-base-content/70 mb-4">Full visibility and premium access.</p>
             <ul className="text-sm text-base-content/80 space-y-2 mb-5">
-              <li>Everything in Community Partner</li>
+              <li>Everything in Silver Package</li>
               <li>Speaker slot</li>
-              <li>All social posts coverage</li>
+              <li>Logo on event page & all social media postings</li>
               <li>CV access for recruitment (Platinum only)</li>
             </ul>
-            <a href={`${SPONSORSHIP_PAGE}#premium-tiers`} className="btn btn-warning btn-sm w-full">
+            <a href={`#${SECTION_IDS.contact}`} className="btn btn-warning btn-sm w-full">
               <Crown className="w-4 h-4" />
-              View Premium Tiers
+              Contact Us for Gold / Platinum
             </a>
           </article>
-        </div>
-
-        <div className="text-center mt-6">
-          <a href={SPONSORSHIP_PAGE} className="text-primary hover:underline text-sm font-semibold">
-            View full sponsorship tier matrix →
-          </a>
         </div>
       </div>
     </section>

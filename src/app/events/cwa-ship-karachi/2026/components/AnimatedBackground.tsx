@@ -1,5 +1,3 @@
-"use client";
-
 const AnimatedBackground = () => {
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">

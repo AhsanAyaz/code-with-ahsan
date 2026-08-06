@@ -1,5 +1,3 @@
-"use client";
-
 import AnimatedBackground from "./components/AnimatedBackground";
 import HeroSection from "./components/HeroSection";
 import AboutSection from "./components/AboutSection";
@@ -10,7 +8,8 @@ import VenueSection from "./components/VenueSection";
 import EventStructureSection from "./components/EventStructureSection";
 import JudgesSection from "./components/JudgesSection";
 import SponsorshipPackagesSection from "./components/SponsorshipPackagesSection";
-import CurrentSponsorsSection from "./components/CurrentSponsorsSection";
+// import CurrentSponsorsSection from "./components/CurrentSponsorsSection";
+import CollaborationPartnersSection from "./components/CollaborationPartnersSection";
 import ContactSection from "./components/ContactSection";
 import OrganizersSection from "./components/OrganizersSection";
 import WinnersDisplay from "./components/WinnersDisplay";
@@ -30,7 +29,8 @@ const CwaShipKarachi2026Page = () => {
       <JudgesSection />
       <VenueSection />
       <SponsorshipPackagesSection />
-      <CurrentSponsorsSection />
+      {/* <CurrentSponsorsSection /> */}
+      <CollaborationPartnersSection />
       <ContactSection />
       <OrganizersSection />
       <WinnersDisplay />
