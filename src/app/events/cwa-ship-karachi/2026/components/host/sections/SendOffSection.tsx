@@ -6,7 +6,7 @@ import SlideBackground from "../SlideBackground";
 import { headingFont } from "../../../constants";
 
 // Submissions close 16:30 PKT = UTC+5 = 11:30 UTC on September 17 2026
-const DEADLINE = new Date("2026-09-17T11:30:00Z");
+const DEADLINE = new Date("2026-09-13T11:30:00Z");
 
 function formatCountdown(ms: number): string {
   if (ms <= 0) return "00:00:00";
