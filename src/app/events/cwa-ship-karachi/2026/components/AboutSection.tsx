@@ -29,9 +29,10 @@ const AboutSection = () => {
             building — with mentors on the floor the whole time.
           </p>
           <p className="text-base-content/70 leading-relaxed text-sm sm:text-base">
-            The focus is <span className="text-accent font-semibold">{EVENT.theme}</span>.
-            Everything wraps the same evening: submissions at 4 PM, judging straight after, and
-            winners announced before everyone heads home.
+            The theme is <span className="text-accent font-semibold">{EVENT.theme}</span> — not a
+            throwaway demo, but something real enough to put in front of users. Everything wraps the
+            same evening: submissions at 4 PM, judging straight after, and winners announced before
+            everyone heads home.
           </p>
 
           {/* Terminal-style decoration */}

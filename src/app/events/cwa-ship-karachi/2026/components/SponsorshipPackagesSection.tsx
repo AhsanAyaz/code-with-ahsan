@@ -1,85 +1,47 @@
-import { Sparkles, Handshake, Crown } from "lucide-react";
-import { SECTION_IDS } from "../constants";
+import { FileText, Mail } from "lucide-react";
+import { EVENT, SECTION_IDS } from "../constants";
+
+// Server Component: static markup only, hover states handled in CSS.
 
 const SponsorshipPackagesSection = () => {
   return (
     <section
       id={SECTION_IDS.sponsorshipPackages}
-      className="py-16 sm:py-24 relative overflow-hidden"
+      className="relative overflow-hidden py-16 sm:py-24"
     >
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-3">Sponsorship Packages</h2>
-          <p className="text-sm sm:text-base text-base-content/70 max-w-3xl mx-auto">
-            We are prioritizing tool partners for this event and offering lightweight cash tiers.
-            Full details on our sponsorship page.
+      <div className="container relative z-10 mx-auto px-4 sm:px-6">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-primary/20 bg-base-200 p-8 text-center shadow-[0_0_25px_rgba(143,39,224,0.1)] sm:p-12">
+          <h2 className="mb-4 text-2xl font-bold text-primary sm:text-3xl md:text-4xl">
+            Sponsor {EVENT.name}
+          </h2>
+
+          <p className="mx-auto mb-3 max-w-2xl text-base text-base-content/80 sm:text-lg">
+            Put your brand in front of the developers building real products with AI — in the room,
+            on the day.
           </p>
-        </div>
+          <p className="mx-auto mb-8 max-w-2xl text-sm text-base-content/60">
+            Full tiers, pricing and in-kind options are in the sponsorship deck. Prefer something
+            custom? Talk to us.
+          </p>
 
-        <div className="grid md:grid-cols-3 gap-5 max-w-6xl mx-auto">
-          <article className="rounded-2xl border border-success/40 bg-base-200 p-6 shadow-[0_0_20px_rgba(30,200,120,0.08)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(30,200,120,0.18)]">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-              <h3 className="text-xl font-semibold text-base-content">Tool Partner</h3>
-              <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-success text-success-content whitespace-nowrap self-start sm:self-auto">
-                Primary
-              </span>
-            </div>
-            <p className="text-sm text-base-content/70 mb-4">
-              Provide API credits or licenses. No cash required.
-            </p>
-            <ul className="text-sm text-base-content/80 space-y-2 mb-5">
-              <li>Logo on event page and social posts</li>
-              <li>Dedicated Discord channel</li>
-              <li>Live demo slot</li>
-              <li>Product featured in participant onboarding</li>
-            </ul>
-            <a href={`#${SECTION_IDS.contact}`} className="btn btn-success btn-sm w-full">
-              <Sparkles className="w-4 h-4" />
-              Contact Us Now
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <a
+              href={EVENT.sponsorshipDeckUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary btn-lg gap-2 rounded-xl shadow-[0_0_20px_rgba(143,39,224,0.35)] transition-transform duration-300 hover:scale-[1.03]"
+            >
+              <FileText className="h-4 w-4" />
+              View Sponsorship Deck
             </a>
-          </article>
-
-          <article className="rounded-2xl border border-primary/30 bg-base-200 p-6 shadow-[0_0_20px_rgba(143,39,224,0.12)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(143,39,224,0.26)]">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-              <h3 className="text-xl font-semibold text-base-content">Silver Package</h3>
-              <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-primary text-primary-content whitespace-nowrap self-start sm:self-auto">
-                $750
-              </span>
-            </div>
-            <p className="text-sm text-base-content/70 mb-4">
-              Entry-level cash sponsorship focused on brand visibility and swag.
-            </p>
-            <ul className="text-sm text-base-content/80 space-y-2 mb-5">
-              <li>Logo on event page</li>
-              <li>Social media mentions & Postings</li>
-              <li>Swag distribution</li>
-              <li>Discord channel and demo room support</li>
-            </ul>
-            <a href={`#${SECTION_IDS.contact}`} className="btn btn-primary btn-sm w-full">
-              <Handshake className="w-4 h-4" />
-              Contact Us for Silver
+            <a
+              href={`#${SECTION_IDS.contact}`}
+              className="btn btn-outline btn-primary btn-lg gap-2 rounded-xl"
+            >
+              <Mail className="h-4 w-4" />
+              Contact Us
             </a>
-          </article>
-
-          <article className="rounded-2xl border border-warning/40 bg-base-200 p-6 shadow-[0_0_20px_rgba(240,180,40,0.1)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(240,180,40,0.2)]">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-              <h3 className="text-xl font-semibold text-base-content">Gold / Platinum</h3>
-              <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-warning text-warning-content whitespace-nowrap self-start sm:self-auto">
-                $1,500 - $2,000
-              </span>
-            </div>
-            <p className="text-sm text-base-content/70 mb-4">Full visibility and premium access.</p>
-            <ul className="text-sm text-base-content/80 space-y-2 mb-5">
-              <li>Everything in Silver Package</li>
-              <li>Speaker slot</li>
-              <li>Logo on event page & all social media postings</li>
-              <li>CV access for recruitment (Platinum only)</li>
-            </ul>
-            <a href={`#${SECTION_IDS.contact}`} className="btn btn-warning btn-sm w-full">
-              <Crown className="w-4 h-4" />
-              Contact Us for Gold / Platinum
-            </a>
-          </article>
+          </div>
         </div>
       </div>
     </section>
