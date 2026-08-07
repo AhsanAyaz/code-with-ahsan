@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Clock, MapPin, Users, Zap } from "lucide-react";
+import { Calendar, Clock, MapPin, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { EVENT, SECTION_IDS } from "../constants";
@@ -16,13 +16,6 @@ const CountdownUnit = ({ value, label }: { value: number; label: string }) => (
       {label}
     </span>
   </div>
-);
-
-const InfoChip = ({ icon: Icon, label }: { icon: typeof Zap; label: string }) => (
-  <span className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-base-200/70 px-4 py-2 text-xs sm:text-sm text-base-content/85 font-medium">
-    <Icon className="w-4 h-4 text-primary" />
-    {label}
-  </span>
 );
 
 const HeroSection = () => {
@@ -126,17 +119,9 @@ const HeroSection = () => {
         >
           {EVENT.tagline}{" "}
           <span className="text-base-content font-semibold">
-            A full-day hackathon, {EVENT.theme}.
+            A full-day hackathon. Build and Ship AI Product.
           </span>
         </motion.p>
-
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 mb-6"
-        >
-          <InfoChip icon={Zap} label="One-Day Build Sprint" />
-          <InfoChip icon={Users} label="Team Formation On the Day" />
-        </motion.div>
 
         <motion.div
           variants={itemVariants}

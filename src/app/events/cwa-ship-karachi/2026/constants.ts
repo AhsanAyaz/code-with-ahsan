@@ -37,7 +37,7 @@ export const EVENT = {
   name: "CWA Ship Karachi 2026",
   kicker: "One-Day Hackathon",
   tagline: "One day. One track. On-site.",
-  theme: "Building with AI",
+  theme: "Build & Ship an AI Product in a Day",
   /** Human-facing date. The exact day is not locked yet. */
   dateLabel: "12 or 13 September 2026",
   timeLabel: "9:00 AM – 7:15 PM",
@@ -45,7 +45,9 @@ export const EVENT = {
   isoStart: "2026-09-13T09:00:00",
   locationShort: "On-site · Karachi, PK",
   registerUrl: "https://forms.gle/davuSPGjiDxTLkte6",
-  sponsorshipUrl: `${EVENT_PATH}/sponsorship`,
+  /** Sponsorship tiers live in the deck, not on the page. */
+  sponsorshipDeckUrl:
+    "/docs/events/cwa-ship-karachi/2026/cwa-ship-karachi-2026-sponsorship-deck.pdf",
 } as const;
 
 export type StatItem = {
@@ -145,48 +147,48 @@ export const ORGANIZER_PROFILES: Organizer[] = [
   {
     name: "Arsalan Paracha",
     title: "Organizer",
-    linkedin: "http://www.linkedin.com/in/arsalan-paracha-4b034a38",
-    instagram: "https://www.instagram.com/arsalanparacha81",
+    linkedin: "arsalan-paracha-4b034a38",
+    instagram: "arsalanparacha81",
     email: "arsalanparacha81@gmail.com",
     avatarUrl: `${ORGANIZER_IMG}/arsalan.jpg`,
   },
   {
     name: "Javeria",
     title: "Organizer",
-    linkedin: "https://www.linkedin.com/in/javeria-kamran-613833417",
-    instagram: "https://www.instagram.com/ozge.belle_",
+    linkedin: "javeria-kamran-613833417",
+    instagram: "ozge.belle_",
     email: "javeriakamran668@gmail.com",
     avatarUrl: `${ORGANIZER_IMG}/javeria.jpg`,
   },
   {
     name: "Kinza",
     title: "Organizer",
-    linkedin: "https://www.linkedin.com/in/kinza-pervez",
-    instagram: "https://www.instagram.com/kp_mallick",
+    linkedin: "kinza-pervez",
+    instagram: "kp_mallick",
     email: "kp.visionwise@gmail.com",
     avatarUrl: `${ORGANIZER_IMG}/kinza.jpg`,
   },
   {
     name: "Muhammad Noman",
     title: "Organizer",
-    linkedin: "https://www.linkedin.com/in/mnomanmemon",
-    instagram: "https://www.instagram.com/m_nomanmemon",
+    linkedin: "mnomanmemon",
+    instagram: "m_nomanmemon",
     email: "muhammadnoumanmemon@gmail.com",
     avatarUrl: `${ORGANIZER_IMG}/noman.jpg`,
   },
   {
     name: "Muhammad Saad",
     title: "Organizer",
-    linkedin: "https://www.linkedin.com/in/saadbandukada",
-    instagram: "https://www.instagram.com/saadbandukada",
+    linkedin: "saadbandukada",
+    instagram: "saadbandukada",
     email: "saadbandukada@gmail.com",
     avatarUrl: `${ORGANIZER_IMG}/saad.jpg`,
   },
   {
     name: "Warisha",
     title: "Organizer",
-    linkedin: "https://www.linkedin.com/in/warishasheikh",
-    instagram: "https://www.instagram.com/warisha_sh_",
+    linkedin: "warishasheikh",
+    instagram: "warisha_sh_",
     email: "warishasheikh007@gmail.com",
     avatarUrl: `${ORGANIZER_IMG}/warisha.jpg`,
   },
@@ -223,14 +225,6 @@ export const CONTACTS: ContactPerson[] = [
     email: "ahsan.ubitian@gmail.com",
     avatarUrl: `${CONTACT_IMG}/ahsan-ayaz.jpeg`,
   },
-];
-
-export const SPONSOR_STATS: StatItem[] = [
-  { value: "5,200+", label: "Discord Members" },
-  { value: "130,000+", label: "Social Followers" },
-  { value: "50", label: "Participants" }, // TODO: confirm the participant cap
-  { value: String(JUDGES.length), label: "Confirmed Judges" },
-  { value: "GDE", label: "Founder" },
 ];
 
 export type ConfirmedSponsor = {
@@ -272,64 +266,6 @@ export type SponsorLogoPlaceholder = {
 };
 
 export const SPONSOR_PLACEHOLDERS: SponsorLogoPlaceholder[] = [];
-
-export type SponsorshipFeature = {
-  name: string;
-  community: string;
-  gold: string;
-  platinum: string;
-};
-
-export const SPONSORSHIP_FEATURES: SponsorshipFeature[] = [
-  {
-    name: "Social Media Mentions & Postings",
-    community: "2-3 posts",
-    gold: "All posts",
-    platinum: "All posts",
-  },
-  {
-    name: "Speaker Slot",
-    community: "No",
-    gold: "Yes",
-    platinum: "1 slot",
-  },
-  {
-    name: "CV Access for Recruitment",
-    community: "No",
-    gold: "No",
-    platinum: "Yes",
-  },
-  {
-    name: "Swag Distribution",
-    community: "Yes",
-    gold: "Yes",
-    platinum: "Yes",
-  },
-  {
-    name: "Logo on Event Page",
-    community: "Yes",
-    gold: "Yes",
-    platinum: "Yes",
-  },
-  {
-    name: "Product Used in Hackathon",
-    community: "Yes",
-    gold: "Yes",
-    platinum: "Yes",
-  },
-  {
-    name: "Dedicated Discord Channel",
-    community: "Yes",
-    gold: "Yes",
-    platinum: "Yes",
-  },
-  {
-    name: "Live Demo Room",
-    community: "Yes",
-    gold: "Yes",
-    platinum: "Yes",
-  },
-];
 
 export const HACKATHON_TEAMS: string[] = ["Team 01"];
 
