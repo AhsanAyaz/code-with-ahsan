@@ -16,7 +16,7 @@ const EventStructureSection = () => {
             </h2>
           </div>
           <p className="text-base-content/70 max-w-2xl mx-auto text-sm sm:text-base">
-            Build tracks for the hackathon. Pick one and ship a working demo by the end of the day.
+            The brief for the day — every team builds to the same theme.
           </p>
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="mt-4">
             <a
@@ -43,9 +43,11 @@ const EventStructureSection = () => {
               className="group w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] bg-base-200 border border-primary/10 rounded-xl p-5 transition-shadow duration-300 hover:border-primary/30 hover:shadow-[0_0_24px_rgba(143,39,224,0.16)]"
             >
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-mono text-primary/60">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
+                {HACKATHON_THEMES.length > 1 && (
+                  <span className="text-xs font-mono text-primary/60">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                )}
                 <h3 className="text-base font-semibold text-primary">{theme.title}</h3>
               </div>
               <p className="text-sm text-base-content/70 leading-relaxed">{theme.description}</p>

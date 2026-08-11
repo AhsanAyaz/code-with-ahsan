@@ -37,7 +37,7 @@ export const EVENT = {
   name: "CWA Ship Karachi 2026",
   kicker: "One-Day Hackathon",
   tagline: "One day. One track. On-site.",
-  theme: "Build & Ship an AI Product in a Day",
+  theme: "Build & Ship AI Product in One Day",
   /** Human-facing date. The exact day is not locked yet. */
   dateLabel: "12 or 13 September 2026",
   timeLabel: "9:00 AM – 7:15 PM",
@@ -70,9 +70,9 @@ export type ThemeItem = {
 
 export const HACKATHON_THEMES: ThemeItem[] = [
   {
-    title: "TBD",
+    title: "Build & Ship AI Product in One Day",
     description:
-      " ------ TO BE DECIDED ------. The hackathon themes will be revealed at the start of the event, challenging participants to build innovative solutions in real-time.",
+      "Ship a production-ready AI product before the day ends — not a prototype, not a vibe-coded demo, but something real enough to put in front of users and keep running after the event.",
   },
 ];
 
@@ -258,7 +258,7 @@ const COLLABORATION_PARTNER_IMG =
   "/static/images/events/cwa-ship-karachi-2026/collaboration-partners";
 
 export const COLLABORATION_PARTNERS: CollaborationPartner[] = [
-  { name: "MLSA KHI", logoUrl: `${COLLABORATION_PARTNER_IMG}/mlsa-khi.jpeg`, websiteUrl: "" },
+  { name: "MSA KHI", logoUrl: `${COLLABORATION_PARTNER_IMG}/msa-khi.png`, websiteUrl: "" },
 ];
 
 export type SponsorLogoPlaceholder = {
