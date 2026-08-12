@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 import SlideBackground from "../SlideBackground";
 import { headingFont } from "../../../constants";
 
-// Submissions close 16:30 PKT = UTC+5 = 11:30 UTC on September 13 2026
-const DEADLINE = new Date("2026-09-13T11:30:00Z");
+// Submissions close 16:30 PKT = UTC+5 = 11:30 UTC on September 12 2026
+const DEADLINE = new Date("2026-09-12T11:30:00Z");
 
 function formatCountdown(ms: number): string {
   if (ms <= 0) return "00:00:00";
@@ -137,7 +137,7 @@ export default function SendOffSection() {
             margin: "16px 0 0",
           }}
         >
-          4:30 PM PKT · September 13, 2026
+          4:30 PM PKT · September 12, 2026
         </motion.p>
       </div>
     </div>

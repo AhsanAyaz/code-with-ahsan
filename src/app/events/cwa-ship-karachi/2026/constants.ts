@@ -38,12 +38,11 @@ export const EVENT = {
   kicker: "One-Day Hackathon",
   tagline: "One day. One track. On-site.",
   theme: "Build & Ship AI Product in One Day",
-  /** Human-facing date. The exact day is not locked yet. */
-  dateLabel: "12 or 13 September 2026",
+  dateLabel: "Saturday, 12 September 2026",
   timeLabel: "9:00 AM – 7:15 PM",
-  /** Countdown target (local time). Uses the earlier of the two candidate days. */
-  isoStart: "2026-09-13T09:00:00",
-  locationShort: "On-site · Karachi, PK",
+  /** Countdown target (local time). Keep in sync with dateLabel/timeLabel. */
+  isoStart: "2026-09-12T09:00:00",
+  locationShort: "Folio3 · Karachi, PK",
   registerUrl: "https://forms.gle/davuSPGjiDxTLkte6",
   /** Sponsorship tiers live in the deck, not on the page. */
   sponsorshipDeckUrl:
@@ -379,15 +378,26 @@ export const DAY_SCHEDULE: ScheduleItem[] = [
 ];
 
 // ─── Venue (on-site) ─────────────────────────────────────────────────────────
-// The venue is not confirmed yet — everything here reads as TBD on the page.
-// TODO: add name, addressLines and mapUrl once the venue is locked in.
-export const VENUE = {
-  name: "To Be Announced",
-  note: "We are finalising the venue. The full address and directions will be shared here — and emailed to everyone who registers — as soon as it is confirmed.",
-  mapUrl: "",
+// TODO: add the street address line once confirmed — `addressLines` renders
+// only when non-empty, so the section is correct without it.
+export type VenueInfo = {
+  name: string;
+  addressLines: string[];
+  note: string;
+  mapUrl: string;
+  logoUrl: string;
+  highlights: string[];
+};
+
+export const VENUE: VenueInfo = {
+  name: "Folio3",
+  addressLines: ["Folio3 Tower, Plot 26 Shahra-e-Faisal", "(SMCHS), Karachi, 75100"],
+  note: "We are hosted at Folio3 in Karachi — one floor, one room, the whole day. Full directions are a tap away, and joining instructions go out by email once you register.",
+  mapUrl: "https://share.google/ZkHTOmQToc8dgbfEO",
+  logoUrl: "/static/images/events/cwa-ship-karachi-2026/venue/folio3.webp",
   highlights: [
     "On-site, in-person only",
-    "Somewhere central and easy to reach",
     "Power and Wi-Fi for every team",
+    "Food and refreshments through the day",
   ],
-} as const;
+};
