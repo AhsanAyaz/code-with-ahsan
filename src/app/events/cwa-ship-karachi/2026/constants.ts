@@ -46,7 +46,7 @@ export const EVENT = {
   registerUrl: "https://forms.gle/davuSPGjiDxTLkte6",
   /** Sponsorship tiers live in the deck, not on the page. */
   sponsorshipDeckUrl:
-    "/docs/events/cwa-ship-karachi/2026/cwa-ship-karachi-2026-sponsorship-deck.pdf",
+    "https://drive.google.com/file/d/1txC2OjlRwuCHi-uAmt_dYhR4m7DNxC9S/view?usp=sharing",
 } as const;
 
 export type StatItem = {
