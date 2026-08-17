@@ -298,10 +298,10 @@ export const TRACK: EventTrack = {
   label: "One Track",
   title: "The Hackathon",
   tagline:
-    "A single-day, on-site build sprint. Form a team in the morning, ship a working demo by 4 PM, and pitch it to the judges the same evening.",
+    "A single-day, on-site build sprint. Register with your team, ship a working demo by 4 PM, and pitch it to the judges the same evening.",
   timeLabel: EVENT.timeLabel,
   points: [
-    "Team formation and theme reveal at kick-off",
+    "Teams register in advance — theme revealed at kick-off",
     "Five hours of heads-down build time across two sessions",
     "Mentors on the floor all day to unblock your team",
     "Same-day judging with prizes for the top three teams",
@@ -330,7 +330,7 @@ export const DAY_SCHEDULE: ScheduleItem[] = [
     time: "9:00 – 9:30 AM",
     title: "Registration",
     kind: "registration",
-    description: "Check in, collect your badge, grab coffee, and find your team.",
+    description: "Check in with your team, collect your badges, and grab coffee before we start.",
   },
   {
     time: "9:30 – 10:00 AM",

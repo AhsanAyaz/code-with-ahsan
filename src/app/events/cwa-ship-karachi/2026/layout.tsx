@@ -11,7 +11,7 @@ const bebasNeue = Bebas_Neue({
 });
 
 const TITLE = `${EVENT.name} | Code with Ahsan`;
-const DESCRIPTION = `${EVENT.name} on ${EVENT.dateLabel}: a single-day, on-site hackathon in Karachi. Form a team, build with AI, and demo to the judges the same evening.`;
+const DESCRIPTION = `${EVENT.name} on ${EVENT.dateLabel}: a single-day, on-site hackathon in Karachi. Bring your team, build and ship an AI product, and demo to the judges the same evening.`;
 
 export const metadata: Metadata = {
   title: TITLE,
