@@ -8,8 +8,17 @@ import { createLogger } from "@/lib/logger";
 
 const logger = createLogger("api-consulting-checkout");
 
-function getSiteUrl(): string {
-  return process.env.NEXT_PUBLIC_SITE_URL || "https://codewithahsan.dev";
+function getBaseUrl(request: NextRequest): string {
+  const origin = request.headers.get("origin");
+  if (origin) return origin;
+
+  const host = request.headers.get("host");
+  if (host) {
+    const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http" : "https";
+    return `${protocol}://${host}`;
+  }
+
+  return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 }
 
 export async function POST(request: NextRequest) {
@@ -102,9 +111,9 @@ export async function POST(request: NextRequest) {
 
     await bookingRef.set(bookingData);
 
-    // Initialize Stripe Checkout Session
+    // Initialize Stripe Checkout Session with dynamic origin URL
     const stripe = getStripeClient();
-    const siteUrl = getSiteUrl();
+    const baseUrl = getBaseUrl(request);
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -132,8 +141,8 @@ export async function POST(request: NextRequest) {
         startTime,
         endTime,
       },
-      success_url: `${siteUrl}/consulting/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${siteUrl}/consulting/cancel?booking_id=${bookingRef.id}`,
+      success_url: `${baseUrl}/consulting/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/consulting/cancel?booking_id=${bookingRef.id}`,
     });
 
     // Save Stripe session ID back to booking
@@ -144,6 +153,7 @@ export async function POST(request: NextRequest) {
     logger.info("Created consulting checkout session", {
       bookingId: bookingRef.id,
       sessionId: session.id,
+      redirectBaseUrl: baseUrl,
     });
 
     return NextResponse.json({
