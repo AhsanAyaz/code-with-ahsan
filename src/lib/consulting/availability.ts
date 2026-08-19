@@ -1,19 +1,19 @@
 import { db } from "@/lib/firebaseAdmin";
-import { isCalendarConfigured, getOAuthClient, decryptToken } from "@/lib/google-calendar";
-import { google } from "googleapis";
+import { getOAuthClient, decryptToken } from "@/lib/google-calendar";
+import { CONSULTING_CONFIG, DEFAULT_WEEKLY_AVAILABILITY } from "./constants";
+import { ConsultingAvailableSlot } from "@/types/consulting";
 import {
-  addMinutes,
   addDays,
-  parseISO,
-  isBefore,
+  addMinutes,
   isAfter,
+  isBefore,
+  parseISO,
   setHours,
   setMinutes,
   setSeconds,
   setMilliseconds,
 } from "date-fns";
-import { DEFAULT_WEEKLY_AVAILABILITY, CONSULTING_CONFIG } from "./constants";
-import { ConsultingAvailableSlot } from "@/types/consulting";
+import { google } from "googleapis";
 import { createLogger } from "@/lib/logger";
 
 const logger = createLogger("consulting-availability");
@@ -24,25 +24,22 @@ interface TimeInterval {
 }
 
 /**
- * Check if two intervals overlap (including buffer).
+ * Helper to check if two time intervals overlap (including safety buffer).
  */
-function intervalsOverlap(a: TimeInterval, b: TimeInterval, bufferMinutes = 0): boolean {
-  const aStart = a.start.getTime();
-  const aEnd = a.end.getTime() + bufferMinutes * 60 * 1000;
-  const bStart = b.start.getTime();
-  const bEnd = b.end.getTime() + bufferMinutes * 60 * 1000;
-
-  return aStart < bEnd && bStart < aEnd;
+function intervalsOverlap(
+  intervalA: TimeInterval,
+  intervalB: TimeInterval,
+  bufferMinutes: number
+): boolean {
+  const bufferedStartB = addMinutes(intervalB.start, -bufferMinutes);
+  const bufferedEndB = addMinutes(intervalB.end, bufferMinutes);
+  return isBefore(intervalA.start, bufferedEndB) && isAfter(intervalA.end, bufferedStartB);
 }
 
 /**
- * Fetch busy periods from Ahsan's Google Calendar via FreeBusy API.
+ * Fetch busy time blocks from Google Calendar API (FreeBusy query).
  */
 async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promise<TimeInterval[]> {
-  if (!isCalendarConfigured()) {
-    return [];
-  }
-
   try {
     // Find Ahsan's profile or admin user with Google Calendar refresh token
     const profilesSnapshot = await db
@@ -178,6 +175,65 @@ async function fetchFirestoreBusyTimes(timeMin: Date, timeMax: Date): Promise<Ti
 }
 
 /**
+ * Get profile custom availability if configured.
+ */
+async function getProfileWeeklyAvailability(): Promise<Record<
+  number,
+  { start: string; end: string }[]
+> | null> {
+  try {
+    const profileSnap = await db
+      .collection("mentorship_profiles")
+      .where("email", "==", CONSULTING_CONFIG.adminEmail)
+      .limit(1)
+      .get();
+
+    if (profileSnap.empty) return null;
+    const data = profileSnap.docs[0].data();
+    if (!data.availability) return null;
+
+    // Map day names or array indices to 0-6 day numbers
+    const dayMap: Record<string, number> = {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6,
+    };
+
+    const schedule: Record<number, { start: string; end: string }[]> = {};
+
+    if (typeof data.availability === "object") {
+      for (const [key, slots] of Object.entries(data.availability)) {
+        const dayNum = dayMap[key.toLowerCase()] ?? Number(key);
+        if (!isNaN(dayNum) && Array.isArray(slots)) {
+          const validSlots = slots.filter(
+            (s: unknown): s is { start: string; end: string } =>
+              typeof s === "object" &&
+              s !== null &&
+              "start" in s &&
+              "end" in s &&
+              typeof (s as { start: unknown }).start === "string" &&
+              typeof (s as { end: unknown }).end === "string"
+          );
+          schedule[dayNum] = validSlots.map((s) => ({
+            start: s.start,
+            end: s.end,
+          }));
+        }
+      }
+    }
+
+    return Object.keys(schedule).length > 0 ? schedule : null;
+  } catch (err) {
+    logger.warn("Could not fetch profile availability, using defaults", { err });
+    return null;
+  }
+}
+
+/**
  * Compute available slots for a given date range, duration, and target timezone.
  */
 export async function getAvailableConsultingSlots({
@@ -200,12 +256,14 @@ export async function getAvailableConsultingSlots({
   const queryStart = startDate;
   const queryEnd = addDays(endDate, 1);
 
-  // Fetch all existing busy intervals
-  const [googleBusy, firestoreBusy] = await Promise.all([
+  // Fetch all existing busy intervals and profile schedule in parallel
+  const [googleBusy, firestoreBusy, customSchedule] = await Promise.all([
     fetchGoogleCalendarBusyTimes(queryStart, queryEnd),
     fetchFirestoreBusyTimes(queryStart, queryEnd),
+    getProfileWeeklyAvailability(),
   ]);
 
+  const weeklySchedule = customSchedule || DEFAULT_WEEKLY_AVAILABILITY;
   const allBusy = [...googleBusy, ...firestoreBusy];
   const availableSlots: ConsultingAvailableSlot[] = [];
 
@@ -213,7 +271,7 @@ export async function getAvailableConsultingSlots({
 
   while (isBefore(currentDate, queryEnd)) {
     const dayOfWeek = currentDate.getDay(); // 0 (Sun) - 6 (Sat)
-    const daySchedules = DEFAULT_WEEKLY_AVAILABILITY[dayOfWeek] || [];
+    const daySchedules = weeklySchedule[dayOfWeek] || [];
 
     for (const sched of daySchedules) {
       const [startH, startM] = sched.start.split(":").map(Number);
