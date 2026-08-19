@@ -111,52 +111,36 @@ async function fetchGoogleCalendarAppointmentSlots(
 
   try {
     const calendar = google.calendar({ version: "v3", auth: oauthClient });
+    const eventsRes = await calendar.events.list({
+      calendarId: "primary",
+      timeMin: timeMin.toISOString(),
+      timeMax: timeMax.toISOString(),
+      singleEvents: true,
+      orderBy: "startTime",
+    });
 
-    let calendarIds = ["primary"];
-    try {
-      const cList = await calendar.calendarList.list({ minAccessRole: "freeBusyReader" });
-      if (cList.data.items && cList.data.items.length > 0) {
-        calendarIds = cList.data.items.map((i) => i.id as string);
-      }
-    } catch (e) {
-      logger.warn("Could not list calendars for appointment slots search", { e });
-    }
+    const items = eventsRes.data.items || [];
+    for (const item of items) {
+      const summary = (item.summary || "").toLowerCase();
+      const description = (item.description || "").toLowerCase();
 
-    for (const calId of calendarIds) {
-      try {
-        const eventsRes = await calendar.events.list({
-          calendarId: calId,
-          timeMin: timeMin.toISOString(),
-          timeMax: timeMax.toISOString(),
-          singleEvents: true,
-          orderBy: "startTime",
+      // Match events created by Google Calendar Appointment Schedules or titled "1:1 with Ahsan"
+      const isAppointmentSlot =
+        summary.includes("1:1 with ahsan") ||
+        summary.includes("bookable appointment") ||
+        description.includes("bookable appointments") ||
+        summary.includes("30 min bookable") ||
+        item.eventType === "workingHours";
+
+      if (isAppointmentSlot && item.start?.dateTime && item.end?.dateTime) {
+        appointmentSlots.push({
+          start: new Date(item.start.dateTime),
+          end: new Date(item.end.dateTime),
         });
-
-        const items = eventsRes.data.items || [];
-        for (const item of items) {
-          const summary = (item.summary || "").toLowerCase();
-          const description = (item.description || "").toLowerCase();
-
-          // Match events created by Google Calendar Appointment Schedules or titled "1:1 with Ahsan"
-          const isAppointmentSlot =
-            summary.includes("1:1 with ahsan") ||
-            summary.includes("bookable appointment") ||
-            description.includes("bookable appointments") ||
-            summary.includes("30 min bookable");
-
-          if (isAppointmentSlot && item.start?.dateTime && item.end?.dateTime) {
-            appointmentSlots.push({
-              start: new Date(item.start.dateTime),
-              end: new Date(item.end.dateTime),
-            });
-          }
-        }
-      } catch (err) {
-        // Skip individual calendar errors
       }
     }
 
-    logger.info("Found explicit Google Calendar appointment slots", {
+    logger.info("Fetched Google Calendar appointment slots", {
       count: appointmentSlots.length,
     });
   } catch (error) {
@@ -167,7 +151,7 @@ async function fetchGoogleCalendarAppointmentSlots(
 }
 
 /**
- * Fetch busy periods from Ahsan's Google Calendar via FreeBusy API.
+ * Fetch busy periods from Ahsan's Google Calendar via FreeBusy API on primary calendar.
  */
 async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promise<TimeInterval[]> {
   const oauthClient = await getAdminOAuthClient();
@@ -175,43 +159,21 @@ async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promi
 
   try {
     const calendar = google.calendar({ version: "v3", auth: oauthClient });
-
-    let calendarIds: { id: string }[] = [{ id: "primary" }];
-    try {
-      const calendarListRes = await calendar.calendarList.list({ minAccessRole: "freeBusyReader" });
-      if (calendarListRes.data.items && calendarListRes.data.items.length > 0) {
-        calendarIds = calendarListRes.data.items.map((item) => ({ id: item.id as string }));
-      }
-    } catch (listErr) {
-      logger.warn("Failed to fetch full calendar list, falling back to primary", { listErr });
-    }
-
     const freeBusyRes = await calendar.freebusy.query({
       requestBody: {
         timeMin: timeMin.toISOString(),
         timeMax: timeMax.toISOString(),
-        items: calendarIds,
+        items: [{ id: "primary" }],
       },
     });
 
-    const busyTimes: TimeInterval[] = [];
-    const calendarsObj = freeBusyRes.data.calendars || {};
-
-    for (const calKey of Object.keys(calendarsObj)) {
-      const calData = calendarsObj[calKey];
-      if (calData?.busy) {
-        for (const b of calData.busy) {
-          if (b.start && b.end) {
-            busyTimes.push({
-              start: new Date(b.start as string),
-              end: new Date(b.end as string),
-            });
-          }
-        }
-      }
-    }
-
-    return busyTimes;
+    const busyList = freeBusyRes.data.calendars?.primary?.busy || [];
+    return busyList
+      .filter((b) => b.start && b.end)
+      .map((b) => ({
+        start: new Date(b.start as string),
+        end: new Date(b.end as string),
+      }));
   } catch (error) {
     logger.error("Error querying Google Calendar freebusy", { error });
     return [];
@@ -219,23 +181,32 @@ async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promi
 }
 
 /**
- * Fetch busy periods from Firestore (both confirmed bookings & active pending checkout locks).
+ * Fetch busy periods from Firestore in memory to avoid index requirements.
  */
 async function fetchFirestoreBusyTimes(timeMin: Date, timeMax: Date): Promise<TimeInterval[]> {
   const busyTimes: TimeInterval[] = [];
   const now = new Date();
 
   try {
-    // 1. Consulting Bookings
-    const consultingSnap = await db
-      .collection("consulting_bookings")
-      .where("startTime", ">=", timeMin)
-      .where("startTime", "<=", timeMax)
-      .get();
+    // 1. Consulting Bookings (try indexed query, fallback to full fetch)
+    let consultingDocs;
+    try {
+      const indexedSnap = await db
+        .collection("consulting_bookings")
+        .where("startTime", ">=", timeMin)
+        .where("startTime", "<=", timeMax)
+        .get();
+      consultingDocs = indexedSnap.docs;
+    } catch {
+      const fullSnap = await db.collection("consulting_bookings").get();
+      consultingDocs = fullSnap.docs;
+    }
 
-    for (const doc of consultingSnap.docs) {
+    for (const doc of consultingDocs) {
       const data = doc.data();
       const status = data.status;
+      if (!data.startTime || !data.endTime) continue;
+
       const startTime = data.startTime?.toDate ? data.startTime.toDate() : new Date(data.startTime);
       const endTime = data.endTime?.toDate ? data.endTime.toDate() : new Date(data.endTime);
       const expiresAt = data.expiresAt?.toDate
@@ -244,26 +215,39 @@ async function fetchFirestoreBusyTimes(timeMin: Date, timeMax: Date): Promise<Ti
           ? new Date(data.expiresAt)
           : null;
 
+      if (endTime < timeMin || startTime > timeMax) continue;
+
       if (status === "confirmed") {
         busyTimes.push({ start: startTime, end: endTime });
       } else if (status === "pending_payment" && expiresAt && isAfter(expiresAt, now)) {
-        // Slot is locked during Stripe checkout window
         busyTimes.push({ start: startTime, end: endTime });
       }
     }
 
-    // 2. Mentorship Bookings
-    const mentorshipSnap = await db
-      .collection("mentorship_bookings")
-      .where("status", "==", "confirmed")
-      .where("startTime", ">=", timeMin)
-      .where("startTime", "<=", timeMax)
-      .get();
+    // 2. Mentorship Bookings (try indexed query, fallback to full fetch)
+    let mentorshipDocs;
+    try {
+      const indexedMentorshipSnap = await db
+        .collection("mentorship_bookings")
+        .where("status", "==", "confirmed")
+        .where("startTime", ">=", timeMin)
+        .where("startTime", "<=", timeMax)
+        .get();
+      mentorshipDocs = indexedMentorshipSnap.docs;
+    } catch {
+      const fullMentorshipSnap = await db.collection("mentorship_bookings").get();
+      mentorshipDocs = fullMentorshipSnap.docs;
+    }
 
-    for (const doc of mentorshipSnap.docs) {
+    for (const doc of mentorshipDocs) {
       const data = doc.data();
+      if (data.status !== "confirmed" || !data.startTime || !data.endTime) continue;
+
       const startTime = data.startTime?.toDate ? data.startTime.toDate() : new Date(data.startTime);
       const endTime = data.endTime?.toDate ? data.endTime.toDate() : new Date(data.endTime);
+
+      if (endTime < timeMin || startTime > timeMax) continue;
+
       busyTimes.push({ start: startTime, end: endTime });
     }
   } catch (error) {
