@@ -1,19 +1,19 @@
 import { db } from "@/lib/firebaseAdmin";
-import { isCalendarConfigured, getOAuthClient, decryptToken } from "@/lib/google-calendar";
-import { google } from "googleapis";
+import { getOAuthClient, decryptToken, isCalendarConfigured } from "@/lib/google-calendar";
+import { CONSULTING_CONFIG, DEFAULT_WEEKLY_AVAILABILITY } from "./constants";
+import { ConsultingAvailableSlot } from "@/types/consulting";
 import {
-  addMinutes,
   addDays,
-  parseISO,
-  isBefore,
+  addMinutes,
   isAfter,
+  isBefore,
+  parseISO,
   setHours,
   setMinutes,
   setSeconds,
   setMilliseconds,
 } from "date-fns";
-import { DEFAULT_WEEKLY_AVAILABILITY, CONSULTING_CONFIG } from "./constants";
-import { ConsultingAvailableSlot } from "@/types/consulting";
+import { google } from "googleapis";
 import { createLogger } from "@/lib/logger";
 
 const logger = createLogger("consulting-availability");
@@ -23,28 +23,23 @@ interface TimeInterval {
   end: Date;
 }
 
-/**
- * Check if two intervals overlap (including buffer).
- */
-function intervalsOverlap(a: TimeInterval, b: TimeInterval, bufferMinutes = 0): boolean {
-  const aStart = a.start.getTime();
-  const aEnd = a.end.getTime() + bufferMinutes * 60 * 1000;
-  const bStart = b.start.getTime();
-  const bEnd = b.end.getTime() + bufferMinutes * 60 * 1000;
-
-  return aStart < bEnd && bStart < aEnd;
+function intervalsOverlap(
+  intervalA: TimeInterval,
+  intervalB: TimeInterval,
+  bufferMinutes: number
+): boolean {
+  const bufferedStartB = addMinutes(intervalB.start, -bufferMinutes);
+  const bufferedEndB = addMinutes(intervalB.end, bufferMinutes);
+  return isBefore(intervalA.start, bufferedEndB) && isAfter(intervalA.end, bufferedStartB);
 }
 
 /**
- * Fetch busy periods from Ahsan's Google Calendar via FreeBusy API.
+ * Fetch Google Calendar OAuth client for admin/mentor.
  */
-async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promise<TimeInterval[]> {
-  if (!isCalendarConfigured()) {
-    return [];
-  }
+async function getAdminOAuthClient() {
+  if (!isCalendarConfigured()) return null;
 
   try {
-    // Find Ahsan's profile or admin user with Google Calendar refresh token
     const profilesSnapshot = await db
       .collection("mentorship_profiles")
       .where("email", "==", CONSULTING_CONFIG.adminEmail)
@@ -60,7 +55,6 @@ async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promi
       }
     }
 
-    // If not found by email, check for any profile marked isAdmin with token
     if (!refreshToken) {
       const adminSnap = await db
         .collection("mentorship_profiles")
@@ -76,7 +70,6 @@ async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promi
       }
     }
 
-    // Fallback: Check any profile with a connected token (e.g. in emulator/dev)
     if (!refreshToken) {
       const anySnap = await db
         .collection("mentorship_profiles")
@@ -92,17 +85,97 @@ async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promi
       }
     }
 
-    if (!refreshToken) {
-      logger.info("No Google Calendar refresh token found for admin");
-      return [];
-    }
+    if (!refreshToken) return null;
 
     const oauthClient = getOAuthClient();
     oauthClient.setCredentials({ refresh_token: refreshToken });
+    return oauthClient;
+  } catch (error) {
+    logger.error("Error getting admin OAuth client", { error });
+    return null;
+  }
+}
 
+/**
+ * Directly fetch explicit appointment slots from Google Calendar events
+ * titled "1:1 with Ahsan" or similar appointment schedule titles.
+ */
+async function fetchGoogleCalendarAppointmentSlots(
+  timeMin: Date,
+  timeMax: Date
+): Promise<TimeInterval[]> {
+  const oauthClient = await getAdminOAuthClient();
+  if (!oauthClient) return [];
+
+  const appointmentSlots: TimeInterval[] = [];
+
+  try {
     const calendar = google.calendar({ version: "v3", auth: oauthClient });
 
-    // Fetch all calendars owned/subscribed by user (e.g. Primary, Topmate, Work, GDE)
+    let calendarIds = ["primary"];
+    try {
+      const cList = await calendar.calendarList.list({ minAccessRole: "freeBusyReader" });
+      if (cList.data.items && cList.data.items.length > 0) {
+        calendarIds = cList.data.items.map((i) => i.id as string);
+      }
+    } catch (e) {
+      logger.warn("Could not list calendars for appointment slots search", { e });
+    }
+
+    for (const calId of calendarIds) {
+      try {
+        const eventsRes = await calendar.events.list({
+          calendarId: calId,
+          timeMin: timeMin.toISOString(),
+          timeMax: timeMax.toISOString(),
+          singleEvents: true,
+          orderBy: "startTime",
+        });
+
+        const items = eventsRes.data.items || [];
+        for (const item of items) {
+          const summary = (item.summary || "").toLowerCase();
+          const description = (item.description || "").toLowerCase();
+
+          // Match events created by Google Calendar Appointment Schedules or titled "1:1 with Ahsan"
+          const isAppointmentSlot =
+            summary.includes("1:1 with ahsan") ||
+            summary.includes("bookable appointment") ||
+            description.includes("bookable appointments") ||
+            summary.includes("30 min bookable");
+
+          if (isAppointmentSlot && item.start?.dateTime && item.end?.dateTime) {
+            appointmentSlots.push({
+              start: new Date(item.start.dateTime),
+              end: new Date(item.end.dateTime),
+            });
+          }
+        }
+      } catch (err) {
+        // Skip individual calendar errors
+      }
+    }
+
+    logger.info("Found explicit Google Calendar appointment slots", {
+      count: appointmentSlots.length,
+    });
+  } catch (error) {
+    logger.error("Error fetching Google Calendar appointment slots", { error });
+  }
+
+  return appointmentSlots;
+}
+
+/**
+ * Fetch busy periods from Ahsan's Google Calendar via FreeBusy API.
+ */
+async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promise<TimeInterval[]> {
+  const oauthClient = await getAdminOAuthClient();
+  if (!oauthClient) return [];
+
+  try {
+    const calendar = google.calendar({ version: "v3", auth: oauthClient });
+
     let calendarIds: { id: string }[] = [{ id: "primary" }];
     try {
       const calendarListRes = await calendar.calendarList.list({ minAccessRole: "freeBusyReader" });
@@ -179,7 +252,7 @@ async function fetchFirestoreBusyTimes(timeMin: Date, timeMax: Date): Promise<Ti
       }
     }
 
-    // 2. Mentorship Bookings (to ensure mentorship sessions also block consulting)
+    // 2. Mentorship Bookings
     const mentorshipSnap = await db
       .collection("mentorship_bookings")
       .where("status", "==", "confirmed")
@@ -198,6 +271,64 @@ async function fetchFirestoreBusyTimes(timeMin: Date, timeMax: Date): Promise<Ti
   }
 
   return busyTimes;
+}
+
+/**
+ * Get profile custom availability if configured.
+ */
+async function getProfileWeeklyAvailability(): Promise<Record<
+  number,
+  { start: string; end: string }[]
+> | null> {
+  try {
+    const profileSnap = await db
+      .collection("mentorship_profiles")
+      .where("email", "==", CONSULTING_CONFIG.adminEmail)
+      .limit(1)
+      .get();
+
+    if (profileSnap.empty) return null;
+    const data = profileSnap.docs[0].data();
+    if (!data.availability) return null;
+
+    const dayMap: Record<string, number> = {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6,
+    };
+
+    const schedule: Record<number, { start: string; end: string }[]> = {};
+
+    if (typeof data.availability === "object") {
+      for (const [key, slots] of Object.entries(data.availability)) {
+        const dayNum = dayMap[key.toLowerCase()] ?? Number(key);
+        if (!isNaN(dayNum) && Array.isArray(slots)) {
+          const validSlots = slots.filter(
+            (s: unknown): s is { start: string; end: string } =>
+              typeof s === "object" &&
+              s !== null &&
+              "start" in s &&
+              "end" in s &&
+              typeof (s as { start: unknown }).start === "string" &&
+              typeof (s as { end: unknown }).end === "string"
+          );
+          schedule[dayNum] = validSlots.map((s) => ({
+            start: s.start,
+            end: s.end,
+          }));
+        }
+      }
+    }
+
+    return Object.keys(schedule).length > 0 ? schedule : null;
+  } catch (err) {
+    logger.warn("Could not fetch profile availability, using defaults", { err });
+    return null;
+  }
 }
 
 /**
@@ -223,20 +354,49 @@ export async function getAvailableConsultingSlots({
   const queryStart = startDate;
   const queryEnd = addDays(endDate, 1);
 
-  // Fetch all existing busy intervals
-  const [googleBusy, firestoreBusy] = await Promise.all([
+  // 1. First, check if explicit "1:1 with Ahsan" Google Calendar Appointment Slots exist
+  const explicitCalendarSlots = await fetchGoogleCalendarAppointmentSlots(queryStart, queryEnd);
+  const firestoreBusy = await fetchFirestoreBusyTimes(queryStart, queryEnd);
+
+  const availableSlots: ConsultingAvailableSlot[] = [];
+
+  if (explicitCalendarSlots.length > 0) {
+    logger.info("Using explicit Google Calendar appointment slots as master schedule", {
+      count: explicitCalendarSlots.length,
+    });
+
+    for (const slot of explicitCalendarSlots) {
+      if (isAfter(slot.start, minNoticeTime) && isBefore(slot.start, maxBookingTime)) {
+        const isBusy = firestoreBusy.some((busy) =>
+          intervalsOverlap(slot, busy, CONSULTING_CONFIG.bufferBetweenSessionsMinutes)
+        );
+
+        if (!isBusy) {
+          availableSlots.push({
+            start: slot.start.toISOString(),
+            end: slot.end.toISOString(),
+          });
+        }
+      }
+    }
+
+    return availableSlots;
+  }
+
+  // 2. Fallback to general schedule minus freebusy if no explicit "1:1 with Ahsan" event titles match
+  const [googleBusy, customSchedule] = await Promise.all([
     fetchGoogleCalendarBusyTimes(queryStart, queryEnd),
-    fetchFirestoreBusyTimes(queryStart, queryEnd),
+    getProfileWeeklyAvailability(),
   ]);
 
+  const weeklySchedule = customSchedule || DEFAULT_WEEKLY_AVAILABILITY;
   const allBusy = [...googleBusy, ...firestoreBusy];
-  const availableSlots: ConsultingAvailableSlot[] = [];
 
   let currentDate = startDate;
 
   while (isBefore(currentDate, queryEnd)) {
-    const dayOfWeek = currentDate.getDay(); // 0 (Sun) - 6 (Sat)
-    const daySchedules = DEFAULT_WEEKLY_AVAILABILITY[dayOfWeek] || [];
+    const dayOfWeek = currentDate.getDay();
+    const daySchedules = weeklySchedule[dayOfWeek] || [];
 
     for (const sched of daySchedules) {
       const [startH, startM] = sched.start.split(":").map(Number);
@@ -256,14 +416,12 @@ export async function getAvailableConsultingSlots({
         const slotEnd = addMinutes(slotStart, durationMinutes);
 
         if (isAfter(slotEnd, blockEnd)) {
-          break; // Exceeds the available block for this day
+          break;
         }
 
-        // Validate min notice and max advance limits
         if (isAfter(slotStart, minNoticeTime) && isBefore(slotStart, maxBookingTime)) {
           const slotInterval: TimeInterval = { start: slotStart, end: slotEnd };
 
-          // Check if it overlaps with any busy period (accounting for buffer)
           const isBusy = allBusy.some((busy) =>
             intervalsOverlap(slotInterval, busy, CONSULTING_CONFIG.bufferBetweenSessionsMinutes)
           );
@@ -276,7 +434,6 @@ export async function getAvailableConsultingSlots({
           }
         }
 
-        // Advance by step minutes
         slotStart = addMinutes(slotStart, CONSULTING_CONFIG.slotDurationStepMinutes);
       }
     }
