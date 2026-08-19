@@ -674,16 +674,6 @@
       ]
     },
     {
-      "collectionGroup": "consulting_bookings",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "startTime",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
       "collectionGroup": "mentorship_bookings",
       "queryScope": "COLLECTION",
       "fields": [

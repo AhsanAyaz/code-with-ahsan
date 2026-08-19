@@ -49,7 +49,10 @@ export function getAuthUrl(mentorId: string): string {
   return client.generateAuthUrl({
     access_type: "offline",
     prompt: "consent", // Force consent to always get refresh_token
-    scope: ["https://www.googleapis.com/auth/calendar.events"],
+    scope: [
+      "https://www.googleapis.com/auth/calendar.events",
+      "https://www.googleapis.com/auth/calendar.readonly",
+    ],
     state: mentorId, // Pass mentorId through OAuth flow
   });
 }

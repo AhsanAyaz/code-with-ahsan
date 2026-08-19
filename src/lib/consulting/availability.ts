@@ -151,7 +151,8 @@ async function fetchGoogleCalendarAppointmentSlots(
 }
 
 /**
- * Fetch busy periods from Ahsan's Google Calendar via FreeBusy API on primary calendar.
+ * Fetch busy periods from Ahsan's Google Calendar using events.list
+ * (matches the authorized calendar.events scope without throwing 403 freebusy errors).
  */
 async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promise<TimeInterval[]> {
   const oauthClient = await getAdminOAuthClient();
@@ -159,23 +160,37 @@ async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promi
 
   try {
     const calendar = google.calendar({ version: "v3", auth: oauthClient });
-    const freeBusyRes = await calendar.freebusy.query({
-      requestBody: {
-        timeMin: timeMin.toISOString(),
-        timeMax: timeMax.toISOString(),
-        items: [{ id: "primary" }],
-      },
+    const eventsRes = await calendar.events.list({
+      calendarId: "primary",
+      timeMin: timeMin.toISOString(),
+      timeMax: timeMax.toISOString(),
+      singleEvents: true,
     });
 
-    const busyList = freeBusyRes.data.calendars?.primary?.busy || [];
-    return busyList
-      .filter((b) => b.start && b.end)
-      .map((b) => ({
-        start: new Date(b.start as string),
-        end: new Date(b.end as string),
-      }));
+    const busyTimes: TimeInterval[] = [];
+    const items = eventsRes.data.items || [];
+
+    for (const item of items) {
+      // Ignore transparent (free) events
+      if (item.transparency === "transparent") continue;
+
+      if (item.start?.dateTime && item.end?.dateTime) {
+        busyTimes.push({
+          start: new Date(item.start.dateTime),
+          end: new Date(item.end.dateTime),
+        });
+      } else if (item.start?.date && item.end?.date) {
+        // All-day events
+        busyTimes.push({
+          start: new Date(item.start.date),
+          end: new Date(item.end.date),
+        });
+      }
+    }
+
+    return busyTimes;
   } catch (error) {
-    logger.error("Error querying Google Calendar freebusy", { error });
+    logger.error("Error querying Google Calendar events for busy times", { error });
     return [];
   }
 }
