@@ -14,6 +14,10 @@ interface TimeInterval {
   end: Date;
 }
 
+interface AppointmentBlock extends TimeInterval {
+  summary: string;
+}
+
 function intervalsOverlap(
   intervalA: TimeInterval,
   intervalB: TimeInterval,
@@ -88,12 +92,19 @@ async function getAdminOAuthClient() {
 }
 
 /**
- * Fetch busy periods from Ahsan's Google Calendar using events.list
- * (uses calendar.events scope without 403 freebusy errors).
+ * Fetch and categorize all Google Calendar events into:
+ * 1. appointmentBlocks: explicit bookable appointment schedules / date overrides (e.g. "1:1 with Ahsan")
+ * 2. busyTimes: actual meetings/events to subtract from availability
  */
-async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promise<TimeInterval[]> {
+async function fetchGoogleCalendarData(
+  timeMin: Date,
+  timeMax: Date
+): Promise<{ appointmentBlocks: AppointmentBlock[]; busyTimes: TimeInterval[] }> {
   const oauthClient = await getAdminOAuthClient();
-  if (!oauthClient) return [];
+  if (!oauthClient) return { appointmentBlocks: [], busyTimes: [] };
+
+  const appointmentBlocks: AppointmentBlock[] = [];
+  const busyTimes: TimeInterval[] = [];
 
   try {
     const calendar = google.calendar({ version: "v3", auth: oauthClient });
@@ -102,34 +113,73 @@ async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promi
       timeMin: timeMin.toISOString(),
       timeMax: timeMax.toISOString(),
       singleEvents: true,
+      orderBy: "startTime",
     });
 
-    const busyTimes: TimeInterval[] = [];
     const items = eventsRes.data.items || [];
+    logger.info("Google Calendar Raw Events Retrieved", { totalEvents: items.length });
 
     for (const item of items) {
-      if (item.transparency === "transparent") continue;
+      const summary = (item.summary || "").trim();
+      const summaryLower = summary.toLowerCase();
+      const descriptionLower = (item.description || "").toLowerCase();
 
-      if (item.start?.dateTime && item.end?.dateTime) {
-        busyTimes.push({
-          start: new Date(item.start.dateTime),
-          end: new Date(item.end.dateTime),
-        });
-      } else if (item.start?.date && item.end?.date) {
-        // All-day events
-        busyTimes.push({
-          start: new Date(item.start.date),
-          end: new Date(item.end.date),
-        });
+      // Check if event is an appointment slot or date override created by Ahsan
+      const isAppointment =
+        summaryLower.includes("1:1 with ahsan") ||
+        summaryLower.includes("30 min bookable") ||
+        summaryLower.includes("bookable appointment") ||
+        descriptionLower.includes("bookable appointment") ||
+        item.eventType === "workingHours";
+
+      if (isAppointment) {
+        if (item.start?.dateTime && item.end?.dateTime) {
+          const start = new Date(item.start.dateTime);
+          const end = new Date(item.end.dateTime);
+          appointmentBlocks.push({ start, end, summary });
+          logger.info("Google Calendar -> APPOINTMENT_OVERRIDE", {
+            summary,
+            start: item.start.dateTime,
+            end: item.end.dateTime,
+          });
+        }
+      } else {
+        // Real busy event (meeting, personal event, etc.)
+        if (item.transparency === "transparent") {
+          logger.info("Google Calendar -> TRANSPARENT_IGNORED", {
+            summary: summary || "(transparent)",
+          });
+          continue;
+        }
+
+        if (item.start?.dateTime && item.end?.dateTime) {
+          busyTimes.push({
+            start: new Date(item.start.dateTime),
+            end: new Date(item.end.dateTime),
+          });
+          logger.info("Google Calendar -> BUSY_CONFLICT", {
+            summary: summary || "(busy)",
+            start: item.start.dateTime,
+            end: item.end.dateTime,
+          });
+        } else if (item.start?.date && item.end?.date) {
+          busyTimes.push({
+            start: new Date(item.start.date),
+            end: new Date(item.end.date),
+          });
+          logger.info("Google Calendar -> ALL_DAY_BUSY", {
+            summary: summary || "(all-day busy)",
+            start: item.start.date,
+            end: item.end.date,
+          });
+        }
       }
     }
-
-    logger.info("Fetched Google Calendar busy events", { count: busyTimes.length });
-    return busyTimes;
   } catch (error) {
-    logger.error("Error querying Google Calendar events for busy times", { error });
-    return [];
+    logger.error("Error querying Google Calendar events", { error });
   }
+
+  return { appointmentBlocks, busyTimes };
 }
 
 /**
@@ -171,8 +221,19 @@ async function fetchFirestoreBusyTimes(timeMin: Date, timeMax: Date): Promise<Ti
 
       if (status === "confirmed") {
         busyTimes.push({ start: startTime, end: endTime });
+        logger.info("Firestore Busy -> CONFIRMED_CONSULTING_BOOKING", {
+          id: doc.id,
+          start: startTime.toISOString(),
+          end: endTime.toISOString(),
+        });
       } else if (status === "pending_payment" && expiresAt && isAfter(expiresAt, now)) {
         busyTimes.push({ start: startTime, end: endTime });
+        logger.info("Firestore Busy -> ACTIVE_PENDING_CHECKOUT_LOCK", {
+          id: doc.id,
+          start: startTime.toISOString(),
+          end: endTime.toISOString(),
+          expiresAt: expiresAt.toISOString(),
+        });
       }
     }
 
@@ -201,6 +262,11 @@ async function fetchFirestoreBusyTimes(timeMin: Date, timeMax: Date): Promise<Ti
       if (endTime < timeMin || startTime > timeMax) continue;
 
       busyTimes.push({ start: startTime, end: endTime });
+      logger.info("Firestore Busy -> CONFIRMED_MENTORSHIP_BOOKING", {
+        id: doc.id,
+        start: startTime.toISOString(),
+        end: endTime.toISOString(),
+      });
     }
   } catch (error) {
     logger.error("Error fetching Firestore busy times", { error });
@@ -297,20 +363,35 @@ export async function getAvailableConsultingSlots({
   const queryStart = startDate;
   const queryEnd = addDays(endDate, 1);
 
-  // Fetch busy intervals from Google Calendar and Firestore
-  const [googleBusy, firestoreBusy, customSchedule] = await Promise.all([
-    fetchGoogleCalendarBusyTimes(queryStart, queryEnd),
+  // 1. Fetch Google Calendar events (categorized into appointment overrides and real busy conflicts) & Firestore bookings
+  const [{ appointmentBlocks, busyTimes }, firestoreBusy, customSchedule] = await Promise.all([
+    fetchGoogleCalendarData(queryStart, queryEnd),
     fetchFirestoreBusyTimes(queryStart, queryEnd),
     getProfileWeeklyAvailability(),
   ]);
 
   const weeklySchedule = customSchedule || DEFAULT_WEEKLY_AVAILABILITY;
-  const allBusy = [...googleBusy, ...firestoreBusy];
-  const availableSlots: ConsultingAvailableSlot[] = [];
-
+  const allBusy = [...busyTimes, ...firestoreBusy];
+  const candidateSlotsMap = new Map<string, { start: Date; end: Date }>();
   const adminTz = CONSULTING_CONFIG.adminTimezone || "Europe/Stockholm";
-  let currentDate = startDate;
 
+  // 2. Generate candidate slots from explicit Google Calendar Appointment Blocks / Date Overrides (e.g. 9am Friday, 10am Thursday)
+  for (const block of appointmentBlocks) {
+    let slotStart = block.start;
+    while (true) {
+      const slotEnd = addMinutes(slotStart, durationMinutes);
+      if (isAfter(slotEnd, block.end)) break;
+
+      const key = slotStart.toISOString();
+      if (!candidateSlotsMap.has(key)) {
+        candidateSlotsMap.set(key, { start: slotStart, end: slotEnd });
+      }
+      slotStart = addMinutes(slotStart, CONSULTING_CONFIG.slotDurationStepMinutes);
+    }
+  }
+
+  // 3. Generate candidate slots from recurring Weekly Schedule (e.g. Mon, Wed, Thu 2:30 PM - 6:30 PM Stockholm)
+  let currentDate = startDate;
   while (isBefore(currentDate, queryEnd)) {
     const dayOfWeek = currentDate.getDay();
     const daySchedules = weeklySchedule[dayOfWeek] || [];
@@ -322,32 +403,49 @@ export async function getAvailableConsultingSlots({
 
       while (true) {
         const slotEnd = addMinutes(slotStart, durationMinutes);
+        if (isAfter(slotEnd, blockEnd)) break;
 
-        if (isAfter(slotEnd, blockEnd)) {
-          break;
+        const key = slotStart.toISOString();
+        if (!candidateSlotsMap.has(key)) {
+          candidateSlotsMap.set(key, { start: slotStart, end: slotEnd });
         }
-
-        if (isAfter(slotStart, minNoticeTime) && isBefore(slotStart, maxBookingTime)) {
-          const slotInterval: TimeInterval = { start: slotStart, end: slotEnd };
-
-          const isBusy = allBusy.some((busy) =>
-            intervalsOverlap(slotInterval, busy, CONSULTING_CONFIG.bufferBetweenSessionsMinutes)
-          );
-
-          if (!isBusy) {
-            availableSlots.push({
-              start: slotStart.toISOString(),
-              end: slotEnd.toISOString(),
-            });
-          }
-        }
-
         slotStart = addMinutes(slotStart, CONSULTING_CONFIG.slotDurationStepMinutes);
       }
     }
 
     currentDate = addDays(currentDate, 1);
   }
+
+  // 4. Filter candidate slots against advance notice, max booking limit, and all busy periods (Google + Firestore)
+  const availableSlots: ConsultingAvailableSlot[] = [];
+
+  for (const candidate of candidateSlotsMap.values()) {
+    if (isAfter(candidate.start, minNoticeTime) && isBefore(candidate.start, maxBookingTime)) {
+      const isBusy = allBusy.some((busy) =>
+        intervalsOverlap(candidate, busy, CONSULTING_CONFIG.bufferBetweenSessionsMinutes)
+      );
+
+      if (!isBusy) {
+        availableSlots.push({
+          start: candidate.start.toISOString(),
+          end: candidate.end.toISOString(),
+        });
+      }
+    }
+  }
+
+  // Sort chronologically
+  availableSlots.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+
+  logger.info("Generated Available Consulting Slots", {
+    totalSlots: availableSlots.length,
+    durationMinutes,
+    slots: availableSlots.map((s) => ({
+      start: s.start,
+      end: s.end,
+      stockholmStart: format(fromZonedTime(s.start, "UTC"), "yyyy-MM-dd HH:mm"),
+    })),
+  });
 
   return availableSlots;
 }
