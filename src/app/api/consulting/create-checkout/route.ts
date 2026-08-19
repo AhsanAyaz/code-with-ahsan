@@ -53,15 +53,30 @@ export async function POST(request: NextRequest) {
     const endDate = parseISO(endTime);
     const now = new Date();
 
-    // Check for conflicting confirmed or active pending bookings
-    const conflictsQuery = await db
-      .collection("consulting_bookings")
-      .where("startTime", "<", endDate)
-      .where("endTime", ">", startDate)
-      .get();
+    // Check for conflicting confirmed or active pending bookings (with resilient fallback)
+    let conflictDocs: FirebaseFirestore.DocumentSnapshot[] = [];
+    try {
+      const indexedQuery = await db
+        .collection("consulting_bookings")
+        .where("startTime", "<", endDate)
+        .where("endTime", ">", startDate)
+        .get();
+      conflictDocs = indexedQuery.docs;
+    } catch {
+      // Fallback if composite index is building or not yet deployed
+      const allBookingsSnap = await db.collection("consulting_bookings").get();
+      conflictDocs = allBookingsSnap.docs.filter((doc) => {
+        const data = doc.data();
+        if (!data.startTime || !data.endTime) return false;
+        const bStart = data.startTime?.toDate ? data.startTime.toDate() : new Date(data.startTime);
+        const bEnd = data.endTime?.toDate ? data.endTime.toDate() : new Date(data.endTime);
+        return bStart < endDate && bEnd > startDate;
+      });
+    }
 
-    for (const doc of conflictsQuery.docs) {
+    for (const doc of conflictDocs) {
       const data = doc.data();
+      if (!data) continue;
       if (data.status === "confirmed") {
         return NextResponse.json(
           { error: "This time slot is no longer available. Please select another time." },
