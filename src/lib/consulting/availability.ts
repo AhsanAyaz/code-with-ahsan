@@ -3,7 +3,7 @@ import { getOAuthClient, decryptToken, isCalendarConfigured } from "@/lib/google
 import { CONSULTING_CONFIG, DEFAULT_WEEKLY_AVAILABILITY } from "./constants";
 import { ConsultingAvailableSlot } from "@/types/consulting";
 import { addDays, addMinutes, format, isAfter, isBefore, parseISO } from "date-fns";
-import { fromZonedTime } from "date-fns-tz";
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
 import { google } from "googleapis";
 import { createLogger } from "@/lib/logger";
 
@@ -14,7 +14,7 @@ interface TimeInterval {
   end: Date;
 }
 
-interface AppointmentBlock extends TimeInterval {
+interface BusyEvent extends TimeInterval {
   summary: string;
 }
 
@@ -26,6 +26,14 @@ function intervalsOverlap(
   const bufferedStartB = addMinutes(intervalB.start, -bufferMinutes);
   const bufferedEndB = addMinutes(intervalB.end, bufferMinutes);
   return isBefore(intervalA.start, bufferedEndB) && isAfter(intervalA.end, bufferedStartB);
+}
+
+/**
+ * Format a UTC Date into Stockholm local time string for logging.
+ */
+function toStockholmStr(date: Date): string {
+  const zoned = toZonedTime(date, "Europe/Stockholm");
+  return format(zoned, "yyyy-MM-dd HH:mm");
 }
 
 /**
@@ -92,19 +100,14 @@ async function getAdminOAuthClient() {
 }
 
 /**
- * Fetch and categorize all Google Calendar events into:
- * 1. appointmentBlocks: explicit bookable appointment schedules / date overrides (e.g. "1:1 with Ahsan")
- * 2. busyTimes: actual meetings/events to subtract from availability
+ * Fetch ALL Google Calendar events as busy periods.
+ * Every non-transparent event is treated as a busy conflict.
  */
-async function fetchGoogleCalendarData(
-  timeMin: Date,
-  timeMax: Date
-): Promise<{ appointmentBlocks: AppointmentBlock[]; busyTimes: TimeInterval[] }> {
+async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promise<BusyEvent[]> {
   const oauthClient = await getAdminOAuthClient();
-  if (!oauthClient) return { appointmentBlocks: [], busyTimes: [] };
+  if (!oauthClient) return [];
 
-  const appointmentBlocks: AppointmentBlock[] = [];
-  const busyTimes: TimeInterval[] = [];
+  const busyTimes: BusyEvent[] = [];
 
   try {
     const calendar = google.calendar({ version: "v3", auth: oauthClient });
@@ -117,76 +120,48 @@ async function fetchGoogleCalendarData(
     });
 
     const items = eventsRes.data.items || [];
-    logger.info("Google Calendar Raw Events Retrieved", { totalEvents: items.length });
+    logger.info("Google Calendar events fetched", { totalEvents: items.length });
 
     for (const item of items) {
-      const summary = (item.summary || "").trim();
-      const summaryLower = summary.toLowerCase();
-      const descriptionLower = (item.description || "").toLowerCase();
+      const summary = (item.summary || "(untitled)").trim();
 
-      // Check if event is an appointment slot or date override created by Ahsan
-      const isAppointment =
-        summaryLower.includes("1:1 with ahsan") ||
-        summaryLower.includes("30 min bookable") ||
-        summaryLower.includes("bookable appointment") ||
-        descriptionLower.includes("bookable appointment") ||
-        item.eventType === "workingHours";
+      if (item.transparency === "transparent") {
+        logger.info("GCal -> TRANSPARENT (ignored)", { summary });
+        continue;
+      }
 
-      if (isAppointment) {
-        if (item.start?.dateTime && item.end?.dateTime) {
-          const start = new Date(item.start.dateTime);
-          const end = new Date(item.end.dateTime);
-          appointmentBlocks.push({ start, end, summary });
-          logger.info("Google Calendar -> APPOINTMENT_OVERRIDE", {
-            summary,
-            start: item.start.dateTime,
-            end: item.end.dateTime,
-          });
-        }
-      } else {
-        // Real busy event (meeting, personal event, etc.)
-        if (item.transparency === "transparent") {
-          logger.info("Google Calendar -> TRANSPARENT_IGNORED", {
-            summary: summary || "(transparent)",
-          });
-          continue;
-        }
-
-        if (item.start?.dateTime && item.end?.dateTime) {
-          busyTimes.push({
-            start: new Date(item.start.dateTime),
-            end: new Date(item.end.dateTime),
-          });
-          logger.info("Google Calendar -> BUSY_CONFLICT", {
-            summary: summary || "(busy)",
-            start: item.start.dateTime,
-            end: item.end.dateTime,
-          });
-        } else if (item.start?.date && item.end?.date) {
-          busyTimes.push({
-            start: new Date(item.start.date),
-            end: new Date(item.end.date),
-          });
-          logger.info("Google Calendar -> ALL_DAY_BUSY", {
-            summary: summary || "(all-day busy)",
-            start: item.start.date,
-            end: item.end.date,
-          });
-        }
+      if (item.start?.dateTime && item.end?.dateTime) {
+        const start = new Date(item.start.dateTime);
+        const end = new Date(item.end.dateTime);
+        busyTimes.push({ start, end, summary });
+        logger.info("GCal -> BUSY", {
+          summary,
+          start: toStockholmStr(start),
+          end: toStockholmStr(end),
+        });
+      } else if (item.start?.date && item.end?.date) {
+        const start = new Date(item.start.date);
+        const end = new Date(item.end.date);
+        busyTimes.push({ start, end, summary });
+        logger.info("GCal -> ALL_DAY_BUSY", {
+          summary,
+          start: item.start.date,
+          end: item.end.date,
+        });
       }
     }
   } catch (error) {
     logger.error("Error querying Google Calendar events", { error });
   }
 
-  return { appointmentBlocks, busyTimes };
+  return busyTimes;
 }
 
 /**
- * Fetch busy periods from Firestore (both confirmed bookings & active pending checkout locks).
+ * Fetch busy periods from Firestore (confirmed bookings & active pending checkout locks).
  */
-async function fetchFirestoreBusyTimes(timeMin: Date, timeMax: Date): Promise<TimeInterval[]> {
-  const busyTimes: TimeInterval[] = [];
+async function fetchFirestoreBusyTimes(timeMin: Date, timeMax: Date): Promise<BusyEvent[]> {
+  const busyTimes: BusyEvent[] = [];
   const now = new Date();
 
   try {
@@ -220,19 +195,16 @@ async function fetchFirestoreBusyTimes(timeMin: Date, timeMax: Date): Promise<Ti
       if (endTime < timeMin || startTime > timeMax) continue;
 
       if (status === "confirmed") {
-        busyTimes.push({ start: startTime, end: endTime });
-        logger.info("Firestore Busy -> CONFIRMED_CONSULTING_BOOKING", {
-          id: doc.id,
-          start: startTime.toISOString(),
-          end: endTime.toISOString(),
+        busyTimes.push({
+          start: startTime,
+          end: endTime,
+          summary: `Confirmed Booking (${doc.id})`,
         });
       } else if (status === "pending_payment" && expiresAt && isAfter(expiresAt, now)) {
-        busyTimes.push({ start: startTime, end: endTime });
-        logger.info("Firestore Busy -> ACTIVE_PENDING_CHECKOUT_LOCK", {
-          id: doc.id,
-          start: startTime.toISOString(),
-          end: endTime.toISOString(),
-          expiresAt: expiresAt.toISOString(),
+        busyTimes.push({
+          start: startTime,
+          end: endTime,
+          summary: `Checkout Lock (${doc.id})`,
         });
       }
     }
@@ -261,11 +233,10 @@ async function fetchFirestoreBusyTimes(timeMin: Date, timeMax: Date): Promise<Ti
 
       if (endTime < timeMin || startTime > timeMax) continue;
 
-      busyTimes.push({ start: startTime, end: endTime });
-      logger.info("Firestore Busy -> CONFIRMED_MENTORSHIP_BOOKING", {
-        id: doc.id,
-        start: startTime.toISOString(),
-        end: endTime.toISOString(),
+      busyTimes.push({
+        start: startTime,
+        end: endTime,
+        summary: `Mentorship Booking (${doc.id})`,
       });
     }
   } catch (error) {
@@ -309,7 +280,6 @@ async function getProfileWeeklyAvailability(): Promise<Record<
       const dayNum = dayMap[key.toLowerCase()] ?? Number(key);
       if (isNaN(dayNum) || !Array.isArray(slots) || slots.length === 0) continue;
 
-      // Check if slots contains time range objects: [{ start: "14:30", end: "18:30" }]
       const objectSlots = slots.filter(
         (s: unknown): s is { start: string; end: string } =>
           typeof s === "object" &&
@@ -326,22 +296,28 @@ async function getProfileWeeklyAvailability(): Promise<Record<
           end: s.end,
         }));
       } else if (slots.includes("flexible") || slots.some((s) => typeof s === "string")) {
-        // Mentor profile has active day with tag like "flexible" -> use default working hours for that day
         schedule[dayNum] = DEFAULT_WEEKLY_AVAILABILITY[dayNum] || [
-          { start: "14:30", end: "18:30" },
+          { start: "15:00", end: "17:00" },
         ];
       }
     }
 
     return Object.keys(schedule).length > 0 ? schedule : null;
   } catch (err) {
-    logger.warn("Could not fetch profile availability, using defaults", { err });
+    logger.warn("Could not fetch profile availability, using defaults", {
+      err,
+    });
     return null;
   }
 }
 
 /**
- * Compute available slots for a given date range, duration, and target timezone.
+ * Compute available consulting slots.
+ *
+ * Approach 1 (Calendly model):
+ *   1. Generate candidate slots from recurring weekly schedule.
+ *   2. Subtract all Google Calendar busy events + Firestore bookings.
+ *   3. Return remaining available slots.
  */
 export async function getAvailableConsultingSlots({
   startDateStr,
@@ -363,35 +339,27 @@ export async function getAvailableConsultingSlots({
   const queryStart = startDate;
   const queryEnd = addDays(endDate, 1);
 
-  // 1. Fetch Google Calendar events (categorized into appointment overrides and real busy conflicts) & Firestore bookings
-  const [{ appointmentBlocks, busyTimes }, firestoreBusy, customSchedule] = await Promise.all([
-    fetchGoogleCalendarData(queryStart, queryEnd),
+  // 1. Fetch busy events from Google Calendar & Firestore, and profile schedule
+  const [googleBusy, firestoreBusy, customSchedule] = await Promise.all([
+    fetchGoogleCalendarBusyTimes(queryStart, queryEnd),
     fetchFirestoreBusyTimes(queryStart, queryEnd),
     getProfileWeeklyAvailability(),
   ]);
 
   const weeklySchedule = customSchedule || DEFAULT_WEEKLY_AVAILABILITY;
-  const allBusy = [...busyTimes, ...firestoreBusy];
-  const candidateSlotsMap = new Map<string, { start: Date; end: Date }>();
+  const allBusy: BusyEvent[] = [...googleBusy, ...firestoreBusy];
   const adminTz = CONSULTING_CONFIG.adminTimezone || "Europe/Stockholm";
 
-  // 2. Generate candidate slots from explicit Google Calendar Appointment Blocks / Date Overrides (e.g. 9am Friday, 10am Thursday)
-  for (const block of appointmentBlocks) {
-    let slotStart = block.start;
-    while (true) {
-      const slotEnd = addMinutes(slotStart, durationMinutes);
-      if (isAfter(slotEnd, block.end)) break;
+  logger.info("Busy events summary", {
+    googleCalendarBusy: googleBusy.length,
+    firestoreBusy: firestoreBusy.length,
+    totalBusy: allBusy.length,
+  });
 
-      const key = slotStart.toISOString();
-      if (!candidateSlotsMap.has(key)) {
-        candidateSlotsMap.set(key, { start: slotStart, end: slotEnd });
-      }
-      slotStart = addMinutes(slotStart, CONSULTING_CONFIG.slotDurationStepMinutes);
-    }
-  }
-
-  // 3. Generate candidate slots from recurring Weekly Schedule (e.g. Mon, Wed, Thu 2:30 PM - 6:30 PM Stockholm)
+  // 2. Generate candidate slots from weekly schedule
+  const availableSlots: ConsultingAvailableSlot[] = [];
   let currentDate = startDate;
+
   while (isBefore(currentDate, queryEnd)) {
     const dayOfWeek = currentDate.getDay();
     const daySchedules = weeklySchedule[dayOfWeek] || [];
@@ -405,10 +373,36 @@ export async function getAvailableConsultingSlots({
         const slotEnd = addMinutes(slotStart, durationMinutes);
         if (isAfter(slotEnd, blockEnd)) break;
 
-        const key = slotStart.toISOString();
-        if (!candidateSlotsMap.has(key)) {
-          candidateSlotsMap.set(key, { start: slotStart, end: slotEnd });
+        const slotLabel = `${toStockholmStr(slotStart)} - ${toStockholmStr(slotEnd)}`;
+
+        // Check advance notice & max booking window
+        if (!isAfter(slotStart, minNoticeTime) || !isBefore(slotStart, maxBookingTime)) {
+          slotStart = addMinutes(slotStart, CONSULTING_CONFIG.slotDurationStepMinutes);
+          continue;
         }
+
+        // Check busy conflicts
+        const blocker = allBusy.find((busy) =>
+          intervalsOverlap(
+            { start: slotStart, end: slotEnd },
+            busy,
+            CONSULTING_CONFIG.bufferBetweenSessionsMinutes
+          )
+        );
+
+        if (blocker) {
+          logger.info("Slot -> BLOCKED", {
+            slot: slotLabel,
+            blockedBy: `${blocker.summary} (${toStockholmStr(blocker.start)} - ${toStockholmStr(blocker.end)})`,
+          });
+        } else {
+          logger.info("Slot -> AVAILABLE", { slot: slotLabel });
+          availableSlots.push({
+            start: slotStart.toISOString(),
+            end: slotEnd.toISOString(),
+          });
+        }
+
         slotStart = addMinutes(slotStart, CONSULTING_CONFIG.slotDurationStepMinutes);
       }
     }
@@ -416,34 +410,12 @@ export async function getAvailableConsultingSlots({
     currentDate = addDays(currentDate, 1);
   }
 
-  // 4. Filter candidate slots against advance notice, max booking limit, and all busy periods (Google + Firestore)
-  const availableSlots: ConsultingAvailableSlot[] = [];
-
-  for (const candidate of candidateSlotsMap.values()) {
-    if (isAfter(candidate.start, minNoticeTime) && isBefore(candidate.start, maxBookingTime)) {
-      const isBusy = allBusy.some((busy) =>
-        intervalsOverlap(candidate, busy, CONSULTING_CONFIG.bufferBetweenSessionsMinutes)
-      );
-
-      if (!isBusy) {
-        availableSlots.push({
-          start: candidate.start.toISOString(),
-          end: candidate.end.toISOString(),
-        });
-      }
-    }
-  }
-
-  // Sort chronologically
-  availableSlots.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
-
-  logger.info("Generated Available Consulting Slots", {
+  logger.info("Final available slots", {
     totalSlots: availableSlots.length,
     durationMinutes,
     slots: availableSlots.map((s) => ({
-      start: s.start,
-      end: s.end,
-      stockholmStart: format(fromZonedTime(s.start, "UTC"), "yyyy-MM-dd HH:mm"),
+      start: toStockholmStr(new Date(s.start)),
+      end: toStockholmStr(new Date(s.end)),
     })),
   });
 

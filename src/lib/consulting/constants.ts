@@ -59,10 +59,10 @@ export const CONSULTING_PACKAGES: ConsultingPackage[] = [
  * Times in "HH:mm" 24-hour format.
  */
 export const DEFAULT_WEEKLY_AVAILABILITY: Record<number, { start: string; end: string }[]> = {
-  1: [{ start: "14:30", end: "18:30" }], // Monday (2:30 PM - 6:30 PM Stockholm)
+  1: [{ start: "15:00", end: "17:00" }], // Monday (3:00 PM - 5:00 PM Stockholm)
   2: [], // Tuesday (Closed)
-  3: [{ start: "14:30", end: "18:30" }], // Wednesday (2:30 PM - 6:30 PM Stockholm)
-  4: [{ start: "14:30", end: "18:30" }], // Thursday (2:30 PM - 6:30 PM Stockholm)
+  3: [{ start: "15:00", end: "17:00" }], // Wednesday (3:00 PM - 5:00 PM Stockholm)
+  4: [{ start: "15:00", end: "17:00" }], // Thursday (3:00 PM - 5:00 PM Stockholm)
   5: [], // Friday (Closed)
   6: [], // Saturday (Closed)
   0: [], // Sunday (Closed)
