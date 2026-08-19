@@ -22,6 +22,8 @@ export const SECTION_IDS = {
   contact: "contact",
   organizers: "organizers",
   collaborationPartners: "collaboration-partners",
+  outreachPartners: "outreach-partners",
+  social: "social",
 } as const;
 
 // ─── Event meta ──────────────────────────────────────────────────────────────
@@ -247,7 +249,7 @@ export const CONFIRMED_SPONSORS: ConfirmedSponsor[] = [
 // from paid sponsorship tiers. An empty `websiteUrl` renders a non-clickable
 // tile, so a partner can be listed before its link is confirmed.
 // TODO: replace the placeholders with real names, logos and links.
-export type CollaborationPartner = {
+export type PartnerLogo = {
   name: string;
   logoUrl: string;
   websiteUrl: string;
@@ -256,8 +258,23 @@ export type CollaborationPartner = {
 const COLLABORATION_PARTNER_IMG =
   "/static/images/events/cwa-ship-karachi-2026/collaboration-partners";
 
-export const COLLABORATION_PARTNERS: CollaborationPartner[] = [
+export const COLLABORATION_PARTNERS: PartnerLogo[] = [
   { name: "MSA KHI", logoUrl: `${COLLABORATION_PARTNER_IMG}/msa-khi.png`, websiteUrl: "" },
+];
+
+// Communities amplifying the event to their own members — distinct from the
+// partners helping run the day itself.
+export const OUTREACH_PARTNERS: PartnerLogo[] = [
+  {
+    name: "GDG On Campus · DHA Suffa University",
+    logoUrl: `${COLLABORATION_PARTNER_IMG}/gdg-dha-suffa.png`,
+    websiteUrl: "",
+  },
+  {
+    name: "GDG On Campus · University of Karachi",
+    logoUrl: `${COLLABORATION_PARTNER_IMG}/gdg-uok.png`,
+    websiteUrl: "",
+  },
 ];
 
 export type SponsorLogoPlaceholder = {
