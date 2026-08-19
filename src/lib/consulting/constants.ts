@@ -59,21 +59,22 @@ export const CONSULTING_PACKAGES: ConsultingPackage[] = [
  * Times in "HH:mm" 24-hour format.
  */
 export const DEFAULT_WEEKLY_AVAILABILITY: Record<number, { start: string; end: string }[]> = {
-  1: [{ start: "12:00", end: "19:00" }], // Mon (14:00 - 21:00 CEST / 2:00 PM - 9:00 PM)
-  2: [{ start: "12:00", end: "19:00" }], // Tue
-  3: [{ start: "12:00", end: "19:00" }], // Wed
-  4: [{ start: "12:00", end: "19:00" }], // Thu
-  5: [{ start: "12:00", end: "18:00" }], // Fri
-  6: [{ start: "13:00", end: "18:00" }], // Sat
-  0: [], // Sun (Closed)
+  1: [{ start: "14:30", end: "18:30" }], // Monday (2:30 PM - 6:30 PM Stockholm)
+  2: [], // Tuesday (Closed)
+  3: [{ start: "14:30", end: "18:30" }], // Wednesday (2:30 PM - 6:30 PM Stockholm)
+  4: [{ start: "14:30", end: "18:30" }], // Thursday (2:30 PM - 6:30 PM Stockholm)
+  5: [], // Friday (Closed)
+  6: [], // Saturday (Closed)
+  0: [], // Sunday (Closed)
 };
 
 export const CONSULTING_CONFIG = {
   adminEmail: process.env.ADMIN_EMAIL || "ahsan.ubitian@gmail.com",
   adminName: "Mohammed S. N. Ayaz",
-  slotDurationStepMinutes: 30, // Granularity of slot start times (e.g. 14:00, 14:30)
-  bufferBetweenSessionsMinutes: 15, // Gap after a session
-  minBookingNoticeHours: 4, // Cannot book slots starting within 4 hours
-  maxBookingDaysInAdvance: 30, // Cannot book more than 30 days ahead
-  slotLockExpirationMinutes: 15, // Hold slot during Stripe checkout
+  adminTimezone: "Europe/Stockholm",
+  slotDurationStepMinutes: 30, // 30-min start time intervals (2:30 PM, 3:00 PM, 3:30 PM, ...)
+  bufferBetweenSessionsMinutes: 15, // 15-min gap after sessions
+  minBookingNoticeHours: 4, // 4-hour advance notice
+  maxBookingDaysInAdvance: 30, // Up to 30 days ahead
+  slotLockExpirationMinutes: 15, // 15-min lock during Stripe checkout
 };

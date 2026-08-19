@@ -2,17 +2,8 @@ import { db } from "@/lib/firebaseAdmin";
 import { getOAuthClient, decryptToken, isCalendarConfigured } from "@/lib/google-calendar";
 import { CONSULTING_CONFIG, DEFAULT_WEEKLY_AVAILABILITY } from "./constants";
 import { ConsultingAvailableSlot } from "@/types/consulting";
-import {
-  addDays,
-  addMinutes,
-  isAfter,
-  isBefore,
-  parseISO,
-  setHours,
-  setMinutes,
-  setSeconds,
-  setMilliseconds,
-} from "date-fns";
+import { addDays, addMinutes, format, isAfter, isBefore, parseISO } from "date-fns";
+import { fromZonedTime } from "date-fns-tz";
 import { google } from "googleapis";
 import { createLogger } from "@/lib/logger";
 
@@ -97,62 +88,8 @@ async function getAdminOAuthClient() {
 }
 
 /**
- * Directly fetch explicit appointment slots from Google Calendar events
- * titled "1:1 with Ahsan" or similar appointment schedule titles.
- */
-async function fetchGoogleCalendarAppointmentSlots(
-  timeMin: Date,
-  timeMax: Date
-): Promise<TimeInterval[]> {
-  const oauthClient = await getAdminOAuthClient();
-  if (!oauthClient) return [];
-
-  const appointmentSlots: TimeInterval[] = [];
-
-  try {
-    const calendar = google.calendar({ version: "v3", auth: oauthClient });
-    const eventsRes = await calendar.events.list({
-      calendarId: "primary",
-      timeMin: timeMin.toISOString(),
-      timeMax: timeMax.toISOString(),
-      singleEvents: true,
-      orderBy: "startTime",
-    });
-
-    const items = eventsRes.data.items || [];
-    for (const item of items) {
-      const summary = (item.summary || "").toLowerCase();
-      const description = (item.description || "").toLowerCase();
-
-      // Match events created by Google Calendar Appointment Schedules or titled "1:1 with Ahsan"
-      const isAppointmentSlot =
-        summary.includes("1:1 with ahsan") ||
-        summary.includes("bookable appointment") ||
-        description.includes("bookable appointments") ||
-        summary.includes("30 min bookable") ||
-        item.eventType === "workingHours";
-
-      if (isAppointmentSlot && item.start?.dateTime && item.end?.dateTime) {
-        appointmentSlots.push({
-          start: new Date(item.start.dateTime),
-          end: new Date(item.end.dateTime),
-        });
-      }
-    }
-
-    logger.info("Fetched Google Calendar appointment slots", {
-      count: appointmentSlots.length,
-    });
-  } catch (error) {
-    logger.error("Error fetching Google Calendar appointment slots", { error });
-  }
-
-  return appointmentSlots;
-}
-
-/**
  * Fetch busy periods from Ahsan's Google Calendar using events.list
- * (matches the authorized calendar.events scope without throwing 403 freebusy errors).
+ * (uses calendar.events scope without 403 freebusy errors).
  */
 async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promise<TimeInterval[]> {
   const oauthClient = await getAdminOAuthClient();
@@ -171,7 +108,6 @@ async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promi
     const items = eventsRes.data.items || [];
 
     for (const item of items) {
-      // Ignore transparent (free) events
       if (item.transparency === "transparent") continue;
 
       if (item.start?.dateTime && item.end?.dateTime) {
@@ -188,6 +124,7 @@ async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promi
       }
     }
 
+    logger.info("Fetched Google Calendar busy events", { count: busyTimes.length });
     return busyTimes;
   } catch (error) {
     logger.error("Error querying Google Calendar events for busy times", { error });
@@ -196,7 +133,7 @@ async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promi
 }
 
 /**
- * Fetch busy periods from Firestore in memory to avoid index requirements.
+ * Fetch busy periods from Firestore (both confirmed bookings & active pending checkout locks).
  */
 async function fetchFirestoreBusyTimes(timeMin: Date, timeMax: Date): Promise<TimeInterval[]> {
   const busyTimes: TimeInterval[] = [];
@@ -353,63 +290,28 @@ export async function getAvailableConsultingSlots({
   const queryStart = startDate;
   const queryEnd = addDays(endDate, 1);
 
-  // 1. First, check if explicit "1:1 with Ahsan" Google Calendar Appointment Slots exist
-  const explicitCalendarSlots = await fetchGoogleCalendarAppointmentSlots(queryStart, queryEnd);
-  const firestoreBusy = await fetchFirestoreBusyTimes(queryStart, queryEnd);
-
-  const availableSlots: ConsultingAvailableSlot[] = [];
-
-  if (explicitCalendarSlots.length > 0) {
-    logger.info("Using explicit Google Calendar appointment slots as master schedule", {
-      count: explicitCalendarSlots.length,
-    });
-
-    for (const slot of explicitCalendarSlots) {
-      if (isAfter(slot.start, minNoticeTime) && isBefore(slot.start, maxBookingTime)) {
-        const isBusy = firestoreBusy.some((busy) =>
-          intervalsOverlap(slot, busy, CONSULTING_CONFIG.bufferBetweenSessionsMinutes)
-        );
-
-        if (!isBusy) {
-          availableSlots.push({
-            start: slot.start.toISOString(),
-            end: slot.end.toISOString(),
-          });
-        }
-      }
-    }
-
-    return availableSlots;
-  }
-
-  // 2. Fallback to general schedule minus freebusy if no explicit "1:1 with Ahsan" event titles match
-  const [googleBusy, customSchedule] = await Promise.all([
+  // Fetch busy intervals from Google Calendar and Firestore
+  const [googleBusy, firestoreBusy, customSchedule] = await Promise.all([
     fetchGoogleCalendarBusyTimes(queryStart, queryEnd),
+    fetchFirestoreBusyTimes(queryStart, queryEnd),
     getProfileWeeklyAvailability(),
   ]);
 
   const weeklySchedule = customSchedule || DEFAULT_WEEKLY_AVAILABILITY;
   const allBusy = [...googleBusy, ...firestoreBusy];
+  const availableSlots: ConsultingAvailableSlot[] = [];
 
+  const adminTz = CONSULTING_CONFIG.adminTimezone || "Europe/Stockholm";
   let currentDate = startDate;
 
   while (isBefore(currentDate, queryEnd)) {
     const dayOfWeek = currentDate.getDay();
     const daySchedules = weeklySchedule[dayOfWeek] || [];
+    const dateStr = format(currentDate, "yyyy-MM-dd");
 
     for (const sched of daySchedules) {
-      const [startH, startM] = sched.start.split(":").map(Number);
-      const [endH, endM] = sched.end.split(":").map(Number);
-
-      let slotStart = setMilliseconds(
-        setSeconds(setMinutes(setHours(currentDate, startH), startM), 0),
-        0
-      );
-
-      const blockEnd = setMilliseconds(
-        setSeconds(setMinutes(setHours(currentDate, endH), endM), 0),
-        0
-      );
+      let slotStart = fromZonedTime(`${dateStr}T${sched.start}:00`, adminTz);
+      const blockEnd = fromZonedTime(`${dateStr}T${sched.end}:00`, adminTz);
 
       while (true) {
         const slotEnd = addMinutes(slotStart, durationMinutes);
