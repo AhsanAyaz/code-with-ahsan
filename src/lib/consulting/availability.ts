@@ -76,6 +76,22 @@ async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promi
       }
     }
 
+    // Fallback: Check any profile with a connected token (e.g. in emulator/dev)
+    if (!refreshToken) {
+      const anySnap = await db
+        .collection("mentorship_profiles")
+        .where("googleCalendarConnected", "==", true)
+        .limit(1)
+        .get();
+
+      if (!anySnap.empty) {
+        const data = anySnap.docs[0].data();
+        if (data.googleCalendarRefreshToken) {
+          refreshToken = decryptToken(data.googleCalendarRefreshToken);
+        }
+      }
+    }
+
     if (!refreshToken) {
       logger.info("No Google Calendar refresh token found for admin");
       return [];

@@ -20,3 +20,28 @@ Aug 19, 2026 9:44:50 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channe
 INFO: Detected HTTP/2 connection.
 Aug 19, 2026 9:45:07 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
+Aug 19, 2026 9:57:47 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Aug 19, 2026 9:57:58 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Aug 19, 2026 9:59:03 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Aug 19, 2026 9:59:08 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Multiple projectIds are not recommended in single project mode. Requested project ID code-with-ahsan-45496, but the emulator is configured for demo-codewithahsan. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
+Aug 19, 2026 9:59:12 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Aug 19, 2026 9:59:22 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Multiple projectIds are not recommended in single project mode. Requested project ID code-with-ahsan-45496, but the emulator is configured for demo-codewithahsan. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
+Multiple projectIds are not recommended in single project mode. Requested project ID code-with-ahsan-45496, but the emulator is configured for demo-codewithahsan. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
+Multiple projectIds are not recommended in single project mode. Requested project ID code-with-ahsan-45496, but the emulator is configured for demo-codewithahsan. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
+Aug 19, 2026 9:59:33 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Multiple projectIds are not recommended in single project mode. Requested project ID code-with-ahsan-45496, but the emulator is configured for demo-codewithahsan. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
+Multiple projectIds are not recommended in single project mode. Requested project ID code-with-ahsan-45496, but the emulator is configured for demo-codewithahsan. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
+Multiple projectIds are not recommended in single project mode. Requested project ID code-with-ahsan-45496, but the emulator is configured for demo-codewithahsan. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
+Aug 19, 2026 9:59:38 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Aug 19, 2026 9:59:44 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.

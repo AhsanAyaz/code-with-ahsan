@@ -107,18 +107,27 @@ export function decryptToken(encryptedData: string): string {
  */
 export async function getMentorCalendarClient(mentorId: string) {
   try {
-    const profileQuery = await db
-      .collection("mentorship_profiles")
-      .where("uid", "==", mentorId)
-      .limit(1)
-      .get();
+    let profileDoc = await db.collection("mentorship_profiles").doc(mentorId).get();
+    let profile = profileDoc.exists ? profileDoc.data() : null;
 
-    if (profileQuery.empty) {
+    if (!profile) {
+      const profileQuery = await db
+        .collection("mentorship_profiles")
+        .where("uid", "==", mentorId)
+        .limit(1)
+        .get();
+
+      if (!profileQuery.empty) {
+        profileDoc = profileQuery.docs[0];
+        profile = profileDoc.data();
+      }
+    }
+
+    if (!profile) {
       logger.warn("Mentor profile not found", { mentorId });
       throw new Error("Mentor profile not found");
     }
 
-    const profile = profileQuery.docs[0].data();
     if (!profile.googleCalendarRefreshToken) {
       logger.info("Mentor has not connected Google Calendar", { mentorId });
       return null; // Calendar not connected
@@ -132,7 +141,7 @@ export async function getMentorCalendarClient(mentorId: string) {
     client.on("tokens", async (tokens) => {
       if (tokens.refresh_token) {
         try {
-          await profileQuery.docs[0].ref.update({
+          await profileDoc.ref.update({
             googleCalendarRefreshToken: encryptToken(tokens.refresh_token),
           });
           logger.info("Updated refresh token after auto-refresh", { mentorId });
@@ -246,31 +255,56 @@ export async function createConsultingCalendarEvent(
   adminEmail: string = "ahsan.ubitian@gmail.com"
 ): Promise<{ eventId: string | null; meetLink: string | null }> {
   try {
-    // Find admin profile with google calendar token
-    let profileQuery = await db
+    // Find admin/mentor profile with google calendar token
+    let mentorId: string | null = null;
+
+    // 1. Try matching by admin email
+    const emailQuery = await db
       .collection("mentorship_profiles")
       .where("email", "==", adminEmail)
       .limit(1)
       .get();
 
-    if (profileQuery.empty) {
-      profileQuery = await db
+    if (!emailQuery.empty && emailQuery.docs[0].data().googleCalendarRefreshToken) {
+      mentorId = emailQuery.docs[0].data().uid || emailQuery.docs[0].id;
+    }
+
+    // 2. Try matching by isAdmin flag
+    if (!mentorId) {
+      const adminQuery = await db
         .collection("mentorship_profiles")
         .where("isAdmin", "==", true)
         .limit(1)
         .get();
+
+      if (!adminQuery.empty && adminQuery.docs[0].data().googleCalendarRefreshToken) {
+        mentorId = adminQuery.docs[0].data().uid || adminQuery.docs[0].id;
+      }
     }
 
-    if (profileQuery.empty) {
-      logger.info("Admin profile not found for calendar event creation");
+    // 3. Fallback: Find ANY profile that has a connected Google Calendar (e.g. in emulator/dev)
+    if (!mentorId) {
+      const anyConnectedQuery = await db
+        .collection("mentorship_profiles")
+        .where("googleCalendarConnected", "==", true)
+        .limit(1)
+        .get();
+
+      if (!anyConnectedQuery.empty) {
+        mentorId = anyConnectedQuery.docs[0].data().uid || anyConnectedQuery.docs[0].id;
+        logger.info("Using connected calendar from profile", { mentorId });
+      }
+    }
+
+    if (!mentorId) {
+      logger.info("No profile with connected Google Calendar found");
       return { eventId: null, meetLink: null };
     }
 
-    const mentorId = profileQuery.docs[0].data().uid || profileQuery.docs[0].id;
     const authClient = await getMentorCalendarClient(mentorId);
 
     if (!authClient) {
-      logger.info("Admin Google Calendar not connected");
+      logger.info("Google Calendar client not authenticated", { mentorId });
       return { eventId: null, meetLink: null };
     }
 
