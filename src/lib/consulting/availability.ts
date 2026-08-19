@@ -101,21 +101,44 @@ async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promi
     oauthClient.setCredentials({ refresh_token: refreshToken });
 
     const calendar = google.calendar({ version: "v3", auth: oauthClient });
+
+    // Fetch all calendars owned/subscribed by user (e.g. Primary, Topmate, Work, GDE)
+    let calendarIds: { id: string }[] = [{ id: "primary" }];
+    try {
+      const calendarListRes = await calendar.calendarList.list({ minAccessRole: "freeBusyReader" });
+      if (calendarListRes.data.items && calendarListRes.data.items.length > 0) {
+        calendarIds = calendarListRes.data.items.map((item) => ({ id: item.id as string }));
+      }
+    } catch (listErr) {
+      logger.warn("Failed to fetch full calendar list, falling back to primary", { listErr });
+    }
+
     const freeBusyRes = await calendar.freebusy.query({
       requestBody: {
         timeMin: timeMin.toISOString(),
         timeMax: timeMax.toISOString(),
-        items: [{ id: "primary" }],
+        items: calendarIds,
       },
     });
 
-    const busyList = freeBusyRes.data.calendars?.primary?.busy || [];
-    return busyList
-      .filter((b) => b.start && b.end)
-      .map((b) => ({
-        start: new Date(b.start as string),
-        end: new Date(b.end as string),
-      }));
+    const busyTimes: TimeInterval[] = [];
+    const calendarsObj = freeBusyRes.data.calendars || {};
+
+    for (const calKey of Object.keys(calendarsObj)) {
+      const calData = calendarsObj[calKey];
+      if (calData?.busy) {
+        for (const b of calData.busy) {
+          if (b.start && b.end) {
+            busyTimes.push({
+              start: new Date(b.start as string),
+              end: new Date(b.end as string),
+            });
+          }
+        }
+      }
+    }
+
+    return busyTimes;
   } catch (error) {
     logger.error("Error querying Google Calendar freebusy", { error });
     return [];
