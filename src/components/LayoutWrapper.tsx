@@ -74,6 +74,12 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
         </div>
         <div className="navbar-end gap-1 sm:gap-2">
           <Link
+            href="/consulting"
+            className="btn btn-ghost btn-sm text-primary font-bold hidden md:inline-flex"
+          >
+            1:1 Advisory
+          </Link>
+          <Link
             href="/about"
             className="btn btn-ghost btn-sm border-light hover:bg-light hover:text-primary-content hidden md:inline-flex"
           >

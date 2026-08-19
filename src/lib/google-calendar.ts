@@ -77,10 +77,7 @@ export async function exchangeCodeForTokens(code: string) {
  * Returns format: iv:authTag:encryptedData
  */
 export function encryptToken(token: string): string {
-  const key = Buffer.from(
-    process.env.GOOGLE_CALENDAR_ENCRYPTION_KEY || "",
-    "hex"
-  );
+  const key = Buffer.from(process.env.GOOGLE_CALENDAR_ENCRYPTION_KEY || "", "hex");
   const iv = randomBytes(16);
   const cipher = createCipheriv(ALGORITHM, key, iv);
   let encrypted = cipher.update(token, "utf8", "hex");
@@ -93,10 +90,7 @@ export function encryptToken(token: string): string {
  * Decrypt a token encrypted with encryptToken.
  */
 export function decryptToken(encryptedData: string): string {
-  const key = Buffer.from(
-    process.env.GOOGLE_CALENDAR_ENCRYPTION_KEY || "",
-    "hex"
-  );
+  const key = Buffer.from(process.env.GOOGLE_CALENDAR_ENCRYPTION_KEY || "", "hex");
   const [ivHex, authTagHex, encrypted] = encryptedData.split(":");
   const iv = Buffer.from(ivHex, "hex");
   const authTag = Buffer.from(authTagHex, "hex");
@@ -113,18 +107,27 @@ export function decryptToken(encryptedData: string): string {
  */
 export async function getMentorCalendarClient(mentorId: string) {
   try {
-    const profileQuery = await db
-      .collection("mentorship_profiles")
-      .where("uid", "==", mentorId)
-      .limit(1)
-      .get();
+    let profileDoc = await db.collection("mentorship_profiles").doc(mentorId).get();
+    let profile = profileDoc.exists ? profileDoc.data() : null;
 
-    if (profileQuery.empty) {
+    if (!profile) {
+      const profileQuery = await db
+        .collection("mentorship_profiles")
+        .where("uid", "==", mentorId)
+        .limit(1)
+        .get();
+
+      if (!profileQuery.empty) {
+        profileDoc = profileQuery.docs[0];
+        profile = profileDoc.data();
+      }
+    }
+
+    if (!profile) {
       logger.warn("Mentor profile not found", { mentorId });
       throw new Error("Mentor profile not found");
     }
 
-    const profile = profileQuery.docs[0].data();
     if (!profile.googleCalendarRefreshToken) {
       logger.info("Mentor has not connected Google Calendar", { mentorId });
       return null; // Calendar not connected
@@ -138,7 +141,7 @@ export async function getMentorCalendarClient(mentorId: string) {
     client.on("tokens", async (tokens) => {
       if (tokens.refresh_token) {
         try {
-          await profileQuery.docs[0].ref.update({
+          await profileDoc.ref.update({
             googleCalendarRefreshToken: encryptToken(tokens.refresh_token),
           });
           logger.info("Updated refresh token after auto-refresh", { mentorId });
@@ -235,13 +238,145 @@ export async function createCalendarEvent(
 }
 
 /**
+ * Create a calendar event for a paid consulting session with Google Meet conferencing.
+ * Returns the Google Calendar event ID and Google Meet URL.
+ */
+export async function createConsultingCalendarEvent(
+  booking: {
+    id: string;
+    packageName: string;
+    startTime: Date;
+    endTime: Date;
+    timezone: string;
+    clientName: string;
+    clientEmail: string;
+    clientNotes?: string;
+  },
+  adminEmail: string = "ahsan.ubitian@gmail.com"
+): Promise<{ eventId: string | null; meetLink: string | null }> {
+  try {
+    // Find admin/mentor profile with google calendar token
+    let mentorId: string | null = null;
+
+    // 1. Try matching by admin email
+    const emailQuery = await db
+      .collection("mentorship_profiles")
+      .where("email", "==", adminEmail)
+      .limit(1)
+      .get();
+
+    if (!emailQuery.empty && emailQuery.docs[0].data().googleCalendarRefreshToken) {
+      mentorId = emailQuery.docs[0].data().uid || emailQuery.docs[0].id;
+    }
+
+    // 2. Try matching by isAdmin flag
+    if (!mentorId) {
+      const adminQuery = await db
+        .collection("mentorship_profiles")
+        .where("isAdmin", "==", true)
+        .limit(1)
+        .get();
+
+      if (!adminQuery.empty && adminQuery.docs[0].data().googleCalendarRefreshToken) {
+        mentorId = adminQuery.docs[0].data().uid || adminQuery.docs[0].id;
+      }
+    }
+
+    // 3. Fallback: Find ANY profile that has a connected Google Calendar (e.g. in emulator/dev)
+    if (!mentorId) {
+      const anyConnectedQuery = await db
+        .collection("mentorship_profiles")
+        .where("googleCalendarConnected", "==", true)
+        .limit(1)
+        .get();
+
+      if (!anyConnectedQuery.empty) {
+        mentorId = anyConnectedQuery.docs[0].data().uid || anyConnectedQuery.docs[0].id;
+        logger.info("Using connected calendar from profile", { mentorId });
+      }
+    }
+
+    if (!mentorId) {
+      logger.info("No profile with connected Google Calendar found");
+      return { eventId: null, meetLink: null };
+    }
+
+    const authClient = await getMentorCalendarClient(mentorId);
+
+    if (!authClient) {
+      logger.info("Google Calendar client not authenticated", { mentorId });
+      return { eventId: null, meetLink: null };
+    }
+
+    const calendar = google.calendar({ version: "v3", auth: authClient });
+
+    const event = {
+      summary: `Consultation: ${booking.clientName} - ${booking.packageName}`,
+      description: `1:1 Consultation with Ahsan Ayaz\n\nClient: ${booking.clientName} (${booking.clientEmail})\nSession: ${booking.packageName}\n${booking.clientNotes ? `Agenda / Notes: ${booking.clientNotes}\n` : ""}\nBooking ID: ${booking.id}`,
+      start: {
+        dateTime: booking.startTime.toISOString(),
+        timeZone: booking.timezone,
+      },
+      end: {
+        dateTime: booking.endTime.toISOString(),
+        timeZone: booking.timezone,
+      },
+      attendees: [
+        { email: booking.clientEmail, displayName: booking.clientName },
+        { email: adminEmail, displayName: "Mohammed S. N. Ayaz" },
+      ],
+      conferenceData: {
+        createRequest: {
+          requestId: `consulting-${booking.id}`,
+          conferenceSolutionKey: { type: "hangoutsMeet" },
+        },
+      },
+      reminders: {
+        useDefault: false,
+        overrides: [
+          { method: "email", minutes: 60 },
+          { method: "popup", minutes: 15 },
+        ],
+      },
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response = await (calendar.events.insert as any)({
+      calendarId: "primary",
+      conferenceDataVersion: 1,
+      requestBody: event,
+      sendUpdates: "all",
+    });
+
+    const eventId = response.data?.id || null;
+    const meetLink =
+      response.data?.hangoutLink ||
+      response.data?.conferenceData?.entryPoints?.find(
+        (ep: { entryPointType: string; uri: string }) => ep.entryPointType === "video"
+      )?.uri ||
+      null;
+
+    logger.info("Created consulting calendar event", {
+      bookingId: booking.id,
+      eventId,
+      meetLink,
+    });
+
+    return { eventId, meetLink };
+  } catch (error) {
+    logger.error("Failed to create consulting calendar event", {
+      bookingId: booking.id,
+      error,
+    });
+    return { eventId: null, meetLink: null };
+  }
+}
+
+/**
  * Delete a calendar event and send cancellation notifications to attendees.
  * Returns true if successful, false if calendar not connected.
  */
-export async function deleteCalendarEvent(
-  mentorId: string,
-  eventId: string
-): Promise<boolean> {
+export async function deleteCalendarEvent(mentorId: string, eventId: string): Promise<boolean> {
   try {
     const authClient = await getMentorCalendarClient(mentorId);
     if (!authClient) {

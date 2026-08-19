@@ -13,7 +13,12 @@ vi.mock("@/lib/ghost/admin", () => ({
 }));
 
 vi.mock("@/lib/email", () => ({
-  sendEmail: vi.fn(),
+  sendEmail: vi.fn().mockResolvedValue(true),
+  sendEmailBatch: vi
+    .fn()
+    .mockImplementation((payloads: { to: string; subject: string; html: string }[]) => {
+      return Promise.resolve(payloads.map((p) => ({ to: p.to, ok: true })));
+    }),
 }));
 
 vi.mock("firebase-admin/firestore", () => ({
@@ -41,7 +46,7 @@ vi.mock("@/lib/firebaseAdmin", () => ({
 import { POST } from "../route";
 import { requireAdmin } from "@/lib/ambassador/adminAuth";
 import { getDraftHtml } from "@/lib/ghost/admin";
-import { sendEmail } from "@/lib/email";
+import { sendEmailBatch } from "@/lib/email";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -58,13 +63,21 @@ function makeRequest(body: unknown, adminToken = "valid-token"): NextRequest {
 
 const mockRequireAdmin = vi.mocked(requireAdmin);
 const mockGetDraftHtml = vi.mocked(getDraftHtml);
-const mockSendEmail = vi.mocked(sendEmail);
+const mockSendEmailBatch = vi.mocked(sendEmailBatch);
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe("POST /api/admin/email-blast", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetDraftHtml.mockReset();
+    mockSendEmailBatch.mockReset();
+    mockRequireAdmin.mockReset();
+    mockSendEmailBatch.mockImplementation(
+      (payloads: { to: string; subject: string; html: string }[]) => {
+        return Promise.resolve(payloads.map((p) => ({ to: p.to, ok: true })));
+      }
+    );
     mockSet.mockResolvedValue(undefined);
     mockUpdate.mockResolvedValue(undefined);
     mockDoc.mockReturnValue(mockDocRef);
@@ -89,7 +102,10 @@ describe("POST /api/admin/email-blast", () => {
   it("returns 400 when ghostPostId is missing", async () => {
     mockRequireAdmin.mockResolvedValueOnce({ ok: true, uid: "admin:test123456" });
 
-    const req = makeRequest({ subject: "Hello", recipients: [{ name: "Ali", email: "ali@example.com" }] });
+    const req = makeRequest({
+      subject: "Hello",
+      recipients: [{ name: "Ali", email: "ali@example.com" }],
+    });
     const res = await POST(req);
 
     expect(res.status).toBe(400);
@@ -100,7 +116,10 @@ describe("POST /api/admin/email-blast", () => {
   it("returns 400 when subject is missing", async () => {
     mockRequireAdmin.mockResolvedValueOnce({ ok: true, uid: "admin:test123456" });
 
-    const req = makeRequest({ ghostPostId: "abc123", recipients: [{ name: "Ali", email: "ali@example.com" }] });
+    const req = makeRequest({
+      ghostPostId: "abc123",
+      recipients: [{ name: "Ali", email: "ali@example.com" }],
+    });
     const res = await POST(req);
 
     expect(res.status).toBe(400);
@@ -159,7 +178,6 @@ describe("POST /api/admin/email-blast", () => {
       updatedAt: "2026-05-20T00:00:00Z",
       url: null,
     });
-    mockSendEmail.mockResolvedValue(true);
 
     const recipients = [
       { name: "Ali", email: "ali@example.com" },
@@ -172,18 +190,20 @@ describe("POST /api/admin/email-blast", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
 
-    // sendEmail called twice with personalized HTML
-    expect(mockSendEmail).toHaveBeenCalledTimes(2);
-    expect(mockSendEmail).toHaveBeenCalledWith(
-      "ali@example.com",
-      "Workshop!",
-      "<p>Hello Ali, welcome!</p>"
-    );
-    expect(mockSendEmail).toHaveBeenCalledWith(
-      "sara@example.com",
-      "Workshop!",
-      "<p>Hello Sara, welcome!</p>"
-    );
+    // sendEmailBatch called with personalized HTML
+    expect(mockSendEmailBatch).toHaveBeenCalledTimes(1);
+    expect(mockSendEmailBatch).toHaveBeenCalledWith([
+      {
+        to: "ali@example.com",
+        subject: "Workshop!",
+        html: "<p>Hello Ali, welcome!</p>",
+      },
+      {
+        to: "sara@example.com",
+        subject: "Workshop!",
+        html: "<p>Hello Sara, welcome!</p>",
+      },
+    ]);
 
     // Firestore: set called (pre-create), update called (final)
     expect(mockSet).toHaveBeenCalledTimes(1);
@@ -209,7 +229,7 @@ describe("POST /api/admin/email-blast", () => {
     expect(json.results[1]).toMatchObject({ name: "Sara", email: "sara@example.com", ok: true });
   });
 
-  it("1 send failure: sendEmail returns false → failed: 1, audit log failedCount: 1", async () => {
+  it("1 send failure: sendEmailBatch returns false for one → failed: 1, audit log failedCount: 1", async () => {
     mockRequireAdmin.mockResolvedValueOnce({ ok: true, uid: "admin:test123456" });
     mockGetDraftHtml.mockResolvedValueOnce({
       id: "ghost-post-2",
@@ -219,10 +239,10 @@ describe("POST /api/admin/email-blast", () => {
       updatedAt: "2026-05-20T00:00:00Z",
       url: null,
     });
-    // First call succeeds, second fails
-    mockSendEmail
-      .mockResolvedValueOnce(true)
-      .mockResolvedValueOnce(false);
+    mockSendEmailBatch.mockResolvedValueOnce([
+      { to: "ali@example.com", ok: true },
+      { to: "bad@example.com", ok: false, error: "Bounced" },
+    ]);
 
     const recipients = [
       { name: "Ali", email: "ali@example.com" },
@@ -260,55 +280,20 @@ describe("POST /api/admin/email-blast", () => {
       updatedAt: "2026-05-20T00:00:00Z",
       url: null,
     });
-    mockSendEmail.mockResolvedValue(true);
+    mockSendEmailBatch.mockResolvedValueOnce([{ to: "xss@example.com", ok: true }]);
 
     const recipients = [{ name: "<b>", email: "xss@example.com" }];
 
     const req = makeRequest({ ghostPostId: "ghost-post-3", subject: "Test", recipients });
     await POST(req);
 
-    // sendEmail must receive escaped HTML, not raw <b>
-    expect(mockSendEmail).toHaveBeenCalledWith(
-      "xss@example.com",
-      "Test",
-      "<p>Dear &lt;b&gt;,</p>"
-    );
-  });
-
-  it("250ms gap: at least N-1 setTimeout calls for N recipients", async () => {
-    const originalSetTimeout = global.setTimeout;
-    const setTimeoutMock = vi.fn().mockImplementation((fn: () => void, _delay?: number) => {
-      fn();
-      return 0 as unknown as ReturnType<typeof setTimeout>;
-    });
-    global.setTimeout = setTimeoutMock as unknown as typeof setTimeout;
-
-    try {
-      mockRequireAdmin.mockResolvedValueOnce({ ok: true, uid: "admin:test123456" });
-      mockGetDraftHtml.mockResolvedValueOnce({
-        id: "ghost-post-4",
-        title: "Timing Test",
-        html: "<p>Hello {{name}}</p>",
-        status: "draft",
-        updatedAt: "2026-05-20T00:00:00Z",
-        url: null,
-      });
-      mockSendEmail.mockResolvedValue(true);
-
-      const recipients = [
-        { name: "A", email: "a@example.com" },
-        { name: "B", email: "b@example.com" },
-        { name: "C", email: "c@example.com" },
-      ];
-
-      const req = makeRequest({ ghostPostId: "ghost-post-4", subject: "Hi", recipients });
-      await POST(req);
-
-      // 3 recipients → 2 setTimeout calls with 250ms delay (no delay after last)
-      const timedCalls = setTimeoutMock.mock.calls.filter((args) => args[1] === 250);
-      expect(timedCalls.length).toBeGreaterThanOrEqual(recipients.length - 1);
-    } finally {
-      global.setTimeout = originalSetTimeout;
-    }
+    // sendEmailBatch must receive escaped HTML, not raw <b>
+    expect(mockSendEmailBatch).toHaveBeenCalledWith([
+      {
+        to: "xss@example.com",
+        subject: "Test",
+        html: "<p>Dear &lt;b&gt;,</p>",
+      },
+    ]);
   });
 });
