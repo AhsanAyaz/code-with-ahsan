@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { CONSULTING_PACKAGES } from "@/lib/consulting/constants";
+import { getConsultingSettings } from "@/lib/consulting/config";
 
 export async function GET() {
+  const settings = await getConsultingSettings();
   return NextResponse.json({
-    packages: CONSULTING_PACKAGES,
+    packages: settings.packages,
   });
 }

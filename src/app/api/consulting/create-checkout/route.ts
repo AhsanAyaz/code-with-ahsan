@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { getStripeClient } from "@/lib/stripe";
-import { CONSULTING_PACKAGES, CONSULTING_CONFIG } from "@/lib/consulting/constants";
+import { getConsultingSettings } from "@/lib/consulting/config";
 import { CreateCheckoutSchema } from "@/types/consulting";
 import { addMinutes, parseISO } from "date-fns";
 import { createLogger } from "@/lib/logger";
@@ -44,7 +44,8 @@ export async function POST(request: NextRequest) {
       githubOrLinkedinUrl,
     } = parseResult.data;
 
-    const pkg = CONSULTING_PACKAGES.find((p) => p.id === packageId);
+    const settings = await getConsultingSettings();
+    const pkg = settings.packages.find((p) => p.id === packageId);
     if (!pkg) {
       return NextResponse.json({ error: "Invalid package selected" }, { status: 400 });
     }
@@ -99,9 +100,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create pending booking in Firestore with 15-min lock
+    // Create pending booking in Firestore with configured lock
     const bookingRef = db.collection("consulting_bookings").doc();
-    const expiresAt = addMinutes(now, CONSULTING_CONFIG.slotLockExpirationMinutes);
+    const expiresAt = addMinutes(now, settings.slotLockExpirationMinutes);
 
     const bookingData = {
       id: bookingRef.id,

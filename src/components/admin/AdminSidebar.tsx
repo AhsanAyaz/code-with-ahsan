@@ -18,6 +18,7 @@ const NAV: NavSection[] = [
   {
     title: "Mentorship",
     items: [
+      { label: "1:1 Advisory", href: "/admin/consulting" },
       { label: "Pending Mentors", href: "/admin/pending" },
       { label: "All Mentors", href: "/admin/mentors" },
       { label: "All Mentees", href: "/admin/mentees" },

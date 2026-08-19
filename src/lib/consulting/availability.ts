@@ -1,6 +1,6 @@
 import { db } from "@/lib/firebaseAdmin";
 import { getOAuthClient, decryptToken, isCalendarConfigured } from "@/lib/google-calendar";
-import { CONSULTING_CONFIG, DEFAULT_WEEKLY_AVAILABILITY } from "./constants";
+import { getConsultingSettings, ConsultingSettings } from "./config";
 import { ConsultingAvailableSlot } from "@/types/consulting";
 import { addDays, addMinutes, format, isAfter, isBefore, parseISO } from "date-fns";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
@@ -29,23 +29,23 @@ function intervalsOverlap(
 }
 
 /**
- * Format a UTC Date into Stockholm local time string for logging.
+ * Format a UTC Date into Stockholm / configured local time string for logging.
  */
-function toStockholmStr(date: Date): string {
-  const zoned = toZonedTime(date, "Europe/Stockholm");
+function toLocalStr(date: Date, timezone: string): string {
+  const zoned = toZonedTime(date, timezone);
   return format(zoned, "yyyy-MM-dd HH:mm");
 }
 
 /**
  * Fetch Google Calendar OAuth client for admin/mentor.
  */
-async function getAdminOAuthClient() {
+async function getAdminOAuthClient(adminEmail: string) {
   if (!isCalendarConfigured()) return null;
 
   try {
     const profilesSnapshot = await db
       .collection("mentorship_profiles")
-      .where("email", "==", CONSULTING_CONFIG.adminEmail)
+      .where("email", "==", adminEmail)
       .limit(1)
       .get();
 
@@ -103,8 +103,13 @@ async function getAdminOAuthClient() {
  * Fetch ALL Google Calendar events as busy periods.
  * Every non-transparent event is treated as a busy conflict.
  */
-async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promise<BusyEvent[]> {
-  const oauthClient = await getAdminOAuthClient();
+async function fetchGoogleCalendarBusyTimes(
+  timeMin: Date,
+  timeMax: Date,
+  adminEmail: string,
+  timezone: string
+): Promise<BusyEvent[]> {
+  const oauthClient = await getAdminOAuthClient(adminEmail);
   if (!oauthClient) return [];
 
   const busyTimes: BusyEvent[] = [];
@@ -136,8 +141,8 @@ async function fetchGoogleCalendarBusyTimes(timeMin: Date, timeMax: Date): Promi
         busyTimes.push({ start, end, summary });
         logger.info("GCal -> BUSY", {
           summary,
-          start: toStockholmStr(start),
-          end: toStockholmStr(end),
+          start: toLocalStr(start, timezone),
+          end: toLocalStr(end, timezone),
         });
       } else if (item.start?.date && item.end?.date) {
         const start = new Date(item.start.date);
@@ -247,77 +252,7 @@ async function fetchFirestoreBusyTimes(timeMin: Date, timeMax: Date): Promise<Bu
 }
 
 /**
- * Get profile custom availability if configured.
- */
-async function getProfileWeeklyAvailability(): Promise<Record<
-  number,
-  { start: string; end: string }[]
-> | null> {
-  try {
-    const profileSnap = await db
-      .collection("mentorship_profiles")
-      .where("email", "==", CONSULTING_CONFIG.adminEmail)
-      .limit(1)
-      .get();
-
-    if (profileSnap.empty) return null;
-    const data = profileSnap.docs[0].data();
-    if (!data.availability || typeof data.availability !== "object") return null;
-
-    const dayMap: Record<string, number> = {
-      sunday: 0,
-      monday: 1,
-      tuesday: 2,
-      wednesday: 3,
-      thursday: 4,
-      friday: 5,
-      saturday: 6,
-    };
-
-    const schedule: Record<number, { start: string; end: string }[]> = {};
-
-    for (const [key, slots] of Object.entries(data.availability)) {
-      const dayNum = dayMap[key.toLowerCase()] ?? Number(key);
-      if (isNaN(dayNum) || !Array.isArray(slots) || slots.length === 0) continue;
-
-      const objectSlots = slots.filter(
-        (s: unknown): s is { start: string; end: string } =>
-          typeof s === "object" &&
-          s !== null &&
-          "start" in s &&
-          "end" in s &&
-          typeof (s as { start: unknown }).start === "string" &&
-          typeof (s as { end: unknown }).end === "string"
-      );
-
-      if (objectSlots.length > 0) {
-        schedule[dayNum] = objectSlots.map((s) => ({
-          start: s.start,
-          end: s.end,
-        }));
-      } else if (slots.includes("flexible") || slots.some((s) => typeof s === "string")) {
-        schedule[dayNum] = DEFAULT_WEEKLY_AVAILABILITY[dayNum] || [
-          { start: "15:00", end: "17:00" },
-        ];
-      }
-    }
-
-    return Object.keys(schedule).length > 0 ? schedule : null;
-  } catch (err) {
-    logger.warn("Could not fetch profile availability, using defaults", {
-      err,
-    });
-    return null;
-  }
-}
-
-/**
- * Compute available consulting slots.
- *
- * Approach 1 (Calendly model):
- *   1. Generate candidate slots from recurring weekly schedule.
- *   2. Subtract all Google Calendar busy events + Firestore bookings.
- *   3. Return remaining available slots.
+ * Compute available consulting slots dynamically based on Firestore settings.
  */
 export async function getAvailableConsultingSlots({
   startDateStr,
@@ -329,26 +264,27 @@ export async function getAvailableConsultingSlots({
   durationMinutes: number;
   timezone?: string;
 }): Promise<ConsultingAvailableSlot[]> {
+  const settings: ConsultingSettings = await getConsultingSettings();
+
   const startDate = parseISO(startDateStr);
   const endDate = parseISO(endDateStr);
 
   const now = new Date();
-  const minNoticeTime = addMinutes(now, CONSULTING_CONFIG.minBookingNoticeHours * 60);
-  const maxBookingTime = addDays(now, CONSULTING_CONFIG.maxBookingDaysInAdvance);
+  const minNoticeTime = addMinutes(now, settings.minBookingNoticeHours * 60);
+  const maxBookingTime = addDays(now, settings.maxBookingDaysInAdvance);
 
   const queryStart = startDate;
   const queryEnd = addDays(endDate, 1);
 
-  // 1. Fetch busy events from Google Calendar & Firestore, and profile schedule
-  const [googleBusy, firestoreBusy, customSchedule] = await Promise.all([
-    fetchGoogleCalendarBusyTimes(queryStart, queryEnd),
+  // 1. Fetch busy events from Google Calendar & Firestore
+  const [googleBusy, firestoreBusy] = await Promise.all([
+    fetchGoogleCalendarBusyTimes(queryStart, queryEnd, settings.adminEmail, settings.adminTimezone),
     fetchFirestoreBusyTimes(queryStart, queryEnd),
-    getProfileWeeklyAvailability(),
   ]);
 
-  const weeklySchedule = customSchedule || DEFAULT_WEEKLY_AVAILABILITY;
+  const weeklySchedule = settings.weeklyAvailability;
   const allBusy: BusyEvent[] = [...googleBusy, ...firestoreBusy];
-  const adminTz = CONSULTING_CONFIG.adminTimezone || "Europe/Stockholm";
+  const adminTz = settings.adminTimezone || "Europe/Stockholm";
 
   logger.info("Busy events summary", {
     googleCalendarBusy: googleBusy.length,
@@ -373,11 +309,11 @@ export async function getAvailableConsultingSlots({
         const slotEnd = addMinutes(slotStart, durationMinutes);
         if (isAfter(slotEnd, blockEnd)) break;
 
-        const slotLabel = `${toStockholmStr(slotStart)} - ${toStockholmStr(slotEnd)}`;
+        const slotLabel = `${toLocalStr(slotStart, adminTz)} - ${toLocalStr(slotEnd, adminTz)}`;
 
         // Check advance notice & max booking window
         if (!isAfter(slotStart, minNoticeTime) || !isBefore(slotStart, maxBookingTime)) {
-          slotStart = addMinutes(slotStart, CONSULTING_CONFIG.slotDurationStepMinutes);
+          slotStart = addMinutes(slotStart, settings.slotDurationStepMinutes);
           continue;
         }
 
@@ -386,14 +322,14 @@ export async function getAvailableConsultingSlots({
           intervalsOverlap(
             { start: slotStart, end: slotEnd },
             busy,
-            CONSULTING_CONFIG.bufferBetweenSessionsMinutes
+            settings.bufferBetweenSessionsMinutes
           )
         );
 
         if (blocker) {
           logger.info("Slot -> BLOCKED", {
             slot: slotLabel,
-            blockedBy: `${blocker.summary} (${toStockholmStr(blocker.start)} - ${toStockholmStr(blocker.end)})`,
+            blockedBy: `${blocker.summary} (${toLocalStr(blocker.start, adminTz)} - ${toLocalStr(blocker.end, adminTz)})`,
           });
         } else {
           logger.info("Slot -> AVAILABLE", { slot: slotLabel });
@@ -403,7 +339,7 @@ export async function getAvailableConsultingSlots({
           });
         }
 
-        slotStart = addMinutes(slotStart, CONSULTING_CONFIG.slotDurationStepMinutes);
+        slotStart = addMinutes(slotStart, settings.slotDurationStepMinutes);
       }
     }
 
@@ -414,8 +350,8 @@ export async function getAvailableConsultingSlots({
     totalSlots: availableSlots.length,
     durationMinutes,
     slots: availableSlots.map((s) => ({
-      start: toStockholmStr(new Date(s.start)),
-      end: toStockholmStr(new Date(s.end)),
+      start: toLocalStr(new Date(s.start), adminTz),
+      end: toLocalStr(new Date(s.end), adminTz),
     })),
   });
 
