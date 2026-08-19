@@ -225,7 +225,7 @@ async function getProfileWeeklyAvailability(): Promise<Record<
 
     if (profileSnap.empty) return null;
     const data = profileSnap.docs[0].data();
-    if (!data.availability) return null;
+    if (!data.availability || typeof data.availability !== "object") return null;
 
     const dayMap: Record<string, number> = {
       sunday: 0,
@@ -239,24 +239,31 @@ async function getProfileWeeklyAvailability(): Promise<Record<
 
     const schedule: Record<number, { start: string; end: string }[]> = {};
 
-    if (typeof data.availability === "object") {
-      for (const [key, slots] of Object.entries(data.availability)) {
-        const dayNum = dayMap[key.toLowerCase()] ?? Number(key);
-        if (!isNaN(dayNum) && Array.isArray(slots)) {
-          const validSlots = slots.filter(
-            (s: unknown): s is { start: string; end: string } =>
-              typeof s === "object" &&
-              s !== null &&
-              "start" in s &&
-              "end" in s &&
-              typeof (s as { start: unknown }).start === "string" &&
-              typeof (s as { end: unknown }).end === "string"
-          );
-          schedule[dayNum] = validSlots.map((s) => ({
-            start: s.start,
-            end: s.end,
-          }));
-        }
+    for (const [key, slots] of Object.entries(data.availability)) {
+      const dayNum = dayMap[key.toLowerCase()] ?? Number(key);
+      if (isNaN(dayNum) || !Array.isArray(slots) || slots.length === 0) continue;
+
+      // Check if slots contains time range objects: [{ start: "14:30", end: "18:30" }]
+      const objectSlots = slots.filter(
+        (s: unknown): s is { start: string; end: string } =>
+          typeof s === "object" &&
+          s !== null &&
+          "start" in s &&
+          "end" in s &&
+          typeof (s as { start: unknown }).start === "string" &&
+          typeof (s as { end: unknown }).end === "string"
+      );
+
+      if (objectSlots.length > 0) {
+        schedule[dayNum] = objectSlots.map((s) => ({
+          start: s.start,
+          end: s.end,
+        }));
+      } else if (slots.includes("flexible") || slots.some((s) => typeof s === "string")) {
+        // Mentor profile has active day with tag like "flexible" -> use default working hours for that day
+        schedule[dayNum] = DEFAULT_WEEKLY_AVAILABILITY[dayNum] || [
+          { start: "14:30", end: "18:30" },
+        ];
       }
     }
 
