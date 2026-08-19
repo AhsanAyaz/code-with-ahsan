@@ -3,18 +3,18 @@ import { ConsultingPackage } from "@/types/consulting";
 export const CONSULTING_PACKAGES: ConsultingPackage[] = [
   {
     id: "rapid-guidance",
-    name: "30-Min Rapid Advisory & AMA",
-    badge: "Quick Answer",
+    name: "30-Min 1:1 Mentorship & Career Advisory",
+    badge: "Fast & Focused",
     durationMinutes: 30,
-    priceInCents: 9900, // $99.00 USD
+    priceInCents: 5000, // $50.00 USD
     currency: "usd",
     description:
-      "Fast-paced, high-impact session for specific technical questions, project unblocking, or quick career feedback.",
+      "Targeted 1:1 guidance for specific technical questions, career roadmapping, resume feedback, or project unblocking.",
     features: [
       "30-minute private video call via Google Meet",
-      "Direct answers on Angular, Web Architecture, or Career",
+      "Direct answers on Angular, Web Architecture, or Career Growth",
+      "Resume review or portfolio critique if desired",
       "Actionable recommendations & next steps",
-      "Session recording available upon request",
     ],
   },
   {
@@ -22,7 +22,7 @@ export const CONSULTING_PACKAGES: ConsultingPackage[] = [
     name: "60-Min Architecture & Code Review",
     badge: "Most Popular",
     durationMinutes: 60,
-    priceInCents: 19900, // $199.00 USD
+    priceInCents: 9000, // $90.00 USD
     currency: "usd",
     description:
       "Deep dive into your system architecture, state management, scalability bottlenecks, or codebase refactoring strategy.",
@@ -36,17 +36,17 @@ export const CONSULTING_PACKAGES: ConsultingPackage[] = [
   },
   {
     id: "deep-dive-coaching",
-    name: "90-Min Technical Interview Prep / GDE Coaching",
+    name: "60-Min Comprehensive Mock Interview & GDE Prep",
     badge: "Comprehensive",
-    durationMinutes: 90,
-    priceInCents: 29900, // $299.00 USD
+    durationMinutes: 60,
+    priceInCents: 11000, // $110.00 USD
     currency: "usd",
     description:
-      "Comprehensive 1:1 coaching: mock technical/system design interviews, GDE application review, or executive tech advisory.",
+      "Real-world technical/system design interview simulation, direct rubric grading, GDE guidance, and actionable prep plan.",
     features: [
-      "90-minute intensive 1:1 strategy session",
-      "Real-world mock interview or deep technical roadmap",
-      "Direct critique, rubric feedback, and improvement plan",
+      "60-minute intensive 1:1 strategy & mock interview",
+      "Real-world coding or system design problem walkthrough",
+      "Direct rubric critique and improvement scorecard",
       "Follow-up async Q&A via email for 7 days post-session",
       "Session recording included",
     ],
