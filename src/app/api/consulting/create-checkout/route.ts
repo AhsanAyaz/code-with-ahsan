@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
             currency: pkg.currency,
             product_data: {
               name: `Consultation: ${pkg.name}`,
-              description: `${pkg.durationMinutes}-min 1:1 consultation with Mohammed S. N. Ayaz (${timezone})`,
+              description: `${pkg.durationMinutes}-min 1:1 consultation with Muhammad Ahsan Ayaz (${timezone})`,
             },
             unit_amount: pkg.priceInCents,
           },

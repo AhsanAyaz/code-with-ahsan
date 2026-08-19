@@ -117,7 +117,7 @@ export async function sendConsultingConfirmationEmail(
             </ul>
 
             <p style="margin-top:24px;">Looking forward to speaking with you!</p>
-            <p>Best regards,<br><strong>Mohammed S. N. Ayaz</strong><br>Google Developer Expert (GDE) & Architect</p>
+            <p>Best regards,<br><strong>Muhammad Ahsan Ayaz</strong><br>Google Developer Expert (GDE) & Architect</p>
           </div>
           <div class="footer">
             <p><a href="${getSiteUrl()}" style="color:#2563eb;text-decoration:none;">CodeWithAhsan.dev</a> • Professional Advisory & Mentorship</p>

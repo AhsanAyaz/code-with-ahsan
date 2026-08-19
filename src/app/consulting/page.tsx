@@ -107,9 +107,9 @@ export default function ConsultingPage() {
             1:1 Technical Advisory & Architecture Review
           </h1>
           <p className="max-w-3xl mx-auto text-base sm:text-lg text-base-content/80 leading-relaxed">
-            Get personalized guidance, architectural reviews, and high-impact strategic advisory
-            directly from <strong>Mohammed S. N. Ayaz (Ahsan)</strong> — Google Developer Expert,
-            author, and engineering leader.
+            Get personalized technical advice, code reviews, and career strategy directly from{" "}
+            <strong>Muhammad Ahsan Ayaz</strong> — Google Developer Expert, author, and frontend
+            architect.
           </p>
 
           <div className="flex flex-wrap justify-center items-center gap-6 pt-2 text-xs sm:text-sm text-base-content/70">

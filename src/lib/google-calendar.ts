@@ -325,8 +325,8 @@ export async function createConsultingCalendarEvent(
         timeZone: booking.timezone,
       },
       attendees: [
+        { email: adminEmail, displayName: "Muhammad Ahsan Ayaz" },
         { email: booking.clientEmail, displayName: booking.clientName },
-        { email: adminEmail, displayName: "Mohammed S. N. Ayaz" },
       ],
       conferenceData: {
         createRequest: {

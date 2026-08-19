@@ -70,7 +70,7 @@ export const DEFAULT_WEEKLY_AVAILABILITY: Record<number, { start: string; end: s
 
 export const CONSULTING_CONFIG = {
   adminEmail: process.env.ADMIN_EMAIL || "ahsan.ubitian@gmail.com",
-  adminName: "Mohammed S. N. Ayaz",
+  adminName: "Muhammad Ahsan Ayaz",
   adminTimezone: "Europe/Stockholm",
   slotDurationStepMinutes: 30, // 30-min start time intervals (2:30 PM, 3:00 PM, 3:30 PM, ...)
   bufferBetweenSessionsMinutes: 15, // 15-min gap after sessions
