@@ -235,12 +235,14 @@ export type ConfirmedSponsor = {
   tier: string;
 };
 
+const SPONSOR_IMG = "/static/images/events/cwa-ship-karachi-2026/sponsors";
+
 export const CONFIRMED_SPONSORS: ConfirmedSponsor[] = [
   {
-    name: "SPONSOR NAME",
-    logoUrl: TBD_AVATAR,
-    websiteUrl: "https://example.com",
-    tier: "TODO",
+    name: "Command Code",
+    logoUrl: `${SPONSOR_IMG}/commandcode.svg`,
+    websiteUrl: "https://commandcode.ai",
+    tier: "Gold Sponsor",
   },
 ];
 
