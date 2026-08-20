@@ -8,7 +8,7 @@ import VenueSection from "./components/VenueSection";
 import EventStructureSection from "./components/EventStructureSection";
 import JudgesSection from "./components/JudgesSection";
 import SponsorshipPackagesSection from "./components/SponsorshipPackagesSection";
-// import CurrentSponsorsSection from "./components/CurrentSponsorsSection";
+import CurrentSponsorsSection from "./components/CurrentSponsorsSection";
 import CollaborationPartnersSection from "./components/CollaborationPartnersSection";
 import OutreachPartnersSection from "./components/OutreachPartnersSection";
 import ContactSection from "./components/ContactSection";
@@ -31,7 +31,7 @@ const CwaShipKarachi2026Page = () => {
       <JudgesSection />
       <VenueSection />
       <SponsorshipPackagesSection />
-      {/* <CurrentSponsorsSection /> */}
+      <CurrentSponsorsSection />
       <CollaborationPartnersSection />
       <OutreachPartnersSection />
       <ContactSection />

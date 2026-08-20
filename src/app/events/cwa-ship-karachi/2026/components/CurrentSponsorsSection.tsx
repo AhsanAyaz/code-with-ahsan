@@ -1,73 +1,67 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { Building2 } from "lucide-react";
 import Image from "next/image";
-import { CONFIRMED_SPONSORS, SPONSOR_PLACEHOLDERS, SECTION_IDS } from "../constants";
+import { Award } from "lucide-react";
+import { CONFIRMED_SPONSORS, SECTION_IDS, type ConfirmedSponsor } from "../constants";
+
+// Server Component: static markup only, hover states handled in CSS.
 
 const TIER_COLORS: Record<string, string> = {
   "Tool Partner": "text-success",
+  "Community Partner": "text-primary",
   "Gold Sponsor": "text-warning",
   Gold: "text-warning",
   "Platinum Sponsor": "text-yellow-300",
   Platinum: "text-yellow-300",
-  "Community Partner": "text-primary",
+  "Title Sponsor": "text-yellow-300",
 };
-const getTierColor = (tier: string) => TIER_COLORS[tier] ?? "text-primary";
+const tierColor = (tier: string) => TIER_COLORS[tier] ?? "text-primary";
+
+const SponsorTile = ({ sponsor }: { sponsor: ConfirmedSponsor }) => (
+  <a
+    href={sponsor.websiteUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="group flex w-full max-w-[300px] flex-col items-center justify-center gap-4 rounded-2xl border border-primary/15 bg-base-200 p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_0_32px_rgba(143,39,224,0.22)] sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)]"
+  >
+    {/* Intrinsic sizing keeps a wide wordmark short instead of padding it into
+        a square, so the label sits directly beneath the logo. */}
+    <Image
+      src={sponsor.logoUrl}
+      alt={`${sponsor.name} logo`}
+      width={400}
+      height={400}
+      unoptimized
+      className="h-auto max-h-[120px] w-full max-w-[220px] object-contain transition-transform duration-300 group-hover:scale-[1.04]"
+    />
+    <span className="flex flex-col gap-1">
+      <span className="text-sm font-semibold leading-tight text-base-content/90">
+        {sponsor.name}
+      </span>
+      <span className={`font-mono text-[11px] uppercase tracking-wider ${tierColor(sponsor.tier)}`}>
+        {sponsor.tier}
+      </span>
+    </span>
+  </a>
+);
 
 const CurrentSponsorsSection = () => {
+  if (CONFIRMED_SPONSORS.length === 0) return null;
+
   return (
-    <section id={SECTION_IDS.sponsors} className="pb-16 sm:pb-24 relative overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-3">Our Sponsors</h2>
-          <p className="text-sm sm:text-base text-base-content/70">
-            Proudly supported by our partners.
+    <section id={SECTION_IDS.sponsors} className="relative overflow-hidden pb-12 sm:pb-16">
+      <div className="container relative z-10 mx-auto px-4 sm:px-6">
+        <div className="mb-8 text-center">
+          <div className="mb-3 flex items-center justify-center gap-2">
+            <Award className="h-5 w-5 text-primary" />
+            <h2 className="text-2xl font-bold text-primary sm:text-3xl">Our Sponsors</h2>
+          </div>
+          <p className="mx-auto max-w-2xl text-sm text-base-content/70 sm:text-base">
+            Backing the builders who ship. Proudly supported by our partners.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
-          {CONFIRMED_SPONSORS.map((sponsor, index) => (
-            <motion.a
-              key={sponsor.name}
-              href={sponsor.websiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
-              transition={{ delay: index * 0.04, duration: 0.3 }}
-              whileHover={{ y: -4 }}
-              className="h-36 mask mask-squircle bg-base-200 flex flex-col items-center justify-center text-center p-5 hover:bg-base-300 transition-colors"
-            >
-              <Image
-                src={sponsor.logoUrl}
-                alt={`${sponsor.name} logo`}
-                width={80}
-                height={60}
-                className="object-contain mask mask-squircle p-2"
-              />
-              <span className="text-[11px] font-bold text-white mt-1 leading-tight">
-                {sponsor.name}
-              </span>
-              <span className={`text-[10px] font-semibold ${getTierColor(sponsor.tier)}`}>
-                {sponsor.tier}
-              </span>
-            </motion.a>
-          ))}
-          {SPONSOR_PLACEHOLDERS.map((item, index) => (
-            <motion.div
-              key={`${item.tierHint}-${index}`}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
-              transition={{ delay: (CONFIRMED_SPONSORS.length + index) * 0.04, duration: 0.3 }}
-              className="h-36 mask mask-squircle border border-dashed border-primary/30 bg-base-200 flex flex-col items-center justify-center text-center p-5"
-            >
-              <Building2 className="w-5 h-5 text-primary/70 mb-2" />
-              <span className="text-xs font-semibold text-base-content/80">{item.tierHint}</span>
-              <span className="text-[11px] text-base-content/60">Your Logo Here</span>
-            </motion.div>
+        <div className="mx-auto flex max-w-5xl flex-wrap items-stretch justify-center gap-4">
+          {CONFIRMED_SPONSORS.map((sponsor) => (
+            <SponsorTile key={sponsor.name} sponsor={sponsor} />
           ))}
         </div>
       </div>
