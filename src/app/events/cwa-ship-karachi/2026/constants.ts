@@ -262,6 +262,35 @@ export const COLLABORATION_PARTNERS: PartnerLogo[] = [
   { name: "MSA KHI", logoUrl: `${COLLABORATION_PARTNER_IMG}/msa-khi.png`, websiteUrl: "" },
 ];
 
+// Named representatives from a collaboration partner. LinkedIn only — personal
+// emails from the planning sheet are deliberately not published here.
+// TODO: drop headshots into
+// public/static/images/events/cwa-ship-karachi-2026/collaboration-partners/reps/
+// using the filename in `avatarUrl`; the card falls back to initials until then.
+export type PartnerRepresentative = {
+  name: string;
+  role: string;
+  linkedinUrl: string;
+  avatarUrl: string;
+};
+
+const PARTNER_REP_IMG = `${COLLABORATION_PARTNER_IMG}/reps`;
+
+export const COLLABORATION_REPRESENTATIVES: PartnerRepresentative[] = [
+  {
+    name: "Areesha Siddiqui",
+    role: "Lead, MSA KHI",
+    linkedinUrl: "https://www.linkedin.com/in/areeshah-siddiqui/",
+    avatarUrl: `${PARTNER_REP_IMG}/areesha-siddiqui.jpg`,
+  },
+  {
+    name: "Muhammad Habib",
+    role: "Co-Lead, MSA KHI",
+    linkedinUrl: "https://www.linkedin.com/in/muhammad-habib-986a89215/",
+    avatarUrl: `${PARTNER_REP_IMG}/muhammad-habib.jpg`,
+  },
+];
+
 // Communities amplifying the event to their own members — distinct from the
 // partners helping run the day itself.
 export const OUTREACH_PARTNERS: PartnerLogo[] = [
