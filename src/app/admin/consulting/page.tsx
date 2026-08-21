@@ -15,6 +15,7 @@ import {
   CheckCircle,
   Video,
   ExternalLink,
+  Mail,
 } from "lucide-react";
 
 const ADMIN_TOKEN_KEY = "mentorship_admin_token";
@@ -54,6 +55,7 @@ export default function AdminConsultingPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"schedule" | "packages" | "rules" | "bookings">(
     "schedule"
   );
@@ -68,6 +70,36 @@ export default function AdminConsultingPage() {
 
   const getAdminToken = () => {
     return typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
+  };
+
+  const handleConfirmAndResend = async (bookingId: string) => {
+    setConfirmingId(bookingId);
+    try {
+      const token = getAdminToken();
+      const res = await fetch("/api/admin/consulting", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": token ?? "",
+        },
+        body: JSON.stringify({
+          action: "confirm_and_resend",
+          bookingId,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        success("Booking confirmed, Google Meet attached, and confirmation email dispatched!");
+        fetchData();
+      } else {
+        error(data.error || "Failed to confirm booking");
+      }
+    } catch {
+      error("Failed to confirm booking");
+    } finally {
+      setConfirmingId(null);
+    }
   };
 
   const fetchData = useCallback(async () => {
@@ -713,6 +745,7 @@ export default function AdminConsultingPage() {
                     <th>Amount</th>
                     <th>Status</th>
                     <th>Meeting Link</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -768,6 +801,21 @@ export default function AdminConsultingPage() {
                         ) : (
                           <span className="text-xs text-base-content/40">-</span>
                         )}
+                      </td>
+                      <td>
+                        <button
+                          onClick={() => handleConfirmAndResend(b.id)}
+                          disabled={confirmingId === b.id}
+                          className="btn btn-xs btn-outline btn-secondary gap-1"
+                          title="Confirm payment, generate Google Meet, and send confirmation email"
+                        >
+                          {confirmingId === b.id ? (
+                            <span className="loading loading-spinner loading-xs"></span>
+                          ) : (
+                            <Mail className="w-3 h-3" />
+                          )}
+                          {b.status === "confirmed" ? "Resend Email" : "Confirm & Send"}
+                        </button>
                       </td>
                     </tr>
                   ))}

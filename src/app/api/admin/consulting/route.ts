@@ -100,3 +100,33 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "Failed to update consulting settings" }, { status: 500 });
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const isAdmin = await verifyAdminRequest(request);
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { action, bookingId } = await request.json();
+
+    if (action === "confirm_and_resend" && bookingId) {
+      const { confirmConsultingBooking } = await import("@/lib/consulting/confirmBooking");
+      const result = await confirmConsultingBooking({
+        bookingId,
+        forceResendEmail: true,
+      });
+
+      if (!result.success) {
+        return NextResponse.json({ error: result.error || "Failed to confirm" }, { status: 400 });
+      }
+
+      return NextResponse.json({ success: true, booking: result.booking });
+    }
+
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+  } catch (error) {
+    logger.error("Error in admin consulting POST action", { error });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

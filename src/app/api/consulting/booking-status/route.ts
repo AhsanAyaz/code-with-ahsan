@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { getStripeClient } from "@/lib/stripe";
+import { confirmConsultingBooking } from "@/lib/consulting/confirmBooking";
 import { createLogger } from "@/lib/logger";
 
 const logger = createLogger("api-consulting-booking-status");
@@ -35,40 +36,61 @@ export async function GET(request: NextRequest) {
       .limit(1)
       .get();
 
-    if (snapshot.empty) {
-      // Fallback: check Stripe directly to see if booking metadata exists
+    let bookingId: string | null = null;
+    let data: FirebaseFirestore.DocumentData | null = null;
+
+    if (!snapshot.empty) {
+      bookingId = snapshot.docs[0].id;
+      data = snapshot.docs[0].data();
+    } else {
+      // Fallback: check Stripe directly
       try {
         const stripe = getStripeClient();
         const session = await stripe.checkout.sessions.retrieve(sessionId);
-        const bookingId = session.client_reference_id || session.metadata?.bookingId;
+        bookingId = session.client_reference_id || session.metadata?.bookingId || null;
 
         if (bookingId) {
           const bookingDoc = await db.collection("consulting_bookings").doc(bookingId).get();
           if (bookingDoc.exists) {
-            const data = bookingDoc.data();
-            return NextResponse.json({
-              booking: {
-                ...data,
-                startTime: toISOStringSafe(data?.startTime),
-                endTime: toISOStringSafe(data?.endTime),
-              },
-            });
+            data = bookingDoc.data() || null;
           }
         }
       } catch (err) {
         logger.error("Error retrieving Stripe session fallback", { err });
       }
+    }
 
+    if (!bookingId || !data) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
-    const data = snapshot.docs[0].data();
+    // Self-healing confirmation: If booking is still pending_payment, trigger confirmation check
+    if (data.status === "pending_payment") {
+      logger.info("Triggering self-healing confirmation for pending booking", {
+        bookingId,
+        sessionId,
+      });
+      const confirmResult = await confirmConsultingBooking({
+        bookingId,
+        stripeSessionId: sessionId,
+      });
+
+      if (confirmResult.success && confirmResult.booking) {
+        return NextResponse.json({
+          booking: {
+            ...confirmResult.booking,
+            startTime: toISOStringSafe(confirmResult.booking.startTime),
+            endTime: toISOStringSafe(confirmResult.booking.endTime),
+          },
+        });
+      }
+    }
 
     return NextResponse.json({
       booking: {
         ...data,
-        startTime: toISOStringSafe(data?.startTime),
-        endTime: toISOStringSafe(data?.endTime),
+        startTime: toISOStringSafe(data.startTime),
+        endTime: toISOStringSafe(data.endTime),
       },
     });
   } catch (error) {
