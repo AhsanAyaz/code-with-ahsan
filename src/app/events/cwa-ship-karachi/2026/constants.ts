@@ -193,6 +193,22 @@ export const ORGANIZER_PROFILES: Organizer[] = [
     email: "warishasheikh007@gmail.com",
     avatarUrl: `${ORGANIZER_IMG}/warisha.jpg`,
   },
+  {
+    name: "Hafsa Shahid",
+    title: "Organizer",
+    linkedin: "hafsashahid03",
+    instagram: "",
+    email: "hafsahere01@gmail.com",
+    avatarUrl: `${ORGANIZER_IMG}/hafsa-shahid.jpg`,
+  },
+  {
+    name: "Ali Hassan",
+    title: "Organizer",
+    linkedin: "alihassancode",
+    instagram: "",
+    email: "alihassan.code@gmail.com",
+    avatarUrl: `${ORGANIZER_IMG}/ali-hassan.jpg`,
+  },
 ];
 
 /** Name-only list consumed by the host/presenter deck. */
@@ -235,6 +251,9 @@ export type ConfirmedSponsor = {
   tier: string;
 };
 
+const COLLABORATION_PARTNER_IMG =
+  "/static/images/events/cwa-ship-karachi-2026/collaboration-partners";
+
 const SPONSOR_IMG = "/static/images/events/cwa-ship-karachi-2026/sponsors";
 
 export const CONFIRMED_SPONSORS: ConfirmedSponsor[] = [
@@ -243,6 +262,12 @@ export const CONFIRMED_SPONSORS: ConfirmedSponsor[] = [
     logoUrl: `${SPONSOR_IMG}/commandcode.svg`,
     websiteUrl: "https://commandcode.ai",
     tier: "Gold Sponsor",
+  },
+  {
+    name: "MSA KHI",
+    logoUrl: `${COLLABORATION_PARTNER_IMG}/msa-khi.png`,
+    websiteUrl: "",
+    tier: "Community Sponsor",
   },
 ];
 
@@ -256,9 +281,6 @@ export type PartnerLogo = {
   logoUrl: string;
   websiteUrl: string;
 };
-
-const COLLABORATION_PARTNER_IMG =
-  "/static/images/events/cwa-ship-karachi-2026/collaboration-partners";
 
 export const COLLABORATION_PARTNERS: PartnerLogo[] = [
   { name: "MSA KHI", logoUrl: `${COLLABORATION_PARTNER_IMG}/msa-khi.png`, websiteUrl: "" },
@@ -304,6 +326,11 @@ export const OUTREACH_PARTNERS: PartnerLogo[] = [
   {
     name: "GDG On Campus · University of Karachi",
     logoUrl: `${COLLABORATION_PARTNER_IMG}/gdg-uok.png`,
+    websiteUrl: "",
+  },
+  {
+    name: "IlmCode",
+    logoUrl: `${COLLABORATION_PARTNER_IMG}/ilmcode.png`,
     websiteUrl: "",
   },
 ];

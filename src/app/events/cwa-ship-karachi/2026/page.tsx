@@ -23,7 +23,6 @@ const CwaShipKarachi2026Page = () => {
       <AnimatedBackground />
       <HeroSection />
       <TracksSection />
-      <CommunityStats />
       <AboutSection />
       <ScheduleSection />
       <EventStructureSection />
@@ -36,6 +35,7 @@ const CwaShipKarachi2026Page = () => {
       <OutreachPartnersSection />
       <ContactSection />
       <OrganizersSection />
+      <CommunityStats />
       <SocialReachSection />
       <WinnersDisplay />
     </main>
