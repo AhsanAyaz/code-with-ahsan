@@ -68,7 +68,7 @@ const SocialReachSection = () => {
           <div className="mb-3 flex items-center justify-center gap-2">
             <Users className="h-5 w-5 text-primary" />
             <h2 className="text-2xl font-bold text-primary sm:text-3xl md:text-4xl">
-              Follow the Community
+              Followers Across Social Platforms
             </h2>
           </div>
           <p className="mx-auto max-w-2xl text-sm text-base-content/70 sm:text-base">
