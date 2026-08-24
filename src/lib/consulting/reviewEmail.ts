@@ -132,6 +132,7 @@ export async function sendConsultingReviewRequestEmail(
     const result = await resend.emails.send({
       from: fromAddress,
       to: [booking.clientEmail],
+      bcc: [CONSULTING_CONFIG.adminEmail],
       replyTo: CONSULTING_CONFIG.adminEmail,
       subject: `How was your 1:1 session with Ahsan? (${booking.packageName})`,
       html: htmlContent,
@@ -146,6 +147,65 @@ export async function sendConsultingReviewRequestEmail(
     return true;
   } catch (err) {
     log.error("Failed to send review request email", { error: err, bookingId: booking.id });
+    return false;
+  }
+}
+
+/**
+ * Notify Ahsan when a new consulting review/testimonial is submitted.
+ */
+export async function sendAdminNewReviewNotificationEmail(review: {
+  clientName: string;
+  clientEmail: string;
+  rating: number;
+  headline: string;
+  feedback: string;
+  packageName: string;
+  role?: string;
+  company?: string;
+}): Promise<boolean> {
+  const resend = getResendClient();
+  if (!resend) return false;
+
+  try {
+    const adminUrl = `${getSiteUrl()}/admin/consulting`;
+    const stars = "★".repeat(review.rating) + "☆".repeat(5 - review.rating);
+
+    const htmlContent = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #1d4ed8;">New 1:1 Consulting Testimonial Received! 🎉</h2>
+        <p><strong>${review.clientName}</strong> (${review.clientEmail}) just submitted a review for <strong>${review.packageName}</strong>.</p>
+        
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="color: #f59e0b; font-size: 20px; margin: 0 0 8px 0;">${stars} (${review.rating}/5)</p>
+          <p style="font-weight: bold; font-size: 16px; margin: 0 0 8px 0;">&ldquo;${review.headline}&rdquo;</p>
+          <p style="color: #334155; margin: 0; line-height: 1.5;">${review.feedback}</p>
+          ${review.role ? `<p style="font-size: 12px; color: #64748b; margin-top: 12px;">Author: ${review.role} ${review.company ? `@ ${review.company}` : ""}</p>` : ""}
+        </div>
+
+        <p><a href="${adminUrl}" style="display: inline-block; background: #2563eb; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">Moderate in Admin Dashboard →</a></p>
+      </div>
+    `;
+
+    const fromAddress =
+      process.env.RESEND_FROM_EMAIL ||
+      process.env.EMAIL_FROM ||
+      "Code With Ahsan <notifications@codewithahsan.dev>";
+
+    await resend.emails.send({
+      from: fromAddress,
+      to: [CONSULTING_CONFIG.adminEmail],
+      subject: `New Review (${review.rating}/5 ⭐) from ${review.clientName} - 1:1 Advisory`,
+      html: htmlContent,
+    });
+
+    log.info("Admin notification for new review sent successfully", {
+      clientName: review.clientName,
+      rating: review.rating,
+    });
+    return true;
+  } catch (err) {
+    log.error("Failed to send admin review notification", { error: err });
     return false;
   }
 }

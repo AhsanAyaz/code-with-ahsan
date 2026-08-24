@@ -142,6 +142,23 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date(),
     });
 
+    // Send instant notification to admin
+    try {
+      const { sendAdminNewReviewNotificationEmail } = await import("@/lib/consulting/reviewEmail");
+      await sendAdminNewReviewNotificationEmail({
+        clientName: booking.clientName,
+        clientEmail: booking.clientEmail,
+        rating,
+        headline,
+        feedback,
+        packageName: booking.packageName,
+        role: role || "",
+        company: company || "",
+      });
+    } catch (notifyErr) {
+      logger.warn("Could not send admin review notification email", { notifyErr });
+    }
+
     logger.info("Consulting review submitted successfully", {
       reviewId: reviewRef.id,
       bookingId,
