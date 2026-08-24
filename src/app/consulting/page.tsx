@@ -13,6 +13,7 @@ import {
   Award,
 } from "lucide-react";
 import ConsultingSlotPicker from "@/components/consulting/ConsultingSlotPicker";
+import ConsultingTestimonials from "@/components/consulting/ConsultingTestimonials";
 import { CONSULTING_PACKAGES } from "@/lib/consulting/constants";
 import { ConsultingPackage, ConsultingAvailableSlot } from "@/types/consulting";
 
@@ -335,6 +336,9 @@ export default function ConsultingPage() {
             </div>
           </div>
         </section>
+
+        {/* Client Testimonials Section */}
+        <ConsultingTestimonials />
 
         {/* FAQ Section */}
         <section className="max-w-3xl mx-auto space-y-6 pt-10 border-t border-base-300">
