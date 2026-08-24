@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { ConsultingSettings } from "@/lib/consulting/config";
-import { ConsultingPackage } from "@/types/consulting";
+import { ConsultingPackage, ConsultingReview } from "@/types/consulting";
 import {
   Calendar,
   Clock,
@@ -16,6 +16,11 @@ import {
   Video,
   ExternalLink,
   Mail,
+  Star,
+  MessageSquare,
+  Send,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 const ADMIN_TOKEN_KEY = "mentorship_admin_token";
@@ -42,12 +47,16 @@ interface BookingItem {
   currency: string;
   createdAt: string;
   googleMeetLink: string | null;
+  reviewEmailSentAt?: string | null;
+  reviewId?: string | null;
 }
 
 interface Metrics {
   totalRevenueInCents: number;
   confirmedCount: number;
   totalBookingsCount: number;
+  reviewsCount?: number;
+  approvedReviewsCount?: number;
 }
 
 export default function AdminConsultingPage() {
@@ -56,20 +65,92 @@ export default function AdminConsultingPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"schedule" | "packages" | "rules" | "bookings">(
-    "schedule"
-  );
+  const [sendingInviteId, setSendingInviteId] = useState<string | null>(null);
+  const [togglingReviewId, setTogglingReviewId] = useState<string | null>(null);
+
+  const [activeTab, setActiveTab] = useState<
+    "schedule" | "packages" | "rules" | "bookings" | "reviews"
+  >("schedule");
 
   const [settings, setSettings] = useState<ConsultingSettings | null>(null);
   const [bookings, setBookings] = useState<BookingItem[]>([]);
+  const [reviews, setReviews] = useState<ConsultingReview[]>([]);
   const [metrics, setMetrics] = useState<Metrics>({
     totalRevenueInCents: 0,
     confirmedCount: 0,
     totalBookingsCount: 0,
+    reviewsCount: 0,
+    approvedReviewsCount: 0,
   });
 
   const getAdminToken = () => {
     return typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
+  };
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const token = getAdminToken();
+      const res = await fetch("/api/admin/consulting", {
+        headers: {
+          "x-admin-token": token ?? "",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to load consulting data");
+      }
+
+      const data = await res.json();
+      setSettings(data.settings);
+      setBookings(data.bookings || []);
+      setReviews(data.reviews || []);
+      setMetrics(
+        data.metrics || {
+          totalRevenueInCents: 0,
+          confirmedCount: 0,
+          totalBookingsCount: 0,
+          reviewsCount: 0,
+          approvedReviewsCount: 0,
+        }
+      );
+    } catch {
+      error("Could not load consulting settings");
+    } finally {
+      setLoading(false);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleSave = async () => {
+    if (!settings) return;
+    setSaving(true);
+    try {
+      const token = getAdminToken();
+      const res = await fetch("/api/admin/consulting", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": token ?? "",
+        },
+        body: JSON.stringify(settings),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to save settings");
+      }
+
+      const data = await res.json();
+      setSettings(data.settings);
+      success("Consulting settings and schedule saved successfully!");
+    } catch {
+      error("Failed to save consulting settings");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleConfirmAndResend = async (bookingId: string) => {
@@ -102,66 +183,68 @@ export default function AdminConsultingPage() {
     }
   };
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  const handleSendReviewInvite = async (bookingId: string) => {
+    setSendingInviteId(bookingId);
     try {
       const token = getAdminToken();
       const res = await fetch("/api/admin/consulting", {
-        headers: {
-          "x-admin-token": token ?? "",
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to load consulting data");
-      }
-
-      const data = await res.json();
-      setSettings(data.settings);
-      setBookings(data.bookings || []);
-      setMetrics(
-        data.metrics || {
-          totalRevenueInCents: 0,
-          confirmedCount: 0,
-          totalBookingsCount: 0,
-        }
-      );
-    } catch (err) {
-      error("Could not load consulting settings");
-    } finally {
-      setLoading(false);
-    }
-  }, [error]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const handleSave = async () => {
-    if (!settings) return;
-    setSaving(true);
-    try {
-      const token = getAdminToken();
-      const res = await fetch("/api/admin/consulting", {
-        method: "PUT",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-admin-token": token ?? "",
         },
-        body: JSON.stringify(settings),
+        body: JSON.stringify({
+          action: "send_review_invite",
+          bookingId,
+        }),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to save settings");
+      const data = await res.json();
+      if (res.ok && data.success) {
+        success("Review invitation email sent via Resend!");
+        fetchData();
+      } else {
+        error(data.error || "Failed to send review invite");
       }
+    } catch {
+      error("Failed to send review invite");
+    } finally {
+      setSendingInviteId(null);
+    }
+  };
+
+  const handleToggleReviewApproval = async (reviewId: string, currentStatus: boolean) => {
+    setTogglingReviewId(reviewId);
+    try {
+      const token = getAdminToken();
+      const res = await fetch("/api/admin/consulting", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": token ?? "",
+        },
+        body: JSON.stringify({
+          action: "toggle_review_approval",
+          reviewId,
+          isApproved: !currentStatus,
+        }),
+      });
 
       const data = await res.json();
-      setSettings(data.settings);
-      success("Consulting settings and schedule saved successfully!");
-    } catch (err) {
-      error("Failed to save consulting settings");
+      if (res.ok && data.success) {
+        success(
+          !currentStatus
+            ? "Testimonial approved and published live!"
+            : "Testimonial unapproved and hidden from website."
+        );
+        fetchData();
+      } else {
+        error(data.error || "Failed to update review status");
+      }
+    } catch {
+      error("Failed to update review status");
     } finally {
-      setSaving(false);
+      setTogglingReviewId(null);
     }
   };
 
@@ -272,8 +355,8 @@ export default function AdminConsultingPage() {
             1:1 Advisory & Consulting Management
           </h1>
           <p className="text-sm text-base-content/70 mt-1">
-            Configure your weekly schedule, package pricing tiers, booking policies, and manage
-            client sessions.
+            Configure weekly schedule, pricing tiers, review testimonials, and manage client
+            consultations.
           </p>
         </div>
 
@@ -292,7 +375,7 @@ export default function AdminConsultingPage() {
       </div>
 
       {/* Metrics Banner */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="card bg-base-100 border border-base-300 shadow-sm">
           <div className="card-body p-4 flex-row items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-success/10 text-success flex items-center justify-center shrink-0">
@@ -325,6 +408,26 @@ export default function AdminConsultingPage() {
 
         <div className="card bg-base-100 border border-base-300 shadow-sm">
           <div className="card-body p-4 flex-row items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+              <Star className="w-6 h-6 fill-amber-500 text-amber-500" />
+            </div>
+            <div>
+              <div className="text-xs text-base-content/60 font-semibold uppercase tracking-wider">
+                Testimonials
+              </div>
+              <div className="text-2xl font-black">
+                {metrics.approvedReviewsCount || 0}
+                <span className="text-sm font-normal text-base-content/60">
+                  {" "}
+                  / {reviews.length}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card bg-base-100 border border-base-300 shadow-sm">
+          <div className="card-body p-4 flex-row items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-info/10 text-info flex items-center justify-center shrink-0">
               <Clock className="w-6 h-6" />
             </div>
@@ -332,14 +435,14 @@ export default function AdminConsultingPage() {
               <div className="text-xs text-base-content/60 font-semibold uppercase tracking-wider">
                 Active Timezone
               </div>
-              <div className="text-lg font-bold truncate">{settings.adminTimezone}</div>
+              <div className="text-sm font-bold truncate">{settings.adminTimezone}</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="tabs tabs-boxed bg-base-300/60 p-1 w-full sm:w-fit">
+      <div className="tabs tabs-boxed bg-base-300/60 p-1 w-full sm:w-fit flex-wrap">
         <button
           onClick={() => setActiveTab("schedule")}
           className={`tab gap-2 font-medium ${activeTab === "schedule" ? "tab-active" : ""}`}
@@ -362,7 +465,13 @@ export default function AdminConsultingPage() {
           onClick={() => setActiveTab("bookings")}
           className={`tab gap-2 font-medium ${activeTab === "bookings" ? "tab-active" : ""}`}
         >
-          <Clock className="w-4 h-4" /> Recent Bookings ({bookings.length})
+          <Clock className="w-4 h-4" /> Bookings ({bookings.length})
+        </button>
+        <button
+          onClick={() => setActiveTab("reviews")}
+          className={`tab gap-2 font-medium ${activeTab === "reviews" ? "tab-active" : ""}`}
+        >
+          <MessageSquare className="w-4 h-4" /> Testimonials ({reviews.length})
         </button>
       </div>
 
@@ -725,7 +834,8 @@ export default function AdminConsultingPage() {
             <div>
               <h2 className="text-lg font-bold">Consulting Bookings History</h2>
               <p className="text-xs text-base-content/60">
-                View completed payments, upcoming client consultations, and Google Meet links.
+                View completed payments, upcoming client consultations, Google Meet links, and
+                dispatch review requests.
               </p>
             </div>
           </div>
@@ -803,24 +913,158 @@ export default function AdminConsultingPage() {
                         )}
                       </td>
                       <td>
-                        <button
-                          onClick={() => handleConfirmAndResend(b.id)}
-                          disabled={confirmingId === b.id}
-                          className="btn btn-xs btn-outline btn-secondary gap-1"
-                          title="Confirm payment, generate Google Meet, and send confirmation email"
-                        >
-                          {confirmingId === b.id ? (
-                            <span className="loading loading-spinner loading-xs"></span>
-                          ) : (
-                            <Mail className="w-3 h-3" />
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <button
+                            onClick={() => handleConfirmAndResend(b.id)}
+                            disabled={confirmingId === b.id}
+                            className="btn btn-xs btn-outline btn-secondary gap-1"
+                            title="Confirm payment, generate Google Meet, and send confirmation email"
+                          >
+                            {confirmingId === b.id ? (
+                              <span className="loading loading-spinner loading-xs"></span>
+                            ) : (
+                              <Mail className="w-3 h-3" />
+                            )}
+                            {b.status === "confirmed" ? "Resend Invite" : "Confirm & Send"}
+                          </button>
+
+                          {b.status === "confirmed" && (
+                            <button
+                              onClick={() => handleSendReviewInvite(b.id)}
+                              disabled={sendingInviteId === b.id}
+                              className="btn btn-xs btn-outline btn-accent gap-1"
+                              title="Send testimonial request email to client"
+                            >
+                              {sendingInviteId === b.id ? (
+                                <span className="loading loading-spinner loading-xs"></span>
+                              ) : (
+                                <Send className="w-3 h-3" />
+                              )}
+                              {b.reviewId
+                                ? "Reviewed ⭐"
+                                : b.reviewEmailSentAt
+                                  ? "Resend Review Email"
+                                  : "Send Review Email"}
+                            </button>
                           )}
-                          {b.status === "confirmed" ? "Resend Email" : "Confirm & Send"}
-                        </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 5: TESTIMONIALS / REVIEWS */}
+      {activeTab === "reviews" && (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-lg font-bold">Consultation Testimonials & Feedback</h2>
+              <p className="text-xs text-base-content/60">
+                Moderate client reviews. Approved testimonials are published live on{" "}
+                <code>/consulting</code>.
+              </p>
+            </div>
+          </div>
+
+          {reviews.length === 0 ? (
+            <div className="card bg-base-100 border border-base-300 p-8 text-center text-sm text-base-content/60">
+              No testimonials submitted yet. You can invite attendees by clicking &ldquo;Send Review
+              Email&rdquo; in the Bookings tab or via automated daily GitHub Actions.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {reviews.map((r) => (
+                <div
+                  key={r.id}
+                  className={`card bg-base-100 border transition-all ${
+                    r.isApproved ? "border-success/40 shadow-sm" : "border-base-300 opacity-90"
+                  }`}
+                >
+                  <div className="card-body p-6 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-base">
+                          {r.clientName.charAt(0)}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-base">{r.clientName}</h3>
+                            {r.role && (
+                              <span className="text-xs text-base-content/70">
+                                • {r.role} {r.company ? `@ ${r.company}` : ""}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-base-content/50 font-mono">
+                            {r.clientEmail} • {r.packageName} ({r.sessionDate})
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 self-start sm:self-auto">
+                        <div className="flex items-center text-amber-400">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`w-4 h-4 ${
+                                star <= r.rating ? "fill-amber-400 text-amber-400" : "text-base-300"
+                              }`}
+                            />
+                          ))}
+                        </div>
+
+                        <button
+                          onClick={() => handleToggleReviewApproval(r.id, r.isApproved)}
+                          disabled={togglingReviewId === r.id}
+                          className={`btn btn-sm gap-1.5 ${
+                            r.isApproved ? "btn-success text-white" : "btn-outline btn-ghost"
+                          }`}
+                        >
+                          {togglingReviewId === r.id ? (
+                            <span className="loading loading-spinner loading-xs"></span>
+                          ) : r.isApproved ? (
+                            <>
+                              <Eye className="w-4 h-4" /> Live on Site
+                            </>
+                          ) : (
+                            <>
+                              <EyeOff className="w-4 h-4" /> Hidden (Click to Approve)
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-base-200/50 p-4 rounded-2xl space-y-1.5">
+                      <h4 className="font-bold text-sm text-base-content">
+                        &ldquo;{r.headline}&rdquo;
+                      </h4>
+                      <p className="text-sm text-base-content/80 whitespace-pre-wrap leading-relaxed">
+                        {r.feedback}
+                      </p>
+                    </div>
+
+                    {r.linkedinUrl && (
+                      <div className="text-xs text-base-content/60 flex items-center gap-1">
+                        <span className="font-semibold">Profile:</span>{" "}
+                        <a
+                          href={r.linkedinUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="link link-primary inline-flex items-center gap-0.5"
+                        >
+                          {r.linkedinUrl} <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>

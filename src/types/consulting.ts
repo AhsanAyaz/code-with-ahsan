@@ -37,6 +37,27 @@ export interface ConsultingBooking {
   expiresAt?: Date | string; // 15-minute slot lock expiration for pending_payment
   createdAt: Date | string;
   updatedAt: Date | string;
+  reviewEmailSentAt?: Date | string | null;
+  reviewId?: string | null;
+}
+
+export interface ConsultingReview {
+  id: string;
+  bookingId: string;
+  clientName: string;
+  clientEmail: string;
+  role?: string; // e.g. "Software Engineer at Kubermatic"
+  company?: string;
+  avatarUrl?: string;
+  linkedinUrl?: string;
+  rating: number; // 1 to 5
+  headline: string; // e.g. "Invaluable architecture guidance!"
+  feedback: string; // Full testimonial
+  permissionToFeature: boolean;
+  isApproved: boolean;
+  packageName: string;
+  sessionDate: string;
+  createdAt: string;
 }
 
 export const CreateCheckoutSchema = z.object({
@@ -51,6 +72,20 @@ export const CreateCheckoutSchema = z.object({
 });
 
 export type CreateCheckoutRequest = z.infer<typeof CreateCheckoutSchema>;
+
+export const SubmitReviewSchema = z.object({
+  bookingId: z.string().min(1, "Booking ID is required"),
+  rating: z.number().min(1).max(5),
+  headline: z.string().min(3, "Headline must be at least 3 characters").max(120),
+  feedback: z.string().min(10, "Feedback must be at least 10 characters").max(2000),
+  role: z.string().max(100).optional().or(z.literal("")),
+  company: z.string().max(100).optional().or(z.literal("")),
+  linkedinUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  avatarUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  permissionToFeature: z.boolean().default(true),
+});
+
+export type SubmitReviewRequest = z.infer<typeof SubmitReviewSchema>;
 
 export interface ConsultingAvailableSlot {
   start: string; // ISO string

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminRequest } from "@/lib/adminAuth";
 import { db } from "@/lib/firebaseAdmin";
 import { getConsultingSettings, ConsultingSettings } from "@/lib/consulting/config";
+import { ConsultingBooking, ConsultingReview } from "@/types/consulting";
+import { sendConsultingReviewRequestEmail } from "@/lib/consulting/reviewEmail";
 import { createLogger } from "@/lib/logger";
 
 const logger = createLogger("api-admin-consulting");
@@ -36,6 +38,41 @@ export async function GET(request: NextRequest) {
         currency: data.currency || "usd",
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : data.createdAt,
         googleMeetLink: data.googleMeetLink || null,
+        reviewEmailSentAt: data.reviewEmailSentAt?.toDate
+          ? data.reviewEmailSentAt.toDate().toISOString()
+          : data.reviewEmailSentAt || null,
+        reviewId: data.reviewId || null,
+      };
+    });
+
+    // Fetch consulting testimonials / reviews
+    const reviewsSnap = await db
+      .collection("consulting_reviews")
+      .orderBy("createdAt", "desc")
+      .limit(50)
+      .get();
+
+    const reviews: ConsultingReview[] = reviewsSnap.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        bookingId: data.bookingId,
+        clientName: data.clientName,
+        clientEmail: data.clientEmail,
+        role: data.role || "",
+        company: data.company || "",
+        avatarUrl: data.avatarUrl || "",
+        linkedinUrl: data.linkedinUrl || "",
+        rating: data.rating || 5,
+        headline: data.headline || "",
+        feedback: data.feedback || "",
+        permissionToFeature: data.permissionToFeature ?? true,
+        isApproved: data.isApproved ?? false,
+        packageName: data.packageName || "",
+        sessionDate: data.sessionDate || "",
+        createdAt: data.createdAt?.toDate
+          ? data.createdAt.toDate().toISOString()
+          : data.createdAt || "",
       };
     });
 
@@ -46,10 +83,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       settings,
       bookings,
+      reviews,
       metrics: {
         totalRevenueInCents,
         confirmedCount: confirmedBookings.length,
         totalBookingsCount: bookings.length,
+        reviewsCount: reviews.length,
+        approvedReviewsCount: reviews.filter((r) => r.isApproved).length,
       },
     });
   } catch (error) {
@@ -108,8 +148,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { action, bookingId } = await request.json();
+    const body = await request.json();
+    const { action, bookingId, reviewId, isApproved } = body;
 
+    // Action 1: Manual confirmation & resend confirmation email
     if (action === "confirm_and_resend" && bookingId) {
       const { confirmConsultingBooking } = await import("@/lib/consulting/confirmBooking");
       const result = await confirmConsultingBooking({
@@ -122,6 +164,52 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json({ success: true, booking: result.booking });
+    }
+
+    // Action 2: Send review request email manually for a booking
+    if (action === "send_review_invite" && bookingId) {
+      const bookingDoc = await db.collection("consulting_bookings").doc(bookingId).get();
+      if (!bookingDoc.exists) {
+        return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+      }
+
+      const booking = { ...bookingDoc.data(), id: bookingDoc.id } as ConsultingBooking;
+      const emailSent = await sendConsultingReviewRequestEmail(booking);
+
+      if (!emailSent) {
+        return NextResponse.json(
+          { error: "Failed to send review email via Resend" },
+          { status: 500 }
+        );
+      }
+
+      const now = new Date();
+      await bookingDoc.ref.update({
+        reviewEmailSentAt: now,
+        updatedAt: now,
+      });
+
+      return NextResponse.json({ success: true, sentAt: now.toISOString() });
+    }
+
+    // Action 3: Toggle testimonial approval (Make Live / Hide)
+    if (action === "toggle_review_approval" && reviewId) {
+      const reviewRef = db.collection("consulting_reviews").doc(reviewId);
+      const reviewDoc = await reviewRef.get();
+
+      if (!reviewDoc.exists) {
+        return NextResponse.json({ error: "Review not found" }, { status: 404 });
+      }
+
+      const newApprovedState =
+        typeof isApproved === "boolean" ? isApproved : !reviewDoc.data()?.isApproved;
+
+      await reviewRef.update({
+        isApproved: newApprovedState,
+        updatedAt: new Date().toISOString(),
+      });
+
+      return NextResponse.json({ success: true, isApproved: newApprovedState });
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
