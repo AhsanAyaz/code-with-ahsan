@@ -114,7 +114,13 @@ export async function sendConsultingReviewRequestEmail(
             </p>
 
             <p style="margin-top: 32px;">Thank you for your trust and time!</p>
-            <p>Warm regards,<br><strong>Muhammad Ahsan Ayaz</strong><br>Google Developer Expert (GDE) & Lead Architect</p>
+            <p style="margin-bottom: 4px;">Best regards,</p>
+            <ul style="list-style-type: disc; padding-left: 20px; margin: 4px 0; color: #374151; font-size: 14px; line-height: 1.6;">
+              <li><strong>Muhammad Ahsan Ayaz</strong></li>
+              <li>Google Developers Expert (GDE) in AI & Angular</li>
+              <li>Software Architect</li>
+              <li><a href="mailto:ahsan.ubitian@gmail.com" style="color: #2563eb; text-decoration: none;">ahsan.ubitian@gmail.com</a></li>
+            </ul>
           </div>
           <div class="footer">
             <p><a href="${getSiteUrl()}" style="color:#2563eb;text-decoration:none;">CodeWithAhsan.dev</a> • 1:1 Technical Advisory</p>
