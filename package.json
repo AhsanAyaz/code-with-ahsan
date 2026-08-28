@@ -16,6 +16,7 @@
     "content:sync:strapi": "npm run content:export:strapi && npm run content:mdx:from-json && npm run content:build",
     "start": "next start",
     "lint": "eslint",
+    "check:firestore-indexes": "node scripts/check-firestore-indexes.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
