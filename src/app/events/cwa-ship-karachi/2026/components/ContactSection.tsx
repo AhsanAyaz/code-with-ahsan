@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, UserRound } from "lucide-react";
+import { Linkedin, Mail, UserRound } from "lucide-react";
 import { CONTACTS, EVENT, SECTION_IDS } from "../constants";
 import PersonAvatar from "./PersonAvatar";
 
@@ -30,7 +30,7 @@ const ContactSection = () => {
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.35, delay: index * 0.08 }}
               whileHover={{ y: -5 }}
-              className="group relative overflow-hidden rounded-2xl border border-primary/15 bg-base-200 p-6 text-center shadow-[0_0_20px_rgba(143,39,224,0.08)] transition-all duration-300 hover:border-primary/40 hover:shadow-[0_0_34px_rgba(143,39,224,0.22)]"
+              className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-primary/15 bg-base-200 p-6 text-center shadow-[0_0_20px_rgba(143,39,224,0.08)] transition-all duration-300 hover:border-primary/40 hover:shadow-[0_0_34px_rgba(143,39,224,0.22)]"
             >
               {/* Top accent */}
               <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
@@ -57,13 +57,27 @@ const ContactSection = () => {
                 <p className="mt-1 text-sm text-base-content/60">{contact.title}</p>
               )}
 
-              <a
-                href={`mailto:${contact.email}`}
-                className="mt-4 inline-flex items-center gap-2 break-all text-sm font-medium text-primary hover:underline"
-              >
-                <Mail className="h-4 w-4 shrink-0" />
-                {contact.email}
-              </a>
+              <div className="mt-auto flex flex-col items-center gap-2 pt-5">
+                <a
+                  href={`mailto:${contact.email}`}
+                  className="inline-flex max-w-full items-center gap-2 break-all text-sm font-medium text-primary hover:underline"
+                >
+                  <Mail className="h-4 w-4 shrink-0" />
+                  <span className="break-all">{contact.email}</span>
+                </a>
+
+                {contact.linkedinUrl && (
+                  <a
+                    href={contact.linkedinUrl}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                  >
+                    <Linkedin className="h-4 w-4 shrink-0" />
+                    LinkedIn
+                  </a>
+                )}
+              </div>
             </motion.article>
           ))}
         </div>
