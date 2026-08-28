@@ -15,3 +15,21 @@ When the main (orchestrator) agent is running on **Opus**:
 Rule of thumb: Opus decides _what_ to do, Sonnet does it.
 
 If the main agent is not Opus, use the model each agent definition specifies.
+
+## Firestore indexes ship with the query
+
+Any change that adds or edits a Firestore query must add the composite index it
+needs to `firestore.indexes.json` **in the same commit**, and deploy it with
+`npx firebase deploy --only firestore:indexes --project code-with-ahsan-45496`.
+Never resolve a missing index by clicking the link in the Firebase console error
+— that leaves production working and the repo wrong.
+
+A missing composite index does not fail the build, the tests, or the emulator; it
+throws `FAILED_PRECONDITION` in production and the UI silently renders nothing.
+
+Verify with `npm run check:firestore-indexes` (also enforced by
+`.husky/pre-commit`). Read the **`firestore-indexes` skill**
+(`.claude/skills/firestore-indexes/SKILL.md`) before touching Firestore query
+code. The same instructions are mirrored for other agents in `AGENTS.md` and
+`.agent/skills/firestore-indexes/SKILL.md`; the checker fails if the two skill
+copies drift apart.
