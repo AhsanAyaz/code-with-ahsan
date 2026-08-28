@@ -41,9 +41,9 @@ export const EVENT = {
   tagline: "One day. One track. On-site.",
   theme: "Build & Ship AI Product in One Day",
   dateLabel: "Saturday, 12 September 2026",
-  timeLabel: "9:00 AM – 7:15 PM",
+  timeLabel: "8:30 AM – 7:15 PM",
   /** Countdown target (local time). Keep in sync with dateLabel/timeLabel. */
-  isoStart: "2026-09-12T09:00:00",
+  isoStart: "2026-09-12T08:30:00",
   locationShort: "Folio3 · Karachi, PK",
   registerUrl: "https://forms.gle/davuSPGjiDxTLkte6",
   /** Sponsorship tiers live in the deck, not on the page. */
@@ -221,6 +221,8 @@ export type ContactPerson = {
   name: string;
   title: string;
   email: string;
+  /** Empty string hides the LinkedIn link on the card. */
+  linkedinUrl: string;
   avatarUrl: string;
 };
 
@@ -232,6 +234,7 @@ export const CONTACTS: ContactPerson[] = [
     name: "Maham Tahir",
     title: "Content Strategist & Community Manager",
     email: "maham.visionwiseab@gmail.com",
+    linkedinUrl: "https://www.linkedin.com/in/maham-tahir-225606431/",
     avatarUrl: `${CONTACT_IMG}/maham-tahir.jpeg`,
   },
   {
@@ -240,6 +243,7 @@ export const CONTACTS: ContactPerson[] = [
     title:
       "Founder, Code With Ahsan, \n GDE in AI & Angular | Software Architect at Scania Group, Sweden",
     email: "ahsan.ubitian@gmail.com",
+    linkedinUrl: "https://www.linkedin.com/in/ahsanayaz/",
     avatarUrl: `${CONTACT_IMG}/ahsan-ayaz.jpeg`,
   },
 ];
@@ -385,13 +389,7 @@ export const TRACK: EventTrack = {
 
 // ─── Day-of schedule ─────────────────────────────────────────────────────────
 export type ScheduleKind =
-  | "registration"
-  | "kickoff"
-  | "build"
-  | "break"
-  | "submission"
-  | "judging"
-  | "closing";
+  "registration" | "kickoff" | "build" | "break" | "submission" | "judging" | "closing";
 
 export type ScheduleItem = {
   time: string;
@@ -402,10 +400,11 @@ export type ScheduleItem = {
 
 export const DAY_SCHEDULE: ScheduleItem[] = [
   {
-    time: "9:00 – 9:30 AM",
+    time: "8:30 – 9:30 AM",
     title: "Registration",
     kind: "registration",
-    description: "Check in with your team, collect your badges, and grab coffee before we start.",
+    description:
+      "Doors open at 8:30 — please arrive on time. Check in with your team, collect your badges, and grab tea or coffee before we start.",
   },
   {
     time: "9:30 – 10:00 AM",
@@ -473,6 +472,6 @@ export const VENUE: VenueInfo = {
   highlights: [
     "On-site, in-person only",
     "Power and Wi-Fi for every team",
-    "Food and refreshments through the day",
+    "Food and Tea/Coffee throughout the day",
   ],
 };
