@@ -168,6 +168,7 @@ def _wire_bot():
     @client.event
     async def on_ready():
         logger.info("Bot ready as %s; listening on channel %s", client.user, ASSISTANT_CHANNEL_ID)
+        _bot_ready.set()
 
     @client.event
     async def on_message(message):
@@ -255,15 +256,27 @@ def _wire_bot():
     return client, BOT_TOKEN
 
 
+# Set once the Discord gateway handshake completes; read by the health handler.
+_bot_ready = threading.Event()
+
+
 class _HealthHandler(BaseHTTPRequestHandler):
-    """Minimal HTTP handler so Cloud Run's health-check probe gets a 200."""
+    """Liveness endpoint. Originally for Cloud Run's probe; the bot now runs on a
+    GCE VM where nothing polls it, but it is kept as a cheap local liveness check
+    (and for any future platform that requires an HTTP port).
+
+    It answers 503 until the gateway is connected, so a running-but-not-connected
+    process is not reported healthy — the previous unconditional 200 came from a
+    separate thread and stayed green even if the event loop was wedged.
+    """
     def do_GET(self):
-        self.send_response(200)
+        ready = _bot_ready.is_set()
+        self.send_response(200 if ready else 503)
         self.end_headers()
-        self.wfile.write(b"ok")
+        self.wfile.write(b"ok" if ready else b"starting")
 
     def log_message(self, *_):
-        pass  # suppress per-request noise from Cloud Run probes
+        pass  # suppress per-request noise from health probes
 
 
 def _start_health_server(port: int) -> None:
@@ -286,7 +299,9 @@ def main():
     logger.info("Health check server listening on port %d", port)
 
     client, token = _wire_bot()
-    client.run(token)
+    # log_handler=None stops discord.py installing its own colour handler on
+    # top of basicConfig above, which logged every discord.* record twice.
+    client.run(token, log_handler=None)
 
 
 if __name__ == "__main__":

@@ -4,12 +4,12 @@ A multi-agent AI assistant for the Code With Ahsan Discord community (4,600+ mem
 
 The root `community_assistant` agent delegates to four specialized sub-agents:
 
-| Sub-agent | Handles |
-|-----------|---------|
-| `onboarding_agent` | Welcome new members, channel guides, "where do I start?" |
+| Sub-agent          | Handles                                                        |
+| ------------------ | -------------------------------------------------------------- |
+| `onboarding_agent` | Welcome new members, channel guides, "where do I start?"       |
 | `mentorship_agent` | Find mentors (semantic + category search), explain the program |
-| `projects_agent` | Discover open-source projects to contribute to |
-| `roadmap_agent` | Learning paths and technology roadmaps |
+| `projects_agent`   | Discover open-source projects to contribute to                 |
+| `roadmap_agent`    | Learning paths and technology roadmaps                         |
 
 All tools call the live `codewithahsan.dev` platform API via `platform_client.py`. The mentorship agent adds semantic search over mentor bios through Firestore Vector Search (see `../src/app/api/mentorship/mentors/semantic-search/route.ts`).
 
@@ -60,10 +60,10 @@ uv run adk web community_assistant
 
 Open http://localhost:8000, pick `community_assistant`, and send a message:
 
-- *"I'm new here, where do I start?"* → onboarding_agent
-- *"Find me a mentor who knows Angular"* → mentorship_agent (uses `semantic_search_mentors`)
-- *"Show me beginner-friendly projects"* → projects_agent
-- *"What AI roadmaps exist?"* → roadmap_agent
+- _"I'm new here, where do I start?"_ → onboarding_agent
+- _"Find me a mentor who knows Angular"_ → mentorship_agent (uses `semantic_search_mentors`)
+- _"Show me beginner-friendly projects"_ → projects_agent
+- _"What AI roadmaps exist?"_ → roadmap_agent
 
 **Data source:** Whatever `PLATFORM_API_BASE_URL` points to. For the richest demo, point at `https://codewithahsan.dev` — it has real mentors, projects, and roadmaps.
 
@@ -72,32 +72,40 @@ Open http://localhost:8000, pick `community_assistant`, and send a message:
 For end-to-end testing in a real Discord channel with your own local Next.js for new endpoints (e.g., semantic search).
 
 **Terminal 1 — Next.js platform API against real Firestore:**
+
 ```bash
 # From the repo root
 npm run dev
 ```
+
 Confirm this is hitting real Firestore (not the emulator) — the terminal should NOT mention emulator connections. Your `.env` needs one of: `FIREBASE_SERVICE_ACCOUNT_KEY`, or `FIREBASE_PRIVATE_KEY` + `FIREBASE_CLIENT_EMAIL`. Without those, the Next.js `firebaseAdmin.ts` falls back to the emulator path.
 
 **Terminal 2 — One-time: embed mentor bios to Firestore (needed for semantic search):**
+
 ```bash
 # From the repo root, one-shot
 npx tsx scripts/embed-mentor-bios.ts
 # Optional dry run first:
 # npx tsx scripts/embed-mentor-bios.ts --dry-run
 ```
+
 Writes `bioEmbedding` (768-dim) + `bioEmbeddingGeneratedAt` to every accepted mentor doc. Only re-run when mentor bios change.
 
 **Terminal 3 — Discord bot:**
+
 ```bash
 cd agent
 uv run python discord_bot/bot.py
 ```
+
 Wait for: `Bot ready as CWA Assistant#NNNN; listening on channel <id>`
 
 **Test in Discord** — in your test server's `#ask-the-assistant` channel:
+
 ```
 @CWA Assistant find me an Angular mentor please
 ```
+
 Expected: typing indicator, then a reply quoting bio excerpts from real Angular mentors with clickable `https://codewithahsan.dev/mentors/...` URLs.
 
 ## Firestore Vector Search indexes (semantic search)
@@ -139,7 +147,7 @@ Tests use fixtures from `tests/fixtures/` and mock `httpx` via `MockTransport` i
 
 ## Deploy
 
-- **Discord bot → Cloud Run**: see [`discord_bot/README.md`](./discord_bot/README.md) for the full `gcloud run deploy` command and Secret Manager setup. Single service, `--min-instances=1 --max-instances=1`.
+- **Discord bot → Compute Engine (`e2-micro`)**: see [`discord_bot/deploy/README.md`](./discord_bot/deploy/README.md). One-time `deploy/provision-gce.sh`, then `deploy/deploy.sh` for each release. Moved off Cloud Run because the always-on gateway websocket forced instance-based billing (~$47/mo).
 - **Next.js platform API (including semantic search)**: deployed via the repo root `npm run build` / Vercel.
 
 ## Project structure
