@@ -27,3 +27,6 @@ packages = ["community_assistant"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 addopts = "-ra --strict-markers --tb=short"
+markers = [
+    "live_llm: hits the real Gemini API; skipped unless GOOGLE_API_KEY is set",
+]

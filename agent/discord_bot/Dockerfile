@@ -1,9 +1,13 @@
 # syntax=docker/dockerfile:1
 FROM python:3.12-slim AS base
 
-# System deps for any C extensions in google-adk's transitive deps
+# ca-certificates only. build-essential used to be installed here for "any C
+# extensions in google-adk's transitive deps", but every one of them ships a
+# manylinux wheel, so nothing was ever compiled — it just added a ~101MB layer
+# (a third of the image) to Artifact Registry on every build. If a future dep
+# genuinely needs a compiler, build it in a separate stage and copy the wheel
+# rather than shipping the toolchain in the runtime image.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential \
       ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 

@@ -24,6 +24,21 @@ echo "==> Re-applying the startup script and restarting the unit"
 gcloud compute ssh "${VM_NAME}" --zone="${ZONE}" --project="${PROJECT_ID}" \
   --command 'sudo google_metadata_script_runner startup && sleep 5 && sudo systemctl is-active cwa-assistant-bot'
 
-echo "==> Tailing logs (Ctrl-C to stop). Expect: Bot ready as CWA Assistant#NNNN"
-gcloud compute ssh "${VM_NAME}" --zone="${ZONE}" --project="${PROJECT_ID}" \
-  --command 'sudo journalctl -u cwa-assistant-bot -n 50 -f'
+# Bounded readiness check rather than `journalctl -f`, which never returns and
+# so cannot be used in a script or from CI.
+echo "==> Waiting for the gateway handshake (up to 3 min)"
+gcloud compute ssh "${VM_NAME}" --zone="${ZONE}" --project="${PROJECT_ID}" --quiet \
+  --command '
+    for i in $(seq 1 36); do
+      if sudo journalctl -u cwa-assistant-bot --since "-5 min" | grep -q "Bot ready as"; then
+        sudo journalctl -u cwa-assistant-bot --since "-5 min" | grep "Bot ready as" | tail -1
+        exit 0
+      fi
+      sleep 5
+    done
+    echo "TIMED OUT waiting for \"Bot ready as\". Recent logs:" >&2
+    sudo journalctl -u cwa-assistant-bot -n 40 --no-pager >&2
+    exit 1
+  '
+
+echo "==> Deployed ${IMAGE_TAG}"
