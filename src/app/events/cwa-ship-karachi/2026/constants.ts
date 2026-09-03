@@ -268,6 +268,12 @@ export const CONFIRMED_SPONSORS: ConfirmedSponsor[] = [
     tier: "Gold Sponsor",
   },
   {
+    name: "Gorelo",
+    logoUrl: `${SPONSOR_IMG}/gorelo.png`,
+    websiteUrl: "",
+    tier: "Startup Sponsor",
+  },
+  {
     name: "MSA KHI",
     logoUrl: `${COLLABORATION_PARTNER_IMG}/msa-khi.png`,
     websiteUrl: "",
