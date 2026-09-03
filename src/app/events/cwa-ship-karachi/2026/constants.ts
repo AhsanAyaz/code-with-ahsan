@@ -262,16 +262,16 @@ const SPONSOR_IMG = "/static/images/events/cwa-ship-karachi-2026/sponsors";
 
 export const CONFIRMED_SPONSORS: ConfirmedSponsor[] = [
   {
-    name: "Command Code",
-    logoUrl: `${SPONSOR_IMG}/commandcode.svg`,
-    websiteUrl: "https://commandcode.ai",
-    tier: "Gold Sponsor",
-  },
-  {
     name: "Gorelo",
     logoUrl: `${SPONSOR_IMG}/gorelo.png`,
     websiteUrl: "",
     tier: "Startup Sponsor",
+  },
+  {
+    name: "Command Code",
+    logoUrl: `${SPONSOR_IMG}/commandcode.svg`,
+    websiteUrl: "https://commandcode.ai",
+    tier: "Gold Sponsor",
   },
   {
     name: "MSA KHI",
