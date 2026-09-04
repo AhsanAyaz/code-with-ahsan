@@ -8,6 +8,7 @@ const TIER_COLORS: Record<string, string> = {
   "Tool Partner": "text-success",
   "Community Partner": "text-primary",
   "Community Sponsor": "text-primary",
+  "Startup Sponsor": "text-info",
   "Gold Sponsor": "text-warning",
   Gold: "text-warning",
   "Platinum Sponsor": "text-yellow-300",
