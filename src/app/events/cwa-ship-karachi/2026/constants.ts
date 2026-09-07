@@ -77,6 +77,9 @@ export const HACKATHON_THEMES: ThemeItem[] = [
   },
 ];
 
+const JUDGE_IMG = "/static/images/events/cwa-ship-karachi-2026/judges";
+const MENTOR_IMG = "/static/images/events/cwa-ship-karachi-2026/mentors";
+
 // ─── Judges ──────────────────────────────────────────────────────────────────
 // `quote` is rendered only when non-empty.
 // TODO: collect a short line from each judge before the event — do not invent one.
@@ -87,42 +90,106 @@ export type JudgeProfile = {
   experience: string;
   quote: string;
   linkedinUrl: string;
+  /** Empty string hides the email link on the card. */
+  email: string;
   avatarUrl: string;
 };
 
 export const JUDGES: JudgeProfile[] = [
   {
-    name: "TBD",
-    position: "------------",
-    company: "-------------",
+    name: "Mohammad Taha Mohsini",
+    position: "Senior Product Engineer",
+    company: "Ezra AI",
     experience: "",
     quote: "",
-    linkedinUrl: "",
-    avatarUrl: TBD_AVATAR,
+    linkedinUrl: "https://www.linkedin.com/in/tahamohsini",
+    email: "taha2000mohammad@gmail.com",
+    avatarUrl: `${JUDGE_IMG}/taha-mohsini.jpg`,
+  },
+  {
+    name: "Sakina Abbas",
+    position: "Co-Founder · Google Developer Expert, Flutter & Dart",
+    company: "Reactree Pvt. Ltd.",
+    experience: "",
+    quote: "",
+    linkedinUrl: "https://pk.linkedin.com/in/sakina-abbas",
+    email: "sakina.abbas.3014@gmail.com",
+    avatarUrl: `${JUDGE_IMG}/sakina-abbas.jpg`,
+  },
+  {
+    name: "Muhammad Shahab Ejaz",
+    position: "Software Architect",
+    company: "Folio3",
+    experience: "",
+    quote: "",
+    linkedinUrl: "https://www.linkedin.com/in/shahabejaz/",
+    email: "sejaz@folio3.com",
+    avatarUrl: `${JUDGE_IMG}/shahab-ejaz.jpg`,
   },
 ];
 
 // ─── Mentors ─────────────────────────────────────────────────────────────────
 // Mentors guide the teams through the build sprint (they do not give talks).
-// Every mentor points at the shared TBD_AVATAR. Swap an individual `avatarUrl`
-// to a real file as each headshot arrives.
-// TODO: confirm each mentor's position, organisation and years of experience.
+// Every mentor has a headshot under public/static/images/events/
+// cwa-ship-karachi-2026/mentors/.
 export type MentorProfile = {
   name: string;
   experience: string;
   position: string;
   /** Company or university the mentor is currently with. */
   organization: string;
+  /** Empty string hides the LinkedIn link on the card. */
+  linkedinUrl: string;
+  /** Empty string hides the email link on the card. */
+  email: string;
   avatarUrl: string;
 };
 
 export const MENTOR_PROFILES: MentorProfile[] = [
   {
-    name: "Mentor",
-    experience: "TODO",
-    position: "TODO",
-    organization: "TODO",
-    avatarUrl: TBD_AVATAR,
+    name: "Adnan Sameer",
+    experience: "",
+    position: "Software Engineer II",
+    organization: "Snoonu",
+    linkedinUrl: "https://www.linkedin.com/in/adnan-sameer/",
+    email: "adnansameer62@gmail.com",
+    avatarUrl: `${MENTOR_IMG}/adnan-sameer.jpg`,
+  },
+  {
+    name: "Muhammad Maaz",
+    experience: "",
+    position: "Senior Software Engineer",
+    organization: "Folio3",
+    linkedinUrl: "https://pk.linkedin.com/in/muhammadmaaz22",
+    email: "muhammadmaaz@folio3.com",
+    avatarUrl: `${MENTOR_IMG}/muhammad-maaz.jpg`,
+  },
+  {
+    name: "Muzammil Jethwa",
+    experience: "",
+    position: "Senior Solutions Engineer",
+    organization: "Mazik Global",
+    linkedinUrl: "https://www.linkedin.com/in/muzammiljethwa",
+    email: "muzammiljethwa104@gmail.com",
+    avatarUrl: `${MENTOR_IMG}/muzammil-jethwa.jpg`,
+  },
+  {
+    name: "Muhammad Sami Ullah",
+    experience: "",
+    position: "AI Transformation Lead · Founder, MLSA Karachi",
+    organization: "Mazik Global & MLSA Karachi",
+    linkedinUrl: "https://www.linkedin.com/in/msamiullah-dev/",
+    email: "samimunir63@gmail.com",
+    avatarUrl: `${MENTOR_IMG}/sami-ullah.jpg`,
+  },
+  {
+    name: "Muhammad Shaharyar Naeem",
+    experience: "",
+    position: "Staff Software Engineer",
+    organization: "Auriga Solutions",
+    linkedinUrl: "https://www.linkedin.com/in/muhammad-shaharyar-252158b5/",
+    email: "shaharyar.naeem@gorelo.io",
+    avatarUrl: `${MENTOR_IMG}/shaharyar-naeem.jpg`,
   },
 ];
 
