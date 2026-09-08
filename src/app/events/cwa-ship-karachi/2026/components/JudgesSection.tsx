@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ExternalLink, Award, Briefcase, Building2, Quote } from "lucide-react";
+import { ExternalLink, Award, Briefcase, Building2, Quote, Mail } from "lucide-react";
 import { JUDGES, EVENT, SECTION_IDS } from "../constants";
 
 const JudgesSection = () => {
@@ -103,10 +103,12 @@ const JudgesSection = () => {
                       <Building2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                       <span>{judge.company}</span>
                     </p>
-                    <p className="flex items-start gap-2.5 text-sm text-base-content/75 sm:text-base">
-                      <Award className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                      <span>{judge.experience} of experience</span>
-                    </p>
+                    {judge.experience.trim().length > 0 && (
+                      <p className="flex items-start gap-2.5 text-sm text-base-content/75 sm:text-base">
+                        <Award className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                        <span>{judge.experience} of experience</span>
+                      </p>
+                    )}
                   </div>
 
                   {/* Quote — hidden until a real one is collected. */}
@@ -120,15 +122,28 @@ const JudgesSection = () => {
                     </blockquote>
                   )}
 
-                  <a
-                    href={judge.linkedinUrl}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="relative mt-6 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-                  >
-                    LinkedIn
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
+                  <div className="relative mt-6 flex flex-wrap items-center gap-x-6 gap-y-2">
+                    {judge.linkedinUrl.trim().length > 0 && (
+                      <a
+                        href={judge.linkedinUrl}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                      >
+                        LinkedIn
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    {judge.email.trim().length > 0 && (
+                      <a
+                        href={`mailto:${judge.email}`}
+                        className="inline-flex w-fit max-w-full items-center gap-1.5 text-sm text-base-content/70 transition-colors hover:text-primary"
+                      >
+                        <Mail className="h-4 w-4 shrink-0 text-primary" />
+                        <span className="truncate">{judge.email}</span>
+                      </a>
+                    )}
+                  </div>
                 </div>
               </motion.article>
             );
