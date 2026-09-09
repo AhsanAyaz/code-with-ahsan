@@ -30,7 +30,8 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                 style={{ objectFit: "cover" }}
               />
               <span className="hidden sm:inline font-bold text-base-content no-underline">
-                {siteMetadata.headerTitle}
+                {/* Wordmark: "with" picks up the purple from the logo gradient */}
+                Code <span className="text-[#BE8EE8]">with</span> Ahsan
               </span>
             </div>
           </Link>
