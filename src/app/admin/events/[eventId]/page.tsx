@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useToast } from "@/contexts/ToastContext";
 import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
-import { HACKATHON_TEAMS } from "@/app/events/cwa-promptathon/2026/constants";
+import { getAdminEvent } from "../registry";
 import type { WinnerPlacement } from "@/types/events";
 
 interface WinnersFormData {
@@ -32,6 +32,11 @@ const PLACEMENTS: Array<{
 export default function AdminEventWinnersPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const { success, error } = useToast();
+
+  // Teams and the display name come from the registry, so this screen works for
+  // any event listed there rather than one hardcoded hackathon.
+  const event = getAdminEvent(eventId);
+  const teams = event?.teams ?? [];
 
   const [formData, setFormData] = useState<WinnersFormData>({
     first: emptyPlacement(),
@@ -96,10 +101,7 @@ export default function AdminEventWinnersPage() {
       error("Please select a team for all three placements");
       return;
     }
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem(ADMIN_TOKEN_KEY)
-        : null;
+    const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
 
     setSaving(true);
     try {
@@ -127,10 +129,24 @@ export default function AdminEventWinnersPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Manage Winners — {eventId}</h1>
+        <h1 className="text-3xl font-bold">Manage Winners — {event?.name ?? eventId}</h1>
         <p className="text-base-content/60 mt-1">
           Set the winning teams and their project details for the public display.
         </p>
+        {!event && (
+          <div className="alert alert-warning mt-3 py-2 text-sm">
+            <span>
+              <span className="font-mono">{eventId}</span> is not in the admin event registry, so
+              there are no teams to pick from. Add it to{" "}
+              <span className="font-mono">src/app/admin/events/registry.ts</span>.
+            </span>
+          </div>
+        )}
+        {event && teams.length === 0 && (
+          <div className="alert alert-warning mt-3 py-2 text-sm">
+            No teams registered for this event yet.
+          </div>
+        )}
         {loadedAt && (
           <div className="alert alert-info mt-3 py-2 text-sm">
             Winners currently saved — announced {new Date(loadedAt).toLocaleString()}
@@ -153,12 +169,10 @@ export default function AdminEventWinnersPage() {
                 <select
                   className="select select-bordered w-full"
                   value={formData[key].teamName}
-                  onChange={(e) =>
-                    updatePlacement(key, "teamName", e.target.value)
-                  }
+                  onChange={(e) => updatePlacement(key, "teamName", e.target.value)}
                 >
                   <option value="">Select a team</option>
-                  {HACKATHON_TEAMS.map((team) => (
+                  {teams.map((team) => (
                     <option key={team} value={team}>
                       {team}
                     </option>
@@ -168,35 +182,27 @@ export default function AdminEventWinnersPage() {
 
               <div className="form-control w-full">
                 <label className="label">
-                  <span className="label-text font-semibold">
-                    Project Description
-                  </span>
+                  <span className="label-text font-semibold">Project Description</span>
                 </label>
                 <textarea
                   className="textarea textarea-bordered w-full"
                   rows={3}
                   placeholder="Describe the project..."
                   value={formData[key].projectDescription}
-                  onChange={(e) =>
-                    updatePlacement(key, "projectDescription", e.target.value)
-                  }
+                  onChange={(e) => updatePlacement(key, "projectDescription", e.target.value)}
                 />
               </div>
 
               <div className="form-control w-full">
                 <label className="label">
-                  <span className="label-text font-semibold">
-                    Judge&apos;s Quote
-                  </span>
+                  <span className="label-text font-semibold">Judge&apos;s Quote</span>
                 </label>
                 <textarea
                   className="textarea textarea-bordered w-full"
                   rows={2}
                   placeholder="A quote from the judges..."
                   value={formData[key].judgeQuote}
-                  onChange={(e) =>
-                    updatePlacement(key, "judgeQuote", e.target.value)
-                  }
+                  onChange={(e) => updatePlacement(key, "judgeQuote", e.target.value)}
                 />
               </div>
             </div>

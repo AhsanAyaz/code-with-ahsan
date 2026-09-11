@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import SlideBackground from "../SlideBackground";
-import { headingFont, EVENT } from "../../../constants";
+import { headingFont, EVENT, CWA_MARK_SRC, VENUE } from "../../../constants";
 
 export default function KeynoteSection() {
   return (
@@ -35,17 +35,17 @@ export default function KeynoteSection() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
+          {/* The community mark opens the deck — no crop or ring, the logo
+              already carries its own hexagon. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/static/images/ahsan-hero.jpg"
-            alt="Ahsan"
+            src={CWA_MARK_SRC}
+            alt="Code With Ahsan community"
             style={{
-              width: 120,
-              height: 120,
-              borderRadius: "50%",
-              border: "3px solid #6C2BD9",
-              objectFit: "cover",
-              boxShadow: "0 0 40px rgba(108,43,217,0.4)",
+              width: 190,
+              height: 190,
+              objectFit: "contain",
+              filter: "drop-shadow(0 0 38px rgba(108,43,217,0.55))",
             }}
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = "none";
@@ -92,6 +92,18 @@ export default function KeynoteSection() {
             </span>
             <div style={{ height: 2, width: 80, background: "#6C2BD9" }} />
           </div>
+          <div
+            style={{
+              fontFamily: "var(--font-space-mono, monospace)",
+              fontSize: 14,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "rgba(240,238,255,0.55)",
+              marginTop: 14,
+            }}
+          >
+            Organised by CWA Community
+          </div>
         </motion.div>
 
         <motion.p
@@ -125,6 +137,48 @@ export default function KeynoteSection() {
         >
           1-Day AI Hackathon · On-site
         </motion.p>
+
+        {/* Venue — the host badge for the day */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.75, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 18,
+            marginTop: 12,
+            padding: "14px 26px",
+            borderRadius: 12,
+            background: "rgba(108,43,217,0.08)",
+            border: "1px solid rgba(108,43,217,0.35)",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "var(--font-space-mono, monospace)",
+              fontSize: 11,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "rgba(240,238,255,0.45)",
+            }}
+          >
+            Hosted at
+          </span>
+          <div
+            style={{ background: "#FFFFFF", borderRadius: 8, padding: "8px 12px", lineHeight: 0 }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={VENUE.logoUrl}
+              alt={`${VENUE.name} logo`}
+              style={{ height: 38, width: "auto", display: "block", objectFit: "contain" }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
+            />
+          </div>
+        </motion.div>
       </div>
     </div>
   );

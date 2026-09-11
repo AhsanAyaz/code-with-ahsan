@@ -1,114 +1,222 @@
 "use client";
 
 import { motion } from "framer-motion";
-import SlideBackground from "../SlideBackground";
-import { HACKATHON_THEMES, headingFont } from "../../../constants";
+import SlideShell from "../SlideShell";
+import { EVENT, HACKATHON_THEMES, THEME_RULE, headingFont } from "../../../constants";
 
 export default function ThemesSection() {
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "100vw",
-        height: "100vh",
-        background: "#07020F",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
-      }}
+    <SlideShell
+      eyebrow="Theme reveal"
+      title="Hackathon Tracks"
+      subtitle={THEME_RULE}
+      maxWidth={1320}
     >
-      <SlideBackground />
-      <div
+      {/* The umbrella theme sits above the three tracks — they are all routes
+          to the same outcome. Sourced from EVENT.theme so it cannot drift from
+          the hero and About section. */}
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          position: "relative",
-          zIndex: 10,
-          textAlign: "center",
-          width: "100%",
-          maxWidth: 1100,
-          padding: "0 40px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 22,
+          margin: "-16px 0 34px",
         }}
       >
-        <motion.h2
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          style={{
-            fontFamily: headingFont,
-            fontSize: "clamp(48px, 7vw, 88px)",
-            color: "#F0EEFF",
-            letterSpacing: "0.06em",
-            margin: "0 0 48px 0",
-          }}
-        >
-          Hackathon Themes
-        </motion.h2>
-
         <div
           style={{
-            display: "flex",
-            gap: 24,
-            justifyContent: "center",
+            height: 1,
+            flex: 1,
+            maxWidth: 140,
+            background: "linear-gradient(90deg, transparent, rgba(108,43,217,0.7))",
+          }}
+        />
+        <span
+          style={{
+            fontFamily: headingFont,
+            fontSize: "clamp(30px, 3.4vw, 46px)",
+            letterSpacing: "0.05em",
+            lineHeight: 1.1,
+            color: "#00F5FF",
+            textShadow: "0 0 32px rgba(0,245,255,0.35)",
+            textAlign: "center",
           }}
         >
-          {HACKATHON_THEMES.map((theme, i) => (
-            <motion.div
-              key={theme.title}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.5,
-                delay: 0.1 + i * 0.12,
-                ease: [0.16, 1, 0.3, 1],
-              }}
+          {EVENT.theme}
+        </span>
+        <div
+          style={{
+            height: 1,
+            flex: 1,
+            maxWidth: 140,
+            background: "linear-gradient(90deg, rgba(108,43,217,0.7), transparent)",
+          }}
+        />
+      </motion.div>
+
+      <div style={{ display: "flex", gap: 18, alignItems: "stretch" }}>
+        {HACKATHON_THEMES.map((theme, i) => (
+          <motion.div
+            key={theme.title}
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 + i * 0.13, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              background: "rgba(108,43,217,0.06)",
+              border: `1px solid ${theme.accent}44`,
+              borderTop: `3px solid ${theme.accent}`,
+              borderRadius: 12,
+              padding: "20px 22px 22px",
+              textAlign: "left",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+              <span
+                style={{
+                  fontFamily: "var(--font-space-mono, monospace)",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: "0.12em",
+                  color: "#07020F",
+                  background: theme.accent,
+                  borderRadius: 4,
+                  padding: "3px 8px",
+                }}
+              >
+                THEME {String(i + 1).padStart(2, "0")}
+              </span>
+              <span
+                style={{
+                  fontFamily: "var(--font-space-mono, monospace)",
+                  fontSize: 10,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: theme.accent,
+                }}
+              >
+                {theme.scope}
+              </span>
+            </div>
+
+            <h3
               style={{
-                flex: 1,
-                background: "rgba(108,43,217,0.07)",
-                border: "1px solid rgba(108,43,217,0.4)",
-                borderRadius: 12,
-                padding: "32px 28px",
-                textAlign: "left",
+                fontFamily: headingFont,
+                fontSize: 34,
+                color: "#F0EEFF",
+                letterSpacing: "0.04em",
+                lineHeight: 1.1,
+                margin: "0 0 12px",
+              }}
+            >
+              {theme.title}
+            </h3>
+
+            <p
+              style={{
+                fontFamily: "Inter, sans-serif",
+                fontSize: 13,
+                lineHeight: 1.55,
+                color: "rgba(240,238,255,0.55)",
+                margin: "0 0 16px",
+              }}
+            >
+              {theme.description}
+            </p>
+
+            <div
+              style={{
+                borderLeft: `2px solid ${theme.accent}`,
+                paddingLeft: 14,
+                marginBottom: 16,
               }}
             >
               <div
                 style={{
                   fontFamily: "var(--font-space-mono, monospace)",
-                  fontSize: 11,
-                  color: "#FFD600",
+                  fontSize: 9.5,
+                  letterSpacing: "0.18em",
                   textTransform: "uppercase",
-                  letterSpacing: "0.12em",
-                  marginBottom: 12,
+                  color: theme.accent,
+                  marginBottom: 5,
                 }}
               >
-                Theme {String(i + 1).padStart(2, "0")}
+                Build this
               </div>
-              <h3
-                style={{
-                  fontFamily: headingFont,
-                  fontSize: "clamp(24px, 2.5vw, 36px)",
-                  color: "#F0EEFF",
-                  letterSpacing: "0.05em",
-                  margin: "0 0 16px 0",
-                  lineHeight: 1.1,
-                }}
-              >
-                {theme.title}
-              </h3>
               <p
                 style={{
                   fontFamily: "Inter, sans-serif",
-                  fontSize: 14,
-                  color: "rgba(240,238,255,0.65)",
-                  lineHeight: 1.65,
+                  fontSize: 14.5,
+                  fontWeight: 500,
+                  lineHeight: 1.5,
+                  color: "#F0EEFF",
                   margin: 0,
                 }}
               >
-                {theme.description}
+                {theme.brief}
               </p>
-            </motion.div>
-          ))}
-        </div>
+            </div>
+
+            {/* mt-auto equivalent — keeps the load-bearing line on one baseline
+                across all three columns however long the copy above runs. */}
+            <div
+              style={{
+                marginTop: "auto",
+                paddingTop: 14,
+                borderTop: "1px solid rgba(108,43,217,0.25)",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "var(--font-space-mono, monospace)",
+                  fontSize: 9.5,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: "rgba(240,238,255,0.4)",
+                  marginBottom: 5,
+                }}
+              >
+                AI is load-bearing
+              </div>
+              <p
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: 12.5,
+                  lineHeight: 1.5,
+                  color: "rgba(240,238,255,0.62)",
+                  margin: 0,
+                }}
+              >
+                {theme.loadBearing}
+              </p>
+
+              {theme.note.length > 0 && (
+                <p
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: 12,
+                    lineHeight: 1.45,
+                    color: "#FFD600",
+                    background: "rgba(255,214,0,0.08)",
+                    border: "1px solid rgba(255,214,0,0.25)",
+                    borderRadius: 8,
+                    padding: "9px 12px",
+                    margin: "12px 0 0",
+                  }}
+                >
+                  ⚠ {theme.note}
+                </p>
+              )}
+            </div>
+          </motion.div>
+        ))}
       </div>
-    </div>
+    </SlideShell>
   );
 }
