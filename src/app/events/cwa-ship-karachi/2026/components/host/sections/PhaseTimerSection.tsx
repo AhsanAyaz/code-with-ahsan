@@ -6,6 +6,10 @@ import CountdownTimer, { type TimerState } from "../CountdownTimer";
 import CountdownGate, { type GateState } from "../CountdownGate";
 import type { DeckPhase } from "../../../constants";
 
+// Stable identity so `Counting`'s onDone-dependent effect isn't torn down and
+// recreated every render for a slide that omits onGateDone.
+const NOOP = () => {};
+
 /**
  * One component behind slides 13, 14, 15 and 17 — the shape is identical, only
  * the copy and the duration change, so they live in constants as DeckPhase.
@@ -15,6 +19,8 @@ type Props = {
   timer: TimerState;
   /** When present, a 10-to-1 countdown gates the slide until it reads "open". */
   gate?: GateState;
+  /** Wall-clock ms the gate countdown ends at; owned by HostPanel. */
+  gateEndsAt?: number | null;
   gatePrompt?: string;
   onGateDone?: () => void;
 };
@@ -23,11 +29,19 @@ export default function PhaseTimerSection({
   phase,
   timer,
   gate,
+  gateEndsAt = null,
   gatePrompt = "Ready?",
   onGateDone,
 }: Props) {
   if (gate && gate !== "open") {
-    return <CountdownGate state={gate} prompt={gatePrompt} onDone={onGateDone ?? (() => {})} />;
+    return (
+      <CountdownGate
+        state={gate}
+        endsAt={gateEndsAt}
+        prompt={gatePrompt}
+        onDone={onGateDone ?? NOOP}
+      />
+    );
   }
 
   return (

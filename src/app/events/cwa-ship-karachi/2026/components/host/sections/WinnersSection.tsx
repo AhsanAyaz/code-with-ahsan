@@ -323,7 +323,9 @@ export default function WinnersSection({ revealedCount }: WinnersSectionProps) {
   useEffect(() => {
     const db = getFirestore(getApp());
     const unsub = onSnapshot(doc(db, "events", EVENT_ID, "winners", "data"), (snap) => {
-      if (snap.exists()) {
+      // A partial or hand-edited doc must not crash the winners slide live —
+      // only treat it as populated once at least `first` is present.
+      if (snap.exists() && snap.data()?.first) {
         setWinners(snap.data() as WinnersData);
       }
     });
@@ -338,15 +340,14 @@ export default function WinnersSection({ revealedCount }: WinnersSectionProps) {
   if (revealedCount >= 3) revealedPlaces.push(1);
   const latest = revealedPlaces[revealedPlaces.length - 1];
 
-  const columnFor = (place: Place) =>
-    revealedPlaces.includes(place) && winners ? (
-      <PodiumColumn
-        key={place}
-        place={place}
-        data={place === 1 ? winners.first : place === 2 ? winners.second : winners.third}
-        isLatest={latest === place}
-      />
-    ) : null;
+  const columnFor = (place: Place) => {
+    if (!revealedPlaces.includes(place) || !winners) return null;
+    // A hand-edited doc may be missing a placement even though `first` is
+    // present — render nothing for that column instead of crashing.
+    const data = place === 1 ? winners.first : place === 2 ? winners.second : winners.third;
+    if (!data) return null;
+    return <PodiumColumn key={place} place={place} data={data} isLatest={latest === place} />;
+  };
 
   return (
     <div
@@ -425,7 +426,7 @@ export default function WinnersSection({ revealedCount }: WinnersSectionProps) {
               }}
             >
               {revealedCount < 3
-                ? `${revealedCount}/3 revealed — press Space to reveal next`
+                ? `${revealedCount}/3 revealed. Press Space to reveal next`
                 : "All winners revealed!"}
             </p>
 

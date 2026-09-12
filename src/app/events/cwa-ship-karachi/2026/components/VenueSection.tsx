@@ -15,7 +15,7 @@ const VenueSection = () => {
             <h2 className="text-2xl font-bold text-primary sm:text-3xl md:text-4xl">The Venue</h2>
           </div>
           <p className="mx-auto max-w-2xl text-sm text-base-content/70 sm:text-base">
-            This is an on-site event — everything happens under one roof on {EVENT.dateLabel}.
+            This is an on-site event: everything happens under one roof on {EVENT.dateLabel}.
           </p>
         </div>
 

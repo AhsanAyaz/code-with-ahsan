@@ -40,7 +40,7 @@ const OrganizersSection = () => {
             </h2>
           </div>
           <p className="mx-auto max-w-2xl text-sm text-base-content/70 sm:text-base">
-            The people putting the day together — from the venue and the schedule to the mentors on
+            The people putting the day together, from the venue and the schedule to the mentors on
             the floor.
           </p>
         </div>

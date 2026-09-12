@@ -24,7 +24,7 @@ const ScheduleSection = () => {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">Schedule</h2>
           </div>
           <p className="text-base-content/70 max-w-2xl mx-auto text-sm sm:text-base">
-            {EVENT.dateLabel} · {EVENT.timeLabel}. Proposed running order — timings may shift
+            {EVENT.dateLabel} · {EVENT.timeLabel}. Proposed running order. Timings may shift
             slightly on the day.
           </p>
         </div>

@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import ControlBar, { SECTION_NAMES } from "./ControlBar";
 import SlideChrome from "./SlideChrome";
 import { createTimer, isRunning, remainingOf, type TimerState } from "./CountdownTimer";
-import type { GateState } from "./CountdownGate";
+import { GATE_COUNTDOWN_SECONDS, type GateState } from "./CountdownGate";
 import KeynoteSection from "./sections/KeynoteSection";
 import SponsorsSection from "./sections/SponsorsSection";
 import FounderSection from "./sections/FounderSection";
@@ -45,10 +45,30 @@ const SLIDE_PHASE_TWO = 15;
 const SLIDE_SUBMISSION = 16;
 const SLIDE_PRESENTATIONS = 17;
 const SLIDE_WINNERS = 18;
+const SLIDE_PERKS = 19;
 const SLIDE_WRAP_UP = 20;
-const TOTAL_SLIDES = 21;
+// Derived, never hardcoded: ControlBar disables [N] on SECTION_NAMES.length - 1,
+// and a second literal here is what let the two drift apart before.
+const TOTAL_SLIDES = SECTION_NAMES.length;
 
 const WINNER_PLACEMENTS = 3;
+
+/**
+ * Everything the host would lose to an accidental Cmd+R at hour six. Timers are
+ * stored as absolute `endsAt` timestamps, so a clock that kept running (or
+ * expired) while the page was closed comes back showing the real time left.
+ */
+const STORAGE_KEY = "cwa-ship-karachi-2026-host-state";
+
+type PersistedState = {
+  slideIndex: number;
+  /** Reveal step within the current slide, so a refresh mid-reveal does not
+      replay the winners slot-machine and confetti from third place. */
+  revealedCount: number;
+  timers: Record<number, TimerState>;
+  phaseOneGate: GateState;
+  countingEndsAt: number | null;
+};
 
 /** Slides that carry a countdown, and the phase whose duration they run on. */
 const TIMED_SLIDES: Record<number, DeckPhase> = {
@@ -62,6 +82,11 @@ const TIMED_SLIDES: Record<number, DeckPhase> = {
 export default function HostPanel() {
   const [slideIndex, setSlideIndex] = useState(0);
   const [revealedCount, setRevealedCount] = useState(0);
+  // Tracks which slide the reveal state belongs to. Declared up here (rather
+  // than next to the reset below) because the rehydration effect has to move it
+  // in step with a restored slideIndex, or the reset would wipe the restored
+  // revealedCount on the first render after a reload.
+  const [renderedSlide, setRenderedSlide] = useState(slideIndex);
   const [controlsVisible, setControlsVisible] = useState(true);
 
   // Timers live here, not in the slide, so navigating away and back does not
@@ -70,11 +95,62 @@ export default function HostPanel() {
 
   // Phase 1 opens with a 10-to-1 countdown. Deliberately NOT reset when the
   // slide changes — stepping back to re-check something and returning must not
-  // replay the countdown mid-hackathon. R on that slide re-arms it.
+  // replay the countdown mid-hackathon. R on that slide re-arms it. The
+  // countdown itself is an absolute timestamp for the same reason the timers
+  // are: the digit is derived from the wall clock, not from a local counter.
   const [phaseOneGate, setPhaseOneGate] = useState<GateState>("idle");
+  const [countingEndsAt, setCountingEndsAt] = useState<number | null>(null);
+
+  // Rehydrate after mount, never during render — reading localStorage in the
+  // render path would make the server and client markup disagree.
+  const [hydrated, setHydrated] = useState(false);
+
+  /* eslint-disable react-hooks/set-state-in-effect -- localStorage is an
+     external system and cannot be read during render without a hydration
+     mismatch, so this one-shot restore has to happen in a mount effect. */
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as Partial<PersistedState>;
+        if (typeof saved.slideIndex === "number") {
+          setSlideIndex(Math.min(Math.max(0, saved.slideIndex), TOTAL_SLIDES - 1));
+        }
+        if (typeof saved.revealedCount === "number") {
+          setRevealedCount(Math.max(0, saved.revealedCount));
+          setRenderedSlide(Math.min(Math.max(0, saved.slideIndex ?? 0), TOTAL_SLIDES - 1));
+        }
+        if (saved.timers) setTimers(saved.timers);
+        if (saved.phaseOneGate) setPhaseOneGate(saved.phaseOneGate);
+        if (typeof saved.countingEndsAt === "number") setCountingEndsAt(saved.countingEndsAt);
+      }
+    } catch {
+      // Private windows throw on access — the deck just starts from the top.
+    }
+    setHydrated(true);
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  useEffect(() => {
+    // Guarded on `hydrated` so the first paint's defaults never overwrite the
+    // state we are about to restore.
+    if (!hydrated) return;
+    try {
+      const payload: PersistedState = {
+        slideIndex,
+        revealedCount,
+        timers,
+        phaseOneGate,
+        countingEndsAt,
+      };
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+      // Storage unavailable or full — the deck keeps working in memory.
+    }
+  }, [hydrated, slideIndex, revealedCount, timers, phaseOneGate, countingEndsAt]);
 
   const timerFor = useCallback(
-    (index: number): TimerState => timers[index] ?? createTimer(TIMED_SLIDES[index].minutes),
+    (index: number): TimerState => timers[index] ?? createTimer(TIMED_SLIDES[index]?.minutes ?? 0),
     [timers]
   );
 
@@ -84,13 +160,19 @@ export default function HostPanel() {
     setTimers((prev) => {
       const current = prev[index] ?? createTimer(phase.minutes);
       const left = remainingOf(current);
+      // Restart is checked first: a finished timer still carries an `endsAt`,
+      // so testing isRunning first would "pause" it at zero and force the host
+      // to press T twice to get the restart the hint promises.
+      if (left <= 0) {
+        const full = phase.minutes * 60_000;
+        return { ...prev, [index]: { endsAt: Date.now() + full, remainingMs: full } };
+      }
       if (isRunning(current)) {
         // Pause: freeze what is left.
         return { ...prev, [index]: { endsAt: null, remainingMs: left } };
       }
-      // Start or resume. A finished timer restarts from the top.
-      const ms = left > 0 ? left : phase.minutes * 60_000;
-      return { ...prev, [index]: { endsAt: Date.now() + ms, remainingMs: ms } };
+      // Start or resume from where it was paused.
+      return { ...prev, [index]: { endsAt: Date.now() + left, remainingMs: left } };
     });
   }, []);
 
@@ -99,7 +181,10 @@ export default function HostPanel() {
     if (!phase) return;
     setTimers((prev) => ({ ...prev, [index]: createTimer(phase.minutes) }));
     // R is "reset this slide", so on Phase 1 it re-arms the countdown too.
-    if (index === SLIDE_PHASE_ONE) setPhaseOneGate("idle");
+    if (index === SLIDE_PHASE_ONE) {
+      setPhaseOneGate("idle");
+      setCountingEndsAt(null);
+    }
   }, []);
 
   const openPhaseOneGate = useCallback(() => setPhaseOneGate("open"), []);
@@ -115,7 +200,6 @@ export default function HostPanel() {
   // Reset per-slide reveal state when the slide changes. Adjusting state during
   // render (rather than in an effect) avoids a cascading second render pass.
   // https://react.dev/learn/you-might-not-need-an-effect
-  const [renderedSlide, setRenderedSlide] = useState(slideIndex);
   if (renderedSlide !== slideIndex) {
     setRenderedSlide(slideIndex);
     setRevealedCount(0);
@@ -125,8 +209,10 @@ export default function HostPanel() {
     switch (slideIndex) {
       case SLIDE_PHASE_ONE:
         // Space arms the countdown, is ignored while it runs, then advances.
-        if (phaseOneGate === "idle") setPhaseOneGate("counting");
-        else if (phaseOneGate === "open") advanceSlide();
+        if (phaseOneGate === "idle") {
+          setCountingEndsAt(Date.now() + GATE_COUNTDOWN_SECONDS * 1000);
+          setPhaseOneGate("counting");
+        } else if (phaseOneGate === "open") advanceSlide();
         break;
       case SLIDE_JUDGES:
         if (revealedCount < JUDGES.length) setRevealedCount((c) => c + 1);
@@ -149,6 +235,25 @@ export default function HostPanel() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Browser chords stay with the browser: Cmd+R must reload, not reset the
+      // running timer, and Cmd+T must open a tab, not toggle the clock.
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      // A held Space used to auto-repeat through the whole winners reveal in
+      // under a second.
+      if (e.repeat) return;
+
+      // Never swallow keys aimed at a field (the winners admin form, say).
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.isContentEditable ||
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT")
+      ) {
+        return;
+      }
+
       if (e.code === "Space") e.preventDefault();
 
       switch (e.code) {
@@ -162,7 +267,13 @@ export default function HostPanel() {
           setControlsVisible((v) => !v);
           break;
         case "KeyF":
-          document.documentElement.requestFullscreen?.();
+          // A real toggle, as the control bar advertises. Both calls reject on
+          // an untrusted gesture or a redundant request, so both are caught.
+          if (document.fullscreenElement) {
+            void document.exitFullscreen?.()?.catch(() => {});
+          } else {
+            void document.documentElement.requestFullscreen?.()?.catch(() => {});
+          }
           break;
         case "KeyT":
           toggleTimer(slideIndex);
@@ -225,6 +336,7 @@ export default function HostPanel() {
             phase={PHASE_ONE}
             timer={timerFor(SLIDE_PHASE_ONE)}
             gate={phaseOneGate}
+            gateEndsAt={countingEndsAt}
             gatePrompt="Ready to build?"
             onGateDone={openPhaseOneGate}
           />
@@ -246,7 +358,7 @@ export default function HostPanel() {
             onReveal={() => setRevealedCount((c) => Math.min(c + 1, WINNER_PLACEMENTS))}
           />
         );
-      case 19:
+      case SLIDE_PERKS:
         return <PerksSection />;
       case SLIDE_WRAP_UP:
         return <WrapUpSection />;

@@ -9,7 +9,7 @@ const CTA_ITEMS = [
   {
     audience: "Attendees",
     color: "#00F5FF",
-    text: "Keep building with us — meetups, hackathons and mentorship all year.",
+    text: "Keep building with us: meetups, hackathons and mentorship all year.",
   },
   {
     audience: "Companies",
@@ -94,8 +94,8 @@ export default function WrapUpSection() {
               maxWidth: 480,
             }}
           >
-            You shipped something real in a single day. Take the momentum with you — the community
-            is where the next one starts.
+            You shipped something real in a single day. Take the momentum with you. The community is
+            where the next one starts.
           </motion.p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 32 }}>

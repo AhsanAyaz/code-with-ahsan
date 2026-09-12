@@ -1,41 +1,43 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
+
+export const HOST_TOKEN_KEY = "cwa_host_token";
 
 interface HostAuthGateProps {
   children: React.ReactNode;
+  eventName: string;
 }
 
-export default function HostAuthGate({ children }: HostAuthGateProps) {
+export default function HostAuthGate({ children, eventName }: HostAuthGateProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
   const [loggingIn, setLoggingIn] = useState(false);
 
-  // Check for existing admin session on mount
+  // Check for existing host session on mount
   useEffect(() => {
     const checkSession = async () => {
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+      const token = localStorage.getItem(HOST_TOKEN_KEY);
       if (!token) {
         setCheckingAuth(false);
         return;
       }
       try {
-        const response = await fetch("/api/mentorship/admin/auth", {
+        const response = await fetch("/api/events/host/auth", {
           method: "GET",
-          headers: { "x-admin-token": token },
+          headers: { "x-host-token": token },
         });
         const data = await response.json();
         if (data.valid) {
           setIsAuthenticated(true);
         } else {
-          localStorage.removeItem(ADMIN_TOKEN_KEY);
+          localStorage.removeItem(HOST_TOKEN_KEY);
         }
       } catch (error) {
         console.error("Error checking host auth session:", error);
-        localStorage.removeItem(ADMIN_TOKEN_KEY);
+        localStorage.removeItem(HOST_TOKEN_KEY);
       } finally {
         setCheckingAuth(false);
       }
@@ -48,14 +50,14 @@ export default function HostAuthGate({ children }: HostAuthGateProps) {
     setLoggingIn(true);
     setAuthError("");
     try {
-      const response = await fetch("/api/mentorship/admin/auth", {
+      const response = await fetch("/api/events/host/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
       });
       const data = await response.json();
       if (response.ok && data.token) {
-        localStorage.setItem(ADMIN_TOKEN_KEY, data.token);
+        localStorage.setItem(HOST_TOKEN_KEY, data.token);
         setIsAuthenticated(true);
         setPassword("");
       } else {
@@ -145,7 +147,7 @@ export default function HostAuthGate({ children }: HostAuthGateProps) {
               fontFamily: "var(--font-space-mono, monospace)",
             }}
           >
-            CWA Prompt-a-thon 2026
+            {eventName}
           </p>
 
           <form onSubmit={handleLogin}>
@@ -161,7 +163,7 @@ export default function HostAuthGate({ children }: HostAuthGateProps) {
                   fontFamily: "var(--font-space-mono, monospace)",
                 }}
               >
-                Admin Password
+                Host Password
               </label>
               <input
                 type="password"
@@ -169,7 +171,7 @@ export default function HostAuthGate({ children }: HostAuthGateProps) {
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loggingIn}
                 autoFocus
-                placeholder="Enter password"
+                placeholder="Enter host password"
                 style={{
                   width: "100%",
                   background: "rgba(108,43,217,0.08)",
@@ -183,12 +185,8 @@ export default function HostAuthGate({ children }: HostAuthGateProps) {
                   boxSizing: "border-box",
                   transition: "border-color 0.2s",
                 }}
-                onFocus={(e) =>
-                  (e.target.style.borderColor = "rgba(108,43,217,0.8)")
-                }
-                onBlur={(e) =>
-                  (e.target.style.borderColor = "rgba(108,43,217,0.35)")
-                }
+                onFocus={(e) => (e.target.style.borderColor = "rgba(108,43,217,0.8)")}
+                onBlur={(e) => (e.target.style.borderColor = "rgba(108,43,217,0.35)")}
               />
               {authError && (
                 <p

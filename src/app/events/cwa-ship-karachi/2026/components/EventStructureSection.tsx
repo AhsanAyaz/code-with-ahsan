@@ -16,7 +16,7 @@ const EventStructureSection = () => {
             </h2>
           </div>
           <p className="text-base-content/70 max-w-2xl mx-auto text-sm sm:text-base">
-            The brief for the day — every team builds to the same theme.
+            The brief for the day: every team builds to the same theme.
           </p>
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} className="mt-4">
             <a

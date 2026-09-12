@@ -31,8 +31,8 @@ export default function SlideShell({ eyebrow, title, subtitle, maxWidth = 1200, 
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        overflow: "hidden",
-        padding: "88px 200px 132px",
+        overflow: "auto",
+        padding: "88px clamp(48px, 8vw, 200px) 132px",
         boxSizing: "border-box",
       }}
     >

@@ -52,17 +52,20 @@ export default function CountdownTimer({ state, totalMs }: Props) {
   // it into state instead would mean a setState in the effect body, which
   // cascades an extra render four times a second.
   const [, setTick] = useState(0);
+  const remaining = remainingOf(state);
+  const done = remaining <= 0;
+
   useEffect(() => {
-    if (!running) return;
+    // Stop ticking once the clock hits zero — otherwise "TIME'S UP" would
+    // re-render four times a second for the rest of the event. `done` is read
+    // from the render that shows 00:00, so the final tick has already landed.
+    if (!running || done) return;
     // 250ms rather than 1000ms so the visible second never lags by up to a
     // full second behind the real clock.
     const id = window.setInterval(() => setTick((t) => t + 1), 250);
     return () => window.clearInterval(id);
-  }, [running]);
+  }, [running, done]);
 
-  const remaining = remainingOf(state);
-
-  const done = remaining <= 0;
   const lowOnTime = !done && remaining <= 5 * 60_000;
   const accent = done ? "#FF3B6B" : lowOnTime ? "#FFD600" : "#00F5FF";
   const progress = totalMs > 0 ? Math.min(1, Math.max(0, 1 - remaining / totalMs)) : 0;

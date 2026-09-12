@@ -18,7 +18,7 @@ const MentorsSection = () => {
             <h2 className="text-2xl font-bold text-primary sm:text-3xl">Mentors</h2>
           </div>
           <p className="mx-auto max-w-2xl text-sm text-base-content/70 sm:text-base">
-            Mentors are on the floor for the whole build sprint — guiding teams, reviewing
+            Mentors are on the floor for the whole build sprint, guiding teams, reviewing
             approaches, and unblocking you when you get stuck.
           </p>
         </div>

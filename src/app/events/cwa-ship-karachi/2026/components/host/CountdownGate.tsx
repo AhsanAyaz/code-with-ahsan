@@ -1,70 +1,95 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { headingFont } from "../../constants";
 
 export type GateState = "idle" | "counting" | "open";
 
+/** Seconds the gate counts down from once it is armed. */
+export const GATE_COUNTDOWN_SECONDS = 10;
+
 /**
  * A 10-to-1 countdown that gates a slide's content, the way the old twist
  * reveal did.
  *
- * The counting view is only mounted while the state is "counting", so it starts
- * from a clean `from` every time it is armed.
+ * The digit is derived from an absolute `endsAt` timestamp owned by HostPanel,
+ * not from local state — so navigating off the slide mid-countdown and back
+ * resumes where the room is, instead of replaying from 10.
  */
-const Counting = ({ from, onDone }: { from: number; onDone: () => void }) => {
-  const [count, setCount] = useState(from);
-  const remainingRef = useRef(from);
+const Counting = ({ endsAt, onDone }: { endsAt: number; onDone: () => void }) => {
+  const secondsLeft = useCallback(
+    () => Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)),
+    [endsAt]
+  );
+  const [count, setCount] = useState(secondsLeft);
 
   useEffect(() => {
-    const id = window.setInterval(() => {
-      remainingRef.current -= 1;
-      setCount(remainingRef.current);
-      if (remainingRef.current <= 0) {
+    const tick = () => {
+      const left = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
+      setCount(left);
+      if (left <= 0) {
         window.clearInterval(id);
         // Fired from the timer callback rather than an effect body or a state
         // updater, so it stays out of React's render path.
         onDone();
       }
-    }, 1000);
+    };
+    // Sub-second tick so the digit flips on the real second boundary rather
+    // than up to a second late after a remount.
+    const id = window.setInterval(tick, 200);
+    tick();
     return () => window.clearInterval(id);
-  }, [onDone]);
+  }, [endsAt, onDone]);
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.span
-        key={count}
-        initial={{ opacity: 0, scale: 0.5, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 1.5, y: -20 }}
-        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        style={{
-          display: "block",
-          fontFamily: headingFont,
-          fontSize: "clamp(120px, 24vw, 300px)",
-          color: "#FFD600",
-          letterSpacing: "0.02em",
-          lineHeight: 1,
-          textShadow: "0 0 70px rgba(255,214,0,0.45)",
-        }}
-      >
-        {count > 0 ? count : ""}
-      </motion.span>
-    </AnimatePresence>
+    // Fixed-height stage with the digits stacked on top of each other, so the
+    // outgoing and incoming digit cross-fade instead of the slot going blank
+    // for the length of the exit animation.
+    <div
+      style={{
+        position: "relative",
+        height: "clamp(120px, 24vw, 300px)",
+      }}
+    >
+      <AnimatePresence>
+        <motion.span
+          key={count}
+          initial={{ opacity: 0, scale: 0.5, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 1.5, y: -20 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: headingFont,
+            fontSize: "clamp(120px, 24vw, 300px)",
+            color: "#FFD600",
+            letterSpacing: "0.02em",
+            lineHeight: 1,
+            textShadow: "0 0 70px rgba(255,214,0,0.45)",
+          }}
+        >
+          {count > 0 ? count : ""}
+        </motion.span>
+      </AnimatePresence>
+    </div>
   );
 };
 
 type Props = {
   state: GateState;
-  /** Seconds to count down from. */
-  from?: number;
+  /** Wall-clock ms the countdown ends at; null until the gate is armed. */
+  endsAt?: number | null;
   /** Headline shown before the countdown starts. */
   prompt: string;
   onDone: () => void;
 };
 
-export default function CountdownGate({ state, from = 10, prompt, onDone }: Props) {
+export default function CountdownGate({ state, endsAt = null, prompt, onDone }: Props) {
   return (
     <div
       style={{
@@ -88,7 +113,7 @@ export default function CountdownGate({ state, from = 10, prompt, onDone }: Prop
           padding: "0 40px",
         }}
       >
-        {state === "idle" ? (
+        {state === "idle" || endsAt === null ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -121,7 +146,7 @@ export default function CountdownGate({ state, from = 10, prompt, onDone }: Prop
             </p>
           </motion.div>
         ) : (
-          <Counting from={from} onDone={onDone} />
+          <Counting endsAt={endsAt} onDone={onDone} />
         )}
       </div>
     </div>

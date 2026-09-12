@@ -54,6 +54,10 @@ const SECTION_HINTS = [
 /** Index of the final slide — the Next button is disabled here. */
 const LAST_SLIDE = SECTION_NAMES.length - 1;
 
+/** Index of the Winners slide — the only place the editor shortcut shows. */
+const WINNERS_SLIDE = SECTION_NAMES.indexOf("Winners");
+const WINNERS_EDITOR_PATH = "/events/cwa-ship-karachi/2026/host/winners";
+
 interface ControlBarProps {
   sectionIndex: number;
   sectionName: string;
@@ -126,6 +130,21 @@ export default function ControlBar({
         >
           {SECTION_HINTS[sectionIndex]}
         </span>
+        {sectionIndex === WINNERS_SLIDE && (
+          <a
+            href={WINNERS_EDITOR_PATH}
+            style={{
+              color: "#00F5FF",
+              fontSize: 11,
+              marginLeft: 16,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              textDecoration: "underline",
+            }}
+          >
+            Edit winners
+          </a>
+        )}
       </div>
 
       <div

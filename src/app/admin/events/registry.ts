@@ -1,4 +1,7 @@
-import { HACKATHON_TEAMS as PROMPTATHON_TEAMS } from "@/app/events/cwa-promptathon/2026/constants";
+import {
+  EVENT as PROMPTATHON,
+  HACKATHON_TEAMS as PROMPTATHON_TEAMS,
+} from "@/app/events/cwa-promptathon/2026/constants";
 import {
   EVENT as SHIP_KARACHI,
   HACKATHON_TEAMS as SHIP_KARACHI_TEAMS,
@@ -30,10 +33,10 @@ export const ADMIN_EVENTS: AdminEvent[] = [
     teams: SHIP_KARACHI_TEAMS,
   },
   {
-    id: "cwa-promptathon-2026",
-    name: "CWA Prompt-A-Thon 2026",
+    id: PROMPTATHON.eventId,
+    name: PROMPTATHON.name,
     type: "hackathon",
-    date: "28 March 2026",
+    date: PROMPTATHON.dateLabel,
     teams: PROMPTATHON_TEAMS,
   },
 ];
