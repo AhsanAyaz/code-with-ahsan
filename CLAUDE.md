@@ -6,15 +6,25 @@ When the main (orchestrator) agent is running on **Opus**:
 
 - **Planning, triage decisions, reviews, and merge gates stay on Opus** — the main agent
   does this work itself and does not delegate the judgment calls.
-- **Execution work is delegated to subagents running Sonnet 5** (`model: sonnet`, i.e.
-  `claude-sonnet-5`). Any Agent tool call that
-  implements, edits, refactors, tests, or otherwise carries out an already-decided plan
-  must pass `model: sonnet`, even when the agent definition's frontmatter says otherwise
-  (this instruction overrides agent frontmatter, e.g. `fix-implementer`).
+- **Execution work is also delegated to subagents running Opus** (`model: opus`). Any
+  Agent tool call that implements, edits, refactors, tests, or otherwise carries out an
+  already-decided plan must pass `model: opus`, even when the agent definition's
+  frontmatter says otherwise (this instruction overrides agent frontmatter, e.g.
+  `fix-implementer`).
 
-Rule of thumb: Opus decides _what_ to do, Sonnet does it.
+Rule of thumb: Opus decides _what_ to do, and Opus does it.
 
 If the main agent is not Opus, use the model each agent definition specifies.
+
+## No em-dashes in copy
+
+Never use an em-dash (`—`) in anything a person reads: slide decks, event copy,
+page and component text, headings, docs, commit messages, PR descriptions.
+Rewrite with a comma, a colon, a full stop, or parentheses, whichever the
+sentence actually wants. Do not swap in an en-dash as a substitute.
+
+En-dashes (`–`) stay where they belong: numeric and time ranges such as
+`8:30 – 9:30 AM`.
 
 ## Firestore indexes ship with the query
 
