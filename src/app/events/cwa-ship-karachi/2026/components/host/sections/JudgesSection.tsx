@@ -63,7 +63,7 @@ export default function JudgesSection({ revealedCount }: JudgesSectionProps) {
             margin: "0 0 40px 0",
           }}
         >
-          {revealedCount}/{JUDGES.length} revealed — press Space to reveal next
+          {revealedCount}/{JUDGES.length} revealed. Press Space to reveal next
         </motion.p>
 
         <div

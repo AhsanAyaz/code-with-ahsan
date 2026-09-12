@@ -26,13 +26,13 @@ const AboutSection = () => {
             <span className="text-base-content font-semibold">{EVENT.name}</span> is a single-day,
             on-site <span className="text-base-content font-semibold">hackathon</span> run by the
             Code With Ahsan community. You register as a team, arrive in the morning, and spend the
-            day building — with mentors on the floor the whole time.
+            day building, with mentors on the floor the whole time.
           </p>
           <p className="text-base-content/70 leading-relaxed text-sm sm:text-base">
-            The theme is <span className="text-accent font-semibold">{EVENT.theme}</span> — not a
+            The theme is <span className="text-accent font-semibold">{EVENT.theme}</span>, not a
             throwaway demo, but something real enough to put in front of users. Everything wraps the
-            same evening: submissions at 4 PM, judging straight after, and winners announced before
-            everyone heads home.
+            same evening: submissions close at 4 PM, judging straight after, and winners announced
+            before everyone heads home.
           </p>
 
           {/* Terminal-style decoration */}

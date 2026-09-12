@@ -13,7 +13,7 @@ const TracksSection = () => {
             One Day. One Track.
           </h2>
           <p className="text-base-content/70 max-w-2xl mx-auto text-sm sm:text-base">
-            {EVENT.name} is a single on-site hackathon — no parallel programme to split your
+            {EVENT.name} is a single on-site hackathon: no parallel programme to split your
             attention. You show up in the morning, build all day, and demo before you leave.
           </p>
         </div>

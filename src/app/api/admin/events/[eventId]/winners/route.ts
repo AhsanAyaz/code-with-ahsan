@@ -1,25 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
+import { verifyHostRequest } from "@/lib/hostAuth";
 import type { WinnersData } from "@/types/events";
 
 // ─── Auth helper — same pattern as src/app/api/admin/courses/route.ts ───────
+//
+// Writes are allowed for a site admin (x-admin-token) or the event presenter
+// (x-host-token), so the host can announce winners from the deck without the
+// admin password. Host tokens live in their own `host_sessions` collection and
+// are never accepted by the admin_sessions lookups elsewhere.
 
-async function checkAdminAuth(request: NextRequest): Promise<NextResponse | null> {
-  const token = request.headers.get("x-admin-token");
-  if (!token) {
-    return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
-  }
+async function checkAdminSession(token: string): Promise<boolean> {
   const sessionDoc = await db.collection("admin_sessions").doc(token).get();
-  if (!sessionDoc.exists) {
-    return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
-  }
+  if (!sessionDoc.exists) return false;
   const session = sessionDoc.data();
   const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
   if (expiresAt < new Date()) {
     await db.collection("admin_sessions").doc(token).delete();
-    return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
+    return false;
   }
-  return null;
+  return true;
+}
+
+async function checkAdminAuth(request: NextRequest): Promise<NextResponse | null> {
+  const unauthorized = NextResponse.json(
+    { error: "Admin or host authentication required" },
+    { status: 401 }
+  );
+
+  const adminToken = request.headers.get("x-admin-token");
+  if (adminToken && (await checkAdminSession(adminToken))) {
+    return null;
+  }
+
+  if (await verifyHostRequest(request)) {
+    return null;
+  }
+
+  return unauthorized;
 }
 
 // ─── GET /api/admin/events/[eventId]/winners — public read ───────────────────
@@ -83,7 +101,10 @@ export async function PUT(
   }
 
   if (!body.first?.teamName || !body.second?.teamName || !body.third?.teamName) {
-    return NextResponse.json({ error: "All three placements must have a team selected" }, { status: 400 });
+    return NextResponse.json(
+      { error: "All three placements must have a team selected" },
+      { status: 400 }
+    );
   }
 
   try {

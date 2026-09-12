@@ -62,7 +62,7 @@ export default function TeamRollCallSection({ revealedCount }: TeamRollCallSecti
             margin: "0 0 40px 0",
           }}
         >
-          {revealedCount}/{HACKATHON_TEAMS.length} teams — press Space to reveal next
+          {revealedCount}/{HACKATHON_TEAMS.length} teams. Press Space to reveal next
         </motion.p>
 
         <div

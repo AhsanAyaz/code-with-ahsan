@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
 /**
- * Admin Password Setup Script
+ * Host Password Setup Script
  *
  * This script generates a bcrypt-hashed password and saves it to Firestore.
  *
  * Usage:
- *   node scripts/set-admin-password.js <password>
+ *   node scripts/set-host-password.js <password>
  *
  * Example:
- *   node scripts/set-admin-password.js MySecurePassword123!
+ *   node scripts/set-host-password.js MySecurePassword123!
  */
 
 const bcrypt = require("bcryptjs");
@@ -107,13 +107,13 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
-async function setAdminPassword(password) {
+async function setHostPassword(password) {
   if (!password || password.length < 8) {
     console.error("✗ Password must be at least 8 characters long");
     process.exit(1);
   }
 
-  console.log("\n📝 Setting admin password...\n");
+  console.log("\n📝 Setting host password...\n");
 
   // Generate bcrypt hash with cost factor of 12
   const saltRounds = 12;
@@ -134,9 +134,9 @@ async function setAdminPassword(password) {
   console.log(
     `\n  Target: project "${targetProject}"${emulator ? ` via EMULATOR at ${emulator}` : " (PRODUCTION)"}`
   );
-  console.log("\n  Saving to Firestore (config/admin)...");
+  console.log("\n  Saving to Firestore (config/host)...");
 
-  await db.collection("config").doc("admin").set(
+  await db.collection("config").doc("host").set(
     {
       passwordHash: hash,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -146,9 +146,9 @@ async function setAdminPassword(password) {
     { merge: true }
   );
 
-  console.log("\n✓ Admin password has been set successfully!");
+  console.log("\n✓ Host password has been set successfully!");
   console.log(
-    "\n⚠️  Important: Keep this password safe. You will need it to access the admin panel."
+    "\n⚠️  Important: Keep this password safe. You will need it to access the presenter host panel."
   );
   console.log("  To reset the password, run this script again with a new password.\n");
 }
@@ -158,13 +158,13 @@ const password = process.argv[2];
 
 if (!password) {
   console.log(`
-Admin Password Setup Script
+Host Password Setup Script
 ============================
 
-Usage: node scripts/set-admin-password.js <password>
+Usage: node scripts/set-host-password.js <password>
 
 Example:
-  node scripts/set-admin-password.js MySecurePassword123!
+  node scripts/set-host-password.js MySecurePassword123!
 
 Requirements:
   - Password must be at least 8 characters
@@ -173,7 +173,7 @@ Requirements:
   process.exit(1);
 }
 
-setAdminPassword(password)
+setHostPassword(password)
   .then(() => process.exit(0))
   .catch((error) => {
     console.error("\n✗ Error setting password:", error.message);

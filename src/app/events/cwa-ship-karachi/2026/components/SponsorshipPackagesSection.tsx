@@ -16,7 +16,7 @@ const SponsorshipPackagesSection = () => {
           </h2>
 
           <p className="mx-auto mb-3 max-w-2xl text-base text-base-content/80 sm:text-lg">
-            Put your brand in front of the developers building real products with AI — in the room,
+            Put your brand in front of the developers building real products with AI, in the room,
             on the day.
           </p>
           <p className="mx-auto mb-8 max-w-2xl text-sm text-base-content/60">

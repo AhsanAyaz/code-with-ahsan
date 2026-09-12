@@ -7,11 +7,26 @@ import SideNav from "./SideNav";
 import Image from "./Image";
 import ProfileMenu from "./ProfileMenu";
 import { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { START_LEARNING_LINKS, COMMUNITY_LINKS } from "@/data/headerNavLinks";
 
 const SUBSCRIBE_URL = "https://blog.codewithahsan.dev/#/portal/signup";
 
+/**
+ * Presenter decks (/events/<event>/<year>/host and anything under it) are
+ * projected full-bleed. The site header is sticky and 84px tall, so leaving it
+ * in would push every 100vh slide down by that much, cut the same amount off
+ * the bottom, and sit underneath the fixed slide indicator.
+ */
+const isPresenterDeck = (pathname: string | null) => /\/host(\/|$)/.test(pathname ?? "");
+
 const LayoutWrapper = ({ children }: { children: ReactNode }) => {
+  const pathname = usePathname();
+
+  if (isPresenterDeck(pathname)) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="navbar bg-base-100 px-4 sm:px-8 md:px-12 lg:px-16 z-50 sticky top-0">

@@ -7,6 +7,14 @@ export const headingFont = USE_BEBAS_HEADINGS
   ? "var(--font-bebas, 'Bebas Neue', sans-serif)"
   : "var(--font-rubik, 'Rubik', sans-serif)";
 
+// ─── Event meta ──────────────────────────────────────────────────────────────
+export const EVENT = {
+  /** Firestore document id — events/{eventId}/winners/data */
+  eventId: "cwa-promptathon-2026",
+  name: "CWA Prompt-A-Thon 2026",
+  dateLabel: "28 March 2026",
+} as const;
+
 export type StatItem = {
   label: string;
   value: string;
