@@ -6,6 +6,17 @@ import { useMentorship } from "@/contexts/MentorshipContext";
 
 export const ADMIN_TOKEN_KEY = "mentorship_admin_token";
 
+/**
+ * Headers that authenticate a request to the admin API routes, which check
+ * `x-admin-token` against `admin_sessions` (see src/lib/adminAuth.ts).
+ * Returns an empty object when no admin session is stored.
+ */
+export function getAdminAuthHeaders(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+  return token ? { "x-admin-token": token } : {};
+}
+
 interface AdminAuthGateProps {
   children: React.ReactNode;
 }
@@ -115,9 +126,7 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Authentication Required</h2>
-          <p className="text-base-content/70">
-            Please sign in to access the admin dashboard
-          </p>
+          <p className="text-base-content/70">Please sign in to access the admin dashboard</p>
         </div>
       </div>
     );

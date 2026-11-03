@@ -9,7 +9,7 @@ import {
   GroupedMentorship,
   MentorshipSummary,
 } from "@/types/admin";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
+import { getAdminAuthHeaders } from "@/components/admin/AdminAuthGate";
 import { useStreamerMode } from "@/hooks/useStreamerMode";
 import {
   getAnonymizedDisplayName,
@@ -87,7 +87,9 @@ export default function AllMentorsPage() {
     const fetchMentorshipData = async () => {
       setLoadingMentorships(true);
       try {
-        const response = await fetch("/api/mentorship/admin/matches?role=mentor");
+        const response = await fetch("/api/mentorship/admin/matches?role=mentor", {
+          headers: getAdminAuthHeaders(),
+        });
         if (response.ok) {
           const data = await response.json();
           setMentorshipData(data.matches || []);
@@ -108,7 +110,9 @@ export default function AllMentorsPage() {
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const response = await fetch("/api/mentorship/admin/profiles?role=mentor");
+        const response = await fetch("/api/mentorship/admin/profiles?role=mentor", {
+          headers: getAdminAuthHeaders(),
+        });
         if (response.ok) {
           const data = await response.json();
           setProfiles(data.profiles || []);
@@ -134,7 +138,7 @@ export default function AllMentorsPage() {
     try {
       const response = await fetch("/api/mentorship/admin/profiles", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
         body: JSON.stringify({ uid, discordUsername: newUsername }),
       });
 
@@ -183,7 +187,7 @@ export default function AllMentorsPage() {
     try {
       const response = await fetch("/api/mentorship/admin/profiles", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
         body: JSON.stringify({ uid, linkedinUrl: trimmed }),
       });
 
@@ -227,7 +231,7 @@ export default function AllMentorsPage() {
     try {
       const response = await fetch("/api/mentorship/admin/sessions", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
         body: JSON.stringify({ sessionId, status: newStatus }),
       });
 
@@ -263,6 +267,7 @@ export default function AllMentorsPage() {
     try {
       const response = await fetch(`/api/mentorship/admin/sessions?id=${sessionToDelete.id}`, {
         method: "DELETE",
+        headers: getAdminAuthHeaders(),
       });
 
       if (!response.ok) {
@@ -293,7 +298,7 @@ export default function AllMentorsPage() {
     try {
       const response = await fetch("/api/mentorship/admin/sessions/regenerate-channel", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
         body: JSON.stringify({ sessionId }),
       });
 
@@ -328,7 +333,9 @@ export default function AllMentorsPage() {
     setLoadingReviews(true);
 
     try {
-      const response = await fetch(`/api/mentorship/admin/reviews?mentorId=${mentor.uid}`);
+      const response = await fetch(`/api/mentorship/admin/reviews?mentorId=${mentor.uid}`, {
+        headers: getAdminAuthHeaders(),
+      });
       if (response.ok) {
         const data = await response.json();
         setReviews(data.reviews || []);
@@ -349,7 +356,7 @@ export default function AllMentorsPage() {
     try {
       const response = await fetch("/api/mentorship/admin/profiles", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
         body: JSON.stringify({ uid, status: newStatus, reactivateSessions }),
       });
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
+import { verifyAdminRequest } from "@/lib/adminAuth";
 import { sendRegistrationStatusEmail, sendAccountStatusEmail } from "@/lib/email";
 import { sendMentorChangesRequestedNotification } from "@/lib/discord";
 import { syncRoleClaim } from "@/lib/ambassador/roleMutation";
@@ -8,6 +9,10 @@ import { cascadeDeleteMentee } from "@/lib/mentorship/deleteMenteeCascade";
 
 // GET: Fetch all profiles with optional filters
 export async function GET(request: NextRequest) {
+  if (!(await verifyAdminRequest(request))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const role = searchParams.get("role"); // 'mentor' | 'mentee' | null for all
   const status = searchParams.get("status"); // 'pending' | 'accepted' | 'declined' | 'disabled' | null for all
@@ -90,6 +95,10 @@ const LINKEDIN_URL_REGEX = /^https:\/\/([\w-]+\.)?linkedin\.com\/.+/i;
 
 // PUT: Update profile status (accept/decline/disable) and/or Discord username
 export async function PUT(request: NextRequest) {
+  if (!(await verifyAdminRequest(request))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { uid, status, adminNotes, reactivateSessions, discordUsername, linkedinUrl, feedback } =

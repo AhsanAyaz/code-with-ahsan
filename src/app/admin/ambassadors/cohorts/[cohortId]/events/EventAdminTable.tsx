@@ -6,8 +6,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { EVENT_TYPE_LABELS, type EventType } from "@/lib/ambassador/eventTypes";
-
-const ADMIN_TOKEN_KEY = "cwa_admin_token";
+import { getAdminAuthHeaders } from "@/components/admin/AdminAuthGate";
 
 type AdminEventItem = {
   id: string;
@@ -21,8 +20,7 @@ type AdminEventItem = {
 };
 
 function adminHeaders(): HeadersInit {
-  const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
-  return { "Content-Type": "application/json", "x-admin-token": token ?? "" };
+  return { "Content-Type": "application/json", ...getAdminAuthHeaders() };
 }
 
 type Props = { cohortId: string };
@@ -35,9 +33,12 @@ export default function EventAdminTable({ cohortId }: Props) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/ambassador/events/admin?cohortId=${encodeURIComponent(cohortId)}`, {
-        headers: adminHeaders(),
-      });
+      const res = await fetch(
+        `/api/ambassador/events/admin?cohortId=${encodeURIComponent(cohortId)}`,
+        {
+          headers: adminHeaders(),
+        }
+      );
       if (!res.ok) {
         toast.error("Could not load events");
         return;
