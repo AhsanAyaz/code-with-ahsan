@@ -301,19 +301,69 @@ export const PAST_EVENTS: PastEvent[] = [
     // HACKATHON_TEAMS in events/cwa-ship-karachi/2026/constants.ts lists 15 teams.
     stat: "15 teams",
     url: "/events/cwa-ship-karachi/2026",
-    photos: [],
+    photos: [
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.shipKarachi}/ship-karachi-01.webp`,
+        alt: "Ship Karachi participants, mentors and organisers posing together in front of the Code with Ahsan backdrop, giving a thumbs up",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.shipKarachi}/ship-karachi-02.webp`,
+        alt: "Participants checking in at the Folio3 reception desk beside a Welcome to CWA Ship Karachi 2026 banner",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.shipKarachi}/ship-karachi-03.webp`,
+        alt: "A team talking through their idea with a mentor at a table of laptops on the hackathon floor",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.shipKarachi}/ship-karachi-04.webp`,
+        alt: "Judges at the judging desk with laptops, one asking a team a question over the microphone",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.shipKarachi}/ship-karachi-05.webp`,
+        alt: "A participant presenting his team's project on two screens during the evening demos",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.shipKarachi}/ship-karachi-06.webp`,
+        alt: "A team on stage holding their certificates, with the winner's trophy in the centre",
+      },
+    ],
   },
   {
     key: "promptathon",
     name: "CWA Prompt-a-thon 2026",
     mark: "PT",
-    date: "28 March – 10 April 2026",
+    date: "28 March 2026",
     where: "Online",
-    summary: "A two-week online generative AI hackathon, open to every skill level.",
+    summary: "A one-day online generative AI hackathon, open to every skill level.",
     // HACKATHON_TEAMS in events/cwa-promptathon/2026/constants.ts lists 10 teams.
     stat: "10 teams",
     url: "/events/cwa-promptathon/2026",
-    photos: [],
+    photos: [
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.promptathon}/promptathon-01.webp`,
+        alt: "Livestream of the kickoff showing the three hackathon themes: AI Brand Architect, AI Community Board and Personal AI Trainer",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.promptathon}/promptathon-02.webp`,
+        alt: "Kickoff livestream revealing the ten competing teams in a team roll call",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.promptathon}/promptathon-03.webp`,
+        alt: "Kickoff livestream introducing the four judges with their photos and roles",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.promptathon}/promptathon-04.webp`,
+        alt: "Kickoff livestream revealing the twist, The Human in the Loop, with an example for each theme",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.promptathon}/promptathon-05.webp`,
+        alt: "A Let's Hack slide with a countdown to the submission deadline, as building begins",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.promptathon}/promptathon-06.webp`,
+        alt: "Results livestream announcing the winners: Axiom first, Aether second and Quasar third",
+      },
+    ],
   },
 ];
 
