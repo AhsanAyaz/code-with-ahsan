@@ -30,6 +30,25 @@ export function adminFetch(url: string, options: RequestInit = {}): Promise<Resp
   return authFetch(url, options);
 }
 
+export const ADMINS_ONLY_MESSAGE = "Admins only: this action needs the admin role.";
+
+/**
+ * Message to show for a failed admin API response. A 403 (moderator hitting an
+ * admin-only action, or a revoked staff member) reports the server's reason;
+ * anything else returns `fallback` so existing error copy is unchanged.
+ */
+export async function adminErrorMessage(res: Response, fallback: string): Promise<string> {
+  if (res.status !== 403) return fallback;
+  const data = (await res
+    .clone()
+    .json()
+    .catch(() => null)) as { error?: unknown } | null;
+  const error = typeof data?.error === "string" ? data.error : "";
+  if (error === "Admins only") return ADMINS_ONLY_MESSAGE;
+  if (error === "No admin access") return "You no longer have access to the admin portal.";
+  return error || fallback;
+}
+
 export type AdminAccessStatus = "loading" | "signed-out" | "no-access" | "ready";
 
 export interface AdminAccessValue {
