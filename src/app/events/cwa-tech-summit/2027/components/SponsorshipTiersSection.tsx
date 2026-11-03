@@ -1,12 +1,9 @@
 import { Check, Minus } from "lucide-react";
 import {
   BENEFIT_ROWS,
-  EVENT,
   SECTION_IDS,
-  SPONSOR_FORM_URL,
   SPONSOR_TIERS,
   TIERS_NOTE,
-  sponsorMailto,
   type BenefitValue,
   type SponsorTier,
   type TierBadge,
@@ -34,17 +31,10 @@ const BenefitCell = ({ value }: { value: BenefitValue }) => {
   return <span>{value}</span>;
 };
 
-const ctaLabel = (tier: SponsorTier) =>
-  tier.key === "title" ? "Apply for Title" : `Choose ${tier.name}`;
+const ctaLabel = (tier: SponsorTier) => `Choose ${tier.name}`;
 
-/**
- * Tier buttons open the sponsor application form in a new tab once
- * SPONSOR_FORM_URL is set; until then they fall back to an email.
- */
-const ctaLinkProps = (tier: SponsorTier) =>
-  SPONSOR_FORM_URL
-    ? { href: SPONSOR_FORM_URL, target: "_blank", rel: "noopener noreferrer" }
-    : { href: sponsorMailto(`${tier.name} sponsorship, ${EVENT.name}`) };
+/** Every tier button jumps to the community manager section on this page. */
+const CTA_HREF = `#${SECTION_IDS.communityManager}`;
 
 const BADGE_TONES: Record<TierBadge["tone"], string> = {
   amber: "bg-(--sm-amber) text-(--sm-ink)",
@@ -143,7 +133,7 @@ const Matrix = () => {
               {/* Short visible label: the column header already names the tier,
                   and "Choose Platinum" would not fit the column. */}
               <a
-                {...ctaLinkProps(tier)}
+                href={CTA_HREF}
                 aria-label={ctaLabel(tier)}
                 className={`inline-flex w-full items-center justify-center whitespace-nowrap rounded-full px-3 py-2.5 text-sm font-semibold transition-colors ${
                   isTitle
@@ -151,7 +141,7 @@ const Matrix = () => {
                     : "border border-(--sm-lilac)/40 text-(--sm-paper) group-hover:border-(--sm-amber) hover:bg-(--sm-lilac)/10"
                 } ${FOCUS_RING}`}
               >
-                {tier.key === "title" ? "Apply" : "Choose"}
+                Choose
               </a>
             </div>
           </div>
@@ -205,7 +195,7 @@ const Cards = () => (
             </dl>
             <div className="mt-auto pt-6">
               <a
-                {...ctaLinkProps(tier)}
+                href={CTA_HREF}
                 className={`inline-flex w-full items-center justify-center rounded-full px-4 py-3 text-sm font-semibold ${
                   isTitle
                     ? "bg-(--sm-amber) text-(--sm-ink)"
