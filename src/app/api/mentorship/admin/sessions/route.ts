@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { db } from "@/lib/firebaseAdmin";
+import { verifyAdminRequest } from "@/lib/adminAuth";
 import {
   sendChannelMessage,
   sendChannelMessageWithComponents,
@@ -22,6 +23,10 @@ const ALLOWED_TRANSITIONS: Record<string, string[]> = {
 
 // PUT: Update session status with state machine validation
 export async function PUT(request: NextRequest) {
+  if (!(await verifyAdminRequest(request))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { sessionId, status } = body;
@@ -197,6 +202,10 @@ export async function PUT(request: NextRequest) {
 
 // DELETE: End a mentorship session (mark as cancelled, archive Discord, notify participants)
 export async function DELETE(request: NextRequest) {
+  if (!(await verifyAdminRequest(request))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get("id");

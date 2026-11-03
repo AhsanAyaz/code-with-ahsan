@@ -1,7 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
+import { verifyAdminRequest } from "@/lib/adminAuth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  if (!(await verifyAdminRequest(request))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     // Get mentor count
     const mentorsSnapshot = await db

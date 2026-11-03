@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import bcrypt from "bcryptjs";
+import { randomBytes } from "node:crypto";
 
 // POST: Verify presenter/host password (accepts either the dedicated host
 // password or the admin password, since an admin should also be able to run
@@ -43,8 +44,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
-    // Generate a simple session token (in production, use proper JWT)
-    const sessionToken = Buffer.from(`host:${Date.now()}:${Math.random()}`).toString("base64");
+    // 256-bit CSPRNG session token; base64url is safe as a Firestore doc ID
+    const sessionToken = randomBytes(32).toString("base64url");
 
     // Store session in Firestore with expiration
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours

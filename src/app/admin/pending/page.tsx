@@ -11,6 +11,7 @@ import {
 } from "@/utils/streamer-mode";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { hasRole } from "@/lib/permissions";
+import { getAdminAuthHeaders } from "@/components/admin/AdminAuthGate";
 
 export default function PendingMentorsPage() {
   const toast = useToast();
@@ -21,9 +22,7 @@ export default function PendingMentorsPage() {
 
   // Reviews modal state
   const [showReviewsModal, setShowReviewsModal] = useState(false);
-  const [reviewMentor, setReviewMentor] = useState<ProfileWithDetails | null>(
-    null
-  );
+  const [reviewMentor, setReviewMentor] = useState<ProfileWithDetails | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
 
@@ -32,8 +31,12 @@ export default function PendingMentorsPage() {
       try {
         // Fetch both pending and changes_requested profiles in parallel
         const [pendingRes, changesRes] = await Promise.all([
-          fetch("/api/mentorship/admin/profiles?role=mentor&status=pending"),
-          fetch("/api/mentorship/admin/profiles?role=mentor&status=changes_requested"),
+          fetch("/api/mentorship/admin/profiles?role=mentor&status=pending", {
+            headers: getAdminAuthHeaders(),
+          }),
+          fetch("/api/mentorship/admin/profiles?role=mentor&status=changes_requested", {
+            headers: getAdminAuthHeaders(),
+          }),
         ]);
 
         const pendingProfiles = pendingRes.ok ? (await pendingRes.json()).profiles || [] : [];
@@ -60,7 +63,7 @@ export default function PendingMentorsPage() {
     try {
       const response = await fetch("/api/mentorship/admin/profiles", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
         body: JSON.stringify({ uid, status: newStatus, reactivateSessions }),
       });
 
@@ -72,9 +75,7 @@ export default function PendingMentorsPage() {
 
         // Show success message if sessions were reactivated
         if (data.reactivatedSessions > 0) {
-          toast.success(
-            `${data.reactivatedSessions} mentorship session(s) have been reactivated.`
-          );
+          toast.success(`${data.reactivatedSessions} mentorship session(s) have been reactivated.`);
         }
       }
     } catch (error) {
@@ -85,9 +86,7 @@ export default function PendingMentorsPage() {
   };
 
   const handleRequestChanges = async (uid: string) => {
-    const feedback = prompt(
-      "Please describe what changes are needed (min 10 characters):"
-    );
+    const feedback = prompt("Please describe what changes are needed (min 10 characters):");
     if (feedback === null) return; // User cancelled
     if (feedback.length < 10) {
       toast.error("Feedback must be at least 10 characters");
@@ -98,7 +97,7 @@ export default function PendingMentorsPage() {
     try {
       const response = await fetch("/api/mentorship/admin/profiles", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
         body: JSON.stringify({ uid, status: "changes_requested", feedback }),
       });
 
@@ -123,9 +122,9 @@ export default function PendingMentorsPage() {
     setLoadingReviews(true);
 
     try {
-      const response = await fetch(
-        `/api/mentorship/admin/reviews?mentorId=${mentor.uid}`
-      );
+      const response = await fetch(`/api/mentorship/admin/reviews?mentorId=${mentor.uid}`, {
+        headers: getAdminAuthHeaders(),
+      });
       if (response.ok) {
         const data = await response.json();
         setReviews(data.reviews || []);
@@ -180,9 +179,7 @@ export default function PendingMentorsPage() {
           <div className="card-body text-center py-12">
             <div className="text-5xl mb-4">📭</div>
             <h3 className="text-xl font-semibold">No pending mentors</h3>
-            <p className="text-base-content/70">
-              All mentor registrations have been reviewed!
-            </p>
+            <p className="text-base-content/70">All mentor registrations have been reviewed!</p>
           </div>
         </div>
       ) : (
@@ -195,22 +192,14 @@ export default function PendingMentorsPage() {
                   <div className="flex items-start gap-4 flex-1">
                     <ProfileAvatar
                       photoURL={p.photoURL}
-                      displayName={getAnonymizedDisplayName(
-                        p.displayName,
-                        p.uid,
-                        isStreamerMode
-                      )}
+                      displayName={getAnonymizedDisplayName(p.displayName, p.uid, isStreamerMode)}
                       size="xl"
                       ring
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="text-lg font-bold">
-                          {getAnonymizedDisplayName(
-                            p.displayName,
-                            p.uid,
-                            isStreamerMode
-                          )}
+                          {getAnonymizedDisplayName(p.displayName, p.uid, isStreamerMode)}
                         </h3>
                         {getStatusBadge(p.status)}
                         <span className="badge badge-outline">
@@ -221,19 +210,14 @@ export default function PendingMentorsPage() {
                         {getAnonymizedEmail(p.email, p.uid, isStreamerMode)}
                       </p>
                       {p.currentRole && (
-                        <p className="text-sm text-base-content/70 mt-1">
-                          {p.currentRole}
-                        </p>
+                        <p className="text-sm text-base-content/70 mt-1">{p.currentRole}</p>
                       )}
 
                       {/* Expertise Tags */}
                       {p.expertise && p.expertise.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {p.expertise.map((skill) => (
-                            <span
-                              key={skill}
-                              className="badge badge-primary badge-sm"
-                            >
+                            <span key={skill} className="badge badge-primary badge-sm">
                               {skill}
                             </span>
                           ))}
@@ -322,19 +306,21 @@ export default function PendingMentorsPage() {
                         </button>
                       </>
                     )}
-                    {p.status !== "disabled" && p.status !== "pending" && p.status !== "changes_requested" && (
-                      <button
-                        className="btn btn-warning btn-sm"
-                        disabled={actionLoading === p.uid}
-                        onClick={() => handleStatusChange(p.uid, "disabled")}
-                      >
-                        {actionLoading === p.uid ? (
-                          <span className="loading loading-spinner loading-xs"></span>
-                        ) : (
-                          "🚫 Disable"
-                        )}
-                      </button>
-                    )}
+                    {p.status !== "disabled" &&
+                      p.status !== "pending" &&
+                      p.status !== "changes_requested" && (
+                        <button
+                          className="btn btn-warning btn-sm"
+                          disabled={actionLoading === p.uid}
+                          onClick={() => handleStatusChange(p.uid, "disabled")}
+                        >
+                          {actionLoading === p.uid ? (
+                            <span className="loading loading-spinner loading-xs"></span>
+                          ) : (
+                            "🚫 Disable"
+                          )}
+                        </button>
+                      )}
                     {p.status === "disabled" && (
                       <>
                         <button
@@ -370,9 +356,7 @@ export default function PendingMentorsPage() {
                 {/* Expandable Details */}
                 <div className="collapse collapse-arrow bg-base-200 mt-4">
                   <input type="checkbox" />
-                  <div className="collapse-title font-medium">
-                    View Full Profile Details
-                  </div>
+                  <div className="collapse-title font-medium">View Full Profile Details</div>
                   <div className="collapse-content">
                     <div className="grid md:grid-cols-2 gap-4 pt-2">
                       {/* Discord Username */}
@@ -380,15 +364,18 @@ export default function PendingMentorsPage() {
                         <h4 className="font-semibold text-sm mb-1">Discord Username</h4>
                         <div className="flex items-center gap-2">
                           <p className="text-sm text-base-content/70">
-                            {p.discordUsername
-                              ? getAnonymizedDiscord(p.discordUsername, p.uid, isStreamerMode)
-                              : <span className="italic">Not provided</span>}
+                            {p.discordUsername ? (
+                              getAnonymizedDiscord(p.discordUsername, p.uid, isStreamerMode)
+                            ) : (
+                              <span className="italic">Not provided</span>
+                            )}
                           </p>
-                          {p.discordUsername && (
-                            p.discordUsernameValidated
-                              ? <span className="badge badge-success badge-xs">Verified</span>
-                              : <span className="badge badge-warning badge-xs">Unverified</span>
-                          )}
+                          {p.discordUsername &&
+                            (p.discordUsernameValidated ? (
+                              <span className="badge badge-success badge-xs">Verified</span>
+                            ) : (
+                              <span className="badge badge-warning badge-xs">Unverified</span>
+                            ))}
                         </div>
                       </div>
 
@@ -419,9 +406,7 @@ export default function PendingMentorsPage() {
 
                       {/* Major Projects */}
                       <div className="md:col-span-2">
-                        <h4 className="font-semibold text-sm mb-1">
-                          Major Projects & Experience
-                        </h4>
+                        <h4 className="font-semibold text-sm mb-1">Major Projects & Experience</h4>
                         {p.majorProjects ? (
                           <p className="text-sm text-base-content/70 whitespace-pre-wrap">
                             {p.majorProjects}
@@ -433,9 +418,7 @@ export default function PendingMentorsPage() {
 
                       {/* CV Link */}
                       <div>
-                        <h4 className="font-semibold text-sm mb-1">
-                          CV / Resume
-                        </h4>
+                        <h4 className="font-semibold text-sm mb-1">CV / Resume</h4>
                         {p.cvUrl ? (
                           <a
                             href={p.cvUrl}
@@ -484,11 +467,13 @@ export default function PendingMentorsPage() {
                       <div>
                         <h4 className="font-semibold text-sm mb-1">Availability</h4>
                         <p className="text-sm text-base-content/70">
-                          {p.availability && Object.keys(p.availability).length > 0
-                            ? Object.keys(p.availability).map(day =>
-                                day.charAt(0).toUpperCase() + day.slice(1)
-                              ).join(", ")
-                            : <span className="italic">Not set</span>}
+                          {p.availability && Object.keys(p.availability).length > 0 ? (
+                            Object.keys(p.availability)
+                              .map((day) => day.charAt(0).toUpperCase() + day.slice(1))
+                              .join(", ")
+                          ) : (
+                            <span className="italic">Not set</span>
+                          )}
                         </p>
                       </div>
 
@@ -496,7 +481,13 @@ export default function PendingMentorsPage() {
                       <div>
                         <h4 className="font-semibold text-sm mb-1">Public Profile</h4>
                         <p className="text-sm text-base-content/70">
-                          {p.isPublic === undefined ? <span className="italic">Not set</span> : p.isPublic ? "Yes" : "No"}
+                          {p.isPublic === undefined ? (
+                            <span className="italic">Not set</span>
+                          ) : p.isPublic ? (
+                            "Yes"
+                          ) : (
+                            "No"
+                          )}
                         </p>
                       </div>
 
@@ -511,12 +502,8 @@ export default function PendingMentorsPage() {
                       {/* Career Goals (for mentees) */}
                       {p.careerGoals && (
                         <div className="md:col-span-2">
-                          <h4 className="font-semibold text-sm mb-1">
-                            Career Goals
-                          </h4>
-                          <p className="text-sm text-base-content/70">
-                            {p.careerGoals}
-                          </p>
+                          <h4 className="font-semibold text-sm mb-1">Career Goals</h4>
+                          <p className="text-sm text-base-content/70">{p.careerGoals}</p>
                         </div>
                       )}
 
@@ -524,9 +511,7 @@ export default function PendingMentorsPage() {
                       <div>
                         <h4 className="font-semibold text-sm mb-1">Registered</h4>
                         <p className="text-sm text-base-content/70">
-                          {p.createdAt
-                            ? new Date(p.createdAt).toLocaleDateString()
-                            : "N/A"}
+                          {p.createdAt ? new Date(p.createdAt).toLocaleDateString() : "N/A"}
                         </p>
                       </div>
                     </div>
@@ -588,9 +573,7 @@ export default function PendingMentorsPage() {
                     ))}
                   </div>
                   <span className="font-semibold">{reviewMentor.avgRating}</span>
-                  <span className="text-base-content/50">
-                    ({reviewMentor.ratingCount} reviews)
-                  </span>
+                  <span className="text-base-content/50">({reviewMentor.ratingCount} reviews)</span>
                 </div>
               </div>
             </div>
@@ -639,14 +622,11 @@ export default function PendingMentorsPage() {
                             </div>
                             <div className="text-xs text-base-content/50">
                               {review.createdAt
-                                ? new Date(review.createdAt).toLocaleDateString(
-                                    "en-US",
-                                    {
-                                      year: "numeric",
-                                      month: "short",
-                                      day: "numeric",
-                                    }
-                                  )
+                                ? new Date(review.createdAt).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  })
                                 : "N/A"}
                             </div>
                           </div>
@@ -657,9 +637,7 @@ export default function PendingMentorsPage() {
                               <svg
                                 key={star}
                                 className={`w-4 h-4 ${
-                                  star <= review.rating
-                                    ? "text-yellow-400"
-                                    : "text-base-content/20"
+                                  star <= review.rating ? "text-yellow-400" : "text-base-content/20"
                                 }`}
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
@@ -667,9 +645,7 @@ export default function PendingMentorsPage() {
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                               </svg>
                             ))}
-                            <span className="text-sm font-medium ml-1">
-                              {review.rating}/5
-                            </span>
+                            <span className="text-sm font-medium ml-1">{review.rating}/5</span>
                           </div>
 
                           {/* Feedback */}
