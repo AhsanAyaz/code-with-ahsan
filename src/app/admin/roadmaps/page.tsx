@@ -7,6 +7,7 @@ import { Roadmap } from "@/types/mentorship";
 import Link from "next/link";
 import { format } from "date-fns";
 import { useDebouncedCallback } from "use-debounce";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 
 const DOMAIN_LABELS: Record<string, string> = {
   "web-dev": "Web Dev",
@@ -353,22 +354,24 @@ export default function AdminRoadmapsPage() {
                           "Approve"
                         )}
                       </button>
-                      <button
+                      <AdminActionButton
+                        action="roadmaps.requestChanges"
                         className="btn btn-warning btn-sm"
                         onClick={() => handleRequestChanges(roadmap.id)}
                         disabled={actionLoading === roadmap.id}
                       >
                         Request Changes
-                      </button>
+                      </AdminActionButton>
                     </>
                   )}
-                  <button
+                  <AdminActionButton
+                    action="roadmaps.delete"
                     className="btn btn-error btn-sm"
                     onClick={() => handleDelete(roadmap.id, roadmap.title)}
                     disabled={actionLoading === roadmap.id}
                   >
                     Delete
-                  </button>
+                  </AdminActionButton>
                 </div>
               </div>
             </div>

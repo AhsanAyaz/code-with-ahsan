@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 
 export function AlumniTransitionButton({
   uid,
@@ -93,8 +94,12 @@ export function AlumniTransitionButton({
   }
 
   return (
-    <button type="button" className="btn btn-outline btn-sm" onClick={() => setConfirming(true)}>
+    <AdminActionButton
+      action="ambassador.member.alumni"
+      className="btn btn-outline btn-sm"
+      onClick={() => setConfirming(true)}
+    >
       Mark as Alumni
-    </button>
+    </AdminActionButton>
   );
 }

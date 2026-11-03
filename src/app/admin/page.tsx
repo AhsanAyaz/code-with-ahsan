@@ -1,6 +1,7 @@
 "use client";
 
 import { adminFetch } from "@/lib/adminAccess/client";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { AdminStats, Alert } from "@/types/admin";
@@ -152,7 +153,8 @@ export default function AdminOverviewPage() {
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
         {/* Delete Archived Channels — danger action */}
-        <button
+        <AdminActionButton
+          action="mentorship.session.deleteArchivedChannels"
           id="admin-delete-archived-channels-btn"
           onClick={handleOpenDeleteModal}
           className="btn btn-error btn-outline btn-sm gap-2"
@@ -174,7 +176,7 @@ export default function AdminOverviewPage() {
             />
           </svg>
           Delete All Archived Channels
-        </button>
+        </AdminActionButton>
       </div>
 
       {/* ── Alerts Section ────────────────────────────────────────────────────── */}

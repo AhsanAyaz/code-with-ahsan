@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Challenge } from "@/types/challenges";
 import { useToast } from "@/contexts/ToastContext";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 
 /**
  * Admin Dashboard - Challenges List.
@@ -149,12 +150,13 @@ export default function AdminChallengesPage() {
                       >
                         Edit
                       </Link>
-                      <button
+                      <AdminActionButton
+                        action="challenges.delete"
                         onClick={() => handleDelete(challenge.id, challenge.title)}
                         className="btn btn-sm btn-outline btn-error"
                       >
                         Delete
-                      </button>
+                      </AdminActionButton>
                     </div>
                   </td>
                 </tr>

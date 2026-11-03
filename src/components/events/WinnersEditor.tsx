@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ButtonHTMLAttributes } from "react";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 import { useToast } from "@/contexts/ToastContext";
 import type { WinnerPlacement } from "@/types/events";
 import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
@@ -41,6 +42,14 @@ interface WinnersEditorProps {
   onLoadedAtChange?: (loadedAt: string | null) => void;
 }
 
+function PlainButton(props: ButtonHTMLAttributes<HTMLButtonElement>) {
+  return <button type="button" {...props} />;
+}
+
+function AdminClearButton(props: ButtonHTMLAttributes<HTMLButtonElement>) {
+  return <AdminActionButton action="events.winners.delete" {...props} />;
+}
+
 export default function WinnersEditor({
   eventId,
   teams,
@@ -48,6 +57,9 @@ export default function WinnersEditor({
   onLoadedAtChange,
 }: WinnersEditorProps) {
   const { success, error } = useToast();
+  // The host deck has no admin portal role context and its route authorizes
+  // clearing itself. In the admin portal, clearing winners is admin-only.
+  const ClearButton = hostTokenKey ? PlainButton : AdminClearButton;
 
   const [formData, setFormData] = useState<WinnersFormData>({
     first: emptyPlacement(),
@@ -219,7 +231,7 @@ export default function WinnersEditor({
       </div>
 
       <div className="flex justify-between items-center">
-        <button
+        <ClearButton
           className="btn btn-error btn-outline btn-sm"
           onClick={handleClear}
           disabled={clearing || saving || !loadedAt}
@@ -232,7 +244,7 @@ export default function WinnersEditor({
           ) : (
             "Clear Winners"
           )}
-        </button>
+        </ClearButton>
         <button
           className="btn btn-primary"
           onClick={handleSave}

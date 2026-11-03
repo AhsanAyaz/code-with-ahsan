@@ -11,6 +11,7 @@ import {
   getAnonymizedDiscord,
 } from "@/utils/streamer-mode";
 import ProfileAvatar from "@/components/ProfileAvatar";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 import { hasRole } from "@/lib/permissions";
 
 export default function PendingMentorsPage() {
@@ -287,7 +288,8 @@ export default function PendingMentorsPage() {
                             "Request Changes"
                           )}
                         </button>
-                        <button
+                        <AdminActionButton
+                          action="mentorship.profile.decline"
                           className="btn btn-error btn-sm"
                           disabled={actionLoading === p.uid}
                           onClick={() => handleStatusChange(p.uid, "declined")}
@@ -297,13 +299,14 @@ export default function PendingMentorsPage() {
                           ) : (
                             "✗ Decline"
                           )}
-                        </button>
+                        </AdminActionButton>
                       </>
                     )}
                     {p.status !== "disabled" &&
                       p.status !== "pending" &&
                       p.status !== "changes_requested" && (
-                        <button
+                        <AdminActionButton
+                          action="mentorship.profile.disable"
                           className="btn btn-warning btn-sm"
                           disabled={actionLoading === p.uid}
                           onClick={() => handleStatusChange(p.uid, "disabled")}
@@ -313,7 +316,7 @@ export default function PendingMentorsPage() {
                           ) : (
                             "🚫 Disable"
                           )}
-                        </button>
+                        </AdminActionButton>
                       )}
                     {p.status === "disabled" && (
                       <>

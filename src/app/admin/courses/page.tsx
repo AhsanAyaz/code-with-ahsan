@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { adminFetch } from "@/lib/adminAccess/client";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 
 interface CoursePost {
   title: string;
@@ -464,12 +465,13 @@ export default function AdminCoursesPage() {
                         />
                       </td>
                       <td>
-                        <button
+                        <AdminActionButton
+                          action="courses.delete"
                           className="btn btn-error btn-sm"
                           onClick={() => handleDelete(course)}
                         >
                           Delete
-                        </button>
+                        </AdminActionButton>
                       </td>
                     </tr>
                   ))}
