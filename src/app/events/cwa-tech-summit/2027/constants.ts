@@ -312,7 +312,32 @@ export const PAST_EVENTS: PastEvent[] = [
     // HACKATHON_TEAMS in events/cwa-promptathon/2026/constants.ts lists 10 teams.
     stat: "10 teams",
     url: "/events/cwa-promptathon/2026",
-    photos: [],
+    photos: [
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.promptathon}/promptathon-01.webp`,
+        alt: "Livestream of the kickoff showing the three hackathon themes: AI Brand Architect, AI Community Board and Personal AI Trainer",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.promptathon}/promptathon-02.webp`,
+        alt: "Kickoff livestream revealing the ten competing teams in a team roll call",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.promptathon}/promptathon-03.webp`,
+        alt: "Kickoff livestream introducing the four judges with their photos and roles",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.promptathon}/promptathon-04.webp`,
+        alt: "Kickoff livestream revealing the twist, The Human in the Loop, with an example for each theme",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.promptathon}/promptathon-05.webp`,
+        alt: "A Let's Hack slide with a countdown to the submission deadline, as building begins",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.promptathon}/promptathon-06.webp`,
+        alt: "Results livestream announcing the winners: Axiom first, Aether second and Quasar third",
+      },
+    ],
   },
 ];
 
