@@ -166,29 +166,20 @@ service cloud.firestore {
       }
     }
 
-    // ─── Challenges ──────────────────────────────
+    // ─── Challenges, Submissions, Leaderboard ────
+    // Admin SDK only, served through the /api/challenges routes. No client
+    // reads or writes, admin-claim clients included. Submissions hold
+    // personal data (name, LinkedIn, repo), so they are never public.
     match /challenges/{challengeId} {
-      // Anyone can read challenges
-      allow read: if true;
-      // Only admins can create, update, delete
-      allow write: if isAdmin();
+      allow read, write: if false;
     }
 
-    // ─── Submissions ─────────────────────────────
     match /submissions/{submissionId} {
-      // Anyone can read submissions
-      allow read: if true;
-      // Client-side submissions creation is disabled. All submissions
-      // must go through the /api/challenges/[id]/submissions route (Admin SDK).
-      allow write: if isAdmin();
+      allow read, write: if false;
     }
 
-    // ─── Leaderboard ─────────────────────────────
     match /leaderboard/{userId} {
-      // Anyone can read leaderboard
-      allow read: if true;
-      // Only admins or backend can write (backend bypasses rules)
-      allow write: if isAdmin();
+      allow read, write: if false;
     }
 
     // ─── Existing collections (passthrough) ─────
