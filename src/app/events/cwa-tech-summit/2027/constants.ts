@@ -78,6 +78,7 @@ export const SECTION_IDS = {
   pastEvents: "past-events",
   sponsors: "sponsors",
   sponsorshipTiers: "sponsorship-tiers",
+  communityManager: "community-manager",
   inKind: "in-kind",
   organizers: "organisers",
   venue: "venue",
