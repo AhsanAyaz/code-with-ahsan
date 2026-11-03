@@ -1,6 +1,6 @@
 "use client";
 
-import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
+import { adminFetch, adminErrorMessage, useAdminAccess } from "@/lib/adminAccess/client";
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import AdminActionButton from "@/components/admin/AdminActionButton";
@@ -61,6 +61,8 @@ interface Metrics {
 
 export default function AdminConsultingPage() {
   const { success, error } = useToast();
+  const { can } = useAdminAccess();
+  const canEditSettings = can("consulting.settings.update");
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -461,357 +463,373 @@ export default function AdminConsultingPage() {
         </button>
       </div>
 
-      {/* TAB 1: WEEKLY SCHEDULE */}
-      {activeTab === "schedule" && (
-        <div className="space-y-6">
-          <div className="alert alert-info shadow-sm">
-            <span>
-              <strong>Note:</strong> Times are configured in your admin timezone (
-              <code>{settings.adminTimezone}</code>). When clients visit your page, the site
-              automatically subtracts your busy Google Calendar events in real-time.
-            </span>
+      {/* Settings tabs (schedule, packages, rules) are read-only for moderators */}
+      {!canEditSettings &&
+        (activeTab === "schedule" || activeTab === "packages" || activeTab === "rules") && (
+          <div role="note" className="alert alert-info alert-soft text-sm">
+            Only admins can change these settings.
           </div>
+        )}
+      <fieldset disabled={!canEditSettings} className="min-w-0 space-y-8">
+        {/* TAB 1: WEEKLY SCHEDULE */}
+        {activeTab === "schedule" && (
+          <div className="space-y-6">
+            <div className="alert alert-info shadow-sm">
+              <span>
+                <strong>Note:</strong> Times are configured in your admin timezone (
+                <code>{settings.adminTimezone}</code>). When clients visit your page, the site
+                automatically subtracts your busy Google Calendar events in real-time.
+              </span>
+            </div>
 
-          <div className="grid grid-cols-1 gap-4">
-            {DAYS_OF_WEEK.map(({ dayNum, name }) => {
-              const daySlots = settings.weeklyAvailability[dayNum] || [];
-              const isEnabled = daySlots.length > 0;
+            <div className="grid grid-cols-1 gap-4">
+              {DAYS_OF_WEEK.map(({ dayNum, name }) => {
+                const daySlots = settings.weeklyAvailability[dayNum] || [];
+                const isEnabled = daySlots.length > 0;
 
-              return (
-                <div
-                  key={dayNum}
-                  className={`card bg-base-100 border transition-all ${
-                    isEnabled ? "border-primary/40 shadow-sm" : "border-base-300 opacity-60"
-                  }`}
-                >
-                  <div className="card-body p-4 sm:p-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-4">
-                        <input
-                          type="checkbox"
-                          checked={isEnabled}
-                          onChange={(e) => handleToggleDay(dayNum, e.target.checked)}
-                          className="toggle toggle-primary toggle-sm sm:toggle-md"
-                        />
-                        <div>
-                          <h3 className="font-bold text-base sm:text-lg">{name}</h3>
-                          <p className="text-xs text-base-content/60">
-                            {isEnabled
-                              ? `${daySlots.length} active time window${daySlots.length > 1 ? "s" : ""}`
-                              : "Closed / Unavailable"}
-                          </p>
+                return (
+                  <div
+                    key={dayNum}
+                    className={`card bg-base-100 border transition-all ${
+                      isEnabled ? "border-primary/40 shadow-sm" : "border-base-300 opacity-60"
+                    }`}
+                  >
+                    <div className="card-body p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <input
+                            type="checkbox"
+                            checked={isEnabled}
+                            onChange={(e) => handleToggleDay(dayNum, e.target.checked)}
+                            className="toggle toggle-primary toggle-sm sm:toggle-md"
+                          />
+                          <div>
+                            <h3 className="font-bold text-base sm:text-lg">{name}</h3>
+                            <p className="text-xs text-base-content/60">
+                              {isEnabled
+                                ? `${daySlots.length} active time window${daySlots.length > 1 ? "s" : ""}`
+                                : "Closed / Unavailable"}
+                            </p>
+                          </div>
                         </div>
+
+                        {isEnabled && (
+                          <button
+                            type="button"
+                            onClick={() => handleAddTimeWindow(dayNum)}
+                            className="btn btn-ghost btn-xs sm:btn-sm gap-1 text-primary self-start sm:self-auto"
+                          >
+                            <Plus className="w-3.5 h-3.5" /> Add Window
+                          </button>
+                        )}
                       </div>
 
+                      {/* Time Windows List */}
                       {isEnabled && (
+                        <div className="mt-4 pt-4 border-t border-base-200 space-y-3">
+                          {daySlots.map((slot, index) => (
+                            <div
+                              key={index}
+                              className="flex flex-wrap items-center gap-3 bg-base-200/50 p-3 rounded-lg"
+                            >
+                              <span className="text-xs font-semibold text-base-content/60 w-16">
+                                Window {index + 1}:
+                              </span>
+
+                              <div className="flex items-center gap-2">
+                                <label className="text-xs text-base-content/70">Start:</label>
+                                <input
+                                  type="time"
+                                  value={slot.start}
+                                  onChange={(e) =>
+                                    handleTimeChange(dayNum, index, "start", e.target.value)
+                                  }
+                                  className="input input-bordered input-sm font-mono w-28"
+                                />
+                              </div>
+
+                              <span className="text-base-content/40">to</span>
+
+                              <div className="flex items-center gap-2">
+                                <label className="text-xs text-base-content/70">End:</label>
+                                <input
+                                  type="time"
+                                  value={slot.end}
+                                  onChange={(e) =>
+                                    handleTimeChange(dayNum, index, "end", e.target.value)
+                                  }
+                                  className="input input-bordered input-sm font-mono w-28"
+                                />
+                              </div>
+
+                              {daySlots.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveTimeWindow(dayNum, index)}
+                                  className="btn btn-ghost btn-xs text-error ml-auto"
+                                  title="Remove time window"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 2: PACKAGES & PRICING */}
+        {activeTab === "packages" && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-lg font-bold">Consulting Tiers & Pricing</h2>
+                <p className="text-xs text-base-content/60">
+                  Manage the packages displayed on <code>/consulting</code> and the Stripe checkout
+                  amounts.
+                </p>
+              </div>
+              <button
+                onClick={handleAddPackage}
+                className="btn btn-sm btn-outline btn-primary gap-1"
+              >
+                <Plus className="w-4 h-4" /> Add Package
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6">
+              {settings.packages.map((pkg, index) => (
+                <div
+                  key={pkg.id || index}
+                  className="card bg-base-100 border border-base-300 shadow-sm"
+                >
+                  <div className="card-body p-6 space-y-4">
+                    <div className="flex justify-between items-start">
+                      <span className="badge badge-primary badge-outline font-mono text-xs">
+                        ID: {pkg.id}
+                      </span>
+                      {settings.packages.length > 1 && (
                         <button
-                          type="button"
-                          onClick={() => handleAddTimeWindow(dayNum)}
-                          className="btn btn-ghost btn-xs sm:btn-sm gap-1 text-primary self-start sm:self-auto"
+                          onClick={() => handleDeletePackage(index)}
+                          className="btn btn-ghost btn-xs text-error"
                         >
-                          <Plus className="w-3.5 h-3.5" /> Add Window
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       )}
                     </div>
 
-                    {/* Time Windows List */}
-                    {isEnabled && (
-                      <div className="mt-4 pt-4 border-t border-base-200 space-y-3">
-                        {daySlots.map((slot, index) => (
-                          <div
-                            key={index}
-                            className="flex flex-wrap items-center gap-3 bg-base-200/50 p-3 rounded-lg"
-                          >
-                            <span className="text-xs font-semibold text-base-content/60 w-16">
-                              Window {index + 1}:
-                            </span>
-
-                            <div className="flex items-center gap-2">
-                              <label className="text-xs text-base-content/70">Start:</label>
-                              <input
-                                type="time"
-                                value={slot.start}
-                                onChange={(e) =>
-                                  handleTimeChange(dayNum, index, "start", e.target.value)
-                                }
-                                className="input input-bordered input-sm font-mono w-28"
-                              />
-                            </div>
-
-                            <span className="text-base-content/40">to</span>
-
-                            <div className="flex items-center gap-2">
-                              <label className="text-xs text-base-content/70">End:</label>
-                              <input
-                                type="time"
-                                value={slot.end}
-                                onChange={(e) =>
-                                  handleTimeChange(dayNum, index, "end", e.target.value)
-                                }
-                                className="input input-bordered input-sm font-mono w-28"
-                              />
-                            </div>
-
-                            {daySlots.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveTimeWindow(dayNum, index)}
-                                className="btn btn-ghost btn-xs text-error ml-auto"
-                                title="Remove time window"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            )}
-                          </div>
-                        ))}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="form-control sm:col-span-2">
+                        <label className="label">
+                          <span className="label-text font-semibold text-xs">Package Title</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={pkg.name}
+                          onChange={(e) => handlePackageChange(index, "name", e.target.value)}
+                          className="input input-bordered input-sm w-full"
+                          placeholder="e.g. 1:1 Mentorship & Career Advisory"
+                        />
                       </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
-      {/* TAB 2: PACKAGES & PRICING */}
-      {activeTab === "packages" && (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-lg font-bold">Consulting Tiers & Pricing</h2>
-              <p className="text-xs text-base-content/60">
-                Manage the packages displayed on <code>/consulting</code> and the Stripe checkout
-                amounts.
-              </p>
-            </div>
-            <button onClick={handleAddPackage} className="btn btn-sm btn-outline btn-primary gap-1">
-              <Plus className="w-4 h-4" /> Add Package
-            </button>
-          </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="form-control">
+                          <label className="label">
+                            <span className="label-text font-semibold text-xs">Price ($ USD)</span>
+                          </label>
+                          <input
+                            type="number"
+                            value={pkg.priceInCents / 100}
+                            onChange={(e) =>
+                              handlePackageChange(
+                                index,
+                                "priceInCents",
+                                Math.round(Number(e.target.value) * 100)
+                              )
+                            }
+                            className="input input-bordered input-sm font-mono w-full"
+                            min="1"
+                          />
+                        </div>
 
-          <div className="grid grid-cols-1 gap-6">
-            {settings.packages.map((pkg, index) => (
-              <div
-                key={pkg.id || index}
-                className="card bg-base-100 border border-base-300 shadow-sm"
-              >
-                <div className="card-body p-6 space-y-4">
-                  <div className="flex justify-between items-start">
-                    <span className="badge badge-primary badge-outline font-mono text-xs">
-                      ID: {pkg.id}
-                    </span>
-                    {settings.packages.length > 1 && (
-                      <button
-                        onClick={() => handleDeletePackage(index)}
-                        className="btn btn-ghost btn-xs text-error"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
+                        <div className="form-control">
+                          <label className="label">
+                            <span className="label-text font-semibold text-xs">
+                              Duration (Mins)
+                            </span>
+                          </label>
+                          <input
+                            type="number"
+                            value={pkg.durationMinutes}
+                            onChange={(e) =>
+                              handlePackageChange(index, "durationMinutes", Number(e.target.value))
+                            }
+                            className="input input-bordered input-sm font-mono w-full"
+                            min="15"
+                            step="15"
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="form-control sm:col-span-2">
+                    <div className="form-control">
                       <label className="label">
-                        <span className="label-text font-semibold text-xs">Package Title</span>
+                        <span className="label-text font-semibold text-xs">Description</span>
                       </label>
-                      <input
-                        type="text"
-                        value={pkg.name}
-                        onChange={(e) => handlePackageChange(index, "name", e.target.value)}
-                        className="input input-bordered input-sm w-full"
-                        placeholder="e.g. 1:1 Mentorship & Career Advisory"
+                      <textarea
+                        value={pkg.description}
+                        onChange={(e) => handlePackageChange(index, "description", e.target.value)}
+                        rows={2}
+                        className="textarea textarea-bordered text-sm w-full"
+                        placeholder="What is covered in this session..."
                       />
                     </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="form-control">
-                        <label className="label">
-                          <span className="label-text font-semibold text-xs">Price ($ USD)</span>
-                        </label>
-                        <input
-                          type="number"
-                          value={pkg.priceInCents / 100}
-                          onChange={(e) =>
-                            handlePackageChange(
-                              index,
-                              "priceInCents",
-                              Math.round(Number(e.target.value) * 100)
-                            )
-                          }
-                          className="input input-bordered input-sm font-mono w-full"
-                          min="1"
-                        />
-                      </div>
-
-                      <div className="form-control">
-                        <label className="label">
-                          <span className="label-text font-semibold text-xs">Duration (Mins)</span>
-                        </label>
-                        <input
-                          type="number"
-                          value={pkg.durationMinutes}
-                          onChange={(e) =>
-                            handlePackageChange(index, "durationMinutes", Number(e.target.value))
-                          }
-                          className="input input-bordered input-sm font-mono w-full"
-                          min="15"
-                          step="15"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold text-xs">Description</span>
-                    </label>
-                    <textarea
-                      value={pkg.description}
-                      onChange={(e) => handlePackageChange(index, "description", e.target.value)}
-                      rows={2}
-                      className="textarea textarea-bordered text-sm w-full"
-                      placeholder="What is covered in this session..."
-                    />
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* TAB 3: BOOKING RULES */}
-      {activeTab === "rules" && (
-        <div className="card bg-base-100 border border-base-300 shadow-sm">
-          <div className="card-body p-6 space-y-6">
-            <h2 className="text-lg font-bold">Booking Policies & Engine Rules</h2>
+        {/* TAB 3: BOOKING RULES */}
+        {activeTab === "rules" && (
+          <div className="card bg-base-100 border border-base-300 shadow-sm">
+            <div className="card-body p-6 space-y-6">
+              <h2 className="text-lg font-bold">Booking Policies & Engine Rules</h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold text-xs">Admin Timezone (IANA)</span>
-                </label>
-                <input
-                  type="text"
-                  value={settings.adminTimezone}
-                  onChange={(e) => setSettings({ ...settings, adminTimezone: e.target.value })}
-                  className="input input-bordered input-sm font-mono"
-                  placeholder="Europe/Stockholm"
-                />
-                <label className="label">
-                  <span className="label-text-alt text-base-content/60">
-                    Weekly schedule start/end hours are interpreted in this timezone.
-                  </span>
-                </label>
-              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold text-xs">Admin Timezone (IANA)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.adminTimezone}
+                    onChange={(e) => setSettings({ ...settings, adminTimezone: e.target.value })}
+                    className="input input-bordered input-sm font-mono"
+                    placeholder="Europe/Stockholm"
+                  />
+                  <label className="label">
+                    <span className="label-text-alt text-base-content/60">
+                      Weekly schedule start/end hours are interpreted in this timezone.
+                    </span>
+                  </label>
+                </div>
 
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold text-xs">Admin Notification Email</span>
-                </label>
-                <input
-                  type="email"
-                  value={settings.adminEmail}
-                  onChange={(e) => setSettings({ ...settings, adminEmail: e.target.value })}
-                  className="input input-bordered input-sm"
-                  placeholder="ahsan.ubitian@gmail.com"
-                />
-              </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold text-xs">
+                      Admin Notification Email
+                    </span>
+                  </label>
+                  <input
+                    type="email"
+                    value={settings.adminEmail}
+                    onChange={(e) => setSettings({ ...settings, adminEmail: e.target.value })}
+                    className="input input-bordered input-sm"
+                    placeholder="ahsan.ubitian@gmail.com"
+                  />
+                </div>
 
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold text-xs">
-                    Minimum Advance Notice (Hours)
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  value={settings.minBookingNoticeHours}
-                  onChange={(e) =>
-                    setSettings({ ...settings, minBookingNoticeHours: Number(e.target.value) })
-                  }
-                  className="input input-bordered input-sm font-mono"
-                  min="0"
-                />
-                <label className="label">
-                  <span className="label-text-alt text-base-content/60">
-                    Clients cannot book slots starting sooner than this.
-                  </span>
-                </label>
-              </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold text-xs">
+                      Minimum Advance Notice (Hours)
+                    </span>
+                  </label>
+                  <input
+                    type="number"
+                    value={settings.minBookingNoticeHours}
+                    onChange={(e) =>
+                      setSettings({ ...settings, minBookingNoticeHours: Number(e.target.value) })
+                    }
+                    className="input input-bordered input-sm font-mono"
+                    min="0"
+                  />
+                  <label className="label">
+                    <span className="label-text-alt text-base-content/60">
+                      Clients cannot book slots starting sooner than this.
+                    </span>
+                  </label>
+                </div>
 
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold text-xs">
-                    Buffer Between Sessions (Minutes)
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  value={settings.bufferBetweenSessionsMinutes}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      bufferBetweenSessionsMinutes: Number(e.target.value),
-                    })
-                  }
-                  className="input input-bordered input-sm font-mono"
-                  min="0"
-                />
-                <label className="label">
-                  <span className="label-text-alt text-base-content/60">
-                    Gap required before & after each confirmed session.
-                  </span>
-                </label>
-              </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold text-xs">
+                      Buffer Between Sessions (Minutes)
+                    </span>
+                  </label>
+                  <input
+                    type="number"
+                    value={settings.bufferBetweenSessionsMinutes}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        bufferBetweenSessionsMinutes: Number(e.target.value),
+                      })
+                    }
+                    className="input input-bordered input-sm font-mono"
+                    min="0"
+                  />
+                  <label className="label">
+                    <span className="label-text-alt text-base-content/60">
+                      Gap required before & after each confirmed session.
+                    </span>
+                  </label>
+                </div>
 
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold text-xs">
-                    Max Advance Booking (Days)
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  value={settings.maxBookingDaysInAdvance}
-                  onChange={(e) =>
-                    setSettings({ ...settings, maxBookingDaysInAdvance: Number(e.target.value) })
-                  }
-                  className="input input-bordered input-sm font-mono"
-                  min="1"
-                />
-              </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold text-xs">
+                      Max Advance Booking (Days)
+                    </span>
+                  </label>
+                  <input
+                    type="number"
+                    value={settings.maxBookingDaysInAdvance}
+                    onChange={(e) =>
+                      setSettings({ ...settings, maxBookingDaysInAdvance: Number(e.target.value) })
+                    }
+                    className="input input-bordered input-sm font-mono"
+                    min="1"
+                  />
+                </div>
 
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold text-xs">
-                    Slot Hold Window on Checkout (Minutes)
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  value={settings.slotLockExpirationMinutes}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      slotLockExpirationMinutes: Number(e.target.value),
-                    })
-                  }
-                  className="input input-bordered input-sm font-mono"
-                  min="5"
-                />
-                <label className="label">
-                  <span className="label-text-alt text-base-content/60">
-                    Holds the slot while the client is on the Stripe checkout page.
-                  </span>
-                </label>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold text-xs">
+                      Slot Hold Window on Checkout (Minutes)
+                    </span>
+                  </label>
+                  <input
+                    type="number"
+                    value={settings.slotLockExpirationMinutes}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        slotLockExpirationMinutes: Number(e.target.value),
+                      })
+                    }
+                    className="input input-bordered input-sm font-mono"
+                    min="5"
+                  />
+                  <label className="label">
+                    <span className="label-text-alt text-base-content/60">
+                      Holds the slot while the client is on the Stripe checkout page.
+                    </span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </fieldset>
 
       {/* TAB 4: RECENT BOOKINGS */}
       {activeTab === "bookings" && (
