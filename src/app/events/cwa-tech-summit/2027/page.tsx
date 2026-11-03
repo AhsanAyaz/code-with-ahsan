@@ -1,6 +1,7 @@
 import AboutSection from "./components/AboutSection";
 import AgendaSection from "./components/AgendaSection";
 import AnimatedBackground from "./components/AnimatedBackground";
+import CommunityManagerSection from "./components/CommunityManagerSection";
 import CommunityNumbersSection from "./components/CommunityNumbersSection";
 import ContactSection from "./components/ContactSection";
 import HeroSection from "./components/HeroSection";
@@ -36,6 +37,7 @@ const CwaTechSummit2027Page = () => {
         <JudgesSection />
         <SponsorsSection />
         <SponsorshipTiersSection />
+        <CommunityManagerSection />
         <InKindSection />
         <OrganizersSection />
         <VenueSection />
