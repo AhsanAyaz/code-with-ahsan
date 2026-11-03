@@ -71,8 +71,7 @@ export default function HostWinnersPage() {
             <WinnersEditor
               eventId={EVENT.eventId}
               teams={HACKATHON_TEAMS}
-              tokenHeader="x-host-token"
-              tokenKey={HOST_TOKEN_KEY}
+              hostTokenKey={HOST_TOKEN_KEY}
             />
           </div>
         </div>

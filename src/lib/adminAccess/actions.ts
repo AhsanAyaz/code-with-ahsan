@@ -61,6 +61,7 @@ export const ADMIN_ACTIONS = {
   // ─── Roadmaps (roadmaps GET ?admin=true, roadmaps/[id]) ───────────────
   "roadmaps.read": "moderator", // roadmaps GET admin listing
   "roadmaps.approve": "moderator", // PUT action=approve / approve-draft
+  "roadmaps.edit": "moderator", // PUT action=edit on a roadmap the staff member did not create
   "roadmaps.requestChanges": "admin", // PUT action=request-changes (marks draft rejected)
   "roadmaps.delete": "admin", // DELETE
 

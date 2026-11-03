@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
+import type { AdminAction } from "@/lib/adminAccess/actions";
 import {
   deleteDiscordChannel,
   getChannel,
@@ -10,34 +12,38 @@ import {
 } from "@/lib/discord";
 import { Project } from "next/dist/build/swc/types";
 
+const PROJECT_ACTIONS: Record<string, AdminAction> = {
+  approve: "projects.approve",
+  decline: "projects.decline",
+  approve_update: "projects.approveUpdate",
+  decline_update: "projects.declineUpdate",
+  reactivate: "projects.reactivate",
+};
+
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    // Phase 1: Authentication
-    const token = request.headers.get("x-admin-token");
-
-    if (!token) {
-      return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
+    // Phase 1: Authorization (per operation: approve is moderator, decline is admin)
+    let body: { action?: unknown; declineReason?: unknown };
+    try {
+      body = await request.json();
+    } catch {
+      body = {};
     }
-
-    // Verify admin session
-    const sessionDoc = await db.collection("admin_sessions").doc(token).get();
-
-    if (!sessionDoc.exists) {
-      return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
+    const projectAction =
+      typeof body.action === "string" && Object.hasOwn(PROJECT_ACTIONS, body.action)
+        ? PROJECT_ACTIONS[body.action]
+        : undefined;
+    if (!projectAction) {
+      const access = await requireAdminAccess(request, "projects.read");
+      if (!access.ok) return access.response;
+      return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
+    const access = await requireAdminAccess(request, projectAction);
+    if (!access.ok) return access.response;
+    const actor = access.actor;
 
-    const session = sessionDoc.data()!;
-    const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
-
-    if (expiresAt < new Date()) {
-      // Session expired, delete it
-      await db.collection("admin_sessions").doc(token).delete();
-      return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
-    }
-
-    // Parse request body
-    const body = await request.json();
-    const { action, declineReason } = body;
+    const action = body.action as string;
+    const declineReason = body.declineReason as string | undefined;
 
     // Fetch project doc
     const { id: projectId } = await params;
@@ -64,7 +70,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       await projectRef.update({
         status: "active",
         approvedAt: FieldValue.serverTimestamp(),
-        approvedBy: "admin",
+        approvedBy: actor.uid,
         updatedAt: FieldValue.serverTimestamp(),
         lastActivityAt: FieldValue.serverTimestamp(),
       });
@@ -112,6 +118,19 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         // Continue - project is still approved even if Discord fails
       }
 
+      await logAdminAction(
+        actor,
+        "projects.approve",
+        {
+          type: "project",
+          id: projectId,
+          ...(projectData.title ? { label: projectData.title } : {}),
+        },
+        {
+          ...(discordChannelId ? { discordChannelId } : {}),
+        }
+      );
+
       return NextResponse.json(
         {
           success: true,
@@ -146,7 +165,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       await projectRef.update({
         status: "declined",
         declinedAt: FieldValue.serverTimestamp(),
-        declinedBy: "admin",
+        declinedBy: actor.uid,
         declineReason,
         updatedAt: FieldValue.serverTimestamp(),
       });
@@ -177,6 +196,17 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         }
       }
 
+      await logAdminAction(
+        actor,
+        "projects.decline",
+        {
+          type: "project",
+          id: projectId,
+          ...(projectData.title ? { label: projectData.title } : {}),
+        },
+        { reason: declineReason }
+      );
+
       return NextResponse.json({ success: true, message: "Project declined" }, { status: 200 });
     } else if (action === "approve_update") {
       // Approve pending updates
@@ -202,7 +232,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         status: "active",
         pendingUpdates: FieldValue.delete(),
         updateApprovedAt: FieldValue.serverTimestamp(),
-        updateApprovedBy: session.adminId || "admin",
+        updateApprovedBy: actor.uid,
         updatedAt: FieldValue.serverTimestamp(),
         lastActivityAt: FieldValue.serverTimestamp(),
       };
@@ -234,6 +264,19 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         }
       }
 
+      await logAdminAction(
+        actor,
+        "projects.approveUpdate",
+        {
+          type: "project",
+          id: projectId,
+          ...(projectData.title ? { label: projectData.title } : {}),
+        },
+        {
+          fields: Object.keys(safeUpdates),
+        }
+      );
+
       return NextResponse.json(
         { success: true, message: "Project updates approved and applied" },
         { status: 200 }
@@ -249,7 +292,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         status: "active",
         pendingUpdates: FieldValue.delete(),
         updateDeclinedAt: FieldValue.serverTimestamp(),
-        updateDeclinedBy: session.adminId || "admin",
+        updateDeclinedBy: actor.uid,
         updateDeclineReason: declineReason || null,
         updatedAt: FieldValue.serverTimestamp(),
         lastActivityAt: FieldValue.serverTimestamp(),
@@ -278,6 +321,19 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         }
       }
 
+      await logAdminAction(
+        actor,
+        "projects.declineUpdate",
+        {
+          type: "project",
+          id: projectId,
+          ...(projectData.title ? { label: projectData.title } : {}),
+        },
+        {
+          ...(declineReason ? { reason: declineReason } : {}),
+        }
+      );
+
       return NextResponse.json(
         { success: true, message: "Project updates declined" },
         { status: 200 }
@@ -296,9 +352,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         status: "active",
         completedAt: FieldValue.delete(),
         reactivatedAt: FieldValue.serverTimestamp(),
-        reactivatedBy: session.adminId || "admin",
+        reactivatedBy: actor.uid,
         updatedAt: FieldValue.serverTimestamp(),
         lastActivityAt: FieldValue.serverTimestamp(),
+      });
+
+      await logAdminAction(actor, "projects.reactivate", {
+        type: "project",
+        id: projectId,
+        ...(projectData.title ? { label: projectData.title } : {}),
       });
 
       return NextResponse.json({ success: true, message: "Project reactivated" }, { status: 200 });
@@ -316,28 +378,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Phase 1: Authentication and Validation
-    const token = request.headers.get("x-admin-token");
-
-    if (!token) {
-      return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
-    }
-
-    // Verify admin session
-    const sessionDoc = await db.collection("admin_sessions").doc(token).get();
-
-    if (!sessionDoc.exists) {
-      return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
-    }
-
-    const session = sessionDoc.data();
-    const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
-
-    if (expiresAt < new Date()) {
-      // Session expired, delete it
-      await db.collection("admin_sessions").doc(token).delete();
-      return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
-    }
+    // Phase 1: Authorization (admins only)
+    const access = await requireAdminAccess(request, "projects.delete");
+    if (!access.ok) return access.response;
 
     // Parse request body for reason
     const body = await request.json();
@@ -446,6 +489,22 @@ export async function DELETE(
     ).length;
     const notificationFailed = notificationResults.length - notificationSuccess;
 
+    await logAdminAction(
+      access.actor,
+      "projects.delete",
+      {
+        type: "project",
+        id: projectId,
+        ...(projectData.title ? { label: projectData.title } : {}),
+      },
+      {
+        reason,
+        membersRemoved: membersSnap.size,
+        applicationsDeleted: applicationsSnap.size,
+        invitationsDeleted: invitationsSnap.size,
+      }
+    );
+
     // Phase 6: Response
     return NextResponse.json(
       {
@@ -471,28 +530,9 @@ export async function DELETE(
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    // Phase 1: Authentication
-    const token = request.headers.get("x-admin-token");
-
-    if (!token) {
-      return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
-    }
-
-    // Verify admin session
-    const sessionDoc = await db.collection("admin_sessions").doc(token).get();
-
-    if (!sessionDoc.exists) {
-      return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
-    }
-
-    const session = sessionDoc.data();
-    const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
-
-    if (expiresAt < new Date()) {
-      // Session expired, delete it
-      await db.collection("admin_sessions").doc(token).delete();
-      return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
-    }
+    // Phase 1: Authorization
+    const access = await requireAdminAccess(request, "projects.edit");
+    if (!access.ok) return access.response;
 
     // Phase 2: Parse and validate request
     const { id } = await params;
@@ -575,6 +615,17 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     // Phase 5: Update project
     await projectRef.update(updateData);
+
+    await logAdminAction(
+      access.actor,
+      "projects.edit",
+      {
+        type: "project",
+        id,
+        ...(projectDoc.data()?.title ? { label: projectDoc.data()?.title } : {}),
+      },
+      { fields: Object.keys(updateData).filter((k) => k !== "updatedAt" && k !== "lastActivityAt") }
+    );
 
     // Phase 6: Fetch updated project
     const updatedDoc = await projectRef.get();

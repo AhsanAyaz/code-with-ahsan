@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
-import { verifyAdminRequest } from "@/lib/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
+import type { AdminAction } from "@/lib/adminAccess/actions";
 import { sendRegistrationStatusEmail, sendAccountStatusEmail } from "@/lib/email";
 import { sendMentorChangesRequestedNotification } from "@/lib/discord";
 import { syncRoleClaim } from "@/lib/ambassador/roleMutation";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
 import { cascadeDeleteMentee } from "@/lib/mentorship/deleteMenteeCascade";
 
 // GET: Fetch all profiles with optional filters
 export async function GET(request: NextRequest) {
-  if (!(await verifyAdminRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireAdminAccess(request, "mentorship.profiles.read");
+  if (!access.ok) return access.response;
 
   const { searchParams } = new URL(request.url);
   const role = searchParams.get("role"); // 'mentor' | 'mentee' | null for all
@@ -94,15 +93,54 @@ const DISCORD_USERNAME_REGEX = /^[a-z0-9_.]{2,32}$/;
 const LINKEDIN_URL_REGEX = /^https:\/\/([\w-]+\.)?linkedin\.com\/.+/i;
 
 // PUT: Update profile status (accept/decline/disable) and/or Discord username
+/**
+ * Map the requested status change to the admin action it requires. No status
+ * means a field-only edit (Discord username / LinkedIn URL). Unknown statuses
+ * fall through to "edit" and are rejected by validation below.
+ */
+function profileUpdateAction(status: unknown): AdminAction {
+  switch (status) {
+    case "accepted":
+    case "pending":
+      return "mentorship.profile.accept";
+    case "changes_requested":
+      return "mentorship.profile.requestChanges";
+    case "declined":
+      return "mentorship.profile.decline";
+    case "disabled":
+      return "mentorship.profile.disable";
+    default:
+      return "mentorship.profile.edit";
+  }
+}
+
 export async function PUT(request: NextRequest) {
-  if (!(await verifyAdminRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  let body: Record<string, unknown> | null = null;
+  try {
+    body = await request.json();
+  } catch {
+    body = null;
+  }
+
+  const action = profileUpdateAction(body?.status);
+  const access = await requireAdminAccess(request, action);
+  if (!access.ok) return access.response;
+
+  if (!body || typeof body !== "object") {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
   try {
-    const body = await request.json();
     const { uid, status, adminNotes, reactivateSessions, discordUsername, linkedinUrl, feedback } =
-      body;
+      body as {
+        uid?: string;
+        status?: string;
+        adminNotes?: string;
+        reactivateSessions?: boolean;
+        discordUsername?: string | null;
+        linkedinUrl?: string | null;
+        feedback?: string;
+      };
 
     if (!uid) {
       return NextResponse.json({ error: "Missing uid" }, { status: 400 });
@@ -280,6 +318,22 @@ export async function PUT(request: NextRequest) {
       await batch.commit();
     }
 
+    await logAdminAction(
+      access.actor,
+      action,
+      {
+        type: "mentorship_profile",
+        id: uid,
+        ...(profileDoc.data()?.displayName ? { label: profileDoc.data()?.displayName } : {}),
+      },
+      {
+        ...(status !== undefined ? { from: previousStatus ?? null, to: status } : {}),
+        ...(discordUsername !== undefined ? { discordUsername: updateData.discordUsername } : {}),
+        ...(linkedinUrl !== undefined ? { linkedinUrl: updateData.linkedinUrl } : {}),
+        ...(reactivatedCount > 0 ? { reactivatedSessions: reactivatedCount } : {}),
+      }
+    );
+
     // Send email notifications for status changes
     const profileData = profileDoc.data();
     if (profileData?.email) {
@@ -318,7 +372,7 @@ export async function PUT(request: NextRequest) {
       sendMentorChangesRequestedNotification(
         profileData.discordUsername,
         profileData.displayName || "",
-        feedback
+        feedback ?? ""
       ).catch((err) => console.error("Failed to send changes requested Discord DM:", err));
     }
 
@@ -346,14 +400,12 @@ export async function PUT(request: NextRequest) {
 // DELETE: Cascade-delete a mentee and ALL associated data (GH#239 / VIS-142).
 //
 // Destructive + irreversible, so it is gated on:
-//   1. A valid admin session (x-admin-token).
-//   2. An explicit `confirmed: true` flag in the request body — mirrors the
+//   1. The admin role (mentorship.profile.delete is admin-only).
+//   2. An explicit `confirmed: true` flag in the request body, mirroring the
 //      confirmation checkbox the admin must tick in the UI.
 export async function DELETE(request: NextRequest) {
-  const authResult = await requireAdmin(request);
-  if (!authResult.ok) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.status });
-  }
+  const access = await requireAdminAccess(request, "mentorship.profile.delete");
+  if (!access.ok) return access.response;
 
   let body: { uid?: string; confirmed?: boolean };
   try {
@@ -386,15 +438,20 @@ export async function DELETE(request: NextRequest) {
     const summary = await cascadeDeleteMentee(uid);
 
     // Audit log: who deleted which user, when, and what was removed.
-    await db.collection("mentorship_admin_audit_log").add({
-      action: "delete_mentee",
-      targetUid: uid,
-      targetEmail: profileData?.email ?? null,
-      targetDisplayName: profileData?.displayName ?? null,
-      performedBy: authResult.uid,
-      summary,
-      createdAt: new Date(),
-    });
+    await logAdminAction(
+      access.actor,
+      "mentorship.profile.delete",
+      {
+        type: "mentorship_profile",
+        id: uid,
+        ...(profileData?.displayName ? { label: profileData.displayName as string } : {}),
+      },
+      {
+        targetEmail: profileData?.email ?? null,
+        targetDisplayName: profileData?.displayName ?? null,
+        summary,
+      }
+    );
 
     return NextResponse.json(
       { success: true, message: "Mentee and associated data deleted", summary },

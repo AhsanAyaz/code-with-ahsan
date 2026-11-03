@@ -9,6 +9,8 @@ import {
   sendNewProjectAnnouncementToCollaborators,
 } from "@/lib/discord";
 import { verifyAuth } from "@/lib/auth";
+import { getAdminRole, logAdminAction, type AdminActor } from "@/lib/adminAccess/server";
+import { can, type AdminAction } from "@/lib/adminAccess/actions";
 import { canDeleteProject } from "@/lib/permissions";
 import { auth } from "@/lib/firebaseAdmin";
 import { Project } from "@/types/mentorship";
@@ -50,40 +52,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    // Phase 1: Authentication - check admin token OR Firebase auth
-    let userId: string | null = null;
-    let isAdmin = false;
-
-    // Check for admin token first
-    const adminToken = request.headers.get("x-admin-token");
-    if (adminToken) {
-      const sessionDoc = await db.collection("admin_sessions").doc(adminToken).get();
-
-      if (sessionDoc.exists) {
-        const session = sessionDoc.data();
-        const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
-
-        if (expiresAt >= new Date()) {
-          // Valid admin session
-          userId = session?.adminId;
-          isAdmin = true;
-        }
-      }
-    }
-
-    // If not admin, try Firebase auth via verifyAuth (existing pattern)
-    let authResult = null;
-    if (!userId) {
-      authResult = await verifyAuth(request);
-      if (authResult) {
-        userId = authResult.uid;
-      }
-    }
-
-    // If still no userId, authentication failed
-    if (!userId) {
+    // Phase 1: Authentication. Creators and staff both sign in with Firebase;
+    // staff access (admin override) comes from admin_roles.
+    const authResult = await verifyAuth(request);
+    if (!authResult) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
+    const userId = authResult.uid;
+    const staffRole = await getAdminRole(userId);
+    const staffActor: AdminActor | null = staffRole
+      ? { uid: userId, email: authResult.email, role: staffRole }
+      : null;
+    const isAdmin = can(staffRole, "projects.edit");
 
     const { id } = await params;
     const body = await request.json();
@@ -224,6 +204,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       // Phase 5: Update project
       await projectRef.update(updateData);
 
+      if (staffActor && isAdmin && projectData?.creatorId !== userId) {
+        await logAdminAction(
+          staffActor,
+          "projects.edit",
+          { type: "project", id, ...(projectData?.title ? { label: projectData.title } : {}) },
+          { fields: Object.keys(proposedChanges) }
+        );
+      }
+
       // Phase 6: Fetch and return updated project
       const updatedDoc = await projectRef.get();
       const updatedData = updatedDoc.data();
@@ -242,6 +231,27 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     // Action-based flow (existing logic)
+    // Approve / decline are staff operations, authorized per action.
+    const staffActions: Record<string, AdminAction> = {
+      approve: "projects.approve",
+      decline: "projects.decline",
+    };
+    const staffAction =
+      typeof action === "string" && Object.hasOwn(staffActions, action)
+        ? staffActions[action]
+        : null;
+    if (staffAction && (!staffActor || !can(staffRole, staffAction))) {
+      return NextResponse.json(
+        staffActor ? { error: "Admins only", action: staffAction } : { error: "No admin access" },
+        { status: 403 }
+      );
+    }
+    const projectTarget = {
+      type: "project",
+      id,
+      ...(projectData?.title ? { label: projectData.title as string } : {}),
+    };
+
     // Handle different actions
     if (action === "approve") {
       // Update project status to active
@@ -307,6 +317,10 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         console.error("Project collaboration notification failed:", notifyError);
       }
 
+      if (staffActor) {
+        await logAdminAction(staffActor, "projects.approve", projectTarget);
+      }
+
       return NextResponse.json(
         {
           success: true,
@@ -351,6 +365,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         declineReason: declineReason || null,
         updatedAt: FieldValue.serverTimestamp(),
       });
+
+      if (staffActor) {
+        await logAdminAction(staffActor, "projects.decline", projectTarget, {
+          ...(declineReason ? { reason: declineReason } : {}),
+        });
+      }
 
       return NextResponse.json({ success: true, message: "Project declined" }, { status: 200 });
     } else if (action === "complete") {
@@ -457,15 +477,17 @@ export async function DELETE(
 
     const projectData = projectDoc.data();
 
-    // Fetch user profile to check admin status
+    // Fetch user profile for roles; staff access comes from admin_roles.
     const userDoc = await db.collection("mentorship_profiles").doc(authResult.uid).get();
     const userData = userDoc.exists ? userDoc.data() : null;
+    const staffRole = await getAdminRole(authResult.uid);
+    const staffCanDelete = can(staffRole, "projects.delete");
 
     // Check permission using canDeleteProject
     const permissionUser = {
       uid: authResult.uid,
       roles: userData?.roles ?? [],
-      isAdmin: userData?.isAdmin === true,
+      isAdmin: staffCanDelete,
     };
 
     const canDelete = canDeleteProject(permissionUser, {
@@ -488,6 +510,23 @@ export async function DELETE(
 
     // Permanently delete the project document
     await projectRef.delete();
+
+    const deletedAsStaff =
+      staffRole &&
+      staffCanDelete &&
+      !(projectData?.creatorId === authResult.uid && projectData?.status === "declined");
+    if (deletedAsStaff) {
+      await logAdminAction(
+        { uid: authResult.uid, email: authResult.email, role: staffRole },
+        "projects.delete",
+        {
+          type: "project",
+          id,
+          ...(projectData?.title ? { label: projectData.title as string } : {}),
+        },
+        { previousStatus: projectData?.status ?? null }
+      );
+    }
 
     return NextResponse.json(
       { success: true, message: "Project deleted successfully" },

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
+import { adminFetch } from "@/lib/adminAccess/client";
 
 interface Props {
   applicationId: string;
@@ -25,15 +25,10 @@ export default function DiscordBanner({
     setBusy(true);
     setResult(null);
     try {
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem(ADMIN_TOKEN_KEY)
-          : null;
-      const res = await fetch(
+      const res = await adminFetch(
         `/api/ambassador/applications/${applicationId}/discord-resolve`,
         {
           method: "POST",
-          headers: token ? { "x-admin-token": token } : {},
         }
       );
       const body = await res.json();
@@ -42,9 +37,7 @@ export default function DiscordBanner({
       } else if (body.reason === "handle_not_found") {
         setResult({
           success: false,
-          message:
-            body.message ??
-            "Discord handle not found in the server.",
+          message: body.message ?? "Discord handle not found in the server.",
         });
       } else {
         setResult({
@@ -70,20 +63,12 @@ export default function DiscordBanner({
             : `Could not find Discord member "${discordHandle}" in the server.`}
         </p>
         {result && (
-          <p
-            className={`text-sm mt-1 ${
-              result.success ? "text-success" : "text-error"
-            }`}
-          >
+          <p className={`text-sm mt-1 ${result.success ? "text-success" : "text-error"}`}>
             {result.message}
           </p>
         )}
       </div>
-      <button
-        className="btn btn-sm btn-warning"
-        onClick={handleRetry}
-        disabled={busy}
-      >
+      <button className="btn btn-sm btn-warning" onClick={handleRetry} disabled={busy}>
         {busy ? "Retrying…" : "Retry"}
       </button>
     </div>

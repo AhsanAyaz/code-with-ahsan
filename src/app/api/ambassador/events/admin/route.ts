@@ -10,7 +10,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { z } from "zod";
 import { db } from "@/lib/firebaseAdmin";
 import { isAmbassadorProgramEnabled } from "@/lib/features";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import { AMBASSADOR_EVENTS_COLLECTION } from "@/types/ambassador";
 
 const AdminHidePatchSchema = z.object({
@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
   if (!isAmbassadorProgramEnabled()) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  const admin = await requireAdmin(request);
-  if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
+  const access = await requireAdminAccess(request, "ambassador.events.read");
+  if (!access.ok) return access.response;
 
   const cohortId = request.nextUrl.searchParams.get("cohortId");
   if (!cohortId) {
@@ -53,8 +53,8 @@ export async function PATCH(request: NextRequest) {
   if (!isAmbassadorProgramEnabled()) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  const admin = await requireAdmin(request);
-  if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
+  const access = await requireAdminAccess(request, "ambassador.event.setHidden");
+  if (!access.ok) return access.response;
 
   let body: unknown;
   try {
@@ -64,7 +64,10 @@ export async function PATCH(request: NextRequest) {
   }
   const parsed = AdminHidePatchSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid body", details: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid body", details: parsed.error.flatten() },
+      { status: 400 }
+    );
   }
 
   const ref = db.collection(AMBASSADOR_EVENTS_COLLECTION).doc(parsed.data.eventId);
@@ -76,6 +79,13 @@ export async function PATCH(request: NextRequest) {
     hidden: parsed.data.hidden,
     updatedAt: FieldValue.serverTimestamp(),
   });
+
+  await logAdminAction(
+    access.actor,
+    "ambassador.event.setHidden",
+    { type: "ambassador_event", id: parsed.data.eventId },
+    { hidden: parsed.data.hidden }
+  );
 
   return NextResponse.json({ success: true }, { status: 200 });
 }

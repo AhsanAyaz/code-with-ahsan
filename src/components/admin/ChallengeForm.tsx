@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Challenge,
-  ChallengeDifficulty,
-  ChallengeStatus,
-} from "@/types/challenges";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
+import { Challenge, ChallengeDifficulty, ChallengeStatus } from "@/types/challenges";
 import { useToast } from "@/contexts/ToastContext";
 import {
   CHALLENGE_DIFFICULTIES,
@@ -17,6 +12,7 @@ import {
   parseChallengeResourcesText,
   parseStringLines,
 } from "@/lib/challenges";
+import { adminFetch } from "@/lib/adminAccess/client";
 
 interface ChallengeFormProps {
   initialData?: Challenge;
@@ -41,13 +37,10 @@ function labelize(value: string) {
 
 /**
  * Challenge form for Admin creation and editing.
- * Handles local state management, text parsing (for lists/resources), 
+ * Handles local state management, text parsing (for lists/resources),
  * and submission to the respective API endpoint.
  */
-export default function ChallengeForm({
-  initialData,
-  isEdit,
-}: ChallengeFormProps) {
+export default function ChallengeForm({ initialData, isEdit }: ChallengeFormProps) {
   const router = useRouter();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
@@ -55,26 +48,19 @@ export default function ChallengeForm({
     title: initialData?.title || "",
     description: initialData?.description || "",
     topic: initialData?.topic || "",
-    difficulty:
-      initialData?.difficulty ||
-      (DEFAULT_CHALLENGE_DIFFICULTY as ChallengeDifficulty),
+    difficulty: initialData?.difficulty || (DEFAULT_CHALLENGE_DIFFICULTY as ChallengeDifficulty),
     status: initialData?.status || (DEFAULT_CHALLENGE_STATUS as ChallengeStatus),
-    startDate: initialData?.startDate
-      ? initialData.startDate.split("T")[0]
-      : "",
+    startDate: initialData?.startDate ? initialData.startDate.split("T")[0] : "",
     endDate: initialData?.endDate ? initialData.endDate.split("T")[0] : "",
     brief: initialData?.brief || "",
     deliverablesText: initialData?.deliverables?.join("\n") || "",
     resourcesText:
-      initialData?.resources
-        ?.map((resource) => `${resource.title} | ${resource.url}`)
-        .join("\n") || "",
+      initialData?.resources?.map((resource) => `${resource.title} | ${resource.url}`).join("\n") ||
+      "",
   });
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -84,10 +70,7 @@ export default function ChallengeForm({
     setLoading(true);
 
     try {
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-      const url = isEdit
-        ? `/api/admin/challenges/${initialData?.id}`
-        : "/api/admin/challenges";
+      const url = isEdit ? `/api/admin/challenges/${initialData?.id}` : "/api/admin/challenges";
       const method = isEdit ? "PUT" : "POST";
 
       const formattedData = {
@@ -103,11 +86,10 @@ export default function ChallengeForm({
         resources: parseChallengeResourcesText(formData.resourcesText),
       };
 
-      const res = await fetch(url, {
+      const res = await adminFetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { "x-admin-token": token } : {}),
         },
         body: JSON.stringify(formattedData),
       });
@@ -164,9 +146,7 @@ export default function ChallengeForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="form-control w-full">
           <label className="label pb-2">
-            <span className="label-text font-medium">
-              Topic (e.g., React, AI, CSS)
-            </span>
+            <span className="label-text font-medium">Topic (e.g., React, AI, CSS)</span>
           </label>
           <input
             required
@@ -247,9 +227,7 @@ export default function ChallengeForm({
 
       <div className="form-control w-full">
         <label className="label pb-2">
-          <span className="label-text font-medium">
-            Full Brief (Markdown supported)
-          </span>
+          <span className="label-text font-medium">Full Brief (Markdown supported)</span>
         </label>
         <textarea
           required
@@ -272,9 +250,7 @@ export default function ChallengeForm({
           placeholder="One deliverable per line"
         />
         <label className="label">
-          <span className="label-text-alt">
-            Example: Public GitHub repo with README
-          </span>
+          <span className="label-text-alt">Example: Public GitHub repo with README</span>
         </label>
       </div>
 
@@ -290,27 +266,17 @@ export default function ChallengeForm({
           placeholder="Title | https://example.com"
         />
         <label className="label">
-          <span className="label-text-alt">
-            Use one resource per line: title | url
-          </span>
+          <span className="label-text-alt">Use one resource per line: title | url</span>
         </label>
       </div>
 
       <div className="flex justify-end gap-3 pt-4 border-t border-base-300">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="btn btn-ghost"
-        >
+        <button type="button" onClick={() => router.back()} className="btn btn-ghost">
           Cancel
         </button>
 
         <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading
-            ? "Saving..."
-            : isEdit
-              ? "Update Challenge"
-              : "Create Challenge"}
+          {loading ? "Saving..." : isEdit ? "Update Challenge" : "Create Challenge"}
         </button>
       </div>
     </form>

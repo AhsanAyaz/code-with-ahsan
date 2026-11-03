@@ -1,12 +1,12 @@
 "use client";
 /**
  * Phase 4 (EVENT-03, EVENT-04): Admin table showing all events for a cohort,
- * with a hide/unhide toggle per row. Uses adminHeaders() for token auth.
+ * with a hide/unhide toggle per row. Calls go through adminFetch (staff ID token).
  */
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { EVENT_TYPE_LABELS, type EventType } from "@/lib/ambassador/eventTypes";
-import { getAdminAuthHeaders } from "@/components/admin/AdminAuthGate";
+import { adminFetch } from "@/lib/adminAccess/client";
 
 type AdminEventItem = {
   id: string;
@@ -19,10 +19,6 @@ type AdminEventItem = {
   hidden: boolean;
 };
 
-function adminHeaders(): HeadersInit {
-  return { "Content-Type": "application/json", ...getAdminAuthHeaders() };
-}
-
 type Props = { cohortId: string };
 
 export default function EventAdminTable({ cohortId }: Props) {
@@ -33,11 +29,9 @@ export default function EventAdminTable({ cohortId }: Props) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(
+      const res = await adminFetch(
         `/api/ambassador/events/admin?cohortId=${encodeURIComponent(cohortId)}`,
-        {
-          headers: adminHeaders(),
-        }
+        {}
       );
       if (!res.ok) {
         toast.error("Could not load events");
@@ -57,9 +51,8 @@ export default function EventAdminTable({ cohortId }: Props) {
   }, [load]);
 
   async function toggleHidden(eventId: string, nextHidden: boolean) {
-    const res = await fetch("/api/ambassador/events/admin", {
+    const res = await adminFetch("/api/ambassador/events/admin", {
       method: "PATCH",
-      headers: adminHeaders(),
       body: JSON.stringify({ eventId, hidden: nextHidden }),
     });
     if (!res.ok) {

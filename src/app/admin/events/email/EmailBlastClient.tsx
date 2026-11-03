@@ -1,12 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
-import {
-  parseRecipients,
-  type ParseResult,
-} from "@/lib/email-blast/parseRecipients";
+import { parseRecipients, type ParseResult } from "@/lib/email-blast/parseRecipients";
 import { PreviewIframe } from "./PreviewIframe";
+import { adminFetch } from "@/lib/adminAccess/client";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -25,14 +22,6 @@ type SendResult = {
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-
-function adminHeaders(): HeadersInit {
-  const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem(ADMIN_TOKEN_KEY)
-      : null;
-  return { "x-admin-token": token ?? "" };
-}
 
 function relativeTime(isoString: string): string {
   try {
@@ -54,9 +43,7 @@ function StepBadge({ n, done }: { n: number; done?: boolean }) {
   return (
     <span
       className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold shrink-0 ${
-        done
-          ? "bg-success text-success-content"
-          : "bg-primary text-primary-content"
+        done ? "bg-success text-success-content" : "bg-primary text-primary-content"
       }`}
     >
       {done ? "✓" : n}
@@ -91,9 +78,7 @@ export function EmailBlastClient() {
     setDraftsLoading(true);
     setDraftsError("");
     try {
-      const res = await fetch("/api/admin/email-blast/drafts", {
-        headers: adminHeaders(),
-      });
+      const res = await adminFetch("/api/admin/email-blast/drafts", {});
       if (res.status === 404 || res.status === 204) {
         setDrafts([]);
         return;
@@ -151,10 +136,9 @@ export function EmailBlastClient() {
     setShowConfirm(false);
 
     try {
-      const res = await fetch("/api/admin/email-blast", {
+      const res = await adminFetch("/api/admin/email-blast", {
         method: "POST",
         headers: {
-          ...adminHeaders(),
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -212,11 +196,7 @@ export function EmailBlastClient() {
   const dupCount = parseResult?.duplicatesRemoved ?? 0;
   const skippedCount = parseResult?.skipped.length ?? 0;
 
-  const canSend =
-    !!selectedDraftId &&
-    subject.trim().length > 0 &&
-    recipientCount >= 1 &&
-    !sending;
+  const canSend = !!selectedDraftId && subject.trim().length > 0 && recipientCount >= 1 && !sending;
 
   // ── Results view ──────────────────────────────────────────────────────────
 
@@ -230,9 +210,7 @@ export function EmailBlastClient() {
           {/* Header */}
           <div>
             <h1 className="text-2xl font-bold">Blast Results</h1>
-            <p className="text-base-content/60 text-sm mt-1">
-              Email delivery summary
-            </p>
+            <p className="text-base-content/60 text-sm mt-1">Email delivery summary</p>
           </div>
 
           {/* Stats */}
@@ -245,12 +223,18 @@ export function EmailBlastClient() {
                 <p className="text-4xl font-bold text-success">{sent}</p>
               </div>
             </div>
-            <div className={`card border ${failed > 0 ? "bg-error/10 border-error/30" : "bg-base-200 border-base-300"}`}>
+            <div
+              className={`card border ${failed > 0 ? "bg-error/10 border-error/30" : "bg-base-200 border-base-300"}`}
+            >
               <div className="card-body py-4 px-5">
-                <p className={`text-xs font-semibold uppercase tracking-wider ${failed > 0 ? "text-error/80" : "text-base-content/40"}`}>
+                <p
+                  className={`text-xs font-semibold uppercase tracking-wider ${failed > 0 ? "text-error/80" : "text-base-content/40"}`}
+                >
                   Failed
                 </p>
-                <p className={`text-4xl font-bold ${failed > 0 ? "text-error" : "text-base-content/30"}`}>
+                <p
+                  className={`text-4xl font-bold ${failed > 0 ? "text-error" : "text-base-content/30"}`}
+                >
                   {failed}
                 </p>
               </div>
@@ -276,21 +260,15 @@ export function EmailBlastClient() {
                         <td>
                           <span
                             className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold ${
-                              r.ok
-                                ? "bg-success/20 text-success"
-                                : "bg-error/20 text-error"
+                              r.ok ? "bg-success/20 text-success" : "bg-error/20 text-error"
                             }`}
                           >
                             {r.ok ? "✓" : "✗"}
                           </span>
                         </td>
                         <td className="font-medium">{r.name}</td>
-                        <td className="font-mono text-sm text-base-content/70">
-                          {r.email}
-                        </td>
-                        <td className="text-sm text-base-content/50">
-                          {r.error ?? ""}
-                        </td>
+                        <td className="font-mono text-sm text-base-content/70">{r.email}</td>
+                        <td className="text-sm text-base-content/50">{r.error ?? ""}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -301,10 +279,7 @@ export function EmailBlastClient() {
 
           <div className="flex gap-3">
             {failedResults.length > 0 && (
-              <button
-                className="btn btn-error"
-                onClick={() => handleRetryFailed(failedResults)}
-              >
+              <button className="btn btn-error" onClick={() => handleRetryFailed(failedResults)}>
                 Retry {failedResults.length} failed
               </button>
             )}
@@ -333,8 +308,19 @@ export function EmailBlastClient() {
         {/* Global errors */}
         {sendError && (
           <div role="alert" className="alert alert-error text-sm py-2.5">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+              />
             </svg>
             {sendError}
           </div>
@@ -364,8 +350,19 @@ export function EmailBlastClient() {
                   {draftsLoading ? (
                     <span className="loading loading-spinner loading-xs" />
                   ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-3.5 w-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
                     </svg>
                   )}
                   Refresh
@@ -389,8 +386,8 @@ export function EmailBlastClient() {
                   {draftsLoading
                     ? "Loading…"
                     : drafts.length === 0
-                    ? "No drafts found — tag a Ghost page with #email-blast"
-                    : "Select a draft…"}
+                      ? "No drafts found — tag a Ghost page with #email-blast"
+                      : "Select a draft…"}
                 </option>
                 {drafts.map((d) => (
                   <option key={d.id} value={d.id}>
@@ -451,9 +448,7 @@ export function EmailBlastClient() {
                     </span>
                   )}
                   {skippedCount > 0 && (
-                    <span className="badge badge-warning badge-sm">
-                      {skippedCount} skipped
-                    </span>
+                    <span className="badge badge-warning badge-sm">{skippedCount} skipped</span>
                   )}
                 </div>
               )}
@@ -472,7 +467,9 @@ export function EmailBlastClient() {
                 id="recipients-textarea"
                 className="textarea textarea-bordered font-mono text-sm leading-relaxed w-full"
                 rows={8}
-                placeholder={"Full Name\tEmail\nJohn Doe\tjohn@example.com\nJane Smith\tjane@example.com"}
+                placeholder={
+                  "Full Name\tEmail\nJohn Doe\tjohn@example.com\nJane Smith\tjane@example.com"
+                }
                 value={recipientsRaw}
                 onChange={(e) => handleRecipientsChange(e.target.value)}
                 disabled={sending}
@@ -490,7 +487,10 @@ export function EmailBlastClient() {
                     <li key={s.line} className="flex gap-2">
                       <span className="text-warning/70 shrink-0">L{s.line}</span>
                       <span className="text-base-content/50 shrink-0">{s.reason}</span>
-                      <span className="truncate">{s.raw.slice(0, 60)}{s.raw.length > 60 ? "…" : ""}</span>
+                      <span className="truncate">
+                        {s.raw.slice(0, 60)}
+                        {s.raw.length > 60 ? "…" : ""}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -508,7 +508,7 @@ export function EmailBlastClient() {
                 <h2 className="font-bold text-base">Preview &amp; Send</h2>
                 {selectedDraft && (
                   <span className="badge badge-ghost badge-sm font-normal text-base-content/50">
-                    {"{{"+"name"+"}}"} substituted
+                    {"{{" + "name" + "}}"} substituted
                   </span>
                 )}
               </div>
@@ -527,8 +527,19 @@ export function EmailBlastClient() {
                   </>
                 ) : (
                   <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                      />
                     </svg>
                     Send to {recipientCount || "…"} recipient{recipientCount !== 1 ? "s" : ""}
                   </>
@@ -542,8 +553,19 @@ export function EmailBlastClient() {
               <PreviewIframe html={previewHtml} />
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-base-content/30 gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
                 </svg>
                 <p className="text-sm">Select a draft to see the preview</p>
               </div>
@@ -569,9 +591,7 @@ export function EmailBlastClient() {
                 <h3 id="confirm-modal-title" className="font-bold text-lg">
                   Ready to send?
                 </h3>
-                <p className="text-sm text-base-content/50 mt-0.5">
-                  This cannot be undone.
-                </p>
+                <p className="text-sm text-base-content/50 mt-0.5">This cannot be undone.</p>
               </div>
               <button
                 type="button"
@@ -606,9 +626,7 @@ export function EmailBlastClient() {
                     {r.name[0]?.toUpperCase() ?? "?"}
                   </span>
                   <span className="font-medium">{r.name}</span>
-                  <span className="text-base-content/50 font-mono text-xs truncate">
-                    {r.email}
-                  </span>
+                  <span className="text-base-content/50 font-mono text-xs truncate">{r.email}</span>
                 </li>
               ))}
             </ul>
@@ -642,8 +660,19 @@ export function EmailBlastClient() {
                 className="btn btn-primary flex-1 gap-2"
                 onClick={handleSendConfirm}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                  />
                 </svg>
                 Send {recipientCount} emails
               </button>

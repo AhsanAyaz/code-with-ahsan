@@ -17,7 +17,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { isAmbassadorProgramEnabled } from "@/lib/features";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import { PUBLIC_AMBASSADORS_COLLECTION, type AmbassadorSubdoc } from "@/types/ambassador";
 import { AMBASSADOR_COHORTS_COLLECTION } from "@/lib/ambassador/constants";
 import { syncAmbassadorClaim } from "@/lib/ambassador/acceptance";
@@ -32,10 +32,8 @@ export async function POST(
   if (!isAmbassadorProgramEnabled()) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  const admin = await requireAdmin(request);
-  if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
-  }
+  const access = await requireAdminAccess(request, "ambassador.member.alumni");
+  if (!access.ok) return access.response;
 
   const { uid } = await Promise.resolve(params);
   if (!uid) return NextResponse.json({ error: "Invalid uid" }, { status: 400 });
@@ -87,6 +85,8 @@ export async function POST(
   } catch (e) {
     logger.error("syncAmbassadorClaim after alumni transition failed", { uid, error: e });
   }
+
+  await logAdminAction(access.actor, "ambassador.member.alumni", { type: "ambassador", id: uid });
 
   return NextResponse.json({ success: true });
 }

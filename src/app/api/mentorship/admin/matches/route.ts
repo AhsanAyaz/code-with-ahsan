@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
-import { verifyAdminRequest } from "@/lib/adminAuth";
+import { requireAdminAccess } from "@/lib/adminAccess/server";
 
 type SerializedProfile = Record<string, unknown> & {
   uid: string;
@@ -24,9 +24,8 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
 
 // GET: Fetch mentorship matches with joined profile data
 export async function GET(request: NextRequest) {
-  if (!(await verifyAdminRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireAdminAccess(request, "mentorship.matches.read");
+  if (!access.ok) return access.response;
 
   const { searchParams } = new URL(request.url);
   const role = searchParams.get("role"); // 'mentor' | 'mentee'

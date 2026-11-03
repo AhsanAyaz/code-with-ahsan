@@ -1,9 +1,9 @@
 "use client";
 
+import { adminFetch } from "@/lib/adminAccess/client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import type { Challenge, Submission } from "@/types/challenges";
 
 export default function AdminChallengeSubmissionsPage() {
@@ -16,10 +16,7 @@ export default function AdminChallengeSubmissionsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-        const res = await fetch(`/api/admin/challenges/${params.id}/submissions`, {
-          headers: token ? { "x-admin-token": token } : {},
-        });
+        const res = await adminFetch(`/api/admin/challenges/${params.id}/submissions`);
         if (!res.ok) {
           const data = await res.json();
           throw new Error(data.error || "Failed to load submissions");

@@ -8,16 +8,9 @@ import { useToast } from "@/contexts/ToastContext";
 import { AuthContext } from "@/contexts/AuthContext";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { hasRole } from "@/lib/permissions";
+import { authFetch } from "@/lib/apiClient";
 
-const DAYS_OF_WEEK = [
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-  "sunday",
-];
+const DAYS_OF_WEEK = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
 type RequestStatus = "none" | "pending" | "declined" | "active" | "completed" | "cancelled";
 
@@ -32,9 +25,7 @@ export default function MentorProfileClient({
   initialMentor,
   isAdminPreview = false,
 }: MentorProfileClientProps) {
-  const [mentor, setMentor] = useState<MentorProfileDetails | null>(
-    initialMentor ?? null
-  );
+  const [mentor, setMentor] = useState<MentorProfileDetails | null>(initialMentor ?? null);
   const [loading, setLoading] = useState(!initialMentor);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,21 +53,9 @@ export default function MentorProfileClient({
   useEffect(() => {
     const fetchMentor = async () => {
       try {
-        // For admin preview, get token from localStorage
-        const headers: HeadersInit = {};
-        if (isAdminPreview) {
-          const adminToken = localStorage.getItem("mentorship_admin_token");
-          if (!adminToken) {
-            setError("Admin authentication required");
-            setLoading(false);
-            return;
-          }
-          headers["x-admin-token"] = adminToken;
-        }
-
-        const response = await fetch(`/api/mentorship/mentors/${username}`, {
-          headers,
-        });
+        // authFetch attaches the signed-in user's ID token when there is one;
+        // staff with mentorship.mentor.preview then see non-public profiles.
+        const response = await authFetch(`/api/mentorship/mentors/${username}`);
         if (response.ok) {
           const data = await response.json();
           setMentor(data.mentor);
@@ -96,10 +75,13 @@ export default function MentorProfileClient({
       }
     };
 
+    // Admin preview needs the signed-in user's token, so wait for auth to settle.
+    if (isAdminPreview && mentorshipLoading) return;
+
     if (username) {
       fetchMentor();
     }
-  }, [username, initialMentor, isAdminPreview]);
+  }, [username, initialMentor, isAdminPreview, mentorshipLoading]);
 
   // Fetch mentee's request status for this mentor
   useEffect(() => {
@@ -107,9 +89,7 @@ export default function MentorProfileClient({
       if (!user || !mentor) return;
 
       try {
-        const response = await fetch(
-          `/api/mentorship/mentee-requests?menteeId=${user.uid}`
-        );
+        const response = await fetch(`/api/mentorship/mentee-requests?menteeId=${user.uid}`);
         if (response.ok) {
           const data = await response.json();
           // Find request for this specific mentor
@@ -242,10 +222,7 @@ export default function MentorProfileClient({
     // User not logged in
     if (!user) {
       return (
-        <button
-          className="btn btn-primary"
-          onClick={() => setShowLoginPopup(true)}
-        >
+        <button className="btn btn-primary" onClick={() => setShowLoginPopup(true)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5 mr-2"
@@ -283,9 +260,7 @@ export default function MentorProfileClient({
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          {hasRole(profile, "mentor")
-            ? "You are a mentor"
-            : "Register as mentee to request"}
+          {hasRole(profile, "mentor") ? "You are a mentor" : "Register as mentee to request"}
         </Link>
       );
     }
@@ -495,8 +470,7 @@ export default function MentorProfileClient({
 
   const availableDays = mentor.availability
     ? Object.keys(mentor.availability).filter(
-        (day) =>
-          mentor.availability![day] && mentor.availability![day].length > 0
+        (day) => mentor.availability![day] && mentor.availability![day].length > 0
       )
     : [];
 
@@ -553,7 +527,12 @@ export default function MentorProfileClient({
           <div className="flex flex-col md:flex-row gap-6">
             {/* Avatar */}
             <div className="flex-shrink-0">
-              <ProfileAvatar photoURL={mentor.photoURL} displayName={mentor.displayName} size={128} ring />
+              <ProfileAvatar
+                photoURL={mentor.photoURL}
+                displayName={mentor.displayName}
+                size={128}
+                ring
+              />
             </div>
 
             {/* Info */}
@@ -561,9 +540,7 @@ export default function MentorProfileClient({
               <h1 className="text-3xl font-bold">{mentor.displayName}</h1>
               <p className="text-base-content/60 text-sm">@{mentor.username}</p>
               {mentor.currentRole && (
-                <p className="text-lg text-base-content/70 mt-1">
-                  {mentor.currentRole}
-                </p>
+                <p className="text-lg text-base-content/70 mt-1">{mentor.currentRole}</p>
               )}
               {mentor.linkedinUrl && (
                 <a
@@ -579,7 +556,7 @@ export default function MentorProfileClient({
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
-                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                   </svg>
                   LinkedIn Profile
                 </a>
@@ -597,17 +574,11 @@ export default function MentorProfileClient({
               <div className="flex flex-wrap gap-4 mt-4">
                 {(mentor.avgRating ?? 0) > 0 && (
                   <div className="flex items-center gap-1 text-warning">
-                    <svg
-                      className="w-5 h-5"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                     <span className="font-semibold">{mentor.avgRating}</span>
-                    <span className="text-base-content/60">
-                      ({mentor.ratingCount} reviews)
-                    </span>
+                    <span className="text-base-content/60">({mentor.ratingCount} reviews)</span>
                   </div>
                 )}
                 <div className="badge badge-primary badge-lg gap-1">
@@ -662,9 +633,7 @@ export default function MentorProfileClient({
                       d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                     />
                   </svg>
-                  <span>
-                    This mentor is currently at capacity. Check back later!
-                  </span>
+                  <span>This mentor is currently at capacity. Check back later!</span>
                 </div>
               )}
             </div>
@@ -693,9 +662,7 @@ export default function MentorProfileClient({
               </svg>
               About
             </h2>
-            <p className="text-base-content/80 whitespace-pre-wrap">
-              {mentor.bio}
-            </p>
+            <p className="text-base-content/80 whitespace-pre-wrap">{mentor.bio}</p>
           </div>
         </div>
       )}
@@ -721,9 +688,7 @@ export default function MentorProfileClient({
               </svg>
               Experience & Projects
             </h2>
-            <div className="text-base-content/80 whitespace-pre-wrap">
-              {mentor.majorProjects}
-            </div>
+            <div className="text-base-content/80 whitespace-pre-wrap">{mentor.majorProjects}</div>
           </div>
         </div>
       )}
@@ -797,16 +762,12 @@ export default function MentorProfileClient({
               })}
             </div>
             <p className="text-sm text-base-content/60 mt-2">
-              Days marked in color indicate general availability for mentorship
-              sessions.
+              Days marked in color indicate general availability for mentorship sessions.
             </p>
             {mentor.hasTimeSlots && (
               <div className="mt-4">
                 {canBook ? (
-                  <Link
-                    href={`/mentorship/book/${mentor.uid}`}
-                    className="btn btn-primary btn-sm"
-                  >
+                  <Link href={`/mentorship/book/${mentor.uid}`} className="btn btn-primary btn-sm">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4 mr-1"
@@ -828,11 +789,7 @@ export default function MentorProfileClient({
                     className="tooltip tooltip-top inline-block before:max-w-[16rem] before:whitespace-normal"
                     data-tip={bookGateTooltip}
                   >
-                    <button
-                      type="button"
-                      className="btn btn-primary btn-sm btn-disabled"
-                      disabled
-                    >
+                    <button type="button" className="btn btn-primary btn-sm btn-disabled" disabled>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-4 w-4 mr-1"
@@ -879,14 +836,12 @@ export default function MentorProfileClient({
               Book a Session
             </h2>
             <p className="text-base-content/70">
-              This mentor offers 30-minute mentoring sessions. Browse available time slots and book a session.
+              This mentor offers 30-minute mentoring sessions. Browse available time slots and book
+              a session.
             </p>
             <div className="card-actions mt-2">
               {canBook ? (
-                <Link
-                  href={`/mentorship/book/${mentor.uid}`}
-                  className="btn btn-primary btn-sm"
-                >
+                <Link href={`/mentorship/book/${mentor.uid}`} className="btn btn-primary btn-sm">
                   View Available Slots
                 </Link>
               ) : (
@@ -894,11 +849,7 @@ export default function MentorProfileClient({
                   className="tooltip tooltip-top inline-block before:max-w-[16rem] before:whitespace-normal"
                   data-tip={bookGateTooltip}
                 >
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm btn-disabled"
-                    disabled
-                  >
+                  <button type="button" className="btn btn-primary btn-sm btn-disabled" disabled>
                     View Available Slots
                   </button>
                 </span>
@@ -940,33 +891,25 @@ export default function MentorProfileClient({
                         : requestStatus === "cancelled"
                           ? "This mentorship was cancelled. You can explore other mentors."
                           : mentor.isAtCapacity
-                          ? "This mentor is at capacity, but you can explore other amazing mentors."
-                          : "Click below to send a mentorship request."}
+                            ? "This mentor is at capacity, but you can explore other amazing mentors."
+                            : "Click below to send a mentorship request."}
           </p>
           <div className="card-actions justify-center items-center flex-wrap gap-3">
             {/* Main action button based on state */}
             {!mentorshipLoading && renderActionButton()}
 
             {/* Rating button for completed mentorships */}
-            {requestStatus === "completed" &&
-              sessionInfo &&
-              !sessionInfo.hasRated && (
-                <button
-                  className="btn btn-warning"
-                  onClick={() => setShowRatingModal(true)}
-                >
-                  ⭐ Rate Your Experience
-                </button>
-              )}
+            {requestStatus === "completed" && sessionInfo && !sessionInfo.hasRated && (
+              <button className="btn btn-warning" onClick={() => setShowRatingModal(true)}>
+                ⭐ Rate Your Experience
+              </button>
+            )}
             {requestStatus === "completed" && sessionInfo?.hasRated && (
               <span className="badge badge-success badge-lg">✓ Rated</span>
             )}
 
             {/* Browse mentors link */}
-            <Link
-              href="/mentorship/browse"
-              className="btn btn-ghost bg-white/20 hover:bg-white/30"
-            >
+            <Link href="/mentorship/browse" className="btn btn-ghost bg-white/20 hover:bg-white/30">
               Browse Mentors
             </Link>
           </div>
@@ -979,8 +922,7 @@ export default function MentorProfileClient({
           <div className="modal-box">
             <h3 className="font-bold text-lg">⭐ Rate Your Mentorship</h3>
             <p className="py-2 text-base-content/70">
-              How was your experience with <strong>{mentor.displayName}</strong>
-              ?
+              How was your experience with <strong>{mentor.displayName}</strong>?
             </p>
 
             {/* Star selector */}
@@ -992,11 +934,7 @@ export default function MentorProfileClient({
                   className={`btn btn-circle btn-lg ${star <= rating ? "btn-warning" : "btn-ghost"}`}
                   onClick={() => setRating(star)}
                 >
-                  <svg
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 </button>
@@ -1031,8 +969,7 @@ export default function MentorProfileClient({
               >
                 {submittingRating ? (
                   <>
-                    <span className="loading loading-spinner loading-sm"></span>{" "}
-                    Submitting...
+                    <span className="loading loading-spinner loading-sm"></span> Submitting...
                   </>
                 ) : (
                   "Submit Rating"

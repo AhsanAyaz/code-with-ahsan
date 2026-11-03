@@ -1,14 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { authFetch } from "@/lib/apiClient";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import { useToast } from "@/contexts/ToastContext";
-
-function adminHeaders(): HeadersInit {
-  const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
-  return { "x-admin-token": token ?? "" };
-}
+import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
 
 export function StrikeConfirmModal({
   uid,
@@ -30,12 +24,14 @@ export function StrikeConfirmModal({
     setError(null);
     setSubmitting(true);
     try {
-      const res = await authFetch(`/api/ambassador/members/${uid}/strike`, {
+      const res = await adminFetch(`/api/ambassador/members/${uid}/strike`, {
         method: "POST",
-        headers: adminHeaders(),
       });
       if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+        setError(
+          await adminErrorMessage(res, "Could not confirm strike. Try again or reload the page.")
+        );
+        return;
       }
       toast.success("Strike confirmed.");
       onConfirmed();
@@ -53,7 +49,8 @@ export function StrikeConfirmModal({
           Confirm strike for {displayName}?
         </h3>
         <p className="py-4">
-          This records a confirmed strike against this ambassador. Strike increments are irreversible from this panel. Review the flagged reports above before confirming.
+          This records a confirmed strike against this ambassador. Strike increments are
+          irreversible from this panel. Review the flagged reports above before confirming.
         </p>
 
         {error && (
@@ -63,12 +60,7 @@ export function StrikeConfirmModal({
         )}
 
         <div className="modal-action">
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={onClose}
-            disabled={submitting}
-          >
+          <button type="button" className="btn btn-ghost" onClick={onClose} disabled={submitting}>
             Go back
           </button>
           <button
@@ -83,7 +75,9 @@ export function StrikeConfirmModal({
         </div>
       </div>
       <form method="dialog" className="modal-backdrop" onClick={onClose}>
-        <button type="button" aria-label="Close">close</button>
+        <button type="button" aria-label="Close">
+          close
+        </button>
       </form>
     </dialog>
   );

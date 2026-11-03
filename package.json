@@ -36,6 +36,8 @@
     "admin-role:set": "npx tsx scripts/set-admin-role.ts",
     "migrate-admin-roles:dry-run": "npx tsx scripts/migrate-admin-roles.ts",
     "migrate-admin-roles": "npx tsx scripts/migrate-admin-roles.ts --apply",
+    "purge-admin-sessions:dry-run": "npx tsx scripts/purge-admin-sessions.ts",
+    "purge-admin-sessions": "npx tsx scripts/purge-admin-sessions.ts --apply",
     "prepare": "husky"
   },
   "dependencies": {

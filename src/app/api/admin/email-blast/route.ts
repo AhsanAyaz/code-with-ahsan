@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import { getDraftHtml } from "@/lib/ghost/admin";
 import { sendEmailBatch } from "@/lib/email";
 import { db } from "@/lib/firebaseAdmin";
@@ -26,10 +26,8 @@ interface SendResult {
  * Resend (250ms gap), writes audit log to Firestore email-blasts/{id}.
  */
 export async function POST(request: NextRequest) {
-  const admin = await requireAdmin(request);
-  if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
-  }
+  const access = await requireAdminAccess(request, "comms.emailBlast");
+  if (!access.ok) return access.response;
 
   // Parse and validate body
   let body: unknown;
@@ -60,24 +58,15 @@ export async function POST(request: NextRequest) {
   }
 
   if (subject.length > 200) {
-    return NextResponse.json(
-      { error: "subject must be 200 characters or fewer" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "subject must be 200 characters or fewer" }, { status: 400 });
   }
 
   if (!Array.isArray(recipients) || recipients.length === 0) {
-    return NextResponse.json(
-      { error: "recipients must be a non-empty array" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "recipients must be a non-empty array" }, { status: 400 });
   }
 
   if (recipients.length > 500) {
-    return NextResponse.json(
-      { error: "recipients must not exceed 500 items" },
-      { status: 413 }
-    );
+    return NextResponse.json({ error: "recipients must not exceed 500 items" }, { status: 413 });
   }
 
   // Validate each recipient shape
@@ -96,10 +85,7 @@ export async function POST(request: NextRequest) {
   // Fetch fresh draft HTML from Ghost
   const draft = await getDraftHtml(ghostPostId.trim());
   if (!draft) {
-    return NextResponse.json(
-      { error: "Draft not found or no longer accessible" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Draft not found or no longer accessible" }, { status: 404 });
   }
 
   // Pre-create Firestore audit doc
@@ -109,10 +95,17 @@ export async function POST(request: NextRequest) {
     ghostPostId: ghostPostId.trim(),
     ghostPostTitle: draft.title,
     status: "in_progress",
-    sentBy: admin.uid,
+    sentBy: access.actor.uid,
     startedAt: FieldValue.serverTimestamp(),
     recipientCount: validatedRecipients.length,
   });
+
+  await logAdminAction(
+    access.actor,
+    "comms.emailBlast",
+    { type: "email_blast", id: blastRef.id, label: subject.trim() },
+    { ghostPostId: ghostPostId.trim(), recipientCount: validatedRecipients.length }
+  );
 
   const results: SendResult[] = [];
 

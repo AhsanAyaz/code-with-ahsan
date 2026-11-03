@@ -3,9 +3,10 @@ import { NextRequest } from "next/server";
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
-vi.mock("@/lib/ambassador/adminAuth", () => ({
-  requireAdmin: vi.fn(),
-}));
+vi.mock(
+  "@/lib/adminAccess/server",
+  async () => (await import("@/lib/adminAccess/testing")).adminAccessServerMock
+);
 
 vi.mock("@/lib/ghost/admin", () => ({
   getDraftHtml: vi.fn(),
@@ -44,24 +45,23 @@ vi.mock("@/lib/firebaseAdmin", () => ({
 // ─── Imports (after mocks) ────────────────────────────────────────────────────
 
 import { POST } from "../route";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { actAs, logAdminActionMock } from "@/lib/adminAccess/testing";
 import { getDraftHtml } from "@/lib/ghost/admin";
 import { sendEmailBatch } from "@/lib/email";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function makeRequest(body: unknown, adminToken = "valid-token"): NextRequest {
+function makeRequest(body: unknown, idToken = "valid-token"): NextRequest {
   return new NextRequest("http://localhost/api/admin/email-blast", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-admin-token": adminToken,
+      ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
     },
     body: JSON.stringify(body),
   });
 }
 
-const mockRequireAdmin = vi.mocked(requireAdmin);
 const mockGetDraftHtml = vi.mocked(getDraftHtml);
 const mockSendEmailBatch = vi.mocked(sendEmailBatch);
 
@@ -72,7 +72,7 @@ describe("POST /api/admin/email-blast", () => {
     vi.clearAllMocks();
     mockGetDraftHtml.mockReset();
     mockSendEmailBatch.mockReset();
-    mockRequireAdmin.mockReset();
+    actAs("admin");
     mockSendEmailBatch.mockImplementation(
       (payloads: { to: string; subject: string; html: string }[]) => {
         return Promise.resolve(payloads.map((p) => ({ to: p.to, ok: true })));
@@ -84,24 +84,36 @@ describe("POST /api/admin/email-blast", () => {
     mockCollection.mockReturnValue({ doc: mockDoc });
   });
 
-  it("returns 401 when admin token is missing or invalid", async () => {
-    mockRequireAdmin.mockResolvedValueOnce({
-      ok: false,
-      status: 401,
-      error: "Admin token required",
-    });
+  it("returns 401 when signed out", async () => {
+    actAs("signed-out");
 
     const req = makeRequest({}, "");
     const res = await POST(req);
 
     expect(res.status).toBe(401);
     const json = await res.json();
-    expect(json.error).toMatch(/admin token/i);
+    expect(json.error).toMatch(/unauthorized/i);
+  });
+
+  it("returns 403 Admins only for a moderator and sends nothing", async () => {
+    actAs("moderator");
+
+    const req = makeRequest({
+      ghostPostId: "abc123",
+      subject: "Hello",
+      recipients: [{ name: "Ali", email: "ali@example.com" }],
+    });
+    const res = await POST(req);
+
+    expect(res.status).toBe(403);
+    expect((await res.json()).error).toBe("Admins only");
+    expect(mockGetDraftHtml).not.toHaveBeenCalled();
+    expect(mockSendEmailBatch).not.toHaveBeenCalled();
+    expect(mockSet).not.toHaveBeenCalled();
+    expect(logAdminActionMock).not.toHaveBeenCalled();
   });
 
   it("returns 400 when ghostPostId is missing", async () => {
-    mockRequireAdmin.mockResolvedValueOnce({ ok: true, uid: "admin:test123456" });
-
     const req = makeRequest({
       subject: "Hello",
       recipients: [{ name: "Ali", email: "ali@example.com" }],
@@ -114,8 +126,6 @@ describe("POST /api/admin/email-blast", () => {
   });
 
   it("returns 400 when subject is missing", async () => {
-    mockRequireAdmin.mockResolvedValueOnce({ ok: true, uid: "admin:test123456" });
-
     const req = makeRequest({
       ghostPostId: "abc123",
       recipients: [{ name: "Ali", email: "ali@example.com" }],
@@ -128,8 +138,6 @@ describe("POST /api/admin/email-blast", () => {
   });
 
   it("returns 400 when recipients is empty array", async () => {
-    mockRequireAdmin.mockResolvedValueOnce({ ok: true, uid: "admin:test123456" });
-
     const req = makeRequest({ ghostPostId: "abc123", subject: "Hi", recipients: [] });
     const res = await POST(req);
 
@@ -137,8 +145,6 @@ describe("POST /api/admin/email-blast", () => {
   });
 
   it("returns 413 when recipients exceed 500", async () => {
-    mockRequireAdmin.mockResolvedValueOnce({ ok: true, uid: "admin:test123456" });
-
     const recipients = Array.from({ length: 501 }, (_, i) => ({
       name: `User ${i}`,
       email: `user${i}@example.com`,
@@ -153,7 +159,6 @@ describe("POST /api/admin/email-blast", () => {
   });
 
   it("returns 404 when draft is not found in Ghost", async () => {
-    mockRequireAdmin.mockResolvedValueOnce({ ok: true, uid: "admin:test123456" });
     mockGetDraftHtml.mockResolvedValueOnce(null);
 
     const req = makeRequest({
@@ -169,7 +174,6 @@ describe("POST /api/admin/email-blast", () => {
   });
 
   it("happy path: 2 recipients — sendEmail called twice, Firestore doc created + updated, response has sent: 2", async () => {
-    mockRequireAdmin.mockResolvedValueOnce({ ok: true, uid: "admin:test123456" });
     mockGetDraftHtml.mockResolvedValueOnce({
       id: "ghost-post-1",
       title: "Workshop Recap",
@@ -230,7 +234,6 @@ describe("POST /api/admin/email-blast", () => {
   });
 
   it("1 send failure: sendEmailBatch returns false for one → failed: 1, audit log failedCount: 1", async () => {
-    mockRequireAdmin.mockResolvedValueOnce({ ok: true, uid: "admin:test123456" });
     mockGetDraftHtml.mockResolvedValueOnce({
       id: "ghost-post-2",
       title: "Event",
@@ -271,7 +274,6 @@ describe("POST /api/admin/email-blast", () => {
   });
 
   it("{{name}} replacement HTML-escapes the recipient name", async () => {
-    mockRequireAdmin.mockResolvedValueOnce({ ok: true, uid: "admin:test123456" });
     mockGetDraftHtml.mockResolvedValueOnce({
       id: "ghost-post-3",
       title: "XSS Test",

@@ -2,7 +2,7 @@
  * GET  /api/ambassador/applications/[applicationId] — Admin detail view.
  * PATCH /api/ambassador/applications/[applicationId] — Admin accepts or declines.
  *
- * Gate order (Pitfall 3): isAmbassadorProgramEnabled() → requireAdmin() → business logic.
+ * Gate order (Pitfall 3): isAmbassadorProgramEnabled() → requireAdminAccess() → business logic.
  *
  * Design:
  *   - GET returns full application doc + a 1-hour signed URL for student-ID photos (REVIEW-02).
@@ -10,13 +10,13 @@
  *     syncAmbassadorClaim, then assignAmbassadorDiscordRoleSoft (D-17: Discord failure
  *     never rolls back Firestore).
  *   - PATCH decline: simple update; does NOT touch mentorship_profiles or cohorts.
- *   - reviewedBy is populated from admin.uid (APPLY-08 admin attribution).
+ *   - reviewedBy is the acting staff member's uid (APPLY-08 admin attribution).
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { db, storage } from "@/lib/firebaseAdmin";
 import { isAmbassadorProgramEnabled } from "@/lib/features";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import { ApplicationReviewSchema, type ApplicationDoc } from "@/types/ambassador";
 import {
   AMBASSADOR_APPLICATIONS_COLLECTION,
@@ -33,9 +33,7 @@ import {
 } from "@/lib/email";
 import { createLogger } from "@/lib/logger";
 import { FieldValue } from "firebase-admin/firestore";
-import {
-  PUBLIC_AMBASSADORS_COLLECTION,
-} from "@/types/ambassador";
+import { PUBLIC_AMBASSADORS_COLLECTION } from "@/types/ambassador";
 import { REFERRAL_CODES_COLLECTION } from "@/lib/ambassador/constants";
 
 const logger = createLogger("ambassador/applications/[id]");
@@ -47,9 +45,10 @@ type RouteParams = { params: Promise<{ applicationId: string }> };
 
 /** GET detail — admin reads full application + 1-hour signed URL for student-ID (REVIEW-02). */
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  if (!isAmbassadorProgramEnabled()) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  const admin = await requireAdmin(request);
-  if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
+  if (!isAmbassadorProgramEnabled())
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const access = await requireAdminAccess(request, "ambassador.applications.read");
+  if (!access.ok) return access.response;
 
   const { applicationId } = await params;
   const snap = await db.collection(AMBASSADOR_APPLICATIONS_COLLECTION).doc(applicationId).get();
@@ -65,13 +64,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // with "Cannot sign data without client_email". Route through our dev
     // proxy, which uses the GCS-style download endpoint (bypasses storage.rules)
     // and streams bytes back to the browser so `<a href>` navigation works
-    // without needing to attach the x-admin-token header.
-    if (
-      process.env.NODE_ENV === "development" &&
-      !!process.env.FIREBASE_STORAGE_EMULATOR_HOST
-    ) {
-      studentIdSignedUrl =
-        `/api/dev/storage-download?path=${encodeURIComponent(app.studentIdStoragePath)}`;
+    // without needing to attach an Authorization header.
+    if (process.env.NODE_ENV === "development" && !!process.env.FIREBASE_STORAGE_EMULATOR_HOST) {
+      studentIdSignedUrl = `/api/dev/storage-download?path=${encodeURIComponent(app.studentIdStoragePath)}`;
     } else if (storage) {
       try {
         const [url] = await storage.file(app.studentIdStoragePath).getSignedUrl({
@@ -95,20 +90,32 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 /** PATCH — admin accepts or declines. Body: { action: "accept" | "decline", notes?: string } */
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
-  if (!isAmbassadorProgramEnabled()) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  const admin = await requireAdmin(request);
-  if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
-
-  // APPLY-08: Plan 04's requireAdmin formally guarantees uid on the ok branch.
-  // uid is synthesised from the admin_sessions token — stable per session.
-  const adminUid = admin.uid;
-
-  const { applicationId } = await params;
-
+  if (!isAmbassadorProgramEnabled())
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   let body: unknown;
   try {
     body = await request.json();
   } catch {
+    body = null;
+  }
+
+  // Authorize per operation: accept is moderator, decline is admin. An
+  // unrecognised action authorizes as accept and is then rejected by the schema.
+  const requestedAction = (body as { action?: unknown } | null)?.action;
+  const access = await requireAdminAccess(
+    request,
+    requestedAction === "decline"
+      ? "ambassador.application.decline"
+      : "ambassador.application.accept"
+  );
+  if (!access.ok) return access.response;
+
+  // APPLY-08: reviewedBy carries the acting staff member's uid.
+  const adminUid = access.actor.uid;
+
+  const { applicationId } = await params;
+
+  if (body === null) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
@@ -116,7 +123,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Invalid body", details: parsed.error.flatten() },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -130,7 +137,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const app = snap.data() as ApplicationDoc;
 
     if (app.status === "accepted") {
-      return NextResponse.json({ error: "Cannot decline an accepted application" }, { status: 409 });
+      return NextResponse.json(
+        { error: "Cannot decline an accepted application" },
+        { status: 409 }
+      );
     }
 
     const now = new Date();
@@ -145,22 +155,26 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     // EMAIL-03 — non-fatal; log on failure, decision is already persisted.
     try {
       // Fetch cohort name for the decline email
-      const cohortSnap = await db
-        .collection("cohorts")
-        .doc(app.targetCohortId)
-        .get();
+      const cohortSnap = await db.collection("cohorts").doc(app.targetCohortId).get();
       const cohortName = cohortSnap.exists
-        ? (cohortSnap.data() as { name?: string }).name ?? "the ambassador program"
+        ? ((cohortSnap.data() as { name?: string }).name ?? "the ambassador program")
         : "the ambassador program";
       await sendAmbassadorApplicationDeclinedEmail(
         app.applicantEmail,
         app.applicantName,
         cohortName,
-        notes,
+        notes
       );
     } catch (e) {
       logger.error("EMAIL-03 send failed", { applicationId, error: e });
     }
+
+    await logAdminAction(
+      access.actor,
+      "ambassador.application.decline",
+      { type: "ambassador_application", id: applicationId, label: app.applicantName },
+      { ...(notes ? { notes } : {}) }
+    );
 
     return NextResponse.json({ success: true, status: "declined" });
   }
@@ -170,9 +184,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
   if (!result.ok) {
     const httpStatus =
-      result.error === "cohort_full" || result.error === "already_declined"
-        ? 409
-        : 404; // application_not_found | cohort_not_found
+      result.error === "cohort_full" || result.error === "already_declined" ? 409 : 404; // application_not_found | cohort_not_found
     return NextResponse.json({ error: result.error }, { status: httpStatus });
   }
 
@@ -192,7 +204,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   } else {
     discord = await assignAmbassadorDiscordRoleSoft(
       result.applicationId,
-      result.discordMemberId ?? result.discordHandle ?? null,
+      result.discordMemberId ?? result.discordHandle ?? null
     );
   }
 
@@ -203,12 +215,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         result.applicantEmail,
         result.applicantName,
         result.cohortName,
-        DISCORD_AMBASSADORS_INVITE,
+        DISCORD_AMBASSADORS_INVITE
       );
     } catch (e) {
       logger.error("EMAIL-02 send failed", { applicationId, error: e });
     }
   }
+
+  await logAdminAction(
+    access.actor,
+    "ambassador.application.accept",
+    { type: "ambassador_application", id: applicationId, label: result.applicantName },
+    { alreadyAccepted: result.alreadyAccepted === true, discordAssigned: discord.ok }
+  );
 
   return NextResponse.json({
     success: true,
@@ -221,14 +240,16 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
 /** DELETE — admin hard-deletes an application and all derived ambassador state if accepted. */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
-  if (!isAmbassadorProgramEnabled()) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  const admin = await requireAdmin(request);
-  if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
+  if (!isAmbassadorProgramEnabled())
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const access = await requireAdminAccess(request, "ambassador.application.delete");
+  if (!access.ok) return access.response;
 
   const { applicationId } = await params;
   const appRef = db.collection(AMBASSADOR_APPLICATIONS_COLLECTION).doc(applicationId);
   const appSnap = await appRef.get();
-  if (!appSnap.exists) return NextResponse.json({ error: "Application not found" }, { status: 404 });
+  if (!appSnap.exists)
+    return NextResponse.json({ error: "Application not found" }, { status: 404 });
   const app = appSnap.data() as ApplicationDoc;
 
   const batch = db.batch();
@@ -257,9 +278,19 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     try {
       await syncAmbassadorClaim(app.applicantUid);
     } catch (e) {
-      logger.error("syncAmbassadorClaim after application delete failed", { uid: app.applicantUid, error: e });
+      logger.error("syncAmbassadorClaim after application delete failed", {
+        uid: app.applicantUid,
+        error: e,
+      });
     }
   }
+
+  await logAdminAction(
+    access.actor,
+    "ambassador.application.delete",
+    { type: "ambassador_application", id: applicationId, label: app.applicantName },
+    { previousStatus: app.status, applicantUid: app.applicantUid }
+  );
 
   return NextResponse.json({ success: true });
 }

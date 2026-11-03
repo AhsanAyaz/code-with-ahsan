@@ -1,13 +1,11 @@
 "use client";
 
+import { adminFetch } from "@/lib/adminAccess/client";
 import { useState, useEffect } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { Roadmap } from "@/types/mentorship";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import Link from "next/link";
 import { format } from "date-fns";
-import { getAuth } from "firebase/auth";
-import { getApp } from "firebase/app";
 import { useDebouncedCallback } from "use-debounce";
 
 const DOMAIN_LABELS: Record<string, string> = {
@@ -48,10 +46,7 @@ export default function AdminRoadmapsPage() {
         if (filters.domain) params.set("domain", filters.domain);
         if (filters.author) params.set("author", filters.author);
 
-        const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-        const response = await fetch(`/api/roadmaps?${params.toString()}`, {
-          headers: token ? { "x-admin-token": token } : {},
-        });
+        const response = await adminFetch(`/api/roadmaps?${params.toString()}`);
         if (response.ok) {
           const data = await response.json();
           setRoadmaps(data.roadmaps || []);
@@ -74,18 +69,8 @@ export default function AdminRoadmapsPage() {
   const handleApprove = async (id: string, hasPendingDraft?: boolean) => {
     setActionLoading(id);
     try {
-      const auth = getAuth(getApp());
-      const user = auth.currentUser;
-      const authToken = user ? await user.getIdToken() : null;
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-
-      const response = await fetch(`/api/roadmaps/${id}`, {
+      const response = await adminFetch(`/api/roadmaps/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-          ...(token ? { "x-admin-token": token } : {}),
-        },
         body: JSON.stringify({
           action: hasPendingDraft ? "approve-draft" : "approve",
         }),
@@ -115,18 +100,8 @@ export default function AdminRoadmapsPage() {
 
     setActionLoading(id);
     try {
-      const auth = getAuth(getApp());
-      const user = auth.currentUser;
-      const authToken = user ? await user.getIdToken() : null;
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-
-      const response = await fetch(`/api/roadmaps/${id}`, {
+      const response = await adminFetch(`/api/roadmaps/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-          ...(token ? { "x-admin-token": token } : {}),
-        },
         body: JSON.stringify({ action: "request-changes", feedback }),
       });
 
@@ -156,17 +131,8 @@ export default function AdminRoadmapsPage() {
 
     setActionLoading(id);
     try {
-      const auth = getAuth(getApp());
-      const user = auth.currentUser;
-      const authToken = user ? await user.getIdToken() : null;
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-
-      const response = await fetch(`/api/roadmaps/${id}`, {
+      const response = await adminFetch(`/api/roadmaps/${id}`, {
         method: "DELETE",
-        headers: {
-          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-          ...(token ? { "x-admin-token": token } : {}),
-        },
       });
 
       if (response.ok) {

@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
-import { verifyAdminRequest } from "@/lib/adminAuth";
+import { requireAdminAccess } from "@/lib/adminAccess/server";
 
 export async function GET(request: NextRequest) {
-  if (!(await verifyAdminRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireAdminAccess(request, "mentorship.stats.read");
+  if (!access.ok) return access.response;
 
   try {
     // Get mentor count

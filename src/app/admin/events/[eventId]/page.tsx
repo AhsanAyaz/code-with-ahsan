@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import WinnersEditor from "@/components/events/WinnersEditor";
 import { getAdminEvent } from "../registry";
 
@@ -39,18 +38,12 @@ export default function AdminEventWinnersPage() {
         )}
         {loadedAt && (
           <div className="alert alert-info mt-3 py-2 text-sm">
-            Winners currently saved — announced {new Date(loadedAt).toLocaleString()}
+            Winners currently saved, announced {new Date(loadedAt).toLocaleString()}
           </div>
         )}
       </div>
 
-      <WinnersEditor
-        eventId={eventId}
-        teams={teams}
-        tokenHeader="x-admin-token"
-        tokenKey={ADMIN_TOKEN_KEY}
-        onLoadedAtChange={setLoadedAt}
-      />
+      <WinnersEditor eventId={eventId} teams={teams} onLoadedAtChange={setLoadedAt} />
     </div>
   );
 }

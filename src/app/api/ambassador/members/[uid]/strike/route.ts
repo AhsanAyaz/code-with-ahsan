@@ -8,7 +8,7 @@
  *
  * Gate order:
  *   1. isAmbassadorProgramEnabled()
- *   2. requireAdmin(request)
+ *   2. requireAdminAccess(request, "ambassador.member.strike")
  *   3. Verify target subdoc exists
  *   4. Atomic increment on `strikes`
  */
@@ -16,19 +16,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { db } from "@/lib/firebaseAdmin";
 import { isAmbassadorProgramEnabled } from "@/lib/features";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { uid: string } | Promise<{ uid: string }> },
+  { params }: { params: { uid: string } | Promise<{ uid: string }> }
 ) {
   if (!isAmbassadorProgramEnabled()) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  const admin = await requireAdmin(request);
-  if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
-  }
+  const access = await requireAdminAccess(request, "ambassador.member.strike");
+  if (!access.ok) return access.response;
 
   // Next 15+: params may be a Promise — await defensively
   const { uid } = await Promise.resolve(params);
@@ -61,8 +59,12 @@ export async function POST(
     return NextResponse.json({ error: result.error }, { status: result.status });
   }
 
-  return NextResponse.json(
-    { uid, strikes: result.strikes },
-    { status: 200 },
+  await logAdminAction(
+    access.actor,
+    "ambassador.member.strike",
+    { type: "ambassador", id: uid },
+    { strikes: result.strikes }
   );
+
+  return NextResponse.json({ uid, strikes: result.strikes }, { status: 200 });
 }
