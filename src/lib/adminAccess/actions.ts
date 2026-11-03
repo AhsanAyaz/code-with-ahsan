@@ -38,7 +38,7 @@ export const ADMIN_ACTIONS = {
   "mentorship.profiles.read": "moderator", // profiles GET
   "mentorship.profile.accept": "moderator", // profiles PUT status=accepted (incl. reactivate)
   "mentorship.profile.edit": "moderator", // profiles PUT discordUsername / linkedinUrl only
-  "mentorship.profile.requestChanges": "admin", // profiles PUT status=changes_requested (reject family)
+  "mentorship.profile.requestChanges": "moderator", // profiles PUT status=changes_requested (reversible)
   "mentorship.profile.decline": "admin", // profiles PUT status=declined
   "mentorship.profile.disable": "admin", // profiles PUT status=disabled (strips roles)
   "mentorship.profile.delete": "admin", // profiles DELETE
