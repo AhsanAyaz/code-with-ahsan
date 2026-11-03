@@ -36,8 +36,8 @@ const CwaTechSummit2027Page = () => {
         <JudgesSection />
         <SponsorsSection />
         <SponsorshipTiersSection />
-        <OrganizersSection />
         <InKindSection />
+        <OrganizersSection />
         <VenueSection />
         <CommunityNumbersSection />
         <PastEventsSection />
