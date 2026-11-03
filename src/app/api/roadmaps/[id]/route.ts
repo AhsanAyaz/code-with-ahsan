@@ -1,30 +1,27 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- pre-existing Firestore query casts; not part of the admin access cutover */
 import { NextRequest, NextResponse } from "next/server";
 import { db, storage } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
-import { canApproveRoadmap, canEditRoadmap } from "@/lib/permissions";
+import { canEditRoadmap } from "@/lib/permissions";
 import { sanitizeMarkdownRaw } from "@/lib/validation/sanitize";
 import { verifyAuth } from "@/lib/auth";
+import { getAdminRole, logAdminAction, type AdminActor } from "@/lib/adminAccess/server";
+import { can } from "@/lib/adminAccess/actions";
 import type { PermissionUser } from "@/lib/permissions";
 import { sendRoadmapSubmissionNotification, sendRoadmapStatusNotification } from "@/lib/discord";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const { searchParams } = new URL(request.url);
-    const previewDraft = searchParams.get('preview') === 'draft';
+    const previewDraft = searchParams.get("preview") === "draft";
 
     // Fetch roadmap document
     const roadmapRef = db.collection("roadmaps").doc(id);
     const roadmapDoc = await roadmapRef.get();
 
     if (!roadmapDoc.exists) {
-      return NextResponse.json(
-        { error: "Roadmap not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Roadmap not found" }, { status: 404 });
     }
 
     let roadmapData = roadmapDoc.data();
@@ -32,7 +29,11 @@ export async function GET(
 
     // If preview=draft, fetch the draft version and overlay its data
     // This includes both pending drafts and rejected drafts (with feedback)
-    if (previewDraft && roadmapData?.draftVersionNumber && (roadmapData?.hasPendingDraft || roadmapData?.feedback)) {
+    if (
+      previewDraft &&
+      roadmapData?.draftVersionNumber &&
+      (roadmapData?.hasPendingDraft || roadmapData?.feedback)
+    ) {
       try {
         const versionsSnapshot = await db
           .collection("roadmaps")
@@ -49,10 +50,15 @@ export async function GET(
           roadmapData = {
             ...roadmapData,
             title: draftData.title !== undefined ? draftData.title : roadmapData.title,
-            description: draftData.description !== undefined ? draftData.description : roadmapData.description,
+            description:
+              draftData.description !== undefined ? draftData.description : roadmapData.description,
             domain: draftData.domain !== undefined ? draftData.domain : roadmapData.domain,
-            difficulty: draftData.difficulty !== undefined ? draftData.difficulty : roadmapData.difficulty,
-            estimatedHours: draftData.estimatedHours !== undefined ? draftData.estimatedHours : roadmapData.estimatedHours,
+            difficulty:
+              draftData.difficulty !== undefined ? draftData.difficulty : roadmapData.difficulty,
+            estimatedHours:
+              draftData.estimatedHours !== undefined
+                ? draftData.estimatedHours
+                : roadmapData.estimatedHours,
             version: draftData.version, // Show draft version number
           };
           contentUrl = draftData.contentUrl; // Use draft content
@@ -91,24 +97,15 @@ export async function GET(
     return NextResponse.json({ roadmap }, { status: 200 });
   } catch (error) {
     console.error("Error fetching roadmap:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch roadmap" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch roadmap" }, { status: 500 });
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authResult = await verifyAuth(request);
     if (!authResult) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -130,28 +127,35 @@ export async function PUT(
     const roadmapDoc = await roadmapRef.get();
 
     if (!roadmapDoc.exists) {
-      return NextResponse.json(
-        { error: "Roadmap not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Roadmap not found" }, { status: 404 });
     }
 
     const roadmapData = roadmapDoc.data();
 
     // Fetch actor's mentorship_profiles doc for permission checks
-    const actorDoc = await db
-      .collection("mentorship_profiles")
-      .doc(authResult.uid)
-      .get();
+    const actorDoc = await db.collection("mentorship_profiles").doc(authResult.uid).get();
 
     const actorData = actorDoc.exists ? actorDoc.data() : null;
 
-    // Build PermissionUser from profile data
+    // Staff access comes from admin_roles (not mentorship_profiles.isAdmin).
+    const staffRole = await getAdminRole(authResult.uid);
+    const staffActor: AdminActor | null = staffRole
+      ? { uid: authResult.uid, email: authResult.email, role: staffRole }
+      : null;
+    const isCreator = authResult.uid === roadmapData?.creatorId;
+
+    // Build PermissionUser from profile data. isAdmin here means "staff may
+    // edit someone else's roadmap" (roadmaps.edit).
     const permissionUser: PermissionUser = {
       uid: authResult.uid,
       roles: actorData?.roles ?? [],
       status: actorData?.status,
-      isAdmin: actorData?.isAdmin,
+      isAdmin: can(staffRole, "roadmaps.edit"),
+    };
+    const roadmapTarget = {
+      type: "roadmap",
+      id,
+      ...(roadmapData?.title ? { label: roadmapData.title as string } : {}),
     };
 
     // Handle different actions
@@ -197,8 +201,8 @@ export async function PUT(
         { status: 200 }
       );
     } else if (action === "approve") {
-      // Check admin permission
-      if (!canApproveRoadmap(permissionUser, roadmapData as any)) {
+      // Check staff permission
+      if (!staffActor || !can(staffRole, "roadmaps.approve")) {
         return NextResponse.json(
           {
             error: "Permission denied",
@@ -237,16 +241,15 @@ export async function PUT(
         }
       }
 
-      return NextResponse.json(
-        { success: true, message: "Roadmap approved" },
-        { status: 200 }
-      );
+      await logAdminAction(staffActor, "roadmaps.approve", roadmapTarget);
+
+      return NextResponse.json({ success: true, message: "Roadmap approved" }, { status: 200 });
     } else if (action === "request-changes") {
-      // Check admin permission
-      if (!canApproveRoadmap(permissionUser, roadmapData as any)) {
+      // Check staff permission (admin only: marks the submission rejected)
+      if (!staffActor || !can(staffRole, "roadmaps.requestChanges")) {
         return NextResponse.json(
           {
-            error: "Permission denied",
+            error: "Admins only",
             message: "Only admins can request changes",
           },
           { status: 403 }
@@ -328,6 +331,10 @@ export async function PUT(
           }
         }
 
+        await logAdminAction(staffActor, "roadmaps.requestChanges", roadmapTarget, {
+          draftVersion,
+        });
+
         return NextResponse.json(
           { success: true, message: "Changes requested on draft version" },
           { status: 200 }
@@ -356,14 +363,13 @@ export async function PUT(
           }
         }
 
-        return NextResponse.json(
-          { success: true, message: "Changes requested" },
-          { status: 200 }
-        );
+        await logAdminAction(staffActor, "roadmaps.requestChanges", roadmapTarget);
+
+        return NextResponse.json({ success: true, message: "Changes requested" }, { status: 200 });
       }
     } else if (action === "approve-draft") {
-      // Check admin permission
-      if (!canApproveRoadmap(permissionUser, roadmapData as any)) {
+      // Check staff permission
+      if (!staffActor || !can(staffRole, "roadmaps.approve")) {
         return NextResponse.json(
           {
             error: "Permission denied",
@@ -375,10 +381,7 @@ export async function PUT(
 
       // Verify there's a pending draft
       if (!roadmapData?.hasPendingDraft) {
-        return NextResponse.json(
-          { error: "No pending draft version found" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "No pending draft version found" }, { status: 400 });
       }
 
       const draftVersion = roadmapData.draftVersionNumber;
@@ -419,7 +422,8 @@ export async function PUT(
       if (draftData.description !== undefined) updateData.description = draftData.description;
       if (draftData.domain !== undefined) updateData.domain = draftData.domain;
       if (draftData.difficulty !== undefined) updateData.difficulty = draftData.difficulty;
-      if (draftData.estimatedHours !== undefined) updateData.estimatedHours = draftData.estimatedHours;
+      if (draftData.estimatedHours !== undefined)
+        updateData.estimatedHours = draftData.estimatedHours;
 
       await roadmapRef.update(updateData);
 
@@ -442,6 +446,10 @@ export async function PUT(
           console.error("[Discord] Failed to send draft approval notification:", error);
         }
       }
+
+      await logAdminAction(staffActor, "roadmaps.approve", roadmapTarget, {
+        draftVersion,
+      });
 
       return NextResponse.json(
         { success: true, message: "Draft version approved and published" },
@@ -471,7 +479,8 @@ export async function PUT(
         return NextResponse.json(
           {
             error: "Draft already exists",
-            message: "This roadmap already has pending changes. Please wait for them to be approved or rejected before making new edits.",
+            message:
+              "This roadmap already has pending changes. Please wait for them to be approved or rejected before making new edits.",
           },
           { status: 409 }
         );
@@ -495,7 +504,11 @@ export async function PUT(
       // - If editing approved roadmap: increment to create new draft
       // - If editing rejected draft: keep the draft version (don't increment)
       // - Otherwise: keep current version (initial draft)
-      const newVersion = isApproved ? currentVersion + 1 : (hasRejectedDraft ? roadmapData.draftVersionNumber : currentVersion);
+      const newVersion = isApproved
+        ? currentVersion + 1
+        : hasRejectedDraft
+          ? roadmapData.draftVersionNumber
+          : currentVersion;
 
       // Sanitize content
       const sanitizedContent = sanitizeMarkdownRaw(content);
@@ -550,7 +563,8 @@ export async function PUT(
             description: description !== undefined ? description : roadmapData.description,
             domain: domain !== undefined ? domain : roadmapData.domain,
             difficulty: difficulty !== undefined ? difficulty : roadmapData.difficulty,
-            estimatedHours: estimatedHours !== undefined ? estimatedHours : roadmapData.estimatedHours,
+            estimatedHours:
+              estimatedHours !== undefined ? estimatedHours : roadmapData.estimatedHours,
             createdBy: authResult.uid,
             createdAt: FieldValue.serverTimestamp(),
             changeDescription: changeDescription || `Version ${newVersion}`,
@@ -566,6 +580,10 @@ export async function PUT(
           );
         } catch (error) {
           console.error("[Discord] Failed to send roadmap version submission notification:", error);
+        }
+
+        if (staffActor && !isCreator) {
+          await logAdminAction(staffActor, "roadmaps.edit", roadmapTarget);
         }
 
         return NextResponse.json(
@@ -613,6 +631,10 @@ export async function PUT(
               feedbackBy: null,
               updatedAt: FieldValue.serverTimestamp(),
             });
+
+            if (staffActor && !isCreator) {
+              await logAdminAction(staffActor, "roadmaps.edit", roadmapTarget);
+            }
 
             return NextResponse.json(
               {
@@ -679,6 +701,10 @@ export async function PUT(
             });
         }
 
+        if (staffActor && !isCreator) {
+          await logAdminAction(staffActor, "roadmaps.edit", roadmapTarget);
+        }
+
         return NextResponse.json(
           {
             success: true,
@@ -693,10 +719,7 @@ export async function PUT(
     }
   } catch (error) {
     console.error("Error updating roadmap:", error);
-    return NextResponse.json(
-      { error: "Failed to update roadmap" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update roadmap" }, { status: 500 });
   }
 }
 
@@ -707,10 +730,7 @@ export async function DELETE(
   try {
     const authResult = await verifyAuth(request);
     if (!authResult) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -720,28 +740,27 @@ export async function DELETE(
     const roadmapDoc = await roadmapRef.get();
 
     if (!roadmapDoc.exists) {
-      return NextResponse.json(
-        { error: "Roadmap not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Roadmap not found" }, { status: 404 });
     }
 
     const roadmapData = roadmapDoc.data();
 
     // Fetch actor's mentorship_profiles doc for permission checks
-    const actorDoc = await db
-      .collection("mentorship_profiles")
-      .doc(authResult.uid)
-      .get();
+    const actorDoc = await db.collection("mentorship_profiles").doc(authResult.uid).get();
 
     const actorData = actorDoc.exists ? actorDoc.data() : null;
+
+    // Staff access comes from admin_roles (not mentorship_profiles.isAdmin).
+    // Deleting someone else's roadmap, or any approved one, is admin only.
+    const staffRole = await getAdminRole(authResult.uid);
+    const staffCanDelete = can(staffRole, "roadmaps.delete");
 
     // Build PermissionUser from profile data
     const permissionUser: PermissionUser = {
       uid: authResult.uid,
       roles: actorData?.roles ?? [],
       status: actorData?.status,
-      isAdmin: actorData?.isAdmin,
+      isAdmin: staffCanDelete,
     };
 
     // Check permission: only creator or admin can delete
@@ -771,11 +790,7 @@ export async function DELETE(
     }
 
     // Clean up versions subcollection
-    const versionsSnapshot = await db
-      .collection("roadmaps")
-      .doc(id)
-      .collection("versions")
-      .get();
+    const versionsSnapshot = await db.collection("roadmaps").doc(id).collection("versions").get();
     const batch = db.batch();
     versionsSnapshot.docs.forEach((doc) => batch.delete(doc.ref));
     if (versionsSnapshot.docs.length > 0) {
@@ -785,18 +800,29 @@ export async function DELETE(
     // Delete the roadmap document
     await roadmapRef.delete();
 
+    const deletedAsStaff =
+      staffRole &&
+      staffCanDelete &&
+      (authResult.uid !== roadmapData?.creatorId || roadmapData?.status === "approved");
+    if (deletedAsStaff) {
+      await logAdminAction(
+        { uid: authResult.uid, email: authResult.email, role: staffRole },
+        "roadmaps.delete",
+        {
+          type: "roadmap",
+          id,
+          ...(roadmapData?.title ? { label: roadmapData.title as string } : {}),
+        },
+        { previousStatus: roadmapData?.status ?? null }
+      );
+    }
+
     // Note: We're not deleting Storage files for audit trail
     // Storage files can be cleaned up separately if needed
 
-    return NextResponse.json(
-      { success: true, message: "Roadmap deleted" },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true, message: "Roadmap deleted" }, { status: 200 });
   } catch (error) {
     console.error("Error deleting roadmap:", error);
-    return NextResponse.json(
-      { error: "Failed to delete roadmap" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to delete roadmap" }, { status: 500 });
   }
 }
