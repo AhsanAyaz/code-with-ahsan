@@ -24,6 +24,10 @@ async function readError(res: Response, fallback: string): Promise<string> {
   return typeof data?.error === "string" ? data.error : fallback;
 }
 
+function withArticle(role: AdminRole): string {
+  return role === "admin" ? "an admin" : "a moderator";
+}
+
 function grantedByLabel(grantedBy: TeamMember["grantedBy"]): string {
   if (!grantedBy) return "Unknown";
   if (grantedBy.uid === "cli" || grantedBy.email.startsWith("cli:")) return "Setup script";
@@ -82,7 +86,7 @@ export default function TeamClient() {
         setAddError(await readError(res, "Could not add that person."));
         return;
       }
-      toast.success(`${email.trim()} is now a ${role}.`);
+      toast.success(`${email.trim()} is now ${withArticle(role)}.`);
       setEmail("");
       await load();
     } catch {
@@ -105,7 +109,7 @@ export default function TeamClient() {
         toast.error(await readError(res, "Could not change the role."));
         return;
       }
-      toast.success(`${member.email} is now a ${next}.`);
+      toast.success(`${member.email} is now ${withArticle(next)}.`);
       setMembers((prev) => prev.map((m) => (m.uid === member.uid ? { ...m, role: next } : m)));
     } catch {
       toast.error("Could not change the role.");
