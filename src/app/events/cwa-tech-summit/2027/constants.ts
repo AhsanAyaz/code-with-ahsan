@@ -300,7 +300,32 @@ export const PAST_EVENTS: PastEvent[] = [
     // HACKATHON_TEAMS in events/cwa-ship-karachi/2026/constants.ts lists 15 teams.
     stat: "15 teams",
     url: "/events/cwa-ship-karachi/2026",
-    photos: [],
+    photos: [
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.shipKarachi}/ship-karachi-01.webp`,
+        alt: "Ship Karachi participants, mentors and organisers posing together in front of the Code with Ahsan backdrop, giving a thumbs up",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.shipKarachi}/ship-karachi-02.webp`,
+        alt: "Participants checking in at the Folio3 reception desk beside a Welcome to CWA Ship Karachi 2026 banner",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.shipKarachi}/ship-karachi-03.webp`,
+        alt: "A team talking through their idea with a mentor at a table of laptops on the hackathon floor",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.shipKarachi}/ship-karachi-04.webp`,
+        alt: "Judges at the judging desk with laptops, one asking a team a question over the microphone",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.shipKarachi}/ship-karachi-05.webp`,
+        alt: "A participant presenting his team's project on two screens during the evening demos",
+      },
+      {
+        src: `${PAST_EVENT_PHOTO_DIRS.shipKarachi}/ship-karachi-06.webp`,
+        alt: "A team on stage holding their certificates, with the winner's trophy in the centre",
+      },
+    ],
   },
   {
     key: "promptathon",
