@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { StrikeConfirmModal } from "./StrikeConfirmModal";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 
 export function StrikePanel({
   uid,
@@ -28,19 +29,21 @@ export function StrikePanel({
           {strikes >= 2 && (
             <div role="alert" className="alert alert-warning">
               <span>
-                This ambassador has reached 2 confirmed strikes. The offboarding flow will be available in the next phase.
+                This ambassador has reached 2 confirmed strikes. The offboarding flow will be
+                available in the next phase.
               </span>
             </div>
           )}
 
           <div className="card-actions justify-end">
-            <button
-              type="button"
+            <AdminActionButton
+              action="ambassador.member.strike"
+              tooltipClassName="tooltip-left"
               className="btn btn-error"
               onClick={() => setModalOpen(true)}
             >
               Confirm strike
-            </button>
+            </AdminActionButton>
           </div>
         </div>
       </section>

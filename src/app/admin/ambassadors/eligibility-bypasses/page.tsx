@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 
 type Bypass = {
   uid: string;
@@ -158,7 +159,9 @@ export default function EligibilityBypassesPage() {
                     </td>
                     <td className="text-sm text-base-content/60">{b.reason ?? "—"}</td>
                     <td>
-                      <button
+                      <AdminActionButton
+                        action="ambassador.eligibilityBypass.revoke"
+                        tooltipClassName="tooltip-left"
                         className="btn btn-ghost btn-xs text-error"
                         onClick={() => handleRevoke(b.uid)}
                         disabled={revoking === b.uid}
@@ -168,7 +171,7 @@ export default function EligibilityBypassesPage() {
                         ) : (
                           "Revoke"
                         )}
-                      </button>
+                      </AdminActionButton>
                     </td>
                   </tr>
                 ))}

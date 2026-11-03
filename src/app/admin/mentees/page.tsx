@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import { useDebouncedCallback } from "use-debounce";
 import ProfileAvatar from "@/components/ProfileAvatar";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 import { format } from "date-fns";
 import { hasRole } from "@/lib/permissions";
 
@@ -597,7 +598,8 @@ export default function AllMentorsPage() {
                             </button>
                           )}
                           {/* Cascade delete-user (GH#239 / VIS-142) */}
-                          <button
+                          <AdminActionButton
+                            action="mentorship.profile.delete"
                             className="btn btn-error btn-outline btn-sm"
                             onClick={() => {
                               setUserToDelete({
@@ -609,7 +611,7 @@ export default function AllMentorsPage() {
                             }}
                           >
                             Delete User
-                          </button>
+                          </AdminActionButton>
                         </div>
                         <p className="text-sm text-base-content/70">
                           {getAnonymizedEmail(p.email, p.uid, isStreamerMode)}
@@ -1541,7 +1543,8 @@ function MentorshipCard({
                   )}
                 </button>
               )}
-              <button
+              <AdminActionButton
+                action="mentorship.session.regenerateChannel"
                 className="btn btn-info btn-xs"
                 disabled={regeneratingChannel === mentorship.id}
                 onClick={() => handleRegenerateChannel(mentorship.id)}
@@ -1551,8 +1554,9 @@ function MentorshipCard({
                 ) : (
                   "Regenerate Channel"
                 )}
-              </button>
-              <button
+              </AdminActionButton>
+              <AdminActionButton
+                action="mentorship.session.delete"
                 className="btn btn-error btn-xs btn-outline"
                 onClick={() => {
                   setSessionToDelete({
@@ -1563,7 +1567,7 @@ function MentorshipCard({
                 }}
               >
                 End
-              </button>
+              </AdminActionButton>
             </div>
           </div>
         </div>

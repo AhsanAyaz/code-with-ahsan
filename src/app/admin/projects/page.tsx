@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import Link from "next/link";
 import ProjectFilters from "@/components/admin/ProjectFilters";
 import DeleteProjectDialog from "@/components/admin/DeleteProjectDialog";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 import DeclineProjectDialog from "@/components/admin/DeclineProjectDialog";
 import DeletionSummaryModal from "@/components/admin/DeletionSummaryModal";
 import ContactInfo from "@/components/mentorship/ContactInfo";
@@ -510,12 +511,14 @@ export default function AdminProjectsPage() {
                             </button>
                           </li>
                           <li>
-                            <button
+                            <AdminActionButton
+                              action="projects.decline"
+                              tooltipClassName="tooltip-left"
                               className="text-warning"
                               onClick={() => setDeclineTarget(project)}
                             >
                               Decline
-                            </button>
+                            </AdminActionButton>
                           </li>
                         </>
                       )}
@@ -555,9 +558,14 @@ export default function AdminProjectsPage() {
                         </>
                       )}
                       <li className="border-t border-base-300 pt-2">
-                        <button className="text-error" onClick={() => setDeleteTarget(project)}>
+                        <AdminActionButton
+                          action="projects.delete"
+                          tooltipClassName="tooltip-left"
+                          className="text-error"
+                          onClick={() => setDeleteTarget(project)}
+                        >
                           Delete Project
-                        </button>
+                        </AdminActionButton>
                       </li>
                     </ul>
                   </div>
@@ -736,7 +744,8 @@ export default function AdminProjectsPage() {
                 Cancel
               </button>
 
-              <button
+              <AdminActionButton
+                action="projects.declineUpdate"
                 onClick={async () => {
                   setActionLoading(reviewTarget.id);
                   try {
@@ -787,7 +796,7 @@ export default function AdminProjectsPage() {
                 ) : (
                   "❌ Decline Changes"
                 )}
-              </button>
+              </AdminActionButton>
 
               <button
                 onClick={async () => {

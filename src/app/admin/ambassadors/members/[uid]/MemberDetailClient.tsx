@@ -7,6 +7,7 @@ import { CronFlagsPanel } from "./CronFlagsPanel";
 import { StrikePanel } from "./StrikePanel";
 import { OffboardConfirmModal } from "./OffboardConfirmModal";
 import { AlumniTransitionButton } from "./AlumniTransitionButton";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
 
 type MemberDetail = {
@@ -139,14 +140,15 @@ export function MemberDetailClient({ uid }: { uid: string }) {
             <p className="text-base-content/70">Cohort: {detail.subdoc.cohortId}</p>
           )}
         </div>
-        <button
-          type="button"
+        <AdminActionButton
+          action="ambassador.member.offboard"
+          tooltipClassName="tooltip-left"
           className="btn btn-outline btn-error btn-sm"
           onClick={() => setOffboardOpen(true)}
           disabled={!(detail.subdoc.active ?? true)}
         >
           Offboard ambassador
-        </button>
+        </AdminActionButton>
       </header>
 
       {discordRetryNeeded && (
@@ -159,14 +161,14 @@ export function MemberDetailClient({ uid }: { uid: string }) {
               }
             </span>
           </div>
-          <button
-            type="button"
+          <AdminActionButton
+            action="ambassador.member.offboard"
             className="btn btn-outline btn-sm btn-error"
             onClick={retryDiscord}
             disabled={retryingDiscord}
           >
             {retryingDiscord ? "Retrying…" : "Retry Discord removal"}
-          </button>
+          </AdminActionButton>
         </div>
       )}
 

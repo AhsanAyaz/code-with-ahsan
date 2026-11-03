@@ -5,6 +5,7 @@ import type { ApplicationDoc } from "@/types/ambassador";
 import VideoEmbed from "./VideoEmbed";
 import DiscordBanner from "./DiscordBanner";
 import DecisionDialog from "./DecisionDialog";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
 
 type AppRow = ApplicationDoc & { applicationId: string };
@@ -111,18 +112,24 @@ export default function ApplicationDetail({ applicationId }: { applicationId: st
               <button className="btn btn-success btn-sm" onClick={() => setDialog("accept")}>
                 Accept
               </button>
-              <button className="btn btn-error btn-sm" onClick={() => setDialog("decline")}>
+              <AdminActionButton
+                action="ambassador.application.decline"
+                className="btn btn-error btn-sm"
+                onClick={() => setDialog("decline")}
+              >
                 Decline
-              </button>
+              </AdminActionButton>
             </>
           )}
-          <button
+          <AdminActionButton
+            action="ambassador.application.delete"
+            tooltipClassName="tooltip-left"
             className="btn btn-outline btn-error btn-sm"
             onClick={handleDelete}
             disabled={deleting}
           >
             {deleting ? "Deleting…" : "Delete"}
-          </button>
+          </AdminActionButton>
         </div>
       </header>
 

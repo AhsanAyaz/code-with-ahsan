@@ -3,6 +3,7 @@
 import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/contexts/ToastContext";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 import { ConsultingSettings } from "@/lib/consulting/config";
 import { ConsultingPackage, ConsultingReview } from "@/types/consulting";
 import {
@@ -343,7 +344,9 @@ export default function AdminConsultingPage() {
           </p>
         </div>
 
-        <button
+        <AdminActionButton
+          action="consulting.settings.update"
+          tooltipClassName="tooltip-left shrink-0"
           onClick={handleSave}
           disabled={saving}
           className="btn btn-primary gap-2 shadow-lg hover:shadow-primary/20 shrink-0"
@@ -354,7 +357,7 @@ export default function AdminConsultingPage() {
             <Save className="w-4 h-4" />
           )}
           {saving ? "Saving..." : "Save Changes"}
-        </button>
+        </AdminActionButton>
       </div>
 
       {/* Metrics Banner */}
