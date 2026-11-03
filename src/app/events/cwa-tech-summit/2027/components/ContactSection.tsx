@@ -1,6 +1,7 @@
 import { Linkedin, Mail } from "lucide-react";
-import { CONTACTS, SECTION_IDS, type ContactPerson } from "../constants";
+import { CONTACTS, ORGANIZER_PROFILES, SECTION_IDS, type ContactPerson } from "../constants";
 import KineticHeading from "./KineticHeading";
+import { SocialLinks } from "./OrganizersSection";
 import PersonAvatar from "./PersonAvatar";
 import { CONTAINER, DISPLAY_FONT, FOCUS_RING, SECTION_SPACING } from "./styles";
 
@@ -59,6 +60,10 @@ export const ContactCard = ({
   </div>
 );
 
+const contactNames = new Set(CONTACTS.map((c) => c.name));
+/** Team leads not already shown as a full contact card. */
+const TEAM_LEADS = ORGANIZER_PROFILES.filter((o) => !contactNames.has(o.name));
+
 const ContactSection = () => {
   return (
     <section id={SECTION_IDS.contact} aria-labelledby="contact-heading" className={SECTION_SPACING}>
@@ -66,8 +71,8 @@ const ContactSection = () => {
         <div className="mb-10 max-w-3xl">
           <KineticHeading id="contact-heading" text="Got questions?" />
           <p className="mt-5 text-lg leading-relaxed text-(--sm-paper)/85">
-            Questions about sponsoring, speaking or the pitch competition? Email either of us and we
-            will get back to you.
+            Questions about sponsoring, speaking or the pitch competition? Reach out to any of us
+            and we will get back to you.
           </p>
         </div>
 
@@ -78,6 +83,31 @@ const ContactSection = () => {
             </li>
           ))}
         </ul>
+
+        {TEAM_LEADS.length > 0 && (
+          <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {TEAM_LEADS.map((lead) => (
+              <li
+                key={lead.name}
+                className="flex h-full flex-col items-center rounded-3xl border border-(--sm-lilac)/20 bg-(--sm-dusk)/60 p-6 text-center"
+              >
+                <PersonAvatar
+                  name={lead.name}
+                  src={lead.avatarUrl}
+                  size={72}
+                  className="rounded-full"
+                />
+                <h3
+                  className={`${DISPLAY_FONT} mt-4 text-xl font-bold leading-tight text-(--sm-paper)`}
+                >
+                  {lead.name}
+                </h3>
+                {lead.team && <p className="mt-1 text-sm text-(--sm-lilac)">{lead.team} lead</p>}
+                <SocialLinks organizer={lead} />
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   );
