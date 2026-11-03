@@ -485,3 +485,35 @@ describe("Admin portal collections (Admin SDK only)", () => {
     );
   });
 });
+
+describe("Challenges, submissions and leaderboard (Admin SDK only)", () => {
+  const collections = ["challenges", "submissions", "leaderboard"] as const;
+  const clients = [
+    ["anonymous", () => asUnauthenticated()],
+    ["signed-in", () => asMentee("mentee1")],
+    ["admin-claim", () => asAdmin("admin1")],
+  ] as const;
+
+  beforeEach(async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      for (const name of collections) {
+        await ctx.firestore().collection(name).doc("doc1").set({ seeded: true });
+      }
+    });
+  });
+
+  for (const name of collections) {
+    for (const [label, ctxFn] of clients) {
+      it(`denies ${label} client reading ${name}`, async () => {
+        await assertFails(ctxFn().firestore().collection(name).doc("doc1").get());
+        await assertFails(ctxFn().firestore().collection(name).get());
+      });
+
+      it(`denies ${label} client writing ${name}`, async () => {
+        await assertFails(ctxFn().firestore().collection(name).doc("new1").set({ x: 1 }));
+        await assertFails(ctxFn().firestore().collection(name).doc("doc1").update({ x: 2 }));
+        await assertFails(ctxFn().firestore().collection(name).doc("doc1").delete());
+      });
+    }
+  }
+});
