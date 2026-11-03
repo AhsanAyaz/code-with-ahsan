@@ -33,6 +33,9 @@
     "drop-legacy-role:dry-run": "npx tsx scripts/drop-legacy-role-field.ts --dry-run",
     "drop-legacy-role": "npx tsx scripts/drop-legacy-role-field.ts",
     "drop-legacy-role:limit-10": "npx tsx scripts/drop-legacy-role-field.ts --limit=10",
+    "admin-role:set": "npx tsx scripts/set-admin-role.ts",
+    "migrate-admin-roles:dry-run": "npx tsx scripts/migrate-admin-roles.ts",
+    "migrate-admin-roles": "npx tsx scripts/migrate-admin-roles.ts --apply",
     "prepare": "husky"
   },
   "dependencies": {

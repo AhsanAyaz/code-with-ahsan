@@ -25,10 +25,7 @@ beforeAll(async () => {
   testEnv = await initializeTestEnvironment({
     projectId: "test-project-" + Date.now(),
     firestore: {
-      rules: fs.readFileSync(
-        path.resolve(__dirname, "../../../firestore.rules"),
-        "utf8"
-      ),
+      rules: fs.readFileSync(path.resolve(__dirname, "../../../firestore.rules"), "utf8"),
     },
   });
 });
@@ -78,12 +75,15 @@ describe("Project Security Rules", () => {
     it("PERM-01: allows accepted mentor to create project", async () => {
       const ctx = asAcceptedMentor();
       await assertSucceeds(
-        ctx.firestore().collection("projects").add({
-          title: "Test Project",
-          creatorId: "mentor1",
-          status: "pending",
-          techStack: ["TypeScript"],
-        })
+        ctx
+          .firestore()
+          .collection("projects")
+          .add({
+            title: "Test Project",
+            creatorId: "mentor1",
+            status: "pending",
+            techStack: ["TypeScript"],
+          })
       );
     });
 
@@ -294,13 +294,11 @@ describe("Roadmap Versions", () => {
 
     const mentor = asAcceptedMentor("mentor1");
     await assertSucceeds(
-      mentor.firestore()
-        .collection("roadmaps").doc("road3")
-        .collection("versions").add({
-          version: 1,
-          content: "# Version 1",
-          createdBy: "mentor1",
-        })
+      mentor.firestore().collection("roadmaps").doc("road3").collection("versions").add({
+        version: 1,
+        content: "# Version 1",
+        createdBy: "mentor1",
+      })
     );
   });
 
@@ -310,9 +308,13 @@ describe("Roadmap Versions", () => {
         title: "Roadmap",
         creatorId: "mentor1",
       });
-      await context.firestore()
-        .collection("roadmaps").doc("road4")
-        .collection("versions").doc("v1").set({
+      await context
+        .firestore()
+        .collection("roadmaps")
+        .doc("road4")
+        .collection("versions")
+        .doc("v1")
+        .set({
           version: 1,
           content: "Content",
           createdBy: "mentor1",
@@ -321,9 +323,13 @@ describe("Roadmap Versions", () => {
 
     const mentor = asAcceptedMentor("mentor1");
     await assertFails(
-      mentor.firestore()
-        .collection("roadmaps").doc("road4")
-        .collection("versions").doc("v1").delete()
+      mentor
+        .firestore()
+        .collection("roadmaps")
+        .doc("road4")
+        .collection("versions")
+        .doc("v1")
+        .delete()
     );
   });
 
@@ -333,9 +339,13 @@ describe("Roadmap Versions", () => {
         title: "Roadmap",
         creatorId: "mentor1",
       });
-      await context.firestore()
-        .collection("roadmaps").doc("road5")
-        .collection("versions").doc("v1").set({
+      await context
+        .firestore()
+        .collection("roadmaps")
+        .doc("road5")
+        .collection("versions")
+        .doc("v1")
+        .set({
           version: 1,
           content: "Content",
           createdBy: "mentor1",
@@ -344,9 +354,13 @@ describe("Roadmap Versions", () => {
 
     const mentor = asAcceptedMentor("mentor1");
     await assertFails(
-      mentor.firestore()
-        .collection("roadmaps").doc("road5")
-        .collection("versions").doc("v1").update({
+      mentor
+        .firestore()
+        .collection("roadmaps")
+        .doc("road5")
+        .collection("versions")
+        .doc("v1")
+        .update({
           content: "Modified",
         })
     );
@@ -408,6 +422,66 @@ describe("Project Members Security Rules", () => {
         userId: "mentee1",
         role: "member",
       })
+    );
+  });
+});
+
+describe("Admin portal collections (Admin SDK only)", () => {
+  beforeEach(async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await context.firestore().collection("admin_roles").doc("admin1").set({
+        role: "admin",
+        email: "admin@example.com",
+      });
+      await context.firestore().collection("admin_audit_log").doc("log1").set({
+        actorUid: "admin1",
+        action: "projects.approve",
+      });
+    });
+  });
+
+  it("denies an admin-claim client reading their own admin_roles doc", async () => {
+    await assertFails(asAdmin("admin1").firestore().collection("admin_roles").doc("admin1").get());
+  });
+
+  it("denies an admin-claim client listing admin_roles", async () => {
+    await assertFails(asAdmin().firestore().collection("admin_roles").get());
+  });
+
+  it("denies an admin-claim client writing admin_roles", async () => {
+    await assertFails(
+      asAdmin().firestore().collection("admin_roles").doc("someone").set({ role: "admin" })
+    );
+  });
+
+  it("denies a signed-in user granting themselves a role", async () => {
+    await assertFails(
+      asMentee("mentee1")
+        .firestore()
+        .collection("admin_roles")
+        .doc("mentee1")
+        .set({ role: "admin" })
+    );
+  });
+
+  it("denies an admin-claim client reading admin_audit_log", async () => {
+    await assertFails(asAdmin().firestore().collection("admin_audit_log").doc("log1").get());
+    await assertFails(asAdmin().firestore().collection("admin_audit_log").get());
+  });
+
+  it("denies an admin-claim client writing admin_audit_log", async () => {
+    await assertFails(
+      asAdmin().firestore().collection("admin_audit_log").add({ action: "projects.delete" })
+    );
+    await assertFails(asAdmin().firestore().collection("admin_audit_log").doc("log1").delete());
+  });
+
+  it("denies unauthenticated access to both collections", async () => {
+    await assertFails(
+      asUnauthenticated().firestore().collection("admin_roles").doc("admin1").get()
+    );
+    await assertFails(
+      asUnauthenticated().firestore().collection("admin_audit_log").doc("log1").get()
     );
   });
 });
