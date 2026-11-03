@@ -60,7 +60,7 @@ const linksFor = (organizer: Organizer): SocialLinkItem[] => {
     );
 };
 
-const SocialLinks = ({ organizer }: { organizer: Organizer }) => {
+export const SocialLinks = ({ organizer }: { organizer: Organizer }) => {
   const links = linksFor(organizer);
   if (links.length === 0) return null;
   return (

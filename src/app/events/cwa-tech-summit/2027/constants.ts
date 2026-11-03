@@ -518,28 +518,30 @@ export type ContactPerson = {
 
 const CONTACT_IMG = "/static/images/events/cwa-tech-summit-2027/contacts";
 
-export const CONTACTS: ContactPerson[] = [
-  {
-    role: "Primary contact",
-    name: "Maham Tahir",
-    title: "Content Strategist & Community Manager",
-    email: "maham.visionwiseab@gmail.com",
-    linkedinUrl: "https://www.linkedin.com/in/maham-tahir-225606431/",
-    avatarUrl: `${CONTACT_IMG}/maham-tahir.jpeg`,
-  },
-  {
-    role: "Secondary contact",
-    name: "Muhammad Ahsan Ayaz",
-    title:
-      "Founder, Code With Ahsan, \n GDE in AI & Angular | Software Architect at Scania Group, Sweden",
-    email: "ahsan.ubitian@gmail.com",
-    linkedinUrl: "https://www.linkedin.com/in/ahsanayaz/",
-    avatarUrl: `${CONTACT_IMG}/ahsan-ayaz.jpeg`,
-  },
-];
+const FOUNDER: ContactPerson = {
+  role: "Founder",
+  name: "Muhammad Ahsan Ayaz",
+  title:
+    "Founder, Code With Ahsan, \n GDE in AI & Angular | Software Architect at Scania Group, Sweden",
+  email: "ahsan.ubitian@gmail.com",
+  linkedinUrl: "https://www.linkedin.com/in/ahsanayaz/",
+  avatarUrl: `${CONTACT_IMG}/ahsan-ayaz.jpeg`,
+};
 
-/** Sponsorship enquiries go to the primary contact. */
-export const SPONSOR_CONTACT = CONTACTS[0];
+const COMMUNITY_MANAGER: ContactPerson = {
+  role: "Community Manager",
+  name: "Maham Tahir",
+  title: "Content Strategist & Community Manager",
+  email: "maham.visionwiseab@gmail.com",
+  linkedinUrl: "https://www.linkedin.com/in/maham-tahir-225606431/",
+  avatarUrl: `${CONTACT_IMG}/maham-tahir.jpeg`,
+};
+
+/** "Got questions?" shows these first, in this order, before the team leads. */
+export const CONTACTS: ContactPerson[] = [FOUNDER, COMMUNITY_MANAGER];
+
+/** Sponsorship enquiries go to the community manager. */
+export const SPONSOR_CONTACT = COMMUNITY_MANAGER;
 
 // TODO: Google Form for sponsor applications; paste the link here. While it is
 // empty, every tier button falls back to an email to SPONSOR_CONTACT.
