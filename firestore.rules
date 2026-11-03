@@ -355,5 +355,17 @@ service cloud.firestore {
     match /email-blasts/{blastId} {
       allow read, write: if false;
     }
+
+    // ─── Admin Portal Roles + Audit Log ───────────────────────────────────
+    // Admin SDK only. Roles are read server-side on every admin request and
+    // managed via the admin-only Team API; the audit log is read through an
+    // admin-only API route. No client access, even with the admin claim.
+    match /admin_roles/{uid} {
+      allow read, write: if false;
+    }
+
+    match /admin_audit_log/{id} {
+      allow read, write: if false;
+    }
   }
 }
