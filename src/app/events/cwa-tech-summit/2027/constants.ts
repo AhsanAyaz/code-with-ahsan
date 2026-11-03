@@ -593,10 +593,6 @@ export const CONTACTS: ContactPerson[] = [FOUNDER, COMMUNITY_MANAGER];
 /** Sponsorship enquiries go to the community manager. */
 export const SPONSOR_CONTACT = COMMUNITY_MANAGER;
 
-// TODO: Google Form for sponsor applications; paste the link here. While it is
-// empty, every tier button falls back to an email to SPONSOR_CONTACT.
-export const SPONSOR_FORM_URL = "";
-
 export const sponsorMailto = (subject: string) =>
   `mailto:${SPONSOR_CONTACT.email}?subject=${encodeURIComponent(subject)}`;
 
