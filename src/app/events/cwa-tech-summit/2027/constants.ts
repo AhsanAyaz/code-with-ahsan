@@ -306,9 +306,9 @@ export const PAST_EVENTS: PastEvent[] = [
     key: "promptathon",
     name: "CWA Prompt-a-thon 2026",
     mark: "PT",
-    date: "28 March – 10 April 2026",
+    date: "28 March 2026",
     where: "Online",
-    summary: "A two-week online generative AI hackathon, open to every skill level.",
+    summary: "A one-day online generative AI hackathon, open to every skill level.",
     // HACKATHON_TEAMS in events/cwa-promptathon/2026/constants.ts lists 10 teams.
     stat: "10 teams",
     url: "/events/cwa-promptathon/2026",
