@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { isAmbassadorProgramEnabled } from "@/lib/features";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import { CohortCreateSchema, type CohortDoc } from "@/types/ambassador";
 import { AMBASSADOR_COHORTS_COLLECTION } from "@/lib/ambassador/constants";
 import { createLogger } from "@/lib/logger";
@@ -33,8 +33,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     if (scope === "open") {
       query = query.where("status", "==", "upcoming").where("applicationWindowOpen", "==", true);
     } else if (scope === "all") {
-      const admin = await requireAdmin(request);
-      if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
+      const access = await requireAdminAccess(request, "ambassador.cohorts.read");
+      if (!access.ok) return access.response;
     }
 
     const snapshot = await query.get();
@@ -65,8 +65,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (gate) return gate;
 
   try {
-    const admin = await requireAdmin(request);
-    if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
+    const access = await requireAdminAccess(request, "ambassador.cohort.create");
+    if (!access.ok) return access.response;
 
     const body = await request.json();
     const parsed = CohortCreateSchema.safeParse(body);
@@ -89,7 +89,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       updatedAt: now,
     };
     const ref = await db.collection(AMBASSADOR_COHORTS_COLLECTION).add(newDoc);
-    log.info("Cohort created", { cohortId: ref.id, name: parsed.data.name, by: admin.uid });
+    log.info("Cohort created", { cohortId: ref.id, name: parsed.data.name, by: access.actor.uid });
+    await logAdminAction(access.actor, "ambassador.cohort.create", {
+      type: "ambassador_cohort",
+      id: ref.id,
+      label: parsed.data.name,
+    });
     return NextResponse.json({ cohortId: ref.id, ...newDoc }, { status: 201 });
   } catch (error) {
     log.error("POST /cohorts failed", { error });
