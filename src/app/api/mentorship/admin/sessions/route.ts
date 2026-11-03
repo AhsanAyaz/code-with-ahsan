@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { db } from "@/lib/firebaseAdmin";
-import { verifyAdminRequest } from "@/lib/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import {
   sendChannelMessage,
   sendChannelMessageWithComponents,
@@ -23,9 +23,8 @@ const ALLOWED_TRANSITIONS: Record<string, string[]> = {
 
 // PUT: Update session status with state machine validation
 export async function PUT(request: NextRequest) {
-  if (!(await verifyAdminRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireAdminAccess(request, "mentorship.session.updateStatus");
+  if (!access.ok) return access.response;
 
   try {
     const body = await request.json();
@@ -90,9 +89,17 @@ export async function PUT(request: NextRequest) {
       updateData.cancellationReason = FieldValue.delete();
       updateData.cancelledAt = FieldValue.delete();
       updateData.cancelledBy = FieldValue.delete();
+      updateData.cancelledByUid = FieldValue.delete();
     }
 
     await sessionRef.update(updateData);
+
+    await logAdminAction(
+      access.actor,
+      "mentorship.session.updateStatus",
+      { type: "mentorship_session", id: sessionId },
+      { from: currentStatus, to: status }
+    );
 
     // Fetch profiles once for notification paths that need them
     const needsProfiles =
@@ -202,9 +209,8 @@ export async function PUT(request: NextRequest) {
 
 // DELETE: End a mentorship session (mark as cancelled, archive Discord, notify participants)
 export async function DELETE(request: NextRequest) {
-  if (!(await verifyAdminRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireAdminAccess(request, "mentorship.session.delete");
+  if (!access.ok) return access.response;
 
   try {
     const { searchParams } = new URL(request.url);
@@ -226,6 +232,12 @@ export async function DELETE(request: NextRequest) {
     // If already cancelled/completed, just delete the record
     if (sessionData.status === "cancelled" || sessionData.status === "completed") {
       await sessionRef.delete();
+      await logAdminAction(
+        access.actor,
+        "mentorship.session.delete",
+        { type: "mentorship_session", id: sessionId },
+        { mode: "deleted", previousStatus: sessionData.status }
+      );
       return NextResponse.json(
         {
           success: true,
@@ -242,7 +254,15 @@ export async function DELETE(request: NextRequest) {
       cancellationReason: "ended_by_admin",
       cancelledAt: new Date(),
       cancelledBy: "admin",
+      cancelledByUid: access.actor.uid,
     });
+
+    await logAdminAction(
+      access.actor,
+      "mentorship.session.delete",
+      { type: "mentorship_session", id: sessionId },
+      { mode: "cancelled", previousStatus: sessionData.status }
+    );
 
     // Fetch profiles for notifications
     const [mentorProfile, menteeProfile] = await Promise.all([

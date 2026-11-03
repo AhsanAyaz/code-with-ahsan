@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
-import { verifyAdminRequest } from "@/lib/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import { FieldValue } from "firebase-admin/firestore";
 
 export async function PUT(request: NextRequest) {
-  if (!(await verifyAdminRequest(request))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireAdminAccess(request, "mentorship.alert.resolve");
+  if (!access.ok) return access.response;
 
   try {
     const body = await request.json();
@@ -23,6 +22,13 @@ export async function PUT(request: NextRequest) {
         resolved: resolved ?? true,
         resolvedAt: FieldValue.serverTimestamp(),
       });
+
+    await logAdminAction(
+      access.actor,
+      "mentorship.alert.resolve",
+      { type: "mentorship_alert", id: alertId },
+      { resolved: resolved ?? true }
+    );
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
