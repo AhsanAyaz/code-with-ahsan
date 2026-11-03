@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
+import { verifyAdminRequest } from "@/lib/adminAuth";
 import { createMentorshipChannel, deleteDiscordChannel, isDiscordConfigured } from "@/lib/discord";
 
 // POST: Regenerate Discord channel for a mentorship session
 export async function POST(request: NextRequest) {
+  if (!(await verifyAdminRequest(request))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { sessionId } = body;
