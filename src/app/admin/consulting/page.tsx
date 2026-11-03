@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { ConsultingSettings } from "@/lib/consulting/config";
@@ -22,8 +23,6 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-
-const ADMIN_TOKEN_KEY = "mentorship_admin_token";
 
 const DAYS_OF_WEEK = [
   { dayNum: 1, name: "Monday" },
@@ -83,19 +82,10 @@ export default function AdminConsultingPage() {
     approvedReviewsCount: 0,
   });
 
-  const getAdminToken = () => {
-    return typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
-  };
-
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const token = getAdminToken();
-      const res = await fetch("/api/admin/consulting", {
-        headers: {
-          "x-admin-token": token ?? "",
-        },
-      });
+      const res = await adminFetch("/api/admin/consulting");
 
       if (!res.ok) {
         throw new Error("Failed to load consulting data");
@@ -129,18 +119,17 @@ export default function AdminConsultingPage() {
     if (!settings) return;
     setSaving(true);
     try {
-      const token = getAdminToken();
-      const res = await fetch("/api/admin/consulting", {
+      const res = await adminFetch("/api/admin/consulting", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "x-admin-token": token ?? "",
         },
         body: JSON.stringify(settings),
       });
 
       if (!res.ok) {
-        throw new Error("Failed to save settings");
+        error(await adminErrorMessage(res, "Failed to save consulting settings"));
+        return;
       }
 
       const data = await res.json();
@@ -156,12 +145,10 @@ export default function AdminConsultingPage() {
   const handleConfirmAndResend = async (bookingId: string) => {
     setConfirmingId(bookingId);
     try {
-      const token = getAdminToken();
-      const res = await fetch("/api/admin/consulting", {
+      const res = await adminFetch("/api/admin/consulting", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-admin-token": token ?? "",
         },
         body: JSON.stringify({
           action: "confirm_and_resend",
@@ -186,12 +173,10 @@ export default function AdminConsultingPage() {
   const handleSendReviewInvite = async (bookingId: string) => {
     setSendingInviteId(bookingId);
     try {
-      const token = getAdminToken();
-      const res = await fetch("/api/admin/consulting", {
+      const res = await adminFetch("/api/admin/consulting", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-admin-token": token ?? "",
         },
         body: JSON.stringify({
           action: "send_review_invite",
@@ -216,12 +201,10 @@ export default function AdminConsultingPage() {
   const handleToggleReviewApproval = async (reviewId: string, currentStatus: boolean) => {
     setTogglingReviewId(reviewId);
     try {
-      const token = getAdminToken();
-      const res = await fetch("/api/admin/consulting", {
+      const res = await adminFetch("/api/admin/consulting", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-admin-token": token ?? "",
         },
         body: JSON.stringify({
           action: "toggle_review_approval",

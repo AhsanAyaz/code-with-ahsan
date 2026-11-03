@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/contexts/ToastContext";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
+import { adminFetch } from "@/lib/adminAccess/client";
 
 interface CoursePost {
   title: string;
@@ -83,19 +83,10 @@ export default function AdminCoursesPage() {
   const [creating, setCreating] = useState(false);
   const [generatingDesc, setGeneratingDesc] = useState(false);
 
-  const getAdminHeaders = (): Record<string, string> => {
-    const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-    const headers: Record<string, string> = {};
-    if (token) headers["x-admin-token"] = token;
-    return headers;
-  };
-
   const fetchCourses = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/admin/courses", {
-        headers: getAdminHeaders(),
-      });
+      const response = await adminFetch("/api/admin/courses");
       if (response.ok) {
         const data = await response.json();
         setCourses(data.courses || []);
@@ -109,7 +100,7 @@ export default function AdminCoursesPage() {
     } finally {
       setLoading(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -117,15 +108,12 @@ export default function AdminCoursesPage() {
   }, [fetchCourses]);
 
   const handleDelete = async (course: Course) => {
-    const confirmed = window.confirm(
-      `Delete course "${course.name}"? This removes all MDX files.`
-    );
+    const confirmed = window.confirm(`Delete course "${course.name}"? This removes all MDX files.`);
     if (!confirmed) return;
 
     try {
-      const response = await fetch(`/api/admin/courses/${course.slug}`, {
+      const response = await adminFetch(`/api/admin/courses/${course.slug}`, {
         method: "DELETE",
-        headers: getAdminHeaders(),
       });
 
       if (response.ok) {
@@ -144,25 +132,20 @@ export default function AdminCoursesPage() {
   const handleToggleVisibility = async (course: Course) => {
     const newVisible = !course.isVisible;
     try {
-      const response = await fetch(`/api/admin/courses/${course.slug}`, {
+      const response = await adminFetch(`/api/admin/courses/${course.slug}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          ...getAdminHeaders(),
         },
         body: JSON.stringify({ isVisible: newVisible }),
       });
 
       if (response.ok) {
         setCourses((prev) =>
-          prev.map((c) =>
-            c.slug === course.slug ? { ...c, isVisible: newVisible } : c
-          )
+          prev.map((c) => (c.slug === course.slug ? { ...c, isVisible: newVisible } : c))
         );
         toast.success(
-          newVisible
-            ? `"${course.name}" is now visible`
-            : `"${course.name}" is now hidden`
+          newVisible ? `"${course.name}" is now visible` : `"${course.name}" is now hidden`
         );
       } else {
         const data = await response.json();
@@ -188,11 +171,10 @@ export default function AdminCoursesPage() {
     setSaving(true);
     try {
       const orderedSlugs = courses.map((c) => c.slug);
-      const response = await fetch("/api/admin/courses", {
+      const response = await adminFetch("/api/admin/courses", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          ...getAdminHeaders(),
         },
         body: JSON.stringify({ orderedSlugs }),
       });
@@ -228,9 +210,8 @@ export default function AdminCoursesPage() {
 
     try {
       const param = inputMode === "video" ? "videoId" : "playlistId";
-      const response = await fetch(
-        `/api/admin/courses/youtube?${param}=${encodeURIComponent(youtubeId.trim())}`,
-        { headers: getAdminHeaders() }
+      const response = await adminFetch(
+        `/api/admin/courses/youtube?${param}=${encodeURIComponent(youtubeId.trim())}`
       );
 
       if (response.ok) {
@@ -265,9 +246,7 @@ export default function AdminCoursesPage() {
   };
 
   const handleChapterTitleChange = (index: number, title: string) => {
-    setEditableChapters((prev) =>
-      prev.map((ch, i) => (i === index ? { ...ch, title } : ch))
-    );
+    setEditableChapters((prev) => prev.map((ch, i) => (i === index ? { ...ch, title } : ch)));
   };
 
   const handleGenerateDescription = async () => {
@@ -278,17 +257,17 @@ export default function AdminCoursesPage() {
 
     setGeneratingDesc(true);
     try {
-      const chapters = editableChapters.length > 0
-        ? editableChapters.map((ch) => ch.title)
-        : isPlaylistData(fetchedData)
-          ? fetchedData.items.map((item) => item.title)
-          : [];
+      const chapters =
+        editableChapters.length > 0
+          ? editableChapters.map((ch) => ch.title)
+          : isPlaylistData(fetchedData)
+            ? fetchedData.items.map((item) => item.title)
+            : [];
 
-      const response = await fetch("/api/admin/courses/generate-description", {
+      const response = await adminFetch("/api/admin/courses/generate-description", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...getAdminHeaders(),
         },
         body: JSON.stringify({ courseName, chapters }),
       });
@@ -349,11 +328,10 @@ export default function AdminCoursesPage() {
         return;
       }
 
-      const response = await fetch("/api/admin/courses", {
+      const response = await adminFetch("/api/admin/courses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...getAdminHeaders(),
         },
         body: JSON.stringify(body),
       });
@@ -402,9 +380,7 @@ export default function AdminCoursesPage() {
       <div className="card bg-base-200 shadow-md">
         <div className="card-body">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="card-title text-xl">
-              Existing Courses ({courses.length})
-            </h2>
+            <h2 className="card-title text-xl">Existing Courses ({courses.length})</h2>
             {orderChanged && (
               <button
                 className="btn btn-primary btn-sm"
@@ -428,9 +404,7 @@ export default function AdminCoursesPage() {
               <span className="loading loading-spinner loading-lg"></span>
             </div>
           ) : courses.length === 0 ? (
-            <div className="text-center py-8 text-base-content/60">
-              No courses found
-            </div>
+            <div className="text-center py-8 text-base-content/60">No courses found</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="table table-zebra w-full">
@@ -447,10 +421,7 @@ export default function AdminCoursesPage() {
                 </thead>
                 <tbody>
                   {courses.map((course, index) => (
-                    <tr
-                      key={course.slug}
-                      className={!course.isVisible ? "opacity-50" : ""}
-                    >
+                    <tr key={course.slug} className={!course.isVisible ? "opacity-50" : ""}>
                       <td>
                         <div className="flex flex-col gap-1">
                           <button
@@ -561,11 +532,7 @@ export default function AdminCoursesPage() {
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder={
-                  inputMode === "video"
-                    ? "e.g. oUmVFHlwZsI"
-                    : "e.g. PLqq6Dn4EQGT..."
-                }
+                placeholder={inputMode === "video" ? "e.g. oUmVFHlwZsI" : "e.g. PLqq6Dn4EQGT..."}
                 className="input input-bordered flex-1"
                 value={youtubeId}
                 onChange={(e) => setYoutubeId(e.target.value)}
@@ -636,9 +603,7 @@ export default function AdminCoursesPage() {
                               type="text"
                               className="input input-bordered input-sm flex-1"
                               value={chapter.title}
-                              onChange={(e) =>
-                                handleChapterTitleChange(index, e.target.value)
-                              }
+                              onChange={(e) => handleChapterTitleChange(index, e.target.value)}
                             />
                           </div>
                         ))}

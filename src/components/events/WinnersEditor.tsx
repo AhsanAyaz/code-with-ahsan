@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import type { WinnerPlacement } from "@/types/events";
+import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
 
 interface WinnersFormData {
   first: WinnerPlacement;
@@ -30,12 +31,12 @@ interface WinnersEditorProps {
   eventId: string;
   teams: string[];
   /**
-   * Which credential this copy of the editor writes with — the admin panel
-   * sends the admin session token, the presenter deck sends the host one.
+   * Which credential this copy of the editor writes with. Omitted (the admin
+   * panel): the signed-in staff member's ID token via adminFetch. Set (the
+   * presenter deck): the localStorage key holding the host session token,
+   * sent as x-host-token.
    */
-  tokenHeader: "x-admin-token" | "x-host-token";
-  /** localStorage key the matching token is stored under. */
-  tokenKey: string;
+  hostTokenKey?: string;
   /** Called after a successful load so the parent can show "announced at". */
   onLoadedAtChange?: (loadedAt: string | null) => void;
 }
@@ -43,8 +44,7 @@ interface WinnersEditorProps {
 export default function WinnersEditor({
   eventId,
   teams,
-  tokenHeader,
-  tokenKey,
+  hostTokenKey,
   onLoadedAtChange,
 }: WinnersEditorProps) {
   const { success, error } = useToast();
@@ -88,9 +88,13 @@ export default function WinnersEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
-  const authHeaders = (): Record<string, string> => {
-    const token = typeof window !== "undefined" ? localStorage.getItem(tokenKey) : null;
-    return { [tokenHeader]: token ?? "" };
+  /** Write request with whichever credential this editor uses. */
+  const writeFetch = (url: string, init: RequestInit): Promise<Response> => {
+    if (!hostTokenKey) return adminFetch(url, init);
+    const token = typeof window !== "undefined" ? localStorage.getItem(hostTokenKey) : null;
+    const headers = new Headers(init.headers);
+    headers.set("x-host-token", token ?? "");
+    return fetch(url, { ...init, headers });
   };
 
   const updatePlacement = (
@@ -107,16 +111,15 @@ export default function WinnersEditor({
   const handleClear = async () => {
     setClearing(true);
     try {
-      const res = await fetch(`/api/admin/events/${eventId}/winners`, {
+      const res = await writeFetch(`/api/admin/events/${eventId}/winners`, {
         method: "DELETE",
-        headers: authHeaders(),
       });
       if (res.ok) {
         setFormData({ first: emptyPlacement(), second: emptyPlacement(), third: emptyPlacement() });
         updateLoadedAt(null);
         success("Winners cleared");
       } else {
-        error("Failed to clear winners");
+        error(await adminErrorMessage(res, "Failed to clear winners"));
       }
     } catch {
       error("Failed to clear winners");
@@ -136,11 +139,10 @@ export default function WinnersEditor({
 
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/events/${eventId}/winners`, {
+      const res = await writeFetch(`/api/admin/events/${eventId}/winners`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...authHeaders(),
         },
         body: JSON.stringify(formData),
       });
@@ -149,7 +151,7 @@ export default function WinnersEditor({
         updateLoadedAt(new Date().toISOString());
         success("Winners saved!");
       } else {
-        error("Failed to save winners");
+        error(await adminErrorMessage(res, "Failed to save winners"));
       }
     } catch {
       error("Failed to save winners");

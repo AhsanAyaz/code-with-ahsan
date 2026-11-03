@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
 import { useState, useEffect } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { ProfileWithDetails, Review } from "@/types/admin";
@@ -11,7 +12,6 @@ import {
 } from "@/utils/streamer-mode";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { hasRole } from "@/lib/permissions";
-import { getAdminAuthHeaders } from "@/components/admin/AdminAuthGate";
 
 export default function PendingMentorsPage() {
   const toast = useToast();
@@ -31,12 +31,8 @@ export default function PendingMentorsPage() {
       try {
         // Fetch both pending and changes_requested profiles in parallel
         const [pendingRes, changesRes] = await Promise.all([
-          fetch("/api/mentorship/admin/profiles?role=mentor&status=pending", {
-            headers: getAdminAuthHeaders(),
-          }),
-          fetch("/api/mentorship/admin/profiles?role=mentor&status=changes_requested", {
-            headers: getAdminAuthHeaders(),
-          }),
+          adminFetch("/api/mentorship/admin/profiles?role=mentor&status=pending"),
+          adminFetch("/api/mentorship/admin/profiles?role=mentor&status=changes_requested"),
         ]);
 
         const pendingProfiles = pendingRes.ok ? (await pendingRes.json()).profiles || [] : [];
@@ -61,9 +57,8 @@ export default function PendingMentorsPage() {
   ) => {
     setActionLoading(uid);
     try {
-      const response = await fetch("/api/mentorship/admin/profiles", {
+      const response = await adminFetch("/api/mentorship/admin/profiles", {
         method: "PUT",
-        headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
         body: JSON.stringify({ uid, status: newStatus, reactivateSessions }),
       });
 
@@ -77,6 +72,8 @@ export default function PendingMentorsPage() {
         if (data.reactivatedSessions > 0) {
           toast.success(`${data.reactivatedSessions} mentorship session(s) have been reactivated.`);
         }
+      } else {
+        toast.error(await adminErrorMessage(response, "Failed to update status"));
       }
     } catch (error) {
       console.error("Error updating status:", error);
@@ -95,9 +92,8 @@ export default function PendingMentorsPage() {
 
     setActionLoading(uid);
     try {
-      const response = await fetch("/api/mentorship/admin/profiles", {
+      const response = await adminFetch("/api/mentorship/admin/profiles", {
         method: "PUT",
-        headers: { "Content-Type": "application/json", ...getAdminAuthHeaders() },
         body: JSON.stringify({ uid, status: "changes_requested", feedback }),
       });
 
@@ -122,9 +118,7 @@ export default function PendingMentorsPage() {
     setLoadingReviews(true);
 
     try {
-      const response = await fetch(`/api/mentorship/admin/reviews?mentorId=${mentor.uid}`, {
-        headers: getAdminAuthHeaders(),
-      });
+      const response = await adminFetch(`/api/mentorship/admin/reviews?mentorId=${mentor.uid}`);
       if (response.ok) {
         const data = await response.json();
         setReviews(data.reviews || []);

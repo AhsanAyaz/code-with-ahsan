@@ -1,9 +1,9 @@
 "use client";
 
+import { adminFetch } from "@/lib/adminAccess/client";
 import { useState, useEffect } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { Project } from "@/types/mentorship";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import { format } from "date-fns";
 import Link from "next/link";
 import ProjectFilters from "@/components/admin/ProjectFilters";
@@ -52,7 +52,6 @@ export default function AdminProjectsPage() {
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem(ADMIN_TOKEN_KEY);
         const params = new URLSearchParams();
         if (filters.status) params.set("status", filters.status);
         if (filters.search) params.set("search", filters.search);
@@ -61,9 +60,7 @@ export default function AdminProjectsPage() {
         if (filters.techStack) params.set("techStack", filters.techStack);
         if (filters.creator) params.set("creator", filters.creator);
 
-        const response = await fetch(`/api/admin/projects?${params.toString()}`, {
-          headers: token ? { "x-admin-token": token } : {},
-        });
+        const response = await adminFetch(`/api/admin/projects?${params.toString()}`);
 
         if (response.ok) {
           const data = await response.json();
@@ -101,12 +98,10 @@ export default function AdminProjectsPage() {
     setActionLoading(project.id);
 
     try {
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-      const response = await fetch(`/api/admin/projects/${project.id}`, {
+      const response = await adminFetch(`/api/admin/projects/${project.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { "x-admin-token": token } : {}),
         },
         body: JSON.stringify({ action: "approve" }),
       });
@@ -133,12 +128,10 @@ export default function AdminProjectsPage() {
     setActionLoading(project.id);
 
     try {
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-      const response = await fetch(`/api/admin/projects/${project.id}`, {
+      const response = await adminFetch(`/api/admin/projects/${project.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { "x-admin-token": token } : {}),
         },
         body: JSON.stringify({ action: "reactivate" }),
       });
@@ -169,12 +162,10 @@ export default function AdminProjectsPage() {
     if (!declineTarget) return;
 
     try {
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-      const response = await fetch(`/api/admin/projects/${declineTarget.id}`, {
+      const response = await adminFetch(`/api/admin/projects/${declineTarget.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { "x-admin-token": token } : {}),
         },
         body: JSON.stringify({ action: "decline", declineReason: reason }),
       });
@@ -201,12 +192,10 @@ export default function AdminProjectsPage() {
     if (!deleteTarget) return;
 
     try {
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-      const response = await fetch(`/api/admin/projects/${deleteTarget.id}`, {
+      const response = await adminFetch(`/api/admin/projects/${deleteTarget.id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { "x-admin-token": token } : {}),
         },
         body: JSON.stringify({ reason }),
       });
@@ -751,12 +740,10 @@ export default function AdminProjectsPage() {
                 onClick={async () => {
                   setActionLoading(reviewTarget.id);
                   try {
-                    const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-                    const response = await fetch(`/api/admin/projects/${reviewTarget.id}`, {
+                    const response = await adminFetch(`/api/admin/projects/${reviewTarget.id}`, {
                       method: "PUT",
                       headers: {
                         "Content-Type": "application/json",
-                        ...(token ? { "x-admin-token": token } : {}),
                       },
                       body: JSON.stringify({
                         action: "decline_update",
@@ -806,12 +793,10 @@ export default function AdminProjectsPage() {
                 onClick={async () => {
                   setActionLoading(reviewTarget.id);
                   try {
-                    const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-                    const response = await fetch(`/api/admin/projects/${reviewTarget.id}`, {
+                    const response = await adminFetch(`/api/admin/projects/${reviewTarget.id}`, {
                       method: "PUT",
                       headers: {
                         "Content-Type": "application/json",
-                        ...(token ? { "x-admin-token": token } : {}),
                       },
                       body: JSON.stringify({ action: "approve_update" }),
                     });

@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useToast } from "@/contexts/ToastContext";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import { format } from "date-fns";
 import type { CohortDoc, CohortStatus } from "@/types/ambassador";
+import { adminFetch } from "@/lib/adminAccess/client";
 
 interface CohortListItem extends CohortDoc {
   cohortId: string;
@@ -25,15 +25,10 @@ export default function AdminAmbassadorCohortsPage() {
     status: "upcoming" as CohortStatus,
   });
 
-  const adminHeaders = (): HeadersInit => {
-    const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
-    return { "Content-Type": "application/json", "x-admin-token": token ?? "" };
-  };
-
   const loadCohorts = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/ambassador/cohorts?scope=all", { headers: adminHeaders() });
+      const res = await adminFetch("/api/ambassador/cohorts?scope=all");
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to load cohorts");
       setCohorts(data.cohorts ?? []);
@@ -61,9 +56,8 @@ export default function AdminAmbassadorCohortsPage() {
         maxSize: Number(form.maxSize),
         status: form.status,
       };
-      const res = await fetch("/api/ambassador/cohorts", {
+      const res = await adminFetch("/api/ambassador/cohorts", {
         method: "POST",
-        headers: adminHeaders(),
         body: JSON.stringify(body),
       });
       const data = await res.json();
@@ -81,9 +75,8 @@ export default function AdminAmbassadorCohortsPage() {
 
   const toggleWindow = async (cohort: CohortListItem) => {
     try {
-      const res = await fetch(`/api/ambassador/cohorts/${cohort.cohortId}`, {
+      const res = await adminFetch(`/api/ambassador/cohorts/${cohort.cohortId}`, {
         method: "PATCH",
-        headers: adminHeaders(),
         body: JSON.stringify({ applicationWindowOpen: !cohort.applicationWindowOpen }),
       });
       if (!res.ok) throw new Error((await res.json()).error ?? "Toggle failed");
@@ -96,9 +89,8 @@ export default function AdminAmbassadorCohortsPage() {
 
   const changeStatus = async (cohort: CohortListItem, status: CohortStatus) => {
     try {
-      const res = await fetch(`/api/ambassador/cohorts/${cohort.cohortId}`, {
+      const res = await adminFetch(`/api/ambassador/cohorts/${cohort.cohortId}`, {
         method: "PATCH",
-        headers: adminHeaders(),
         body: JSON.stringify({ status }),
       });
       if (!res.ok) throw new Error((await res.json()).error ?? "Status change failed");
@@ -119,7 +111,9 @@ export default function AdminAmbassadorCohortsPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-10"><span className="loading loading-spinner loading-lg" /></div>
+        <div className="text-center py-10">
+          <span className="loading loading-spinner loading-lg" />
+        </div>
       ) : cohorts.length === 0 ? (
         <div className="text-center py-10 text-gray-500">No cohorts yet. Create the first one.</div>
       ) : (
@@ -143,7 +137,9 @@ export default function AdminAmbassadorCohortsPage() {
                   <td className="font-semibold">{c.name}</td>
                   <td>{c.startDate ? format(new Date(c.startDate), "MMM d, yyyy") : "—"}</td>
                   <td>{c.endDate ? format(new Date(c.endDate), "MMM d, yyyy") : "—"}</td>
-                  <td>{c.acceptedCount}/{c.maxSize}</td>
+                  <td>
+                    {c.acceptedCount}/{c.maxSize}
+                  </td>
                   <td>
                     <select
                       className="select select-sm select-bordered"
@@ -172,7 +168,10 @@ export default function AdminAmbassadorCohortsPage() {
                     </Link>
                   </td>
                   <td>
-                    <Link href={`/admin/ambassadors?cohort=${c.cohortId}`} className="btn btn-ghost btn-sm">
+                    <Link
+                      href={`/admin/ambassadors?cohort=${c.cohortId}`}
+                      className="btn btn-ghost btn-sm"
+                    >
                       Applications
                     </Link>
                   </td>
@@ -244,7 +243,12 @@ export default function AdminAmbassadorCohortsPage() {
                 </select>
               </div>
               <div className="modal-action">
-                <button type="button" className="btn" onClick={() => setShowCreate(false)} disabled={submitting}>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => setShowCreate(false)}
+                  disabled={submitting}
+                >
                   Cancel
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={submitting}>

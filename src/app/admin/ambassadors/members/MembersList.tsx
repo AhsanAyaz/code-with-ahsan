@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { authFetch } from "@/lib/apiClient";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
+import { adminFetch } from "@/lib/adminAccess/client";
 
 type Member = {
   uid: string;
@@ -16,11 +15,6 @@ type Member = {
   unresolvedFlagCount: number;
 };
 
-function adminHeaders(): HeadersInit {
-  const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
-  return { "x-admin-token": token ?? "" };
-}
-
 export function MembersList() {
   const [members, setMembers] = useState<Member[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -29,9 +23,7 @@ export function MembersList() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await authFetch("/api/ambassador/members", {
-          headers: adminHeaders(),
-        });
+        const res = await adminFetch("/api/ambassador/members", {});
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = (await res.json()) as { members: Member[] };
         if (!cancelled) setMembers(json.members);
@@ -101,18 +93,13 @@ export function MembersList() {
               </td>
               <td>
                 {m.unresolvedFlagCount > 0 ? (
-                  <span className="badge badge-warning font-bold">
-                    {m.unresolvedFlagCount}
-                  </span>
+                  <span className="badge badge-warning font-bold">{m.unresolvedFlagCount}</span>
                 ) : (
                   <span className="badge badge-ghost">0</span>
                 )}
               </td>
               <td>
-                <Link
-                  href={`/admin/ambassadors/members/${m.uid}`}
-                  className="btn btn-sm btn-ghost"
-                >
+                <Link href={`/admin/ambassadors/members/${m.uid}`} className="btn btn-sm btn-ghost">
                   View
                 </Link>
               </td>

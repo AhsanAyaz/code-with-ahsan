@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/contexts/ToastContext";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
-
-function adminHeaders(): HeadersInit {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
-  return { "x-admin-token": token ?? "" };
-}
+import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
 
 export function OffboardConfirmModal({
   uid,
@@ -34,20 +28,17 @@ export function OffboardConfirmModal({
     setInlineError(null);
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/ambassador/members/${uid}/offboard`, {
+      const res = await adminFetch(`/api/ambassador/members/${uid}/offboard`, {
         method: "POST",
-        headers: adminHeaders(),
       });
 
       if (res.status === 409) {
-        setInlineError(
-          "This ambassador is already inactive. Refresh and try again."
-        );
+        setInlineError("This ambassador is already inactive. Refresh and try again.");
         return;
       }
 
       if (!res.ok) {
-        setInlineError("Offboarding failed. Try again.");
+        setInlineError(await adminErrorMessage(res, "Offboarding failed. Try again."));
         return;
       }
 
@@ -58,9 +49,7 @@ export function OffboardConfirmModal({
       };
 
       if (data.emailSent === false) {
-        toast.error(
-          "Offboarding email could not be sent. Follow up manually."
-        );
+        toast.error("Offboarding email could not be sent. Follow up manually.");
       }
 
       onCompleted({ discordRemoved: data.discordRemoved, emailSent: data.emailSent });
@@ -79,10 +68,9 @@ export function OffboardConfirmModal({
           Offboard {displayName}?
         </h3>
         <p className="py-4">
-          This will revoke {displayName}&apos;s ambassador role, remove their
-          Discord Ambassador role, mark their cohort membership as ended, and
-          send an offboarding email. This action cannot be undone. They will not
-          receive the Alumni Ambassador status.
+          This will revoke {displayName}&apos;s ambassador role, remove their Discord Ambassador
+          role, mark their cohort membership as ended, and send an offboarding email. This action
+          cannot be undone. They will not receive the Alumni Ambassador status.
         </p>
 
         {inlineError && (
@@ -92,12 +80,7 @@ export function OffboardConfirmModal({
         )}
 
         <div className="modal-action">
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={onClose}
-            disabled={submitting}
-          >
+          <button type="button" className="btn btn-ghost" onClick={onClose} disabled={submitting}>
             Go back
           </button>
           <button
@@ -106,9 +89,7 @@ export function OffboardConfirmModal({
             onClick={handleConfirm}
             disabled={submitting}
           >
-            {submitting && (
-              <span className="loading loading-spinner loading-sm" />
-            )}
+            {submitting && <span className="loading loading-spinner loading-sm" />}
             Yes, offboard {displayName}
           </button>
         </div>

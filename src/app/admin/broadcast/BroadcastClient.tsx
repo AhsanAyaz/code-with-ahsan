@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import {
   BROADCAST_GROUPS,
   BROADCAST_GROUP_LABELS,
   type BroadcastGroup,
 } from "@/lib/admin-broadcast/groups";
+import { adminFetch } from "@/lib/adminAccess/client";
 
 type SendResult = {
   name: string;
@@ -22,14 +22,6 @@ type SendResponse = {
   sent: number;
   failed: number;
 };
-
-function adminHeaders(): HeadersInit {
-  const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
-  return {
-    "Content-Type": "application/json",
-    "x-admin-token": token ?? "",
-  };
-}
 
 const MAX_SUBJECT = 200;
 const MAX_MESSAGE = 20000;
@@ -55,9 +47,8 @@ export function BroadcastClient() {
     setError("");
     setResult(null);
     try {
-      const res = await fetch("/api/admin/broadcast", {
+      const res = await adminFetch("/api/admin/broadcast", {
         method: "POST",
-        headers: adminHeaders(),
         body: JSON.stringify({ group, subject, message }),
       });
       const data = await res.json().catch(() => ({}));

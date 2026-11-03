@@ -1,9 +1,9 @@
 "use client";
 
+import { adminFetch } from "@/lib/adminAccess/client";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { AdminStats, Alert } from "@/types/admin";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 
 // Types
 
@@ -44,10 +44,7 @@ export default function AdminOverviewPage() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-        const response = await fetch("/api/mentorship/admin/stats", {
-          headers: token ? { "x-admin-token": token } : {},
-        });
+        const response = await adminFetch("/api/mentorship/admin/stats");
         if (response.ok) {
           const data = await response.json();
           setStats(data.stats);
@@ -95,10 +92,8 @@ export default function AdminOverviewPage() {
     setDeleteResult(null);
 
     try {
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-      const response = await fetch("/api/mentorship/admin/sessions/delete-archived-channels", {
+      const response = await adminFetch("/api/mentorship/admin/sessions/delete-archived-channels", {
         method: "DELETE",
-        headers: token ? { "x-admin-token": token } : {},
       });
 
       // The endpoint can return an HTML error page (e.g. a 504 if the batch
@@ -126,13 +121,17 @@ export default function AdminOverviewPage() {
           // More archived channels remain than fit in one run — tell the admin
           // to click again to continue the cleanup.
           toast.success(
-            `Deleted ${data.deleted} channel(s). ${data.remaining ?? 0} remaining — click again to continue.`
+            `Deleted ${data.deleted} channel(s). ${data.remaining ?? 0} remaining. Click again to continue.`
           );
         } else {
-          toast.success(`Cleanup complete — ${data.deleted} channel(s) deleted.`);
+          toast.success(`Cleanup complete: ${data.deleted} channel(s) deleted.`);
         }
       } else {
-        toast.error(data.message || "Failed to delete archived channels.");
+        toast.error(
+          data.message ||
+            (data as { error?: string }).error ||
+            "Failed to delete archived channels."
+        );
         handleCloseDeleteModal();
       }
     } catch (error) {

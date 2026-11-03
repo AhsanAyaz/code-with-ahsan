@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { MentorshipProvider } from "@/contexts/MentorshipContext";
 import AdminAuthGate from "@/components/admin/AdminAuthGate";
+import { AdminAccessProvider } from "@/lib/adminAccess/client";
 import { AdminSidebarContent, AdminDrawerToggle } from "@/components/admin/AdminSidebar";
 
 export const metadata: Metadata = {
@@ -12,37 +13,33 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <MentorshipProvider>
-      <AdminAuthGate>
-        <div className="drawer lg:drawer-open min-h-screen">
-          <input id="admin-drawer" type="checkbox" className="drawer-toggle" />
+      <AdminAccessProvider>
+        <AdminAuthGate>
+          <div className="drawer lg:drawer-open min-h-screen">
+            <input id="admin-drawer" type="checkbox" className="drawer-toggle" />
 
-          {/* Page content */}
-          <div className="drawer-content flex flex-col">
-            {/* Mobile top bar */}
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-base-300 lg:hidden">
-              <AdminDrawerToggle />
-              <span className="font-bold">Admin Panel</span>
+            {/* Page content */}
+            <div className="drawer-content flex flex-col">
+              {/* Mobile top bar */}
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-base-300 lg:hidden">
+                <AdminDrawerToggle />
+                <span className="font-bold">Admin Panel</span>
+              </div>
+
+              <main className="flex-1 p-6 max-w-7xl w-full mx-auto">{children}</main>
             </div>
 
-            <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
-              {children}
-            </main>
+            {/* Sidebar */}
+            <div className="drawer-side z-40">
+              <label htmlFor="admin-drawer" className="drawer-overlay" />
+              <AdminSidebarContent />
+            </div>
           </div>
-
-          {/* Sidebar */}
-          <div className="drawer-side z-40">
-            <label htmlFor="admin-drawer" className="drawer-overlay" />
-            <AdminSidebarContent />
-          </div>
-        </div>
-      </AdminAuthGate>
+        </AdminAuthGate>
+      </AdminAccessProvider>
     </MentorshipProvider>
   );
 }

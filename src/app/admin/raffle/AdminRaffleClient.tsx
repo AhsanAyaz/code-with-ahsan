@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
+import { adminFetch } from "@/lib/adminAccess/client";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -13,14 +13,6 @@ interface RaffleState {
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-
-function adminHeaders(): HeadersInit {
-  const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem(ADMIN_TOKEN_KEY)
-      : null;
-  return { "x-admin-token": token ?? "" };
-}
 
 const STATE_BADGE: Record<RaffleState["state"], string> = {
   idle: "badge-neutral",
@@ -42,9 +34,7 @@ export function AdminRaffleClient() {
   const [spinning, setSpinning] = useState(false);
   const [title, setTitle] = useState<string>("Raffle");
   const [error, setError] = useState("");
-  const pendingWinner = useRef<{ winnerName: string; docId: string } | null>(
-    null,
-  );
+  const pendingWinner = useRef<{ winnerName: string; docId: string } | null>(null);
   // Hydrate title from server ONCE on mount; subsequent polls must not clobber
   // the admin's in-progress edits to the title input.
   const titleHydratedRef = useRef(false);
@@ -56,7 +46,12 @@ export function AdminRaffleClient() {
         const res = await fetch("/api/raffle/state");
         if (res.ok) {
           const data = await res.json();
-          setRaffleState({ state: data.state, winnerName: data.winnerName, date: "", title: data.title ?? "Raffle" });
+          setRaffleState({
+            state: data.state,
+            winnerName: data.winnerName,
+            date: "",
+            title: data.title ?? "Raffle",
+          });
           if (!titleHydratedRef.current) {
             setTitle(data.title ?? "Raffle");
             titleHydratedRef.current = true;
@@ -81,9 +76,7 @@ export function AdminRaffleClient() {
 
   async function fetchEntryCount() {
     try {
-      const res = await fetch("/api/raffle/entries/count", {
-        headers: adminHeaders(),
-      });
+      const res = await adminFetch("/api/raffle/entries/count", {});
       if (res.ok) {
         const data = await res.json();
         setEntryCount(data.count as number);
@@ -100,9 +93,9 @@ export function AdminRaffleClient() {
 
     try {
       // Step 1: Pick winner + write "spinning" state
-      const res = await fetch("/api/raffle/spin", {
+      const res = await adminFetch("/api/raffle/spin", {
         method: "POST",
-        headers: { ...adminHeaders(), "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "spin", title: title.trim() || "Raffle" }),
       });
 
@@ -125,9 +118,9 @@ export function AdminRaffleClient() {
         if (!winner) return;
 
         try {
-          const confirmRes = await fetch("/api/raffle/spin", {
+          const confirmRes = await adminFetch("/api/raffle/spin", {
             method: "POST",
-            headers: { ...adminHeaders(), "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               action: "confirm",
               winnerName: winner.winnerName,
@@ -161,9 +154,9 @@ export function AdminRaffleClient() {
   async function handleReset() {
     setError("");
     try {
-      const res = await fetch("/api/raffle/spin", {
+      const res = await adminFetch("/api/raffle/spin", {
         method: "POST",
-        headers: { ...adminHeaders(), "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "reset" }),
       });
       if (!res.ok) {
@@ -189,9 +182,7 @@ export function AdminRaffleClient() {
         <div className="card-body gap-6">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <h1 className="card-title text-2xl font-bold">
-              Raffle — Admin
-            </h1>
+            <h1 className="card-title text-2xl font-bold">Raffle — Admin</h1>
             {raffleState && (
               <span className={`badge badge-lg ${STATE_BADGE[currentState]}`}>
                 {STATE_LABEL[currentState]}
@@ -293,10 +284,7 @@ export function AdminRaffleClient() {
             </button>
 
             {isWinner && (
-              <button
-                className="btn btn-ghost btn-sm"
-                onClick={handleReset}
-              >
+              <button className="btn btn-ghost btn-sm" onClick={handleReset}>
                 Reset for next spin
               </button>
             )}
@@ -305,9 +293,7 @@ export function AdminRaffleClient() {
           {/* Helper text */}
           {!canSpin && !spinning && !isWinner && (
             <p className="text-sm text-base-content/80 text-center">
-              {(entryCount ?? 0) === 0
-                ? "No entries yet for today — share the raffle link!"
-                : ""}
+              {(entryCount ?? 0) === 0 ? "No entries yet for today — share the raffle link!" : ""}
             </p>
           )}
         </div>
