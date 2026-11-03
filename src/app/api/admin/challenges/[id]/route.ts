@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getChallenge, updateChallenge, deleteChallenge } from "@/services/ChallengeService";
-import { verifyAdminRequest } from "@/lib/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import { parseChallengeUpdatePayload } from "@/lib/challenges";
 import { announceChallenge, isDiscordConfigured } from "@/lib/discord";
 
@@ -9,17 +9,10 @@ import { announceChallenge, isDiscordConfigured } from "@/lib/discord";
  * Retrieves a single challenge for the admin edit page.
  * Requires admin authentication.
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    if (!(await verifyAdminRequest(request))) {
-      return NextResponse.json(
-        { error: "Admin authentication required" },
-        { status: 401 }
-      );
-    }
+    const access = await requireAdminAccess(request, "challenges.read");
+    if (!access.ok) return access.response;
 
     const { id } = await params;
     const challenge = await getChallenge(id);
@@ -38,25 +31,15 @@ export async function GET(
  * Updates an existing challenge.
  * Requires admin authentication and only updates provided fields.
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    if (!(await verifyAdminRequest(request))) {
-      return NextResponse.json(
-        { error: "Admin authentication required" },
-        { status: 401 }
-      );
-    }
+    const access = await requireAdminAccess(request, "challenges.update");
+    if (!access.ok) return access.response;
 
     const { id } = await params;
     const parsed = parseChallengeUpdatePayload(await request.json());
     if (!parsed.ok) {
-      return NextResponse.json(
-        { error: parsed.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: parsed.error }, { status: 400 });
     }
 
     const existingChallenge = await getChallenge(id);
@@ -65,6 +48,17 @@ export async function PUT(
     }
 
     await updateChallenge(id, parsed.data);
+
+    await logAdminAction(
+      access.actor,
+      "challenges.update",
+      {
+        type: "challenge",
+        id,
+        ...(existingChallenge.title ? { label: existingChallenge.title } : {}),
+      },
+      { fields: Object.keys(parsed.data) }
+    );
 
     if (
       existingChallenge.status !== "active" &&
@@ -78,14 +72,11 @@ export async function PUT(
         console.error("Failed to send Discord challenge announcement:", err);
       }
     }
-    
+
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("Error updating challenge:", error);
-    return NextResponse.json(
-      { error: "Failed to update challenge" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update challenge" }, { status: 500 });
   }
 }
 
@@ -99,12 +90,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    if (!(await verifyAdminRequest(request))) {
-      return NextResponse.json(
-        { error: "Admin authentication required" },
-        { status: 401 }
-      );
-    }
+    const access = await requireAdminAccess(request, "challenges.delete");
+    if (!access.ok) return access.response;
 
     const { id } = await params;
     const existingChallenge = await getChallenge(id);
@@ -114,12 +101,15 @@ export async function DELETE(
 
     await deleteChallenge(id);
 
+    await logAdminAction(access.actor, "challenges.delete", {
+      type: "challenge",
+      id,
+      ...(existingChallenge.title ? { label: existingChallenge.title } : {}),
+    });
+
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("Error deleting challenge:", error);
-    return NextResponse.json(
-      { error: "Failed to delete challenge" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to delete challenge" }, { status: 500 });
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAdminRequest } from "@/lib/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
+import type { AdminAction } from "@/lib/adminAccess/actions";
 import { db } from "@/lib/firebaseAdmin";
 import { getConsultingSettings, ConsultingSettings } from "@/lib/consulting/config";
 import { ConsultingBooking, ConsultingReview } from "@/types/consulting";
@@ -10,10 +11,8 @@ const logger = createLogger("api-admin-consulting");
 
 export async function GET(request: NextRequest) {
   try {
-    const isAdmin = await verifyAdminRequest(request);
-    if (!isAdmin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const access = await requireAdminAccess(request, "consulting.read");
+    if (!access.ok) return access.response;
 
     const settings = await getConsultingSettings();
 
@@ -100,10 +99,8 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const isAdmin = await verifyAdminRequest(request);
-    if (!isAdmin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const access = await requireAdminAccess(request, "consulting.settings.update");
+    if (!access.ok) return access.response;
 
     const body = await request.json();
 
@@ -133,6 +130,13 @@ export async function PUT(request: NextRequest) {
       packagesCount: Array.isArray(cleanPayload.packages) ? cleanPayload.packages.length : 0,
     });
 
+    await logAdminAction(
+      access.actor,
+      "consulting.settings.update",
+      { type: "config", id: "consulting" },
+      { fields: Object.keys(cleanPayload).filter((k) => k !== "updatedAt") }
+    );
+
     const updatedSettings = await getConsultingSettings();
     return NextResponse.json({ success: true, settings: updatedSettings });
   } catch (error) {
@@ -141,15 +145,33 @@ export async function PUT(request: NextRequest) {
   }
 }
 
+const CONSULTING_POST_ACTIONS: Record<string, AdminAction> = {
+  confirm_and_resend: "consulting.booking.confirmAndResend",
+  send_review_invite: "consulting.review.sendInvite",
+  toggle_review_approval: "consulting.review.toggleApproval",
+};
+
 export async function POST(request: NextRequest) {
   try {
-    const isAdmin = await verifyAdminRequest(request);
-    if (!isAdmin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      body = {};
     }
+    const { action, bookingId, reviewId, isApproved } = body as {
+      action?: string;
+      bookingId?: string;
+      reviewId?: string;
+      isApproved?: unknown;
+    };
 
-    const body = await request.json();
-    const { action, bookingId, reviewId, isApproved } = body;
+    const adminAction: AdminAction =
+      action && Object.hasOwn(CONSULTING_POST_ACTIONS, action)
+        ? CONSULTING_POST_ACTIONS[action]
+        : "consulting.read";
+    const access = await requireAdminAccess(request, adminAction);
+    if (!access.ok) return access.response;
 
     // Action 1: Manual confirmation & resend confirmation email
     if (action === "confirm_and_resend" && bookingId) {
@@ -162,6 +184,11 @@ export async function POST(request: NextRequest) {
       if (!result.success) {
         return NextResponse.json({ error: result.error || "Failed to confirm" }, { status: 400 });
       }
+
+      await logAdminAction(access.actor, "consulting.booking.confirmAndResend", {
+        type: "consulting_booking",
+        id: bookingId,
+      });
 
       return NextResponse.json({ success: true, booking: result.booking });
     }
@@ -189,6 +216,11 @@ export async function POST(request: NextRequest) {
         updatedAt: now,
       });
 
+      await logAdminAction(access.actor, "consulting.review.sendInvite", {
+        type: "consulting_booking",
+        id: bookingId,
+      });
+
       return NextResponse.json({ success: true, sentAt: now.toISOString() });
     }
 
@@ -208,6 +240,13 @@ export async function POST(request: NextRequest) {
         isApproved: newApprovedState,
         updatedAt: new Date().toISOString(),
       });
+
+      await logAdminAction(
+        access.actor,
+        "consulting.review.toggleApproval",
+        { type: "consulting_review", id: reviewId },
+        { isApproved: newApprovedState }
+      );
 
       return NextResponse.json({ success: true, isApproved: newApprovedState });
     }

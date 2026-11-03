@@ -1,39 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
+import { requireAdminAccess } from "@/lib/adminAccess/server";
+
+type AdminProjectRow = Record<string, unknown> & {
+  title?: string;
+  description?: string;
+  createdAt: string | null;
+  techStack?: string[];
+  creatorProfile?: { displayName?: string };
+};
 
 export async function GET(request: NextRequest) {
   try {
-    // Authentication: verify admin session token
-    const token = request.headers.get("x-admin-token");
-
-    if (!token) {
-      return NextResponse.json(
-        { error: "Admin authentication required" },
-        { status: 401 }
-      );
-    }
-
-    // Verify admin session
-    const sessionDoc = await db.collection("admin_sessions").doc(token).get();
-
-    if (!sessionDoc.exists) {
-      return NextResponse.json(
-        { error: "Admin authentication required" },
-        { status: 401 }
-      );
-    }
-
-    const session = sessionDoc.data();
-    const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
-
-    if (expiresAt < new Date()) {
-      // Session expired, delete it
-      await db.collection("admin_sessions").doc(token).delete();
-      return NextResponse.json(
-        { error: "Admin authentication required" },
-        { status: 401 }
-      );
-    }
+    const access = await requireAdminAccess(request, "projects.read");
+    if (!access.ok) return access.response;
 
     // Parse query parameters
     const { searchParams } = new URL(request.url);
@@ -45,11 +25,11 @@ export async function GET(request: NextRequest) {
     const creator = searchParams.get("creator");
 
     // Build Firestore query
-    let query = db.collection("projects").orderBy("createdAt", "desc");
+    let query: FirebaseFirestore.Query = db.collection("projects").orderBy("createdAt", "desc");
 
     // Apply status filter via Firestore (single-field, auto-indexed)
     if (status) {
-      query = query.where("status", "==", status) as any;
+      query = query.where("status", "==", status);
     }
 
     // Execute query
@@ -76,12 +56,10 @@ export async function GET(request: NextRequest) {
     );
 
     // Build counts map
-    const countsMap = new Map(
-      countsData.map((c) => [c.projectId, c])
-    );
+    const countsMap = new Map(countsData.map((c) => [c.projectId, c]));
 
     // Convert Firestore documents to JSON-serializable format with counts
-    let projects: any[] = snapshot.docs.map((doc) => {
+    let projects: AdminProjectRow[] = snapshot.docs.map((doc) => {
       const data = doc.data();
       const counts = countsMap.get(doc.id) || {
         memberCount: 0,
@@ -133,7 +111,7 @@ export async function GET(request: NextRequest) {
     // Tech stack filter (client-side: check if any tech in array contains the search term)
     if (techStack) {
       const techLower = techStack.toLowerCase();
-      projects = projects.filter((p: any) =>
+      projects = projects.filter((p) =>
         p.techStack?.some((t: string) => t.toLowerCase().includes(techLower))
       );
     }
@@ -141,7 +119,7 @@ export async function GET(request: NextRequest) {
     // Creator filter (client-side: match against creator display name)
     if (creator) {
       const creatorLower = creator.toLowerCase();
-      projects = projects.filter((p: any) =>
+      projects = projects.filter((p) =>
         p.creatorProfile?.displayName?.toLowerCase().includes(creatorLower)
       );
     }
@@ -155,9 +133,6 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     console.error("Error fetching admin projects:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch projects" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch projects" }, { status: 500 });
   }
 }

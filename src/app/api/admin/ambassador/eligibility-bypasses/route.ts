@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { db, auth } from "@/lib/firebaseAdmin";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import { isAmbassadorProgramEnabled } from "@/lib/features";
 import { AMBASSADOR_ELIGIBILITY_BYPASSES_COLLECTION } from "@/lib/ambassador/constants";
 import { z } from "zod";
@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
   if (!isAmbassadorProgramEnabled()) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  const admin = await requireAdmin(request);
-  if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
+  const access = await requireAdminAccess(request, "ambassador.eligibilityBypass.read");
+  if (!access.ok) return access.response;
 
   const snap = await db
     .collection(AMBASSADOR_ELIGIBILITY_BYPASSES_COLLECTION)
@@ -52,8 +52,8 @@ export async function POST(request: NextRequest) {
   if (!isAmbassadorProgramEnabled()) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  const admin = await requireAdmin(request);
-  if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
+  const access = await requireAdminAccess(request, "ambassador.eligibilityBypass.grant");
+  if (!access.ok) return access.response;
 
   let body: unknown;
   try {
@@ -64,7 +64,10 @@ export async function POST(request: NextRequest) {
 
   const parsed = GrantSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid body", details: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid body", details: parsed.error.flatten() },
+      { status: 400 }
+    );
   }
   const { email, reason } = parsed.data;
 
@@ -85,15 +88,19 @@ export async function POST(request: NextRequest) {
     uid: targetUser.uid,
     email: targetUser.email,
     displayName: targetUser.displayName,
-    grantedBy: admin.uid,
+    grantedBy: access.actor.uid,
     grantedAt: FieldValue.serverTimestamp(),
   };
   if (reason) doc.reason = reason;
 
-  await db
-    .collection(AMBASSADOR_ELIGIBILITY_BYPASSES_COLLECTION)
-    .doc(targetUser.uid)
-    .set(doc);
+  await db.collection(AMBASSADOR_ELIGIBILITY_BYPASSES_COLLECTION).doc(targetUser.uid).set(doc);
+
+  await logAdminAction(
+    access.actor,
+    "ambassador.eligibilityBypass.grant",
+    { type: "ambassador_eligibility_bypass", id: targetUser.uid, label: targetUser.email },
+    { ...(reason ? { reason } : {}) }
+  );
 
   return NextResponse.json({
     uid: targetUser.uid,

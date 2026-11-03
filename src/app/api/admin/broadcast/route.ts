@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import { sendEmailBatch } from "@/lib/email";
 import { db } from "@/lib/firebaseAdmin";
 import { isBroadcastGroup, BROADCAST_GROUP_LABELS } from "@/lib/admin-broadcast/groups";
@@ -28,10 +28,8 @@ interface SendResult {
  * v1 is email-only — no in-app messaging/threads/replies (see PR follow-ups).
  */
 export async function POST(request: NextRequest) {
-  const admin = await requireAdmin(request);
-  if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
-  }
+  const access = await requireAdminAccess(request, "comms.broadcast");
+  if (!access.ok) return access.response;
 
   let body: unknown;
   try {
@@ -101,10 +99,17 @@ export async function POST(request: NextRequest) {
     group,
     subject: cleanSubject,
     status: "in_progress",
-    sentBy: admin.uid,
+    sentBy: access.actor.uid,
     startedAt: FieldValue.serverTimestamp(),
     recipientCount: recipients.length,
   });
+
+  await logAdminAction(
+    access.actor,
+    "comms.broadcast",
+    { type: "admin_broadcast", id: broadcastRef.id, label: cleanSubject },
+    { group, recipientCount: recipients.length }
+  );
 
   const results: SendResult[] = [];
 

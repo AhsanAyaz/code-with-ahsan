@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllSubmissionsForChallenge, getChallenge } from "@/services/ChallengeService";
-import { verifyAdminRequest } from "@/lib/adminAuth";
+import { requireAdminAccess } from "@/lib/adminAccess/server";
 
 /**
  * GET /api/admin/challenges/[id]/submissions
  * Retrieves all submissions (all statuses) for a challenge.
- * Admin-only — uses verifyAdminRequest.
+ * Staff only (challenges.read).
  */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    if (!(await verifyAdminRequest(request))) {
-      return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
-    }
+    const access = await requireAdminAccess(request, "challenges.read");
+    if (!access.ok) return access.response;
 
     const { id } = await params;
     const challenge = await getChallenge(id);

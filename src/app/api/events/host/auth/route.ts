@@ -3,9 +3,8 @@ import { db } from "@/lib/firebaseAdmin";
 import bcrypt from "bcryptjs";
 import { randomBytes } from "node:crypto";
 
-// POST: Verify presenter/host password (accepts either the dedicated host
-// password or the admin password, since an admin should also be able to run
-// the deck without a second credential).
+// POST: Verify the presenter/host password. Staff use their own admin portal
+// sign-in; the shared admin password is retired and no longer accepted here.
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -15,32 +14,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Password required" }, { status: 400 });
     }
 
-    const [hostConfigDoc, adminConfigDoc] = await Promise.all([
-      db.collection("config").doc("host").get(),
-      db.collection("config").doc("admin").get(),
-    ]);
-
+    const hostConfigDoc = await db.collection("config").doc("host").get();
     const hostHash = hostConfigDoc.exists ? hostConfigDoc.data()?.passwordHash : undefined;
-    const adminHash = adminConfigDoc.exists ? adminConfigDoc.data()?.passwordHash : undefined;
 
-    if (!hostHash && !adminHash) {
+    if (!hostHash) {
       return NextResponse.json(
         {
-          error: "Host password not configured — run scripts/set-host-password.js",
+          error: "Host password not configured. Run scripts/set-host-password.js",
         },
         { status: 500 }
       );
     }
 
-    let role: "host" | "admin" | null = null;
-
-    if (hostHash && (await bcrypt.compare(password, hostHash))) {
-      role = "host";
-    } else if (adminHash && (await bcrypt.compare(password, adminHash))) {
-      role = "admin";
-    }
-
-    if (!role) {
+    if (!(await bcrypt.compare(password, hostHash))) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
@@ -52,7 +38,7 @@ export async function POST(request: NextRequest) {
     await db.collection("host_sessions").doc(sessionToken).set({
       createdAt: new Date(),
       expiresAt,
-      role,
+      role: "host",
     });
 
     return NextResponse.json(

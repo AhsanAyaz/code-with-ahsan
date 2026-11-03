@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import { isAmbassadorProgramEnabled } from "@/lib/features";
 import { AMBASSADOR_ELIGIBILITY_BYPASSES_COLLECTION } from "@/lib/ambassador/constants";
 
@@ -16,8 +16,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
   if (!isAmbassadorProgramEnabled()) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  const admin = await requireAdmin(request);
-  if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
+  const access = await requireAdminAccess(request, "ambassador.eligibilityBypass.revoke");
+  if (!access.ok) return access.response;
 
   const { uid } = await params;
 
@@ -28,5 +28,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
   }
 
   await ref.delete();
+  await logAdminAction(access.actor, "ambassador.eligibilityBypass.revoke", {
+    type: "ambassador_eligibility_bypass",
+    id: uid,
+    ...(snap.data()?.email ? { label: snap.data()?.email as string } : {}),
+  });
   return NextResponse.json({ ok: true });
 }
