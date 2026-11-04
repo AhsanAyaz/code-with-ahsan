@@ -532,7 +532,7 @@ export const IN_KIND: InKindOption[] = [
 
 export const SPONSOR_NEXT_STEPS: string[] = [
   "Pick a tier, or ask us about Title.",
-  "Send your logo and brand assets.",
+  "Send your logo and brand assets by 31 Jan 2027.",
   "Confirm payment and we lock in your place.",
 ];
 
