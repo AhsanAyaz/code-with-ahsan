@@ -89,20 +89,24 @@ const ContactSection = () => {
             {TEAM_LEADS.map((lead) => (
               <li
                 key={lead.name}
-                className="flex h-full flex-col items-center rounded-3xl border border-(--sm-lilac)/20 bg-(--sm-dusk)/60 p-6 text-center"
+                className="flex h-full flex-col items-center rounded-3xl border border-(--sm-lilac)/20 bg-(--sm-dusk)/60 p-7 text-center"
               >
                 <PersonAvatar
                   name={lead.name}
                   src={lead.avatarUrl}
-                  size={72}
-                  className="rounded-full"
+                  size={128}
+                  className="rounded-full ring-2 ring-(--sm-amber)/60"
                 />
                 <h3
-                  className={`${DISPLAY_FONT} mt-4 text-xl font-bold leading-tight text-(--sm-paper)`}
+                  className={`${DISPLAY_FONT} mt-5 text-3xl font-bold leading-tight text-(--sm-paper)`}
                 >
                   {lead.name}
                 </h3>
-                {lead.team && <p className="mt-1 text-sm text-(--sm-lilac)">{lead.team} lead</p>}
+                {lead.team && (
+                  <p className="mt-1 text-balance font-semibold text-(--sm-amber)">
+                    {lead.team} lead
+                  </p>
+                )}
                 <SocialLinks organizer={lead} />
               </li>
             ))}
