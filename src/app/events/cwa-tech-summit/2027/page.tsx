@@ -8,7 +8,6 @@ import HeroSection from "./components/HeroSection";
 import InKindSection from "./components/InKindSection";
 import JudgesSection from "./components/JudgesSection";
 import MarqueeBand from "./components/MarqueeBand";
-import OrganizersSection from "./components/OrganizersSection";
 import PastEventsSection from "./components/PastEventsSection";
 import PitchSection from "./components/PitchSection";
 import ScrollProgress from "./components/ScrollProgress";
@@ -39,7 +38,6 @@ const CwaTechSummit2027Page = () => {
         <SponsorshipTiersSection />
         <CommunityManagerSection />
         <InKindSection />
-        <OrganizersSection />
         <VenueSection />
         <CommunityNumbersSection />
         <PastEventsSection />

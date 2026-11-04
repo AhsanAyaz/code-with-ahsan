@@ -80,7 +80,6 @@ export const SECTION_IDS = {
   sponsorshipTiers: "sponsorship-tiers",
   communityManager: "community-manager",
   inKind: "in-kind",
-  organizers: "organisers",
   venue: "venue",
   contact: "contact",
   community: "community",
@@ -597,7 +596,7 @@ export const sponsorMailto = (subject: string) =>
   `mailto:${SPONSOR_CONTACT.email}?subject=${encodeURIComponent(subject)}`;
 
 // ─── Organisers ──────────────────────────────────────────────────────────────
-// The "Meet the team" section shows these team leads, in this order. Social
+// "Got questions?" lists these team leads, in this order. Social
 // handles are stored WITHOUT the leading "@". For linkedin, instagram and
 // email: an empty string hides that link on the card, and SOCIAL_TBD ("TBD")
 // shows the platform as a dimmed, non-clickable "coming soon" placeholder. A
@@ -616,8 +615,6 @@ const ORGANIZER_IMG = "/static/images/events/cwa-tech-summit-2027/organizers";
 
 /** Sentinel for a social field we know exists but don't have yet. */
 export const SOCIAL_TBD = "TBD";
-
-export const ORGANIZERS_INTRO = "Six team leads, each running one part of the summit.";
 
 export const ORGANIZER_PROFILES: Organizer[] = [
   {

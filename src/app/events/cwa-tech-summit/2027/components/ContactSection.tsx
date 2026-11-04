@@ -1,7 +1,7 @@
 import { Linkedin, Mail } from "lucide-react";
 import { CONTACTS, ORGANIZER_PROFILES, SECTION_IDS, type ContactPerson } from "../constants";
 import KineticHeading from "./KineticHeading";
-import { SocialLinks } from "./OrganizersSection";
+import { SocialLinks } from "./SocialLinks";
 import PersonAvatar from "./PersonAvatar";
 import { CONTAINER, DISPLAY_FONT, FOCUS_RING, SECTION_SPACING } from "./styles";
 
