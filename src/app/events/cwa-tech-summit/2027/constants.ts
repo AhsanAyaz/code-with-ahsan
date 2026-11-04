@@ -518,7 +518,7 @@ export const IN_KIND_INTRO =
 export const IN_KIND: InKindOption[] = [
   {
     title: "Food and venue",
-    body: "Catering, snacks, or hosting the venue. Counts as Gold-equivalent.",
+    body: "Catering, snacks, or hosting the venue. Counts as Platinum-equivalent.",
   },
   {
     title: "Prizes and swag",
@@ -532,7 +532,7 @@ export const IN_KIND: InKindOption[] = [
 
 export const SPONSOR_NEXT_STEPS: string[] = [
   "Pick a tier, or ask us about Title.",
-  "Send your logo and brand assets.",
+  "Send your logo and brand assets by 31 Jan 2027.",
   "Confirm payment and we lock in your place.",
 ];
 
@@ -578,9 +578,9 @@ const FOUNDER: ContactPerson = {
 };
 
 const COMMUNITY_MANAGER: ContactPerson = {
-  role: "Community Manager",
+  role: "Community Lead",
   name: "Maham Tahir",
-  title: "Content Strategist & Community Manager",
+  title: "Community Lead at Code with Ahsan | Software Engineer",
   email: "maham.visionwiseab@gmail.com",
   linkedinUrl: "https://www.linkedin.com/in/maham-tahir-225606431/",
   avatarUrl: `${CONTACT_IMG}/maham-tahir.jpeg`,
@@ -633,20 +633,17 @@ export const ORGANIZER_PROFILES: Organizer[] = [
   {
     name: "Fatima Khan",
     team: "Outreach",
-    // TODO: real LinkedIn and email are pending the Core Team sheet, plus a
-    // headshot as organizers/fatima-khan.jpg. Initials render until then.
-    linkedin: SOCIAL_TBD,
-    email: SOCIAL_TBD,
+    linkedin: "fatima-khan-cs",
+    email: "fatimak432@gmail.com",
+    // TODO: add headshot as organizers/fatima-khan.jpg. Initials render until then.
     avatarUrl: "",
   },
   {
     name: "Hashir Afzal",
     team: "Community Moderation",
-    // TODO: add headshot as organizers/hashir-afzal.jpg, plus real LinkedIn
-    // and email (pending the Core Team sheet). Initials render until then, and
-    // "TBD" shows each platform as a dimmed placeholder icon.
-    linkedin: SOCIAL_TBD,
-    email: SOCIAL_TBD,
+    linkedin: "hashir-afzal",
+    email: "hashirdev9t@gmail.com",
+    // TODO: add headshot as organizers/hashir-afzal.jpg. Initials render until then.
     avatarUrl: "",
   },
   {
