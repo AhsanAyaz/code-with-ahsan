@@ -579,9 +579,9 @@ const FOUNDER: ContactPerson = {
 };
 
 const COMMUNITY_MANAGER: ContactPerson = {
-  role: "Community Manager",
+  role: "Community Lead",
   name: "Maham Tahir",
-  title: "Content Strategist & Community Manager",
+  title: "Community Lead at Code with Ahsan | Software Engineer",
   email: "maham.visionwiseab@gmail.com",
   linkedinUrl: "https://www.linkedin.com/in/maham-tahir-225606431/",
   avatarUrl: `${CONTACT_IMG}/maham-tahir.jpeg`,
