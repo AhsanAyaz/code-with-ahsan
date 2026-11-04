@@ -1,4 +1,4 @@
-import { Instagram, Linkedin, Mail } from "lucide-react";
+import { Linkedin, Mail } from "lucide-react";
 import { SOCIAL_TBD, type Organizer } from "../constants";
 import { FOCUS_RING } from "./styles";
 
@@ -24,14 +24,6 @@ const linksFor = (organizer: Organizer): SocialLinkItem[] => {
       href: (v: string) => `https://www.linkedin.com/in/${v}`,
       label: `${organizer.name} on LinkedIn`,
       icon: Linkedin,
-    },
-    {
-      key: "instagram",
-      value: organizer.instagram,
-      platform: "Instagram",
-      href: (v: string) => `https://instagram.com/${v}`,
-      label: `${organizer.name} on Instagram`,
-      icon: Instagram,
     },
     {
       key: "email",

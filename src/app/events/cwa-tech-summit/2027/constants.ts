@@ -597,8 +597,8 @@ export const sponsorMailto = (subject: string) =>
 
 // ─── Organisers ──────────────────────────────────────────────────────────────
 // "Got questions?" lists these team leads, in this order. Social
-// handles are stored WITHOUT the leading "@". For linkedin, instagram and
-// email: an empty string hides that link on the card, and SOCIAL_TBD ("TBD")
+// handles are stored WITHOUT the leading "@". For linkedin and email: an
+// empty string hides that link on the card, and SOCIAL_TBD ("TBD")
 // shows the platform as a dimmed, non-clickable "coming soon" placeholder. A
 // missing headshot falls back to initials (PersonAvatar).
 export type Organizer = {
@@ -606,7 +606,6 @@ export type Organizer = {
   /** e.g. "Marketing", shown as "Marketing lead". */
   team: string;
   linkedin: string;
-  instagram: string;
   email: string;
   avatarUrl: string;
 };
@@ -621,7 +620,6 @@ export const ORGANIZER_PROFILES: Organizer[] = [
     name: "Arsalan Paracha",
     team: "Management",
     linkedin: "arsalan-paracha-4b034a38",
-    instagram: "arsalanparacha81",
     email: "arsalanparacha81@gmail.com",
     avatarUrl: `${ORGANIZER_IMG}/arsalan.jpg`,
   },
@@ -629,35 +627,29 @@ export const ORGANIZER_PROFILES: Organizer[] = [
     name: "Saad Jawaid",
     team: "Technical",
     linkedin: "saadbandukada",
-    instagram: "saadbandukada",
     email: "saadbandukada@gmail.com",
     avatarUrl: `${ORGANIZER_IMG}/saad.jpg`,
   },
   {
-    name: "Javeria Kamran",
+    name: "Fatima Khan",
     team: "Outreach",
-    linkedin: "javeria-kamran-613833417",
-    instagram: "ozge.belle_",
-    email: "javeriakamran668@gmail.com",
-    // TODO: add headshot as organizers/javeria-kamran.jpg. Initials render until then.
+    linkedin: "fatima-khan-cs",
+    email: "fatimak432@gmail.com",
+    // TODO: add headshot as organizers/fatima-khan.jpg. Initials render until then.
     avatarUrl: "",
   },
   {
     name: "Hashir Afzal",
     team: "Community Moderation",
-    // TODO: add headshot as organizers/hashir-afzal.jpg, plus real LinkedIn,
-    // Instagram and email. Initials render until then, and "TBD" shows each
-    // platform as a dimmed placeholder icon.
-    linkedin: SOCIAL_TBD,
-    instagram: SOCIAL_TBD,
-    email: SOCIAL_TBD,
+    linkedin: "hashir-afzal",
+    email: "hashirdev9t@gmail.com",
+    // TODO: add headshot as organizers/hashir-afzal.jpg. Initials render until then.
     avatarUrl: "",
   },
   {
     name: "Warisha Sheikh",
     team: "Marketing",
     linkedin: "warishasheikh",
-    instagram: "warisha_sh_",
     email: "warishasheikh007@gmail.com",
     // TODO: add headshot as organizers/warisha.jpg (missing in Ship Karachi too).
     avatarUrl: "",
@@ -666,7 +658,6 @@ export const ORGANIZER_PROFILES: Organizer[] = [
     name: "Kinza Pervez",
     team: "Designs & Content",
     linkedin: "kinza-pervez",
-    instagram: "kp_mallick",
     email: "kp.visionwise@gmail.com",
     avatarUrl: `${ORGANIZER_IMG}/kinza.jpg`,
   },
