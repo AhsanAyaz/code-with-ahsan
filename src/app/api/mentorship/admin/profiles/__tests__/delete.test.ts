@@ -3,9 +3,10 @@ import { NextRequest } from "next/server";
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
-vi.mock("@/lib/ambassador/adminAuth", () => ({
-  requireAdmin: vi.fn(),
-}));
+vi.mock(
+  "@/lib/adminAccess/server",
+  async () => (await import("@/lib/adminAccess/testing")).adminAccessServerMock
+);
 
 vi.mock("@/lib/mentorship/deleteMenteeCascade", () => ({
   cascadeDeleteMentee: vi.fn(),
@@ -38,10 +39,14 @@ vi.mock("@/lib/firebaseAdmin", () => ({
 
 // ─── Imports (after mocks) ─────────────────────────────────────────────────────
 import { DELETE } from "../route";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
 import { cascadeDeleteMentee } from "@/lib/mentorship/deleteMenteeCascade";
+import {
+  actAs,
+  logAdminActionMock,
+  TEST_ACTOR_UID,
+  TEST_ACTOR_EMAIL,
+} from "@/lib/adminAccess/testing";
 
-const requireAdminMock = vi.mocked(requireAdmin);
 const cascadeMock = vi.mocked(cascadeDeleteMentee);
 
 function makeRequest(body: unknown): NextRequest {
@@ -55,7 +60,7 @@ function makeRequest(body: unknown): NextRequest {
 describe("DELETE /api/mentorship/admin/profiles (cascade delete mentee)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    requireAdminMock.mockResolvedValue({ ok: true, uid: "admin:abc123" });
+    actAs("admin");
     mockGet.mockResolvedValue({
       exists: true,
       data: () => ({ email: "m@e.com", displayName: "Mentee" }),
@@ -81,15 +86,21 @@ describe("DELETE /api/mentorship/admin/profiles (cascade delete mentee)", () => 
     });
   });
 
-  it("returns 401 when the caller is not an admin", async () => {
-    requireAdminMock.mockResolvedValue({
-      ok: false,
-      status: 401,
-      error: "Admin token required",
-    });
+  it("returns 401 when the caller is signed out", async () => {
+    actAs("signed-out");
     const res = await DELETE(makeRequest({ uid: "u1", confirmed: true }));
     expect(res.status).toBe(401);
     expect(cascadeMock).not.toHaveBeenCalled();
+  });
+
+  it("returns 403 Admins only for a moderator and does not cascade", async () => {
+    actAs("moderator");
+    const res = await DELETE(makeRequest({ uid: "u1", confirmed: true }));
+    expect(res.status).toBe(403);
+    expect((await res.json()).error).toBe("Admins only");
+    expect(cascadeMock).not.toHaveBeenCalled();
+    expect(mockGet).not.toHaveBeenCalled();
+    expect(logAdminActionMock).not.toHaveBeenCalled();
   });
 
   it("returns 400 when confirmation flag is missing", async () => {
@@ -126,14 +137,13 @@ describe("DELETE /api/mentorship/admin/profiles (cascade delete mentee)", () => 
     expect(json.success).toBe(true);
     expect(json.summary.counts.sessions).toBe(1);
 
-    // Audit log recorded with the acting admin + target.
-    expect(mockCollection).toHaveBeenCalledWith("mentorship_admin_audit_log");
-    expect(mockAdd).toHaveBeenCalledWith(
-      expect.objectContaining({
-        action: "delete_mentee",
-        targetUid: "u1",
-        performedBy: "admin:abc123",
-      })
+    // Audit log recorded with the real acting admin + target.
+    expect(logAdminActionMock).toHaveBeenCalledWith(
+      { uid: TEST_ACTOR_UID, email: TEST_ACTOR_EMAIL, role: "admin" },
+      "mentorship.profile.delete",
+      expect.objectContaining({ type: "mentorship_profile", id: "u1", label: "Mentee" }),
+      expect.objectContaining({ targetEmail: "m@e.com" })
     );
+    expect(mockAdd).not.toHaveBeenCalled();
   });
 });

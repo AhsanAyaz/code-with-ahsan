@@ -1,10 +1,11 @@
 "use client";
 
+import { adminFetch } from "@/lib/adminAccess/client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Challenge } from "@/types/challenges";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import { useToast } from "@/contexts/ToastContext";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 
 /**
  * Admin Dashboard - Challenges List.
@@ -19,10 +20,7 @@ export default function AdminChallengesPage() {
   useEffect(() => {
     const fetchChallenges = async () => {
       try {
-        const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-        const res = await fetch("/api/admin/challenges", {
-          headers: token ? { "x-admin-token": token } : {},
-        });
+        const res = await adminFetch("/api/admin/challenges");
         if (res.ok) {
           const data = await res.json();
           setChallenges(data.challenges);
@@ -42,10 +40,8 @@ export default function AdminChallengesPage() {
     }
 
     try {
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-      const res = await fetch(`/api/admin/challenges/${id}`, {
+      const res = await adminFetch(`/api/admin/challenges/${id}`, {
         method: "DELETE",
-        headers: token ? { "x-admin-token": token } : {},
       });
 
       if (res.ok) {
@@ -154,12 +150,13 @@ export default function AdminChallengesPage() {
                       >
                         Edit
                       </Link>
-                      <button
+                      <AdminActionButton
+                        action="challenges.delete"
                         onClick={() => handleDelete(challenge.id, challenge.title)}
                         className="btn btn-sm btn-outline btn-error"
                       >
                         Delete
-                      </button>
+                      </AdminActionButton>
                     </div>
                   </td>
                 </tr>

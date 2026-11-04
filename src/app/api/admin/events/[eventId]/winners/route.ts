@@ -1,28 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
+import { verifyHostRequest } from "@/lib/hostAuth";
+import { requireAdminAccess, logAdminAction, type AdminActor } from "@/lib/adminAccess/server";
+import type { AdminAction } from "@/lib/adminAccess/actions";
 import type { WinnersData } from "@/types/events";
 
-// ─── Auth helper — same pattern as src/app/api/admin/courses/route.ts ───────
+// ─── Auth helper ─────────────────────────────────────────────────────────────
+//
+// Writes are allowed for a staff member signed in to the admin portal (Bearer
+// ID token, checked per action: editing is moderator, clearing is admin only)
+// or for the event presenter (x-host-token), so the host can announce winners
+// from the deck. Host tokens live in their own `host_sessions` collection.
 
-async function checkAdminAuth(request: NextRequest): Promise<NextResponse | null> {
-  const token = request.headers.get("x-admin-token");
-  if (!token) {
-    return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
+type WinnersWriteAuth =
+  | { ok: true; actor: AdminActor | null }
+  | { ok: false; response: NextResponse };
+
+async function authorizeWinnersWrite(
+  request: NextRequest,
+  action: AdminAction
+): Promise<WinnersWriteAuth> {
+  if (await verifyHostRequest(request)) {
+    return { ok: true, actor: null };
   }
-  const sessionDoc = await db.collection("admin_sessions").doc(token).get();
-  if (!sessionDoc.exists) {
-    return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
+
+  const access = await requireAdminAccess(request, action);
+  if (access.ok) return { ok: true, actor: access.actor };
+
+  // No staff credential either: answer as the combined admin-or-host gate.
+  if (!request.headers.get("Authorization")) {
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { error: "Admin or host authentication required" },
+        { status: 401 }
+      ),
+    };
   }
-  const session = sessionDoc.data();
-  const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
-  if (expiresAt < new Date()) {
-    await db.collection("admin_sessions").doc(token).delete();
-    return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
-  }
-  return null;
+  return access;
 }
 
-// ─── GET /api/admin/events/[eventId]/winners — public read ───────────────────
+// ─── GET /api/admin/events/[eventId]/winners: public read ───────────────────
 
 export async function GET(
   _request: NextRequest,
@@ -45,18 +63,24 @@ export async function GET(
   }
 }
 
-// ─── DELETE /api/admin/events/[eventId]/winners — admin clear ────────────────
+// ─── DELETE /api/admin/events/[eventId]/winners: admin or host clear ────────────────
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ eventId: string }> }
 ) {
-  const authError = await checkAdminAuth(request);
-  if (authError) return authError;
+  const auth = await authorizeWinnersWrite(request, "events.winners.delete");
+  if (!auth.ok) return auth.response;
 
   const { eventId } = await params;
   try {
     await db.doc(`events/${eventId}/winners/data`).delete();
+    if (auth.actor) {
+      await logAdminAction(auth.actor, "events.winners.delete", {
+        type: "event_winners",
+        id: eventId,
+      });
+    }
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error clearing winners:", error);
@@ -64,14 +88,14 @@ export async function DELETE(
   }
 }
 
-// ─── PUT /api/admin/events/[eventId]/winners — admin write ───────────────────
+// ─── PUT /api/admin/events/[eventId]/winners: staff or host write ───────────────────
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ eventId: string }> }
 ) {
-  const authError = await checkAdminAuth(request);
-  if (authError) return authError;
+  const auth = await authorizeWinnersWrite(request, "events.winners.edit");
+  if (!auth.ok) return auth.response;
 
   const { eventId } = await params;
 
@@ -83,7 +107,10 @@ export async function PUT(
   }
 
   if (!body.first?.teamName || !body.second?.teamName || !body.third?.teamName) {
-    return NextResponse.json({ error: "All three placements must have a team selected" }, { status: 400 });
+    return NextResponse.json(
+      { error: "All three placements must have a team selected" },
+      { status: 400 }
+    );
   }
 
   try {
@@ -93,6 +120,18 @@ export async function PUT(
       third: body.third,
       announcedAt: new Date(),
     });
+    if (auth.actor) {
+      await logAdminAction(
+        auth.actor,
+        "events.winners.edit",
+        { type: "event_winners", id: eventId },
+        {
+          first: body.first.teamName,
+          second: body.second.teamName,
+          third: body.third.teamName,
+        }
+      );
+    }
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error saving winners:", error);

@@ -1,34 +1,25 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import type { ApplicationDoc } from "@/types/ambassador";
 import VideoEmbed from "./VideoEmbed";
 import DiscordBanner from "./DiscordBanner";
 import DecisionDialog from "./DecisionDialog";
+import AdminActionButton from "@/components/admin/AdminActionButton";
+import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
 
 type AppRow = ApplicationDoc & { applicationId: string };
 
 function fmtDate(ts: unknown): string {
   if (!ts) return "";
-  if (
-    typeof ts === "object" &&
-    ts !== null &&
-    "_seconds" in (ts as Record<string, unknown>)
-  ) {
-    return new Date(
-      (ts as { _seconds: number })._seconds * 1000
-    ).toLocaleString();
+  if (typeof ts === "object" && ts !== null && "_seconds" in (ts as Record<string, unknown>)) {
+    return new Date((ts as { _seconds: number })._seconds * 1000).toLocaleString();
   }
   if (typeof ts === "string") return new Date(ts).toLocaleString();
   return "";
 }
 
-export default function ApplicationDetail({
-  applicationId,
-}: {
-  applicationId: string;
-}) {
+export default function ApplicationDetail({ applicationId }: { applicationId: string }) {
   const router = useRouter();
   const [app, setApp] = useState<AppRow | null>(null);
   const [studentIdUrl, setStudentIdUrl] = useState<string | null>(null);
@@ -38,15 +29,22 @@ export default function ApplicationDetail({
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = useCallback(async () => {
-    if (!confirm("Permanently delete this application and all related ambassador data? This cannot be undone.")) return;
+    if (
+      !confirm(
+        "Permanently delete this application and all related ambassador data? This cannot be undone."
+      )
+    )
+      return;
     setDeleting(true);
     try {
-      const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
-      const res = await fetch(`/api/ambassador/applications/${applicationId}`, {
+      const res = await adminFetch(`/api/ambassador/applications/${applicationId}`, {
         method: "DELETE",
-        headers: token ? { "x-admin-token": token } : {},
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        setError(await adminErrorMessage(res, "Delete failed. Try again."));
+        setDeleting(false);
+        return;
+      }
       router.push("/admin/ambassadors");
     } catch {
       setError("Delete failed. Try again.");
@@ -58,16 +56,7 @@ export default function ApplicationDetail({
     setLoading(true);
     setError(null);
     try {
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem(ADMIN_TOKEN_KEY)
-          : null;
-      const res = await fetch(
-        `/api/ambassador/applications/${applicationId}`,
-        {
-          headers: token ? { "x-admin-token": token } : {},
-        }
-      );
+      const res = await adminFetch(`/api/ambassador/applications/${applicationId}`);
       if (!res.ok) {
         setError(`HTTP ${res.status}`);
         return;
@@ -87,10 +76,7 @@ export default function ApplicationDetail({
   }, [load]);
 
   if (loading) return <div className="loading loading-spinner" />;
-  if (error || !app)
-    return (
-      <div className="alert alert-error">{error ?? "Not found"}</div>
-    );
+  if (error || !app) return <div className="alert alert-error">{error ?? "Not found"}</div>;
 
   // REVIEW-05: show Discord banner when accepted AND Discord isn't cleanly resolved.
   const showDiscordBanner =
@@ -106,9 +92,7 @@ export default function ApplicationDetail({
         <div>
           <h1 className="text-2xl font-bold">{app.applicantName}</h1>
           <p className="opacity-70 text-sm">{app.applicantEmail}</p>
-          <p className="opacity-70 text-sm">
-            Submitted {fmtDate(app.submittedAt)}
-          </p>
+          <p className="opacity-70 text-sm">Submitted {fmtDate(app.submittedAt)}</p>
         </div>
         <div className="flex gap-2 items-center">
           <span
@@ -116,8 +100,8 @@ export default function ApplicationDetail({
               app.status === "accepted"
                 ? "badge-success"
                 : app.status === "declined"
-                ? "badge-error"
-                : "badge-info"
+                  ? "badge-error"
+                  : "badge-info"
             }`}
           >
             {app.status}
@@ -125,27 +109,27 @@ export default function ApplicationDetail({
           {/* D-11: Accept / Decline buttons only visible when status is not yet final */}
           {app.status !== "accepted" && app.status !== "declined" && (
             <>
-              <button
-                className="btn btn-success btn-sm"
-                onClick={() => setDialog("accept")}
-              >
+              <button className="btn btn-success btn-sm" onClick={() => setDialog("accept")}>
                 Accept
               </button>
-              <button
+              <AdminActionButton
+                action="ambassador.application.decline"
                 className="btn btn-error btn-sm"
                 onClick={() => setDialog("decline")}
               >
                 Decline
-              </button>
+              </AdminActionButton>
             </>
           )}
-          <button
+          <AdminActionButton
+            action="ambassador.application.delete"
+            tooltipClassName="tooltip-left"
             className="btn btn-outline btn-error btn-sm"
             onClick={handleDelete}
             disabled={deleting}
           >
             {deleting ? "Deleting…" : "Delete"}
-          </button>
+          </AdminActionButton>
         </div>
       </header>
 
@@ -175,9 +159,7 @@ export default function ApplicationDetail({
             <dt className="font-semibold whitespace-nowrap">Discord</dt>
             <dd>
               {app.discordHandle}
-              {app.discordMemberId
-                ? ` (${app.discordMemberId})`
-                : " (unresolved)"}
+              {app.discordMemberId ? ` (${app.discordMemberId})` : " (unresolved)"}
             </dd>
             <dt className="font-semibold whitespace-nowrap">Academic</dt>
             <dd>
@@ -186,14 +168,10 @@ export default function ApplicationDetail({
                   {app.academicEmail}{" "}
                   <span
                     className={`badge badge-sm ${
-                      app.academicEmailVerified
-                        ? "badge-success"
-                        : "badge-warning"
+                      app.academicEmailVerified ? "badge-success" : "badge-warning"
                     }`}
                   >
-                    {app.academicEmailVerified
-                      ? "auto-verified"
-                      : "needs manual review"}
+                    {app.academicEmailVerified ? "auto-verified" : "needs manual review"}
                   </span>
                 </>
               ) : app.studentIdStoragePath ? (
@@ -209,9 +187,7 @@ export default function ApplicationDetail({
                       View photo (signed, expires in 1 hour)
                     </a>
                   ) : (
-                    <span className="opacity-60">
-                      (signed URL unavailable)
-                    </span>
+                    <span className="opacity-60">(signed URL unavailable)</span>
                   )}
                 </>
               ) : (
@@ -238,17 +214,9 @@ export default function ApplicationDetail({
       <section className="card bg-base-100 border border-base-300">
         <div className="card-body p-4">
           <h2 className="font-semibold mb-2">Application Video</h2>
-          <VideoEmbed
-            videoUrl={app.videoUrl}
-            videoEmbedType={app.videoEmbedType}
-          />
+          <VideoEmbed videoUrl={app.videoUrl} videoEmbedType={app.videoEmbedType} />
           <p className="text-xs opacity-60 mt-2 break-all">
-            <a
-              href={app.videoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="link"
-            >
+            <a href={app.videoUrl} target="_blank" rel="noopener noreferrer" className="link">
               {app.videoUrl}
             </a>
           </p>

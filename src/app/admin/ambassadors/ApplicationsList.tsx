@@ -2,18 +2,13 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import type { ApplicationDoc, ApplicationStatus } from "@/types/ambassador";
+import { adminFetch } from "@/lib/adminAccess/client";
 
 type ApplicationRow = ApplicationDoc & { applicationId: string };
 type CohortRow = { cohortId: string; name: string };
 
-const STATUS_OPTIONS: ApplicationStatus[] = [
-  "submitted",
-  "under_review",
-  "accepted",
-  "declined",
-];
+const STATUS_OPTIONS: ApplicationStatus[] = ["submitted", "under_review", "accepted", "declined"];
 
 const STATUS_BADGE: Record<ApplicationStatus, string> = {
   submitted: "badge badge-info",
@@ -26,14 +21,8 @@ const PAGE_SIZE = 20;
 
 function fmtDate(ts: unknown): string {
   if (!ts) return "";
-  if (
-    typeof ts === "object" &&
-    ts !== null &&
-    "_seconds" in (ts as Record<string, unknown>)
-  ) {
-    return new Date(
-      (ts as { _seconds: number })._seconds * 1000
-    ).toLocaleDateString();
+  if (typeof ts === "object" && ts !== null && "_seconds" in (ts as Record<string, unknown>)) {
+    return new Date((ts as { _seconds: number })._seconds * 1000).toLocaleDateString();
   }
   if (typeof ts === "string") return new Date(ts).toLocaleDateString();
   return "";
@@ -57,13 +46,7 @@ export default function ApplicationsList() {
 
   // Load cohort list once for the filter dropdown (scope=all shows closed cohorts too).
   useEffect(() => {
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem(ADMIN_TOKEN_KEY)
-        : null;
-    fetch("/api/ambassador/cohorts?scope=all", {
-      headers: token ? { "x-admin-token": token } : {},
-    })
+    adminFetch("/api/ambassador/cohorts?scope=all")
       .then((r) => r.json())
       .then((b) =>
         setCohorts(
@@ -81,21 +64,12 @@ export default function ApplicationsList() {
       setLoading(true);
       setError(null);
       try {
-        const token =
-          typeof window !== "undefined"
-            ? localStorage.getItem(ADMIN_TOKEN_KEY)
-            : null;
-        const url = new URL(
-          "/api/ambassador/applications",
-          window.location.origin
-        );
+        const url = new URL("/api/ambassador/applications", window.location.origin);
         if (statusFilter) url.searchParams.set("status", statusFilter);
         if (cohortFilter) url.searchParams.set("cohortId", cohortFilter);
         if (c) url.searchParams.set("cursor", c);
         url.searchParams.set("pageSize", String(PAGE_SIZE));
-        const res = await fetch(url.toString(), {
-          headers: token ? { "x-admin-token": token } : {},
-        });
+        const res = await adminFetch(url.toString());
         if (!res.ok) {
           setError(`Failed to load (HTTP ${res.status})`);
           return;
@@ -206,8 +180,7 @@ export default function ApplicationsList() {
                   <td>{r.applicantName}</td>
                   <td>{r.university}</td>
                   <td>
-                    {cohorts.find((c) => c.cohortId === r.targetCohortId)
-                      ?.name ?? r.targetCohortId}
+                    {cohorts.find((c) => c.cohortId === r.targetCohortId)?.name ?? r.targetCohortId}
                   </td>
                   <td>
                     <span className={STATUS_BADGE[r.status]}>{r.status}</span>
@@ -237,11 +210,7 @@ export default function ApplicationsList() {
         >
           &larr; Previous
         </button>
-        <button
-          className="btn btn-sm"
-          disabled={!nextCursor || loading}
-          onClick={onNext}
-        >
+        <button className="btn btn-sm" disabled={!nextCursor || loading} onClick={onNext}>
           Next &rarr;
         </button>
       </div>

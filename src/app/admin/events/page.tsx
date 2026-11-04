@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Trophy, Users, Calendar } from "lucide-react";
+import { ADMIN_EVENTS } from "./registry";
 
 const EVENT_TYPE_ICONS: Record<string, React.ReactNode> = {
   hackathon: <Trophy className="w-4 h-4" />,
@@ -10,16 +11,6 @@ const EVENT_TYPE_BADGE: Record<string, string> = {
   hackathon: "badge-warning",
   meetup: "badge-info",
 };
-
-const ADMIN_EVENTS = [
-  {
-    id: "cwa-promptathon-2026",
-    name: "CWA Prompt-A-Thon 2026",
-    type: "hackathon",
-    date: "28 March 2026",
-    href: "/admin/events/cwa-promptathon-2026",
-  },
-];
 
 export default function AdminEventsPage() {
   return (
@@ -35,13 +26,15 @@ export default function AdminEventsPage() {
         {ADMIN_EVENTS.map((event) => (
           <Link
             key={event.id}
-            href={event.href}
+            href={`/admin/events/${event.id}`}
             className="card bg-base-200 hover:bg-base-300 transition-colors shadow-sm"
           >
             <div className="card-body gap-3">
               <div className="flex items-start justify-between gap-2">
                 <h2 className="card-title text-base leading-snug">{event.name}</h2>
-                <span className={`badge ${EVENT_TYPE_BADGE[event.type] ?? "badge-ghost"} gap-1 shrink-0`}>
+                <span
+                  className={`badge ${EVENT_TYPE_BADGE[event.type] ?? "badge-ghost"} gap-1 shrink-0`}
+                >
                   {EVENT_TYPE_ICONS[event.type]}
                   {event.type}
                 </span>

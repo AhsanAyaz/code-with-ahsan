@@ -16,6 +16,22 @@ service firebase.storage {
       allow read: if request.auth != null && request.auth.token.admin == true;
     }
 
+    // ─── Mentorship profiles: avatar uploads (GH#285) ───
+    // Path: mentorship-profiles/{userId}/avatar-{timestamp}.{ext}
+    // Writer: the profile owner only (signed-in + matching uid).
+    //   Used by MentorRegistrationForm's handleImageUpload(); ambassadors edit
+    //   via the same mentorship profile form. Without this block the write hit
+    //   the default-deny below → "Failed to upload image. Please try again."
+    // Reader: public — avatars are shown on public mentor/ambassador profiles,
+    //   matching how the stored downloadURL (photoURL) is displayed.
+    match /mentorship-profiles/{userId}/{fileName} {
+      allow write: if request.auth != null
+                      && request.auth.uid == userId
+                      && request.resource.size < 10 * 1024 * 1024          // 10 MB cap
+                      && request.resource.contentType.matches('image/.*'); // images only
+      allow read: if true;
+    }
+
     // Deny everything else by default (default-deny policy).
     match /{allPaths=**} {
       allow read, write: if false;

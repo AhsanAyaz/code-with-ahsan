@@ -10,7 +10,7 @@ const PrimaryLink = ({ href, children }: PrimaryLinkProps) => {
   return (
     <Link
       href={href}
-      className="text-primary dark:text-primary"
+      className="link link-primary underline-offset-2"
       rel="noopener noreferrer"
       target={"_blank"}
     >

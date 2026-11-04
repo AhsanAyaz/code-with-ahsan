@@ -15,7 +15,6 @@
 
 import * as admin from "firebase-admin";
 import { randUser, randParagraph, randPastDate, randJobTitle } from "@ngneat/falso";
-import bcrypt from "bcryptjs";
 
 // ─── Init ────────────────────────────────────────────────────────────────────
 
@@ -45,9 +44,7 @@ function userId(n: number) {
 }
 
 function pastTimestamp() {
-  return admin.firestore.Timestamp.fromDate(
-    randPastDate({ years: 1 }) as unknown as Date
-  );
+  return admin.firestore.Timestamp.fromDate(randPastDate({ years: 1 }) as unknown as Date);
 }
 
 const SEED_COLLECTIONS = [
@@ -57,7 +54,6 @@ const SEED_COLLECTIONS = [
   "mentor_ratings",
   "projects",
   "roadmaps",
-  "admin_sessions",
 ];
 
 async function clearCollection(name: string) {
@@ -89,11 +85,22 @@ async function clearAll() {
 
 const FAKE_USERS = Array.from({ length: 8 }, () => randUser());
 
-function fakeUser(n: number) { return FAKE_USERS[n - 1]; } // 1-indexed
-function displayName(n: number) { const u = fakeUser(n); return `${u.firstName} ${u.lastName}`; }
-function photoURL(n: number) { return fakeUser(n).img + `?u=${fakeUser(n).id}`; }
-function email(n: number) { return fakeUser(n).email; }
-function username(n: number) { return fakeUser(n).username.toLowerCase(); }
+function fakeUser(n: number) {
+  return FAKE_USERS[n - 1];
+} // 1-indexed
+function displayName(n: number) {
+  const u = fakeUser(n);
+  return `${u.firstName} ${u.lastName}`;
+}
+function photoURL(n: number) {
+  return fakeUser(n).img + `?u=${fakeUser(n).id}`;
+}
+function email(n: number) {
+  return fakeUser(n).email;
+}
+function username(n: number) {
+  return fakeUser(n).username.toLowerCase();
+}
 
 // ─── Seed: Users (Firebase Auth stand-ins) ───────────────────────────────────
 
@@ -136,7 +143,12 @@ const EXPERTISE_SETS = [
 async function seedMentorshipProfiles() {
   log("\n[mentorship_profiles] Seeding mentor and mentee profiles...");
 
-  const mentorRoles = ["Senior Frontend Engineer", "ML Engineer", "Staff Backend Engineer", "Engineering Manager"];
+  const mentorRoles = [
+    "Senior Frontend Engineer",
+    "ML Engineer",
+    "Staff Backend Engineer",
+    "Engineering Manager",
+  ];
 
   for (let i = 1; i <= 4; i++) {
     const id = userId(i);
@@ -210,11 +222,20 @@ async function seedMentorshipSessions() {
 
   for (let i = 0; i < sessions.length; i++) {
     const s = sessions[i];
-    const data = { mentorId: s.mentorId, menteeId: s.menteeId, status: s.status, createdAt: pastTimestamp(), updatedAt: pastTimestamp() };
+    const data = {
+      mentorId: s.mentorId,
+      menteeId: s.menteeId,
+      status: s.status,
+      createdAt: pastTimestamp(),
+      updatedAt: pastTimestamp(),
+    };
     if (DRY_RUN) {
       log(`  [dry-run] Would create session ${s.mentorId} → ${s.menteeId} (${s.status})`);
     } else {
-      await db.collection("mentorship_sessions").doc(`seed-session-${String(i + 1).padStart(3, "0")}`).set(data);
+      await db
+        .collection("mentorship_sessions")
+        .doc(`seed-session-${String(i + 1).padStart(3, "0")}`)
+        .set(data);
       log(`  Created session: ${s.mentorId} → ${s.menteeId} (${s.status})`);
     }
   }
@@ -235,11 +256,19 @@ async function seedMentorRatings() {
 
   for (let i = 0; i < ratings.length; i++) {
     const r = ratings[i];
-    const data = { mentorId: r.mentorId, menteeId: r.menteeId, rating: r.rating, createdAt: pastTimestamp() };
+    const data = {
+      mentorId: r.mentorId,
+      menteeId: r.menteeId,
+      rating: r.rating,
+      createdAt: pastTimestamp(),
+    };
     if (DRY_RUN) {
       log(`  [dry-run] Would create rating ${r.rating}★ for ${r.mentorId}`);
     } else {
-      await db.collection("mentor_ratings").doc(`seed-rating-${String(i + 1).padStart(3, "0")}`).set(data);
+      await db
+        .collection("mentor_ratings")
+        .doc(`seed-rating-${String(i + 1).padStart(3, "0")}`)
+        .set(data);
       log(`  Created rating: ${r.rating}★ for ${r.mentorId}`);
     }
   }
@@ -265,7 +294,8 @@ async function seedProjects() {
     {
       id: "seed-project-001",
       title: "Community Learning Dashboard",
-      description: "A collaborative dashboard where learners track their progress, share resources, and celebrate milestones together. Integrates with GitHub to pull commit activity and visualises learning streaks.",
+      description:
+        "A collaborative dashboard where learners track their progress, share resources, and celebrate milestones together. Integrates with GitHub to pull commit activity and visualises learning streaks.",
       status: "active",
       creatorId: userId(1),
       creatorProfile: creatorProfile(1),
@@ -278,7 +308,8 @@ async function seedProjects() {
     {
       id: "seed-project-002",
       title: "AI Code Review Bot",
-      description: "A GitHub bot that uses OpenAI to give constructive code review comments on pull requests. Catches common patterns, suggests improvements, and explains reasoning for each suggestion.",
+      description:
+        "A GitHub bot that uses OpenAI to give constructive code review comments on pull requests. Catches common patterns, suggests improvements, and explains reasoning for each suggestion.",
       status: "active",
       creatorId: userId(2),
       creatorProfile: creatorProfile(2),
@@ -291,7 +322,8 @@ async function seedProjects() {
     {
       id: "seed-project-003",
       title: "Mobile Mentorship Tracker",
-      description: "Cross-platform mobile app for mentors and mentees to schedule sessions, set goals, track progress, and share resources — all in one place.",
+      description:
+        "Cross-platform mobile app for mentors and mentees to schedule sessions, set goals, track progress, and share resources — all in one place.",
       status: "active",
       creatorId: userId(3),
       creatorProfile: creatorProfile(3),
@@ -304,7 +336,8 @@ async function seedProjects() {
     {
       id: "seed-project-004",
       title: "Open-Source Blog Engine",
-      description: "A lightweight, markdown-first blog engine built for developers. Supports syntax highlighting, RSS feeds, dark mode, and deploys to any static host in seconds.",
+      description:
+        "A lightweight, markdown-first blog engine built for developers. Supports syntax highlighting, RSS feeds, dark mode, and deploys to any static host in seconds.",
       status: "completed",
       creatorId: userId(4),
       creatorProfile: creatorProfile(4),
@@ -318,7 +351,12 @@ async function seedProjects() {
 
   for (const p of projects) {
     const { id, ...data } = p;
-    const doc = { ...data, lastActivityAt: pastTimestamp(), createdAt: pastTimestamp(), updatedAt: pastTimestamp() };
+    const doc = {
+      ...data,
+      lastActivityAt: pastTimestamp(),
+      createdAt: pastTimestamp(),
+      updatedAt: pastTimestamp(),
+    };
     if (DRY_RUN) {
       log(`  [dry-run] Would create project "${data.title}" (${data.status})`);
     } else {
@@ -337,7 +375,8 @@ async function seedRoadmaps() {
     {
       id: "seed-roadmap-001",
       title: "Full-Stack Web Development with Next.js",
-      description: "Go from zero to deploying production Next.js apps. Covers React fundamentals, server components, Firebase, and CI/CD.",
+      description:
+        "Go from zero to deploying production Next.js apps. Covers React fundamentals, server components, Firebase, and CI/CD.",
       domain: "web-dev",
       difficulty: "beginner",
       estimatedHours: 120,
@@ -349,7 +388,8 @@ async function seedRoadmaps() {
     {
       id: "seed-roadmap-002",
       title: "Backend Engineering with Node.js",
-      description: "Master server-side development: REST APIs, databases, authentication, and cloud deployment with Node.js and PostgreSQL.",
+      description:
+        "Master server-side development: REST APIs, databases, authentication, and cloud deployment with Node.js and PostgreSQL.",
       domain: "backend",
       difficulty: "intermediate",
       estimatedHours: 80,
@@ -361,7 +401,8 @@ async function seedRoadmaps() {
     {
       id: "seed-roadmap-003",
       title: "Practical Machine Learning with Python",
-      description: "Hands-on ML: from data wrangling with pandas to deploying scikit-learn and PyTorch models in production.",
+      description:
+        "Hands-on ML: from data wrangling with pandas to deploying scikit-learn and PyTorch models in production.",
       domain: "ml",
       difficulty: "advanced",
       estimatedHours: 160,
@@ -384,17 +425,15 @@ async function seedRoadmaps() {
   }
 }
 
-// ─── Seed: Admin Config ───────────────────────────────────────────────────────
+// ─── Admin portal access ──────────────────────────────────────────────────────
+//
+// The shared admin password is retired. Portal access is per person, stored in
+// admin_roles/{uid}. Sign in once on the emulator, then grant yourself a role:
+//   npm run admin-role:set -- you@example.com admin
 
-async function seedAdminConfig() {
-  log("\n[config/admin] Seeding admin password (password: \"admin\")...");
-  if (DRY_RUN) {
-    log('  [dry-run] Would set config/admin with bcrypt hash of "admin"');
-    return;
-  }
-  const passwordHash = await bcrypt.hash("admin", 10);
-  await db.collection("config").doc("admin").set({ passwordHash });
-  log('  Set admin password to "admin" (bcrypt hashed)');
+function printAdminAccessHint() {
+  log("\n[admin_roles] Admin portal access is per person. After signing in once, run:");
+  log("  npm run admin-role:set -- <your-email> admin");
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -424,7 +463,7 @@ async function main() {
   await seedMentorRatings();
   await seedProjects();
   await seedRoadmaps();
-  await seedAdminConfig();
+  printAdminAccessHint();
 
   console.log("\n" + "=".repeat(60));
   if (DRY_RUN) {

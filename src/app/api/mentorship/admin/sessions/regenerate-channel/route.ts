@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import { createMentorshipChannel, deleteDiscordChannel, isDiscordConfigured } from "@/lib/discord";
 
 // POST: Regenerate Discord channel for a mentorship session
 export async function POST(request: NextRequest) {
+  const access = await requireAdminAccess(request, "mentorship.session.regenerateChannel");
+  if (!access.ok) return access.response;
+
   try {
     const body = await request.json();
     const { sessionId } = body;
@@ -88,6 +92,13 @@ export async function POST(request: NextRequest) {
       discordChannelUrl: channelResult.channelUrl,
       updatedAt: new Date(),
     });
+
+    await logAdminAction(
+      access.actor,
+      "mentorship.session.regenerateChannel",
+      { type: "mentorship_session", id: sessionId },
+      { channelId: channelResult.channelId }
+    );
 
     return NextResponse.json(
       {

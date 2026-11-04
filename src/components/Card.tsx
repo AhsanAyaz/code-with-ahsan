@@ -12,7 +12,7 @@ const Card = ({ title, description, imgSrc, href }: CardProps) => (
   <div className="p-4 md:w-1/2 md" style={{ maxWidth: "544px" }}>
     <div className="card bg-base-100 shadow-xl h-full border border-base-300">
       {href ? (
-        <Link href={href} aria-label={`Link to ${title}`}>
+        <Link href={href} className="no-underline" aria-label={`Link to ${title}`}>
           <figure>
             <Image
               alt={title}
@@ -37,23 +37,17 @@ const Card = ({ title, description, imgSrc, href }: CardProps) => (
       <div className="card-body p-6">
         <h2 className="card-title text-2xl font-bold leading-8 tracking-tight">
           {href ? (
-            <Link href={href} aria-label={`Link to ${title}`}>
+            <Link href={href} className="no-underline" aria-label={`Link to ${title}`}>
               {title}
             </Link>
           ) : (
             title
           )}
         </h2>
-        <p className="prose mb-3 max-w-none text-base-content/70">
-          {description}
-        </p>
+        <p className="prose mb-3 max-w-none text-base-content/70">{description}</p>
         {href && (
           <div className="card-actions justify-end">
-            <Link
-              href={href}
-              className="btn btn-primary btn-sm"
-              aria-label={`Link to ${title}`}
-            >
+            <Link href={href} className="btn btn-primary btn-sm" aria-label={`Link to ${title}`}>
               Learn more &rarr;
             </Link>
           </div>

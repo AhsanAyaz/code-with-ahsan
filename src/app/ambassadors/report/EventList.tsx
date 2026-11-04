@@ -4,7 +4,7 @@
  * own non-hidden events with edit/delete affordances inside the 30-day window.
  * Copy strings from 04-UI-SPEC.md §Event Logger.
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { authFetch } from "@/lib/apiClient";
 import { useToast } from "@/contexts/ToastContext";
 import { EVENT_TYPE_LABELS, type EventType } from "@/lib/ambassador/eventTypes";
@@ -27,23 +27,39 @@ export default function EventList({ refreshKey = 0 }: Props) {
   const toast = useToast();
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const mountedRef = useRef(false);
+  const loadAttemptedRef = useRef(false);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const load = useCallback(async () => {
+    if (loadAttemptedRef.current && !refreshKey) return;
     setLoading(true);
     try {
       const res = await authFetch("/api/ambassador/events");
       if (!res.ok) {
-        toast.error("Could not load events");
+        if (mountedRef.current && !loadAttemptedRef.current) {
+          toast.error("Could not load events");
+          loadAttemptedRef.current = true;
+        }
         return;
       }
       const data = (await res.json()) as { events: EventItem[] };
-      setEvents(data.events ?? []);
+      if (mountedRef.current) setEvents(data.events ?? []);
     } catch {
-      toast.error("Network error — try again");
+      if (mountedRef.current && !loadAttemptedRef.current) {
+        toast.error("Network error — try again");
+        loadAttemptedRef.current = true;
+      }
     } finally {
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }
-  }, [toast]);
+  }, [refreshKey, toast]);
 
   useEffect(() => {
     load();
@@ -64,10 +80,10 @@ export default function EventList({ refreshKey = 0 }: Props) {
     const res = await authFetch(`/api/ambassador/events/${id}`, { method: "DELETE" });
     if (!res.ok) {
       const { error } = (await res.json().catch(() => ({}))) as { error?: string };
-      toast.error(error ?? "Could not delete");
+      if (mountedRef.current) toast.error(error ?? "Could not delete");
       return;
     }
-    toast.success("Event deleted");
+    if (mountedRef.current) toast.success("Event deleted");
     load();
   }
 
@@ -104,8 +120,7 @@ export default function EventList({ refreshKey = 0 }: Props) {
               <li key={e.id} className="py-4 flex justify-between gap-4">
                 <div>
                   <div className="font-bold">
-                    {EVENT_TYPE_LABELS[e.type] ?? e.type} —{" "}
-                    {new Date(e.date).toLocaleDateString()}
+                    {EVENT_TYPE_LABELS[e.type] ?? e.type} — {new Date(e.date).toLocaleDateString()}
                   </div>
                   <div className="text-sm opacity-80">
                     {e.attendanceEstimate} attendees

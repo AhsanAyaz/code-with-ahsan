@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
-import { verifyAdminRequest } from "@/lib/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import { deleteDiscordChannel, isDiscordConfigured } from "@/lib/discord";
 
 // Deleting Discord channels is a slow, sequential, rate-limited operation. Give
@@ -47,13 +47,9 @@ interface ChannelDeletionResult {
  */
 export async function DELETE(request: Request) {
   try {
-    // Guard: destructive endpoint — require a valid admin session.
-    if (!(await verifyAdminRequest(request))) {
-      return NextResponse.json(
-        { success: false, error: "Admin authentication required." },
-        { status: 401 }
-      );
-    }
+    // Guard: destructive endpoint, admins only.
+    const access = await requireAdminAccess(request, "mentorship.session.deleteArchivedChannels");
+    if (!access.ok) return access.response;
 
     // Guard: Discord must be configured
     if (!isDiscordConfigured()) {
@@ -150,8 +146,15 @@ export async function DELETE(request: Request) {
     const failed = results.filter((r) => !r.success).length;
     const hasMore = remaining > 0;
 
+    await logAdminAction(
+      access.actor,
+      "mentorship.session.deleteArchivedChannels",
+      { type: "mentorship_sessions", id: "bulk" },
+      { deleted, failed, remaining }
+    );
+
     const message = hasMore
-      ? `Deleted ${deleted}, failed ${failed}. ${remaining} archived channel(s) remaining — run again to continue.`
+      ? `Deleted ${deleted}, failed ${failed}. ${remaining} archived channel(s) remaining. Run again to continue.`
       : `Bulk cleanup complete. Deleted: ${deleted}, Failed: ${failed}.`;
 
     return NextResponse.json(

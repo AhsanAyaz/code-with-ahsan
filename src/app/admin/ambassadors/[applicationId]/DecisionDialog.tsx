@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
+import { adminFetch } from "@/lib/adminAccess/client";
 
 interface Props {
   applicationId: string;
@@ -9,47 +9,30 @@ interface Props {
   onDone: () => void;
 }
 
-export default function DecisionDialog({
-  applicationId,
-  action,
-  onClose,
-  onDone,
-}: Props) {
+export default function DecisionDialog({ applicationId, action, onClose, onDone }: Props) {
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const title =
-    action === "accept" ? "Accept application" : "Decline application";
-  const confirmLabel =
-    action === "accept" ? "Confirm accept" : "Confirm decline";
+  const title = action === "accept" ? "Accept application" : "Decline application";
+  const confirmLabel = action === "accept" ? "Confirm accept" : "Confirm decline";
   const confirmClass = action === "accept" ? "btn-success" : "btn-error";
 
   const handleConfirm = async () => {
     setBusy(true);
     setError(null);
     try {
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem(ADMIN_TOKEN_KEY)
-          : null;
-      const res = await fetch(
-        `/api/ambassador/applications/${applicationId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { "x-admin-token": token } : {}),
-          },
-          body: JSON.stringify({ action, notes: notes || undefined }),
-        }
-      );
+      const res = await adminFetch(`/api/ambassador/applications/${applicationId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action, notes: notes || undefined }),
+      });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
         const msg = (body as { error?: string }).error ?? `HTTP ${res.status}`;
-        setError(
-          msg === "cohort_full" ? "Cohort is full — cannot accept." : msg
-        );
+        setError(msg === "cohort_full" ? "Cohort is full — cannot accept." : msg);
         return;
       }
       onDone();
@@ -79,22 +62,12 @@ export default function DecisionDialog({
           placeholder="Share any context that will help (saved with the application)..."
           disabled={busy}
         />
-        {error && (
-          <div className="alert alert-error mt-2 text-sm">{error}</div>
-        )}
+        {error && <div className="alert alert-error mt-2 text-sm">{error}</div>}
         <div className="modal-action">
-          <button
-            className="btn btn-ghost"
-            onClick={onClose}
-            disabled={busy}
-          >
+          <button className="btn btn-ghost" onClick={onClose} disabled={busy}>
             Cancel
           </button>
-          <button
-            className={`btn ${confirmClass}`}
-            onClick={handleConfirm}
-            disabled={busy}
-          >
+          <button className={`btn ${confirmClass}`} onClick={handleConfirm} disabled={busy}>
             {busy ? "Working…" : confirmLabel}
           </button>
         </div>

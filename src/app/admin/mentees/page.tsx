@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import {
@@ -9,7 +10,6 @@ import {
   GroupedMentorship,
   MentorshipSummary,
 } from "@/types/admin";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import { useStreamerMode } from "@/hooks/useStreamerMode";
 import {
   getAnonymizedDisplayName,
@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import { useDebouncedCallback } from "use-debounce";
 import ProfileAvatar from "@/components/ProfileAvatar";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 import { format } from "date-fns";
 import { hasRole } from "@/lib/permissions";
 
@@ -89,7 +90,7 @@ export default function AllMentorsPage() {
     const fetchMentorshipData = async () => {
       setLoadingMentorships(true);
       try {
-        const response = await fetch("/api/mentorship/admin/matches?role=mentee");
+        const response = await adminFetch("/api/mentorship/admin/matches?role=mentee");
         if (response.ok) {
           const data = await response.json();
           setMentorshipData(data.matches || []);
@@ -110,7 +111,7 @@ export default function AllMentorsPage() {
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const response = await fetch("/api/mentorship/admin/profiles?role=mentee");
+        const response = await adminFetch("/api/mentorship/admin/profiles?role=mentee");
         if (response.ok) {
           const data = await response.json();
           setProfiles(data.profiles || []);
@@ -134,9 +135,8 @@ export default function AllMentorsPage() {
 
     setSavingDiscord(true);
     try {
-      const response = await fetch("/api/mentorship/admin/profiles", {
+      const response = await adminFetch("/api/mentorship/admin/profiles", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ uid, discordUsername: newUsername }),
       });
 
@@ -178,9 +178,8 @@ export default function AllMentorsPage() {
   ) => {
     setUpdatingStatus(sessionId);
     try {
-      const response = await fetch("/api/mentorship/admin/sessions", {
+      const response = await adminFetch("/api/mentorship/admin/sessions", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, status: newStatus }),
       });
 
@@ -216,7 +215,7 @@ export default function AllMentorsPage() {
 
     setDeletingSession(sessionToDelete.id);
     try {
-      const response = await fetch(`/api/mentorship/admin/sessions?id=${sessionToDelete.id}`, {
+      const response = await adminFetch(`/api/mentorship/admin/sessions?id=${sessionToDelete.id}`, {
         method: "DELETE",
       });
 
@@ -246,9 +245,8 @@ export default function AllMentorsPage() {
   const handleRegenerateChannel = async (sessionId: string) => {
     setRegeneratingChannel(sessionId);
     try {
-      const response = await fetch("/api/mentorship/admin/sessions/regenerate-channel", {
+      const response = await adminFetch("/api/mentorship/admin/sessions/regenerate-channel", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId }),
       });
 
@@ -283,7 +281,7 @@ export default function AllMentorsPage() {
     setLoadingReviews(true);
 
     try {
-      const response = await fetch(`/api/mentorship/admin/reviews?mentorId=${mentor.uid}`);
+      const response = await adminFetch(`/api/mentorship/admin/reviews?mentorId=${mentor.uid}`);
       if (response.ok) {
         const data = await response.json();
         setReviews(data.reviews || []);
@@ -302,9 +300,8 @@ export default function AllMentorsPage() {
   ) => {
     setActionLoading(uid);
     try {
-      const response = await fetch("/api/mentorship/admin/profiles", {
+      const response = await adminFetch("/api/mentorship/admin/profiles", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ uid, status: newStatus, reactivateSessions }),
       });
 
@@ -328,6 +325,8 @@ export default function AllMentorsPage() {
         if (data.reactivatedSessions > 0) {
           toast.success(`${data.reactivatedSessions} mentorship session(s) have been reactivated.`);
         }
+      } else {
+        toast.error(await adminErrorMessage(response, "Failed to update status"));
       }
     } catch (error) {
       console.error("Error updating status:", error);
@@ -339,20 +338,10 @@ export default function AllMentorsPage() {
   const handleDeleteUser = async () => {
     if (!userToDelete || !deleteConfirmChecked) return;
 
-    const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
-    if (!token) {
-      toast.error("Admin session expired. Please log in again.");
-      return;
-    }
-
     setDeletingUser(true);
     try {
-      const response = await fetch("/api/mentorship/admin/profiles", {
+      const response = await adminFetch("/api/mentorship/admin/profiles", {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-token": token,
-        },
         body: JSON.stringify({ uid: userToDelete.uid, confirmed: true }),
       });
 
@@ -609,7 +598,8 @@ export default function AllMentorsPage() {
                             </button>
                           )}
                           {/* Cascade delete-user (GH#239 / VIS-142) */}
-                          <button
+                          <AdminActionButton
+                            action="mentorship.profile.delete"
                             className="btn btn-error btn-outline btn-sm"
                             onClick={() => {
                               setUserToDelete({
@@ -621,7 +611,7 @@ export default function AllMentorsPage() {
                             }}
                           >
                             Delete User
-                          </button>
+                          </AdminActionButton>
                         </div>
                         <p className="text-sm text-base-content/70">
                           {getAnonymizedEmail(p.email, p.uid, isStreamerMode)}
@@ -1553,7 +1543,8 @@ function MentorshipCard({
                   )}
                 </button>
               )}
-              <button
+              <AdminActionButton
+                action="mentorship.session.regenerateChannel"
                 className="btn btn-info btn-xs"
                 disabled={regeneratingChannel === mentorship.id}
                 onClick={() => handleRegenerateChannel(mentorship.id)}
@@ -1563,8 +1554,9 @@ function MentorshipCard({
                 ) : (
                   "Regenerate Channel"
                 )}
-              </button>
-              <button
+              </AdminActionButton>
+              <AdminActionButton
+                action="mentorship.session.delete"
                 className="btn btn-error btn-xs btn-outline"
                 onClick={() => {
                   setSessionToDelete({
@@ -1575,7 +1567,7 @@ function MentorshipCard({
                 }}
               >
                 End
-              </button>
+              </AdminActionButton>
             </div>
           </div>
         </div>

@@ -7,11 +7,26 @@ import SideNav from "./SideNav";
 import Image from "./Image";
 import ProfileMenu from "./ProfileMenu";
 import { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { START_LEARNING_LINKS, COMMUNITY_LINKS } from "@/data/headerNavLinks";
 
 const SUBSCRIBE_URL = "https://blog.codewithahsan.dev/#/portal/signup";
 
+/**
+ * Presenter decks (/events/<event>/<year>/host and anything under it) are
+ * projected full-bleed. The site header is sticky and 84px tall, so leaving it
+ * in would push every 100vh slide down by that much, cut the same amount off
+ * the bottom, and sit underneath the fixed slide indicator.
+ */
+const isPresenterDeck = (pathname: string | null) => /\/host(\/|$)/.test(pathname ?? "");
+
 const LayoutWrapper = ({ children }: { children: ReactNode }) => {
+  const pathname = usePathname();
+
+  if (isPresenterDeck(pathname)) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="navbar bg-base-100 px-4 sm:px-8 md:px-12 lg:px-16 z-50 sticky top-0">
@@ -30,7 +45,8 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                 style={{ objectFit: "cover" }}
               />
               <span className="hidden sm:inline font-bold text-base-content no-underline">
-                {siteMetadata.headerTitle}
+                {/* Wordmark: "with" picks up the purple from the logo gradient */}
+                Code <span className="text-[#BE8EE8]">with</span> Ahsan
               </span>
             </div>
           </Link>
@@ -61,7 +77,7 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
                           {l.title}
                         </a>
                       ) : (
-                        <Link href={l.href} onClick={closeDropdown}>
+                        <Link href={l.href} className="no-underline" onClick={closeDropdown}>
                           {l.title}
                         </Link>
                       )}
@@ -73,6 +89,12 @@ const LayoutWrapper = ({ children }: { children: ReactNode }) => {
           ))}
         </div>
         <div className="navbar-end gap-1 sm:gap-2">
+          <Link
+            href="/consulting"
+            className="btn btn-ghost btn-sm text-primary font-bold hidden md:inline-flex"
+          >
+            1:1 Advisory
+          </Link>
           <Link
             href="/about"
             className="btn btn-ghost btn-sm border-light hover:bg-light hover:text-primary-content hidden md:inline-flex"

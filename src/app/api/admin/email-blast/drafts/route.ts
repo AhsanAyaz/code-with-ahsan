@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { requireAdminAccess } from "@/lib/adminAccess/server";
 import { listEmailBlastDrafts } from "@/lib/ghost/admin";
 
 /**
@@ -10,10 +10,8 @@ import { listEmailBlastDrafts } from "@/lib/ghost/admin";
  * empty list with error message rather than 5xx) so the UI can still render.
  */
 export async function GET(request: NextRequest) {
-  const admin = await requireAdmin(request);
-  if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
-  }
+  const access = await requireAdminAccess(request, "comms.emailBlast.drafts.read");
+  if (!access.ok) return access.response;
 
   try {
     const drafts = await listEmailBlastDrafts();

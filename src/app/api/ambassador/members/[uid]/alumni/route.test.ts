@@ -10,9 +10,10 @@ const deleteMock = vi.fn();
 const commitMock = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@/lib/features", () => ({ isAmbassadorProgramEnabled: vi.fn().mockReturnValue(true) }));
-vi.mock("@/lib/ambassador/adminAuth", () => ({
-  requireAdmin: vi.fn().mockResolvedValue({ ok: true, uid: "admin:t1" }),
-}));
+vi.mock(
+  "@/lib/adminAccess/server",
+  async () => (await import("@/lib/adminAccess/testing")).adminAccessServerMock
+);
 vi.mock("@/lib/ambassador/acceptance", () => ({
   syncAmbassadorClaim: vi.fn().mockResolvedValue(undefined),
 }));
@@ -50,6 +51,7 @@ vi.mock("@/lib/firebaseAdmin", () => {
 });
 
 import { POST } from "./route";
+import { actAs, logAdminActionMock } from "@/lib/adminAccess/testing";
 
 function makeReq(): NextRequest {
   return new Request("http://localhost/api/ambassador/members/u1/alumni", {
@@ -58,6 +60,8 @@ function makeReq(): NextRequest {
 }
 
 beforeEach(() => {
+  actAs("admin");
+  logAdminActionMock.mockClear();
   updateMock.mockClear();
   deleteMock.mockClear();
   commitMock.mockClear();
@@ -127,5 +131,26 @@ describe("POST /api/ambassador/members/[uid]/alumni", () => {
     subdocActive = false;
     const res = await POST(makeReq(), { params: { uid: "u1" } });
     expect(res.status).toBe(409);
+  });
+});
+
+describe("POST /api/ambassador/members/[uid]/alumni: access", () => {
+  it("rejects a moderator with 403 and writes nothing", async () => {
+    actAs("moderator");
+    const res = await POST(makeReq(), { params: { uid: "u1" } });
+    expect(res.status).toBe(403);
+    expect((await res.json()).error).toBe("Admins only");
+    expect(commitMock).not.toHaveBeenCalled();
+    expect(logAdminActionMock).not.toHaveBeenCalled();
+  });
+
+  it("logs the alumni for an admin", async () => {
+    await POST(makeReq(), { params: { uid: "u1" } });
+    expect(logAdminActionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ role: "admin" }),
+      "ambassador.member.alumni",
+      expect.objectContaining({ type: "ambassador", id: "u1" }),
+      ...[]
+    );
   });
 });

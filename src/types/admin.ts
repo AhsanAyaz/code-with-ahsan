@@ -6,6 +6,7 @@ export interface AdminStats {
   totalMatches: number;
   activeMatches: number;
   pendingMatches: number;
+  completedMentorships: number;
   completedGoals: number;
   totalGoals: number;
   totalSessions: number;

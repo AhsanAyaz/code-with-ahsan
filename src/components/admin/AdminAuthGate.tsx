@@ -1,107 +1,38 @@
 "use client";
 
-import { useState, useEffect, useContext } from "react";
+import { useContext, useEffect } from "react";
+import { getAuth } from "firebase/auth";
+import { getApp } from "firebase/app";
 import { AuthContext } from "@/contexts/AuthContext";
-import { useMentorship } from "@/contexts/MentorshipContext";
-
-export const ADMIN_TOKEN_KEY = "mentorship_admin_token";
+import { useAdminAccess } from "@/lib/adminAccess/client";
 
 interface AdminAuthGateProps {
   children: React.ReactNode;
 }
 
+function signOut() {
+  getAuth(getApp())
+    .signOut()
+    .catch((error) => console.error("Sign out failed:", error));
+}
+
+/**
+ * Gate for the admin portal. Access is per person: the signed-in Firebase user
+ * must have a role in admin_roles (resolved by AdminAccessProvider through
+ * GET /api/admin/me). Must render inside AdminAccessProvider.
+ */
 export default function AdminAuthGate({ children }: AdminAuthGateProps) {
   const { setShowLoginPopup } = useContext(AuthContext);
-  const { user, loading } = useMentorship();
+  const { status, role, email } = useAdminAccess();
 
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
-  const [adminPassword, setAdminPassword] = useState("");
-  const [authError, setAuthError] = useState("");
-  const [loggingIn, setLoggingIn] = useState(false);
-
-  // Check for existing admin session on mount
+  // Prompt sign-in when nobody is signed in
   useEffect(() => {
-    const checkAdminSession = async () => {
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-      if (!token) {
-        setCheckingAuth(false);
-        return;
-      }
-      try {
-        const response = await fetch("/api/mentorship/admin/auth", {
-          method: "GET",
-          headers: { "x-admin-token": token },
-        });
-        const data = await response.json();
-        if (data.valid) {
-          setIsAdminAuthenticated(true);
-        } else {
-          localStorage.removeItem(ADMIN_TOKEN_KEY);
-        }
-      } catch (error) {
-        console.error("Error checking admin session:", error);
-        localStorage.removeItem(ADMIN_TOKEN_KEY);
-      } finally {
-        setCheckingAuth(false);
-      }
-    };
-    checkAdminSession();
-  }, []);
-
-  // Prompt login if Firebase user is not signed in
-  useEffect(() => {
-    if (!loading && !user) {
+    if (status === "signed-out") {
       setShowLoginPopup(true);
     }
-  }, [loading, user, setShowLoginPopup]);
+  }, [status, setShowLoginPopup]);
 
-  // Handle admin login
-  const handleAdminLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoggingIn(true);
-    setAuthError("");
-    try {
-      const response = await fetch("/api/mentorship/admin/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: adminPassword }),
-      });
-      const data = await response.json();
-      if (response.ok && data.token) {
-        localStorage.setItem(ADMIN_TOKEN_KEY, data.token);
-        setIsAdminAuthenticated(true);
-        setAdminPassword("");
-      } else {
-        setAuthError(data.error || "Invalid password");
-      }
-    } catch (error) {
-      console.error("Admin login error:", error);
-      setAuthError("Authentication failed. Please try again.");
-    } finally {
-      setLoggingIn(false);
-    }
-  };
-
-  // Handle admin logout
-  const handleAdminLogout = async () => {
-    const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-    if (token) {
-      try {
-        await fetch("/api/mentorship/admin/auth", {
-          method: "DELETE",
-          headers: { "x-admin-token": token },
-        });
-      } catch (error) {
-        console.error("Logout error:", error);
-      }
-    }
-    localStorage.removeItem(ADMIN_TOKEN_KEY);
-    setIsAdminAuthenticated(false);
-  };
-
-  // Loading state - checking auth or loading user
-  if (checkingAuth || loading) {
+  if (status === "loading") {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <span className="loading loading-spinner loading-lg"></span>
@@ -109,84 +40,78 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
     );
   }
 
-  // Not logged in with Firebase - prompt will show via AuthContext
-  if (!user) {
+  if (status === "signed-out") {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Authentication Required</h2>
-          <p className="text-base-content/70">
-            Please sign in to access the admin dashboard
-          </p>
+          <p className="text-base-content/70">Please sign in to access the admin dashboard</p>
+          <button className="btn btn-primary mt-6" onClick={() => setShowLoginPopup(true)}>
+            Sign in
+          </button>
         </div>
       </div>
     );
   }
 
-  // Not admin authenticated - show admin password form
-  if (!isAdminAuthenticated) {
+  if (status === "no-access") {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-base-200">
-        <div className="card w-96 bg-base-100 shadow-xl">
-          <div className="card-body">
-            <h2 className="card-title">Admin Authentication</h2>
-            <p className="text-sm text-base-content/70 mb-4">
-              Enter the admin password to continue
-            </p>
-            <form onSubmit={handleAdminLogin}>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Admin Password</span>
-                </label>
-                <input
-                  type="password"
-                  placeholder="Enter admin password"
-                  className="input input-bordered"
-                  value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
-                  disabled={loggingIn}
-                  autoFocus
+      <div className="flex justify-center items-center min-h-screen bg-base-200 px-4">
+        <div className="card w-full max-w-md bg-base-100 shadow-xl">
+          <div className="card-body items-center text-center">
+            <div className="rounded-full bg-base-200 p-4 mb-2" aria-hidden="true">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8 text-base-content/60"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
                 />
-                {authError && (
-                  <label className="label">
-                    <span className="label-text-alt text-error">{authError}</span>
-                  </label>
-                )}
-              </div>
-              <div className="form-control mt-6">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={loggingIn || !adminPassword}
-                >
-                  {loggingIn ? (
-                    <>
-                      <span className="loading loading-spinner loading-sm"></span>
-                      Authenticating...
-                    </>
-                  ) : (
-                    "Login"
-                  )}
-                </button>
-              </div>
-            </form>
+              </svg>
+            </div>
+            <h2 className="card-title">You don&apos;t have access to the admin portal</h2>
+            {email && (
+              <p className="text-sm text-base-content/70">
+                Signed in as <span className="font-medium text-base-content">{email}</span>
+              </p>
+            )}
+            <p className="text-sm text-base-content/70">
+              Ask an admin to add you, then reload this page.
+            </p>
+            <div className="card-actions mt-4">
+              <button className="btn btn-outline btn-sm" onClick={signOut}>
+                Sign out
+              </button>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  // Authenticated - show admin UI with header and logout button
+  const isAdmin = role === "admin";
+
   return (
     <div className="bg-base-100 min-h-screen">
-      {/* Admin header banner */}
-      <div className="bg-warning text-warning-content px-4 py-2 flex justify-between items-center">
-        <div className="flex items-center gap-2">
+      {/* Staff role banner */}
+      <div
+        className={`${
+          isAdmin ? "bg-warning text-warning-content" : "bg-info text-info-content"
+        } px-4 py-2 flex justify-between items-center gap-4`}
+      >
+        <div className="flex items-center gap-2 min-w-0">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
+            className="h-5 w-5 shrink-0"
             viewBox="0 0 20 20"
             fill="currentColor"
+            aria-hidden="true"
           >
             <path
               fillRule="evenodd"
@@ -194,10 +119,11 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
               clipRule="evenodd"
             />
           </svg>
-          <span className="font-semibold">ADMIN MODE - Viewing as Administrator</span>
+          <span className="font-semibold">{isAdmin ? "ADMIN MODE" : "MODERATOR MODE"}</span>
+          {email && <span className="text-sm opacity-80 truncate hidden sm:inline">{email}</span>}
         </div>
-        <button onClick={handleAdminLogout} className="btn btn-sm btn-ghost">
-          Logout
+        <button onClick={signOut} className="btn btn-sm btn-ghost">
+          Sign out
         </button>
       </div>
 

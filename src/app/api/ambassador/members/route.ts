@@ -8,17 +8,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { isAmbassadorProgramEnabled } from "@/lib/features";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { requireAdminAccess } from "@/lib/adminAccess/server";
 import { AMBASSADOR_CRON_FLAGS_COLLECTION } from "@/types/ambassador";
 
 export async function GET(request: NextRequest) {
   if (!isAmbassadorProgramEnabled()) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  const admin = await requireAdmin(request);
-  if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
-  }
+  const access = await requireAdminAccess(request, "ambassador.members.read");
+  if (!access.ok) return access.response;
 
   // Collection-group read of all ambassador subdocs where active === true.
   // .limit(200) guards against unbounded fan-out: each result triggers 2 extra
@@ -35,9 +33,7 @@ export async function GET(request: NextRequest) {
       const subdoc = subdocSnap.data();
       const uid = subdocSnap.ref.parent.parent?.id ?? "";
       // Parent profile for displayName + email
-      const profileSnap = uid
-        ? await db.collection("mentorship_profiles").doc(uid).get()
-        : null;
+      const profileSnap = uid ? await db.collection("mentorship_profiles").doc(uid).get() : null;
       const profile = profileSnap?.data() ?? {};
 
       // Unresolved flag count
@@ -58,7 +54,7 @@ export async function GET(request: NextRequest) {
         active: subdoc.active === true,
         unresolvedFlagCount: flagsSnap.data().count ?? 0,
       };
-    }),
+    })
   );
 
   members.sort((a, b) => a.displayName.localeCompare(b.displayName));

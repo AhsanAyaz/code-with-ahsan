@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useMentorship } from "@/contexts/MentorshipContext";
 import { authFetch } from "@/lib/apiClient";
 import { canEditProject } from "@/lib/permissions";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
+import { can, isAdminRole } from "@/lib/adminAccess/actions";
 import Link from "next/link";
 import { Project } from "@/types/mentorship";
 import type { PermissionUser } from "@/lib/permissions";
@@ -22,6 +22,7 @@ export default function EditProjectPage() {
   const [error, setError] = useState("");
   const [warning, setWarning] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [adminCheckDone, setAdminCheckDone] = useState(false);
 
   // Form state
   const [title, setTitle] = useState("");
@@ -33,26 +34,39 @@ export default function EditProjectPage() {
   );
   const [maxTeamSize, setMaxTeamSize] = useState(4);
 
-  // Check admin status
+  // Staff check: GET /api/admin/me returns the caller's admin portal role
+  // (admin_roles). Anyone without a role just gets the regular view.
   useEffect(() => {
-    const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-    if (token) {
-      // Simple check - token exists and not expired
-      try {
-        const parts = token.split(".");
-        if (parts.length === 3) {
-          setIsAdmin(true);
-        }
-      } catch {
-        setIsAdmin(false);
-      }
+    if (authLoading) return;
+    if (!user) {
+      setIsAdmin(false);
+      setAdminCheckDone(true);
+      return;
     }
-  }, []);
+    let cancelled = false;
+    const checkAdmin = async () => {
+      try {
+        const res = await authFetch("/api/admin/me");
+        if (!res.ok) return;
+        const data = (await res.json()) as { role?: unknown };
+        const role = isAdminRole(data.role) ? data.role : null;
+        if (!cancelled) setIsAdmin(can(role, "projects.edit"));
+      } catch {
+        // Not staff
+      } finally {
+        if (!cancelled) setAdminCheckDone(true);
+      }
+    };
+    checkAdmin();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, authLoading]);
 
   // Fetch project and validate authorization
   useEffect(() => {
     const fetchProject = async () => {
-      if (authLoading) return;
+      if (authLoading || !adminCheckDone) return;
 
       try {
         setLoading(true);
@@ -114,7 +128,7 @@ export default function EditProjectPage() {
     };
 
     fetchProject();
-  }, [projectId, user, profile, authLoading, isAdmin, router]);
+  }, [projectId, user, profile, authLoading, isAdmin, adminCheckDone, router]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -150,27 +164,13 @@ export default function EditProjectPage() {
         maxTeamSize,
       };
 
-      let response;
-
-      if (isAdmin) {
-        // Admin: include x-admin-token header
-        const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-        response = await fetch(`/api/projects/${projectId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { "x-admin-token": token } : {}),
-          },
-          body: JSON.stringify(requestBody),
-        });
-      } else {
-        // Creator: use authFetch for Firebase Auth token
-        response = await authFetch(`/api/projects/${projectId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestBody),
-        });
-      }
+      // Creators and staff both authenticate with their Firebase ID token; the
+      // server applies the staff override from admin_roles.
+      const response = await authFetch(`/api/projects/${projectId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
 
       if (response.ok) {
         // Success - navigate back to project detail page

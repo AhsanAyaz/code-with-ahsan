@@ -75,7 +75,7 @@ export default async function EventDetailPage({ params }: PageProps) {
       </section>
 
       <section className="bg-base-100 page-padding py-12">
-        <div className="max-w-3xl mx-auto prose prose-base">
+        <div className="max-w-3xl mx-auto prose dark:prose-invert prose-base">
           <LegitMarkdown>{event.body}</LegitMarkdown>
         </div>
       </section>

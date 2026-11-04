@@ -103,6 +103,28 @@ def format_error_reply(exc: BaseException) -> str:
     return ERROR_REPLY
 
 
+async def drain_final_response(event_stream, events_seen: list) -> str:
+    """Drain the FULL ADK event stream; return the LATEST non-empty final text.
+
+    ADK fires `is_final_response()` once PER participating agent, so in a
+    ParallelAgent fan-out the fastest leaf's reply arrives first and the
+    orchestrator/synthesizer's merged answer arrives last — the latest
+    non-empty final must win. Breaking early also cancels the ParallelAgent
+    TaskGroup mid-flight (see postmortem 07-06-HOTFIX-DISCORD-EVENT-DRAIN).
+
+    Appends every event to `events_seen` as it drains so partial telemetry
+    survives a mid-stream exception.
+    """
+    response_text = ""
+    async for event in event_stream:
+        events_seen.append(event)
+        if event.is_final_response() and event.content and event.content.parts:
+            text = event.content.parts[0].text or ""
+            if text:
+                response_text = text  # keep latest; orchestrator/synthesizer wins
+    return response_text
+
+
 async def get_or_create_session(
     *,
     user_id: str,
@@ -210,16 +232,14 @@ def _wire_bot():
                 # devto_researcher's "dev.to temporarily unavailable") instead of the
                 # synthesizer's merged answer — and the early break cancels the
                 # ParallelAgent TaskGroup mid-flight (OpenTelemetry GeneratorExit cascade).
-                async for event in runner.run_async(
-                    user_id=user_id,
-                    session_id=session_id,
-                    new_message=new_message,
-                ):
-                    events_seen.append(event)
-                    if event.is_final_response() and event.content and event.content.parts:
-                        text = event.content.parts[0].text or ""
-                        if text:
-                            response_text = text  # keep latest; orchestrator/synthesizer wins
+                response_text = await drain_final_response(
+                    runner.run_async(
+                        user_id=user_id,
+                        session_id=session_id,
+                        new_message=new_message,
+                    ),
+                    events_seen,
+                )
 
             if not response_text:
                 response_text = "I couldn't generate a response. Please try again."

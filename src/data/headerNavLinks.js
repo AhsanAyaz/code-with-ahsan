@@ -5,6 +5,7 @@ export const LINKS = {
 
 // Base nav items — always visible
 const baseNavLinks = [
+  { href: "/consulting", title: "1:1 Advisory" },
   { href: "/mentorship", title: "Mentorship" },
   { href: "/projects", title: "Projects" },
   { href: "/roadmaps", title: "Roadmaps" },
@@ -20,9 +21,9 @@ const AMBASSADORS_ENABLED = process.env.NEXT_PUBLIC_FEATURE_AMBASSADOR_PROGRAM =
 
 const headerNavLinks = AMBASSADORS_ENABLED
   ? [
-      ...baseNavLinks.slice(0, 3), // Mentorship, Projects, Roadmaps
+      ...baseNavLinks.slice(0, 4), // 1:1 Advisory, Mentorship, Projects, Roadmaps
       { href: "/ambassadors", title: "Ambassadors" },
-      ...baseNavLinks.slice(3), // Courses, Books, Blog, About
+      ...baseNavLinks.slice(4), // Courses, Books, Blog, About
     ]
   : baseNavLinks;
 
@@ -48,6 +49,7 @@ export const START_LEARNING_LINKS = [
 
 // Sketch group B — "Community Engagements" (GH#275)
 export const COMMUNITY_LINKS = [
+  { href: "/consulting", title: "1:1 Advisory" },
   { href: "/mentorship", title: "Mentorship" },
   ...(AMBASSADORS_ENABLED ? [{ href: "/ambassadors", title: "Ambassadors" }] : []),
   { href: "/events", title: "Events" },

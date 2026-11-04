@@ -66,10 +66,7 @@ function isAuthenticated(user: PermissionUser | null): boolean {
 /**
  * Check if user owns a resource
  */
-function isOwner(
-  user: PermissionUser | null,
-  resource: { creatorId: string }
-): boolean {
+function isOwner(user: PermissionUser | null, resource: { creatorId: string }): boolean {
   if (!user) return false;
   return user.uid === resource.creatorId;
 }
@@ -93,10 +90,7 @@ function canOwnerOrAdminAccess(
  * Returns true if the profile has the given role. Null-safe.
  * Use hasAnyRole / hasAllRoles for multi-role semantics.
  */
-export function hasRole(
-  profile: PermissionUser | null | undefined,
-  role: Role
-): boolean {
+export function hasRole(profile: PermissionUser | null | undefined, role: Role): boolean {
   if (!profile) return false;
   return profile.roles.includes(role);
 }
@@ -104,10 +98,7 @@ export function hasRole(
 /**
  * Returns true if the profile has AT LEAST ONE of the given roles. Null-safe.
  */
-export function hasAnyRole(
-  profile: PermissionUser | null | undefined,
-  roles: Role[]
-): boolean {
+export function hasAnyRole(profile: PermissionUser | null | undefined, roles: Role[]): boolean {
   if (!profile) return false;
   if (roles.length === 0) return false;
   return roles.some((r) => profile.roles.includes(r));
@@ -116,10 +107,7 @@ export function hasAnyRole(
 /**
  * Returns true if the profile has EVERY given role. Null-safe.
  */
-export function hasAllRoles(
-  profile: PermissionUser | null | undefined,
-  roles: Role[]
-): boolean {
+export function hasAllRoles(profile: PermissionUser | null | undefined, roles: Role[]): boolean {
   if (!profile) return false;
   if (roles.length === 0) return true;
   return roles.every((r) => profile.roles.includes(r));
@@ -142,10 +130,7 @@ export interface DecodedRoleClaim {
  * Returns true if the decoded token carries the given role claim. Null-safe.
  * Use in API route handlers that have a decoded token and don't want a Firestore round-trip.
  */
-export function hasRoleClaim(
-  token: DecodedRoleClaim | null | undefined,
-  role: Role
-): boolean {
+export function hasRoleClaim(token: DecodedRoleClaim | null | undefined, role: Role): boolean {
   if (!token) return false;
   return !!token.roles?.includes(role);
 }
@@ -196,10 +181,7 @@ export function canCreateProject(user: PermissionUser | null): boolean {
  * PERM-03: Can approve projects
  * Only admins can approve projects
  */
-export function canApproveProject(
-  user: PermissionUser | null,
-  project: Project
-): boolean {
+export function canApproveProject(user: PermissionUser | null, project: Project): boolean {
   return isAdminUser(user);
 }
 
@@ -207,19 +189,18 @@ export function canApproveProject(
  * PERM-04: Can edit projects
  * Admin can edit any project status, creators can only edit pending/declined projects
  */
-export function canEditProject(
-  user: PermissionUser | null,
-  project: Project
-): boolean {
+export function canEditProject(user: PermissionUser | null, project: Project): boolean {
   // Admin can always edit any project
   if (isAdminUser(user)) return true;
 
   // Creator can edit pending, declined, or active projects
   // update_pending status blocks edits until pending changes are reviewed
   if (isOwner(user, project)) {
-    return project.status === "pending" 
-        || project.status === "declined" 
-        || (project.status === "active" && !project.pendingUpdates);
+    return (
+      project.status === "pending" ||
+      project.status === "declined" ||
+      (project.status === "active" && !project.pendingUpdates)
+    );
   }
 
   return false;
@@ -229,10 +210,7 @@ export function canEditProject(
  * PERM-04: Can manage project members
  * Only project creator or admin can manage members
  */
-export function canManageProjectMembers(
-  user: PermissionUser | null,
-  project: Project
-): boolean {
+export function canManageProjectMembers(user: PermissionUser | null, project: Project): boolean {
   return canOwnerOrAdminAccess(user, project);
 }
 
@@ -240,10 +218,7 @@ export function canManageProjectMembers(
  * PERM-07, PERM-08: Can apply to projects
  * Any authenticated user can apply, except the project creator
  */
-export function canApplyToProject(
-  user: PermissionUser | null,
-  project: Project
-): boolean {
+export function canApplyToProject(user: PermissionUser | null, project: Project): boolean {
   if (!isAuthenticated(user)) return false;
   if (isOwner(user, project)) return false; // PERM-08: Cannot apply to own project
   return true;
@@ -253,10 +228,7 @@ export function canApplyToProject(
  * PERM-09: Can delete projects
  * Admin can delete any project, creators can delete their own declined projects
  */
-export function canDeleteProject(
-  user: PermissionUser | null,
-  project: Project
-): boolean {
+export function canDeleteProject(user: PermissionUser | null, project: Project): boolean {
   // Admin can delete any project
   if (isAdminUser(user)) return true;
 
@@ -280,10 +252,7 @@ export function canCreateRoadmap(user: PermissionUser | null): boolean {
  * PERM-03: Can approve roadmaps
  * Only admins can approve roadmaps
  */
-export function canApproveRoadmap(
-  user: PermissionUser | null,
-  roadmap: Roadmap
-): boolean {
+export function canApproveRoadmap(user: PermissionUser | null, roadmap: Roadmap): boolean {
   return isAdminUser(user);
 }
 
@@ -291,9 +260,20 @@ export function canApproveRoadmap(
  * Can edit roadmaps
  * Only roadmap creator or admin can edit
  */
-export function canEditRoadmap(
-  user: PermissionUser | null,
-  roadmap: Roadmap
-): boolean {
+export function canEditRoadmap(user: PermissionUser | null, roadmap: Roadmap): boolean {
   return canOwnerOrAdminAccess(user, roadmap);
+}
+
+/**
+ * Can view a roadmap detail page.
+ * Approved roadmaps are public. Unpublished roadmaps (draft/pending) are only
+ * visible to the creator or an admin — admins need this to preview submissions
+ * before approving them (GH#296).
+ */
+export function canViewRoadmap(
+  user: PermissionUser | null,
+  roadmap: { status?: string; creatorId: string }
+): boolean {
+  if (roadmap.status === "approved") return true;
+  return canOwnerOrAdminAccess(user, { creatorId: roadmap.creatorId });
 }

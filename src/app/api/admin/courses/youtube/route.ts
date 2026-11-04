@@ -1,28 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { google } from 'googleapis';
-import { db } from '@/lib/firebaseAdmin';
-
-// ─────────────────────────────────────────────
-// Auth helper — Firestore session verification
-// ─────────────────────────────────────────────
-
-async function checkAdminAuth(request: NextRequest): Promise<NextResponse | null> {
-  const token = request.headers.get('x-admin-token');
-  if (!token) {
-    return NextResponse.json({ error: 'Admin authentication required' }, { status: 401 });
-  }
-  const sessionDoc = await db.collection('admin_sessions').doc(token).get();
-  if (!sessionDoc.exists) {
-    return NextResponse.json({ error: 'Admin authentication required' }, { status: 401 });
-  }
-  const session = sessionDoc.data();
-  const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
-  if (expiresAt < new Date()) {
-    await db.collection('admin_sessions').doc(token).delete();
-    return NextResponse.json({ error: 'Admin authentication required' }, { status: 401 });
-  }
-  return null;
-}
+import { NextRequest, NextResponse } from "next/server";
+import { google } from "googleapis";
+import { requireAdminAccess } from "@/lib/adminAccess/server";
 
 // ─────────────────────────────────────────────
 // YouTube chapter timestamp parser
@@ -64,46 +42,46 @@ function parseChapterTimestamps(description: string): ChapterTimestamp[] {
 // ─────────────────────────────────────────────
 
 export async function GET(request: NextRequest) {
-  const authError = await checkAdminAuth(request);
-  if (authError) return authError;
+  const access = await requireAdminAccess(request, "courses.read");
+  if (!access.ok) return access.response;
 
   const { searchParams } = new URL(request.url);
-  const videoId = searchParams.get('videoId');
-  const playlistId = searchParams.get('playlistId');
+  const videoId = searchParams.get("videoId");
+  const playlistId = searchParams.get("playlistId");
 
   if (!videoId && !playlistId) {
     return NextResponse.json(
-      { error: 'Provide either videoId or playlistId query param' },
+      { error: "Provide either videoId or playlistId query param" },
       { status: 400 }
     );
   }
 
   try {
     const youtube = google.youtube({
-      version: 'v3',
+      version: "v3",
       auth: process.env.YT_API_KEY,
     });
 
     // ── Video info + chapter timestamps ──────────────────────────
     if (videoId) {
       const response = await youtube.videos.list({
-        part: ['snippet', 'contentDetails'],
+        part: ["snippet", "contentDetails"],
         id: [videoId],
       });
 
       const items = response.data.items || [];
       if (items.length === 0) {
-        return NextResponse.json({ error: 'Video not found' }, { status: 404 });
+        return NextResponse.json({ error: "Video not found" }, { status: 404 });
       }
 
       const video = items[0];
       const snippet = video.snippet;
-      const description = snippet?.description || '';
+      const description = snippet?.description || "";
       const chapters = parseChapterTimestamps(description);
 
       return NextResponse.json({
         videoId,
-        title: snippet?.title || '',
+        title: snippet?.title || "",
         description,
         thumbnail:
           snippet?.thumbnails?.maxres?.url ||
@@ -118,14 +96,14 @@ export async function GET(request: NextRequest) {
     // ── Playlist items ────────────────────────────────────────────
     if (playlistId) {
       const response = await youtube.playlistItems.list({
-        part: ['snippet', 'contentDetails'],
+        part: ["snippet", "contentDetails"],
         playlistId,
         maxResults: 50,
       });
 
       const items = (response.data.items || []).map((item) => ({
-        videoId: item.contentDetails?.videoId || item.snippet?.resourceId?.videoId || '',
-        title: item.snippet?.title || '',
+        videoId: item.contentDetails?.videoId || item.snippet?.resourceId?.videoId || "",
+        title: item.snippet?.title || "",
         position: item.snippet?.position ?? 0,
       }));
 
@@ -134,7 +112,7 @@ export async function GET(request: NextRequest) {
       const firstVideoId = items[0]?.videoId;
       if (firstVideoId) {
         const videoRes = await youtube.videos.list({
-          part: ['snippet'],
+          part: ["snippet"],
           id: [firstVideoId],
         });
         const firstSnippet = videoRes.data.items?.[0]?.snippet;
@@ -148,8 +126,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ playlistId, items, thumbnail });
     }
   } catch (error) {
-    console.error('YouTube API error:', error);
-    const message = error instanceof Error ? error.message : 'YouTube API request failed';
+    console.error("YouTube API error:", error);
+    const message = error instanceof Error ? error.message : "YouTube API request failed";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
+import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 
 type Bypass = {
   uid: string;
@@ -9,14 +10,6 @@ type Bypass = {
   grantedAt: string | null;
   reason: string | null;
 };
-
-function adminHeaders(): Record<string, string> {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (token) headers["x-admin-token"] = token;
-  return headers;
-}
 
 export default function EligibilityBypassesPage() {
   const [bypasses, setBypasses] = useState<Bypass[]>([]);
@@ -33,9 +26,7 @@ export default function EligibilityBypassesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/ambassador/eligibility-bypasses", {
-        headers: adminHeaders(),
-      });
+      const res = await adminFetch("/api/admin/ambassador/eligibility-bypasses", {});
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const body = await res.json();
       setBypasses(body.bypasses ?? []);
@@ -46,7 +37,9 @@ export default function EligibilityBypassesPage() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const handleGrant = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,9 +47,8 @@ export default function EligibilityBypassesPage() {
     setGranting(true);
     setGrantError(null);
     try {
-      const res = await fetch("/api/admin/ambassador/eligibility-bypasses", {
+      const res = await adminFetch("/api/admin/ambassador/eligibility-bypasses", {
         method: "POST",
-        headers: adminHeaders(),
         body: JSON.stringify({ email: email.trim(), reason: reason.trim() || undefined }),
       });
       const body = await res.json();
@@ -77,10 +69,13 @@ export default function EligibilityBypassesPage() {
   const handleRevoke = async (uid: string) => {
     setRevoking(uid);
     try {
-      await fetch(`/api/admin/ambassador/eligibility-bypasses/${uid}`, {
+      const res = await adminFetch(`/api/admin/ambassador/eligibility-bypasses/${uid}`, {
         method: "DELETE",
-        headers: adminHeaders(),
       });
+      if (!res.ok) {
+        setError(await adminErrorMessage(res, `Revoke failed (HTTP ${res.status})`));
+        return;
+      }
       await load();
     } finally {
       setRevoking(null);
@@ -92,7 +87,8 @@ export default function EligibilityBypassesPage() {
       <div>
         <h1 className="text-2xl font-bold">Eligibility Bypasses</h1>
         <p className="text-base-content/60 mt-1 text-sm">
-          Grant a user the ability to apply regardless of account age. Enter their CWA account email address.
+          Grant a user the ability to apply regardless of account age. Enter their CWA account email
+          address.
         </p>
       </div>
 
@@ -134,9 +130,13 @@ export default function EligibilityBypassesPage() {
             <span className="loading loading-spinner loading-md" />
           </div>
         ) : error ? (
-          <div className="alert alert-error"><span>{error}</span></div>
+          <div className="alert alert-error">
+            <span>{error}</span>
+          </div>
         ) : bypasses.length === 0 ? (
-          <div className="alert alert-info"><span>No bypasses granted yet.</span></div>
+          <div className="alert alert-info">
+            <span>No bypasses granted yet.</span>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="table table-zebra w-full">
@@ -159,13 +159,19 @@ export default function EligibilityBypassesPage() {
                     </td>
                     <td className="text-sm text-base-content/60">{b.reason ?? "—"}</td>
                     <td>
-                      <button
+                      <AdminActionButton
+                        action="ambassador.eligibilityBypass.revoke"
+                        tooltipClassName="tooltip-left"
                         className="btn btn-ghost btn-xs text-error"
                         onClick={() => handleRevoke(b.uid)}
                         disabled={revoking === b.uid}
                       >
-                        {revoking === b.uid ? <span className="loading loading-spinner loading-xs" /> : "Revoke"}
-                      </button>
+                        {revoking === b.uid ? (
+                          <span className="loading loading-spinner loading-xs" />
+                        ) : (
+                          "Revoke"
+                        )}
+                      </AdminActionButton>
                     </td>
                   </tr>
                 ))}

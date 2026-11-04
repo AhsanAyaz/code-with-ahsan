@@ -1,6 +1,6 @@
 /**
  * POST /api/ambassador/applications — Submit a new ambassador application (APPLY-01..06).
- * GET  /api/ambassador/applications — Admin list with cursor pagination (x-admin-token required).
+ * GET  /api/ambassador/applications: staff list with cursor pagination (ambassador.applications.read).
  *
  * Pitfall 3 (RESEARCH.md): isAmbassadorProgramEnabled() guard is the FIRST check in every handler.
  * Pitfall 4: Firestore rules (Plan 03) deny-all client writes to applications/*; Admin SDK is the sole write path.
@@ -11,7 +11,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { db } from "@/lib/firebaseAdmin";
 import { verifyAuth } from "@/lib/auth";
 import { isAmbassadorProgramEnabled } from "@/lib/features";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { requireAdminAccess } from "@/lib/adminAccess/server";
 import { ApplicationSubmitSchema, type ApplicationDoc } from "@/types/ambassador";
 import { AMBASSADOR_APPLICATIONS_COLLECTION } from "@/lib/ambassador/constants";
 import {
@@ -36,7 +36,8 @@ void FieldValue;
 
 export async function POST(request: NextRequest) {
   // Pitfall 3: feature flag check — must be FIRST
-  if (!isAmbassadorProgramEnabled()) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!isAmbassadorProgramEnabled())
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const auth = await verifyAuth(request);
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Invalid application body", details: parsed.error.flatten() },
-      { status: 400 },
+      { status: 400 }
     );
   }
   const input = parsed.data;
@@ -62,7 +63,10 @@ export async function POST(request: NextRequest) {
   // Cross-field + regex re-validation (defense-in-depth — D-07, D-15)
   const contentCheck = runServerSideContentChecks(input);
   if (!contentCheck.ok) {
-    return NextResponse.json({ error: contentCheck.error, field: contentCheck.field }, { status: 400 });
+    return NextResponse.json(
+      { error: contentCheck.error, field: contentCheck.field },
+      { status: 400 }
+    );
   }
 
   // APPLY-01: Discord/profile age gate (returns 403 when too_new or profile_missing)
@@ -75,7 +79,7 @@ export async function POST(request: NextRequest) {
         profileAgeDays: eligibility.profileAgeDays,
         requiredDays: eligibility.requiredDays,
       },
-      { status: 403 },
+      { status: 403 }
     );
   }
 
@@ -84,7 +88,7 @@ export async function POST(request: NextRequest) {
   if (!cohortCheck.open) {
     return NextResponse.json(
       { error: `Cohort is not accepting submissions (${cohortCheck.reason})` },
-      { status: 409 },
+      { status: 409 }
     );
   }
 
@@ -97,7 +101,7 @@ export async function POST(request: NextRequest) {
         existingApplicationId: dup.existingApplicationId,
         existingStatus: dup.existingStatus,
       },
-      { status: 409 },
+      { status: 409 }
     );
   }
 
@@ -132,7 +136,7 @@ export async function POST(request: NextRequest) {
       discordMemberId: discordMember?.id ?? null,
       academicEmailVerified,
     },
-    docRef.id,
+    docRef.id
   );
   await docRef.set(payload);
 
@@ -141,7 +145,7 @@ export async function POST(request: NextRequest) {
     await sendAmbassadorApplicationSubmittedEmail(
       applicantEmail,
       applicantName,
-      cohortCheck.cohortName ?? "the next cohort",
+      cohortCheck.cohortName ?? "the next cohort"
     );
   } catch (e) {
     logger.error("EMAIL-01 send failed", { uid: auth.uid, applicationId: docRef.id, error: e });
@@ -153,7 +157,7 @@ export async function POST(request: NextRequest) {
       status: "submitted",
       discordResolved: discordMember != null,
     },
-    { status: 201 },
+    { status: 201 }
   );
 }
 
@@ -163,21 +167,20 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   // Pitfall 3: feature flag check — must be FIRST
-  if (!isAmbassadorProgramEnabled()) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!isAmbassadorProgramEnabled())
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const adminResult = await requireAdmin(request);
-  if (!adminResult.ok) {
-    return NextResponse.json({ error: adminResult.error }, { status: adminResult.status });
-  }
+  const access = await requireAdminAccess(request, "ambassador.applications.read");
+  if (!access.ok) return access.response;
 
   const { searchParams } = new URL(request.url);
-  const status = searchParams.get("status");       // optional filter
-  const cohortId = searchParams.get("cohortId");   // optional filter
-  const cursor = searchParams.get("cursor");        // last docId from previous page
+  const status = searchParams.get("status"); // optional filter
+  const cohortId = searchParams.get("cohortId"); // optional filter
+  const cursor = searchParams.get("cursor"); // last docId from previous page
   const pageSizeRaw = Number(searchParams.get("pageSize") ?? DEFAULT_PAGE_SIZE);
   const pageSize = Math.min(
     Math.max(1, Number.isFinite(pageSizeRaw) ? pageSizeRaw : DEFAULT_PAGE_SIZE),
-    MAX_PAGE_SIZE,
+    MAX_PAGE_SIZE
   );
 
   let q = db

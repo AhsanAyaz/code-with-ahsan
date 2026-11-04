@@ -1,9 +1,10 @@
 "use client";
 
+import { adminFetch } from "@/lib/adminAccess/client";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { AdminStats, Alert } from "@/types/admin";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 
 // Types
 
@@ -44,10 +45,7 @@ export default function AdminOverviewPage() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-        const response = await fetch("/api/mentorship/admin/stats", {
-          headers: token ? { "x-admin-token": token } : {},
-        });
+        const response = await adminFetch("/api/mentorship/admin/stats");
         if (response.ok) {
           const data = await response.json();
           setStats(data.stats);
@@ -95,10 +93,8 @@ export default function AdminOverviewPage() {
     setDeleteResult(null);
 
     try {
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-      const response = await fetch("/api/mentorship/admin/sessions/delete-archived-channels", {
+      const response = await adminFetch("/api/mentorship/admin/sessions/delete-archived-channels", {
         method: "DELETE",
-        headers: token ? { "x-admin-token": token } : {},
       });
 
       // The endpoint can return an HTML error page (e.g. a 504 if the batch
@@ -126,13 +122,17 @@ export default function AdminOverviewPage() {
           // More archived channels remain than fit in one run — tell the admin
           // to click again to continue the cleanup.
           toast.success(
-            `Deleted ${data.deleted} channel(s). ${data.remaining ?? 0} remaining — click again to continue.`
+            `Deleted ${data.deleted} channel(s). ${data.remaining ?? 0} remaining. Click again to continue.`
           );
         } else {
-          toast.success(`Cleanup complete — ${data.deleted} channel(s) deleted.`);
+          toast.success(`Cleanup complete: ${data.deleted} channel(s) deleted.`);
         }
       } else {
-        toast.error(data.message || "Failed to delete archived channels.");
+        toast.error(
+          data.message ||
+            (data as { error?: string }).error ||
+            "Failed to delete archived channels."
+        );
         handleCloseDeleteModal();
       }
     } catch (error) {
@@ -153,7 +153,8 @@ export default function AdminOverviewPage() {
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
         {/* Delete Archived Channels — danger action */}
-        <button
+        <AdminActionButton
+          action="mentorship.session.deleteArchivedChannels"
           id="admin-delete-archived-channels-btn"
           onClick={handleOpenDeleteModal}
           className="btn btn-error btn-outline btn-sm gap-2"
@@ -175,7 +176,7 @@ export default function AdminOverviewPage() {
             />
           </svg>
           Delete All Archived Channels
-        </button>
+        </AdminActionButton>
       </div>
 
       {/* ── Alerts Section ────────────────────────────────────────────────────── */}
@@ -278,6 +279,31 @@ export default function AdminOverviewPage() {
                 </div>
                 <div className="stat-title">Active Matches</div>
                 <div className="stat-value text-success">{stats.activeMatches}</div>
+                <div className="stat-desc">of {stats.totalMatches} total</div>
+              </div>
+            </div>
+
+            {/* Completed Mentorships */}
+            <div className="stats shadow bg-base-100">
+              <div className="stat">
+                <div className="stat-figure text-accent">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                    />
+                  </svg>
+                </div>
+                <div className="stat-title">Completed Mentorships</div>
+                <div className="stat-value text-accent">{stats.completedMentorships}</div>
                 <div className="stat-desc">of {stats.totalMatches} total</div>
               </div>
             </div>

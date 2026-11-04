@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
+import { requireAdminAccess } from "@/lib/adminAccess/server";
 import { DEFAULT_MAX_MENTEES } from "@/lib/mentorship-constants";
 
 interface RouteContext {
@@ -10,28 +11,15 @@ export async function GET(request: NextRequest, context: RouteContext) {
   const { username } = await context.params;
 
   if (!username) {
-    return NextResponse.json(
-      { error: "Username is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Username is required" }, { status: 400 });
   }
 
   try {
-    // Check for admin token
-    const adminToken = request.headers.get("x-admin-token");
-    let isAdminRequest = false;
-
-    if (adminToken) {
-      // Validate admin token
-      const sessionDoc = await db.collection("admin_sessions").doc(adminToken).get();
-      if (sessionDoc.exists) {
-        const session = sessionDoc.data();
-        const expiresAt = session?.expiresAt?.toDate?.() || new Date(0);
-        if (expiresAt >= new Date()) {
-          isAdminRequest = true;
-        }
-      }
-    }
+    // Optional admin preview: a staff member's Bearer ID token unlocks
+    // non-public / non-accepted profiles. Anything else (no token, invalid
+    // token, no admin role) just gets the public view; never a 401/403.
+    const adminAccess = await requireAdminAccess(request, "mentorship.mentor.preview");
+    const isAdminRequest = adminAccess.ok;
 
     // Fetch the mentor's profile by username
     const profilesSnapshot = await db
@@ -55,34 +43,27 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     // Verify this is a public, accepted mentor (bypass for admin)
     if (profileData?.status !== "accepted" && !isAdminRequest) {
-      return NextResponse.json(
-        { error: "Mentor profile is not available" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Mentor profile is not available" }, { status: 404 });
     }
 
     if (profileData?.isPublic === false && !isAdminRequest) {
-      return NextResponse.json(
-        { error: "Mentor profile is private" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Mentor profile is private" }, { status: 404 });
     }
 
     // Fetch mentor stats
-    const [activeSessionsSnapshot, completedSessionsSnapshot, ratingsSnapshot] =
-      await Promise.all([
-        db
-          .collection("mentorship_sessions")
-          .where("mentorId", "==", uid)
-          .where("status", "==", "active")
-          .get(),
-        db
-          .collection("mentorship_sessions")
-          .where("mentorId", "==", uid)
-          .where("status", "==", "completed")
-          .get(),
-        db.collection("mentor_ratings").where("mentorId", "==", uid).get(),
-      ]);
+    const [activeSessionsSnapshot, completedSessionsSnapshot, ratingsSnapshot] = await Promise.all([
+      db
+        .collection("mentorship_sessions")
+        .where("mentorId", "==", uid)
+        .where("status", "==", "active")
+        .get(),
+      db
+        .collection("mentorship_sessions")
+        .where("mentorId", "==", uid)
+        .where("status", "==", "completed")
+        .get(),
+      db.collection("mentor_ratings").where("mentorId", "==", uid).get(),
+    ]);
 
     const activeMenteeCount = activeSessionsSnapshot.size;
     const completedMentorships = completedSessionsSnapshot.size;
@@ -113,9 +94,8 @@ export async function GET(request: NextRequest, context: RouteContext) {
       completedMentorships,
       avgRating,
       ratingCount,
-      isAtCapacity:
-        activeMenteeCount >= (profileData.maxMentees || DEFAULT_MAX_MENTEES),
-      hasTimeSlots: !!(profileData.timeSlotAvailability?.timezone),
+      isAtCapacity: activeMenteeCount >= (profileData.maxMentees || DEFAULT_MAX_MENTEES),
+      hasTimeSlots: !!profileData.timeSlotAvailability?.timezone,
       createdAt: profileData.createdAt?.toDate?.() || null,
       status: profileData.status,
       linkedinUrl: profileData.linkedinUrl,
@@ -124,9 +104,6 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ mentor }, { status: 200 });
   } catch (error) {
     console.error("Error fetching mentor profile:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch mentor profile" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch mentor profile" }, { status: 500 });
   }
 }

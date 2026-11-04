@@ -166,29 +166,20 @@ service cloud.firestore {
       }
     }
 
-    // ─── Challenges ──────────────────────────────
+    // ─── Challenges, Submissions, Leaderboard ────
+    // Admin SDK only, served through the /api/challenges routes. No client
+    // reads or writes, admin-claim clients included. Submissions hold
+    // personal data (name, LinkedIn, repo), so they are never public.
     match /challenges/{challengeId} {
-      // Anyone can read challenges
-      allow read: if true;
-      // Only admins can create, update, delete
-      allow write: if isAdmin();
+      allow read, write: if false;
     }
 
-    // ─── Submissions ─────────────────────────────
     match /submissions/{submissionId} {
-      // Anyone can read submissions
-      allow read: if true;
-      // Client-side submissions creation is disabled. All submissions
-      // must go through the /api/challenges/[id]/submissions route (Admin SDK).
-      allow write: if isAdmin();
+      allow read, write: if false;
     }
 
-    // ─── Leaderboard ─────────────────────────────
     match /leaderboard/{userId} {
-      // Anyone can read leaderboard
-      allow read: if true;
-      // Only admins or backend can write (backend bypasses rules)
-      allow write: if isAdmin();
+      allow read, write: if false;
     }
 
     // ─── Existing collections (passthrough) ─────
@@ -353,6 +344,18 @@ service cloud.firestore {
     // Server writes via Admin SDK bypass these rules. Lock down client-side
     // reads — future audit UI will use an Admin SDK proxy route.
     match /email-blasts/{blastId} {
+      allow read, write: if false;
+    }
+
+    // ─── Admin Portal Roles + Audit Log ───────────────────────────────────
+    // Admin SDK only. Roles are read server-side on every admin request and
+    // managed via the admin-only Team API; the audit log is read through an
+    // admin-only API route. No client access, even with the admin claim.
+    match /admin_roles/{uid} {
+      allow read, write: if false;
+    }
+
+    match /admin_audit_log/{id} {
       allow read, write: if false;
     }
   }

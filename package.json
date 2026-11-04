@@ -16,6 +16,7 @@
     "content:sync:strapi": "npm run content:export:strapi && npm run content:mdx:from-json && npm run content:build",
     "start": "next start",
     "lint": "eslint",
+    "check:firestore-indexes": "node scripts/check-firestore-indexes.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
@@ -32,6 +33,11 @@
     "drop-legacy-role:dry-run": "npx tsx scripts/drop-legacy-role-field.ts --dry-run",
     "drop-legacy-role": "npx tsx scripts/drop-legacy-role-field.ts",
     "drop-legacy-role:limit-10": "npx tsx scripts/drop-legacy-role-field.ts --limit=10",
+    "admin-role:set": "npx tsx scripts/set-admin-role.ts",
+    "migrate-admin-roles:dry-run": "npx tsx scripts/migrate-admin-roles.ts",
+    "migrate-admin-roles": "npx tsx scripts/migrate-admin-roles.ts --apply",
+    "purge-admin-sessions:dry-run": "npx tsx scripts/purge-admin-sessions.ts",
+    "purge-admin-sessions": "npx tsx scripts/purge-admin-sessions.ts --apply",
     "prepare": "husky"
   },
   "dependencies": {
@@ -88,6 +94,7 @@
     "remark-rehype": "^11.1.2",
     "resend": "^6.12.3",
     "smoothscroll-polyfill": "^0.4.4",
+    "stripe": "^22.5.0",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.0.0",
     "use-debounce": "^10.1.0",

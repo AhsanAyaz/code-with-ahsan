@@ -1,14 +1,13 @@
 "use client";
 
+import { adminFetch } from "@/lib/adminAccess/client";
 import { useState, useEffect } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { Roadmap } from "@/types/mentorship";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import Link from "next/link";
 import { format } from "date-fns";
-import { getAuth } from "firebase/auth";
-import { getApp } from "firebase/app";
 import { useDebouncedCallback } from "use-debounce";
+import AdminActionButton from "@/components/admin/AdminActionButton";
 
 const DOMAIN_LABELS: Record<string, string> = {
   "web-dev": "Web Dev",
@@ -36,8 +35,7 @@ export default function AdminRoadmapsPage() {
     setFilters((prev) => ({ ...prev, author: value }));
   }, 300);
 
-  const hasActiveFilters =
-    filters.status !== "pending" || filters.domain || filters.author;
+  const hasActiveFilters = filters.status !== "pending" || filters.domain || filters.author;
 
   useEffect(() => {
     const fetchRoadmaps = async () => {
@@ -49,7 +47,7 @@ export default function AdminRoadmapsPage() {
         if (filters.domain) params.set("domain", filters.domain);
         if (filters.author) params.set("author", filters.author);
 
-        const response = await fetch(`/api/roadmaps?${params.toString()}`);
+        const response = await adminFetch(`/api/roadmaps?${params.toString()}`);
         if (response.ok) {
           const data = await response.json();
           setRoadmaps(data.roadmaps || []);
@@ -72,18 +70,8 @@ export default function AdminRoadmapsPage() {
   const handleApprove = async (id: string, hasPendingDraft?: boolean) => {
     setActionLoading(id);
     try {
-      const auth = getAuth(getApp());
-      const user = auth.currentUser;
-      const authToken = user ? await user.getIdToken() : null;
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-
-      const response = await fetch(`/api/roadmaps/${id}`, {
+      const response = await adminFetch(`/api/roadmaps/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-          ...(token ? { "x-admin-token": token } : {}),
-        },
         body: JSON.stringify({
           action: hasPendingDraft ? "approve-draft" : "approve",
         }),
@@ -105,9 +93,7 @@ export default function AdminRoadmapsPage() {
   };
 
   const handleRequestChanges = async (id: string) => {
-    const feedback = prompt(
-      "Please provide feedback for the roadmap author (min 10 characters):",
-    );
+    const feedback = prompt("Please provide feedback for the roadmap author (min 10 characters):");
     if (!feedback || feedback.length < 10) {
       toast.error("Feedback must be at least 10 characters");
       return;
@@ -115,18 +101,8 @@ export default function AdminRoadmapsPage() {
 
     setActionLoading(id);
     try {
-      const auth = getAuth(getApp());
-      const user = auth.currentUser;
-      const authToken = user ? await user.getIdToken() : null;
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-
-      const response = await fetch(`/api/roadmaps/${id}`, {
+      const response = await adminFetch(`/api/roadmaps/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-          ...(token ? { "x-admin-token": token } : {}),
-        },
         body: JSON.stringify({ action: "request-changes", feedback }),
       });
 
@@ -148,7 +124,7 @@ export default function AdminRoadmapsPage() {
   const handleDelete = async (id: string, title: string) => {
     if (
       !confirm(
-        `Are you sure you want to delete the roadmap "${title}"? This action cannot be undone.`,
+        `Are you sure you want to delete the roadmap "${title}"? This action cannot be undone.`
       )
     ) {
       return;
@@ -156,17 +132,8 @@ export default function AdminRoadmapsPage() {
 
     setActionLoading(id);
     try {
-      const auth = getAuth(getApp());
-      const user = auth.currentUser;
-      const authToken = user ? await user.getIdToken() : null;
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-
-      const response = await fetch(`/api/roadmaps/${id}`, {
+      const response = await adminFetch(`/api/roadmaps/${id}`, {
         method: "DELETE",
-        headers: {
-          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-          ...(token ? { "x-admin-token": token } : {}),
-        },
       });
 
       if (response.ok) {
@@ -201,9 +168,7 @@ export default function AdminRoadmapsPage() {
             <select
               className="select select-bordered w-full"
               value={filters.status}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, status: e.target.value }))
-              }
+              onChange={(e) => setFilters((prev) => ({ ...prev, status: e.target.value }))}
             >
               <option value="pending">Pending Review</option>
               <option value="all">All Roadmaps</option>
@@ -220,9 +185,7 @@ export default function AdminRoadmapsPage() {
             <select
               className="select select-bordered w-full"
               value={filters.domain}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, domain: e.target.value }))
-              }
+              onChange={(e) => setFilters((prev) => ({ ...prev, domain: e.target.value }))}
             >
               <option value="">All Domains</option>
               {Object.entries(DOMAIN_LABELS).map(([value, label]) => (
@@ -249,10 +212,7 @@ export default function AdminRoadmapsPage() {
 
           {/* Clear filters button */}
           {hasActiveFilters && (
-            <button
-              className="btn btn-ghost btn-sm gap-2 md:self-end"
-              onClick={handleClearFilters}
-            >
+            <button className="btn btn-ghost btn-sm gap-2 md:self-end" onClick={handleClearFilters}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4"
@@ -287,9 +247,7 @@ export default function AdminRoadmapsPage() {
           <span className="loading loading-spinner loading-lg"></span>
         </div>
       ) : roadmaps.length === 0 ? (
-        <div className="text-center py-12 text-base-content/60">
-          No roadmaps found
-        </div>
+        <div className="text-center py-12 text-base-content/60">No roadmaps found</div>
       ) : (
         <div className="grid gap-4">
           {roadmaps.map((roadmap) => (
@@ -356,21 +314,17 @@ export default function AdminRoadmapsPage() {
                   </div>
                   {roadmap.estimatedHours && (
                     <div>
-                      <span className="font-semibold">Estimated:</span>{" "}
-                      {roadmap.estimatedHours} hours
+                      <span className="font-semibold">Estimated:</span> {roadmap.estimatedHours}{" "}
+                      hours
                     </div>
                   )}
                   <div>
-                    <span className="font-semibold">Current Version:</span>{" "}
-                    {roadmap.version}
+                    <span className="font-semibold">Current Version:</span> {roadmap.version}
                   </div>
                   <div className="text-xs text-base-content/60">
                     Submitted:{" "}
                     {roadmap.createdAt
-                      ? format(
-                          new Date(roadmap.createdAt as unknown as string),
-                          "MMM d, yyyy",
-                        )
+                      ? format(new Date(roadmap.createdAt as unknown as string), "MMM d, yyyy")
                       : "Unknown"}
                   </div>
                 </div>
@@ -382,14 +336,11 @@ export default function AdminRoadmapsPage() {
                   >
                     Preview
                   </Link>
-                  {(roadmap.status === "pending" ||
-                    roadmap.hasPendingDraft) && (
+                  {(roadmap.status === "pending" || roadmap.hasPendingDraft) && (
                     <>
                       <button
                         className="btn btn-success btn-sm"
-                        onClick={() =>
-                          handleApprove(roadmap.id, roadmap.hasPendingDraft)
-                        }
+                        onClick={() => handleApprove(roadmap.id, roadmap.hasPendingDraft)}
                         disabled={actionLoading === roadmap.id}
                       >
                         {actionLoading === roadmap.id ? (
@@ -403,22 +354,24 @@ export default function AdminRoadmapsPage() {
                           "Approve"
                         )}
                       </button>
-                      <button
+                      <AdminActionButton
+                        action="roadmaps.requestChanges"
                         className="btn btn-warning btn-sm"
                         onClick={() => handleRequestChanges(roadmap.id)}
                         disabled={actionLoading === roadmap.id}
                       >
                         Request Changes
-                      </button>
+                      </AdminActionButton>
                     </>
                   )}
-                  <button
+                  <AdminActionButton
+                    action="roadmaps.delete"
                     className="btn btn-error btn-sm"
                     onClick={() => handleDelete(roadmap.id, roadmap.title)}
                     disabled={actionLoading === roadmap.id}
                   >
                     Delete
-                  </button>
+                  </AdminActionButton>
                 </div>
               </div>
             </div>

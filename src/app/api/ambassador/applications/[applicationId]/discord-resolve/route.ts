@@ -8,7 +8,7 @@
  * the handle freshly via `lookupMemberByUsername` rather than trusting `app.discordMemberId`.
  *
  * Flow:
- *   1. Gate: isAmbassadorProgramEnabled() + requireAdmin()
+ *   1. Gate: isAmbassadorProgramEnabled() + requireAdminAccess()
  *   2. Validate application exists and is accepted.
  *   3. Re-resolve Discord handle freshly (Pitfall 2).
  *   4. Persist fresh memberId (or null) to the application doc.
@@ -20,7 +20,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
 import { isAmbassadorProgramEnabled } from "@/lib/features";
-import { requireAdmin } from "@/lib/ambassador/adminAuth";
+import { requireAdminAccess, logAdminAction } from "@/lib/adminAccess/server";
 import { lookupMemberByUsername } from "@/lib/discord";
 import { assignAmbassadorDiscordRoleSoft } from "@/lib/ambassador/acceptance";
 import { AMBASSADOR_APPLICATIONS_COLLECTION } from "@/lib/ambassador/constants";
@@ -42,8 +42,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   if (!isAmbassadorProgramEnabled()) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  const admin = await requireAdmin(request);
-  if (!admin.ok) return NextResponse.json({ error: admin.error }, { status: admin.status });
+  const access = await requireAdminAccess(request, "ambassador.application.discordResolve");
+  if (!access.ok) return access.response;
 
   const { applicationId } = await params;
   const ref = db.collection(AMBASSADOR_APPLICATIONS_COLLECTION).doc(applicationId);
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   if (app.status !== "accepted") {
     return NextResponse.json(
       { error: "Application must be accepted before Discord retry" },
-      { status: 409 },
+      { status: 409 }
     );
   }
 
@@ -91,6 +91,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
   // Re-attempt role assignment via the soft wrapper (never throws, persists result to doc).
   const discord = await assignAmbassadorDiscordRoleSoft(applicationId, freshMember.id);
+
+  await logAdminAction(
+    access.actor,
+    "ambassador.application.discordResolve",
+    { type: "ambassador_application", id: applicationId },
+    { discordMemberId: freshMember.id, roleAssigned: discord.ok }
+  );
 
   return NextResponse.json({
     success: discord.ok,

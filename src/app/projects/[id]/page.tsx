@@ -20,7 +20,7 @@ import {
   ProjectDifficulty,
 } from "@/types/mentorship";
 import RecommendedRoadmapsWidget from "@/components/projects/RecommendedRoadmapsWidget";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
+import { can, isAdminRole } from "@/lib/adminAccess/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -65,31 +65,34 @@ export default function ProjectDetailPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminCheckDone, setAdminCheckDone] = useState(false);
 
-  // Check admin status by validating the token against the server
+  // Staff check: GET /api/admin/me returns the caller's admin portal role
+  // (admin_roles). Anyone without a role just gets the regular view.
   useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      setIsAdmin(false);
+      setAdminCheckDone(true);
+      return;
+    }
+    let cancelled = false;
     const checkAdmin = async () => {
-      const token = localStorage.getItem(ADMIN_TOKEN_KEY);
-      if (!token) {
-        setAdminCheckDone(true);
-        return;
-      }
       try {
-        const res = await fetch("/api/mentorship/admin/auth", {
-          method: "GET",
-          headers: { "x-admin-token": token },
-        });
-        const data = await res.json();
-        if (data.valid) {
-          setIsAdmin(true);
-        }
+        const res = await authFetch("/api/admin/me");
+        if (!res.ok) return;
+        const data = (await res.json()) as { role?: unknown };
+        const role = isAdminRole(data.role) ? data.role : null;
+        if (!cancelled) setIsAdmin(can(role, "projects.read"));
       } catch {
-        // Not admin
+        // Not staff
       } finally {
-        setAdminCheckDone(true);
+        if (!cancelled) setAdminCheckDone(true);
       }
     };
     checkAdmin();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [user, authLoading]);
 
   const isCreator = user && project?.creatorId === user.uid;
   const isMember = members.some((m) => m.userId === user?.uid);

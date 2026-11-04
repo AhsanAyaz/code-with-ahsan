@@ -1,14 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { authFetch } from "@/lib/apiClient";
-import { ADMIN_TOKEN_KEY } from "@/components/admin/AdminAuthGate";
 import { useToast } from "@/contexts/ToastContext";
 import { ActivitySummaryPanel } from "./ActivitySummaryPanel";
 import { CronFlagsPanel } from "./CronFlagsPanel";
 import { StrikePanel } from "./StrikePanel";
 import { OffboardConfirmModal } from "./OffboardConfirmModal";
 import { AlumniTransitionButton } from "./AlumniTransitionButton";
+import AdminActionButton from "@/components/admin/AdminActionButton";
+import { adminFetch, adminErrorMessage } from "@/lib/adminAccess/client";
 
 type MemberDetail = {
   profile: { displayName?: string; email?: string };
@@ -48,11 +48,6 @@ type MemberDetail = {
   referralsCount: number;
 };
 
-function adminHeaders(): HeadersInit {
-  const token = typeof window !== "undefined" ? localStorage.getItem(ADMIN_TOKEN_KEY) : null;
-  return { "x-admin-token": token ?? "" };
-}
-
 export function MemberDetailClient({ uid }: { uid: string }) {
   const toast = useToast();
   const [detail, setDetail] = useState<MemberDetail | null>(null);
@@ -65,9 +60,7 @@ export function MemberDetailClient({ uid }: { uid: string }) {
 
   const load = useCallback(async () => {
     try {
-      const res = await authFetch(`/api/ambassador/members/${uid}`, {
-        headers: adminHeaders(),
-      });
+      const res = await adminFetch(`/api/ambassador/members/${uid}`, {});
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = (await res.json()) as MemberDetail;
       setDetail(json);
@@ -83,9 +76,8 @@ export function MemberDetailClient({ uid }: { uid: string }) {
   const retryDiscord = useCallback(async () => {
     setRetryingDiscord(true);
     try {
-      const res = await fetch(`/api/ambassador/members/${uid}/offboard`, {
+      const res = await adminFetch(`/api/ambassador/members/${uid}/offboard`, {
         method: "POST",
-        headers: adminHeaders(),
       });
 
       if (res.status === 409) {
@@ -96,7 +88,9 @@ export function MemberDetailClient({ uid }: { uid: string }) {
       }
 
       if (!res.ok) {
-        toast.error("Discord role removal failed again. Try again later.");
+        toast.error(
+          await adminErrorMessage(res, "Discord role removal failed again. Try again later.")
+        );
         return;
       }
 
@@ -146,30 +140,35 @@ export function MemberDetailClient({ uid }: { uid: string }) {
             <p className="text-base-content/70">Cohort: {detail.subdoc.cohortId}</p>
           )}
         </div>
-        <button
-          type="button"
+        <AdminActionButton
+          action="ambassador.member.offboard"
+          tooltipClassName="tooltip-left"
           className="btn btn-outline btn-error btn-sm"
           onClick={() => setOffboardOpen(true)}
           disabled={!(detail.subdoc.active ?? true)}
         >
           Offboard ambassador
-        </button>
+        </AdminActionButton>
       </header>
 
       {discordRetryNeeded && (
         <div role="alert" className="alert alert-error">
           <div>
             <h3 className="font-bold">Discord role removal failed</h3>
-            <span>{"Discord role removal failed — retry below. The Firestore record has already been updated."}</span>
+            <span>
+              {
+                "Discord role removal failed — retry below. The Firestore record has already been updated."
+              }
+            </span>
           </div>
-          <button
-            type="button"
+          <AdminActionButton
+            action="ambassador.member.offboard"
             className="btn btn-outline btn-sm btn-error"
             onClick={retryDiscord}
             disabled={retryingDiscord}
           >
             {retryingDiscord ? "Retrying…" : "Retry Discord removal"}
-          </button>
+          </AdminActionButton>
         </div>
       )}
 
@@ -205,7 +204,8 @@ export function MemberDetailClient({ uid }: { uid: string }) {
           {detail.recentReports.length === 0 ? (
             <div className="alert alert-info">
               <span>
-                No reports submitted yet. Reports appear here once an ambassador submits their monthly self-report.
+                No reports submitted yet. Reports appear here once an ambassador submits their
+                monthly self-report.
               </span>
             </div>
           ) : (
@@ -226,14 +226,16 @@ export function MemberDetailClient({ uid }: { uid: string }) {
           {detail.recentEvents.length === 0 ? (
             <div className="alert alert-info">
               <span>
-                No events logged. Events appear here once an ambassador logs an activity from their report page.
+                No events logged. Events appear here once an ambassador logs an activity from their
+                report page.
               </span>
             </div>
           ) : (
             <ul className="list-disc pl-5">
               {detail.recentEvents.map((e) => (
                 <li key={e.id}>
-                  {new Date(e.date).toLocaleDateString()} — {e.type} ({e.attendanceEstimate} attendees)
+                  {new Date(e.date).toLocaleDateString()} — {e.type} ({e.attendanceEstimate}{" "}
+                  attendees)
                   {e.hidden && <span className="badge badge-error ml-2">Hidden</span>}
                 </li>
               ))}

@@ -10,6 +10,7 @@ import {
   Calendar,
   GraduationCap,
   CalendarDays,
+  Receipt,
 } from "lucide-react";
 import SponsorContactForm from "./SponsorContactForm";
 import { BRAND_LOGOS } from "./logos";
@@ -163,6 +164,10 @@ export default function SponsorsPage() {
             <Calendar className="w-4 h-4" />
             Book a call
           </a>
+          <Link href="/rates" className="btn btn-outline">
+            <Receipt className="w-4 h-4" />
+            View rate card
+          </Link>
         </div>
 
         {/* Audience stats — shared SocialStats component, single source (socialReach → /api/stats) */}
