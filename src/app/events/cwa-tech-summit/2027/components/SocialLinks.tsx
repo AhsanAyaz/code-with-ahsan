@@ -1,15 +1,6 @@
 import { Instagram, Linkedin, Mail } from "lucide-react";
-import {
-  ORGANIZER_PROFILES,
-  ORGANIZERS_INTRO,
-  SECTION_IDS,
-  SOCIAL_TBD,
-  type Organizer,
-} from "../constants";
-import KineticHeading from "./KineticHeading";
-import PersonAvatar from "./PersonAvatar";
-import TiltCard from "./TiltCard";
-import { CONTAINER, DISPLAY_FONT, FOCUS_RING, SECTION_SPACING } from "./styles";
+import { SOCIAL_TBD, type Organizer } from "../constants";
+import { FOCUS_RING } from "./styles";
 
 type SocialLinkItem = {
   key: string;
@@ -93,53 +84,3 @@ export const SocialLinks = ({ organizer }: { organizer: Organizer }) => {
     </div>
   );
 };
-
-const LeadCard = ({ organizer }: { organizer: Organizer }) => (
-  <TiltCard className="h-full rounded-3xl border border-(--sm-amber)/35 bg-(--sm-dusk) p-7 text-center">
-    <div className="flex justify-center">
-      <PersonAvatar
-        name={organizer.name}
-        src={organizer.avatarUrl}
-        size={128}
-        className="rounded-full ring-2 ring-(--sm-amber)/60"
-      />
-    </div>
-    <h3 className={`${DISPLAY_FONT} mt-5 text-3xl font-bold leading-tight text-(--sm-paper)`}>
-      {organizer.name}
-    </h3>
-    {organizer.team && (
-      <p className="mt-1 text-balance font-semibold text-(--sm-amber)">{organizer.team} lead</p>
-    )}
-    <SocialLinks organizer={organizer} />
-  </TiltCard>
-);
-
-/** Team leads only: one card per entry in ORGANIZER_PROFILES, in order. */
-const OrganizersSection = () => {
-  if (ORGANIZER_PROFILES.length === 0) return null;
-
-  return (
-    <section
-      id={SECTION_IDS.organizers}
-      aria-labelledby="organisers-heading"
-      className={SECTION_SPACING}
-    >
-      <div className={CONTAINER}>
-        <div className="mb-10 max-w-3xl">
-          <KineticHeading id="organisers-heading" text="Meet the team" />
-          <p className="mt-5 text-lg leading-relaxed text-(--sm-paper)/85">{ORGANIZERS_INTRO}</p>
-        </div>
-
-        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {ORGANIZER_PROFILES.map((organizer) => (
-            <li key={organizer.name}>
-              <LeadCard organizer={organizer} />
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-};
-
-export default OrganizersSection;
