@@ -518,7 +518,7 @@ export const IN_KIND_INTRO =
 export const IN_KIND: InKindOption[] = [
   {
     title: "Food and venue",
-    body: "Catering, snacks, or hosting the venue. Counts as Gold-equivalent.",
+    body: "Catering, snacks, or hosting the venue. Counts as Platinum-equivalent.",
   },
   {
     title: "Prizes and swag",
