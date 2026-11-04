@@ -13,7 +13,7 @@ const CommunityManagerSection = () => {
     >
       <div className={CONTAINER}>
         <div className="mb-10 max-w-3xl">
-          <KineticHeading id="community-manager-heading" text="Contact our Community Manager" />
+          <KineticHeading id="community-manager-heading" text="Contact our Community Lead" />
           <p className="mt-5 text-lg leading-relaxed text-(--sm-paper)/85">
             Picked a tier, or want help choosing one? Reach out to {SPONSOR_CONTACT.name} to lock in
             your sponsorship and talk through the next steps.
