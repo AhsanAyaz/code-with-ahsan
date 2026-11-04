@@ -204,7 +204,7 @@ const CommunityNumbersSection = () => {
             <span className={`${DISPLAY_FONT} text-3xl font-black text-(--sm-amber)`}>
               {formatTotal(social)}
             </span>{" "}
-            developers follow Code with Ahsan across platforms. Your sponsor posts reach them too.
+            followers across Code with Ahsan&apos;s platforms. Your sponsor posts reach them too.
           </p>
 
           <ul className={`mt-8 grid gap-3 sm:gap-4 ${gridCols}`}>
