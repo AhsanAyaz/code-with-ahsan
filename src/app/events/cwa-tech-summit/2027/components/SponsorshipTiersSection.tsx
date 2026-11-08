@@ -224,8 +224,8 @@ const SponsorshipTiersSection = () => {
           <KineticHeading id="tiers-heading" text="Sponsorship tiers" />
           <p className="mt-5 text-lg leading-relaxed text-(--sm-paper)/85">
             Put your team in front of Karachi&apos;s developers, founders and students. Every tier
-            includes attendee passes and social posts; the top three add a keynote, a panel seat and
-            a booth.
+            includes attendee passes and social posts; the top three add a keynote and a booth, and
+            Title and Platinum also take a panel seat.
           </p>
           <p className="mt-3 text-sm text-(--sm-lilac)">{TIERS_NOTE}</p>
         </div>

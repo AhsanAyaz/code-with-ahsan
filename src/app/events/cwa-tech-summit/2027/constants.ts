@@ -247,7 +247,7 @@ export const SPEAKERS: Speaker[] = [];
 export const JUDGES: Judge[] = [];
 
 export const SPEAKERS_PENDING_COPY =
-  "Speakers announced soon. Title and Platinum sponsors get a keynote.";
+  "Speakers announced soon. Title, Platinum and Gold sponsors get a keynote.";
 export const JUDGES_PENDING_COPY =
   "Judges announced soon. Title and Platinum sponsors get a seat on the panel.";
 
@@ -410,8 +410,8 @@ export const SPONSOR_TIERS: SponsorTier[] = [
     key: "title",
     name: "Title",
     badge: { label: "By application", tone: "amber" },
-    pricePkr: "300,000",
-    priceUsd: "~$1,080",
+    pricePkr: "400,000",
+    priceUsd: "~$1,455",
     slots: 1,
     benefits: {
       logo: "Website, banners, flyers, swag, cards, shields and every social post",
@@ -436,8 +436,8 @@ export const SPONSOR_TIERS: SponsorTier[] = [
       panel: true,
       booth: true,
       pitch: "Judge seat",
-      passes: "5",
-      social: "2",
+      passes: "6",
+      social: "2 dedicated posts",
     },
   },
   {
@@ -450,11 +450,11 @@ export const SPONSOR_TIERS: SponsorTier[] = [
     benefits: {
       logo: "Website, banners, flyers, cards",
       speaking: "5-minute keynote",
-      panel: true,
+      panel: false,
       booth: true,
       pitch: "Shoutout",
       passes: "4",
-      social: "1",
+      social: "2 dedicated posts",
     },
   },
   {
@@ -470,8 +470,8 @@ export const SPONSOR_TIERS: SponsorTier[] = [
       panel: false,
       booth: false,
       pitch: "Shoutout",
-      passes: "4",
-      social: "1",
+      passes: "3",
+      social: "1 dedicated post",
     },
   },
   {
@@ -488,7 +488,7 @@ export const SPONSOR_TIERS: SponsorTier[] = [
       booth: false,
       pitch: false,
       passes: "2",
-      social: "1",
+      social: "1 dedicated post",
     },
   },
 ];
