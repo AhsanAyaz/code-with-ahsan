@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebaseAdmin";
-import { FieldValue } from "firebase-admin/firestore";
+import { FieldValue, type Query } from "firebase-admin/firestore";
 import { canCreateProject } from "@/lib/permissions";
 import { validateGitHubUrl } from "@/lib/validation/urls";
 import { verifyAuth } from "@/lib/auth";
@@ -11,22 +11,11 @@ export async function POST(request: NextRequest) {
   try {
     const authResult = await verifyAuth(request);
     if (!authResult) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
     const body = await request.json();
-    const {
-      title,
-      description,
-      githubRepo,
-      techStack,
-      difficulty,
-      maxTeamSize,
-      templateId,
-    } = body;
+    const { title, description, githubRepo, techStack, difficulty, maxTeamSize, templateId } = body;
 
     const creatorId = authResult.uid;
 
@@ -64,24 +53,15 @@ export async function POST(request: NextRequest) {
       try {
         validateGitHubUrl(githubRepo);
       } catch (err) {
-        return NextResponse.json(
-          { error: "Invalid GitHub repository URL" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Invalid GitHub repository URL" }, { status: 400 });
       }
     }
 
     // Fetch creator's mentorship profile
-    const creatorDoc = await db
-      .collection("mentorship_profiles")
-      .doc(creatorId)
-      .get();
+    const creatorDoc = await db.collection("mentorship_profiles").doc(creatorId).get();
 
     if (!creatorDoc.exists) {
-      return NextResponse.json(
-        { error: "Creator profile not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Creator profile not found" }, { status: 404 });
     }
 
     const creatorData = creatorDoc.data();
@@ -108,10 +88,7 @@ export async function POST(request: NextRequest) {
     if (templateId) {
       const validTemplateIds = ["fullstack-app", "ai-tool", "open-source-library"];
       if (!validTemplateIds.includes(templateId)) {
-        return NextResponse.json(
-          { error: "Invalid templateId" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Invalid templateId" }, { status: 400 });
       }
     }
 
@@ -152,16 +129,10 @@ export async function POST(request: NextRequest) {
       // Non-blocking - project creation succeeds even if notification fails
     }
 
-    return NextResponse.json(
-      { success: true, projectId: docRef.id },
-      { status: 201 }
-    );
+    return NextResponse.json({ success: true, projectId: docRef.id }, { status: 201 });
   } catch (error) {
     console.error("Error creating project:", error);
-    return NextResponse.json(
-      { error: "Failed to create project" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create project" }, { status: 500 });
   }
 }
 
@@ -187,14 +158,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ projects: [] }, { status: 200 });
       }
 
-      const projectIds = membershipsSnapshot.docs.map(
-        (doc) => doc.data().projectId
-      );
+      const projectIds = membershipsSnapshot.docs.map((doc) => doc.data().projectId);
 
       // Batch-fetch projects by their IDs
-      const projectRefs = projectIds.map((id) =>
-        db.collection("projects").doc(id)
-      );
+      const projectRefs = projectIds.map((id) => db.collection("projects").doc(id));
       const projectDocs = await db.getAll(...projectRefs);
 
       const projects = projectDocs
@@ -207,8 +174,7 @@ export async function GET(request: NextRequest) {
             createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
             updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
             approvedAt: data.approvedAt?.toDate?.()?.toISOString() || null,
-            lastActivityAt:
-              data.lastActivityAt?.toDate?.()?.toISOString() || null,
+            lastActivityAt: data.lastActivityAt?.toDate?.()?.toISOString() || null,
           };
         });
 
@@ -216,28 +182,31 @@ export async function GET(request: NextRequest) {
     }
 
     // Build query
-    let query = db.collection("projects");
+    let query: Query = db.collection("projects");
 
     if (status) {
-      query = query.where("status", "==", status) as any;
+      query = query.where("status", "==", status);
     } else if (isPublicListing) {
       // Public listings: only show approved projects (active or completed)
-      query = query.where("status", "in", ["active", "completed"]) as any;
+      query = query.where("status", "in", ["active", "completed"]);
     }
 
     if (creatorId) {
-      query = query.where("creatorId", "==", creatorId) as any;
+      query = query.where("creatorId", "==", creatorId);
     }
 
     if (techStack) {
-      const techList = techStack.split(",").map((t) => t.trim()).slice(0, 10); // limit to 10 for array-contains-any
+      const techList = techStack
+        .split(",")
+        .map((t) => t.trim())
+        .slice(0, 10); // limit to 10 for array-contains-any
       if (techList.length > 0) {
-        query = query.where("techStack", "array-contains-any", techList) as any;
+        query = query.where("techStack", "array-contains-any", techList);
       }
     }
 
     // Order by creation date descending
-    query = query.orderBy("createdAt", "desc") as any;
+    query = query.orderBy("createdAt", "desc");
 
     const snapshot = await query.get();
 
@@ -284,9 +253,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ projects }, { status: 200 });
   } catch (error) {
     console.error("Error fetching projects:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch projects" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch projects" }, { status: 500 });
   }
 }
