@@ -166,7 +166,7 @@ export type AgendaItem = {
 export const AGENDA_NOTE = "Draft agenda. Times are confirmed closer to the day.";
 
 export const AGENDA: AgendaItem[] = [
-  { time: "9:00 – 9:45 AM", title: "Registration and breakfast" },
+  { time: "9:00 – 9:45 AM", title: "Registration and tea/coffee" },
   { time: "9:45 – 10:00 AM", title: "Opening, Ahsan Ayaz" },
   { time: "10:00 AM – 12:30 PM", title: "Tech talks (including sponsor keynotes)" },
   { time: "12:30 – 1:30 PM", title: "Lunch and networking" },
