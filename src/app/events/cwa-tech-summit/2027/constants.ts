@@ -99,6 +99,8 @@ export const EVENT = {
   // TODO: replace with the confirmed date once the venue is booked.
   dateLabel: "Late March 2027",
   timeLabel: "9:00 AM – 6:00 PM",
+  /** Expected headcount, shown in the hero for sponsors pricing on reach. */
+  attendanceLabel: "300 expected attendees",
   city: "Karachi",
   intro:
     "One day in Karachi for developers, founders and students: tech talks from people shipping real products, a panel discussion, and a pitch final where three teams take the stage.",
