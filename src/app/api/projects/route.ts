@@ -174,6 +174,7 @@ export async function GET(request: NextRequest) {
             createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
             updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
             approvedAt: data.approvedAt?.toDate?.()?.toISOString() || null,
+            completedAt: data.completedAt?.toDate?.()?.toISOString() || null,
             lastActivityAt: data.lastActivityAt?.toDate?.()?.toISOString() || null,
           };
         });
@@ -236,6 +237,7 @@ export async function GET(request: NextRequest) {
         createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
         approvedAt: data.approvedAt?.toDate?.()?.toISOString() || null,
+        completedAt: data.completedAt?.toDate?.()?.toISOString() || null,
         lastActivityAt: data.lastActivityAt?.toDate?.()?.toISOString() || null,
       };
 
