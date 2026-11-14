@@ -1,0 +1,94 @@
+name: Loupe Automated Bug Triage
+
+on:
+  issues:
+    types: [opened, labeled]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'GitHub issue number to triage (leave empty for latest open loupe issue)'
+        required: false
+        default: ''
+        type: string
+      dry_run:
+        description: 'Dry run mode (true = preview in logs only, false = post comment on issue)'
+        required: false
+        default: false
+        type: boolean
+  push:
+    branches:
+      - 'feat/loupe-triage*'
+      - 'test/loupe-triage*'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  triage:
+    name: Triage Loupe Issue
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' ||
+      (github.event_name == 'issues' && github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'loupe')) ||
+      (github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'loupe')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: 'agent/uv.lock'
+
+      - name: Sync agent dependencies
+        working-directory: agent
+        run: uv sync --frozen --no-dev
+
+      - name: Run Loupe bug triage loop
+        working-directory: agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_ISSUE_NUMBER: ${{ github.event.issue.number }}
+          INPUT_ISSUE_NUMBER: ${{ inputs.issue_number }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          uv run python -c '
+          import json
+          import os
+          import sys
+          from community_assistant.triage_tools import fetch_loupe_issues, run_triage_loop_for_issue
+
+          raw_num = (os.environ.get("INPUT_ISSUE_NUMBER") or os.environ.get("EVENT_ISSUE_NUMBER") or "").strip()
+          issue_number = int(raw_num) if raw_num.isdigit() and int(raw_num) > 0 else 0
+
+          if issue_number == 0:
+              fetched = fetch_loupe_issues(state="open", limit=1)
+              issues = fetched.get("issues") or []
+              if not issues:
+                  print("No open loupe-labeled issues found to triage.")
+                  sys.exit(0)
+              issue_number = int(issues[0]["number"])
+
+          dry_run_str = (os.environ.get("INPUT_DRY_RUN") or "false").strip().lower()
+          dry_run = dry_run_str == "true"
+
+          print(f"Running Loupe triage for issue #{issue_number} (dry_run={dry_run})...")
+          result = run_triage_loop_for_issue(issue_number=issue_number, dry_run=dry_run)
+          print(json.dumps(result, indent=2))
+
+          report_status = (result.get("report") or {}).get("status")
+          if report_status not in ("success", "dry_run"):
+              sys.exit(1)
+          '

@@ -12,6 +12,7 @@ from .sub_agents.mentorship_agent import mentorship_agent
 from .sub_agents.onboarding_agent import onboarding_agent
 from .sub_agents.projects_agent import projects_agent
 from .sub_agents.roadmap_agent import roadmap_agent
+from .sub_agents.triage_agent import triage_agent
 
 MODEL = "gemini-2.5-flash"
 
@@ -31,20 +32,24 @@ directions. Use ONLY when the user asks for a "roadmap", "learning path", "study
 blog.codewithahsan.dev / youtube.com/codewithahsan ONLY. Use when the user asks for "a guide", \
 "the AI guide", "developer guide", "blog post", "article", "video", "tutorial", or any specific \
 named piece of content from Ahsan. This agent does NOT search dev.to, Medium, or the open web.
-- external_knowledge_agent: third-party sources outside Ahsan's owned content — trending repos \
+- external_knowledge_agent: third-party sources outside Ahsan's owned content -- trending repos \
 on GitHub at large, articles on dev.to, questions on Stack Overflow. This is the PRIMARY agent \
 for those three platforms; do not route them anywhere else.
+- triage_agent: Loupe feedback reports, visual bug screenshots, GitHub issues labeled `loupe` on \
+AhsanAyaz/code-with-ahsan, or self-healing bug triage for codewithahsan.dev.
 
 Disambiguation:
-- "Do you have an AI guide?" / "Ahsan's developer guide" / "the AI era guide" → content_agent \
+- "Do you have an AI guide?" / "Ahsan's developer guide" / "the AI era guide" -> content_agent \
 (flagship published content, not a roadmap).
-- "Roadmap for AI" / "learning path to become AI engineer" / "where to start with AI" → \
+- "Roadmap for AI" / "learning path to become AI engineer" / "where to start with AI" -> \
 roadmap_agent (structured path).
-- "Trending GitHub repos in X" / "popular X repos" / "what's hot on GitHub for X" → \
-external_knowledge_agent (NOT projects_agent — projects_agent is for Ahsan's repos only).
-- "dev.to article on X" / "any dev.to posts about Y" / "Medium-style article on Z" → \
-external_knowledge_agent (NOT content_agent — content_agent only searches Ahsan's blog).
-- "Stack Overflow answers about X" / "common SO questions on Y" → external_knowledge_agent.
+- "Trending GitHub repos in X" / "popular X repos" / "what's hot on GitHub for X" -> \
+external_knowledge_agent (NOT projects_agent -- projects_agent is for Ahsan's repos only).
+- "dev.to article on X" / "any dev.to posts about Y" / "Medium-style article on Z" -> \
+external_knowledge_agent (NOT content_agent -- content_agent only searches Ahsan's blog).
+- "Stack Overflow answers about X" / "common SO questions on Y" -> external_knowledge_agent.
+- "Triage Loupe issues" / "analyze this bug screenshot" / "check loupe feedback on GitHub" -> \
+triage_agent (self-healing bug triage for codewithahsan.dev).
 - When in doubt between content_agent and roadmap_agent, prefer content_agent first; it owns \
 the curated featured-resource layer.
 
@@ -61,7 +66,7 @@ root_agent = LlmAgent(
     model=MODEL,
     description=(
         "Root orchestrator for the Code with Ahsan community assistant. Delegates to specialized "
-        "sub-agents for onboarding, mentorship, projects, and learning roadmaps."
+        "sub-agents for onboarding, mentorship, projects, learning roadmaps, and Loupe bug triage."
     ),
     instruction=ROOT_INSTRUCTION,
     before_model_callback=[pii_sanitizer, inject_current_date],
@@ -74,5 +79,6 @@ root_agent = LlmAgent(
         roadmap_agent,
         content_agent,
         external_knowledge_agent,
+        triage_agent,
     ],
 )
