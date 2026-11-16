@@ -18,9 +18,10 @@ COPY agent/discord_bot/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r /app/requirements.txt
 
-# Copy the bot package AND the community_assistant package it imports at runtime
+# Copy the bot package, the community_assistant package, and the Loupe triage MCP module
 COPY agent/discord_bot /app/discord_bot
 COPY agent/community_assistant /app/community_assistant
+COPY agent/loupe_triage_mcp.py /app/loupe_triage_mcp.py
 
 # Make both packages importable from /app
 ENV PYTHONPATH=/app

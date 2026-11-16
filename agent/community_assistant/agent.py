@@ -12,6 +12,7 @@ from .sub_agents.mentorship_agent import mentorship_agent
 from .sub_agents.onboarding_agent import onboarding_agent
 from .sub_agents.projects_agent import projects_agent
 from .sub_agents.roadmap_agent import roadmap_agent
+from .sub_agents.triage_agent import triage_agent
 
 MODEL = "gemini-2.5-flash"
 
@@ -34,8 +35,13 @@ named piece of content from Ahsan. This agent does NOT search dev.to, Medium, or
 - external_knowledge_agent: third-party sources outside Ahsan's owned content — trending repos \
 on GitHub at large, articles on dev.to, questions on Stack Overflow. This is the PRIMARY agent \
 for those three platforms; do not route them anywhere else.
+- triage_agent: triaging GitHub issues and Loupe visual bug reports (e.g., "Triage issue #379"), \
+analyzing bug screenshots, finding suspect Next.js/React frontend components in `src/` for an issue, \
+generating fix Draft PRs, or posting triage reports to GitHub.
 
 Disambiguation:
+- "Triage issue #379" / "analyze Loupe bug report" / "find suspect components for issue #N" / \
+"post triage report" → triage_agent.
 - "Do you have an AI guide?" / "Ahsan's developer guide" / "the AI era guide" → content_agent \
 (flagship published content, not a roadmap).
 - "Roadmap for AI" / "learning path to become AI engineer" / "where to start with AI" → \
@@ -61,7 +67,7 @@ root_agent = LlmAgent(
     model=MODEL,
     description=(
         "Root orchestrator for the Code with Ahsan community assistant. Delegates to specialized "
-        "sub-agents for onboarding, mentorship, projects, and learning roadmaps."
+        "sub-agents for onboarding, mentorship, projects, learning roadmaps, and Loupe issue triage."
     ),
     instruction=ROOT_INSTRUCTION,
     before_model_callback=[pii_sanitizer, inject_current_date],
@@ -74,5 +80,6 @@ root_agent = LlmAgent(
         roadmap_agent,
         content_agent,
         external_knowledge_agent,
+        triage_agent,
     ],
 )

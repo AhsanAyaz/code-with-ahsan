@@ -3,3 +3,4 @@ google-adk>=1.29.0,<2.0
 python-dotenv>=1.0.1
 google-auth>=2.0.0
 httpx>=0.28.0
+mcp>=1.0.0,<2.0

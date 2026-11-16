@@ -8,12 +8,13 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import re
 import sys
 import threading
 import uuid
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Iterable
 
 # usage_metrics lives next to bot.py — works under `python bot.py` (script dir
 # auto-added to sys.path) and under pytest (conftest adds agent/ root).
@@ -49,6 +50,189 @@ ERROR_REPLY = (
     "I'm temporarily unavailable. Please try again in a minute, "
     "or visit https://codewithahsan.dev/mentorship to find help directly."
 )
+
+TRIAGE_UNAUTHORIZED_REPLY = (
+    "⛔ Only moderators are allowed to trigger Loupe issue triage."
+)
+
+DEFAULT_MODERATOR_USER_IDS = frozenset({
+    "814185701537087527",
+})
+
+DEFAULT_MODERATOR_ROLE_IDS = frozenset({
+    "874774318779887656",
+})
+
+DEFAULT_MODERATOR_ROLE_NAMES = frozenset({
+    "moderator",
+    "moderators",
+    "mod",
+    "mods",
+    "admin",
+    "administrator",
+    "founder",
+    "owner",
+    "core team",
+    "staff",
+})
+
+_TRIAGE_CMD_RE = re.compile(
+    r"(?:^|[!\s/])(?:loupe[\s_-]+)?triage(?:\s+(?:github\s+)?(?:issue\s+)?)?#?(\d+)\b",
+    re.IGNORECASE,
+)
+_TRIAGE_INTENT_RE = re.compile(
+    r"(?:^[!/]triage\b|\btriage\s+(?:github\s+)?(?:issue|bug|loupe|#\d+)\b|\bloupe\s+triage\b)",
+    re.IGNORECASE,
+)
+
+
+def _parse_id_env(var_names: Iterable[str]) -> set[str]:
+    ids: set[str] = set()
+    for name in var_names:
+        raw = os.environ.get(name, "")
+        for part in raw.split(","):
+            cleaned = part.strip()
+            if cleaned:
+                ids.add(cleaned)
+    return ids
+
+
+def parse_triage_issue_number(text: str) -> int | None:
+    """Extract the GitHub issue number from a Discord triage command or prompt."""
+    if not text:
+        return None
+    match = _TRIAGE_CMD_RE.search(text.strip())
+    if not match:
+        return None
+    try:
+        return int(match.group(1))
+    except ValueError:
+        return None
+
+
+def is_triage_request(text: str) -> bool:
+    """Return True if the message is attempting to trigger Loupe/GitHub issue triage."""
+    if not text:
+        return False
+    if parse_triage_issue_number(text) is not None:
+        return True
+    return bool(_TRIAGE_INTENT_RE.search(text.strip()))
+
+
+def is_authorized_for_triage(
+    *,
+    user_id: str | int,
+    role_names: Iterable[str] = (),
+    role_ids: Iterable[str | int] = (),
+    has_mod_permission: bool = False,
+    allowed_user_ids: Iterable[str | int] | None = None,
+    allowed_role_ids: Iterable[str | int] | None = None,
+) -> bool:
+    """Pure authorization check for moderator-only Loupe triage triggers in Discord."""
+    uid_str = str(user_id).strip()
+    env_user_ids = (
+        {str(x).strip() for x in allowed_user_ids if str(x).strip()}
+        if allowed_user_ids is not None
+        else (
+            set(DEFAULT_MODERATOR_USER_IDS)
+            | _parse_id_env(("MODERATOR_USER_IDS", "TRIAGE_ALLOWED_USER_IDS", "DISCORD_MODERATOR_IDS"))
+        )
+    )
+    if uid_str and uid_str in env_user_ids:
+        return True
+
+    if has_mod_permission:
+        return True
+
+    env_role_ids = (
+        {str(x).strip() for x in allowed_role_ids if str(x).strip()}
+        if allowed_role_ids is not None
+        else (
+            set(DEFAULT_MODERATOR_ROLE_IDS)
+            | _parse_id_env(("MODERATOR_ROLE_IDS", "DISCORD_MODERATOR_ROLE_IDS"))
+        )
+    )
+    member_role_ids = {str(r).strip() for r in role_ids if str(r).strip()}
+    if env_role_ids and (member_role_ids & env_role_ids):
+        return True
+
+    for r_name in role_names:
+        if r_name and r_name.strip().lower() in DEFAULT_MODERATOR_ROLE_NAMES:
+            return True
+
+    return False
+
+
+def _extract_member_auth_context(author: Any) -> tuple[list[str], list[str], bool]:
+    """Extract role names, role IDs, and moderator permission boolean from a discord.Member/User."""
+    roles = getattr(author, "roles", None) or []
+    role_names = [str(getattr(r, "name", "")) for r in roles if getattr(r, "name", None)]
+    role_ids = [str(getattr(r, "id", "")) for r in roles if getattr(r, "id", None)]
+
+    perms = getattr(author, "guild_permissions", None)
+    has_mod_perm = bool(
+        perms
+        and (
+            getattr(perms, "administrator", False)
+            or getattr(perms, "manage_guild", False)
+            or getattr(perms, "manage_messages", False)
+            or getattr(perms, "kick_members", False)
+            or getattr(perms, "ban_members", False)
+        )
+    )
+    return role_names, role_ids, has_mod_perm
+
+
+CLOUD_RUN_TRIAGE_URL = os.environ.get(
+    "LOUPE_TRIAGE_SERVICE_URL",
+    "https://cwa-loupe-triage-205504954450.us-central1.run.app/triage",
+)
+
+
+def run_direct_triage_for_discord(issue_number: int, repo: str | None = None) -> str:
+    """Run the Loupe triage pipeline directly (or via Cloud Run when GITHUB_TOKEN is only in Cloud Run)
+    and return a Discord-formatted summary.
+    """
+    agent_root = Path(__file__).resolve().parent.parent
+    if str(agent_root) not in sys.path:
+        sys.path.insert(0, str(agent_root))
+    import httpx
+    import loupe_triage_mcp
+
+    target_repo = repo or loupe_triage_mcp.DEFAULT_REPO
+    result: dict[str, Any] = {}
+
+    if not os.environ.get("GITHUB_TOKEN") and not getattr(loupe_triage_mcp, "GITHUB_TOKEN", ""):
+        try:
+            with httpx.Client(timeout=90.0) as http_client:
+                resp = http_client.post(
+                    CLOUD_RUN_TRIAGE_URL,
+                    json={
+                        "issue_number": issue_number,
+                        "repo": target_repo,
+                        "post_to_github": True,
+                        "create_pr": True,
+                    },
+                )
+                if resp.status_code == 200:
+                    result = resp.json()
+        except Exception:
+            logger.warning("Cloud Run triage proxy failed; falling back to local execution", exc_info=True)
+
+    if not result:
+        result = loupe_triage_mcp.triage_loupe_issue(
+            issue_number=issue_number,
+            repo=target_repo,
+            post_to_github=True,
+            create_pr=True,
+        )
+
+    markdown = result.get("triage_markdown") or f"Triage completed for #{issue_number}."
+    gh_post = result.get("github_post") or {}
+    comment_url = gh_post.get("comment_url")
+    if comment_url and comment_url not in markdown:
+        markdown = f"{markdown}\n\n🔗 **GitHub Comment:** {comment_url}"
+    return markdown
 
 
 def should_handle_message(
@@ -206,7 +390,9 @@ def _wire_bot():
     @client.event
     async def on_message(message):
         bot_user = client.user
-        if not should_handle_message(
+        raw_content = getattr(message, "content", "") or ""
+        direct_triage_cmd = (not message.author.bot) and raw_content.strip().lower().startswith(("!triage", "/triage"))
+        if not direct_triage_cmd and not should_handle_message(
             author_is_bot=message.author.bot,
             channel_id=message.channel.id,
             target_channel_id=ASSISTANT_CHANNEL_ID,
@@ -221,6 +407,34 @@ def _wire_bot():
         if not user_text:
             await message.reply("Hi! Ask me about mentors, projects, or roadmaps.")
             return
+
+        if is_triage_request(user_text):
+            role_names, role_ids, has_mod_perm = _extract_member_auth_context(message.author)
+            if not is_authorized_for_triage(
+                user_id=user_id,
+                role_names=role_names,
+                role_ids=role_ids,
+                has_mod_permission=has_mod_perm,
+            ):
+                await message.reply(TRIAGE_UNAUTHORIZED_REPLY)
+                return
+
+            issue_num = parse_triage_issue_number(user_text)
+            if issue_num is not None:
+                try:
+                    async with message.channel.typing():
+                        triage_reply = await asyncio.to_thread(
+                            run_direct_triage_for_discord,
+                            issue_num,
+                        )
+                    for idx, chunk in enumerate(chunk_reply(triage_reply)):
+                        if idx == 0 and hasattr(message, "reply"):
+                            await message.reply(chunk)
+                        else:
+                            await message.channel.send(chunk)
+                except Exception as exc:
+                    await message.channel.send(format_error_reply(exc))
+                return
 
         guild_id = message.guild.id if message.guild else None
         started_ms = now_ms()

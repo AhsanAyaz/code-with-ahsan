@@ -26,6 +26,7 @@ rsync -a \
   --exclude='.venv/' \
   "${REPO_ROOT}/agent/discord_bot" \
   "${REPO_ROOT}/agent/community_assistant" \
+  "${REPO_ROOT}/agent/loupe_triage_mcp.py" \
   "${STAGE}/agent/"
 
 cp "${REPO_ROOT}/agent/discord_bot/Dockerfile" "${STAGE}/Dockerfile"
