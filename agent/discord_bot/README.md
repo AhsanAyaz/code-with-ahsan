@@ -11,10 +11,12 @@ discord.py bridge to the ADK community_assistant agent.
 ## Local development
 
 1. Install runtime deps in the agent virtualenv:
+
    ```bash
    cd agent
    uv pip install "discord.py>=2.7.1" "google-auth>=2.0.0"
    ```
+
    (`google-adk`, `python-dotenv`, `httpx` are already in pyproject.toml.)
 
 2. Create `agent/discord_bot/.env` from `.env.example` and fill in:
@@ -26,16 +28,36 @@ discord.py bridge to the ADK community_assistant agent.
 3. Make sure `npm run dev` is running (the bot's tools call the Next.js API).
 
 4. Run the bot:
+
    ```bash
    cd agent
    uv run python discord_bot/bot.py
    ```
+
    Expected: `Bot ready as CWA Assistant#NNNN; listening on channel ...`
 
 5. In Discord, in your test channel: `@CWA Assistant Find me a mentor who knows Angular`
    Expected: typing indicator, then a reply with mentor results and clickable URLs.
 
-## Deploy to Cloud Run
+## Deploy
+
+The bot runs on a **Compute Engine `e2-micro` VM**, not Cloud Run. See
+[`deploy/README.md`](./deploy/README.md) for the rationale (Cloud Run billed
+~$47/month for an always-on 1 vCPU because the Discord gateway websocket forces
+`min-instances=1` + `--no-cpu-throttling`).
+
+```bash
+# one-time
+./agent/discord_bot/deploy/provision-gce.sh
+
+# every subsequent deploy
+./agent/discord_bot/deploy/deploy.sh
+```
+
+Same `Dockerfile`, same Secret Manager secrets, same container.
+
+<details>
+<summary><strong>Legacy: Cloud Run deploy (superseded — kept for reference)</strong></summary>
 
 **IMPORTANT: Build context is the repo root.** The Dockerfile copies `agent/discord_bot/` and `agent/community_assistant/` — both paths are relative to the repo root. Run all deploy commands from the repo root (`/home/ahsan/projects/code-with-ahsan`), NOT from `agent/discord_bot/`.
 
@@ -58,15 +80,18 @@ gcloud run deploy cwa-assistant-bot \
 ```
 
 **Why these flags:**
+
 - `--min-instances=1` keeps the gateway websocket alive (prevents gateway disconnect on idle)
 - `--max-instances=1` prevents session-splitting across instances (one session store per container)
 - `--timeout=3600` is the Cloud Run max; discord.py handles reconnection within the connection lifecycle
 - `--no-allow-unauthenticated` because the bot has no inbound HTTP — it doesn't need public ingress
 
 **After first deploy, also run:**
+
 ```bash
 gcloud run services update cwa-assistant-bot --region=us-central1 --no-cpu-throttling
 ```
+
 Without this, Cloud Run throttles CPU when no HTTP requests are active, which freezes the Discord event loop.
 
 ### Secret Manager setup (one-time, before first deploy)
@@ -97,6 +122,8 @@ gcloud run services update cwa-assistant-bot \
   --update-env-vars="ASSISTANT_CHANNEL_ID=<new channel id>"
 ```
 
+</details>
+
 ## Usage tracking (Cloud Logging log-based metrics)
 
 Every handled message emits one structured JSON line to stdout. Cloud Run captures stdout into Cloud Logging as `jsonPayload`. No new infra. Privacy: raw user IDs are HMAC-hashed; raw query text is never emitted.
@@ -104,10 +131,21 @@ Every handled message emits one structured JSON line to stdout. Cloud Run captur
 Event shape (see `usage_metrics.py`):
 
 ```json
-{"severity":"INFO","event_type":"bot_message","user_id_hash":"abc123def4567890",
- "guild_id":"987...","channel_id":"1504...","routed_agents":["root_agent","content_agent"],
- "tool_calls":["search_blog_posts"],"cited_urls":["https://blog.codewithahsan.dev/x"],
- "response_chars":512,"latency_ms":1234,"status":"ok","query_len":42,"query_topic":"content_agent"}
+{
+  "severity": "INFO",
+  "event_type": "bot_message",
+  "user_id_hash": "abc123def4567890",
+  "guild_id": "987...",
+  "channel_id": "1504...",
+  "routed_agents": ["root_agent", "content_agent"],
+  "tool_calls": ["search_blog_posts"],
+  "cited_urls": ["https://blog.codewithahsan.dev/x"],
+  "response_chars": 512,
+  "latency_ms": 1234,
+  "status": "ok",
+  "query_len": 42,
+  "query_topic": "content_agent"
+}
 ```
 
 ### One-time secret setup
@@ -199,6 +237,7 @@ gcloud monitoring dashboards create \
 View at: https://console.cloud.google.com/monitoring/dashboards (filter by name "CWA Assistant Bot")
 
 To update an existing dashboard, find its ID then:
+
 ```bash
 gcloud monitoring dashboards list --filter='displayName:"CWA Assistant Bot"' --format="value(name)"
 gcloud monitoring dashboards update <DASHBOARD_ID> --config-from-file=agent/discord_bot/monitoring/cwa-bot-dashboard.json
