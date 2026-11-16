@@ -33,16 +33,35 @@ class TestShouldHandleMessage:
             bot_user_id=99, mentioned_user_ids=[99],
         ) is False
 
-    def test_ignores_wrong_channel(self):
+    def test_responds_in_target_channel_without_mention(self):
         assert should_handle_message(
-            author_is_bot=False, channel_id=1, target_channel_id=42,
-            bot_user_id=99, mentioned_user_ids=[99],
-        ) is False
+            author_is_bot=False, channel_id=42, target_channel_id=42,
+            bot_user_id=99, mentioned_user_ids=[],
+        ) is True
 
-    def test_ignores_when_not_mentioned(self):
+    def test_ignores_in_target_channel_when_only_other_users_mentioned(self):
         assert should_handle_message(
             author_is_bot=False, channel_id=42, target_channel_id=42,
             bot_user_id=99, mentioned_user_ids=[100, 101],
+        ) is False
+
+    def test_ignores_in_target_channel_when_mention_everyone(self):
+        assert should_handle_message(
+            author_is_bot=False, channel_id=42, target_channel_id=42,
+            bot_user_id=99, mentioned_user_ids=[],
+            mention_everyone=True,
+        ) is False
+
+    def test_responds_in_other_channel_when_bot_mentioned(self):
+        assert should_handle_message(
+            author_is_bot=False, channel_id=1, target_channel_id=42,
+            bot_user_id=99, mentioned_user_ids=[99],
+        ) is True
+
+    def test_ignores_other_channel_when_not_mentioned(self):
+        assert should_handle_message(
+            author_is_bot=False, channel_id=1, target_channel_id=42,
+            bot_user_id=99, mentioned_user_ids=[100],
         ) is False
 
 

@@ -58,15 +58,26 @@ def should_handle_message(
     target_channel_id: int,
     bot_user_id: int,
     mentioned_user_ids: Iterable[int],
+    mention_everyone: bool = False,
 ) -> bool:
-    """Pure predicate. No discord.py types — easier to test."""
+    """Pure predicate. No discord.py types — easier to test.
+
+    - Always ignores bots.
+    - Responds in ANY channel when the bot is explicitly @mentioned.
+    - Responds in `target_channel_id` (#ask-ai-assistant) even without an
+      explicit @mention, unless the message is an @everyone/@here announcement
+      or only @mentions other human users.
+    """
     if author_is_bot:
         return False
-    if channel_id != target_channel_id:
-        return False
-    if bot_user_id not in set(mentioned_user_ids):
-        return False
-    return True
+    mentioned = set(mentioned_user_ids)
+    if bot_user_id in mentioned:
+        return True
+    if channel_id == target_channel_id:
+        if mention_everyone or len(mentioned) > 0:
+            return False
+        return True
+    return False
 
 
 def strip_mention(content: str, bot_user_id: int) -> str:
@@ -200,13 +211,14 @@ def _wire_bot():
             target_channel_id=ASSISTANT_CHANNEL_ID,
             bot_user_id=bot_user.id,
             mentioned_user_ids=(u.id for u in message.mentions),
+            mention_everyone=getattr(message, "mention_everyone", False),
         ):
             return
 
         user_id = str(message.author.id)
         user_text = strip_mention(message.content, bot_user.id)
         if not user_text:
-            await message.channel.send("Hi! Ask me about mentors, projects, or roadmaps.")
+            await message.reply("Hi! Ask me about mentors, projects, or roadmaps.")
             return
 
         guild_id = message.guild.id if message.guild else None
@@ -245,8 +257,11 @@ def _wire_bot():
                 response_text = "I couldn't generate a response. Please try again."
                 status = "empty_response"
 
-            for chunk in chunk_reply(response_text):
-                await message.channel.send(chunk)
+            for idx, chunk in enumerate(chunk_reply(response_text)):
+                if idx == 0 and hasattr(message, "reply"):
+                    await message.reply(chunk)
+                else:
+                    await message.channel.send(chunk)
         except Exception as exc:  # graceful, never crash the bot
             status = "error"
             try:
