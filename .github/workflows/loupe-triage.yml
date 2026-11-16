@@ -2,7 +2,7 @@ name: Loupe Visual Bug Auto-Triage
 
 on:
   issues:
-    types: [opened, labeled]
+    types: [opened]
   workflow_dispatch:
     inputs:
       issue_number:
@@ -10,15 +10,13 @@ on:
         required: true
         default: "379"
 
+concurrency:
+  group: loupe-triage-${{ github.event.inputs.issue_number || github.event.issue.number }}
+  cancel-in-progress: false
+
 jobs:
   triage:
     runs-on: ubuntu-latest
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.action == 'opened' ||
-      (github.event.action == 'labeled' &&
-       github.event.label.name != 'triaged' &&
-       github.event.label.name != 'wontfix')
     steps:
       - name: Trigger Cloud Run Loupe Triage Service
         env:
