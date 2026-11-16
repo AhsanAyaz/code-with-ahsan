@@ -12,8 +12,12 @@ from discord_bot.bot import (
     strip_mention,
     chunk_reply,
     format_error_reply,
+    parse_triage_issue_number,
+    is_triage_request,
+    is_authorized_for_triage,
     SAFE_CHUNK_SIZE,
     ERROR_REPLY,
+    TRIAGE_UNAUTHORIZED_REPLY,
 )
 
 
@@ -115,3 +119,55 @@ class TestFormatErrorReply:
         assert reply == ERROR_REPLY
         assert "stack trace" not in reply
         assert "https://codewithahsan.dev" in reply
+
+
+class TestModeratorTriageControls:
+    def test_parse_triage_issue_number(self):
+        assert parse_triage_issue_number("!triage 379") == 379
+        assert parse_triage_issue_number("/triage #379") == 379
+        assert parse_triage_issue_number("triage issue #379") == 379
+        assert parse_triage_issue_number("loupe triage #412") == 412
+        assert parse_triage_issue_number("Where do I find a mentor?") is None
+
+    def test_is_triage_request(self):
+        assert is_triage_request("!triage 379") is True
+        assert is_triage_request("Can you triage issue #379?") is True
+        assert is_triage_request("run loupe triage") is True
+        assert is_triage_request("Show me Angular blog posts") is False
+
+    def test_authorized_by_moderator_role_name(self):
+        assert is_authorized_for_triage(
+            user_id="111",
+            role_names=["Community Member", "Moderator"],
+            allowed_user_ids=(),
+            allowed_role_ids=(),
+        ) is True
+
+    def test_authorized_by_allowed_user_id(self):
+        assert is_authorized_for_triage(
+            user_id="814185701537087527",
+            role_names=["Member"],
+        ) is True
+        assert is_authorized_for_triage(
+            user_id="111",
+            role_ids=["874774318779887656"],
+        ) is True
+
+    def test_authorized_by_guild_permission(self):
+        assert is_authorized_for_triage(
+            user_id="222",
+            role_names=["Member"],
+            has_mod_permission=True,
+            allowed_user_ids=(),
+        ) is True
+
+    def test_rejects_regular_user(self):
+        assert is_authorized_for_triage(
+            user_id="333",
+            role_names=["Member"],
+            role_ids=["444"],
+            has_mod_permission=False,
+            allowed_user_ids=["999"],
+            allowed_role_ids=["888"],
+        ) is False
+        assert "moderators" in TRIAGE_UNAUTHORIZED_REPLY.lower()
