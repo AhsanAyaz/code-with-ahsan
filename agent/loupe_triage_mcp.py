@@ -67,24 +67,43 @@ mcp = FastMCP("loupe-triage")
 # Lazy PII Redaction Helper (avoids circular imports with triage_agent.py)
 # ---------------------------------------------------------------------------
 
+_URL_TOKEN_RE = re.compile(r"https?://[^\s)\"'>]+", re.IGNORECASE)
+
+
 def redact_pii(text: str) -> tuple[str, list[str]]:
     """Redact PII from text using community_assistant.callbacks patterns.
 
     Lazily imports `PII_PATTERNS` and `REDACTION_PLACEHOLDER` from
     `community_assistant.callbacks` inside this function to avoid circular
     imports when `triage_agent.py` imports `loupe_triage_mcp`.
+
+    Preserves http(s) URLs so 13-digit epoch timestamps in signed screenshot URLs
+    do not false-positive as credit card numbers.
     """
     if not text:
         return "", []
 
     from community_assistant.callbacks import PII_PATTERNS, REDACTION_PLACEHOLDER
 
-    redacted = text
+    saved_urls: list[str] = []
+
+    def _mask_url(match: re.Match[str]) -> str:
+        idx = len(saved_urls)
+        saved_urls.append(match.group(0))
+        return f"__URL_PLACEHOLDER_{idx}__"
+
+    masked_text = _URL_TOKEN_RE.sub(_mask_url, text)
+
+    redacted = masked_text
     redacted_types: list[str] = []
     for pii_type, pattern in PII_PATTERNS.items():
         if pattern.search(redacted):
             redacted = pattern.sub(REDACTION_PLACEHOLDER, redacted)
             redacted_types.append(pii_type)
+
+    for idx, original_url in enumerate(saved_urls):
+        redacted = redacted.replace(f"__URL_PLACEHOLDER_{idx}__", original_url)
+
     return redacted, redacted_types
 
 
@@ -557,6 +576,23 @@ def _search_github_src(
 
         path_scored.sort(key=lambda item: (-item[0], item[1]))
         top_paths = [p for _, p in path_scored[: max_candidates * 2]]
+
+        tree_blobs = {
+            entry.get("path", "")
+            for entry in tree
+            if entry.get("type") == "blob"
+        }
+        core_ui_files = (
+            "src/components/LayoutWrapper.tsx",
+            "src/app/globals.css",
+            "src/data/headerNavLinks.js",
+            "src/components/SideNav.tsx",
+            "src/components/Footer.tsx",
+        )
+        for core_path in core_ui_files:
+            if core_path in tree_blobs and core_path not in top_paths:
+                top_paths.append(core_path)
+
         if not top_paths:
             # Fallback to common top-level app/components files in tree
             top_paths = [
@@ -568,7 +604,7 @@ def _search_github_src(
             ][:max_candidates]
 
         candidates: list[dict[str, Any]] = []
-        for rel_path in top_paths[:max_candidates]:
+        for rel_path in top_paths[: max_candidates + len(core_ui_files)]:
             content_url = f"https://api.github.com/repos/{repo}/contents/{rel_path}?ref=main"
             c_resp = client.get(content_url, headers=headers)
             if c_resp.status_code != 200:
@@ -660,14 +696,25 @@ def find_suspect_components(
         "- \"suggested_fix\" (str, concrete code change recommendation)"
     )
 
+    valid_paths = {c["file_path"] for c in candidates}
+
     try:
         parsed = _call_gemini_json(contents=prompt, model=MODEL)
-        suspects = list(parsed.get("suspects") or [])
+        raw_suspects = list(parsed.get("suspects") or [])
+        suspects: list[dict[str, Any]] = []
+        for idx, s in enumerate(raw_suspects):
+            fp = str(s.get("file_path") or "")
+            if fp not in valid_paths:
+                fp = candidates[min(idx, len(candidates) - 1)]["file_path"]
+            suspects.append({
+                **s,
+                "file_path": fp,
+                "component_name": str(s.get("component_name") or Path(fp).stem),
+            })
+
         top_suspect = str(parsed.get("top_suspect_file") or "")
-        if not top_suspect and suspects:
-            top_suspect = str(suspects[0].get("file_path") or "")
-        if not top_suspect:
-            top_suspect = candidates[0]["file_path"]
+        if top_suspect not in valid_paths:
+            top_suspect = suspects[0]["file_path"] if suspects else candidates[0]["file_path"]
         if not suspects:
             suspects = [
                 {
@@ -921,11 +968,30 @@ def post_triage_report(
             lbl_resp.raise_for_status()
 
             comments_url = f"https://api.github.com/repos/{repo}/issues/{issue_number}/comments"
-            cmt_resp = client.post(
-                comments_url,
-                headers=headers,
-                json={"body": clean_markdown},
-            )
+            existing_cmt_id: int | None = None
+            try:
+                existing_resp = client.get(comments_url, headers=headers)
+                if existing_resp.status_code == 200 and isinstance(existing_resp.json(), list):
+                    for cmt in existing_resp.json():
+                        if isinstance(cmt, dict) and "Automated Loupe Bug Triage" in str(cmt.get("body", "")):
+                            existing_cmt_id = cmt.get("id")
+                            break
+            except Exception:
+                existing_cmt_id = None
+
+            if existing_cmt_id and hasattr(client, "patch"):
+                patch_cmt_url = f"https://api.github.com/repos/{repo}/issues/comments/{existing_cmt_id}"
+                cmt_resp = client.patch(
+                    patch_cmt_url,
+                    headers=headers,
+                    json={"body": clean_markdown},
+                )
+            else:
+                cmt_resp = client.post(
+                    comments_url,
+                    headers=headers,
+                    json={"body": clean_markdown},
+                )
             cmt_resp.raise_for_status()
             cmt_data = cmt_resp.json()
             comment_url = cmt_data.get("html_url", "")
