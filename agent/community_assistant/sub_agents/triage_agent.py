@@ -12,10 +12,13 @@ if _AGENT_DIR not in sys.path:
 from loupe_triage_mcp import (  # noqa: E402
     analyze_loupe_screenshot,
     create_fix_draft_pr,
+    evaluate_pull_request,
     fetch_loupe_issue,
+    fetch_pull_request_context,
     find_suspect_components,
     post_triage_report,
     triage_loupe_issue,
+    triage_pull_request,
 )
 
 from ..callbacks import (  # noqa: E402
@@ -51,6 +54,16 @@ Generates a minimal patch with `gemini-3.8-flash` and creates or updates an idem
 - `post_triage_report(issue_number, triage_markdown, is_wontfix=False, labels=None, repo="AhsanAyaz/code-with-ahsan")`: \
 Applies labels (`triaged` for valid bugs, or `wontfix` for non-bugs) and posts a structured \
 Markdown triage comment on the GitHub issue after redacting any PII.
+- `triage_pull_request(pr_number, repo="AhsanAyaz/code-with-ahsan", post_to_github=True)`: \
+Runs the complete automated Pull Request triage pipeline (classifies new vs. active contributors, \
+evaluates the PR diff against linked target issues and Firestore index guardrails, and posts/updates \
+an idempotent summary comment + labels on the PR).
+- `fetch_pull_request_context(pr_number, repo="AhsanAyaz/code-with-ahsan")`: \
+Fetches PR metadata, contributor status (`new_contributor` vs `active_contributor` vs `maintainer`), \
+linked target issues, and PII-sanitized file diffs.
+- `evaluate_pull_request(pr_context)`: \
+Evaluates a PR context dict with `gemini-3.8-flash` to produce `verdict` (`looks_good`, `needs_changes`, \
+or `does_not_address_issue`), `addresses_target_issue`, `findings`, and a tailored `contributor_message`.
 
 WORKFLOW GUIDELINES:
 1. **End-to-End Triage**: When asked to triage a specific GitHub issue (e.g., "Triage issue #379" or \
@@ -88,6 +101,9 @@ triage_agent = LlmAgent(
         create_fix_draft_pr,
         post_triage_report,
         triage_loupe_issue,
+        fetch_pull_request_context,
+        evaluate_pull_request,
+        triage_pull_request,
     ],
     before_model_callback=inject_current_date,
     before_agent_callback=lifecycle_before_agent,

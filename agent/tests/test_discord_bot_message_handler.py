@@ -13,6 +13,7 @@ from discord_bot.bot import (
     chunk_reply,
     format_error_reply,
     parse_triage_issue_number,
+    parse_triage_pr_number,
     is_triage_request,
     is_authorized_for_triage,
     SAFE_CHUNK_SIZE,
@@ -127,10 +128,21 @@ class TestModeratorTriageControls:
         assert parse_triage_issue_number("/triage #379") == 379
         assert parse_triage_issue_number("triage issue #379") == 379
         assert parse_triage_issue_number("loupe triage #412") == 412
+        assert parse_triage_issue_number("!triage-pr 377") is None
+        assert parse_triage_issue_number("triage pr #377") is None
         assert parse_triage_issue_number("Where do I find a mentor?") is None
+
+    def test_parse_triage_pr_number(self):
+        assert parse_triage_pr_number("!triage-pr 377") == 377
+        assert parse_triage_pr_number("/triage-pr #377") == 377
+        assert parse_triage_pr_number("triage pr #378") == 378
+        assert parse_triage_pr_number("triage pull request 374") == 374
+        assert parse_triage_pr_number("!triage 379") is None
 
     def test_is_triage_request(self):
         assert is_triage_request("!triage 379") is True
+        assert is_triage_request("!triage-pr 377") is True
+        assert is_triage_request("Can you triage PR #377?") is True
         assert is_triage_request("Can you triage issue #379?") is True
         assert is_triage_request("run loupe triage") is True
         assert is_triage_request("Show me Angular blog posts") is False

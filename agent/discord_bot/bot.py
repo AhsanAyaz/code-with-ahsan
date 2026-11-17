@@ -76,12 +76,16 @@ DEFAULT_MODERATOR_ROLE_NAMES = frozenset({
     "staff",
 })
 
+_TRIAGE_PR_CMD_RE = re.compile(
+    r"(?:^|[!\s/])(?:loupe[\s_-]+)?triage(?:[\s_-]+(?:pr|pull(?:\s+request)?))\s*#?(\d+)\b",
+    re.IGNORECASE,
+)
 _TRIAGE_CMD_RE = re.compile(
-    r"(?:^|[!\s/])(?:loupe[\s_-]+)?triage(?:\s+(?:github\s+)?(?:issue\s+)?)?#?(\d+)\b",
+    r"(?:^|[!\s/])(?:loupe[\s_-]+)?triage(?!-?pr\b|\s+pr\b|\s+pull\b)(?:\s+(?:github\s+)?(?:issue\s+)?)?#?(\d+)\b",
     re.IGNORECASE,
 )
 _TRIAGE_INTENT_RE = re.compile(
-    r"(?:^[!/]triage\b|\btriage\s+(?:github\s+)?(?:issue|bug|loupe|#\d+)\b|\bloupe\s+triage\b)",
+    r"(?:^[!/]triage(?:-pr)?\b|\btriage[\s_-]+(?:github\s+)?(?:issue|bug|loupe|pr|pull(?:\s+request)?|#\d+)\b|\bloupe\s+triage\b)",
     re.IGNORECASE,
 )
 
@@ -97,9 +101,24 @@ def _parse_id_env(var_names: Iterable[str]) -> set[str]:
     return ids
 
 
+def parse_triage_pr_number(text: str) -> int | None:
+    """Extract the GitHub Pull Request number from a Discord PR triage command or prompt."""
+    if not text:
+        return None
+    match = _TRIAGE_PR_CMD_RE.search(text.strip())
+    if not match:
+        return None
+    try:
+        return int(match.group(1))
+    except ValueError:
+        return None
+
+
 def parse_triage_issue_number(text: str) -> int | None:
     """Extract the GitHub issue number from a Discord triage command or prompt."""
     if not text:
+        return None
+    if parse_triage_pr_number(text) is not None:
         return None
     match = _TRIAGE_CMD_RE.search(text.strip())
     if not match:
@@ -111,10 +130,10 @@ def parse_triage_issue_number(text: str) -> int | None:
 
 
 def is_triage_request(text: str) -> bool:
-    """Return True if the message is attempting to trigger Loupe/GitHub issue triage."""
+    """Return True if the message is attempting to trigger Loupe/GitHub issue or PR triage."""
     if not text:
         return False
-    if parse_triage_issue_number(text) is not None:
+    if parse_triage_pr_number(text) is not None or parse_triage_issue_number(text) is not None:
         return True
     return bool(_TRIAGE_INTENT_RE.search(text.strip()))
 
@@ -187,6 +206,54 @@ CLOUD_RUN_TRIAGE_URL = os.environ.get(
     "LOUPE_TRIAGE_SERVICE_URL",
     "https://cwa-loupe-triage-205504954450.us-central1.run.app/triage",
 )
+CLOUD_RUN_PR_TRIAGE_URL = os.environ.get(
+    "LOUPE_PR_TRIAGE_SERVICE_URL",
+    CLOUD_RUN_TRIAGE_URL.rstrip("/").removesuffix("/triage") + "/triage-pr",
+)
+
+
+def run_direct_pr_triage_for_discord(pr_number: int, repo: str | None = None) -> str:
+    """Run the Pull Request triage pipeline directly (or via Cloud Run when GITHUB_TOKEN is only in Cloud Run)
+    and return a Discord-formatted summary.
+    """
+    agent_root = Path(__file__).resolve().parent.parent
+    if str(agent_root) not in sys.path:
+        sys.path.insert(0, str(agent_root))
+    import httpx
+    import loupe_triage_mcp
+
+    target_repo = repo or loupe_triage_mcp.DEFAULT_REPO
+    result: dict[str, Any] = {}
+
+    if not os.environ.get("GITHUB_TOKEN") and not getattr(loupe_triage_mcp, "GITHUB_TOKEN", ""):
+        try:
+            with httpx.Client(timeout=90.0) as http_client:
+                resp = http_client.post(
+                    CLOUD_RUN_PR_TRIAGE_URL,
+                    json={
+                        "pr_number": pr_number,
+                        "repo": target_repo,
+                        "post_to_github": True,
+                    },
+                )
+                if resp.status_code == 200:
+                    result = resp.json()
+        except Exception:
+            logger.warning("Cloud Run PR triage proxy failed; falling back to local execution", exc_info=True)
+
+    if not result:
+        result = loupe_triage_mcp.triage_pull_request(
+            pr_number=pr_number,
+            repo=target_repo,
+            post_to_github=True,
+        )
+
+    markdown = result.get("triage_markdown") or f"PR triage completed for #{pr_number}."
+    gh_post = result.get("github_post") or {}
+    comment_url = gh_post.get("comment_url")
+    if comment_url and comment_url not in markdown:
+        markdown = f"{markdown}\n\n🔗 **GitHub PR Comment:** {comment_url}"
+    return markdown
 
 
 def run_direct_triage_for_discord(issue_number: int, repo: str | None = None) -> str:
@@ -417,6 +484,23 @@ def _wire_bot():
                 has_mod_permission=has_mod_perm,
             ):
                 await message.reply(TRIAGE_UNAUTHORIZED_REPLY)
+                return
+
+            pr_num = parse_triage_pr_number(user_text)
+            if pr_num is not None:
+                try:
+                    async with message.channel.typing():
+                        pr_triage_reply = await asyncio.to_thread(
+                            run_direct_pr_triage_for_discord,
+                            pr_num,
+                        )
+                    for idx, chunk in enumerate(chunk_reply(pr_triage_reply)):
+                        if idx == 0 and hasattr(message, "reply"):
+                            await message.reply(chunk)
+                        else:
+                            await message.channel.send(chunk)
+                except Exception as exc:
+                    await message.channel.send(format_error_reply(exc))
                 return
 
             issue_num = parse_triage_issue_number(user_text)
