@@ -21,14 +21,17 @@ from community_assistant.callbacks import REDACTION_PLACEHOLDER
 
 
 def test_redact_pii_replaces_all_sensitive_patterns():
-    """redact_pii redacts email, phone, Discord mention, SSN, and credit card."""
+    """redact_pii redacts email, phone, Discord mention, SSN, and credit card while preserving signed screenshot URLs."""
+    signed_url = "https://etdekhjnkevmrkgqixow.supabase.co/storage/v1/object/sign/screenshots/1794843860828.jpg?token=abc"
     raw = (
+        f"Screenshot: {signed_url}\n"
         "Contact reporter at reporter@example.com or +1 (555) 234-5678, "
         "Discord <@!123456789012345678>, SSN 123-45-6789, "
         "card 4111-1111-1111-1111."
     )
     cleaned, pii_types = loupe_triage_mcp.redact_pii(raw)
 
+    assert signed_url in cleaned
     assert "reporter@example.com" not in cleaned
     assert "555" not in cleaned
     assert "<@!123456789012345678>" not in cleaned
@@ -36,6 +39,11 @@ def test_redact_pii_replaces_all_sensitive_patterns():
     assert "4111-1111-1111-1111" not in cleaned
     assert REDACTION_PLACEHOLDER in cleaned
     assert set(pii_types) >= {"EMAIL", "PHONE", "DISCORD_MENTION", "SSN", "CREDIT_CARD"}
+
+    # Pure Loupe issue body with signed URL should report zero PII
+    clean_only_url, url_pii = loupe_triage_mcp.redact_pii(f"![Screenshot]({signed_url})")
+    assert url_pii == []
+    assert signed_url in clean_only_url
 
 
 # ---------------------------------------------------------------------------
