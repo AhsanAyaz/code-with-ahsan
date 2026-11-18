@@ -690,3 +690,239 @@ def test_triage_service_health_and_post_triage_endpoints(monkeypatch):
     # Missing issue_number -> 400
     bad_resp = client.post("/triage", json={"action": "opened"})
     assert bad_resp.status_code == 400
+
+
+# ---------------------------------------------------------------------------
+# 10. Pull Request Triage & Contributor Review Tests
+# ---------------------------------------------------------------------------
+
+
+def test_fetch_pull_request_context_contributor_types_linked_issues_and_firestore_guardrail(monkeypatch):
+    """fetch_pull_request_context classifies new vs active contributors, extracts target issues (filtering self/PRs), and flags missing Firestore indexes."""
+
+    class FakePRContextClient:
+        def __init__(self, merged_count: int = 0, include_index_file: bool = False):
+            self.merged_count = merged_count
+            self.include_index_file = include_index_file
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+        def get(self, url: str, headers: dict | None = None, params: dict | None = None):
+            resp = MagicMock()
+            resp.status_code = 200
+            resp.raise_for_status = MagicMock()
+
+            if url.endswith("/pulls/377"):
+                resp.json.return_value = {
+                    "number": 377,
+                    "title": "fix(projects): show completed date (#377)",
+                    "body": "Fixes #375 and also references #377 (self) and #376 (another PR). Contact dev@example.com",
+                    "html_url": "https://github.com/AhsanAyaz/code-with-ahsan/pull/377",
+                    "state": "open",
+                    "draft": False,
+                    "head": {"ref": "fix/375-completed-date"},
+                    "base": {"ref": "main"},
+                    "user": {"login": "newbie-dev"},
+                    "author_association": "FIRST_TIME_CONTRIBUTOR" if self.merged_count == 0 else "CONTRIBUTOR",
+                }
+            elif "/pulls/377/files" in url:
+                files = [
+                    {
+                        "filename": "src/services/projects.ts",
+                        "status": "modified",
+                        "additions": 4,
+                        "deletions": 1,
+                        "patch": "@@ -10,3 +10,6 @@\n+const q = ref.where('status', '==', 'completed').orderBy('completedAt', 'desc');",
+                    }
+                ]
+                if self.include_index_file:
+                    files.append(
+                        {
+                            "filename": "firestore.indexes.json",
+                            "status": "modified",
+                            "additions": 10,
+                            "deletions": 0,
+                            "patch": "@@ -1,3 +1,10 @@\n+{\"collectionGroup\": \"projects\"}",
+                        }
+                    )
+                resp.json.return_value = files
+            elif "/search/issues" in url:
+                resp.json.return_value = {"total_count": self.merged_count}
+            elif url.endswith("/issues/375"):
+                resp.json.return_value = {
+                    "number": 375,
+                    "title": "Project card shows Invalid Date when completed",
+                    "body": "Completed projects render Invalid Date on /projects.",
+                    "state": "open",
+                    "html_url": "https://github.com/AhsanAyaz/code-with-ahsan/issues/375",
+                }
+            elif url.endswith("/issues/376"):
+                # Simulate #376 being a Pull Request, which must be skipped as a target issue
+                resp.json.return_value = {
+                    "number": 376,
+                    "title": "Some other PR",
+                    "pull_request": {"url": "https://api.github.com/repos/AhsanAyaz/code-with-ahsan/pulls/376"},
+                }
+            elif "/issues/375/comments" in url:
+                resp.json.return_value = [
+                    {
+                        "id": 10,
+                        "body": "## 🤖 Automated Loupe Bug Triage (Gemini Vision)\nSuspect: `src/components/ProjectCard.tsx`",
+                    }
+                ]
+            return resp
+
+    # Case A: First-time contributor + missing firestore.indexes.json update
+    monkeypatch.setattr(
+        loupe_triage_mcp.httpx,
+        "Client",
+        lambda *a, **kw: FakePRContextClient(merged_count=0, include_index_file=False),
+    )
+    ctx_new = loupe_triage_mcp.fetch_pull_request_context(377)
+    assert ctx_new["status"] == "success"
+    assert ctx_new["contributor_type"] == "new_contributor"
+    assert ctx_new["merged_pr_count"] == 0
+    assert ctx_new["linked_issue_numbers"] == [375]
+    assert len(ctx_new["target_issues"]) == 1
+    assert "Automated Loupe Bug Triage" in ctx_new["target_issues"][0]["triage_summary"]
+    assert ctx_new["firestore_index_warning"] is True
+    assert ctx_new["pii_redacted"] is True
+    assert "dev@example.com" not in ctx_new["body"]
+
+    # Case B: Active contributor (3 merged PRs) + firestore.indexes.json updated
+    monkeypatch.setattr(
+        loupe_triage_mcp.httpx,
+        "Client",
+        lambda *a, **kw: FakePRContextClient(merged_count=3, include_index_file=True),
+    )
+    ctx_active = loupe_triage_mcp.fetch_pull_request_context(377)
+    assert ctx_active["contributor_type"] == "active_contributor"
+    assert ctx_active["merged_pr_count"] == 3
+    assert ctx_active["firestore_index_warning"] is False
+
+
+def test_evaluate_and_triage_pull_request_end_to_end(monkeypatch):
+    """evaluate_pull_request and triage_pull_request format review markdown, apply labels, and upsert comment."""
+    fake_ctx = {
+        "status": "success",
+        "pr_number": 377,
+        "repo": "AhsanAyaz/code-with-ahsan",
+        "title": "fix(projects): show completed date",
+        "body": "Fixes #375",
+        "html_url": "https://github.com/AhsanAyaz/code-with-ahsan/pull/377",
+        "state": "open",
+        "draft": False,
+        "head_ref": "fix/375-completed-date",
+        "base_ref": "main",
+        "author_login": "newbie-dev",
+        "author_association": "FIRST_TIME_CONTRIBUTOR",
+        "merged_pr_count": 0,
+        "contributor_type": "new_contributor",
+        "linked_issue_numbers": [375],
+        "target_issues": [
+            {
+                "issue_number": 375,
+                "title": "Project card shows Invalid Date",
+                "body": "Completed date is broken",
+                "state": "open",
+                "html_url": "https://github.com/AhsanAyaz/code-with-ahsan/issues/375",
+                "triage_summary": "",
+            }
+        ],
+        "changed_files": [
+            {
+                "filename": "src/app/projects/page.tsx",
+                "status": "modified",
+                "additions": 5,
+                "deletions": 2,
+                "patch": "@@ -1,3 +1,6 @@\n+const formatted = new Date(completedAt).toLocaleDateString();",
+            }
+        ],
+        "firestore_index_warning": False,
+        "pii_redacted": False,
+        "pii_types": [],
+    }
+
+    monkeypatch.setattr(loupe_triage_mcp, "fetch_pull_request_context", lambda pr_number, repo="": fake_ctx)
+    monkeypatch.setattr(
+        loupe_triage_mcp,
+        "_call_gemini_json",
+        lambda contents, system_instruction="", model="": {
+            "verdict": "looks_good",
+            "addresses_target_issue": True,
+            "summary": "Formats `completedAt` safely before rendering on project cards.",
+            "issue_alignment_notes": "Directly resolves #375 by parsing the timestamp before formatting.",
+            "findings": [],
+            "contributor_message": "Welcome to Code with Ahsan, @newbie-dev! 🌱",
+        },
+    )
+
+    upserted: list[dict[str, Any]] = []
+
+    def fake_upsert(issue_number, clean_markdown, labels_to_apply, repo="", comment_marker=""):
+        upserted.append(
+            {
+                "issue_number": issue_number,
+                "clean_markdown": clean_markdown,
+                "labels": labels_to_apply,
+                "marker": comment_marker,
+            }
+        )
+        return f"https://github.com/{repo}/pull/{issue_number}#issuecomment-777"
+
+    monkeypatch.setattr(loupe_triage_mcp, "_upsert_issue_comment_and_labels", fake_upsert)
+
+    res = loupe_triage_mcp.triage_pull_request(377, repo="AhsanAyaz/code-with-ahsan", post_to_github=True)
+    assert res["status"] == "success"
+    assert res["verdict"] == "looks_good"
+    assert res["contributor_type"] == "new_contributor"
+    assert res["addresses_target_issue"] is True
+    assert "pr-triaged" in res["labels_applied"]
+    assert "first-time-contributor" in res["labels_applied"]
+    assert "Automated PR Triage & Review" in res["triage_markdown"]
+    assert "Looks Good to Merge" in res["triage_markdown"]
+    assert len(upserted) == 1
+    assert upserted[0]["marker"] == "Automated PR Triage & Review"
+
+
+def test_triage_service_post_triage_pr_endpoint_and_draft_skip(monkeypatch):
+    """POST /triage-pr supports direct payloads, pull_request webhooks, and skips draft PRs unless forced."""
+    client = TestClient(triage_service.app)
+
+    recorded: list[dict[str, Any]] = []
+
+    def fake_triage_pr(pr_number: int, repo: str = "AhsanAyaz/code-with-ahsan", post_to_github: bool = True):
+        info = {"pr_number": pr_number, "repo": repo, "post_to_github": post_to_github}
+        recorded.append(info)
+        return {"status": "success", "verdict": "looks_good", **info}
+
+    monkeypatch.setattr(loupe_triage_mcp, "triage_pull_request", fake_triage_pr)
+
+    # 1. Direct payload
+    r1 = client.post("/triage-pr", json={"pr_number": 377, "repo": "AhsanAyaz/code-with-ahsan"})
+    assert r1.status_code == 200
+    assert r1.json()["pr_number"] == 377
+    assert recorded[-1]["pr_number"] == 377
+
+    # 2. Webhook payload with draft=True -> skipped
+    r_draft = client.post(
+        "/triage-pr",
+        json={
+            "action": "opened",
+            "pull_request": {"number": 401, "draft": True},
+            "repository": {"full_name": "AhsanAyaz/code-with-ahsan"},
+        },
+    )
+    assert r_draft.status_code == 200
+    assert r_draft.json()["status"] == "skipped"
+
+    # 3. Disallowed repo -> 403
+    r_forbidden = client.post(
+        "/triage-pr",
+        json={"pr_number": 1, "repo": "evil/other-repo"},
+    )
+    assert r_forbidden.status_code == 403

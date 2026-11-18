@@ -1,0 +1,32 @@
+name: Pull Request Auto-Triage
+
+on:
+  pull_request_target:
+    types: [opened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "GitHub Pull Request number to triage"
+        required: true
+        default: "377"
+
+permissions: {}
+
+concurrency:
+  group: pr-triage-${{ github.event.inputs.pr_number || github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  triage-pr:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    steps:
+      - name: Trigger Cloud Run PR Triage Service
+        env:
+          PR_NUMBER: ${{ github.event.inputs.pr_number || github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          echo "Triggering PR triage for PR #${PR_NUMBER} in ${REPO}..."
+          curl -fsS --max-time 120 --retry 2 -X POST "https://cwa-loupe-triage-205504954450.us-central1.run.app/triage-pr" \
+            -H "Content-Type: application/json" \
+            -d "{\"pr_number\": ${PR_NUMBER}, \"repo\": \"${REPO}\"}"

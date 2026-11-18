@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 from pathlib import Path
@@ -24,8 +25,26 @@ logger = logging.getLogger("triage_service")
 
 MODEL = "gemini-3.8-flash"
 DEFAULT_REPO = os.environ.get("GITHUB_REPO", "AhsanAyaz/code-with-ahsan")
+ALLOWED_REPOS = frozenset({
+    r.strip()
+    for r in os.environ.get("ALLOWED_GITHUB_REPOS", DEFAULT_REPO).split(",")
+    if r.strip()
+} | {DEFAULT_REPO})
 
-app = FastAPI(title="Code with Ahsan — Loupe Triage Service")
+app = FastAPI(title="Code with Ahsan — Loupe & PR Triage Service")
+
+
+def _resolve_repo(payload: dict[str, Any]) -> str:
+    repo = payload.get("repo")
+    if not repo and isinstance(payload.get("repository"), dict):
+        repo = payload["repository"].get("full_name")
+    repo_str = str(repo or DEFAULT_REPO).strip()
+    if repo_str not in ALLOWED_REPOS:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Repository '{repo_str}' is not in ALLOWED_REPOS",
+        )
+    return repo_str
 
 
 @app.get("/")
@@ -69,20 +88,66 @@ async def triage(request: Request) -> dict[str, Any]:
             detail=f"Invalid issue_number: {raw_issue_number!r}",
         ) from exc
 
-    # Extract repo from direct payload or GitHub webhook payload
-    repo = payload.get("repo")
-    if not repo and isinstance(payload.get("repository"), dict):
-        repo = payload["repository"].get("full_name")
-    repo = str(repo or DEFAULT_REPO)
+    repo = _resolve_repo(payload)
 
     post_to_github = bool(payload.get("post_to_github", True))
     create_pr = bool(payload.get("create_pr", True))
 
-    result = loupe_triage_mcp.triage_loupe_issue(
+    result = await asyncio.to_thread(
+        loupe_triage_mcp.triage_loupe_issue,
         issue_number=issue_number,
         repo=repo,
         post_to_github=post_to_github,
         create_pr=create_pr,
+    )
+    return result
+
+
+@app.post("/triage-pr")
+async def triage_pr(request: Request) -> dict[str, Any]:
+    """Trigger Pull Request auto-triage from either direct API call or GitHub pull_request webhook/Action."""
+    try:
+        payload: dict[str, Any] = await request.json()
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Invalid JSON payload: {exc}") from exc
+
+    if not isinstance(payload, dict):
+        raise HTTPException(status_code=400, detail="Payload must be a JSON object")
+
+    pr_obj = payload.get("pull_request") if isinstance(payload.get("pull_request"), dict) else {}
+    raw_pr_number = payload.get("pr_number")
+    if raw_pr_number is None and pr_obj:
+        raw_pr_number = pr_obj.get("number")
+
+    if raw_pr_number is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing 'pr_number' (or 'pull_request.number') in request payload",
+        )
+
+    try:
+        pr_number = int(raw_pr_number)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid pr_number: {raw_pr_number!r}",
+        ) from exc
+
+    if pr_obj.get("draft") is True and not payload.get("force", False):
+        return {
+            "status": "skipped",
+            "reason": "Pull request is a draft",
+            "pr_number": pr_number,
+        }
+
+    repo = _resolve_repo(payload)
+    post_to_github = bool(payload.get("post_to_github", True))
+
+    result = await asyncio.to_thread(
+        loupe_triage_mcp.triage_pull_request,
+        pr_number=pr_number,
+        repo=repo,
+        post_to_github=post_to_github,
     )
     return result
 
