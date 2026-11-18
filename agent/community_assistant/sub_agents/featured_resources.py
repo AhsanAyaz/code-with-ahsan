@@ -13,6 +13,7 @@ from __future__ import annotations
 from google.adk.agents import LlmAgent
 from google.adk.tools.agent_tool import AgentTool
 
+from ..models import MODEL, TOOL_AGENT_CONFIG
 from ..callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 
 FEATURED_RESOURCES: list[dict] = [
@@ -66,7 +67,8 @@ def lookup_featured_resource(topic: str) -> list[dict]:
 
 featured_resources_agent = LlmAgent(
     name="featured_resources_agent",
-    model="gemini-2.5-flash",
+    model=MODEL,
+    generate_content_config=TOOL_AGENT_CONFIG,
     description=(
         "Returns curated flagship resources (e.g., Ahsan's AI Guide) whose keywords match "
         "the user query. Always call this BEFORE search_blog_posts when the user asks about "

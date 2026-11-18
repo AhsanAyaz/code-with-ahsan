@@ -2,6 +2,7 @@ from collections import Counter
 
 from google.adk.agents import LlmAgent
 
+from ..models import MODEL, TOOL_AGENT_CONFIG
 from ..callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 from ..platform_client import BASE_URL, fetch_mentors, fetch_mentors_semantic
 
@@ -143,7 +144,8 @@ def semantic_search_mentors(query: str) -> dict:
 
 mentorship_agent = LlmAgent(
     name="mentorship_agent",
-    model="gemini-2.5-flash",
+    model=MODEL,
+    generate_content_config=TOOL_AGENT_CONFIG,
     description=(
         "Handles mentorship-related questions: finding mentors by topic, explaining the mentorship "
         "program, and matching mentees to available mentors."

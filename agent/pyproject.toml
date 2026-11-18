@@ -2,9 +2,10 @@
 name = "community-assistant"
 version = "0.1.0"
 description = "Multi-agent Discord assistant for the Code with Ahsan community, powered by Google ADK."
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
-    "google-adk>=1.0.0",
+    "google-adk[mcp]>=2.14.1",
+    "google-genai>=2.34.0",
     "python-dotenv>=1.0.1",
     "httpx>=0.28.0",
 ]

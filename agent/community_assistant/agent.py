@@ -12,9 +12,8 @@ from .sub_agents.mentorship_agent import mentorship_agent
 from .sub_agents.onboarding_agent import onboarding_agent
 from .sub_agents.projects_agent import projects_agent
 from .sub_agents.roadmap_agent import roadmap_agent
+from .models import MODEL, TOOL_AGENT_CONFIG
 from .sub_agents.triage_agent import triage_agent
-
-MODEL = "gemini-2.5-flash"
 
 ROOT_INSTRUCTION = """You are the Code with Ahsan community assistant, helping fresh and \
 early-career developers in a Discord community of 4,600+ members founded by Muhammad Ahsan Ayaz \
@@ -66,6 +65,8 @@ and suggest the next best step.
 root_agent = LlmAgent(
     name="community_assistant",
     model=MODEL,
+    # Root delegates via transfer_to_agent (a tool call), so it gets the tool-agent config.
+    generate_content_config=TOOL_AGENT_CONFIG,
     description=(
         "Root orchestrator for the Code with Ahsan community assistant. Delegates to specialized "
         "sub-agents for onboarding, mentorship, projects, learning roadmaps, and Loupe issue triage."
