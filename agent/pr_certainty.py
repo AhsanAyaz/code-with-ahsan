@@ -122,16 +122,22 @@ _TIER_0_PATTERNS: tuple[str, ...] = (
     "RELEASE_NOTES*.md",
 )
 
-# Tier 1: Frontend UI, styles, hooks, utilities, tests, MDX content, static images
+# Tier 1: Frontend UI, colocated App Router components/pages/constants, styles, hooks, utilities, tests, MDX, images
 _TIER_1_PATTERNS: tuple[str, ...] = (
     "src/components/*",
     "src/components/**",
+    "src/app/**/components/*",
+    "src/app/**/components/**",
+    "src/app/**/constants.ts",
+    "src/app/**/constants.tsx",
     "src/app/**/page.tsx",
     "src/app/**/page.ts",
     "src/app/page.tsx",
     "src/app/**/loading.tsx",
     "src/app/**/not-found.tsx",
     "src/app/**/error.tsx",
+    "src/app/**/*.tsx",
+    "src/app/**/*.css",
     "src/app/globals.css",
     "src/css/*",
     "src/css/**",
@@ -157,6 +163,14 @@ _TIER_1_PATTERNS: tuple[str, ...] = (
     "public/**/*.svg",
     "public/*.ico",
     "public/**/*.ico",
+)
+
+# Tier 2 overrides inside src/app/ that must be checked BEFORE Tier 1 `src/app/**/*.tsx`
+_TIER_2_APP_OVERRIDES: tuple[str, ...] = (
+    "src/app/api/*",
+    "src/app/api/**",
+    "src/app/**/layout.tsx",
+    "src/app/layout.tsx",
 )
 
 # Tier 2: Backend services, libs, types, contexts, layouts, non-admin API routes, scripts
@@ -255,6 +269,8 @@ def _classify_single_path(path: str) -> tuple[str, int]:
         return "tier_3_critical", _TIER_BASE_POINTS["tier_3_critical"]
     if _matches_any(norm, _TIER_0_PATTERNS):
         return "tier_0_docs", _TIER_BASE_POINTS["tier_0_docs"]
+    if _matches_any(norm, _TIER_2_APP_OVERRIDES):
+        return "tier_2_backend", _TIER_BASE_POINTS["tier_2_backend"]
     if _matches_any(norm, _TIER_1_PATTERNS):
         return "tier_1_ui", _TIER_BASE_POINTS["tier_1_ui"]
     if _matches_any(norm, _TIER_2_PATTERNS):

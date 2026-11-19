@@ -2104,12 +2104,6 @@ def _format_pr_triage_markdown(
         "- **Maintainer HITL Commands:** Comment `/merge` (SHA-pinned squash auto-merge), `/hold` (block auto-merge), or `/rescore` (re-evaluate)."
     )
 
-    if certainty and certainty.get("telemetry_meta"):
-        lines.extend([
-            "",
-            pr_certainty.encode_certainty_meta(certainty["telemetry_meta"]),
-        ])
-
     return "\n".join(lines)
 
 
@@ -2172,6 +2166,14 @@ def triage_pull_request(
     )
     triage_markdown, report_pii = redact_pii(raw_markdown)
     all_pii_types = list(dict.fromkeys(all_pii_types + report_pii))
+
+    # Append machine-generated telemetry metadata AFTER PII redaction so 10-digit Unix
+    # timestamps are never mangled by phone-number regexes.
+    if certainty and certainty.get("telemetry_meta"):
+        triage_markdown = (
+            f"{triage_markdown}\n\n"
+            f"{pr_certainty.encode_certainty_meta(certainty['telemetry_meta'])}"
+        )
 
     # Build final labels and stale managed labels to remove
     labels_to_apply = ["pr-triaged"]

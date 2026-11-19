@@ -24,11 +24,14 @@ def test_classify_path_risk_tiers_and_fail_closed():
     assert pr_certainty.classify_path_risk("README.md") == ("tier_0_docs", 25)
 
     assert pr_certainty.classify_path_risk("src/components/Footer.tsx") == ("tier_1_ui", 20)
+    assert pr_certainty.classify_path_risk("src/app/events/cwa-tech-summit/2027/components/HeroSection.tsx") == ("tier_1_ui", 20)
+    assert pr_certainty.classify_path_risk("src/app/events/cwa-tech-summit/2027/constants.ts") == ("tier_1_ui", 20)
     assert pr_certainty.classify_path_risk("src/content/courses/angular/intro.mdx") == ("tier_1_ui", 20)
     assert pr_certainty.classify_path_risk("public/images/logo.png") == ("tier_1_ui", 20)
 
     assert pr_certainty.classify_path_risk("src/services/mentorship.ts") == ("tier_2_backend", 12)
     assert pr_certainty.classify_path_risk("src/app/api/roadmaps/route.ts") == ("tier_2_backend", 12)
+    assert pr_certainty.classify_path_risk("src/app/layout.tsx") == ("tier_2_backend", 12)
 
     # Critical Tier 3 paths (including executable files in public/ and admin/webhooks)
     assert pr_certainty.classify_path_risk("firestore.rules") == ("tier_3_critical", 0)
