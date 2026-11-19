@@ -30,3 +30,21 @@ Full rules (when an index is required, field ordering, array and vector index
 shapes, graceful fallbacks while an index builds) are in the
 **`firestore-indexes` skill**: `.agent/skills/firestore-indexes/SKILL.md`.
 Read it before touching Firestore query code.
+
+## ADK Agent, MCP & Cloud Run Conventions (`agent/`)
+
+- **Python & Pytest**: Always use the existing virtualenv binaries directly (`agent/.venv/bin/python` and `agent/.venv/bin/pytest -k "not test_fan_out_executes_three_leaves_concurrently"`) because `~/.local/bin/uv` is hidden inside the terminal sandbox and `test_fan_out_executes_three_leaves_concurrently` makes a live network call to `generativelanguage.googleapis.com`. Never modify `agent/pyproject.toml` or `agent/uv.lock`.
+- **Environment & Keys**: Load `GEMINI_API_KEY` (and set `GOOGLE_API_KEY` if unset), `GITHUB_TOKEN`, and `NEXT_PUBLIC_LOUPE_API_KEY` from environment variables or the repo root `.env.local`. Default GitHub repo is `AhsanAyaz/code-with-ahsan`.
+- **Model Selection (`gemini-3.8-flash`)**: Use `gemini-3.8-flash` for Loupe screenshot vision analysis, suspect code analysis, code fix generation, and the `triage_agent` ADK sub-agent.
+- **`adk web` Directory Rule & Circular Import Avoidance**: `uv run adk web` treats every subdirectory inside `agent/` as a selectable ADK agent package. Do **NOT** create new subdirectories inside `agent/` for MCP servers or FastAPI/Cloud Run workers (which causes `No root_agent found` in the `adk web` dropdown). Place standalone scripts and `Dockerfile` directly in `agent/` (e.g., `agent/loupe_triage_mcp.py`, `agent/triage_service.py`, `agent/Dockerfile`), and place new ADK sub-agents inside `agent/community_assistant/sub_agents/`. In `loupe_triage_mcp.py`, import `community_assistant.callbacks` (`PII_PATTERNS`, `REDACTION_PLACEHOLDER`) lazily inside a helper function to avoid circular imports when `triage_agent.py` imports `loupe_triage_mcp`.
+- **Codebase Search & Idempotent Draft PR Creation (Local + Cloud Run)**:
+  - When searching Next.js source files (`src/`), check local `../src` first and fall back to the GitHub REST API (`GET /repos/AhsanAyaz/code-with-ahsan/git/trees/main?recursive=1` + file content fetch) when running inside a Cloud Run container where `../src` is not mounted.
+  - When generating a fix and opening a Draft PR, use `gemini-3.8-flash` to produce a minimal code patch for the top suspect file, and use the GitHub REST API (`GET /git/ref/heads/main`, `POST /git/refs` or `PATCH /git/refs/heads/fix/loupe-<issue_number>` with `force=True` if the branch already exists, `PUT /contents/<path>` on `fix/loupe-<issue_number>`, and `POST /pulls` with `"draft": True` or reuse an existing open PR for that head branch) so re-runs across multiple demo takes are 100% idempotent and work inside Cloud Run without needing `git` on disk. Include the Draft PR link in the triage comment posted on the issue.
+- **Cloud Run Deployment & GitHub Action Trigger**: Deploy from `agent/` to GCP project `code-with-ahsan-45496` (`us-central1`) using `BypassSandbox: true` (required for network + `~/.config/gcloud` access):
+  - Service name: `cwa-loupe-triage` (`--source . --project code-with-ahsan-45496 --region us-central1 --allow-unauthenticated`).
+  - Load `GEMINI_API_KEY`, `GITHUB_TOKEN`, and `NEXT_PUBLIC_LOUPE_API_KEY` from `../.env.local` in Python/shell and pass via `--set-env-vars` without printing secret values to terminal output.
+  - Have the GitHub Action workflow (`POST /triage` on `issues: [opened, labeled]` and `workflow_dispatch`) call the deployed Cloud Run service URL (`https://cwa-loupe-triage-205504954450.us-central1.run.app/triage`).
+- **Local Verification Commands to Give the User**:
+  - MCP Inspector: `cd agent && npx @modelcontextprotocol/inspector uv run python loupe_triage_mcp.py`
+  - ADK Web UI: `cd agent && uv run adk web` (select `community_assistant` in the top-left dropdown)
+
