@@ -550,7 +550,7 @@ def compute_pr_certainty(
     if secret_hits:
         _add_veto("PII_OR_SECRET_DETECTED", f"Potential secret/credential pattern in diff: {', '.join(secret_hits)}.")
 
-    fs_warning = bool(pr_context.get("firestore_index_warning", False))
+    fs_warning = bool(pr_context.get("firestore_index_warning", False)) and ci_state != "passed"
     fs_pts = 0 if fs_warning else 3
     p5_score = max(0, min(10, issue_pts + secret_pts + fs_pts))
     p5_note = f"Issue link +{issue_pts}/4, Secrets +{secret_pts}/3, Firestore advisory +{fs_pts}/3."
