@@ -1,5 +1,6 @@
 from google.adk.agents import LlmAgent, SequentialAgent
 
+from ..models import MODEL, TOOL_AGENT_CONFIG
 from ..callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 
 
@@ -60,7 +61,7 @@ def get_channel_guide() -> dict:
 
 skill_level_extractor = LlmAgent(
     name="onboarding_skill_level",
-    model="gemini-2.5-flash",
+    model=MODEL,
     description="Asks/identifies the user's current skill level.",
     instruction="""From the conversation so far, identify the user's developer skill level \
 ("beginner" / "intermediate" / "advanced" / "unknown"). Reply with JUST that single word. \
@@ -74,7 +75,7 @@ If you cannot tell, reply "unknown".""",
 
 goals_extractor = LlmAgent(
     name="onboarding_goals",
-    model="gemini-2.5-flash",
+    model=MODEL,
     description="Asks/identifies the user's stated goals.",
     instruction="""From the conversation so far, summarize the user's stated goals in <40 words. \
 If no goals are clear, reply "unknown".""",
@@ -87,7 +88,8 @@ If no goals are clear, reply "unknown".""",
 
 welcome_agent = LlmAgent(
     name="onboarding_welcome",
-    model="gemini-2.5-flash",
+    model=MODEL,
+    generate_content_config=TOOL_AGENT_CONFIG,
     description=(
         "Welcomes new members to the Code with Ahsan community and helps them navigate channels, "
         "community norms, and first steps."

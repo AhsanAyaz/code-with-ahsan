@@ -1,5 +1,6 @@
 from google.adk.agents import LlmAgent
 
+from ..models import MODEL, TOOL_AGENT_CONFIG
 from ..callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 from ..platform_client import BASE_URL, fetch_projects
 
@@ -88,7 +89,8 @@ def get_contribution_guide(project_name: str) -> dict:
 
 projects_agent = LlmAgent(
     name="projects_agent",
-    model="gemini-2.5-flash",
+    model=MODEL,
+    generate_content_config=TOOL_AGENT_CONFIG,
     description=(
         "Helps developers discover open-source projects in the Code with Ahsan community and "
         "understand how to contribute. Reads live project data from the platform."

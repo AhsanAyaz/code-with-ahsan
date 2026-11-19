@@ -1,0 +1,29 @@
+name: Loupe Visual Bug Auto-Triage
+
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "GitHub issue number to triage"
+        required: true
+        default: "379"
+
+concurrency:
+  group: loupe-triage-${{ github.event.inputs.issue_number || github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cloud Run Loupe Triage Service
+        env:
+          ISSUE_NUMBER: ${{ github.event.inputs.issue_number || github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          echo "Triggering Loupe triage for issue #${ISSUE_NUMBER} in ${REPO}..."
+          curl -sS -X POST "https://cwa-loupe-triage-205504954450.us-central1.run.app/triage" \
+            -H "Content-Type: application/json" \
+            -d "{\"issue_number\": ${ISSUE_NUMBER}, \"repo\": \"${REPO}\"}"

@@ -1,0 +1,49 @@
+name: Pull Request Auto-Triage
+
+on:
+  workflow_run:
+    workflows: ["PR Verify"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "GitHub Pull Request number to triage"
+        required: true
+        default: "377"
+      force_rescore:
+        description: "Bypass SHA cache and force fresh Gemini evaluation"
+        type: boolean
+        required: false
+        default: false
+
+permissions: {}
+
+concurrency:
+  group: pr-triage-${{ github.event.inputs.pr_number || github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+jobs:
+  triage-pr:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion != 'cancelled')
+    steps:
+      - name: Trigger Cloud Run PR Certainty & Triage Service
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.inputs.pr_number || '' }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha || '' }}
+          FORCE_RESCORE: ${{ github.event.inputs.force_rescore || 'false' }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
+            echo "Triggering manual PR triage for PR #${PR_NUMBER} in ${REPO}..."
+            PAYLOAD="{\"pr_number\": ${PR_NUMBER}, \"repo\": \"${REPO}\", \"force_rescore\": ${FORCE_RESCORE}}"
+          else
+            echo "Triggering PR Certainty triage for head_sha ${HEAD_SHA} in ${REPO}..."
+            PAYLOAD="{\"head_sha\": \"${HEAD_SHA}\", \"repo\": \"${REPO}\"}"
+          fi
+          curl -fsS --max-time 120 --retry 2 -X POST "https://cwa-loupe-triage-205504954450.us-central1.run.app/triage-pr" \
+            -H "Content-Type: application/json" \
+            -d "${PAYLOAD}"
