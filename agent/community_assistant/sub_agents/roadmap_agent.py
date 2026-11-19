@@ -2,6 +2,7 @@ from collections import Counter
 
 from google.adk.agents import LlmAgent
 
+from ..models import MODEL, TOOL_AGENT_CONFIG
 from ..callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 from ..platform_client import BASE_URL, fetch_roadmaps
 
@@ -86,7 +87,8 @@ def list_roadmap_domains() -> dict:
 
 roadmap_agent = LlmAgent(
     name="roadmap_agent",
-    model="gemini-2.5-flash",
+    model=MODEL,
+    generate_content_config=TOOL_AGENT_CONFIG,
     description=(
         "Provides live learning roadmaps from the Code with Ahsan platform, filtered by domain "
         "and difficulty."

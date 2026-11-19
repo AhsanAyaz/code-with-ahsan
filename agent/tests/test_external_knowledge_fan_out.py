@@ -14,6 +14,7 @@ timestamps are within 100ms of each other (proving parallel dispatch).
 from __future__ import annotations
 
 import json
+import os
 import time
 from pathlib import Path
 
@@ -277,6 +278,16 @@ def test_gh_uses_github_token_when_set(monkeypatch):
 # ---------------------------------------------------------------------------
 
 
+# This drives the real ADK Runner, so each leaf LlmAgent makes a genuine Gemini
+# call — without a key google.genai raises "No API key was provided" during
+# client construction. The 2000ms threshold below is calibrated against real LLM
+# latency, so stubbing the model out would not preserve what the test proves;
+# skipping when unconfigured is the honest option.
+@pytest.mark.live_llm
+@pytest.mark.skipif(
+    not os.environ.get("GOOGLE_API_KEY"),
+    reason="requires GOOGLE_API_KEY; this test calls the real Gemini API",
+)
 @pytest.mark.asyncio
 async def test_fan_out_executes_three_leaves_concurrently(monkeypatch):
     """Drives SequentialAgent via Runner; asserts (a) all 3 result keys populated

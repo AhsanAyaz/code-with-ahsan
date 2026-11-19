@@ -10,11 +10,12 @@ from __future__ import annotations
 
 from google.adk.agents import LlmAgent
 
+from ...models import MODEL
 from ...callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 
 external_knowledge_synthesizer = LlmAgent(
     name="external_knowledge_synthesizer",
-    model="gemini-2.5-flash",
+    model=MODEL,
     description="Merges GitHub, dev.to, and Stack Overflow results into a unified, cited reply.",
     instruction="""You synthesize developer search results from three independent sources \
 into a single reply for the user.
