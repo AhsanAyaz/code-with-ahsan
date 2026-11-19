@@ -1,3 +1,4 @@
+// Loupe auto-triage (#364): Update the tier pricing, deliverables, naming rights, and feature inclusion flags in SponsorshipTabl
 import { describe, it, expect } from "vitest";
 import { buildSerpTitle, SERP_TITLE_MAX } from "@/lib/seo/serpTitle";
 
