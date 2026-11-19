@@ -17,7 +17,7 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { Calendar, Clock, MapPin } from "lucide-react";
+import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import { COMMUNITY_DISCORD_URL, EVENT, SECTION_IDS, VENUE } from "../constants";
 import { HeroPhotoCluster, HeroPhotoRow } from "./HeroPhotos";
 import MagneticLink from "./MagneticLink";
@@ -279,6 +279,10 @@ const HeroSection = () => {
               <li className="flex items-center gap-2.5">
                 <MapPin className="h-5 w-5 shrink-0 text-(--sm-amber)" aria-hidden />
                 {venueLabel}
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Users className="h-5 w-5 shrink-0 text-(--sm-amber)" aria-hidden />
+                {EVENT.attendanceLabel}
               </li>
             </ul>
 

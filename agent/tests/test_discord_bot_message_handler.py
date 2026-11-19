@@ -12,8 +12,13 @@ from discord_bot.bot import (
     strip_mention,
     chunk_reply,
     format_error_reply,
+    parse_triage_issue_number,
+    parse_triage_pr_number,
+    is_triage_request,
+    is_authorized_for_triage,
     SAFE_CHUNK_SIZE,
     ERROR_REPLY,
+    TRIAGE_UNAUTHORIZED_REPLY,
 )
 
 
@@ -33,16 +38,35 @@ class TestShouldHandleMessage:
             bot_user_id=99, mentioned_user_ids=[99],
         ) is False
 
-    def test_ignores_wrong_channel(self):
+    def test_responds_in_target_channel_without_mention(self):
         assert should_handle_message(
-            author_is_bot=False, channel_id=1, target_channel_id=42,
-            bot_user_id=99, mentioned_user_ids=[99],
-        ) is False
+            author_is_bot=False, channel_id=42, target_channel_id=42,
+            bot_user_id=99, mentioned_user_ids=[],
+        ) is True
 
-    def test_ignores_when_not_mentioned(self):
+    def test_ignores_in_target_channel_when_only_other_users_mentioned(self):
         assert should_handle_message(
             author_is_bot=False, channel_id=42, target_channel_id=42,
             bot_user_id=99, mentioned_user_ids=[100, 101],
+        ) is False
+
+    def test_ignores_in_target_channel_when_mention_everyone(self):
+        assert should_handle_message(
+            author_is_bot=False, channel_id=42, target_channel_id=42,
+            bot_user_id=99, mentioned_user_ids=[],
+            mention_everyone=True,
+        ) is False
+
+    def test_responds_in_other_channel_when_bot_mentioned(self):
+        assert should_handle_message(
+            author_is_bot=False, channel_id=1, target_channel_id=42,
+            bot_user_id=99, mentioned_user_ids=[99],
+        ) is True
+
+    def test_ignores_other_channel_when_not_mentioned(self):
+        assert should_handle_message(
+            author_is_bot=False, channel_id=1, target_channel_id=42,
+            bot_user_id=99, mentioned_user_ids=[100],
         ) is False
 
 
@@ -96,3 +120,66 @@ class TestFormatErrorReply:
         assert reply == ERROR_REPLY
         assert "stack trace" not in reply
         assert "https://codewithahsan.dev" in reply
+
+
+class TestModeratorTriageControls:
+    def test_parse_triage_issue_number(self):
+        assert parse_triage_issue_number("!triage 379") == 379
+        assert parse_triage_issue_number("/triage #379") == 379
+        assert parse_triage_issue_number("triage issue #379") == 379
+        assert parse_triage_issue_number("loupe triage #412") == 412
+        assert parse_triage_issue_number("!triage-pr 377") is None
+        assert parse_triage_issue_number("triage pr #377") is None
+        assert parse_triage_issue_number("Where do I find a mentor?") is None
+
+    def test_parse_triage_pr_number(self):
+        assert parse_triage_pr_number("!triage-pr 377") == 377
+        assert parse_triage_pr_number("/triage-pr #377") == 377
+        assert parse_triage_pr_number("triage pr #378") == 378
+        assert parse_triage_pr_number("triage pull request 374") == 374
+        assert parse_triage_pr_number("!triage 379") is None
+
+    def test_is_triage_request(self):
+        assert is_triage_request("!triage 379") is True
+        assert is_triage_request("!triage-pr 377") is True
+        assert is_triage_request("Can you triage PR #377?") is True
+        assert is_triage_request("Can you triage issue #379?") is True
+        assert is_triage_request("run loupe triage") is True
+        assert is_triage_request("Show me Angular blog posts") is False
+
+    def test_authorized_by_moderator_role_name(self):
+        assert is_authorized_for_triage(
+            user_id="111",
+            role_names=["Community Member", "Moderator"],
+            allowed_user_ids=(),
+            allowed_role_ids=(),
+        ) is True
+
+    def test_authorized_by_allowed_user_id(self):
+        assert is_authorized_for_triage(
+            user_id="814185701537087527",
+            role_names=["Member"],
+        ) is True
+        assert is_authorized_for_triage(
+            user_id="111",
+            role_ids=["874774318779887656"],
+        ) is True
+
+    def test_authorized_by_guild_permission(self):
+        assert is_authorized_for_triage(
+            user_id="222",
+            role_names=["Member"],
+            has_mod_permission=True,
+            allowed_user_ids=(),
+        ) is True
+
+    def test_rejects_regular_user(self):
+        assert is_authorized_for_triage(
+            user_id="333",
+            role_names=["Member"],
+            role_ids=["444"],
+            has_mod_permission=False,
+            allowed_user_ids=["999"],
+            allowed_role_ids=["888"],
+        ) is False
+        assert "moderators" in TRIAGE_UNAUTHORIZED_REPLY.lower()
