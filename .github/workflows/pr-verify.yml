@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout PR code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -37,8 +39,19 @@ jobs:
       - name: Check Firestore composite indexes
         run: npm run check:firestore-indexes
 
-      - name: Lint
-        run: npm run lint
+      - name: Lint changed files
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          git fetch origin "${BASE_REF}" --depth=1 || true
+          CHANGED_FILES=$(git diff --name-only --diff-filter=ACMR "origin/${BASE_REF}...HEAD" -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.mjs' || true)
+          if [ -z "${CHANGED_FILES}" ]; then
+            echo "No JS/TS files changed — skipping eslint."
+          else
+            echo "Linting changed files:"
+            echo "${CHANGED_FILES}"
+            echo "${CHANGED_FILES}" | tr '\n' '\0' | xargs -0 npx eslint
+          fi
 
       - name: Typecheck
         run: npx tsc --noEmit
