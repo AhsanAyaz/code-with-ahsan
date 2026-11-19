@@ -4,4 +4,4 @@ google-genai>=2.34.0,<3
 python-dotenv>=1.0.1
 google-auth>=2.0.0
 httpx>=0.28.0
-mcp>=1.0.0,<2.0
+mcp>=2.3.0,<3

@@ -448,6 +448,7 @@ dependencies = [
     { name = "google-adk", extra = ["mcp"] },
     { name = "google-genai" },
     { name = "httpx" },
+    { name = "mcp" },
     { name = "python-dotenv" },
 ]
 
@@ -460,9 +461,10 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "google-adk", extras = ["mcp"], specifier = ">=2.14.1" },
-    { name = "google-genai", specifier = ">=2.34.0" },
+    { name = "google-adk", extras = ["mcp"], specifier = ">=2.14.1,<3" },
+    { name = "google-genai", specifier = ">=2.34.0,<3" },
     { name = "httpx", specifier = ">=0.28.0" },
+    { name = "mcp", specifier = ">=2.3.0,<3" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
 ]
 

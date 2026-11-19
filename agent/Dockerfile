@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir \
     "python-dotenv>=1.0.1" \
     "fastapi" \
     "uvicorn" \
-    "mcp<2"
+    "mcp>=2.3.0,<3"
 
 COPY community_assistant /app/community_assistant
 COPY loupe_triage_mcp.py /app/loupe_triage_mcp.py

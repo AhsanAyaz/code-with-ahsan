@@ -1,10 +1,10 @@
 """
-loupe_triage_mcp.py — FastMCP server & self-healing Loupe visual bug triage tools.
+loupe_triage_mcp.py — MCPServer (mcp 2.x) & self-healing Loupe visual bug triage tools.
 
 Placed directly in `agent/` (not in a subdirectory) so `uv run adk web` only sees
 `community_assistant` as a selectable ADK agent package.
 
-Exposes 6 MCP tools via FastMCP("loupe-triage"):
+Exposes 6 MCP tools via MCPServer("loupe-triage"):
   1. fetch_loupe_issue
   2. analyze_loupe_screenshot
   3. find_suspect_components
@@ -28,10 +28,7 @@ import dotenv
 import httpx
 from google import genai
 from google.genai import types
-try:
-    from mcp.server.fastmcp import FastMCP
-except ModuleNotFoundError:
-    from mcp.server.mcpserver import MCPServer as FastMCP  # type: ignore[no-redef]
+from mcp.server.mcpserver import MCPServer
 
 # Ensure `agent/` is on sys.path so `community_assistant` is always importable
 # when running `uv run python loupe_triage_mcp.py` from any working directory.
@@ -60,7 +57,7 @@ FALLBACK_MODEL = "gemini-3.5-flash-lite"
 
 logger = logging.getLogger("loupe_triage_mcp")
 
-mcp = FastMCP("loupe-triage")
+mcp = MCPServer("loupe-triage")
 
 
 # ---------------------------------------------------------------------------
