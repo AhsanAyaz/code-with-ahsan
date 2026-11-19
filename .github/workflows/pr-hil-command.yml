@@ -1,0 +1,61 @@
+name: Pull Request HITL Commands
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions: {}
+
+concurrency:
+  group: pr-hil-cmd-${{ github.event.issue.number }}-${{ github.event.comment.id }}
+  cancel-in-progress: false
+
+jobs:
+  handle-command:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event.issue.pull_request != null &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association) &&
+      (
+        startsWith(github.event.comment.body, '/merge') ||
+        startsWith(github.event.comment.body, '/hold') ||
+        startsWith(github.event.comment.body, '/rescore')
+      )
+    steps:
+      - name: Dispatch HMAC-signed HITL command to Cloud Run
+        env:
+          PR_NUMBER: ${{ github.event.issue.number }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          REPO: ${{ github.repository }}
+          TRIAGE_WEBHOOK_SECRET: ${{ secrets.TRIAGE_WEBHOOK_SECRET }}
+        run: |
+          python3 - <<'PY'
+          import hashlib, hmac, json, os, sys, time, urllib.request
+
+          secret = os.environ.get("TRIAGE_WEBHOOK_SECRET", "").strip()
+          if not secret:
+              print("ERROR: TRIAGE_WEBHOOK_SECRET is not configured in GitHub Secrets.", file=sys.stderr)
+              sys.exit(1)
+
+          payload = json.dumps({
+              "repo": os.environ["REPO"],
+              "pr_number": int(os.environ["PR_NUMBER"]),
+              "comment_id": int(os.environ["COMMENT_ID"]),
+          }, separators=(",", ":")).encode("utf-8")
+
+          ts = str(int(time.time()))
+          sig = hmac.new(secret.encode("utf-8"), f"{ts}.".encode("utf-8") + payload, hashlib.sha256).hexdigest()
+
+          req = urllib.request.Request(
+              "https://cwa-loupe-triage-205504954450.us-central1.run.app/pr-command",
+              data=payload,
+              method="POST",
+              headers={
+                  "Content-Type": "application/json",
+                  "X-CWA-Timestamp": ts,
+                  "X-CWA-Signature-256": f"sha256={sig}",
+              },
+          )
+          with urllib.request.urlopen(req, timeout=60) as resp:
+              print(f"HTTP {resp.status}: {resp.read().decode('utf-8', errors='replace')}")
+          PY

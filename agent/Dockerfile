@@ -16,6 +16,7 @@ RUN pip install --no-cache-dir \
     "mcp>=2.3.0,<3"
 
 COPY community_assistant /app/community_assistant
+COPY pr_certainty.py /app/pr_certainty.py
 COPY loupe_triage_mcp.py /app/loupe_triage_mcp.py
 COPY triage_service.py /app/triage_service.py
 

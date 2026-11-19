@@ -16,6 +16,7 @@ from loupe_triage_mcp import (  # noqa: E402
     fetch_loupe_issue,
     fetch_pull_request_context,
     find_suspect_components,
+    handle_pr_hil_command,
     post_triage_report,
     triage_loupe_issue,
     triage_pull_request,
@@ -54,10 +55,13 @@ Generates a minimal patch with `gemini-3.8-flash` and creates or updates an idem
 - `post_triage_report(issue_number, triage_markdown, is_wontfix=False, labels=None, repo="AhsanAyaz/code-with-ahsan")`: \
 Applies labels (`triaged` for valid bugs, or `wontfix` for non-bugs) and posts a structured \
 Markdown triage comment on the GitHub issue after redacting any PII.
-- `triage_pull_request(pr_number, repo="AhsanAyaz/code-with-ahsan", post_to_github=True)`: \
-Runs the complete automated Pull Request triage pipeline (classifies new vs. active contributors, \
-evaluates the PR diff against linked target issues and Firestore index guardrails, and posts/updates \
-an idempotent summary comment + labels on the PR).
+- `triage_pull_request(pr_number, repo="AhsanAyaz/code-with-ahsan", post_to_github=True, force_rescore=False)`: \
+Runs the complete automated Pull Request triage & 5-Pillar Certainty pipeline (fetches paginated PR diffs, \
+CI check-runs, and contributor trust history; evaluates the diff with `gemini-3.8-flash`; computes the 0-100 \
+Certainty Score, 3-bucket Hard Vetoes, and Autonomy Lane; upserts the Scorecard comment + managed labels; \
+and executes Shadow/Live auto-merge or Discord `#moderators` HITL alerts).
+- `handle_pr_hil_command(pr_number, comment_id, repo="AhsanAyaz/code-with-ahsan")`: \
+Pull-verifies a maintainer `/merge`, `/hold`, or `/rescore` comment directly from GitHub API and executes it safely.
 - `fetch_pull_request_context(pr_number, repo="AhsanAyaz/code-with-ahsan")`: \
 Fetches PR metadata, contributor status (`new_contributor` vs `active_contributor` vs `maintainer`), \
 linked target issues, and PII-sanitized file diffs.
@@ -104,6 +108,7 @@ triage_agent = LlmAgent(
         fetch_pull_request_context,
         evaluate_pull_request,
         triage_pull_request,
+        handle_pr_hil_command,
     ],
     before_model_callback=inject_current_date,
     before_agent_callback=lifecycle_before_agent,
