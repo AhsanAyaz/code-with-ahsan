@@ -1845,7 +1845,8 @@ def evaluate_pull_request(pr_context: dict[str, Any]) -> dict[str, Any]:
     contributor_type = str(pr_context.get("contributor_type") or "new_contributor")
     author_login = str(pr_context.get("author_login") or "unknown")
     merged_count = int(pr_context.get("merged_pr_count") or 0)
-    fs_warning = bool(pr_context.get("firestore_index_warning"))
+    ci_passed = str((pr_context.get("ci_status") or {}).get("state") or "").lower() == "passed"
+    fs_warning = bool(pr_context.get("firestore_index_warning")) and not ci_passed
 
     nonce = secrets.token_hex(8)
     open_tag = f"<untrusted_pr_data_{nonce}>"
@@ -2086,10 +2087,13 @@ def _format_pr_triage_markdown(
             lines.append(f"| `{fp}` | `{sev}` | {cmt} |")
 
     lines.extend(["", "### 🛡️ Guardrails"])
-    if pr_context.get("firestore_index_warning"):
+    ci_passed = str((pr_context.get("ci_status") or {}).get("state") or "").lower() == "passed"
+    if pr_context.get("firestore_index_warning") and not ci_passed:
         lines.append(
             "- ⚠️ **Firestore Indexes (Advisory):** Detected new `.where()` / `.orderBy()` / `.findNearest()` query without an update to `firestore.indexes.json`. Enforced deterministically by `PR Verify` (`npm run check:firestore-indexes`)."
         )
+    elif ci_passed:
+        lines.append("- **Firestore Indexes:** Verified clean by `PR Verify` (`npm run check:firestore-indexes`).")
     else:
         lines.append("- **Firestore Indexes:** Verified clean.")
 
