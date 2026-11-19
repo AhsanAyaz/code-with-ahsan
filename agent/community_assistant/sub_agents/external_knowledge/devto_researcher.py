@@ -12,6 +12,7 @@ import logging
 import httpx
 from google.adk.agents import LlmAgent
 
+from ...models import MODEL, TOOL_AGENT_CONFIG
 from ...callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 from ._shapes import _shape_devto_article
 
@@ -91,7 +92,8 @@ def search_devto_articles(query: str) -> dict:
 
 devto_researcher = LlmAgent(
     name="devto_researcher",
-    model="gemini-2.5-flash",
+    model=MODEL,
+    generate_content_config=TOOL_AGENT_CONFIG,
     description="Searches dev.to for articles matching the user query.",
     instruction="""Call search_devto_articles with the user query as-is.
 Return a concise summary of the top community articles.

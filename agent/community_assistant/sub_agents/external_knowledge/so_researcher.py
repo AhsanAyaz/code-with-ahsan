@@ -10,6 +10,7 @@ from __future__ import annotations
 import httpx
 from google.adk.agents import LlmAgent
 
+from ...models import MODEL, TOOL_AGENT_CONFIG
 from ...callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 from ._shapes import _shape_stackoverflow_question
 
@@ -70,7 +71,8 @@ def search_stackoverflow_questions(query: str) -> dict:
 
 so_researcher = LlmAgent(
     name="so_researcher",
-    model="gemini-2.5-flash",
+    model=MODEL,
+    generate_content_config=TOOL_AGENT_CONFIG,
     description="Searches Stack Overflow for answered questions matching the user query.",
     instruction="""Call search_stackoverflow_questions with the user query as-is.
 Return a concise summary of the top voted, answered questions.

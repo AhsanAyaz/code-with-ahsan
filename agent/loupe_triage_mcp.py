@@ -1,10 +1,10 @@
 """
-loupe_triage_mcp.py — FastMCP server & self-healing Loupe visual bug triage tools.
+loupe_triage_mcp.py — MCPServer (mcp 2.x) & self-healing Loupe visual bug triage tools.
 
 Placed directly in `agent/` (not in a subdirectory) so `uv run adk web` only sees
 `community_assistant` as a selectable ADK agent package.
 
-Exposes 6 MCP tools via FastMCP("loupe-triage"):
+Exposes 6 MCP tools via MCPServer("loupe-triage"):
   1. fetch_loupe_issue
   2. analyze_loupe_screenshot
   3. find_suspect_components
@@ -28,10 +28,7 @@ import dotenv
 import httpx
 from google import genai
 from google.genai import types
-try:
-    from mcp.server.fastmcp import FastMCP
-except ModuleNotFoundError:
-    from mcp.server.mcpserver import MCPServer as FastMCP  # type: ignore[no-redef]
+from mcp.server.mcpserver import MCPServer
 
 # Ensure `agent/` is on sys.path so `community_assistant` is always importable
 # when running `uv run python loupe_triage_mcp.py` from any working directory.
@@ -56,11 +53,11 @@ NEXT_PUBLIC_LOUPE_API_KEY = os.environ.get("NEXT_PUBLIC_LOUPE_API_KEY", "")
 
 DEFAULT_REPO = os.environ.get("GITHUB_REPO", "AhsanAyaz/code-with-ahsan")
 MODEL = "gemini-3.8-flash"
-FALLBACK_MODEL = "gemini-2.5-flash"
+FALLBACK_MODEL = "gemini-3.5-flash-lite"
 
 logger = logging.getLogger("loupe_triage_mcp")
 
-mcp = FastMCP("loupe-triage")
+mcp = MCPServer("loupe-triage")
 
 
 # ---------------------------------------------------------------------------
@@ -140,13 +137,24 @@ def _parse_json_output(raw_text: str) -> dict[str, Any]:
     return json.loads(cleaned)
 
 
+_DETERMINISM_INSTRUCTION = (
+    "Be deterministic and conservative: given the same input, produce the same output. "
+    "Base every conclusion strictly on the provided input; do not speculate, embellish, "
+    "or vary wording for style. When evidence is ambiguous, choose the most likely, "
+    "most cautious interpretation and say so. Respond with a single JSON object only."
+)
+
+
 def _call_gemini_json(
     contents: Any,
     system_instruction: str = "",
     model: str = MODEL,
 ) -> dict[str, Any]:
     """Call Gemini with `model=MODEL` ('gemini-3.8-flash') first, falling back to
-    `FALLBACK_MODEL` ('gemini-2.5-flash') on 404 / NOT_FOUND in live environments.
+    `FALLBACK_MODEL` ('gemini-3.5-flash-lite') on 404 / NOT_FOUND in live environments.
+
+    No sampling params (`temperature` / `top_p` / `top_k`) are sent: gemini-3.5-flash-lite
+    ignores them, so determinism is requested in the system instruction instead.
     """
     api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or GEMINI_API_KEY
     if not api_key:
@@ -155,10 +163,10 @@ def _call_gemini_json(
     client = genai.Client(api_key=api_key)
     config_kwargs: dict[str, Any] = {
         "response_mime_type": "application/json",
-        "temperature": 0.1,
+        "system_instruction": "\n\n".join(
+            part for part in (system_instruction, _DETERMINISM_INSTRUCTION) if part
+        ),
     }
-    if system_instruction:
-        config_kwargs["system_instruction"] = system_instruction
 
     config = types.GenerateContentConfig(**config_kwargs)
 
@@ -1547,7 +1555,7 @@ def _heuristic_pr_evaluation(pr_context: dict[str, Any]) -> dict[str, Any]:
 @mcp.tool()
 def evaluate_pull_request(pr_context: dict[str, Any]) -> dict[str, Any]:
     """Evaluate a Pull Request's diff against its target issue(s) and repo guardrails
-    using Gemini (`gemini-3.8-flash` with fallback to `gemini-2.5-flash`).
+    using Gemini (`gemini-3.8-flash` with fallback to `gemini-3.5-flash-lite`).
     """
     target_issues = pr_context.get("target_issues") or []
     changed_files = pr_context.get("changed_files") or []

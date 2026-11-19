@@ -1,5 +1,6 @@
 from google.adk.agents import LlmAgent
 
+from ..models import MODEL, TOOL_AGENT_CONFIG
 from ..callbacks import (
     after_tool_cache,
     before_tool_cache,
@@ -120,7 +121,8 @@ def search_youtube_videos(query: str) -> dict:
 
 content_agent = LlmAgent(
     name="content_agent",
-    model="gemini-2.5-flash",
+    model=MODEL,
+    generate_content_config=TOOL_AGENT_CONFIG,
     description=(
         "Surfaces Code with Ahsan's owned content — blog posts from blog.codewithahsan.dev "
         "and YouTube videos from youtube.com/codewithahsan."

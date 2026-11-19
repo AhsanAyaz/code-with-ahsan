@@ -12,6 +12,7 @@ import os
 import httpx
 from google.adk.agents import LlmAgent
 
+from ...models import MODEL, TOOL_AGENT_CONFIG
 from ...callbacks import inject_current_date, lifecycle_after_agent, lifecycle_before_agent
 from ._shapes import _shape_github_repo
 
@@ -74,7 +75,8 @@ def search_github_repos(query: str) -> dict:
 
 gh_researcher = LlmAgent(
     name="gh_researcher",
-    model="gemini-2.5-flash",
+    model=MODEL,
+    generate_content_config=TOOL_AGENT_CONFIG,
     description="Searches GitHub for repos matching the user query.",
     instruction="""Call search_github_repos with the user query as-is.
 Return a concise summary of the top results.
