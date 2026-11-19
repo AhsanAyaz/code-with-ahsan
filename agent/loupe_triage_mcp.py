@@ -567,6 +567,9 @@ def _search_local_src(
         except ValueError:
             rel_path = f"src/{file_path.relative_to(src_dir).as_posix()}"
 
+        if "__tests__" in rel_path or ".test." in rel_path or ".spec." in rel_path:
+            continue
+
         try:
             content = file_path.read_text(encoding="utf-8", errors="ignore")
         except Exception:
@@ -606,6 +609,8 @@ def _search_github_src(
                 continue
             path = entry.get("path", "")
             if not path.startswith("src/"):
+                continue
+            if "__tests__" in path or ".test." in path or ".spec." in path:
                 continue
             ext = Path(path).suffix
             if ext not in _SEARCH_EXTENSIONS:
@@ -859,17 +864,22 @@ def create_fix_draft_pr(
             except Exception as gen_exc:
                 logger.warning("Gemini patch generation failed (%s); applying safe fallback note", gen_exc)
 
-            patch_is_placeholder = False
             if not patched_content.strip() or patched_content.strip() == original_content.strip():
-                patch_is_placeholder = True
-                comment_line = (
-                    f"/* Loupe auto-triage (#{issue_number}): {(suggested_fix or issue_summary)[:100]} */\n"
-                    if rel_path.endswith(".css")
-                    else f"// Loupe auto-triage (#{issue_number}): {(suggested_fix or issue_summary)[:100]}\n"
+                logger.info(
+                    "Skipping Draft PR for issue #%s on %s: Gemini returned no code diff.",
+                    issue_number,
+                    rel_path,
                 )
-                patched_content = comment_line + original_content
-                if not patch_summary:
-                    patch_summary = f"Added Loupe triage fix annotation for issue #{issue_number} in `{rel_path}`."
+                return {
+                    "status": "skipped",
+                    "reason": "no_confident_patch",
+                    "branch": branch,
+                    "file_path": rel_path,
+                    "pr_url": "",
+                    "pr_number": None,
+                    "patch_summary": patch_summary or f"No confident code diff generated for `{rel_path}`.",
+                }
+            patch_is_placeholder = False
 
             # 3. Get `main` branch SHA
             ref_url = f"https://api.github.com/repos/{repo}/git/ref/heads/main"
