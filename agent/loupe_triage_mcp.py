@@ -1457,12 +1457,30 @@ def resolve_pr_number_from_sha(
     head_sha: str,
     repo: str = DEFAULT_REPO,
 ) -> dict[str, Any] | None:
-    """Resolve an open PR targeting `main` from `head_sha` (works for fork PRs on `workflow_run`)."""
+    """Resolve an open PR targeting `main` from `head_sha` (works for both branch & fork PRs)."""
     if not head_sha:
         return None
     headers = _github_headers()
     try:
         with httpx.Client(timeout=20.0, follow_redirects=True) as client:
+            # 1. List open PRs targeting main — works reliably for cross-repository fork PRs
+            pulls_resp = client.get(
+                f"https://api.github.com/repos/{repo}/pulls?state=open&base=main&per_page=100",
+                headers=headers,
+            )
+            if pulls_resp.status_code == 200 and isinstance(pulls_resp.json(), list):
+                for pr in pulls_resp.json():
+                    if not isinstance(pr, dict):
+                        continue
+                    pr_sha = str((pr.get("head") or {}).get("sha") or "")
+                    if pr_sha == head_sha:
+                        return {
+                            "pr_number": int(pr["number"]),
+                            "draft": bool(pr.get("draft", False)),
+                            "head_sha": pr_sha,
+                        }
+
+            # 2. Fallback to commits/{sha}/pulls
             resp = client.get(
                 f"https://api.github.com/repos/{repo}/commits/{head_sha}/pulls",
                 headers=headers,
