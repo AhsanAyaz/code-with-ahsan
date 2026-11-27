@@ -22,6 +22,7 @@ RUN pip install --no-cache-dir --upgrade pip \
 COPY agent/discord_bot /app/discord_bot
 COPY agent/community_assistant /app/community_assistant
 COPY agent/loupe_triage_mcp.py /app/loupe_triage_mcp.py
+COPY agent/pr_certainty.py /app/pr_certainty.py
 
 # Make both packages importable from /app
 ENV PYTHONPATH=/app
