@@ -382,8 +382,17 @@ def _heuristic_screenshot_analysis(
         "hello world test",
         "working as intended",
     )
+    feature_markers = (
+        "feature request",
+        "new feature",
+        "add support for",
+        "enhancement",
+        "would be nice to have",
+    )
     is_non_bug = any(m in combined for m in non_bug_markers)
-    is_bug = not is_non_bug
+    is_feature = (not is_non_bug) and any(m in combined for m in feature_markers)
+    issue_type = "wontfix" if is_non_bug else ("feature" if is_feature else "bug")
+    is_bug = issue_type == "bug"
 
     _, route_hint = _extract_page_url_and_route(clean_body)
     words = [
@@ -404,8 +413,9 @@ def _heuristic_screenshot_analysis(
     return {
         "status": "success",
         "model_used": MODEL,
+        "issue_type": issue_type,
         "is_bug": is_bug,
-        "is_wontfix": not is_bug,
+        "is_wontfix": issue_type == "wontfix",
         "severity": "medium" if is_bug else "none",
         "visual_summary": (
             f"Visual report for '{clean_title}'. "
@@ -416,8 +426,12 @@ def _heuristic_screenshot_analysis(
         "suspected_route": route_hint or "/",
         "reasoning": (
             "Issue describes a UI/visual defect reported via Loupe."
-            if is_bug
-            else "Issue appears to be a non-bug test or informational submission."
+            if issue_type == "bug"
+            else (
+                "Issue describes a feature request or enhancement."
+                if issue_type == "feature"
+                else "Issue appears to be a non-bug test or informational submission."
+            )
         ),
     }
 
@@ -469,15 +483,18 @@ def analyze_loupe_screenshot(
         f"Issue Body:\n{clean_body}\n"
         f"Screenshot URL: {screenshot_url or 'None'}\n\n"
         "Analyze the screenshot (if provided) and the issue report. Return a JSON object with:\n"
-        "- \"is_bug\" (bool): true if this represents a real visual, layout, styling, accessibility, or functional bug; "
-        "false if it is spam, gibberish, a test ping, working-as-intended, or not a bug.\n"
-        "- \"is_wontfix\" (bool): true when is_bug is false (should be labeled wontfix).\n"
+        "- \"issue_type\" (string): strictly one of \"bug\", \"feature\", or \"wontfix\":\n"
+        "    - \"bug\": a real visual, layout, styling, accessibility, or functional defect.\n"
+        "    - \"feature\": a feature request, enhancement, or requested behavior change (NEVER mark a legitimate feature request as \"wontfix\").\n"
+        "    - \"wontfix\": spam, gibberish, a test ping, or working-as-intended.\n"
+        "- \"is_bug\" (bool): true only when issue_type is \"bug\".\n"
+        "- \"is_wontfix\" (bool): true only when issue_type is \"wontfix\".\n"
         "- \"severity\" (string): one of \"high\", \"medium\", \"low\", or \"none\".\n"
         "- \"visual_summary\" (string): clear description of what is visible in the screenshot and what looks broken or normal.\n"
         "- \"ui_elements\" (list[str]): UI components visible or affected (e.g. [\"Navbar\", \"HeroBanner\", \"CourseCard\", \"Footer\"]).\n"
         "- \"search_keywords\" (list[str]): 3 to 8 specific code search keywords (React component names, Tailwind classes, button labels, route names) to locate the component in `src/`.\n"
         "- \"suspected_route\" (string): URL path if identifiable (e.g. \"/courses\", \"/mentorship\", \"/\").\n"
-        "- \"reasoning\" (string): concise technical explanation of why this is a confirmed bug or won't fix."
+        "- \"reasoning\" (string): concise technical explanation of why this is a bug, feature request, or won't fix."
     )
 
     contents: list[Any] = []
@@ -487,11 +504,19 @@ def analyze_loupe_screenshot(
 
     try:
         parsed = _call_gemini_json(contents=contents, model=MODEL)
-        is_bug = bool(parsed.get("is_bug", True))
-        is_wontfix = bool(parsed.get("is_wontfix", not is_bug))
+        raw_issue_type = str(parsed.get("issue_type") or "").strip().lower()
+        if raw_issue_type in {"bug", "feature", "wontfix"}:
+            issue_type = raw_issue_type
+            is_bug = issue_type == "bug"
+            is_wontfix = issue_type == "wontfix"
+        else:
+            is_bug = bool(parsed.get("is_bug", True))
+            is_wontfix = bool(parsed.get("is_wontfix", not is_bug))
+            issue_type = "wontfix" if is_wontfix else ("bug" if is_bug else "feature")
         return {
             "status": "success",
             "model_used": MODEL,
+            "issue_type": issue_type,
             "is_bug": is_bug,
             "is_wontfix": is_wontfix,
             "severity": str(parsed.get("severity") or ("medium" if is_bug else "none")),
@@ -1136,11 +1161,16 @@ def _format_triage_markdown(
     from community_assistant.callbacks import REDACTION_PLACEHOLDER
 
     severity = str(analysis.get("severity") or ("none" if is_wontfix else "medium")).upper()
-    verdict = (
-        "🚫 **Won't Fix (Non-Bug / Working as Intended)**"
-        if is_wontfix
-        else f"🐛 **Confirmed Visual Bug** (Severity: `{severity}`)"
-    )
+    issue_type = str(analysis.get("issue_type") or ("wontfix" if is_wontfix else "bug")).strip().lower()
+    if is_wontfix or issue_type == "wontfix":
+        verdict = "🚫 **Won't Fix (Non-Bug / Working as Intended)**"
+    elif issue_type == "feature":
+        verdict = (
+            "✨ **Feature Request** — comment `/implement` (or add the `ai-implement` label) "
+            "to generate a multi-file Draft PR."
+        )
+    else:
+        verdict = f"🐛 **Confirmed Visual Bug** (Severity: `{severity}`)"
 
     lines = [
         "## 🤖 Automated Loupe Bug Triage (Gemini Vision)",
@@ -1246,13 +1276,16 @@ def triage_loupe_issue(
         repo=repo,
     )
 
-    # 6. Determine verdict
-    is_wontfix = bool(analysis.get("is_wontfix") or not analysis.get("is_bug", True))
+    # 6. Determine verdict (3-bucket taxonomy: bug | feature | wontfix)
+    issue_type = str(analysis.get("issue_type") or "").strip().lower()
+    if issue_type not in {"bug", "feature", "wontfix"}:
+        issue_type = "wontfix" if (analysis.get("is_wontfix") or not analysis.get("is_bug", True)) else "bug"
+    is_wontfix = issue_type == "wontfix"
 
-    # 7. Self-healing Draft PR (only for confirmed bugs when create_pr=True)
+    # 7. Self-healing Draft PR (only for confirmed bugs when create_pr=True; features use /implement)
     draft_pr: dict[str, Any] | None = None
     top_suspect_file = suspects.get("top_suspect_file") or ""
-    if not is_wontfix and create_pr and top_suspect_file:
+    if issue_type == "bug" and create_pr and top_suspect_file:
         try:
             draft_pr = create_fix_draft_pr(
                 issue_number=issue_number,
@@ -1286,10 +1319,12 @@ def triage_loupe_issue(
     # 9. Optionally post comment and labels to GitHub
     github_post_result: dict[str, Any] | None = None
     if post_to_github:
+        triage_labels = ["triaged", "enhancement"] if issue_type == "feature" else None
         github_post_result = post_triage_report(
             issue_number=issue_number,
             triage_markdown=triage_markdown,
             is_wontfix=is_wontfix,
+            labels=triage_labels,
             repo=repo,
         )
 
@@ -1297,6 +1332,7 @@ def triage_loupe_issue(
         "status": "success",
         "issue_number": issue_number,
         "repo": repo,
+        "issue_type": issue_type,
         "is_wontfix": is_wontfix,
         "issue": issue,
         "analysis": analysis,
