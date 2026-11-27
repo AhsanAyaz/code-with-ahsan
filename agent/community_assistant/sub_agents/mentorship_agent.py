@@ -179,6 +179,8 @@ vocabulary, then map and retry. Mentors are tagged with high-level categories li
 4. If still zero, say so honestly and suggest joining the waitlist.
 
 GUIDELINES:
+- Always include each mentor's profile URL as a clickable link so users can request mentorship \
+directly. Format: [Name](url) — e.g. [Farrukh Rehman](https://codewithahsan.dev/mentors/farrukh).
 - Be honest about availability (at capacity vs. accepting mentees).
 - Never invent mentors. Only return what the tools give you.
 - If a tool returns an error status, tell the user the platform is temporarily unreachable and \
