@@ -1,4 +1,4 @@
-name: Loupe Visual Bug Auto-Triage
+name: Issue Triage & Auto-Implement
 
 on:
   issues:
@@ -8,74 +8,125 @@ on:
   workflow_dispatch:
     inputs:
       issue_number:
-        description: "GitHub issue number to triage"
+        description: "GitHub issue number to process"
         required: true
         default: "379"
+      mode:
+        description: "Action mode"
+        type: choice
+        required: true
+        default: "triage"
+        options:
+          - triage
+          - implement
+      instructions:
+        description: "Optional extra guidance (used in implement mode)"
+        required: false
+        default: ""
 
 permissions: {}
 
 concurrency:
-  group: loupe-triage-${{ github.event.inputs.issue_number || github.event.issue.number }}
+  group: issue-action-${{ github.event.inputs.issue_number || github.event.issue.number }}
   cancel-in-progress: false
 
 jobs:
-  triage:
+  issue-action:
     runs-on: ubuntu-latest
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'issues' && github.event.label.name == 'ai-triage') ||
+      (
+        github.event_name == 'issues' &&
+        (github.event.label.name == 'ai-triage' || github.event.label.name == 'ai-implement')
+      ) ||
       (
         github.event_name == 'issue_comment' &&
         github.event.issue.pull_request == null &&
-        startsWith(github.event.comment.body, '/triage')
+        (startsWith(github.event.comment.body, '/triage') || startsWith(github.event.comment.body, '/implement'))
       )
     steps:
-      - name: Authorize trigger & invoke Cloud Run Loupe Triage Service
+      - name: Authorize trigger & dispatch HMAC-signed issue action to Cloud Run
         env:
           EVENT_NAME: ${{ github.event_name }}
           ISSUE_NUMBER: ${{ github.event.inputs.issue_number || github.event.issue.number }}
           REPO: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
           AUTHOR_ASSOC: ${{ github.event.comment.author_association || '' }}
+          COMMENT_ID: ${{ github.event.comment.id || '' }}
+          COMMENT_BODY: ${{ github.event.comment.body || '' }}
+          LABEL_NAME: ${{ github.event.label.name || '' }}
+          INPUT_MODE: ${{ github.event.inputs.mode || 'triage' }}
+          INPUT_INSTRUCTIONS: ${{ github.event.inputs.instructions || '' }}
           WHITELIST_USERS: ${{ vars.TRIAGE_WHITELIST_USERS || '' }}
+          TRIAGE_WEBHOOK_SECRET: ${{ secrets.TRIAGE_WEBHOOK_SECRET }}
         run: |
           python3 - <<'PY'
-          import json, os, sys, urllib.request
+          import hashlib, hmac, json, os, sys, time, urllib.request
+
+          secret = os.environ.get("TRIAGE_WEBHOOK_SECRET", "").strip()
+          if not secret:
+              print("ERROR: TRIAGE_WEBHOOK_SECRET is not configured in GitHub Secrets.", file=sys.stderr)
+              sys.exit(1)
 
           event = os.environ["EVENT_NAME"]
           actor = os.environ.get("ACTOR", "").strip().lower()
           assoc = os.environ.get("AUTHOR_ASSOC", "").strip().upper()
-          whitelist = {
+          whitelist = [
               u.strip().lower().lstrip("@")
               for u in os.environ.get("WHITELIST_USERS", "").split(",")
               if u.strip()
-          }
+          ]
 
           if event == "issue_comment":
               allowed_assocs = {"OWNER", "MEMBER", "COLLABORATOR"}
-              if assoc not in allowed_assocs and actor not in whitelist:
+              if assoc not in allowed_assocs and actor not in set(whitelist):
                   print(
-                      f"Skipping /triage: @{actor} (association={assoc}) is neither a collaborator "
+                      f"Skipping comment trigger: @{actor} (association={assoc}) is neither a collaborator "
                       f"nor in TRIAGE_WHITELIST_USERS."
                   )
                   sys.exit(0)
+              body = os.environ.get("COMMENT_BODY", "").strip()
+              mode = "implement" if body.lower().startswith("/implement") else "triage"
+              trigger = "comment"
+          elif event == "issues":
+              label_name = os.environ.get("LABEL_NAME", "").strip().lower()
+              mode = "implement" if label_name == "ai-implement" else "triage"
+              trigger = "label"
+          else:
+              mode = os.environ.get("INPUT_MODE", "triage").strip().lower()
+              trigger = "manual"
 
           issue_number = int(os.environ["ISSUE_NUMBER"])
           repo = os.environ["REPO"]
-          print(f"Authorized ({event} by @{actor}). Triggering Loupe triage for issue #{issue_number} in {repo}...")
+          print(f"Authorized ({event}/{trigger} by @{actor}). Dispatching mode={mode} for issue #{issue_number} in {repo}...")
 
-          payload = json.dumps({
-              "issue_number": issue_number,
+          payload_dict = {
               "repo": repo,
-          }).encode("utf-8")
+              "issue_number": issue_number,
+              "mode": mode,
+              "trigger": trigger,
+              "whitelist_users": whitelist,
+          }
+          if trigger == "comment" and os.environ.get("COMMENT_ID"):
+              payload_dict["comment_id"] = int(os.environ["COMMENT_ID"])
+          if trigger == "manual" and os.environ.get("INPUT_INSTRUCTIONS", "").strip():
+              payload_dict["instructions"] = os.environ["INPUT_INSTRUCTIONS"].strip()
+
+          payload = json.dumps(payload_dict, separators=(",", ":")).encode("utf-8")
+          ts = str(int(time.time()))
+          sig = hmac.new(secret.encode("utf-8"), f"{ts}.".encode("utf-8") + payload, hashlib.sha256).hexdigest()
 
           req = urllib.request.Request(
-              "https://cwa-loupe-triage-205504954450.us-central1.run.app/triage",
+              "https://cwa-loupe-triage-205504954450.us-central1.run.app/issue-action",
               data=payload,
               method="POST",
-              headers={"Content-Type": "application/json"},
+              headers={
+                  "Content-Type": "application/json",
+                  "X-CWA-Timestamp": ts,
+                  "X-CWA-Signature-256": f"sha256={sig}",
+              },
           )
-          with urllib.request.urlopen(req, timeout=120) as resp:
+          with urllib.request.urlopen(req, timeout=240) as resp:
               body = resp.read().decode("utf-8", errors="replace")
               print(f"HTTP {resp.status}: {body[:1000]}")
           PY

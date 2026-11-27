@@ -18,6 +18,7 @@ RUN pip install --no-cache-dir \
 COPY community_assistant /app/community_assistant
 COPY pr_certainty.py /app/pr_certainty.py
 COPY loupe_triage_mcp.py /app/loupe_triage_mcp.py
+COPY issue_pipeline.py /app/issue_pipeline.py
 COPY triage_service.py /app/triage_service.py
 
 ENV PYTHONPATH=/app

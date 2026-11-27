@@ -19,6 +19,7 @@ load_dotenv(_AGENT_DIR / ".env", override=False)
 if os.environ.get("GEMINI_API_KEY") and not os.environ.get("GOOGLE_API_KEY"):
     os.environ["GOOGLE_API_KEY"] = os.environ["GEMINI_API_KEY"]
 
+import issue_pipeline  # noqa: E402
 import loupe_triage_mcp  # noqa: E402
 import pr_certainty  # noqa: E402
 
@@ -118,6 +119,69 @@ async def triage(request: Request) -> dict[str, Any]:
         post_to_github=post_to_github,
         create_pr=create_pr,
     )
+    return result
+
+
+@app.post("/issue-action")
+async def issue_action(request: Request) -> dict[str, Any]:
+    """Zero-trust HMAC-verified unified endpoint for issue actions (`triage` and `implement`)."""
+    raw_body = await request.body()
+    secret = os.environ.get("TRIAGE_WEBHOOK_SECRET", "").strip()
+    if not secret:
+        raise HTTPException(status_code=503, detail="TRIAGE_WEBHOOK_SECRET is not configured on server")
+
+    sig_header = request.headers.get("X-CWA-Signature-256", "")
+    ts_header = request.headers.get("X-CWA-Timestamp", "")
+    if not pr_certainty.verify_hmac_signature(raw_body, sig_header, ts_header, secret):
+        raise HTTPException(status_code=401, detail="Invalid or expired HMAC signature")
+
+    try:
+        payload: dict[str, Any] = await request.json()
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Invalid JSON payload: {exc}") from exc
+
+    if not isinstance(payload, dict):
+        raise HTTPException(status_code=400, detail="Payload must be a JSON object")
+
+    repo = _resolve_repo(payload)
+    try:
+        issue_number = int(payload["issue_number"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail="Missing or invalid 'issue_number'") from exc
+
+    mode = str(payload.get("mode") or "triage").strip().lower()
+    trigger = str(payload.get("trigger") or "manual").strip().lower()
+    raw_comment_id = payload.get("comment_id")
+    comment_id: int | None = None
+    if raw_comment_id is not None and str(raw_comment_id).strip() != "":
+        try:
+            comment_id = int(raw_comment_id)
+        except (TypeError, ValueError) as exc:
+            raise HTTPException(status_code=400, detail="Invalid 'comment_id'") from exc
+
+    instructions = str(payload.get("instructions") or "")
+    raw_whitelist = payload.get("whitelist_users") or []
+    whitelist_users = (
+        [str(u).strip() for u in raw_whitelist if str(u).strip()]
+        if isinstance(raw_whitelist, list)
+        else [u.strip() for u in str(raw_whitelist).split(",") if u.strip()]
+    )
+    post_to_github = bool(payload.get("post_to_github", True))
+
+    result = await asyncio.to_thread(
+        issue_pipeline.handle_issue_action,
+        issue_number=issue_number,
+        mode=mode,
+        repo=repo,
+        trigger=trigger,
+        comment_id=comment_id,
+        instructions=instructions,
+        whitelist_users=whitelist_users,
+        post_to_github=post_to_github,
+    )
+    http_status = int(result.get("http_status", 200))
+    if http_status >= 400:
+        raise HTTPException(status_code=http_status, detail=result.get("error") or result.get("status"))
     return result
 
 
